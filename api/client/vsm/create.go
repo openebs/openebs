@@ -36,9 +36,9 @@ func NewVSMCreateCommand(openEBSCli *client.OpenEBSCli) *cobra.Command {
 	var opts createOptions
 
 	cmd := &cobra.Command{
-		Use:   "vsm-create [OPTIONS]",
-		Short: "Create a VSM",
-		Args:  cli.ExactArgs(0),
+		Use:   "vsm-create --name=<name> --ip=<IP Address> ..",
+		Short: "Create a new VSM",
+		Args:  cli.RequiresMinArgs(6),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return runCreate(openEBSCli, &opts)
 		},
@@ -47,11 +47,11 @@ func NewVSMCreateCommand(openEBSCli *client.OpenEBSCli) *cobra.Command {
 	flags := cmd.Flags()
 
 	flags.StringVar(&opts.name, "name", "", "Name of the VSM")
-	flags.StringVar(&opts.ip, "ip", "", "IP Address of the VSM")
-	flags.StringVarP(&opts.ninterface, "interface", "n", "", "Network interface of the VSM")
-	flags.StringVarP(&opts.subnet, "subnet", "s", "", "Subnet of the VSM")
-	flags.StringVarP(&opts.router, "router", "r", "", "Router of the VSM")
-	flags.StringVarP(&opts.volume, "volume", "v", "", "Name of the volume to be created")
+	flags.StringVar(&opts.ip, "ipaddr", "", "IP Address of the VSM")
+	flags.StringVarP(&opts.ninterface, "iface", "", "", "Network interface of the VSM")
+	flags.StringVarP(&opts.subnet, "subnet", "", "", "Subnet of the VSM")
+	flags.StringVarP(&opts.router, "router", "", "", "Router of the VSM")
+	flags.StringVarP(&opts.volume, "volume", "", "", "Name of the volume to be created")
 
 	return cmd
 }

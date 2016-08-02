@@ -35,7 +35,7 @@ func main() {
 
 	flag.Usage = func() {
 		fmt.Fprint(stdout, "Usage: openebs [OPTIONS] COMMAND [arg...]\n       openebs [ --help | -v | --version ]\n\n")
-		fmt.Fprint(stdout, "A self-sufficient runtime for containers.\n\nOptions:\n")
+		fmt.Fprint(stdout, "A self-sufficient runtime for block storage.\n\nOptions:\n")
 
 		flag.CommandLine.SetOutput(stdout)
 		flag.PrintDefaults()
@@ -44,7 +44,7 @@ func main() {
 
 		openEBSCommands := append(cli.OpenEBSCommandUsage, cobraAdaptor.Usage()...)
 		for _, cmd := range sortCommands(openEBSCommands) {
-			help += fmt.Sprintf("    %-10.10s%s\n", cmd.Name, cmd.Description)
+			help += fmt.Sprintf("    %-16.10s%s\n", cmd.Name, cmd.Description)
 		}
 
 		help += "\nRun 'openebs COMMAND --help' for more information on a command."

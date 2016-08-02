@@ -36,6 +36,7 @@ func NewCobraAdaptor(clientFlags *cliflags.ClientFlags) CobraAdaptor {
 		system.NewVersionCommand(openEBSCli),
 		system.NewInfoCommand(openEBSCli),
 		vsm.NewVSMListCommand(openEBSCli),
+		vsm.NewVSMCreateCommand(openEBSCli),
 	)
 
 	rootCmd.PersistentFlags().BoolP("help", "h", false, "Print usage")
