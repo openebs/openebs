@@ -13,6 +13,7 @@ import (
 	"github.com/openebs/openebs/api/server/middleware"
 	"github.com/openebs/openebs/api/server/router"
 	systemrouter "github.com/openebs/openebs/api/server/router/system"
+	vsmrouter "github.com/openebs/openebs/api/server/router/vsm"
 	cliflags "github.com/openebs/openebs/cli/flags"
 	"github.com/openebs/openebs/daemon"
 	"github.com/openebs/openebs/opts"
@@ -279,6 +280,7 @@ func initRouter(s *apiserver.Server, d *daemon.Daemon) {
 
 	routers := []router.Router{
 		systemrouter.NewRouter(d),
+		vsmrouter.NewRouter(d),
 	}
 	s.InitRouter(utils.IsDebugEnabled(), routers...)
 }

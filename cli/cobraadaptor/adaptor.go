@@ -3,6 +3,7 @@ package cobraadaptor
 import (
 	"github.com/openebs/openebs/api/client"
 	"github.com/openebs/openebs/api/client/system"
+	"github.com/openebs/openebs/api/client/vsm"
 	"github.com/openebs/openebs/cli"
 	cliflags "github.com/openebs/openebs/cli/flags"
 	"github.com/openebs/openebs/pkg/term"
@@ -23,7 +24,7 @@ func NewCobraAdaptor(clientFlags *cliflags.ClientFlags) CobraAdaptor {
 
 	var rootCmd = &cobra.Command{
 		Use:           "openebs [OPTIONS]",
-		Short:         "A self-sufficient runtime for containers",
+		Short:         "A self-sufficient runtime for elastic block storage",
 		SilenceUsage:  true,
 		SilenceErrors: true,
 	}
@@ -34,6 +35,7 @@ func NewCobraAdaptor(clientFlags *cliflags.ClientFlags) CobraAdaptor {
 	rootCmd.AddCommand(
 		system.NewVersionCommand(openEBSCli),
 		system.NewInfoCommand(openEBSCli),
+		vsm.NewVSMListCommand(openEBSCli),
 	)
 
 	rootCmd.PersistentFlags().BoolP("help", "h", false, "Print usage")

@@ -1,6 +1,5 @@
 package types
 
-
 // VersionResponse holds version information for the client and the server
 type VersionResponse struct {
 	Client *Version
@@ -13,3 +12,7 @@ func (v VersionResponse) ServerOK() bool {
 	return v.Server != nil
 }
 
+// VSMListOptions holds paramters to list the VSMs
+type VSMListOptions struct {
+        All		bool
+}

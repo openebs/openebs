@@ -38,3 +38,14 @@ type Info struct {
 	ExperimentalBuild  bool
 	ServerVersion      string
 }
+
+// Vsm contains response of Remote API:
+// GET "/vsm/json"
+type Vsm struct {
+        Name		string
+        IPAddress    	string
+        IOPS      	string
+        Volumes      	string
+        Status     	string
+}
+
