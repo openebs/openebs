@@ -73,7 +73,7 @@ func runCreate(openEBSCli *client.OpenEBSCli, opts *createOptions) error {
 		return err
 	}
 
-	if len(vsm) > 0 {
+	if len(vsm.Name) > 0 {
 		fmt.Fprintf(openEBSCli.Out(), "TODO Formatting\n")
 	}
 
