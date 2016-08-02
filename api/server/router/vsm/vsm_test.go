@@ -11,24 +11,4 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package daemon
-
-import (
-	"github.com/openebs/openebs/types"
-)
-
-// Vsms returns the list of VSMs to show given the user's filtering.
-func (daemon *Daemon) Vsms(config *types.VSMListOptions) ([]*types.Vsm, error) {
-	vsms := []*types.Vsm{}
-	//TODO Fill with some data
-
-	return vsms, nil
-}
-
-// This returns the newly created VSM.
-func (daemon *Daemon) VsmCreate(opts *types.VSMListOptions) (*types.Vsm, error) {
-	vsm := *types.Vsm{}
-	//TODO Fill with some data
-
-	return vsm, nil
-}
+package vsm

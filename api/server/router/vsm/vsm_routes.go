@@ -11,6 +11,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// This is responsible for implementing the http handlers
+// w.r.t VSM. The function names start with <<http-verb>> prefix.
 package vsm
 
 import (
@@ -21,7 +23,8 @@ import (
 	"golang.org/x/net/context"
 )
 
-func (s *vsmRouter) getVsmsJSON(ctx context.Context, w http.ResponseWriter, r *http.Request, vars map[string]string) error {
+// This will return a list of VSMs in JSON format
+func (s *vsmRouter) getVsmLsJSON(ctx context.Context, w http.ResponseWriter, r *http.Request, vars map[string]string) error {
 	if err := httputils.ParseForm(r); err != nil {
 		return err
 	}
@@ -38,38 +41,42 @@ func (s *vsmRouter) getVsmsJSON(ctx context.Context, w http.ResponseWriter, r *h
 	return httputils.WriteJSON(w, http.StatusOK, vsms)
 }
 
-//func (s *containerRouter) postContainersCreate(ctx context.Context, w http.ResponseWriter, r *http.Request, vars map[string]string) error {
-//	if err := httputils.ParseForm(r); err != nil {
-//		return err
-//	}
-//	if err := httputils.CheckForJSON(r); err != nil {
-//		return err
-//	}
-//
-//	name := r.Form.Get("name")
-//
-//	config, hostConfig, networkingConfig, err := s.decoder.DecodeConfig(r.Body)
-//	if err != nil {
-//		return err
-//	}
-//	version := httputils.VersionFromContext(ctx)
-//	adjustCPUShares := versions.LessThan(version, "1.19")
-//
-//	validateHostname := versions.GreaterThanOrEqualTo(version, "1.24")
-//	ccr, err := s.backend.ContainerCreate(types.ContainerCreateConfig{
-//		Name:             name,
-//		Config:           config,
-//		HostConfig:       hostConfig,
-//		NetworkingConfig: networkingConfig,
-//		AdjustCPUShares:  adjustCPUShares,
-//	}, validateHostname)
-//	if err != nil {
-//		return err
-//	}
-//
-//	return httputils.WriteJSON(w, http.StatusCreated, ccr)
-//}
-//
+// This will create a VSM
+func (s *vsmRouter) postVsmCreate(ctx context.Context, w http.ResponseWriter, r *http.Request, vars map[string]string) error {
+	if err := httputils.ParseForm(r); err != nil {
+		return err
+	}
+	if err := httputils.CheckForJSON(r); err != nil {
+		return err
+	}
+
+	name := r.Form.Get("name")
+	ip := r.Form.Get("ip")
+	ninterface := r.Form.Get("interface")
+	subnet := r.Form.Get("subnet")
+	router := r.Form.Get("router")
+	volume := r.Form.Get("volume")
+
+	config, hostConfig, networkingConfig, err := s.decoder.DecodeConfig(r.Body)
+	if err != nil {
+		return err
+	}
+
+	vsmcr, err := s.backend.VsmCreate(types.VSMCreateOptions{
+		Name:      name,
+		IP:        ip,
+		Interface: ninterface,
+		Subnet:    subnet,
+		Router:    router,
+		Volume:    volume,
+	})
+	if err != nil {
+		return err
+	}
+
+	return httputils.WriteJSON(w, http.StatusCreated, vsmcr)
+}
+
 //func (s *containerRouter) deleteContainers(ctx context.Context, w http.ResponseWriter, r *http.Request, vars map[string]string) error {
 //	if err := httputils.ParseForm(r); err != nil {
 //		return err

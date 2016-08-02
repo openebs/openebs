@@ -39,8 +39,9 @@ type Info struct {
 	ServerVersion     string
 }
 
-// Vsm contains response of Remote API:
-// GET "/vsm/json"
+// Used for response from Remote API:
+// GET "/vsm/lsjson"
+// POST "/vsm/create"
 type Vsm struct {
 	Name      string
 	IPAddress string

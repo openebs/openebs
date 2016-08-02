@@ -25,13 +25,29 @@ func (validationError) IsValidationError() bool {
 	return true
 }
 
-// vsmRouter is a router to talk with the VSMs
+// vsmRouter is a router to talk with the server logic of VSM
 type vsmRouter struct {
 	backend Backend
 	routes  []router.Route
 }
 
-// NewRouter initializes a new vsm router
+// This initializes the routes in vsm router
+func (r *vsmRouter) initRoutes() {
+	r.routes = []router.Route{
+		// HEAD
+		//router.NewHeadRoute("/vsm/{name:.*}/archive", r.headVsmArchive),
+		// GET
+		router.NewGetRoute("/vsm/lsjson", r.getVsmLsJSON),
+		// POST
+		//router.NewPostRoute("/vsm/create", r.postVsmCreate),
+		// PUT
+		//router.NewPutRoute("/vsm/{name:.*}/archive", r.putVsmArchive),
+		// DELETE
+		//router.NewDeleteRoute("/vsm/{name:.*}", r.deleteVsm),
+	}
+}
+
+// This initializes a new vsm router
 func NewRouter(b Backend) router.Router {
 	r := &vsmRouter{
 		backend: b,
@@ -40,23 +56,7 @@ func NewRouter(b Backend) router.Router {
 	return r
 }
 
-// Routes returns the available routes to the vsm controller
+// This returns the available routes to the vsm controller
 func (r *vsmRouter) Routes() []router.Route {
 	return r.routes
-}
-
-// initRoutes initializes the routes in vsm router
-func (r *vsmRouter) initRoutes() {
-	r.routes = []router.Route{
-		// HEAD
-		//router.NewHeadRoute("/containers/{name:.*}/archive", r.headContainersArchive),
-		// GET
-		router.NewGetRoute("/vsm/json", r.getVsmsJSON),
-		// POST
-		//router.NewPostRoute("/containers/create", r.postContainersCreate),
-		// PUT
-		//router.NewPutRoute("/containers/{name:.*}/archive", r.putContainersArchive),
-		// DELETE
-		//router.NewDeleteRoute("/containers/{name:.*}", r.deleteContainers),
-	}
 }

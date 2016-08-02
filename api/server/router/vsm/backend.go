@@ -27,8 +27,8 @@ type monitorBackend interface {
 	Vsms(config *types.VSMListOptions) ([]*types.Vsm, error)
 }
 
-// Backend is all the methods that need to be implemented to provide VSM specific functionality.
+// These functions need to be implemented to provide VSM specific functionality.
 type Backend interface {
-	//	stateBackend
 	monitorBackend
+	VsmCreate(opts *types.VSMCreateOptions) (*types.Vsm, error)
 }

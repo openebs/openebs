@@ -21,4 +21,5 @@ type SystemAPIClient interface {
 // VSMAPIClient defines API client methods for the system
 type VSMAPIClient interface {
 	VSMList(ctx context.Context, options types.VSMListOptions) ([]types.Vsm, error)
+	VSMCreate(ctx context.Context, options types.VSMCreateOptions) (types.Vsm, error)
 }

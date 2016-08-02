@@ -1,0 +1,34 @@
+package client
+
+import (
+	"encoding/json"
+	"net/url"
+
+	"github.com/openebs/openebs/types"
+	"golang.org/x/net/context"
+)
+
+// This will form the http client request to create a VSM.
+func (cli *Client) VSMCreate(ctx context.Context, opts types.VSMCreateOptions) (types.Vsm, error) {
+	query := url.Values{}
+
+	if options.All {
+		query.Set("name", opts.Name)
+		query.Set("ip", opts.IP)
+		query.Set("interface", opts.Interface)
+		query.Set("subnet", opts.Subnet)
+		query.Set("router", opts.Router)
+		query.Set("volume", opts.Volume)
+
+	}
+
+	resp, err := cli.get(ctx, "/vsm/create", query, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	var vsm types.Vsm
+	err = json.NewDecoder(resp.body).Decode(&vsm)
+	ensureReaderClosed(resp)
+	return vsm, err
+}

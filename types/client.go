@@ -1,6 +1,8 @@
+// This will hold the definition of the structures, functions, etc.
+// required for client-server communication.
 package types
 
-// VersionResponse holds version information for the client and the server
+// This holds version information for the client and the server
 type VersionResponse struct {
 	Client *Version
 	Server *Version
@@ -12,7 +14,17 @@ func (v VersionResponse) ServerOK() bool {
 	return v.Server != nil
 }
 
-// VSMListOptions holds paramters to list the VSMs
+// This holds paramters required to list the VSMs.
 type VSMListOptions struct {
 	All bool
+}
+
+// This holds parameters required to create a VSM.
+type VSMCreateOptions struct {
+	Name      string
+	IP        string
+	Interface string
+	Subnet    string
+	Router    string
+	Volume    string
 }

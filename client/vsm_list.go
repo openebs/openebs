@@ -16,7 +16,7 @@ func (cli *Client) VSMList(ctx context.Context, options types.VSMListOptions) ([
 		query.Set("all", "1")
 	}
 
-	resp, err := cli.get(ctx, "/vsm/json", query, nil)
+	resp, err := cli.get(ctx, "/vsm/lsjson", query, nil)
 	if err != nil {
 		return nil, err
 	}
