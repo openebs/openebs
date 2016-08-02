@@ -26,8 +26,8 @@ func (daemon *Daemon) Vsms(config *types.VSMListOptions) ([]*types.Vsm, error) {
 }
 
 // This returns the newly created VSM.
-func (daemon *Daemon) VsmCreate(opts *types.VSMListOptions) (*types.Vsm, error) {
-	vsm := *types.Vsm{}
+func (daemon *Daemon) VsmCreate(opts *types.VSMCreateOptions) (*types.Vsm, error) {
+	vsm := &types.Vsm{}
 	//TODO Fill with some data
 
 	return vsm, nil
