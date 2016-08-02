@@ -13,7 +13,6 @@ type CommonAPIClient interface {
 	ServerVersion(ctx context.Context) (types.Version, error)
 }
 
-
 // SystemAPIClient defines API client methods for the system
 type SystemAPIClient interface {
 	Info(ctx context.Context) (types.Info, error)
@@ -23,4 +22,3 @@ type SystemAPIClient interface {
 type VSMAPIClient interface {
 	VSMList(ctx context.Context, options types.VSMListOptions) ([]types.Vsm, error)
 }
-

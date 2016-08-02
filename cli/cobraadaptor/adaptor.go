@@ -6,14 +6,14 @@ import (
 	"github.com/openebs/openebs/api/client/vsm"
 	"github.com/openebs/openebs/cli"
 	cliflags "github.com/openebs/openebs/cli/flags"
-	"github.com/openebs/openebs/pkg/term"
 	"github.com/openebs/openebs/pkg/spf13/cobra"
+	"github.com/openebs/openebs/pkg/term"
 )
 
 // CobraAdaptor is an adaptor for supporting spf13/cobra commands in the
 // openebs/cli framework
 type CobraAdaptor struct {
-	rootCmd   *cobra.Command
+	rootCmd    *cobra.Command
 	openEBSCli *client.OpenEBSCli
 }
 
@@ -42,7 +42,7 @@ func NewCobraAdaptor(clientFlags *cliflags.ClientFlags) CobraAdaptor {
 	rootCmd.PersistentFlags().MarkShorthandDeprecated("help", "please use --help")
 
 	return CobraAdaptor{
-		rootCmd:   rootCmd,
+		rootCmd:    rootCmd,
 		openEBSCli: openEBSCli,
 	}
 }

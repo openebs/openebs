@@ -26,26 +26,25 @@ type Version struct {
 // Info contains response of Remote API:
 // GET "/info"
 type Info struct {
-	ID                 string
-	Debug              bool
-	SystemTime         string
-	KernelVersion      string
-	OperatingSystem    string
-	OSType             string
-	Architecture       string
-	NCPU               int
-	MemTotal           int64
-	ExperimentalBuild  bool
-	ServerVersion      string
+	ID                string
+	Debug             bool
+	SystemTime        string
+	KernelVersion     string
+	OperatingSystem   string
+	OSType            string
+	Architecture      string
+	NCPU              int
+	MemTotal          int64
+	ExperimentalBuild bool
+	ServerVersion     string
 }
 
 // Vsm contains response of Remote API:
 // GET "/vsm/json"
 type Vsm struct {
-        Name		string
-        IPAddress    	string
-        IOPS      	string
-        Volumes      	string
-        Status     	string
+	Name      string
+	IPAddress string
+	IOPS      string
+	Volumes   string
+	Status    string
 }
-

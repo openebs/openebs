@@ -17,12 +17,10 @@ import (
 	"github.com/openebs/openebs/types"
 )
 
-
 // Vsms returns the list of VSMs to show given the user's filtering.
 func (daemon *Daemon) Vsms(config *types.VSMListOptions) ([]*types.Vsm, error) {
-        vsms := []*types.Vsm{}
+	vsms := []*types.Vsm{}
 	//TODO Fill with some data
 
 	return vsms, nil
 }
-

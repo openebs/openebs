@@ -27,7 +27,7 @@ func (s *vsmRouter) getVsmsJSON(ctx context.Context, w http.ResponseWriter, r *h
 	}
 
 	config := &types.VSMListOptions{
-		All:    httputils.BoolValue(r, "all"),
+		All: httputils.BoolValue(r, "all"),
 	}
 
 	vsms, err := s.backend.Vsms(config)
@@ -37,7 +37,6 @@ func (s *vsmRouter) getVsmsJSON(ctx context.Context, w http.ResponseWriter, r *h
 
 	return httputils.WriteJSON(w, http.StatusOK, vsms)
 }
-
 
 //func (s *containerRouter) postContainersCreate(ctx context.Context, w http.ResponseWriter, r *http.Request, vars map[string]string) error {
 //	if err := httputils.ParseForm(r); err != nil {
@@ -95,4 +94,3 @@ func (s *vsmRouter) getVsmsJSON(ctx context.Context, w http.ResponseWriter, r *h
 //
 //	return nil
 //}
-

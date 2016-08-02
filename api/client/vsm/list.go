@@ -19,12 +19,12 @@ import (
 
 	"github.com/openebs/openebs/api/client"
 	"github.com/openebs/openebs/cli"
-	"github.com/openebs/openebs/types"
 	"github.com/openebs/openebs/pkg/spf13/cobra"
+	"github.com/openebs/openebs/types"
 )
 
 type listOptions struct {
-	all		bool
+	all bool
 }
 
 type preProcessor struct {
@@ -55,7 +55,7 @@ func runList(openEBSCli *client.OpenEBSCli, opts *listOptions) error {
 	ctx := context.Background()
 
 	options := types.VSMListOptions{
-		All:    opts.all,
+		All: opts.all,
 	}
 
 	vsms, err := openEBSCli.Client().VSMList(ctx, options)
@@ -63,14 +63,12 @@ func runList(openEBSCli *client.OpenEBSCli, opts *listOptions) error {
 		return err
 	}
 
-
 	if len(vsms) > 0 {
 		fmt.Fprintf(openEBSCli.Out(), "TODO Formatting\n")
-	} 
+	}
 
 	fmt.Fprintf(openEBSCli.Out(), "TODO \n")
-        // TODO - KIRAN -- Check how to format the output. 
-
+	// TODO - KIRAN -- Check how to format the output.
 
 	return nil
 }

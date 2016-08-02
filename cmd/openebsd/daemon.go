@@ -8,7 +8,6 @@ import (
 
 	"github.com/Sirupsen/logrus"
 	"github.com/openebs/openebs/api"
-	"github.com/openebs/openebs/version"
 	apiserver "github.com/openebs/openebs/api/server"
 	"github.com/openebs/openebs/api/server/middleware"
 	"github.com/openebs/openebs/api/server/router"
@@ -17,12 +16,13 @@ import (
 	cliflags "github.com/openebs/openebs/cli/flags"
 	"github.com/openebs/openebs/daemon"
 	"github.com/openebs/openebs/opts"
+	"github.com/openebs/openebs/pkg/jsonlog"
+	"github.com/openebs/openebs/pkg/listeners"
 	flag "github.com/openebs/openebs/pkg/mflag"
 	"github.com/openebs/openebs/pkg/pidfile"
 	"github.com/openebs/openebs/pkg/signal"
-	"github.com/openebs/openebs/pkg/jsonlog"
-	"github.com/openebs/openebs/pkg/listeners"
 	"github.com/openebs/openebs/utils"
+	"github.com/openebs/openebs/version"
 )
 
 const (
@@ -76,7 +76,6 @@ func (cli *DaemonCli) start() (err error) {
 		utils.EnableDebug()
 	}
 
-
 	logrus.SetFormatter(&logrus.TextFormatter{
 		TimestampFormat: jsonlog.RFC3339NanoFixed,
 		DisableColors:   cli.Config.RawLogs,
@@ -86,7 +85,7 @@ func (cli *DaemonCli) start() (err error) {
 		return fmt.Errorf("Failed to set umask: %v", err)
 	}
 
-	//TODO : Kiran 
+	//TODO : Kiran
 	//if len(cli.LogConfig.Config) > 0 {
 	//	if err := logger.ValidateLogOpts(cli.LogConfig.Type, cli.LogConfig.Config); err != nil {
 	//		return fmt.Errorf("Failed to set log opts: %v", err)
@@ -152,7 +151,6 @@ func (cli *DaemonCli) start() (err error) {
 		api.Accept(protoAddrParts[1], ls...)
 	}
 
-
 	signal.Trap(func() {
 		cli.stop()
 		<-stopc // wait for daemonCli.start() to return
@@ -165,12 +163,11 @@ func (cli *DaemonCli) start() (err error) {
 
 	//name, _ := os.Hostname()
 
-
 	logrus.Info("Daemon has completed initialization")
 
 	logrus.WithFields(logrus.Fields{
-		"version":     version.Version,
-		"commit":      version.GitCommit,
+		"version": version.Version,
+		"commit":  version.GitCommit,
 	}).Info("OpenEBS daemon")
 
 	cli.initMiddlewares(api, serverConfig)
@@ -250,7 +247,6 @@ func loadDaemonCliConfig(config *daemon.Config, flags *flag.FlagSet, commonConfi
 	config.Hosts = commonConfig.Hosts
 	config.LogLevel = commonConfig.LogLevel
 
-
 	if configFile != "" {
 		c, err := daemon.MergeDaemonConfigurations(config, flags, configFile)
 		if err != nil {
@@ -268,7 +264,6 @@ func loadDaemonCliConfig(config *daemon.Config, flags *flag.FlagSet, commonConfi
 	if err := daemon.ValidateConfiguration(config); err != nil {
 		return nil, err
 	}
-
 
 	// ensure that the log level is the one set after merging configurations
 	cliflags.SetDaemonLogLevel(config.LogLevel)
@@ -290,7 +285,6 @@ func (cli *DaemonCli) initMiddlewares(s *apiserver.Server, cfg *apiserver.Config
 
 	vm := middleware.NewVersionMiddleware(v, api.DefaultVersion, api.MinVersion)
 	s.UseMiddleware(vm)
-
 
 	u := middleware.NewUserAgentMiddleware(v)
 	s.UseMiddleware(u)

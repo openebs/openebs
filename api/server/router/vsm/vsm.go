@@ -25,7 +25,7 @@ func (validationError) IsValidationError() bool {
 	return true
 }
 
-// vsmRouter is a router to talk with the VSMs 
+// vsmRouter is a router to talk with the VSMs
 type vsmRouter struct {
 	backend Backend
 	routes  []router.Route

@@ -14,5 +14,5 @@ func (v VersionResponse) ServerOK() bool {
 
 // VSMListOptions holds paramters to list the VSMs
 type VSMListOptions struct {
-        All		bool
+	All bool
 }

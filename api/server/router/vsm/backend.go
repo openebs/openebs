@@ -17,7 +17,6 @@ import (
 	"github.com/openebs/openebs/types"
 )
 
-
 // stateBackend includes functions to implement to provide container state lifecycle functionality.
 //type stateBackend interface {
 //	ContainerCreate(config types.ContainerCreateConfig, validateHostname bool) (types.ContainerCreateResponse, error)
@@ -30,6 +29,6 @@ type monitorBackend interface {
 
 // Backend is all the methods that need to be implemented to provide VSM specific functionality.
 type Backend interface {
-//	stateBackend
+	//	stateBackend
 	monitorBackend
 }
