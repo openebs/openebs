@@ -71,11 +71,13 @@ endif
 #
 # A private target
 #
+# Should we have this ???
+# @cp /etc/openebs/tgt/usr/sbin/* /var/lib/lxc/$(name)/rootfs/usr/sbin/
+#
 _lxc_create:
 	@lxc-create -n $(name) -t none
 	@mkdir /var/lib/lxc/$(name)/rootfs
 	@tar -zxf /etc/openebs/base.tar.gz -C /var/lib/lxc/$(name)/rootfs/
-	@cp /etc/openebs/tgt/usr/sbin/* /var/lib/lxc/$(name)/rootfs/usr/sbin/
 
 
 #
