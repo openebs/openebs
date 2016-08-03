@@ -1,0 +1,111 @@
+# Makefile for creating a Virtual Storage Machine otherwise known as VSM.
+#
+# Reference Guide - https://www.gnu.org/software/make/manual/make.html
+#
+# NOTE - The targets prefixed with underscore are meant to be
+# used internally.
+#
+
+
+#
+# You can set these variables as options from command line
+#
+name       =
+ip         =
+interface  =
+subnet     =
+router     =
+volume     =
+debug      =
+
+
+#
+# Internal variables or constants
+#
+LXC_CONF_PATH        := /var/lib/lxc/$(name)/config
+SLEEP_SECS           := 5
+ROOT_DIR             := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
+
+
+#
+# Avoid conflict with a file of same name as target
+#
+.PHONY: help create _verify_create _lxc_create _lxc_conf _lxc_start
+
+
+#
+# The target 'help' will be our first and hence the default target
+#
+help: _verify_create
+	@echo ""
+	@echo "Please invoke 'make -f vsm_create create <options>' where <options> are listed below"
+	@echo ""
+	@echo "       name          name of the vsm"
+	@echo "       ip            ip address of the vsm"
+	@echo "       interface     interface of the vsm"
+	@echo "       subnet        subnet of the vsm"
+	@echo "       router        router of the vsm"
+	@echo "       volume        name of the volume to be created within vsm"
+	@echo "       debug         a non-empty value will trigger verifications"
+	@echo "                        before execution of make targets"
+	@echo ""
+
+
+#
+# The target that creates a vsm
+#
+create: _verify_create _lxc_create _lxc_conf _lxc_start
+	@echo -e "INFO:\tvsm $(name) with volume $(volume) created successfully..."
+
+
+#
+# A private target
+# Run the required verifications
+#
+_verify_create:
+ifdef debug
+	@cd $(ROOT_DIR) && $(MAKE) -f ./install_checks
+endif
+
+
+#
+# A private target
+#
+_lxc_create:
+	@lxc-create -n $(name) -t none
+	@mkdir /var/lib/lxc/$(name)/rootfs
+	@tar -zxf /etc/openebs/base.tar.gz -C /var/lib/lxc/$(name)/rootfs/
+	@cp /etc/openebs/tgt/usr/sbin/* /var/lib/lxc/$(name)/rootfs/usr/sbin/
+
+
+#
+# A private target
+#
+_lxc_conf:
+	@echo "lxc.network.type = phys"               > $(LXC_CONF_PATH)
+	@echo "lxc.network.flags = up"                >> $(LXC_CONF_PATH)
+	@echo "lxc.network.link = $(interface)"       >> $(LXC_CONF_PATH)
+	@echo "lxc.network.ipv4 = $(ip)/$(subnet)"    >> $(LXC_CONF_PATH)
+	@echo "lxc.network.ipv4.gateway = $(router)"  >> $(LXC_CONF_PATH)
+	@echo "lxc.mount.entry = /dev /var/lib/lxc/$(name)/rootfs/dev none bind 0 0" \
+	>> $(LXC_CONF_PATH)
+	@echo "lxc.rootfs = /var/lib/lxc/$(name)/rootfs"               >> $(LXC_CONF_PATH)
+	@echo "lxc.include = /usr/share/lxc/config/centos.common.conf" >> $(LXC_CONF_PATH)
+	@echo "lxc.arch = x86_64"                     >> $(LXC_CONF_PATH)
+	@echo "lxc.utsname = $(name)"                 >> $(LXC_CONF_PATH)
+	@echo "lxc.autodev = 1"                       >> $(LXC_CONF_PATH)
+
+
+#
+# A private target
+#
+_lxc_start:
+	@ifconfig $(interface) $(ip)/$(subnet) up
+	@lxc-start -n $(name) -d
+	@sleep $(SLEEP_SECS)
+	@lxc-attach -n $(name) -- service tgtd start
+	@sleep $(SLEEP_SECS)
+	@lxc-attach -n $(name) -- tgtadm --lld iscsi --op new --mode target --tid 1 -T iqn.2016-07.com.cb:openebs.disk.$(volume)
+	@lxc-attach -n $(name) -- mkdir -p /openebs
+	@lxc-attach -n $(name) -- tgtadm --lld iscsi --op new --mode logicalunit --tid 1 --lun 1 -b /openebs/$(volume)
+	@lxc-attach -n $(name) -- tgtadm --lld iscsi --op bind --mode target --tid 1 -I ALL

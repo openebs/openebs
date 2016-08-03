@@ -1,0 +1,48 @@
+# Makefile for verifying the installations required for proper
+# functioning of OpenEBS.
+#
+# Reference Guide - https://www.gnu.org/software/make/manual/make.html
+#
+# NOTE - The targets prefixed with underscore are meant to be 
+# used internally.
+#
+
+
+#
+# You can set these variables as options from command line
+#
+
+
+#
+# Internal variables or constants
+#
+LXC_CREATE_CMD              :=   lxc-create
+
+
+#
+# Avoid conflict with a file of same name as target
+#
+.PHONY: verify_all verify_lxc _is_lxc_create_installed
+
+
+#
+# The default target.
+#
+verify_all: verify_lxc
+
+
+#
+# The target to verify lxc installations
+#
+verify_lxc: _is_lxc_create_installed
+
+
+#
+# Verification check for lxc-create installation
+#
+_is_lxc_create_installed:
+ifeq ($(shell which $(LXC_CREATE_CMD) >/dev/null 2>&1; echo $$?), 1)
+	$(error ERROR: '$(LXC_CREATE_CMD)' command not found.)
+else
+	@echo -e "INFO:\t'$(LXC_CREATE_CMD)' install verification passed."
+endif

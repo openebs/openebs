@@ -15,6 +15,8 @@ package daemon
 
 import (
 	"fmt"
+	"os"
+	"os/exec"
 	"github.com/openebs/openebs/types"
 )
 
@@ -30,9 +32,63 @@ func (daemon *Daemon) Vsms(config *types.VSMListOptions) ([]*types.Vsm, error) {
 func (daemon *Daemon) VsmCreate(opts *types.VSMCreateOptions) (*types.Vsm, error) {
 
 	fmt.Printf("VSM Create at server ...\n")
+	fmt.Printf("Provided ip: %s\n", opts.IP)
+	fmt.Printf("Provided vsm name: %s\n", opts.Name)
+	fmt.Printf("Provided iface: %s\n", opts.Interface)
+	fmt.Printf("Provided subnet: %s\n", opts.Subnet)
+	fmt.Printf("Provided router: %s\n", opts.Router)
+	fmt.Printf("Provided volume name: %s\n", opts.Volume)
 
-	vsm := &types.Vsm{}
-	//TODO Fill with some data
+	name := opts.Name
+	ip := opts.IP
+	netface := opts.Interface
+	subnet := opts.Subnet
+	router := opts.Router
+	volume := opts.Volume
 
-	return vsm, nil
+	// This is make based !!!
+	// Base path of Makefile
+	makefilename := MAKEFILEBASE + "vsm_create"
+
+	// Subcommand i.e. makefile's target name
+	subcommand := "create"
+
+	// Non-silent mode to execute make commands
+	makeopts := "-sf"
+
+	// Preparing the arguments
+	args := []string{makeopts, makefilename,
+		subcommand,
+		"name=" + name,
+		"interface=" + netface,
+		"ip=" + ip,
+		"subnet=" + subnet,
+		"volume=" + volume,
+		"router=" + router,
+		"debug=1"}
+
+	// Preparing the final command
+	finalcmd := exec.Command(MAKECMD, args...)
+
+	PrintCommand(finalcmd)
+
+	// We want to see what's going on
+	finalcmd.Stdout = os.Stdout
+	finalcmd.Stderr = os.Stderr
+
+	// Actual execution
+	err := finalcmd.Run()
+	if err != nil {
+		return nil, err
+	}
+
+	vsm := &types.Vsm{
+		Name: name,
+		IPAddress: netface,
+		IOPS: "0",
+		Volumes: "1",
+		Status: "Active",
+	}
+
+	return vsm, err
 }

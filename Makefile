@@ -33,6 +33,10 @@ clean:
 	@rm -f $(GOPATH)/bin/openebsd
 	@echo -e "INFO:\topenebs binaries removed successfully from $(GOPATH)/bin ..."
 	@echo ""
+	@echo -e "INFO:\tremoving openebs conf from /etc/openebs ..."
+	@rm -rf /etc/openebs/
+	@echo -e "INFO:\topenebs conf removed successfully from /etc/openebs ..."
+	@echo ""
 
 
 #
@@ -56,6 +60,8 @@ install:
 	@echo -e "INFO:\tinstalling openebs ..."
 	@cp $(GOPATH)/bin/openebs /sbin/
 	@cp $(GOPATH)/bin/openebsd /sbin/
+	@rm -rf /etc/openebs/
+	@cp -rp ./etc/openebs /etc
 	@echo -e "INFO:\topenebs installed successfully ..."
 	@echo ""
 	@echo -e "INFO:\tRun openebs to use the CLI"
