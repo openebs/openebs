@@ -13,7 +13,7 @@
 # Internal variables or constants
 #
 IS_OPENEBSD_RUNNING       := $(shell ps -aux | grep openebsd | grep -v grep | awk '{print $$NF}')
-
+IS_BASE_AVAIL             := $(shell if [ -d "/etc/openebs" ]; then ls -ltr /etc/openebs | grep base.tar.gz | awk '{print $$NF}'; fi)
 
 #
 # The first target is the default.
@@ -38,9 +38,9 @@ clean:
 	@rm -f $(GOPATH)/bin/openebsd
 	@echo -e "INFO:\topenebs binaries removed successfully from $(GOPATH)/bin ..."
 	@echo ""
-	@echo -e "INFO:\tremoving openebs conf from /etc/openebs ..."
-	@rm -rf /etc/openebs/
-	@echo -e "INFO:\topenebs conf removed successfully from /etc/openebs ..."
+	@echo -e "INFO:\tremoving openebs conf from /etc/openebs/make ..."
+	@rm -rf /etc/openebs/make
+	@echo -e "INFO:\topenebs conf removed successfully from /etc/openebs/make ..."
 	@echo ""
 
 
@@ -58,20 +58,52 @@ build:
 
 
 #
+# Internally used target.
+# Will place the openebs config or script files at /etc/openebs
+# Will reuse the base image if available.
+#
+_install_conf: 
+	@echo ""
+	@echo -e "INFO:\tinstalling openebs conf ..."
+	@rm -rf /etc/openebs/make
+	@cp -rp ./etc/openebs /etc
+	@echo -e "INFO:\topenebs conf installed successfully ..."
+	@echo ""
+ifndef IS_BASE_AVAIL
+	@echo -e "INFO:\tdownloading openebs base image ..."
+	@cd /etc/openebs && wget https://www.dropbox.com/s/b1voxh0t5xlrnqn/base.tar.gz?dl=0#
+	@echo -e "INFO:\topenebs base image downloaded successfully ..."
+	@echo ""
+endif
+
+
+#
+# Internally used target.
 # Will place the openebs binaries at /sbin/
 #
-install: 
+_install_binary:
 	@echo ""
-	@echo -e "INFO:\tinstalling openebs ..."
+	@echo -e "INFO:\tinstalling openebs binaries ..."
 ifdef IS_OPENEBSD_RUNNING
 	@$(error ERROR: openebsd is running. It needs to be stopped before re-install.)
 endif
 	@cp $(GOPATH)/bin/openebs /sbin/
 	@cp $(GOPATH)/bin/openebsd /sbin/
-	@rm -rf /etc/openebs/
-	@cp -rp ./etc/openebs /etc
-	@echo -e "INFO:\topenebs installed successfully ..."
+	@echo -e "INFO:\topenebs binaries installed successfully ..."
+	@echo ""
+
+
+#
+# Internally used target.
+# Will post a simple usage message.
+#
+_post_install_msg:
 	@echo ""
 	@echo -e "INFO:\tRun openebs to use the CLI"
 	@echo -e "INFO:\tRun openebsd in a new terminal to start the openebs daemon"
 	@echo ""
+
+#
+# The install target to be used by Admin.
+#
+install: _install_conf _install_binary _post_install_msg
