@@ -7,6 +7,6 @@
 
 - router.go defines the interface(s) related to http requests from client to server.
 - local.go refers to local routing.
-- Each folder indicates an entity within openebs server.
-  - It consolidates the routing related mapping w.r.t that entity.
+- Each folder inside the router package refers to an ```entity``` within openebs server.
+  - This folder consolidates all routing related mapping w.r.t that particular entity.
 
