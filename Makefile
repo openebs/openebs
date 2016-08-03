@@ -9,6 +9,11 @@
 #
 .PHONY: help clean build install
 
+#
+# Internal variables or constants
+#
+IS_OPENEBSD_RUNNING       := $(shell ps -aux | grep openebsd | grep -v grep | awk '{print $$NF}')
+
 
 #
 # The first target is the default.
@@ -58,6 +63,9 @@ build:
 install: 
 	@echo ""
 	@echo -e "INFO:\tinstalling openebs ..."
+ifdef IS_OPENEBSD_RUNNING
+	@$(error ERROR: openebsd is running. It needs to be stopped before re-install.)
+endif
 	@cp $(GOPATH)/bin/openebs /sbin/
 	@cp $(GOPATH)/bin/openebsd /sbin/
 	@rm -rf /etc/openebs/
