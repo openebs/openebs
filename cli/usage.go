@@ -8,7 +8,6 @@ type Command struct {
 
 // OpenEBSCommandUsage lists the top level openebs commands and their short usage
 var OpenEBSCommandUsage = []Command{
-	{"inspect", "Return low-level information on a directory"},
 }
 
 // OpenEBSCommands stores all the openebs command
