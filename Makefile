@@ -12,7 +12,7 @@
 #
 # Internal variables or constants
 #
-IS_OPENEBSD_RUNNING       := $(shell ps -aux | grep openebsd | grep -v grep | awk '{print $$NF}')
+IS_OPENEBSD_RUNNING       := $(shell ps aux | grep openebsd | grep -v grep | awk '{print $$NF}')
 IS_BASE_AVAIL             := $(shell if [ -d "/etc/openebs" ]; then ls -ltr /etc/openebs | grep base.tar.gz | awk '{print $$NF}'; fi)
 
 #
