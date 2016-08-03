@@ -1,9 +1,9 @@
-### Router
+### What is the significance of router ?
 
-> Routing implies mapping the http requests to specific handler logic.
-> Router specific mapping are defined in this package.
+- Routing implies mapping the http requests to specific handler logic.
+- Router specific mappings are defined in this package.
 
-### FAQs
+### Important Notes:
 
 - router.go defines the interface(s) related to http requests from client to server.
 - local.go refers to local routing.
