@@ -17,14 +17,27 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"github.com/Sirupsen/logrus"
 	"github.com/openebs/openebs/types"
 )
 
 // Vsms returns the list of VSMs to show given the user's filtering.
 func (daemon *Daemon) Vsms(config *types.VSMListOptions) ([]*types.Vsm, error) {
 	vsms := []*types.Vsm{}
-	//TODO Fill with some data
 
+	//TODO - Fetch this data from a registry
+	for i := 1; i < 2; i++ {
+		vsm := &types.Vsm {
+			Name:		"vsm",
+			IPAddress:	"10.10.1.1",
+			IOPS:		"100",
+			Volumes:	"1",
+			Status:		"active",
+		}
+		vsms = append(vsms, vsm)
+	}
+
+	logrus.Debugf("Total VSMs %d\n", len(vsms))
 	return vsms, nil
 }
 

@@ -343,7 +343,7 @@ func TestNewJsonNoEmail(t *testing.T) {
 	}
 }
 
-func TestJsonWithPsFormat(t *testing.T) {
+func TestJsonWithListFormat(t *testing.T) {
 	tmpHome, err := ioutil.TempDir("", "config-test")
 	if err != nil {
 		t.Fatal(err)
@@ -353,7 +353,7 @@ func TestJsonWithPsFormat(t *testing.T) {
 	fn := filepath.Join(tmpHome, ConfigFileName)
 	js := `{
 		"auths": { "https://index.openebs.io/v1/": { "auth": "am9lam9lOmhlbGxv", "email": "user@example.com" } },
-		"psFormat": "table {{.ID}}\\t{{.Label \"com.openebs.label.cpu\"}}"
+		"listFormat": "table {{.ID}}\\t{{.Label \"com.openebs.label.cpu\"}}"
 }`
 	if err := ioutil.WriteFile(fn, []byte(js), 0600); err != nil {
 		t.Fatal(err)
@@ -364,13 +364,13 @@ func TestJsonWithPsFormat(t *testing.T) {
 		t.Fatalf("Failed loading on empty json file: %q", err)
 	}
 
-	if config.PsFormat != `table {{.ID}}\t{{.Label "com.openebs.label.cpu"}}` {
-		t.Fatalf("Unknown ps format: %s\n", config.PsFormat)
+	if config.ListFormat != `table {{.ID}}\t{{.Label "com.openebs.label.cpu"}}` {
+		t.Fatalf("Unknown ps format: %s\n", config.ListFormat)
 	}
 
 	// Now save it and make sure it shows up in new form
 	configStr := saveConfigAndValidateNewFormat(t, config, tmpHome)
-	if !strings.Contains(configStr, `"psFormat":`) ||
+	if !strings.Contains(configStr, `"listFormat":`) ||
 		!strings.Contains(configStr, "{{.ID}}") {
 		t.Fatalf("Should have save in new form: %s", configStr)
 	}
@@ -449,18 +449,18 @@ func TestOldJsonReaderNoFile(t *testing.T) {
 	}
 }
 
-func TestJsonWithPsFormatNoFile(t *testing.T) {
+func TestJsonWithListFormatNoFile(t *testing.T) {
 	js := `{
 		"auths": { "https://index.openebs.io/v1/": { "auth": "am9lam9lOmhlbGxv", "email": "user@example.com" } },
-		"psFormat": "table {{.ID}}\\t{{.Label \"com.openebs.label.cpu\"}}"
+		"listFormat": "table {{.ID}}\\t{{.Label \"com.openebs.label.cpu\"}}"
 }`
 	config, err := LoadFromReader(strings.NewReader(js))
 	if err != nil {
 		t.Fatalf("Failed loading on empty json file: %q", err)
 	}
 
-	if config.PsFormat != `table {{.ID}}\t{{.Label "com.openebs.label.cpu"}}` {
-		t.Fatalf("Unknown ps format: %s\n", config.PsFormat)
+	if config.ListFormat != `table {{.ID}}\t{{.Label "com.openebs.label.cpu"}}` {
+		t.Fatalf("Unknown ps format: %s\n", config.ListFormat)
 	}
 
 }
@@ -468,7 +468,7 @@ func TestJsonWithPsFormatNoFile(t *testing.T) {
 func TestJsonSaveWithNoFile(t *testing.T) {
 	js := `{
 		"auths": { "https://index.openebs.io/v1/": { "auth": "am9lam9lOmhlbGxv" } },
-		"psFormat": "table {{.ID}}\\t{{.Label \"com.openebs.label.cpu\"}}"
+		"listFormat": "table {{.ID}}\\t{{.Label \"com.openebs.label.cpu\"}}"
 }`
 	config, err := LoadFromReader(strings.NewReader(js))
 	err = config.Save()
@@ -498,7 +498,7 @@ func TestJsonSaveWithNoFile(t *testing.T) {
 			"auth": "am9lam9lOmhlbGxv"
 		}
 	},
-	"psFormat": "table {{.ID}}\\t{{.Label \"com.openebs.label.cpu\"}}"
+	"listFormat": "table {{.ID}}\\t{{.Label \"com.openebs.label.cpu\"}}"
 }`
 	if string(buf) != expConfStr {
 		t.Fatalf("Should have save in new form: \n%s\nnot \n%s", string(buf), expConfStr)

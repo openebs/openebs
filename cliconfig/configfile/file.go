@@ -24,7 +24,7 @@ const (
 type ConfigFile struct {
 	AuthConfigs      map[string]types.AuthConfig `json:"auths"`
 	HTTPHeaders      map[string]string           `json:"HttpHeaders,omitempty"`
-	PsFormat         string                      `json:"psFormat,omitempty"`
+	ListFormat       string                      `json:"listFormat,omitempty"`
 	ImagesFormat     string                      `json:"imagesFormat,omitempty"`
 	DetachKeys       string                      `json:"detachKeys,omitempty"`
 	Filename         string                      `json:"-"` // Note: for internal use only
