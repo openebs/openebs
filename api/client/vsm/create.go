@@ -38,7 +38,7 @@ func NewVSMCreateCommand(openEBSCli *client.OpenEBSCli) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "vsm-create --name=<name> --ip=<IP Address> ..",
 		Short: "Create a new VSM",
-		Args:  cli.RequiresMinArgs(6),
+		Args:  cli.ExactArgs(0),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return runCreate(openEBSCli, &opts)
 		},

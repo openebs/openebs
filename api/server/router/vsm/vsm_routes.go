@@ -46,9 +46,10 @@ func (s *vsmRouter) postVsmCreate(ctx context.Context, w http.ResponseWriter, r 
 	if err := httputils.ParseForm(r); err != nil {
 		return err
 	}
-	if err := httputils.CheckForJSON(r); err != nil {
-		return err
-	}
+
+	//if err := httputils.CheckForJSON(r); err != nil {
+	//	return err
+	//}
 
 	name := r.Form.Get("name")
 	ip := r.Form.Get("ip")

@@ -20,7 +20,7 @@ func (cli *Client) VSMCreate(ctx context.Context, opts types.VSMCreateOptions) (
 	query.Set("volume", opts.Volume)
 
 	var vsm types.Vsm
-	resp, err := cli.get(ctx, "/vsm/create", query, nil)
+	resp, err := cli.post(ctx, "/vsm/create", query, nil, nil)
 	if err != nil {
 		return vsm, err
 	}
