@@ -105,7 +105,7 @@ _lxc_conf:
 # A private target
 #
 _lxc_start:
-	@ifconfig $(interface) $(ip)/$(subnet) up
+	@ip addr add $(ip)/$(subnet) dev $(interface)
 	@lxc-start -n $(name) -d
 	@sleep $(SLEEP_SECS)
 	@lxc-attach -n $(name) -- service tgtd start
