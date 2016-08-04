@@ -7,13 +7,16 @@
 # This is done to avoid conflict with a file of same name as the targets
 # mentioned in this makefile.
 #
-.PHONY: help clean build install
+.PHONY: help clean build install _install_base_img _install_make_conf _install_binary _post_install_msg
 
 #
-# Internal variables or constants
+# Internal variables or constants.
+# NOTE - These will be executed when any make target is invoked.
 #
+SET_OPENEBS_CONF_DIR      := $(shell mkdir -p /etc/openebs)
 IS_OPENEBSD_RUNNING       := $(shell ps aux | grep openebsd | grep -v grep | awk '{print $$NF}')
-IS_BASE_AVAIL             := $(shell if [ -d "/etc/openebs" ]; then ls -ltr /etc/openebs | grep base.tar.gz | awk '{print $$NF}'; fi)
+IS_BASE_AVAIL             := $(shell ls -ltr /etc/openebs | grep base.tar.gz | awk '{print $$NF}')
+
 
 #
 # The first target is the default.
@@ -38,10 +41,6 @@ clean:
 	@rm -f $(GOPATH)/bin/openebsd
 	@echo -e "INFO:\topenebs binaries removed successfully from $(GOPATH)/bin ..."
 	@echo ""
-	@echo -e "INFO:\tremoving openebs conf from /etc/openebs/make ..."
-	@rm -rf /etc/openebs/make
-	@echo -e "INFO:\topenebs conf removed successfully from /etc/openebs/make ..."
-	@echo ""
 
 
 #
@@ -59,22 +58,29 @@ build:
 
 #
 # Internally used target.
-# Will place the openebs config or script files at /etc/openebs
 # Will reuse the base image if available.
 #
-_install_conf: 
-	@echo ""
-	@echo -e "INFO:\tinstalling openebs conf ..."
-	@rm -rf /etc/openebs/make
-	@cp -rp ./etc/openebs /etc
-	@echo -e "INFO:\topenebs conf installed successfully ..."
-	@echo ""
+_install_base_img: 
 ifndef IS_BASE_AVAIL
+	@echo ""
 	@echo -e "INFO:\tdownloading openebs base image ..."
 	@cd /etc/openebs && wget https://www.dropbox.com/s/b1voxh0t5xlrnqn/base.tar.gz?dl=0#
 	@echo -e "INFO:\topenebs base image downloaded successfully ..."
 	@echo ""
 endif
+
+
+#
+# Internally used target.
+# Will place the openebs make configs at /etc/openebs/make
+#
+_install_make_conf: 
+	@echo ""
+	@echo -e "INFO:\tinstalling openebs make confs ..."
+	@rm -rf /etc/openebs/make
+	@cp -rp ./etc/openebs/make/ /etc/openebs/make
+	@echo -e "INFO:\topenebs make confs installed successfully ..."
+	@echo ""
 
 
 #
@@ -106,4 +112,5 @@ _post_install_msg:
 #
 # The install target to be used by Admin.
 #
-install: _install_conf _install_binary _post_install_msg
+install: _install_make_conf _install_base_img _install_binary _post_install_msg
+
