@@ -31,7 +31,7 @@ ROOT_DIR             := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST)))
 #
 # Avoid conflict with a file of same name as target
 #
-.PHONY: help create _verify_create _lxc_create _lxc_conf _lxc_start
+.PHONY: help create _verify_create _lxc_create _lxc_conf _lxc_start _vsm_state
 
 
 #
@@ -56,7 +56,7 @@ help: _verify_create
 #
 # The target that creates a vsm
 #
-create: _verify_create _lxc_create _lxc_conf _lxc_start
+create: _verify_create _lxc_create _lxc_conf _lxc_start _vsm_state
 	@echo -e "INFO:\tvsm $(name) with volume $(volume) created successfully..."
 
 
@@ -72,9 +72,6 @@ endif
 
 #
 # A private target
-#
-# Should we have this ???
-# @cp /etc/openebs/tgt/usr/sbin/* /var/lib/lxc/$(name)/rootfs/usr/sbin/
 #
 _lxc_create:
 	@lxc-create -n $(name) -t none
@@ -114,3 +111,10 @@ _lxc_start:
 	@lxc-attach -n $(name) -- mkdir -p /openebs
 	@lxc-attach -n $(name) -- tgtadm --lld iscsi --op new --mode logicalunit --tid 1 --lun 1 -b /openebs/$(volume)
 	@lxc-attach -n $(name) -- tgtadm --lld iscsi --op bind --mode target --tid 1 -I ALL
+
+
+#
+# A private target
+#
+_vsm_state:
+	@touch /etc/openebs/.vsms/$(name)-$(volume)

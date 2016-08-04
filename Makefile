@@ -7,15 +7,15 @@
 # This is done to avoid conflict with a file of same name as the targets
 # mentioned in this makefile.
 #
-.PHONY: help clean build install _install_base_img _install_make_conf _install_binary _post_install_msg _install_git_base_img
+.PHONY: help clean build install _install_base_img _install_make_conf _install_binary _post_install_msg _install_git_base_img _clean_git_base_img _clean_binaries
 
 #
 # Internal variables or constants.
 # NOTE - These will be executed when any make target is invoked.
 #
-SET_OPENEBS_CONF_DIR      := $(shell mkdir -p /etc/openebs)
+SET_OPENEBS_CONF_DIR      := $(shell mkdir -p /etc/openebs/.vsms)
 IS_OPENEBSD_RUNNING       := $(shell ps aux | grep openebsd | grep -v grep | awk '{print $$NF}')
-IS_BASE_AVAIL             := $(shell ls -ltr /etc/openebs | grep base.tar.gz | awk '{print $$NF}')
+IS_DROPBOX_BASE_AVAIL     := $(shell ls -ltr /etc/openebs | grep base.tar.gz | awk '{print $$NF}')
 
 
 #
@@ -34,13 +34,32 @@ help:
 #
 # Will remove the openebs binaries at $GOPATH/bin
 #
-clean:
+_clean_git_base_img:
+	@echo ""
+	@echo -e "INFO:\tremoving openebs base img repo ..."
+	@rm -rf ../vsm-image
+	@rm -f ../base.tar.gz
+	@echo -e "INFO:\topenebs base img repo removed successfully ..."
+	@echo ""
+
+
+#
+# Will remove the openebs binaries at $GOPATH/bin
+#
+_clean_binaries:
 	@echo ""
 	@echo -e "INFO:\tremoving openebs binaries from $(GOPATH)/bin ..."
 	@rm -f $(GOPATH)/bin/openebs
 	@rm -f $(GOPATH)/bin/openebsd
 	@echo -e "INFO:\topenebs binaries removed successfully from $(GOPATH)/bin ..."
 	@echo ""
+
+
+#
+# The clean target to be used by user.
+#
+clean: _clean_git_base_img _clean_binaries
+
 
 
 #
@@ -62,7 +81,7 @@ build:
 # Will reuse the base image if available.
 #
 _install_base_img: 
-ifndef IS_BASE_AVAIL
+ifndef IS_DROPBOX_BASE_AVAIL
 	@echo ""
 	@echo -e "INFO:\tdownloading openebs base image ..."
 	@cd /etc/openebs && wget https://www.dropbox.com/s/b1voxh0t5xlrnqn/base.tar.gz?dl=0#
@@ -77,9 +96,11 @@ endif
 # Will reuse the base image if available.
 #
 _install_git_base_img:
+	@echo ""
 	@if [ -d ../vsm-image ]; then echo -e "INFO:\tgit clone of vsm-image not required"; else cd .. && git clone https://github.com/openebs/vsm-image.git ; fi
 	@if [ -f ../base.tar.gz ]; then echo -e "INFO:\twill use ../base.tar.gz file"; else cd ../vsm-image/rootfs && tar -zcvf ../../base.tar.gz . ; fi
 	@cp ../base.tar.gz /etc/openebs/
+	@echo ""
 
 
 #
@@ -117,8 +138,10 @@ endif
 #
 _post_install_msg:
 	@echo ""
+	@echo "--------------------------------------------------------------------"
 	@echo -e "INFO:\tRun openebs to use the CLI"
 	@echo -e "INFO:\tRun openebsd in a new terminal to start the openebs daemon"
+	@echo "--------------------------------------------------------------------"
 	@echo ""
 
 #
