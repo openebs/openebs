@@ -15,27 +15,51 @@ package daemon
 
 import (
 	"fmt"
-	"os"
-	"os/exec"
 	"github.com/Sirupsen/logrus"
 	"github.com/openebs/openebs/types"
+	"os"
+	"os/exec"
+	"path/filepath"
+)
+
+var (
+	// directory contains the list of VSMs created via OpenEBS
+	vsmsDir = "/etc/openebs/.vsms/"
 )
 
 // Vsms returns the list of VSMs to show given the user's filtering.
 func (daemon *Daemon) Vsms(config *types.VSMListOptions) ([]*types.Vsm, error) {
 	vsms := []*types.Vsm{}
 
-	//TODO - Fetch this data from a registry
-	for i := 1; i < 2; i++ {
-		vsm := &types.Vsm {
-			Name:		"vsm",
-			IPAddress:	"10.10.1.1",
-			IOPS:		"100",
-			Volumes:	"1",
-			Status:		"active",
+	err := filepath.Walk(vsmsDir, func(d string, fileInfo os.FileInfo, err error) error {
+		if err != nil {
+			if os.IsNotExist(err) && d != vsmsDir {
+				return nil
+			}
+			return err
+		}
+		if fileInfo == nil || fileInfo.IsDir() {
+			return nil
+		}
+		logrus.Debugf("Found VSM %s\n", fileInfo.Name())
+
+		//TODO - Fetch the details of the VSM from the name
+		vsm := &types.Vsm{
+			Name:      fileInfo.Name(),
+			IPAddress: "10.10.1.1",
+			IOPS:      "100",
+			Volumes:   "1",
+			Status:    "active",
 		}
 		vsms = append(vsms, vsm)
+
+		return nil
+	})
+
+	if err != nil {
+		logrus.Errorf("Unable to fetch VSMs from %s\n", vsmsDir)
 	}
+
 
 	logrus.Debugf("Total VSMs %d\n", len(vsms))
 	return vsms, nil
@@ -99,11 +123,11 @@ func (daemon *Daemon) VsmCreate(opts *types.VSMCreateOptions) (*types.Vsm, error
 	}
 
 	vsm := &types.Vsm{
-		Name: name,
+		Name:      name,
 		IPAddress: netface,
-		IOPS: "0",
-		Volumes: "1",
-		Status: "Active",
+		IOPS:      "0",
+		Volumes:   "1",
+		Status:    "Active",
 	}
 
 	return vsm, err
