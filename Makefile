@@ -7,7 +7,7 @@
 # This is done to avoid conflict with a file of same name as the targets
 # mentioned in this makefile.
 #
-.PHONY: help clean build install _install_base_img _install_make_conf _install_binary _post_install_msg
+.PHONY: help clean build install _install_base_img _install_make_conf _install_binary _post_install_msg _install_git_base_img
 
 #
 # Internal variables or constants.
@@ -58,6 +58,7 @@ build:
 
 #
 # Internally used target.
+# Will download from dropbox.
 # Will reuse the base image if available.
 #
 _install_base_img: 
@@ -68,6 +69,17 @@ ifndef IS_BASE_AVAIL
 	@echo -e "INFO:\topenebs base image downloaded successfully ..."
 	@echo ""
 endif
+
+
+#
+# Internally used target.
+# Will create the base image from git.
+# Will reuse the base image if available.
+#
+_install_git_base_img:
+	@if [ -d ../vsm-image ]; then echo -e "INFO:\tgit clone of vsm-image not required"; else cd .. && git clone https://github.com/openebs/vsm-image.git ; fi
+	@if [ -f ../base.tar.gz ]; then echo -e "INFO:\twill use ../base.tar.gz file"; else cd ../vsm-image/rootfs && tar -zcvf ../../base.tar.gz . ; fi
+	@cp ../base.tar.gz /etc/openebs/
 
 
 #
@@ -112,5 +124,5 @@ _post_install_msg:
 #
 # The install target to be used by Admin.
 #
-install: _install_make_conf _install_base_img _install_binary _post_install_msg
+install: _install_make_conf _install_git_base_img _install_binary _post_install_msg
 
