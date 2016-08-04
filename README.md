@@ -12,7 +12,24 @@ TBD
 
 #Building from Sources
 <setup the golang environemtn>
-TBD
+OpenEBS requires Go 1.6.3 or above. If you running older version, you can upgrade to 1.6.3 using the following:
+
+```bash
+curl -fsSL "https://storage.googleapis.com/golang/go1.6.3.linux-amd64.tar.gz" | tar -xzC /usr/local
+```
+
+Fetch the code into your Go workspace.
+
+```bash
+mkdir -p $GOPATH/github.com/openebs/
+cd $GOPATH/github.com/openebs/
+git clone https://github.com/openebs/openebs.git
+cd openebs/
+sh auto-version.sh
+make build
+ 
+```
+
 
 ## Quick demo of OpenEBS 
 [![OpenEBS Demo](https://s32.postimg.org/wm1p8p8x1/openebs9.png)](https://youtu.be/tYQCPZMzAq4)
