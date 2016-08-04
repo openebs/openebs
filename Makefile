@@ -124,5 +124,5 @@ _post_install_msg:
 #
 # The install target to be used by Admin.
 #
-install: _install_make_conf _install_git_base_img _install_binary _post_install_msg
+install: build _install_make_conf _install_git_base_img _install_binary _post_install_msg
 
