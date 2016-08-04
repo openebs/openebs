@@ -57,11 +57,8 @@ func (s *vsmRouter) postVsmCreate(ctx context.Context, w http.ResponseWriter, r 
 	subnet := r.Form.Get("subnet")
 	router := r.Form.Get("router")
 	volume := r.Form.Get("volume")
+	mount := r.Form.Get("mount")
 
-	//config, hostConfig, networkingConfig, err := s.decoder.DecodeConfig(r.Body)
-	//if err != nil {
-	//	return err
-	//}
 
 	vsmcr, err := s.backend.VsmCreate(&types.VSMCreateOptions{
 		Name:      name,
@@ -70,6 +67,7 @@ func (s *vsmRouter) postVsmCreate(ctx context.Context, w http.ResponseWriter, r 
 		Subnet:    subnet,
 		Router:    router,
 		Volume:    volume,
+		Mount:     mount,
 	})
 	if err != nil {
 		return err
