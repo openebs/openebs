@@ -117,4 +117,4 @@ _lxc_start:
 # A private target
 #
 _vsm_state:
-	@touch /etc/openebs/.vsms/$(name)-$(volume)
+	@touch /etc/openebs/.vsms/$(name)
