@@ -14,18 +14,100 @@
 package daemon
 
 import (
+	"bufio"
 	"fmt"
 	"github.com/Sirupsen/logrus"
 	"github.com/openebs/openebs/types"
+	"io"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 )
 
 var (
 	// directory contains the list of VSMs created via OpenEBS
 	vsmsDir = "/etc/openebs/.vsms/"
 )
+
+func fillVsmType(vsm *types.Vsm, data string) {
+
+	values := strings.Split(data, ":")
+
+	var key, val string
+	if len(values) < 2 {
+		key = "Error"
+	} else {
+		key = strings.TrimSpace(values[0])
+		val = strings.TrimSpace(values[1])
+	}
+
+	switch key {
+	case "State":
+		vsm.Status = val
+	case "IP":
+		vsm.IPAddress = val
+	case "Name":
+		vsm.Name = val
+	case "PID", "CPU use", "BlkIO use", "Memory use", "KMem use", "Link", "Total bytes":
+		// do nothing
+	case "Error":
+		vsm.Name = "NA"
+		vsm.Status = data
+		fmt.Println("Some error: ", data)
+	default:
+		vsm.Name = "NA"
+		vsm.Status = data
+		fmt.Println("default: ", data)
+	}
+
+	// TODO remove these hard codings
+	vsm.IOPS = "100"
+	vsm.Volumes = "1"
+}
+
+func vsmDetails(vsmname string) (*types.Vsm, error) {
+
+	// Preparing the arguments
+	args := []string{"--name=" + vsmname}
+
+	// Preparing the command
+	cmd := exec.Command("lxc-info", args...)
+
+	PrintCommand(cmd)
+
+	cmd.Stderr = os.Stderr
+
+	stdout, err := cmd.StdoutPipe()
+	if nil != err {
+		return nil, err
+	}
+
+	vsm := types.Vsm{}
+	reader := bufio.NewReader(stdout)
+
+	go func(reader io.Reader, vsm *types.Vsm) {
+		scanner := bufio.NewScanner(reader)
+		for scanner.Scan() {
+			fillVsmType(vsm, scanner.Text())
+			fmt.Println(scanner.Text())
+		}
+	}(reader, &vsm)
+
+	if err := cmd.Start(); nil != err {
+		fmt.Println("Error starting program: %s, %s", cmd.Path, err.Error())
+		return nil, err
+	}
+
+	cmd.Wait()
+
+	if strings.TrimSpace(vsm.Status) == "" || strings.TrimSpace(vsm.Name) == "" {
+		vsm.Name = vsmname
+		vsm.Status = "ERROR"
+	}
+
+	return &vsm, nil
+}
 
 // Vsms returns the list of VSMs to show given the user's filtering.
 func (daemon *Daemon) Vsms(config *types.VSMListOptions) ([]*types.Vsm, error) {
@@ -43,14 +125,18 @@ func (daemon *Daemon) Vsms(config *types.VSMListOptions) ([]*types.Vsm, error) {
 		}
 		logrus.Debugf("Found VSM %s\n", fileInfo.Name())
 
-		//TODO - Fetch the details of the VSM from the name
-		vsm := &types.Vsm{
-			Name:      fileInfo.Name(),
-			IPAddress: "10.10.1.1",
-			IOPS:      "100",
-			Volumes:   "1",
-			Status:    "active",
+		vsm, err := vsmDetails(fileInfo.Name())
+		if err != nil {
+			return err
 		}
+
+		//vsm := &types.Vsm{
+		//	Name:      fileInfo.Name(),
+		//	IPAddress: "10.10.1.1",
+		//	IOPS:      "100",
+		//	Volumes:   "1",
+		//	Status:    "active",
+		//}
 		vsms = append(vsms, vsm)
 
 		return nil
@@ -58,8 +144,8 @@ func (daemon *Daemon) Vsms(config *types.VSMListOptions) ([]*types.Vsm, error) {
 
 	if err != nil {
 		logrus.Errorf("Unable to fetch VSMs from %s\n", vsmsDir)
+		return vsms, err
 	}
-
 
 	logrus.Debugf("Total VSMs %d\n", len(vsms))
 	return vsms, nil
@@ -67,15 +153,6 @@ func (daemon *Daemon) Vsms(config *types.VSMListOptions) ([]*types.Vsm, error) {
 
 // This returns the newly created VSM.
 func (daemon *Daemon) VsmCreate(opts *types.VSMCreateOptions) (*types.Vsm, error) {
-
-	fmt.Printf("VSM Create at server ...\n")
-	fmt.Printf("Provided ip: %s\n", opts.IP)
-	fmt.Printf("Provided vsm name: %s\n", opts.Name)
-	fmt.Printf("Provided iface: %s\n", opts.Interface)
-	fmt.Printf("Provided subnet: %s\n", opts.Subnet)
-	fmt.Printf("Provided router: %s\n", opts.Router)
-	fmt.Printf("Provided volume name: %s\n", opts.Volume)
-	fmt.Printf("Provided mount name: %s\n", opts.Mount)
 
 	name := opts.Name
 	ip := opts.IP

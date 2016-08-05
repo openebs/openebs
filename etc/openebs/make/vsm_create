@@ -56,7 +56,7 @@ help: _verify_create
 #
 # The target that creates a vsm
 #
-create: _verify_create _lxc_create _lxc_conf _lxc_start _vsm_state
+create: _verify_create _vsm_state _lxc_create _lxc_conf _lxc_start
 	@echo -e "INFO:\tvsm $(name) with volume $(volume) created successfully..."
 
 
