@@ -96,6 +96,7 @@ _lxc_conf:
 	@echo "lxc.arch = x86_64"                     >> $(LXC_CONF_PATH)
 	@echo "lxc.utsname = $(name)"                 >> $(LXC_CONF_PATH)
 	@echo "lxc.autodev = 1"                       >> $(LXC_CONF_PATH)
+	@echo "lxc.kmsg = 0"                          >> $(LXC_CONF_PATH)
 
 
 #
