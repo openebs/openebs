@@ -140,7 +140,10 @@ _post_install_msg:
 	@echo ""
 	@echo "--------------------------------------------------------------------"
 	@echo -e "INFO:\tRun openebs to use the CLI"
-	@echo -e "INFO:\tRun openebsd in a new terminal to start the openebs daemon"
+	@echo -e "INFO:\tRun below to start the deamon"
+	@echo ""
+	@echo -e "     \tnohup openebsd >> openebsd.log 2>&1 &"
+	@echo ""
 	@echo "--------------------------------------------------------------------"
 	@echo ""
 
