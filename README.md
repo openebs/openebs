@@ -21,8 +21,8 @@ curl -fsSL "https://storage.googleapis.com/golang/go1.6.3.linux-amd64.tar.gz" | 
 Fetch the code into your Go workspace.
 
 ```bash
-mkdir -p $GOPATH/github.com/openebs/
-cd $GOPATH/github.com/openebs/
+mkdir -p $GOPATH/src/github.com/openebs/
+cd $GOPATH/src/github.com/openebs/
 git clone https://github.com/openebs/openebs.git
 cd openebs/
 sh auto-version.sh
