@@ -110,7 +110,7 @@ _lxc_start:
 	@sleep $(SLEEP_SECS)
 	@lxc-attach -n $(name) -- tgtadm --lld iscsi --op new --mode target --tid 1 -T iqn.2016-07.com.cb:openebs.disk.$(volume)
 	@lxc-attach -n $(name) -- mkdir -p /openebs
-	@lxc-attach -n $(name) -- tgtadm --lld iscsi --op new --mode logicalunit --tid 1 --lun 1 -b /openebs/$(volume)
+	@lxc-attach -n $(name) -- tgtadm --lld iscsi --op new --mode logicalunit --tid 1 --lun 1 --blocksize 4096 --bstype cfs -b /openebs/$(volume)
 	@lxc-attach -n $(name) -- tgtadm --lld iscsi --op bind --mode target --tid 1 -I ALL
 
 
