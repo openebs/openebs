@@ -30,7 +30,7 @@ type createOptions struct {
 	subnet     string
 	router     string
 	volume     string
-	mount      string
+	storage    string
 }
 
 func NewVSMCreateCommand(openEBSCli *client.OpenEBSCli) *cobra.Command {
@@ -52,8 +52,8 @@ func NewVSMCreateCommand(openEBSCli *client.OpenEBSCli) *cobra.Command {
 	flags.StringVarP(&opts.ninterface, "iface", "", "", "Network interface of the VSM")
 	flags.StringVarP(&opts.subnet, "subnet", "", "", "Subnet of the VSM")
 	flags.StringVarP(&opts.router, "router", "", "", "Router of the VSM")
-	flags.StringVarP(&opts.volume, "volume", "", "", "Name of the volume to be created")
-	flags.StringVarP(&opts.mount, "mount", "", "", "Mountpoint of the volume to be created")
+	flags.StringVarP(&opts.volume, "volume", "", "", "Name of the volume that will get created")
+	flags.StringVarP(&opts.storage, "storage", "", "", "Backing storage of the volume that will get created")
 
 	return cmd
 }
@@ -68,7 +68,7 @@ func runCreate(openEBSCli *client.OpenEBSCli, opts *createOptions) error {
 		Subnet:    opts.subnet,
 		Router:    opts.router,
 		Volume:    opts.volume,
-		Mount:     opts.mount,
+		Storage:   opts.storage,
 	}
 
 	vsm, err := openEBSCli.Client().VSMCreate(ctx, options)

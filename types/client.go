@@ -27,5 +27,5 @@ type VSMCreateOptions struct {
 	Subnet    string
 	Router    string
 	Volume    string
-	Mount     string
+	Storage   string
 }

@@ -160,7 +160,7 @@ func (daemon *Daemon) VsmCreate(opts *types.VSMCreateOptions) (*types.Vsm, error
 	subnet := opts.Subnet
 	router := opts.Router
 	volume := opts.Volume
-	mount := opts.Mount
+	storage := opts.Storage
 
 	// This is make based !!!
 	// Base path of Makefile
@@ -181,7 +181,7 @@ func (daemon *Daemon) VsmCreate(opts *types.VSMCreateOptions) (*types.Vsm, error
 		"subnet=" + subnet,
 		"volume=" + volume,
 		"router=" + router,
-		"mount=" + mount,
+		"storage=" + storage,
 		"debug=1"}
 
 	// Preparing the final command

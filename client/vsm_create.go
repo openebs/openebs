@@ -18,7 +18,7 @@ func (cli *Client) VSMCreate(ctx context.Context, opts types.VSMCreateOptions) (
 	query.Set("subnet", opts.Subnet)
 	query.Set("router", opts.Router)
 	query.Set("volume", opts.Volume)
-	query.Set("mount", opts.Mount)
+	query.Set("storage", opts.Storage)
 
 	var vsm types.Vsm
 	resp, err := cli.post(ctx, "/vsm/create", query, nil, nil)
