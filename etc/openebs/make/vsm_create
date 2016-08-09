@@ -77,7 +77,10 @@ _lxc_create:
 	@lxc-create -n $(name) -t none
 	@mkdir /var/lib/lxc/$(name)/rootfs
 	@tar -zxf /etc/openebs/base.tar.gz -C /var/lib/lxc/$(name)/rootfs/
-
+	@chmod 600 /var/lib/lxc/$(name)/rootfs/etc/ssh/ssh_host_rsa_key
+	@chmod 600 /var/lib/lxc/$(name)/rootfs/etc/ssh/ssh_host_ecdsa_key
+	@chmod 600 /var/lib/lxc/$(name)/rootfs/etc/ssh/ssh_host_ed25519_key
+	@mkdir -p /var/lib/lxc/$(name)/rootfs/var/empty/sshd/
 
 #
 # A private target
