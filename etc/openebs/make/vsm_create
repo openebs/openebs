@@ -94,7 +94,7 @@ _lxc_conf:
 	@echo "lxc.mount.entry = /dev /var/lib/lxc/$(name)/rootfs/dev none bind 0 0" >> $(LXC_CONF_PATH)
 	@mkdir -p $(storage)/$(name)
 	@mkdir -p /var/lib/lxc/$(name)/rootfs/openebs
-	@echo "lxc.mount.entry = $(storage)/$(name) /openebs none bind 0 0" >> $(LXC_CONF_PATH)
+	@echo "lxc.mount.entry = $(storage)/$(name) /var/lib/lxc/$(name)/rootfs/openebs none bind 0 0" >> $(LXC_CONF_PATH)
 	@echo "lxc.rootfs = /var/lib/lxc/$(name)/rootfs"                >> $(LXC_CONF_PATH)
 	@echo "lxc.include = /usr/share/lxc/config/centos.common.conf"  >> $(LXC_CONF_PATH)
 	@echo "lxc.arch = x86_64"                     >> $(LXC_CONF_PATH)
