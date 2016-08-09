@@ -53,7 +53,7 @@ func NewVSMCreateCommand(openEBSCli *client.OpenEBSCli) *cobra.Command {
 	flags.StringVarP(&opts.subnet, "subnet", "", "", "Subnet of the VSM")
 	flags.StringVarP(&opts.router, "router", "", "", "Router of the VSM")
 	flags.StringVarP(&opts.volume, "volume", "", "", "Name of the volume that will get created")
-	flags.StringVarP(&opts.storage, "storage", "", "", "Backing storage of the volume that will get created")
+	flags.StringVarP(&opts.storage, "storage", "", "", "Backing storage of the VSM")
 
 	return cmd
 }

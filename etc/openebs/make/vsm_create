@@ -47,7 +47,7 @@ help: _verify_create
 	@echo "       subnet        subnet of the vsm"
 	@echo "       router        router of the vsm"
 	@echo "       volume        name of the volume to be created within vsm"
-	@echo "       storage       backing storage of the volume to be created within vsm"
+	@echo "       storage       backing storage of the vsm"
 	@echo "       debug         a non-empty value will trigger verifications"
 	@echo "                        before execution of make targets"
 	@echo ""
@@ -89,8 +89,9 @@ _lxc_conf:
 	@echo "lxc.network.ipv4 = $(ip)/$(subnet)"    >> $(LXC_CONF_PATH)
 	@echo "lxc.network.ipv4.gateway = $(router)"  >> $(LXC_CONF_PATH)
 	@echo "lxc.mount.entry = /dev /var/lib/lxc/$(name)/rootfs/dev none bind 0 0" >> $(LXC_CONF_PATH)
+	@mkdir -p $(storage)/$(name)
 	@mkdir -p /var/lib/lxc/$(name)/rootfs/openebs
-	@echo "lxc.mount.entry = /$(storage) /openebs none bind 0 0" >> $(LXC_CONF_PATH)
+	@echo "lxc.mount.entry = $(storage)/$(name) /openebs none bind 0 0" >> $(LXC_CONF_PATH)
 	@echo "lxc.rootfs = /var/lib/lxc/$(name)/rootfs"                >> $(LXC_CONF_PATH)
 	@echo "lxc.include = /usr/share/lxc/config/centos.common.conf"  >> $(LXC_CONF_PATH)
 	@echo "lxc.arch = x86_64"                     >> $(LXC_CONF_PATH)
