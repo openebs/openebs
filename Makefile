@@ -7,14 +7,13 @@
 # This is done to avoid conflict with a file of same name as the targets
 # mentioned in this makefile.
 #
-.PHONY: help clean build install _install_base_img _install_make_conf _install_binary _post_install_msg _install_git_base_img _clean_git_base_img _clean_binaries _install_openebs_conf_dir _build_check_go _build_check_lxc _install_check_openebs_daemon
+.PHONY: help clean build install _install_make_conf _install_binary _post_install_msg _install_git_base_img _clean_git_base_img _clean_binaries _install_openebs_conf_dir _build_check_go _build_check_lxc _install_check_openebs_daemon
 
 #
 # Internal variables or constants.
 # NOTE - These will be executed when any make target is invoked.
 #
 IS_OPENEBSD_RUNNING       := $(shell ps aux | grep -v grep | grep -c openebsd)
-IS_DROPBOX_BASE_AVAIL     := $(shell ls -ltr /etc/openebs | grep base.tar.gz | awk '{print $$NF}')
 IS_GO_INSTALLED           := $(shell which go >> /dev/null 2>&1; echo $$?)
 IS_LXC_INSTALLED          := $(shell which lxc-create >> /dev/null 2>&1; echo $$?)
 
@@ -109,22 +108,6 @@ _install_check_openebs_daemon:
 #
 _install_openebs_conf_dir:
 	@mkdir -p /etc/openebs/.vsms
-
-
-#
-# Internally used target.
-# Will download from dropbox.
-# Will reuse the base image if available.
-#
-#
-_install_base_img: 
-ifndef IS_DROPBOX_BASE_AVAIL
-	@echo ""
-	@echo -e "INFO:\tdownloading openebs base image ..."
-	@cd /etc/openebs && wget https://www.dropbox.com/s/b1voxh0t5xlrnqn/base.tar.gz?dl=0#
-	@echo -e "INFO:\topenebs base image downloaded successfully ..."
-	@echo ""
-endif
 
 
 #
