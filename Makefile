@@ -36,10 +36,11 @@ help:
 #
 _clean_git_base_img:
 	@echo ""
-	@echo -e "INFO:\tremoving openebs base img repo ..."
+	@echo -e "INFO:\tremoving openebs base img repos and tar file ..."
 	@rm -rf ../vsm-image
+	@rm -rf ../tgt
 	@rm -f ../base.tar.gz
-	@echo -e "INFO:\topenebs base img repo removed successfully ..."
+	@echo -e "INFO:\topenebs base img repos and tar file removed successfully ..."
 	@echo ""
 
 
@@ -133,8 +134,25 @@ endif
 #
 _install_git_base_img:
 	@echo ""
-	@if [ -d ../vsm-image ]; then echo -e "INFO:\tgit clone of vsm-image not required"; else cd .. && git clone https://github.com/openebs/vsm-image.git ; fi
-	@if [ -f ../base.tar.gz ]; then echo -e "INFO:\twill use ../base.tar.gz file"; else cd ../vsm-image/rootfs && tar -zcf ../../base.tar.gz . ; fi
+	@if [ -d ../vsm-image ]; then echo -e "INFO:\tgit clone of vsm-image not required"; else \
+		echo "" \
+		&& cd .. \
+		&& git clone https://github.com/openebs/vsm-image.git \
+		&& echo "" ;\
+		fi
+	@if [ -d ../tgt ]; then echo -e "INFO:\tbuild  tgt binaries not required"; else \
+		echo "" \
+		&& cd .. \
+		&& git clone https://github.com/openebs/tgt.git \
+		&& cd ./tgt \
+		&& make -s programs CFS=1 \
+		&& cp usr/tgtd usr/tgtadm usr/tgtimg ../vsm-image/rootfs/sbin/ \
+		&& echo "" ; \
+		fi
+	@if [ -f ../base.tar.gz ]; then echo -e "INFO:\twill use existing base file at ../base.tar.gz"; else \
+		cd ../vsm-image/rootfs \
+		&& tar -zcf ../../base.tar.gz . ; \
+		fi
 	@cp ../base.tar.gz /etc/openebs/
 	@echo ""
 
