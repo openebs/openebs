@@ -46,8 +46,6 @@ func absentFromHelp(string) string      { return "" }
 func NewDaemonCli() *DaemonCli {
 	// TODO(tiborvass): remove InstallFlags?
 	daemonConfig := new(daemon.Config)
-	// We want openebsd to run on TLS
-	daemonConfig.TLS = true
 
 	daemonConfig.LogConfig.Config = make(map[string]string)
 
