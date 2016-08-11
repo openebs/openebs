@@ -16,13 +16,14 @@ package daemon
 import (
 	"bufio"
 	"fmt"
-	"github.com/Sirupsen/logrus"
-	"github.com/openebs/openebs/types"
 	"io"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
+
+	"github.com/Sirupsen/logrus"
+	"github.com/openebs/openebs/types"
 )
 
 var (
