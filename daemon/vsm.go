@@ -31,83 +31,129 @@ var (
 	vsmsDir = "/etc/openebs/.vsms/"
 )
 
-func fillVsmType(vsm *types.Vsm, data string) {
+const (
+	InvalidLxcInfoOp     = "Error"
+	LxcInfoOpState       = "State"
+	LxcInfoOpIP          = "IP"
+	LxcInfoOpName        = "Name"
+	LxcInfoOpInvalidName = "NA"
+	LxcInfoOpPID         = "PID"
+	LxcInfoOpCPUUse      = "CPU use"
+	LxcInfoOpBlkIOUse    = "BlkIO use"
+	LxcInfoOpMemoryUse   = "Memory use"
+	LxcInfoOpKMemUse     = "KMem use"
+	LxcInfoOpLink        = "Link"
+	LxcInfoOpTotalBytes  = "Total bytes"
+)
 
-	values := strings.Split(data, ":")
+type mapper func(dest *types.Vsm, src string)
 
-	var key, val string
+func parseLxcInfoOpAsKV(rawLxcInfoOp string) (key string, value string) {
+
+	// a valid output will list the details of the LXC
+	// in `key: value` format with each `key: value`
+	// separated by new lines
+	values := strings.Split(rawLxcInfoOp, ":")
+
+	// A very basic parsing validation
 	if len(values) < 2 {
-		key = "Error"
+		key = InvalidLxcInfoOp
 	} else {
 		key = strings.TrimSpace(values[0])
-		val = strings.TrimSpace(values[1])
+		value = strings.TrimSpace(values[1])
 	}
 
+	return key, value
+}
+
+func mapVsmFromLxcInfo(vsm *types.Vsm, rawLxcInfoOp string) {
+
+	key, val := parseLxcInfoOpAsKV(rawLxcInfoOp)
+
 	switch key {
-	case "State":
+	case LxcInfoOpState:
 		vsm.Status = val
-	case "IP":
+	case LxcInfoOpIP:
 		vsm.IPAddress = val
-	case "Name":
+	case LxcInfoOpName:
 		vsm.Name = val
-	case "PID", "CPU use", "BlkIO use", "Memory use", "KMem use", "Link", "Total bytes":
+	case LxcInfoOpPID, LxcInfoOpCPUUse, LxcInfoOpBlkIOUse, LxcInfoOpMemoryUse, LxcInfoOpKMemUse, LxcInfoOpLink, LxcInfoOpTotalBytes:
 		// do nothing
-	case "Error":
-		vsm.Name = "NA"
-		vsm.Status = data
-		fmt.Println("Some error: ", data)
+	case InvalidLxcInfoOp:
+		vsm.Name = LxcInfoOpInvalidName
+		vsm.Status = rawLxcInfoOp
+		//fmt.Println("Some error: ", data)
 	default:
 		vsm.Name = "NA"
-		vsm.Status = data
-		fmt.Println("default: ", data)
+		vsm.Status = rawLxcInfoOp
+		//fmt.Println("default: ", data)
 	}
 
 	// TODO remove these hard codings
-	vsm.IOPS = "100"
-	vsm.Volumes = "1"
+	vsm.IOPS = "0"
+	vsm.Volumes = "0"
 }
 
-func vsmDetails(vsmname string) (*types.Vsm, error) {
+func execOsCmd(cmdName string, cmdArgs []string, dest *types.Vsm, mapper mapper) error {
 
-	// Preparing the arguments
-	args := []string{"--name=" + vsmname}
+	// prepare the command
+	cmd := exec.Command(cmdName, cmdArgs...)
 
-	// Preparing the command
-	cmd := exec.Command("lxc-info", args...)
-
-	PrintCommand(cmd)
-
+	// capture the std err
 	cmd.Stderr = os.Stderr
 
+	// capture the std output
 	stdout, err := cmd.StdoutPipe()
 	if nil != err {
-		return nil, err
+		return err
 	}
 
-	vsm := types.Vsm{}
+	// read the std output
 	reader := bufio.NewReader(stdout)
-
-	go func(reader io.Reader, vsm *types.Vsm) {
+	go func(reader io.Reader, dest *types.Vsm) {
 		scanner := bufio.NewScanner(reader)
 		for scanner.Scan() {
-			fillVsmType(vsm, scanner.Text())
+			mapper(dest, scanner.Text())
 			fmt.Println(scanner.Text())
 		}
-	}(reader, &vsm)
+	}(reader, dest)
 
+	// execute the command
 	if err := cmd.Start(); nil != err {
-		fmt.Println("Error starting program: %s, %s", cmd.Path, err.Error())
-		return nil, err
+		fmt.Println("Error executing: %s, %s", cmd.Path, err.Error())
+		return err
 	}
 
 	cmd.Wait()
 
+	// no error if logic has reached here
+	return nil
+}
+
+func vsmDetails(vsmName string) (*types.Vsm, error) {
+
+	// an empty vsm will be passed while
+	// a filled up vsm will be received
+	vsm := &types.Vsm{}
+	cmd := "lxc-info"
+	args := []string{"--name=" + vsmName}
+
+	err := execOsCmd(
+		cmd,
+		args,
+		vsm,
+		mapVsmFromLxcInfo)
+
+	if nil != err {
+		return nil, err
+	}
+
 	if strings.TrimSpace(vsm.Status) == "" || strings.TrimSpace(vsm.Name) == "" {
-		vsm.Name = vsmname
+		vsm.Name = vsmName
 		vsm.Status = "ERROR"
 	}
 
-	return &vsm, nil
+	return vsm, nil
 }
 
 // Vsms returns the list of VSMs to show given the user's filtering.
@@ -131,13 +177,6 @@ func (daemon *Daemon) Vsms(config *types.VSMListOptions) ([]*types.Vsm, error) {
 			return err
 		}
 
-		//vsm := &types.Vsm{
-		//	Name:      fileInfo.Name(),
-		//	IPAddress: "10.10.1.1",
-		//	IOPS:      "100",
-		//	Volumes:   "1",
-		//	Status:    "active",
-		//}
 		vsms = append(vsms, vsm)
 
 		return nil

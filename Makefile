@@ -182,6 +182,9 @@ _post_install_msg:
 	@echo -e "INFO:\ttcp mode:"
 	@echo -e "     \tnohup openebsd -H tcp://0.0.0.0:8000 >> openebsd.log 2>&1 &"
 	@echo ""
+	@echo -e "INFO:\tWhen daemon is in tcp mode, set below before running openebs commands:"
+	@echo -e "     \te.g. export OPENEBS_HOST=\"tcp://0.0.0.0:8000\""
+	@echo ""
 	@echo "--------------------------------------------------------------------"
 	@echo ""
 
