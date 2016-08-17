@@ -8,7 +8,7 @@ import (
 	"golang.org/x/net/context"
 )
 
-// ContainerList returns the list of containers in the docker host.
+// Invoke the list command exposed by the server/daemon
 func (cli *Client) VSMList(ctx context.Context, options types.VSMListOptions) ([]types.Vsm, error) {
 	query := url.Values{}
 
@@ -16,7 +16,7 @@ func (cli *Client) VSMList(ctx context.Context, options types.VSMListOptions) ([
 		query.Set("all", "1")
 	}
 
-	resp, err := cli.get(ctx, "/vsm/lsjson", query, nil)
+	resp, err := cli.get(ctx, "/vsm/list", query, nil)
 	if err != nil {
 		return nil, err
 	}

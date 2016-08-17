@@ -37,7 +37,7 @@ func (r *vsmRouter) initRoutes() {
 		// HEAD
 		//router.NewHeadRoute("/vsm/{name:.*}/archive", r.headVsmArchive),
 		// GET
-		router.NewGetRoute("/vsm/lsjson", r.getVsmList),
+		router.NewGetRoute("/vsm/list", r.getVsmList),
 		// POST
 		router.NewPostRoute("/vsm/create", r.postVsmCreate),
 		// PUT
