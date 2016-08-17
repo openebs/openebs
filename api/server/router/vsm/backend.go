@@ -17,18 +17,9 @@ import (
 	"github.com/openebs/openebs/types"
 )
 
-// stateBackend includes functions to implement to provide container state lifecycle functionality.
-//type stateBackend interface {
-//	ContainerCreate(config types.ContainerCreateConfig, validateHostname bool) (types.ContainerCreateResponse, error)
-//}
-
-// monitorBackend includes functions to implement to provide containers monitoring functionality.
-type monitorBackend interface {
-	Vsms(config *types.VSMListOptions) ([]*types.Vsm, error)
-}
-
-// These functions need to be implemented to provide VSM specific functionality.
+// Router will hook aginst these functions of same signature
+// implemented at the server side i.e. openebs daemon.
 type Backend interface {
-	monitorBackend
+	VsmList(config *types.VSMListOptions) ([]*types.Vsm, error)
 	VsmCreate(opts *types.VSMCreateOptions) (*types.Vsm, error)
 }

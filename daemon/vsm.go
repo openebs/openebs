@@ -23,7 +23,7 @@ import (
 )
 
 // This returns the list of VSMs.
-func (daemon *Daemon) Vsms(config *types.VSMListOptions) ([]*types.Vsm, error) {
+func (daemon *Daemon) VsmList(config *types.VSMListOptions) ([]*types.Vsm, error) {
 	vsms := []*types.Vsm{}
 
 	err := filepath.Walk(vsmsDir, func(d string, fileInfo os.FileInfo, err error) error {
