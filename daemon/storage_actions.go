@@ -11,7 +11,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// This will consist of common signatures of actions w.r.t OpenEBS storage.
+// This will consist of signatures of the actions related to OpenEBS storage.
 // In programming design patterns' terminology, this file will expose behaviors
 // as interfaces, also known as contracts in some programming languages.
 
@@ -30,65 +30,57 @@ type Profiler interface {
 	Stop() (err error)
 }
 
-//////////////////////////
-// Individual VSM actions
-//////////////////////////
-
-type VsmCreator interface {
-	Create() (err error)
+type Creator interface {
+	Create() (resp Response, err error)
 }
 
-type VsmReader interface {
-	Read() (err error)
+type Reader interface {
+	Read() (resp Response, err error)
 }
 
-type VsmUpdater interface {
-	Update() (err error)
+type Updater interface {
+	Update() (resp Response, err error)
 }
 
-type VsmDestroyer interface {
-	Destroy() (err error)
+type Destroyer interface {
+	Destroy() (resp Response, err error)
 }
 
-//////////////////////////
-// Composable VSM actions
-//////////////////////////
-
-type VsmStatisticsReader interface {
-	Stats(r VsmReader) (err error)
+type StatisticsReader interface {
+	Stats(r Reader) (err error)
 }
 
-type VsmLister interface {
-	List(rdrs []VsmReader) (err error)
+type Lister interface {
+	List(rdrs []Reader) (err error)
 }
 
-type VsmStatisticsLister interface {
-	List(sr []VsmStatisticsReader) (err error)
+type StatisticsLister interface {
+	List(sr []StatisticsReader) (err error)
 }
 
-type VsmCreateReader interface {
-	VsmCreator
-	VsmReader
+type CreateReader interface {
+	Creator
+	Reader
 }
 
-type VsmCreateReadProfiler interface {
-	VsmCreateReader
+type CreateReadProfiler interface {
+	CreateReader
 	Profiler
 }
 
-type VsmCreateUpdateReader interface {
-	VsmCreator
-	VsmUpdater
-	VsmReader
+type CreateUpdateReader interface {
+	Creator
+	Updater
+	Reader
 }
 
-type VsmCreateUpdateReadProfiler interface {
-	VsmCreateUpdateReader
+type CreateUpdateReadProfiler interface {
+	CreateUpdateReader
 	Profiler
 }
 
-type VsmRangeLister struct {
-	VsmLister
+type RangeLister struct {
+	Lister
 	Begin int
 	End   int
 }

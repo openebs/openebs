@@ -21,6 +21,10 @@
 
 package daemon
 
+/////////////////////////
+// common storage types
+/////////////////////////
+
 type NameID struct {
 	name string
 	id   string
@@ -45,28 +49,19 @@ type Message struct {
 	desc  string
 }
 
-type Messages struct {
-	msgs []Message
+type Response struct {
+	value  interface{}
+	infos  []Message
+	errors []Message
+	warns  []Message
 }
 
-type VsmCreateIpOpts struct {
+type Vsm struct {
 	NameID
 	Network
 }
 
-type VsmCreateOpOpts struct {
-	NameID
-	Network
-	Messages
-}
-
-type VolumeCreateIpOpts struct {
+type Volume struct {
 	NameID
 	Storage
-}
-
-type VolumeCreateOpOpts struct {
-	NameID
-	Storage
-	Messages
 }
