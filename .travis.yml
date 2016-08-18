@@ -1,0 +1,15 @@
+sudo: false
+language: go
+
+os:
+        - linux
+
+env:
+        - ARCH=x86_64
+
+go:
+        - 1.6.2
+
+script:
+        - make build
+        - make install
