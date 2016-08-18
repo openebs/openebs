@@ -18,7 +18,7 @@
 package daemon
 
 /////////////////////////////////////
-// Individual common storage actions
+// Individual storage actions
 /////////////////////////////////////
 
 type Timer interface {
@@ -45,6 +45,10 @@ type Updater interface {
 type Destroyer interface {
 	Destroy() (resp Response, err error)
 }
+
+/////////////////////////////////////
+// Composable storage actions
+/////////////////////////////////////
 
 type StatisticsReader interface {
 	Stats(r Reader) (err error)
