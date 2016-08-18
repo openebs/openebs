@@ -11,8 +11,8 @@ go:
         - 1.6.2
 
 before_install:
-        - apt-get -qq update
-        - apt-get install -y lxc 
+        - sudo apt-get -qq update
+        - sudo apt-get install -y lxc 
 
 script:
         - make build
