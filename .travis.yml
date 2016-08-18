@@ -19,5 +19,5 @@ before_install:
         - sudo apt-get install -y lxc 
 
 script:
-        - make build
-        - make install
+        - sudo make build
+        - sudo make install
