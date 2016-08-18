@@ -20,3 +20,53 @@
 // comprises of an OS container and a filesystem.
 
 package daemon
+
+type NameID struct {
+	name string
+	id   string
+	desc string
+}
+
+type Storage struct {
+	size uint64
+	iops uint64
+}
+
+type Network struct {
+	ip     string
+	iface  string
+	subnet string
+	router string
+}
+
+type Message struct {
+	id    string
+	level string
+	desc  string
+}
+
+type Messages struct {
+	msgs []Message
+}
+
+type VsmCreateIpOpts struct {
+	NameID
+	Network
+}
+
+type VsmCreateOpOpts struct {
+	NameID
+	Network
+	Messages
+}
+
+type VolumeCreateIpOpts struct {
+	NameID
+	Storage
+}
+
+type VolumeCreateOpOpts struct {
+	NameID
+	Storage
+	Messages
+}
