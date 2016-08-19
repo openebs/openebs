@@ -123,10 +123,11 @@ const (
 
 // A filter can be value based or range based.
 type OpsFilter struct {
-	Id  FilterID
-	Val string
-	Min uint64
-	Max uint64
+	Id    FilterID
+	Truth bool
+	Val   string
+	Min   uint64
+	Max   uint64
 }
 
 type Opts struct {
@@ -142,7 +143,6 @@ type VSMListOptions struct {
 // This holds request paramters required to list the VSMs.
 // This will determine the variation w.r.t listing the VSMs.
 type VSMListOptionsV2 struct {
-	Filters []NameID
 	Opts
 }
 
