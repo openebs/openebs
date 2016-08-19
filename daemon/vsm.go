@@ -113,3 +113,15 @@ func (daemon *Daemon) VsmCreate(opts *types.VSMCreateOptions) (*types.Vsm, error
 
 	return vsm, err
 }
+
+// This creates a new VSM.
+// Version 2
+func (daemon *Daemon) VsmCreateV2(opts *types.VSMCreateOptionsV2) (*types.VsmV2, error) {
+
+	// find the operation variation
+
+	// execute the selected operation
+	//resp, err = opts.VsmV2.Create()
+
+	return nil, nil
+}

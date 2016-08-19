@@ -60,40 +60,40 @@ type OEBSType interface {
 }
 
 type NameID struct {
-	name string
-	id   string
-	desc string
+	Name string
+	Id   string
+	Desc string
 }
 
 type Storage struct {
-	size uint64
-	iops uint64
+	Size uint64
+	Iops uint64
 }
 
 type Network struct {
-	ip     string
-	iface  string
-	subnet string
-	router string
+	Ip     string
+	Iface  string
+	Subnet string
+	Router string
 }
 
 type Message struct {
-	id    string
-	level string
-	desc  string
+	Id    string
+	Level string
+	Desc  string
 }
 
 type Response struct {
-	val    OEBSType
-	infos  []Message
-	errors []Message
-	warns  []Message
+	Val    OEBSType
+	Infos  []Message
+	Errors []Message
+	Warns  []Message
 }
 
 type VsmV2 struct {
 	NameID
 	Network
-	vols []Volume
+	Vols []Volume
 }
 
 type Volume struct {
@@ -101,10 +101,49 @@ type Volume struct {
 	Storage
 }
 
-// This holds request paramters required to list the VSMs.
-// This will determine the variation w.r.t listing the VSMs.
+// Various options whose combinations will determine
+// the storage operation. These will play a crucial
+// role in executing the vanilla operation
+// or a variation of the operation.
+
+type FilterID string
+
+// Various filters that will be used as options
+// during request against a particular operation.
+const (
+	Iops    FilterID = "iops"
+	Size    FilterID = "size"
+	Usage   FilterID = "usage"
+	None    FilterID = "none"
+	Default FilterID = "default"
+	Err     FilterID = "errors"
+	All     FilterID = "all"
+	Profile FilterID = "profile"
+)
+
+// A filter can be value based or range based.
+type OpsFilter struct {
+	Id  FilterID
+	Val string
+	Min uint64
+	Max uint64
+}
+
+type Opts struct {
+	Filters []OpsFilter
+}
+
+// TODO deprecate
 type VSMListOptions struct {
 	All bool
+}
+
+// Version 2
+// This holds request paramters required to list the VSMs.
+// This will determine the variation w.r.t listing the VSMs.
+type VSMListOptionsV2 struct {
+	Filters []NameID
+	Opts
 }
 
 // This holds request parameters required to create a VSM.
@@ -124,4 +163,5 @@ type VSMCreateOptions struct {
 // This will determine the variations required w.r.t creating a VSM.
 type VSMCreateOptionsV2 struct {
 	VsmV2
+	Opts
 }
