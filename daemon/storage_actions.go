@@ -17,6 +17,10 @@
 
 package daemon
 
+import (
+	"github.com/openebs/openebs/types"
+)
+
 /////////////////////////////////////
 // Individual storage actions
 /////////////////////////////////////
@@ -31,19 +35,19 @@ type Profiler interface {
 }
 
 type Creator interface {
-	Create() (resp Response, err error)
+	Create() (resp types.Response, err error)
 }
 
 type Reader interface {
-	Read() (resp Response, err error)
+	Read() (resp types.Response, err error)
 }
 
 type Updater interface {
-	Update() (resp Response, err error)
+	Update() (resp types.Response, err error)
 }
 
 type Destroyer interface {
-	Destroy() (resp Response, err error)
+	Destroy() (resp types.Response, err error)
 }
 
 /////////////////////////////////////

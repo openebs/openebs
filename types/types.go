@@ -42,10 +42,86 @@ type Info struct {
 // Used for response from Remote API:
 // GET "/vsm/lsjson"
 // POST "/vsm/create"
+// TODO deprecate
 type Vsm struct {
 	Name      string
 	IPAddress string
 	IOPS      string
 	Volumes   string
 	Status    string
+}
+
+/////////////////////////
+// common storage types
+/////////////////////////
+
+// Generic Type
+type OEBSType interface {
+}
+
+type NameID struct {
+	name string
+	id   string
+	desc string
+}
+
+type Storage struct {
+	size uint64
+	iops uint64
+}
+
+type Network struct {
+	ip     string
+	iface  string
+	subnet string
+	router string
+}
+
+type Message struct {
+	id    string
+	level string
+	desc  string
+}
+
+type Response struct {
+	val    OEBSType
+	infos  []Message
+	errors []Message
+	warns  []Message
+}
+
+type VsmV2 struct {
+	NameID
+	Network
+	vols []Volume
+}
+
+type Volume struct {
+	NameID
+	Storage
+}
+
+// This holds request paramters required to list the VSMs.
+// This will determine the variation w.r.t listing the VSMs.
+type VSMListOptions struct {
+	All bool
+}
+
+// This holds request parameters required to create a VSM.
+// TODO deprecate
+type VSMCreateOptions struct {
+	Name      string
+	IP        string
+	Interface string
+	Subnet    string
+	Router    string
+	Volume    string
+	Storage   string
+}
+
+// Version 2
+// This holds the request parameters to create a VSM.
+// This will determine the variations required w.r.t creating a VSM.
+type VSMCreateOptionsV2 struct {
+	VsmV2
 }
