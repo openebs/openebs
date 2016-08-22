@@ -52,7 +52,7 @@ type Vsm struct {
 }
 
 /////////////////////////
-// common storage types
+// Storage Types
 /////////////////////////
 
 // Generic Type
@@ -101,6 +101,10 @@ type Volume struct {
 	Storage
 }
 
+///////////////////
+// Options w.r.t storage operations
+///////////////////
+
 // Various options whose combinations will determine
 // the storage operation. These will play a crucial
 // role in executing the vanilla operation
@@ -111,7 +115,7 @@ type OptionType string
 // Various options that may be exercised during
 // a request against a particular operation.
 const (
-	// Pure types
+	// Pure options
 	IopsOpt     OptionType = "iops"
 	SizeOpt     OptionType = "size"
 	UsageOpt    OptionType = "usage"
@@ -122,7 +126,7 @@ const (
 	AllOpt     OptionType = "all"
 	ProfileOpt OptionType = "profile"
 
-	// Derived types based on combinations of above types
+	// Derived options based on combinations of above types
 	ProfiledDefaultOpt OptionType = "pdefault"
 	ProfiledErrOpt     OptionType = "perrors"
 	ProfiledAllOpt     OptionType = "pall"
@@ -139,6 +143,157 @@ type Option struct {
 	Min   uint64
 	Max   uint64
 }
+
+func FirstOptType(options []Option) OptionType {
+
+	optionType := DefaultOpt
+
+	if nil == options || 0 == len(options) {
+		return optionType
+	}
+
+	// return the very first option type
+	return options[0].Type
+}
+
+func LastOptType(options []Option) OptionType {
+
+	optionType := DefaultOpt
+
+	if nil == options || 0 == len(options) {
+		return optionType
+	}
+
+	// return the last option type
+	return options[len(options)-1].Type
+}
+
+func GetOptTypes(options []Option) []OptionType {
+
+	optTypes := []OptionType{}
+
+	if nil == options || 0 == len(options) {
+		optTypes = append(optTypes, NoneOpt)
+		return optTypes
+	}
+
+	for _, option := range options {
+		optTypes = append(optTypes, option.Type)
+	}
+
+	return optTypes
+}
+
+// Checks if the provided collection has the required type.
+func HasOptType(providedOptTypes []OptionType, requiredOptType OptionType) bool {
+
+	for _, providedOptType := range providedOptTypes {
+		if providedOptType == requiredOptType {
+			// break out in case of a successful match
+			return true
+		}
+	}
+
+	return false
+}
+
+// Checks if the provided collection has all the required types.
+// In other words, it checks if the provided collection is a superset of required collection.
+func IsSuperSetOptTypes(providedOptTypes []OptionType, requiredOptTypes ...OptionType) bool {
+
+	truthy := true
+
+	for _, requiredOptType := range requiredOptTypes {
+		truthy = HasOptType(providedOptTypes, requiredOptType)
+
+		// break out if no match
+		if !truthy {
+			return truthy
+		}
+	}
+
+	return truthy
+}
+
+// This logic is critical to the functioning of any OpenEBS operation.
+// We assume that any OpenEBS operation can have multiple variants/modes of
+// execution.
+//
+// e.g. It may be a vanilla execution or a profiled execution or execution of a
+// particular version, etc.
+//
+// NOTE - Logic will be correct when choice of options are exercized properly.
+// TODO - Re-factor to a fitting structural pattern !!!
+func InferredOptType(options []Option) OptionType {
+
+	providedOptTypes := GetOptTypes(options)
+
+	// This is the verbose mode.
+	// This indicates the combination of all possible modes of an operation.
+	// This will be a time taking operation.
+	optA := []OptionType{AllOpt}
+
+	// This mode will profile the execution, collect the
+	// possible errors, warnings, etc in addition to executing
+	// the given operation.
+	optPnE := []OptionType{ProfileOpt, ErrCountOpt}
+
+	// This mode will profile in addition to executing the given operation.
+	optPnD := []OptionType{ProfileOpt, DefaultOpt}
+
+	// This mode will collect the possible errors, warnings, etc
+	// in addition to executing the given operation.
+	optE := []OptionType{ErrCountOpt}
+
+	// This is same as profile & default mode of operation.
+	optP := []OptionType{ProfileOpt}
+
+	// This mode is the vanilla execution of any operation.
+	// This mode is expected to be used often.
+	optD := []OptionType{DefaultOpt}
+
+	// This is the mode when client does not provide any
+	// mode of operation.
+	optN := []OptionType{NoneOpt}
+
+	if IsSuperSetOptTypes(providedOptTypes, optA...) {
+		return AllOpt
+
+	} else if IsSuperSetOptTypes(providedOptTypes, optPnE...) {
+		return ProfiledErrOpt
+
+	} else if IsSuperSetOptTypes(providedOptTypes, optPnD...) {
+		return ProfiledDefaultOpt
+
+	} else if IsSuperSetOptTypes(providedOptTypes, optE...) {
+		return ErrCountOpt
+
+	} else if IsSuperSetOptTypes(providedOptTypes, optP...) {
+		return ProfiledDefaultOpt
+
+	} else if IsSuperSetOptTypes(providedOptTypes, optD...) {
+		return DefaultOpt
+
+	} else if IsSuperSetOptTypes(providedOptTypes, optN...) {
+		return NoneOpt
+
+	}
+
+	return NoneOpt
+}
+
+func SetOptToDefaultIfNone(providedOptType OptionType) OptionType {
+
+	if providedOptType == NoneOpt {
+		return DefaultOpt
+	}
+
+	return providedOptType
+}
+
+///////////////////////////
+// Storage operation types
+///////////////////////////
 
 // TODO deprecate
 type VSMListOptions struct {
