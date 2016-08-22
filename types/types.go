@@ -106,32 +106,38 @@ type Volume struct {
 // role in executing the vanilla operation
 // or a variation of the operation.
 
-type FilterID string
+type OptionType string
 
-// Various filters that will be used as options
-// during request against a particular operation.
+// Various options that may be exercised during
+// a request against a particular operation.
 const (
-	Iops    FilterID = "iops"
-	Size    FilterID = "size"
-	Usage   FilterID = "usage"
-	None    FilterID = "none"
-	Default FilterID = "default"
-	Err     FilterID = "errors"
-	All     FilterID = "all"
-	Profile FilterID = "profile"
+	// Pure types
+	IopsOpt     OptionType = "iops"
+	SizeOpt     OptionType = "size"
+	UsageOpt    OptionType = "usage"
+	NoneOpt     OptionType = "none"
+	DefaultOpt  OptionType = "default"
+	ErrCountOpt OptionType = "errorcount"
+	// Verbose mode
+	AllOpt     OptionType = "all"
+	ProfileOpt OptionType = "profile"
+
+	// Derived types based on combinations of above types
+	ProfiledDefaultOpt OptionType = "pdefault"
+	ProfiledErrOpt     OptionType = "perrors"
+	ProfiledAllOpt     OptionType = "pall"
+
+	// Not sure if this is the right place !!
+	VersionOpt OptionType = "version"
 )
 
-// A filter can be value based or range based.
-type OpsFilter struct {
-	Id    FilterID
+// An option can be value based or range based.
+type Option struct {
+	Type  OptionType
 	Truth bool
 	Val   string
 	Min   uint64
 	Max   uint64
-}
-
-type Opts struct {
-	Filters []OpsFilter
 }
 
 // TODO deprecate
@@ -143,7 +149,8 @@ type VSMListOptions struct {
 // This holds request paramters required to list the VSMs.
 // This will determine the variation w.r.t listing the VSMs.
 type VSMListOptionsV2 struct {
-	Opts
+	All  bool
+	Opts []Option
 }
 
 // This holds request parameters required to create a VSM.
@@ -163,5 +170,5 @@ type VSMCreateOptions struct {
 // This will determine the variations required w.r.t creating a VSM.
 type VSMCreateOptionsV2 struct {
 	VsmV2
-	Opts
+	Opts []Option
 }
