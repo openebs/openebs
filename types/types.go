@@ -116,20 +116,18 @@ type OptionType string
 // a request against a particular operation.
 const (
 	// Pure options
-	IopsOpt     OptionType = "iops"
-	SizeOpt     OptionType = "size"
-	UsageOpt    OptionType = "usage"
-	NoneOpt     OptionType = "none"
-	DefaultOpt  OptionType = "default"
-	ErrCountOpt OptionType = "errorcount"
+	IopsOpt    OptionType = "iops"
+	SizeOpt    OptionType = "size"
+	UsageOpt   OptionType = "usage"
+	NoneOpt    OptionType = "none"
+	DefaultOpt OptionType = "default"
+	IssuesOpt  OptionType = "issues"
 	// Verbose mode
 	AllOpt     OptionType = "all"
 	ProfileOpt OptionType = "profile"
 
 	// Derived options based on combinations of above types
-	ProfiledDefaultOpt OptionType = "pdefault"
-	ProfiledErrOpt     OptionType = "perrors"
-	ProfiledAllOpt     OptionType = "pall"
+	ProfileIssuesOpt OptionType = "pissues"
 
 	// Not sure if this is the right place !!
 	VersionOpt OptionType = "version"
@@ -168,7 +166,7 @@ func LastOptType(options []Option) OptionType {
 	return options[len(options)-1].Type
 }
 
-func GetOptTypes(options []Option) []OptionType {
+func getOptTypes(options []Option) []OptionType {
 
 	optTypes := []OptionType{}
 
@@ -185,7 +183,7 @@ func GetOptTypes(options []Option) []OptionType {
 }
 
 // Checks if the provided collection has the required type.
-func HasOptType(providedOptTypes []OptionType, requiredOptType OptionType) bool {
+func hasOptType(providedOptTypes []OptionType, requiredOptType OptionType) bool {
 
 	for _, providedOptType := range providedOptTypes {
 		if providedOptType == requiredOptType {
@@ -199,12 +197,12 @@ func HasOptType(providedOptTypes []OptionType, requiredOptType OptionType) bool 
 
 // Checks if the provided collection has all the required types.
 // In other words, it checks if the provided collection is a superset of required collection.
-func IsSuperSetOptTypes(providedOptTypes []OptionType, requiredOptTypes ...OptionType) bool {
+func isSuperSetOptTypes(providedOptTypes []OptionType, requiredOptTypes ...OptionType) bool {
 
 	truthy := true
 
 	for _, requiredOptType := range requiredOptTypes {
-		truthy = HasOptType(providedOptTypes, requiredOptType)
+		truthy = hasOptType(providedOptTypes, requiredOptType)
 
 		// break out if no match
 		if !truthy {
@@ -223,10 +221,10 @@ func IsSuperSetOptTypes(providedOptTypes []OptionType, requiredOptTypes ...Optio
 // particular version, etc.
 //
 // NOTE - Logic will be correct when choice of options are exercized properly.
-// TODO - Re-factor to a fitting structural pattern !!!
-func InferredOptType(options []Option) OptionType {
+// TODO - Can this be re-factored to a fitting structural pattern !!!
+func InferredOptType(providedOptions []Option) OptionType {
 
-	providedOptTypes := GetOptTypes(options)
+	providedOptTypes := getOptTypes(providedOptions)
 
 	// This is the verbose mode.
 	// This indicates the combination of all possible modes of an operation.
@@ -236,14 +234,18 @@ func InferredOptType(options []Option) OptionType {
 	// This mode will profile the execution, collect the
 	// possible errors, warnings, etc in addition to executing
 	// the given operation.
-	optPnE := []OptionType{ProfileOpt, ErrCountOpt}
+	// e.g. list VSMs by exposing default properties of each VSM
+	// along with the errors that have happened so far within each
+	// of these VSMs and finally include the profiling details during
+	// the listing of each VSM.
+	optPnI := []OptionType{ProfileOpt, IssuesOpt}
 
 	// This mode will profile in addition to executing the given operation.
 	optPnD := []OptionType{ProfileOpt, DefaultOpt}
 
 	// This mode will collect the possible errors, warnings, etc
 	// in addition to executing the given operation.
-	optE := []OptionType{ErrCountOpt}
+	optI := []OptionType{IssuesOpt}
 
 	// This is same as profile & default mode of operation.
 	optP := []OptionType{ProfileOpt}
@@ -256,25 +258,32 @@ func InferredOptType(options []Option) OptionType {
 	// mode of operation.
 	optN := []OptionType{NoneOpt}
 
-	if IsSuperSetOptTypes(providedOptTypes, optA...) {
+	// If provided option types is a superset of All mode
+	if isSuperSetOptTypes(providedOptTypes, optA...) {
 		return AllOpt
 
-	} else if IsSuperSetOptTypes(providedOptTypes, optPnE...) {
-		return ProfiledErrOpt
+		// If provided option types is a superset of Profile & Issues mode
+	} else if isSuperSetOptTypes(providedOptTypes, optPnI...) {
+		return ProfileIssuesOpt
 
-	} else if IsSuperSetOptTypes(providedOptTypes, optPnD...) {
-		return ProfiledDefaultOpt
+		// If provided option types is a superset of Profile & Default mode
+	} else if isSuperSetOptTypes(providedOptTypes, optPnD...) {
+		return ProfileOpt
 
-	} else if IsSuperSetOptTypes(providedOptTypes, optE...) {
-		return ErrCountOpt
+		// If provided option types is a superset of Issues mode
+	} else if isSuperSetOptTypes(providedOptTypes, optI...) {
+		return IssuesOpt
 
-	} else if IsSuperSetOptTypes(providedOptTypes, optP...) {
-		return ProfiledDefaultOpt
+		// If provided option types is a superset of Profile mode
+	} else if isSuperSetOptTypes(providedOptTypes, optP...) {
+		return ProfileOpt
 
-	} else if IsSuperSetOptTypes(providedOptTypes, optD...) {
+		// If provided option types is a superset of Default mode
+	} else if isSuperSetOptTypes(providedOptTypes, optD...) {
 		return DefaultOpt
 
-	} else if IsSuperSetOptTypes(providedOptTypes, optN...) {
+		// If provided option types is a superset of None mode
+	} else if isSuperSetOptTypes(providedOptTypes, optN...) {
 		return NoneOpt
 
 	}
@@ -282,6 +291,8 @@ func InferredOptType(options []Option) OptionType {
 	return NoneOpt
 }
 
+// A public function that may be invoked to return default mode
+// if the provided mode is none type.
 func SetOptToDefaultIfNone(providedOptType OptionType) OptionType {
 
 	if providedOptType == NoneOpt {
@@ -300,10 +311,10 @@ type VSMListOptions struct {
 	All bool
 }
 
-// Version 2
 // This holds request paramters required to list the VSMs.
-// This will determine the variation w.r.t listing the VSMs.
-type VSMListOptionsV2 struct {
+// The options available in this request will determine the
+// operational mode of listing the VSMs.
+type VSMListRequest struct {
 	All  bool
 	Opts []Option
 }
@@ -320,10 +331,10 @@ type VSMCreateOptions struct {
 	Storage   string
 }
 
-// Version 2
 // This holds the request parameters to create a VSM.
-// This will determine the variations required w.r.t creating a VSM.
-type VSMCreateOptionsV2 struct {
+// The options available in this request will determine the
+// operational mode of creating a VSM.
+type VSMCreateRequest struct {
 	VsmV2
 	Opts []Option
 }
