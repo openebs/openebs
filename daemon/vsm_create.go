@@ -29,3 +29,36 @@
 //          verifying if create is feasible or not.
 
 package daemon
+
+import "github.com/openebs/openebs/types"
+
+// Check if the option is meant for Create operation
+func isValidCreateOption(providedOpt types.OptionType) bool {
+
+	switch providedOpt {
+	case types.DefaultOpt, types.ProfileOpt:
+		return true
+	default:
+		return false
+	}
+}
+
+func CreateVsm(vsm *types.VsmV2, otype types.OptionType) (*types.VsmV2, error) {
+
+	// check if resulting option type is valid w.r.t create operation
+	if isValidType := isValidCreateOption(otype); !isValidType {
+		return nil, types.InvalidOptionType
+	}
+
+	switch otype {
+	case types.ProfileOpt:
+		// execute the operation with profiling
+	case types.DefaultOpt:
+		// just execute the operation
+	default:
+		// this is probably un-supported
+		return nil, types.UnsupportedOptionType
+	}
+
+	return nil, nil
+}

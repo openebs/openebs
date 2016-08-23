@@ -335,6 +335,6 @@ type VSMCreateOptions struct {
 // The options available in this request will determine the
 // operational mode of creating a VSM.
 type VSMCreateRequest struct {
-	VsmV2
+	Vsm  *VsmV2
 	Opts []Option
 }

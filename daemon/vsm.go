@@ -114,18 +114,6 @@ func (daemon *Daemon) VsmCreate(opts *types.VSMCreateOptions) (*types.Vsm, error
 	return vsm, err
 }
 
-// Check if the option is meant for Create operation
-// TODO - put this in appropriate file e.g. vsm_create.go
-func isValidCreateOption(providedOpt types.OptionType) bool {
-
-	switch providedOpt {
-	case types.DefaultOpt, types.ProfileOpt:
-		return true
-	default:
-		return false
-	}
-}
-
 // This creates a new VSM.
 func (daemon *Daemon) VsmCreateV2(req *types.VSMCreateRequest) (*types.VsmV2, error) {
 
@@ -135,23 +123,7 @@ func (daemon *Daemon) VsmCreateV2(req *types.VSMCreateRequest) (*types.VsmV2, er
 	// set the option type to default if provided option type is None
 	finalOptionType := types.SetOptToDefaultIfNone(inferredOptionType)
 
-	// check if resulting option type is valid w.r.t create operation
-	if isValidType := isValidCreateOption(finalOptionType); !isValidType {
-		return nil, types.InvalidOptionType
-	}
-
-	// TODO - check if this can be delegated to Create func of vsm_create.go
-	// Decorators to types.OptionType mapping will make this feasible and avoid
-	// explosion of structs !!!!
-	switch finalOptionType {
-	case types.ProfileOpt:
-		// execute the operation with profiling
-	case types.DefaultOpt:
-		// just execute the operation
-	default:
-		// this is probably un-supported
-		return nil, types.UnsupportedOptionType
-	}
+	CreateVsm(req.Vsm, finalOptionType)
 
 	return nil, nil
 }
