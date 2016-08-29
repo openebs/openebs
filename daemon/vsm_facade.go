@@ -114,16 +114,22 @@ func (daemon *Daemon) VsmCreate(opts *types.VSMCreateOptions) (*types.Vsm, error
 	return vsm, err
 }
 
-// This creates a new VSM.
-func (daemon *Daemon) VsmCreateV2(req *types.VSMCreateRequest) (*types.VsmV2, error) {
+// This strategizes the creation of a new VSM.
+func (daemon *Daemon) VsmCreateV2(vsm *types.VsmType, opts []types.Option) (*types.Response, error) {
 
 	// find the appropriate option type for this operation
-	inferredOptionType := types.InferredOptType(req.Opts)
+	//inferredOptionType := types.InferredOptType(opts)
 
 	// set the option type to default if provided option type is None
-	finalOptionType := types.SetOptToDefaultIfNone(inferredOptionType)
+	//finalOptionType := types.SetOptToDefaultIfNone(inferredOptionType)
 
-	CreateVsm(req.Vsm, finalOptionType)
+	// get the decorators from Option Type
 
-	return nil, nil
+	creator := Decorate(VsmCreator(vsm),
+		AuditDecorator(LogAuditor()),
+	)
+
+	r, err := creator.Exec()
+
+	return r, err
 }

@@ -40,6 +40,8 @@ func (r *vsmRouter) initRoutes() {
 		router.NewGetRoute("/vsm/list", r.getVsmList),
 		// POST
 		router.NewPostRoute("/vsm/create", r.postVsmCreate),
+		router.NewPostRoute("/vsm/createv2", r.postVsmCreateV2),
+		//router.NewPostRoute("v2/vsm/create", r.postVsmCreateV2),
 		// PUT
 		//router.NewPutRoute("/vsm/{name:.*}/archive", r.putVsmArchive),
 		// DELETE

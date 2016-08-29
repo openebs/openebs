@@ -11,16 +11,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package vsm
+package daemon
 
-import (
-	"github.com/openebs/openebs/types"
-)
+import "github.com/openebs/openebs/types"
 
-// Router will hook aginst these functions of same signature
-// implemented at the server side i.e. openebs daemon.
-type Backend interface {
-	VsmList(config *types.VSMListOptions) ([]*types.Vsm, error)
-	VsmCreate(opts *types.VSMCreateOptions) (*types.Vsm, error)
-	VsmCreateV2(vsm *types.VsmType, opts []types.Option) (*types.Response, error)
+// This implements the logic to create an OpenEBS VSM.
+// This is a concrete i.e. a specific executor implementation.
+func VsmCreator(vsm *types.VsmType) Executor {
+	return ExecutorFn(func() (resp *types.Response, err error) {
+
+		resp = &types.Response{
+			Val: "Received VSM with name: " + vsm.NameID.Name,
+		}
+
+		return resp, nil
+	})
 }

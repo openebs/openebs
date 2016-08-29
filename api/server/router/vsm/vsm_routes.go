@@ -18,6 +18,7 @@
 package vsm
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/openebs/openebs/api/server/httputils"
@@ -75,4 +76,34 @@ func (s *vsmRouter) postVsmCreate(ctx context.Context, w http.ResponseWriter, r 
 	}
 
 	return httputils.WriteJSON(w, http.StatusCreated, vsmcr)
+}
+
+// A router handler
+func (s *vsmRouter) postVsmCreateV2(ctx context.Context, w http.ResponseWriter, r *http.Request, vars map[string]string) error {
+
+	if nil == r {
+		return errors.New("Nil http request provided.")
+	}
+
+	if err := httputils.ParseForm(r); err != nil {
+		return err
+	}
+
+	vsm := &types.VsmType{
+		NameID: &types.NameID{
+			Name: r.Form.Get("name"),
+		},
+	}
+
+	opts := []types.Option{}
+
+	// Actual call to the backend i.e. server side logic.
+	// A backend of OpenEBS is the logic in daemon package.
+	sres, err := s.backend.VsmCreateV2(vsm, opts)
+
+	if err != nil {
+		return err
+	}
+
+	return httputils.WriteJSON(w, http.StatusCreated, sres)
 }
