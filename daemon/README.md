@@ -67,7 +67,7 @@ sleep $(SLEEP_SECS)
 
 ```
 
-## Commands w.r.t VSM (via LXC) and Storage (via CFS)
+## Commands w.r.t VSM (as LXC) and Storage (as CFS)
 
 ### Start the tgtd service
 
@@ -98,4 +98,20 @@ lxc-attach -n $(name) -- \
 
 # ??
 lxc-attach -n $(name) -- tgtadm --lld iscsi --op bind --mode target --tid 1 -I ALL
+```
+
+## Commands w.r.t VSM (as Docker)
+
+
+```shell
+```
+
+## Commands w.r.t VSM (as Docker) and Storage (as CFS)
+
+```shell
+```
+
+##  Commands w.r.t VSM (as Docker) and Storage (as CFS) Snapshots
+
+```shell
 ```
