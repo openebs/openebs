@@ -13,7 +13,11 @@
 
 package daemon
 
-import "github.com/openebs/openebs/types"
+import (
+	"time"
+
+	"github.com/openebs/openebs/types"
+)
 
 // This implements the logic to create an OpenEBS VSM.
 // This is a concrete i.e. a specific executor implementation.
@@ -21,7 +25,8 @@ func VsmCreator(vsm *types.VsmType) Executor {
 	return ExecutorFn(func() (resp *types.Response, err error) {
 
 		resp = &types.Response{
-			Val: "Received VSM with name: " + vsm.NameID.Name,
+			Val:  vsm.NameID,
+			Date: time.Now(),
 		}
 
 		return resp, nil

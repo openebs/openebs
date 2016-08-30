@@ -109,6 +109,7 @@ type Message struct {
 
 type Response struct {
 	Val    OEBSValue
+	Date   time.Time
 	Infos  []Message
 	Errors []Message
 	Warns  []Message
@@ -145,7 +146,10 @@ func (dr *Response) Merge(sr *Response) {
 	}
 
 	if sr.Val != nil {
-		msg := Message{Val: sr.Val}
+		msg := Message{
+			Val:  sr.Val,
+			Date: sr.Date,
+		}
 
 		if dr.Infos != nil {
 			dr.Infos = append(dr.Infos, msg)
@@ -158,14 +162,14 @@ func (dr *Response) Merge(sr *Response) {
 }
 
 type VsmType struct {
-	*NameID
-	Network
+	NameID      *NameID
+	Network     *Network
 	VolumeCount uint64
 }
 
 type VolumeType struct {
-	NameID
-	Storage
+	NameID  *NameID
+	Storage *Storage
 }
 
 // This holds request parameters required to list the VSMs.

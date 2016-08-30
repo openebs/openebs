@@ -20,6 +20,8 @@ package vsm
 import (
 	"errors"
 	"net/http"
+	"strconv"
+	"time"
 
 	"github.com/openebs/openebs/api/server/httputils"
 	"github.com/openebs/openebs/types"
@@ -92,6 +94,7 @@ func (s *vsmRouter) postVsmCreateV2(ctx context.Context, w http.ResponseWriter, 
 	vsm := &types.VsmType{
 		NameID: &types.NameID{
 			Name: r.Form.Get("name"),
+			Id:   r.Form.Get("name") + strconv.FormatInt(time.Now().UnixNano(), 10),
 		},
 	}
 

@@ -15,7 +15,11 @@
 // storage operations.
 package daemon
 
-import "github.com/openebs/openebs/types"
+import (
+	"time"
+
+	"github.com/openebs/openebs/types"
+)
 
 // This is responsible for Open EBS specific operation.
 // A single method interface will help us in adhering to
@@ -57,7 +61,10 @@ func (f AuditorFn) Audit() (*types.Response, error) {
 // implementation.
 func LogAuditor() Auditor {
 	return AuditorFn(func() (*types.Response, error) {
-		return &types.Response{Val: "Action was audited in logs."}, nil
+		return &types.Response{
+			Val:  "Action was audited in logs.",
+			Date: time.Now(),
+		}, nil
 	})
 }
 
