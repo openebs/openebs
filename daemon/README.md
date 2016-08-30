@@ -86,13 +86,15 @@ sleep $(SLEEP_SECS)
 # name refers to the name of the LXC
 
 # create a volume as an iscsi target
-lxc-attach -n $(name) -- tgtadm --lld iscsi --op new --mode target --tid 1 -T iqn.2016-07.com.cb:openebs.disk.$(volume)
+lxc-attach -n $(name) -- \
+  tgtadm --lld iscsi --op new --mode target --tid 1 -T iqn.2016-07.com.cb:openebs.disk.$(volume)
 
 # ?? Probably not required as it is already created & mounted to the storage pool
 lxc-attach -n $(name) -- mkdir -p /openebs
 
 # set properties of the iscsi target
-lxc-attach -n $(name) -- tgtadm --lld iscsi --op new --mode logicalunit --tid 1 --lun 1 --blocksize 4096 --bstype cfs -b /openebs/$(volume)
+lxc-attach -n $(name) -- \
+  tgtadm --lld iscsi --op new --mode logicalunit --tid 1 --lun 1 --blocksize 4096 --bstype cfs -b /openebs/$(volume)
 
 # ??
 lxc-attach -n $(name) -- tgtadm --lld iscsi --op bind --mode target --tid 1 -I ALL
