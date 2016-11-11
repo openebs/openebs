@@ -83,7 +83,7 @@ _build_check_go:
 # Will build the go based binaries
 # The binaries will be placed at $GOPATH/bin/
 #
-build: _build_check_go _build_check_lxc
+build: _build_check_go
 	@echo ""
 	@echo -e "INFO:\tbuilding openebs ..."
 	@go get -t ./...
