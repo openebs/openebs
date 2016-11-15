@@ -17,19 +17,35 @@
 # Internal variables or constants
 #
 LXC_CREATE_CMD              :=   lxc-create
+DOCKER_CMD           :=   docker
 
 
 #
 # Avoid conflict with a file of same name as target
 #
-.PHONY: verify_all verify_lxc _is_lxc_create_installed
+.PHONY: verify_all verify_lxc verify_docker _is_lxc_create_installed _is_docker_installed
 
 
 #
 # The default target.
 #
-verify_all: verify_lxc
+verify_all: verify_docker
 
+#
+# The target to verify docker installations
+#
+verify_docker: _is_docker_installed
+
+
+#
+# Verification check for docker installation
+#
+_is_docker_installed:
+ifeq ($(shell which $(DOCKER_CMD) >/dev/null 2>&1; echo $$?), 1)
+	$(error ERROR: '$(DOCKER_CMD)' command not found.)
+else
+	@echo "INFO:\t'$(DOCKER_CMD)' install verification passed."
+endif
 
 #
 # The target to verify lxc installations

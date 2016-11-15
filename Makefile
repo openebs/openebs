@@ -134,8 +134,8 @@ _install_make_conf:
 _install_binary:
 	@echo ""
 	@echo "INFO:\tinstalling openebs binaries ..."
-	@cp $(GOPATH)/bin/openebs /sbin/
-	@cp $(GOPATH)/bin/openebsd /sbin/
+	@sudo cp $(GOPATH)/bin/openebs /sbin/
+	@sudo cp $(GOPATH)/bin/openebsd /sbin/
 	@echo "INFO:\topenebs binaries installed successfully ..."
 	@echo ""
 
@@ -149,6 +149,8 @@ _post_install_msg:
 	@echo "--------------------------------------------------------------------"
 	@echo "INFO:\tRun openebs to use the CLI"
 	@echo "INFO:\tRun either of below to start the deamon"
+	@echo ""
+	@echo "NOTE:\tYou will need root(or sudo) previleges to run openebs"
 	@echo ""
 	@echo "INFO:\tsocket mode:"
 	@echo "     \tnohup openebsd >> openebsd.log 2>&1 &"
