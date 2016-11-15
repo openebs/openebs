@@ -31,7 +31,7 @@ ROOT_DIR             := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST)))
 #
 # Avoid conflict with a file of same name as target
 #
-.PHONY: help create _verify_create _lxc_create _lxc_conf _lxc_start _vsm_state
+.PHONY: help create create_lxc _verify_create _docker_create _lxc_create _lxc_conf _lxc_start _vsm_state
 
 
 #
@@ -54,9 +54,15 @@ help: _verify_create
 
 
 #
-# The target that creates a vsm
+# The target that creates a jiva vsm
 #
-create: _verify_create _vsm_state _lxc_create _lxc_conf _lxc_start
+create: _verify_create _vsm_state _docker_create 
+	@echo "INFO:\tvsm $(name) with volume $(volume) created successfully..."
+
+#
+# The target that creates a lxc based vsm
+#
+create_lxc: _verify_create _vsm_state _lxc_create _lxc_conf _lxc_start
 	@echo -e "INFO:\tvsm $(name) with volume $(volume) created successfully..."
 
 
@@ -69,6 +75,12 @@ ifdef debug
 	@cd $(ROOT_DIR) && $(MAKE) -f ./install_checks
 endif
 
+
+#
+# A private target
+#
+_docker_create:
+	@docker images
 
 #
 # A private target
