@@ -77,9 +77,11 @@ _build_check_go:
 #
 build: _build_check_go
 	@echo ""
+	@echo "INFO:\tverifying dependencies for openebs ..."
+	@glide up
 	@echo "INFO:\tbuilding openebs ..."
-	@go get -t ./...
-	@go get -u github.com/golang/lint/golint
+	@go install github.com/openebs/openebs/cmd/openebs
+	@go install github.com/openebs/openebs/cmd/openebsd
 	@echo "INFO:\topenebs built successfully ..."
 	@echo ""
 
