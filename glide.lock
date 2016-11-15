@@ -1,0 +1,77 @@
+hash: 3b0c46a557f14b99b869fb4e40b288a0c1fc1e5a2046f49197199adf73aaf8aa
+updated: 2016-11-15T17:21:41.824106366Z
+imports:
+- name: github.com/coreos/go-systemd
+  version: 48702e0da86bd25e76cfef347e2adeb434a0d0a6
+  subpackages:
+  - activation
+  - daemon
+- name: github.com/docker/go-connections
+  version: 4ccf312bf1d35e5dbda654e57a9be4c3f3cd0366
+  subpackages:
+  - sockets
+  - tlsconfig
+- name: github.com/docker/go-units
+  version: 8a7beacffa3009a9ac66bad506b18ffdd110cf97
+- name: github.com/docker/libnetwork
+  version: be377dc49fe399d4ad0af957f084436c41a7877b
+  subpackages:
+  - portallocator
+- name: github.com/docker/libtrust
+  version: aabc10ec26b754e797f9028f4589c5b7bd90dc20
+- name: github.com/golang/protobuf
+  version: da116c3771bf4a398a43f44e069195ef1c9688ef
+  subpackages:
+  - proto
+- name: github.com/gorilla/context
+  version: 08b5f424b9271eedf6f9f0ce86cb9396ed337a42
+- name: github.com/gorilla/mux
+  version: 757bef944d0f21880861c2dd9c871ca543023cba
+- name: github.com/imdario/mergo
+  version: 50d4dbd4eb0e84778abe37cefef140271d96fade
+- name: github.com/inconshreveable/mousetrap
+  version: 76626ae9c91c4f2a10f34cad8ce83ea42c93bb75
+- name: github.com/mattn/go-shellwords
+  version: 525bedee691b5a8df547cb5cf9f86b7fb1883e24
+- name: github.com/Microsoft/go-winio
+  version: 562bb09f6612d9a4e91597184709d1cdba95af93
+- name: github.com/opencontainers/runc
+  version: 43c43004ef0563ceab23bb8f254cd5061a6f607e
+  subpackages:
+  - libcontainer/cgroups
+  - libcontainer/configs
+  - libcontainer/user
+- name: github.com/Sirupsen/logrus
+  version: abc6f20dabf4b10195f233ad21ea6c5ba33acae0
+- name: github.com/spf13/pflag
+  version: 5ccb023bc27df288a957c5e994cd44fd19619465
+- name: golang.org/x/net
+  version: cac22060de4e495155959e69adcb4b45763ccb10
+  subpackages:
+  - context
+  - http2
+  - http2/hpack
+  - idna
+  - internal/timeseries
+  - lex/httplex
+  - proxy
+  - trace
+- name: golang.org/x/sys
+  version: 5eaf0df67e70d6997a9fe0ed24383fa1b01638d3
+  subpackages:
+  - unix
+  - windows
+- name: google.golang.org/grpc
+  version: 0d9891286aca15aeb2b0a73be9f5946c3cfefa85
+  subpackages:
+  - codes
+  - credentials
+  - grpclog
+  - internal
+  - metadata
+  - naming
+  - peer
+  - stats
+  - tap
+  - transport
+testImports: []
