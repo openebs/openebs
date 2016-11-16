@@ -12,6 +12,7 @@ before_install:
   - sudo apt-get install -y
   - sudo apt-get install -y curl
   - go env && pwd
+  - sudo mkdir -p $GOPATH/bin
   - curl https://glide.sh/get | sh
 script:
   - make build
