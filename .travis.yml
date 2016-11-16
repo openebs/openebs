@@ -2,14 +2,16 @@ language: go
 sudo: required
 install: true
 go:
-  - 1.7.3
+  - 1.7.1
 env:
   global:
     - GOARCH=amd64
-    - GO_FOR_RELEASE=1.7.3
+    - GO_FOR_RELEASE=1.7.1
 before_install:
   - sleep 15
   - sudo apt-get install -y
+  - sudo apt-get install -y curl
   - go env && pwd
+  - curl https://glide.sh/get | sh
 script:
   - make build
