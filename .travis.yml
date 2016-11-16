@@ -1,23 +1,15 @@
-sudo: required
-dist: trusty
 language: go
-
-os:
-        - linux
-
-env:
-        - ARCH=x86_64
-
+sudo: required
+install: true
 go:
-        - 1.6.2
-
-services:
-          - docker
-
+  - 1.7.3
+env:
+  global:
+    - GOARCH=amd64
+    - GO_FOR_RELEASE=1.7.3
 before_install:
-        - sudo apt-get -qq update
-        - sudo apt-get install -y lxc 
-
+  - sleep 15
+  - sudo apt-get install -y
+  - go env && pwd
 script:
-        - sudo make build
-        - sudo make install
+  - make build
