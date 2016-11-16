@@ -1,5 +1,5 @@
 language: go
-dist:trusty
+dist: trusty
 sudo: required
 install: true
 go:
