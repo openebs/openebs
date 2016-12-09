@@ -1,6 +1,8 @@
 #OpenEBS 
 
-[![Build Status](https://travis-ci.org/openebs/openebs.svg?branch=master)](https://travis-ci.org/openebs/openebs)
+[![Build Status](https://travis-ci.org/openebs/openebs.svg?branch=master)](https://travis-ci.org/openebs/openebs) [![Join the chat at https://gitter.im/openebs/Lobby](https://badges.gitter.im/openebs/Lobby.svg)](https://gitter.im/openebs/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+=========
+-       Website: http://www.openebs.io/
 
 OpenEBS is a Software Defined Storage (SDS) platform, written in GoLang, that provides the block storage containers called Virtual Storage Machines or VSMs. A VSM is a fully isolated block storage container, has it's own iSCSI stack, full set of storage management APIs and can back up the application consistent data to another VSM or an S3 compatible storage.
 
