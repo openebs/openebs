@@ -5,7 +5,7 @@ An OpenEBS Cluster comprises of OpenEBS Maya Masters (omm) for storing the metad
 
 OpenEBS binary (maya) releases are maintained in github at https://github.com/openebs/maya/releases
 
-**maya** is a single binary that will be installed on the machine, which can later pull in the dependendcies from githup or dockerhub. 
+**maya** is a single binary that will be installed on the machine, which can later pull in the dependencies from githup or dockerhub. 
 
 OpenEBS Storage is delivered through containers called VSMs. The docker image (called as **jiva**) for the containers are distributed from Dockerhub https://hub.docker.com/r/openebs/jiva/
 
