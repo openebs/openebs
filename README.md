@@ -8,31 +8,12 @@ OpenEBS is a Software Defined Storage (SDS) platform, written in GoLang, that pr
 OpenEBS can scale to millions of VSMs seamlessly as it manages the metadata of the block storage system at a file level. The block storage for each VSM is managed as one single file or directory. The IO to this file is managed through large size chunks rather than the typical small size blocks. This enables to OpenEBS to provide higher performance for each VSM and to easilyh scale to very large number of VSMs. 
 
 #License
-OpenEBS is developed under Apache2 License at the project level. Some components of the project are derived via the GPL license and will continue to be developed under GPL.
+OpenEBS is developed under Apache 2.0 License at the project level. Some components of the project are derived from other opensource projects like Nomad, Longhorn and are distributed under their respective licenses. 
 
-#Running a Simple OpenEBS server
-<pre-requisites>
-TBD
-
-#Building from Sources
-<setup the golang environemtn>
-OpenEBS requires Go 1.6.3 or above. If you running older version, you can upgrade to 1.6.3 using the following:
-
-```bash
-curl -fsSL "https://storage.googleapis.com/golang/go1.6.3.linux-amd64.tar.gz" | tar -xzC /usr/local
-```
-
-Fetch the code into your Go workspace.
-
-```bash
-mkdir -p $GOPATH/src/github.com/openebs/
-cd $GOPATH/src/github.com/openebs/
-git clone https://github.com/openebs/openebs.git
-cd openebs/
-sh auto-version.sh
-make build
- 
-```
+#Setting up your own OpenEBS Storage Cluster
+It is very easy to install OpenEBS from binaries or source on your Ubuntu 16.04 VMs or Appliances and enable them to provide persistent distributed storage to your containers or VMs. All you require is access to Internet!
+- [Install from Binaries](https://github.com/openebs/openebs/blob/master/docs/Installing-from-binaries.md)
+- [Install from Sources](https://github.com/openebs/openebs/blob/master/docs/installing-from-source.md)
 
 
 ## Quick demo of OpenEBS 
