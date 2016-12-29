@@ -1,31 +1,36 @@
 
 ## Installing from source
 
-Pre-requisites : ubuntu 16.04, git, zip, unzip, go. 
+An OpenEBS Cluster comprises of OpenEBS Maya Masters (omm) for storing the metadata and orchestrating the VSMs on the OpenEBS Storage Hosts (osh). The OpenEBS Storage Hosts typically would either have hard disks/SSDs or mounted file/block/s3 storage that will be used as persistent store.
 
+**maya** is the only binary that needs to be installed on the machine to turn the machine in to either **omm** or **osh**. Maya will pull in the dependencies from githup or dockerhub as required. You need to have the machine connected to internet while running the *setup* commands. 
+
+### Software Requirements
+
+On your machine, ensure the following:
+- **golang** is installed. Verify $GOPATH environment variable is set and $GOPATH/bin is included in your $PATH
+- **git** is installed for downloading the source
+- **zip** and **unzip** packages are required for creating and distributing the depedencies 
+
+### Download Source, Compile and Install maya
 ```
 mkdir -p $GOPATH/src/github.com/openebs && cd $GOPATH/src/github.com/openebs
 git clone https://github.com/openebs/maya.git
 cd maya && make dev
 ```
 
+### Verify maya is running
+```
+maya
+```
 
-### Setup and Initialize 
+### Setup OpenEBS Maya Master (omm)
 
-Setup OpenEBS Master and Host Nodes by logging into the nodes via ssh. When there are multiple IPs on the node, you can specify the listening ip for the node via **-self-ip**
-
-#### Setup OpenEBS Maya Master (omm)
-
-maya setup-omm [-self-ip=<listen ip address>]
-
-Example:
 ```
 ubuntu@master-01:~$ maya setup-omm -self-ip=172.28.128.3
 ```
 
-#### Setup OpenEBS Host (osh)
-
-maya setup-osh -omm-ips=172.28.128.3 [-self-ip=<listen ip address>]
+### Setup OpenEBS Host (osh)
 
 ```
 ubuntu@host-01:~$ maya setup-osh -self-ip=172.28.128.6 -omm-ips=172.28.128.3
