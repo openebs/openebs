@@ -26,7 +26,7 @@ OpenEBS is developed under Apache 2.0 License at the project level. Some compone
 OpenEBS is completely Open Source and is built by making use of other Open Source projects (listed below). The project is in the early stages of the development and we welcome your feedback and contributions in any form possible.
 - Join the Discussion at https://gitter.im/openebs/Lobby
 - Raise an issue https://github.com/openebs/openebs/issues
-- Discuss the enhancements/wip items - https://github.com/issues?q=user%3Aopenebs+label%3Aenhancement+is%3Aopen
+- Help with fixes and features https://github.com/issues?q=user%3Aopenebs+is%3Aopen
 
 #Credits
 - Persistent Storage and Replication for OpenEBS VSMs provided implmented by forked Rancher Longhorn (https://github.com/openebs/longhorn)
