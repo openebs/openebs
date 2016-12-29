@@ -29,6 +29,7 @@ OpenEBS is completely Open Source and is built by making use of other Open Sourc
 - Help with fixes and features https://github.com/issues?q=user%3Aopenebs+is%3Aopen
 
 #Credits
+- VSMs are containers running on Docker (https://github.com/docker/docker)
 - Persistent Storage and Replication for OpenEBS VSMs from forked Rancher Longhorn (https://github.com/openebs/longhorn)
 - iSCSI Frontent for OpenEBS VSMs from forked gostor gotgt (https://github.com/openebs/gotgt)
 - VSMs are managed and scheduled via HashiCorp Nomad (https://github.com/hashicorp/nomad)
