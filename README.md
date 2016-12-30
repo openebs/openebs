@@ -14,9 +14,6 @@ OpenEBS can scale to millions of VSMs seamlessly as it manages the metadata of t
 ##Installation and Getting Started
 OpenEBS can be setup in few easy steps either on Physical Machines or VMs. Please follow our [Getting Started](docs/getting-started.md) documentation 
 
-##License
-OpenEBS is developed under Apache 2.0 License at the project level. Some components of the project are derived from other opensource projects like Nomad, Longhorn and are distributed under their respective licenses. 
-
 ##Source Code
 This is a meta-repository for OpenEBS. The source code is located in other repositories under openebs organization, which majority of it under:
 - Storage Orchestration; Maya Master :  https://github.com/openebs/maya
@@ -34,3 +31,6 @@ OpenEBS is completely Open Source and is built by making use of other Open Sourc
 - iSCSI Frontent for OpenEBS VSMs from forked gostor gotgt (https://github.com/openebs/gotgt)
 - VSMs are managed and scheduled via HashiCorp Nomad (https://github.com/hashicorp/nomad)
 - Configuration Information is stored in HashiCorp Consul (https://github.com/hashicorp/consul)
+
+##License
+OpenEBS is developed under Apache 2.0 License at the project level. Some components of the project are derived from other opensource projects like Nomad, Longhorn and are distributed under their respective licenses. 
