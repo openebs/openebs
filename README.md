@@ -11,17 +11,24 @@ OpenEBS can scale to millions of VSMs seamlessly as it manages the metadata of t
 ## Quick demo of OpenEBS 
 [![OpenEBS Demo](https://s7.postimg.org/adw357irf/openebs_demo_png.png)](https://www.youtube.com/watch?v=jeeWIFiC5LQ)
 
+##Installation and Getting Started
+OpenEBS can be setup in few easy steps either on Physical Machines or VMs. Please follow our [Getting Started](docs/getting-started.md) documentation 
 
-#License
+##License
 OpenEBS is developed under Apache 2.0 License at the project level. Some components of the project are derived from other opensource projects like Nomad, Longhorn and are distributed under their respective licenses. 
 
-#Contributing
+##Source Code
+This is a meta-repository for OpenEBS. The source code is located in other repositories under openebs organization, which majority of it under:
+- Storage Orchestration; Maya Master :  https://github.com/openebs/maya
+- Containerized Storage; VSMs : https://github.com/openebs/jiva
+
+##Contributing
 OpenEBS is completely Open Source and is built by making use of other Open Source projects (listed below). The project is in the early stages of the development and we welcome your feedback and contributions in any form possible.
 - Join the Discussion at https://gitter.im/openebs/Lobby
 - Raise an issue https://github.com/openebs/openebs/issues
 - Help with fixes and features https://github.com/issues?q=user%3Aopenebs+is%3Aopen
 
-#Credits
+##Credits
 - VSMs are containers running on Docker (https://github.com/docker/docker)
 - Persistent Storage and Replication for OpenEBS VSMs from forked Rancher Longhorn (https://github.com/openebs/longhorn)
 - iSCSI Frontent for OpenEBS VSMs from forked gostor gotgt (https://github.com/openebs/gotgt)
