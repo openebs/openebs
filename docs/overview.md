@@ -14,7 +14,7 @@ OpenEBS uses the best available infrastructure libraries underneath. Jiva (means
 Jiva inherits majority of its capabilities from Rancher Longhorn (https://github.com/rancher/longhorn). QoS, Caching, Backup/Restore capabilities are being added to Jiva.
 
 Use | Library |  Logo     | Usage
-------- | ---------------- | ---------- | ---------:
+------- | ---------------- | ---------- | ---------
 Containerization  | Docker |  ![alt tag](./images/docker.png) | Dockerized images are pushed onto docker hub
 Jiva  | Rancher Longhorn        | ![alt tag](./images/rancher.png)       | Multiple Jiva containers make a VSM
 Scheduler   | Nomad | ![alt tag](./images/nomad.jpg)      | Nomad library forms the core of Maya scheduler
@@ -23,16 +23,29 @@ Automation   | Terraform | ![alt tag](./images/terraform.jpg)      | Terraform c
 Automation   | Ansible | ![alt tag](./images/ansible.png)      | Terraform compatible
 Orchestration integration   | Kubernetes | ![alt tag](./images/kubernetes.png)      | VSMs are scheduled from k8s
 
-#Maya makes the storage deployment programmable
+
+
+#Programmable storage
 Maya is designed to have developer friendly interfaces to configure, deploy and manage the storage platform. Maya provides the configuration through YAML files and automation is made possible through ansible and/or terraform
 
+![alt tag](./images/programmable-storage.jpg)
+
+
 #Components of OpenEBS platform
+OpenEBS platform contains three major components: 
+
 ![alt tag](./images/OpenEBS-intro-v1.jpg)
+
+
 
 #Architectural overview
 ![alt tag](./MayaArchitectureOverview.png)
 
+
+
 #Jiva overview
+
+
 
 #Maya overview
 
