@@ -30,8 +30,8 @@ Jiva inherits majority of its capabilities from Rancher Longhorn (https://github
 Use | Library |  Logo     | Usage
 ------- | ---------------- | ---------- | ---------
 Containerization  | Docker |  ![alt tag](./images/docker.png) | Dockerized images are pushed onto docker hub
-Jiva  | Rancher Longhorn        | ![alt tag](./images/rancher.png)       | Multiple Jiva containers make a VSM
-Scheduler   | Nomad | ![alt tag](./images/nomad.jpg)      | Nomad library forms the core of Maya scheduler
+Jiva  | Rancher Longhorn        | ![alt tag](./images/rancher.png)       | Longhorn is one of the software components of Jiva. Multiple Jiva containers make a VSM
+Maya Scheduler   | Nomad | ![alt tag](./images/nomad.jpg)      | Nomad library forms the core of Maya scheduler
 Networking   | Flannel | ![alt tag](./images/flannel.png)      | Flannel library is used without its config db
 Automation   | Terraform | ![alt tag](./images/terraform.jpg)      | Terraform compatible
 Automation   | Ansible | ![alt tag](./images/ansible.png)      | Terraform compatible
