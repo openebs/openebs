@@ -15,8 +15,11 @@ OpenEBS platform contains three major components:
 #Architectural overview
 ![alt tag](./MayaArchitectureOverview.png)
 
+Maya is the orchestration engine that schedules the VSMs among OpenEBS hosts as needed. Maya driver (Docker Volume Driver for Maya) plays an important role in achieving the smooth flow of provisioning of VSMs and attaining the application consistent snapshots. The data is kept in more than one copy among the OpenEBS hosts through a backend network replication, thus achieving the necessary redundancy. VSMs expose the iSCSI interface currently. 
 
-#Built with the best tools available
+The backend data store for Jiva containers come either through locally managed disks or through remotely managed network disks. The intelligent caching along with the lazy read indexing capability makes it possible to treat remote S3 storage also as the backing data store (Refer to the Roadmap: TBD)
+
+#Built with the best tools 
 OpenEBS uses the best available infrastructure libraries underneath. Jiva (means "life" in Sanskrit) is the core software that runs inside the storage container. The core functionalities of Jiva include 
 - Block storage protocol (iSCSI/TCMU/NBD)
 - Replication
@@ -34,7 +37,7 @@ Jiva  | Rancher Longhorn        | ![alt tag](https://raw.githubusercontent.com/o
 Maya Scheduler   | Nomad | ![alt tag](https://raw.githubusercontent.com/openebs/openebs/master/docs/images/nomad.jpg)      | Nomad library forms the core of Maya scheduler
 Networking   | Flannel | ![alt tag](https://raw.githubusercontent.com/openebs/openebs/master/docs/images/flannel.png)      | Flannel library is used without its config db
 Automation   | Terraform | ![alt tag](https://raw.githubusercontent.com/openebs/openebs/master/docs/images/terraform.jpg)      | Terraform compatible
-Automation   | Ansible | ![alt tag](https://raw.githubusercontent.com/openebs/openebs/master/docs/images/ansible.png)      | Terraform compatible
+Automation   | Ansible | ![alt tag](https://raw.githubusercontent.com/openebs/openebs/master/docs/images/ansible.png)      | Ansible compatible
 Orchestration integration   | Kubernetes | ![alt tag](https://raw.githubusercontent.com/openebs/openebs/master/docs/images/kubernetes.png)      | VSMs are scheduled from k8s
 
 
