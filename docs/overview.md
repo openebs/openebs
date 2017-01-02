@@ -8,7 +8,7 @@ OpenEBS platform contains three major components:
 - An orchestration engine or VSM Scheduler called Maya
 - The OpenEBS hosts that provide the data store from either local disks or remote disks
 
-![alt tag](./images/OpenEBS-intro-v1.jpg)
+![alt tag](https://github.com/openebs/openebs/blob/master/docs/images/OpenEBS-intro-v1.jpg?raw=true)
 
 
 
