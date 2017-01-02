@@ -13,9 +13,9 @@ OpenEBS uses the best available infrastructure libraries underneath. Jiva (means
 - QoS 
 Jiva inherits majority of its capabilities from Rancher Longhorn (https://github.com/rancher/longhorn). QoS, Caching, Backup/Restore capabilities are being added to Jiva.
 
-Usage | Library |       | 
+Use | Library |  Logo     | Usage
 ------- | ---------------- | ---------- | ---------:
-Containerization  | Docker |  ![alt tag](./images/docker.png) | Jiva images are on Docker Hub
+Containerization  | Docker |  ![alt tag](./images/docker.png) | Dockerized images are pushed onto docker hub
 Jiva  | Rancher Longhorn        | ![alt tag](./images/rancher.png)       | Multiple Jiva containers make a VSM
 Scheduler   | Nomad | ![alt tag](./images/nomad.jpg)      | Nomad library forms the core of Maya scheduler
 Networking   | Flannel | ![alt tag](./images/flannel.png)      | Flannel library is used without its config db
