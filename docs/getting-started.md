@@ -23,7 +23,7 @@ To get started, let us use three machines, referred here as: master-01 used as O
 
 ##Prepare the machines for installation. 
 
-Since OpenEBS is delivered through containers, the OpenEBS hosts can be run on any operating system with container engine (say docker, etc.,). We will use Ubuntu 16.04 in this example. 
+Since OpenEBS is delivered through containers, the OpenEBS hosts can be run on any operating system with container engine. This guide will use Ubuntu 16.04 and docker.
 
 ### Prepare Software
 OpenEBS is a software-only solution that can be installed using the released binaries or built and installed directly from source. In this guide we will *Ubuntu 16.04* as the underlying operating system. 
@@ -31,7 +31,8 @@ OpenEBS is a software-only solution that can be installed using the released bin
 To download and install, you will require *wget* and *unzip* to be present on the operating system. 
 
 ```
-apt-get update wget unzip
+sudo apt-get update
+sudo apt-get install -y wget unzip
 ```
 
 ### Prepare Network
