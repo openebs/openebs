@@ -8,12 +8,12 @@ OpenEBS platform contains three major components
 * An orchestration engine or VSM Scheduler called Maya
 * The OpenEBS hosts that provide the data store from either local disks or remote disks
 
-![alt tag](https://github.com/openebs/openebs/blob/master/docs/images/OpenEBS-intro-v1.jpg?raw=true)
+![alt tag](https://raw.githubusercontent.com/openebs/openebs/master/docs/images/OpenEBS-intro-v1.jpg)
 
 
 
 #Architectural overview
-![alt tag](https://github.com/openebs/openebs/blob/master/docs/MayaArchitectureOverview.png)
+![alt tag](https://raw.githubusercontent.com/openebs/openebs/master/docs/MayaArchitectureOverview.png)
 
 Maya is the orchestration engine that schedules the VSMs among OpenEBS hosts as needed. Maya driver (Docker Volume Driver for Maya) plays an important role in achieving the smooth flow of provisioning of VSMs and attaining the application consistent snapshots. The data is kept in more than one copy among the OpenEBS hosts through a backend network replication, thus achieving the necessary redundancy. VSMs expose the iSCSI interface currently. 
 
