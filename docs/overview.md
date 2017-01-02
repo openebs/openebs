@@ -15,13 +15,13 @@ Jiva inherits majority of its capabilities from Rancher Longhorn (https://github
 
 Usage | Library |       | 
 ------- | ---------------- | ---------- | ---------:
-Containerization  | Docker |  ![alt tag](./images/docker.jpg) | Jiva images are on Docker Hub
-Jiva  | Rancher Longhorn        | ![alt tag](./images/racher.jpg)       | Multiple Jiva containers make a VSM
+Containerization  | Docker |  ![alt tag](./images/docker.png) | Jiva images are on Docker Hub
+Jiva  | Rancher Longhorn        | ![alt tag](./images/rancher.png)       | Multiple Jiva containers make a VSM
 Scheduler   | Nomad | ![alt tag](./images/nomad.jpg)      | Nomad library forms the core of Maya scheduler
-Networking   | Flannel | ![alt tag](./images/flannel.jpg)      | Flannel library is used without its config db
+Networking   | Flannel | ![alt tag](./images/flannel.png)      | Flannel library is used without its config db
 Automation   | Terraform | ![alt tag](./images/terraform.jpg)      | Terraform compatible
-Automation   | Ansible | ![alt tag](./images/ansible.jpg)      | Terraform compatible
-Orchestration integration   | Kubernetes | ![alt tag](./images/kubernetes.jpg)      | VSMs are scheduled from k8s
+Automation   | Ansible | ![alt tag](./images/ansible.png)      | Terraform compatible
+Orchestration integration   | Kubernetes | ![alt tag](./images/kubernetes.png)      | VSMs are scheduled from k8s
 
 #Maya makes the storage deployment programmable
 Maya is designed to have developer friendly interfaces to configure, deploy and manage the storage platform. Maya provides the configuration through YAML files and automation is made possible through ansible and/or terraform
