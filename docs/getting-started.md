@@ -7,7 +7,7 @@ This quick start guide helps you to setup a simple OpenEBS Cluster with three ma
 
 OpenEBS is delivered through container architecture called VSM (Virtual Storage Machine), to provide storage. A VSM can be considered as Storage Pod,a set of containers - a frontend-container and one or more storage-containers. 
 
-<< Block Diagram of frontend and backend containers of a VSM >>
+![OpenEBS Storage Pod](./images/OpenEBSVSMTechnicalOverview.png)
 
 The frontend container takes care of providing access to the block storage, example iscsi, and handles the data input/output operations and data management functions like - snapshots, replication, caching, metering etc., 
 
@@ -19,7 +19,7 @@ To get started, let us use three machines, referred here as: master-01 used as O
 
 *If you are trying to use VirtualBox VMs, you can bring up the machines using the following Vagrantfile*
 
-<< Connectivity Diagram showing the three machines >>
+![Machine Connectivity Diagram](./images/OpenEBSNodes.png)
 
 ##Prepare the machines for installation. 
 
