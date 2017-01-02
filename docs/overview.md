@@ -3,10 +3,10 @@
 OpenEBS is a storage platform, written in GoLang, to deliver persistent block storage for container eco system. The storage itself is containerized through a storage POD concept called VSM or "Virtual Storage Machine". VSMs are scheduled and managed using an orchestrator engine called "Maya". VSMs are fully isolated user space storage engines that present the block storage at the front end through iSCSI, NBD or TCMU protocol and consume raw storage from a local OpenEBS host or remote storage.  
 
 #Components of OpenEBS platform
-OpenEBS platform contains three major components: 
-+ Storage PODs or VSMs
-+ An orchestration engine or VSM Scheduler called Maya
-+ The OpenEBS hosts that provide the data store from either local disks or remote disks
+OpenEBS platform contains three major components
+* Storage PODs or VSMs
+* An orchestration engine or VSM Scheduler called Maya
+* The OpenEBS hosts that provide the data store from either local disks or remote disks
 
 ![alt tag](https://github.com/openebs/openebs/blob/master/docs/images/OpenEBS-intro-v1.jpg?raw=true)
 
