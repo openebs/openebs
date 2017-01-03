@@ -19,6 +19,7 @@ If you can see the maya version, you are all set to go!
 ### Setup OpenEBS Maya Master (OMM)
 
 Verify that maya is installed and obtain the Listen IP address for Maya Master. The maya cli will connect to this IP address for scheduling and managing the VSMs.
+
 ```
 ubuntu@master-01:~$ maya version
 Maya v'0.0.4'-dev ('6fe624e3bc71c0b053795939511eff00a18c10f3')
@@ -28,7 +29,8 @@ ubuntu@master-01:~$ ip addr show | grep global
 ubuntu@master-01:~$ 
 ```
 
-Let us use the 172.28.128.8 as the listen IP address. Configure the machine as OMM with the following instruction. 
+Let us use the 172.28.128.8 as the listen IP address. Configure the machine as OMM with the following instruction.
+
 ```
 ubuntu@master-01:~$ maya setup-omm -self-ip=172.28.128.8
 ```
@@ -45,6 +47,7 @@ ubuntu@master-01:~$
 ### Setup OpenEBS Storage Host (OSH)
 
 Verify that maya is installed and obtain the Listen IP address for Maya Master. The maya cli will connect to this IP address for scheduling and managing the VSMs.
+
 ```
 ubuntu@host-01:~$ maya version
 Maya v'0.0.4'-dev ('6fe624e3bc71c0b053795939511eff00a18c10f3')
@@ -56,6 +59,7 @@ ubuntu@host-01:~$
 ```
 
 Let us use the 172.28.128.9 as the listen IP address and connect to the previously installed Maya Master at 172.28.128.8 Configure the machine as OSH with the following instruction. 
+
 ```
 ubuntu@host-01:~$ maya setup-osh -self-ip=172.28.128.9 -omm-ips=172.28.128.8
 ```
@@ -85,7 +89,3 @@ cbceb3d2  dc1  host-02  <none>  false  ready
 dc7fd9b9  dc1  host-01  <none>  false  ready
 ubuntu@master-01:~$ 
 ```
-
-
-
-
