@@ -96,4 +96,26 @@ ID        Eval ID   Node ID   Task Group     Desired  Status   Created At
 ubuntu@master-01:~/vsms$ 
 ```
 
+Check the osh where the VSMs are running. 
 
+```
+ubuntu@master-01:~$ maya osh-status
+ID        DC   Name     Class   Drain  Status
+cbceb3d2  dc1  host-02  <none>  false  ready
+dc7fd9b9  dc1  host-01  <none>  false  ready
+ubuntu@master-01:~$ 
+```
+
+
+Docker status
+
+```
+ubuntu@host-02:~$ docker images
+REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
+openebs/jiva        latest              d3e3835763f3        11 days ago         308 MB
+ubuntu@host-02:~$ docker ps
+CONTAINER ID        IMAGE                 COMMAND                  CREATED             STATUS              PORTS               NAMES
+2427c7a510bb        openebs/jiva:latest   "launch controller --"   57 seconds ago      Up 51 seconds                           demo-vsm1-ctl
+c01ce8d57dd8        openebs/jiva:latest   "launch replica --fro"   57 seconds ago      Up 51 seconds                           demo-vsm1-rep-store1
+ubuntu@host-02:~$ 
+```
