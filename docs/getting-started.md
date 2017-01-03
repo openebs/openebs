@@ -28,7 +28,33 @@ sudo apt-get install -y wget unzip
 ```
 
 ### Prepare Network
-Typically, the storage is accessed via a different network (with high bandwidth 10G or 40G et.,) than management on 1G. In case you don't have an high bandwidth network in your setup, you can try this example with a single network as well.
+Typically, the storage is accessed via a different network (with high bandwidth 10G or 40G et.,) than management on 1G. You will need to identify the IP address on which the management traffic flows and the interface that is used for data. 
+
+It is possible that same interface can be used for both management and data.
+```
+ubuntu@host-01:~$ ip addr show
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host 
+       valid_lft forever preferred_lft forever
+2: enp0s3: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP group default qlen 1000
+    link/ether 02:d8:e4:47:7a:33 brd ff:ff:ff:ff:ff:ff
+    inet 10.0.2.15/24 brd 10.0.2.255 scope global enp0s3
+       valid_lft forever preferred_lft forever
+    inet6 fe80::d8:e4ff:fe47:7a33/64 scope link 
+       valid_lft forever preferred_lft forever
+3: enp0s8: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP group default qlen 1000
+    link/ether 08:00:27:9a:7e:b0 brd ff:ff:ff:ff:ff:ff
+    inet 172.28.128.9/24 brd 172.28.128.255 scope global enp0s8
+       valid_lft forever preferred_lft forever
+    inet6 fe80::a00:27ff:fe9a:7eb0/64 scope link 
+       valid_lft forever preferred_lft forever
+ubuntu@host-01:~$ 
+```
+For example, we will be using the interface **enp0s8** and subnet **172.28.128.0/24**  for both management and data in this guide. 
+
 
 ### Prepare Disk Storage
 You can use *maya* to manage the local and remote disks. Optionally create RAID and filesystem layer ontop of the raw disks, etc., 
