@@ -55,6 +55,16 @@ Maya is designed to have developer friendly interfaces to configure, deploy and 
 
 #Jiva overview
 
+OpenEBS is delivered through container architecture called VSM (Virtual Storage Machine), to provide storage. A VSM can be considered as Storage Pod,a set of containers - a frontend-container and one or more storage-containers. 
+
+![OpenEBS Storage Pod](./images/OpenEBSVSMTechnicalOverview.png)
+
+The frontend container takes care of providing access to the block storage, example iscsi, and handles the data input/output operations and data management functions like - snapshots, replication, caching, metering etc., 
+
+The storage container(s) are configured with a persistent backend storage using local disks or remote disks. The controller will replicate the data inot the storage-containers and the storage containers also participate in building new backends for a VSM, restoring the data from snapshots, transferring snapshots to clouds, etc., Storage-containers can be added/removed dynamically to an VSM. 
+
+The VSM/Storage Pod - containers provisioning, scheduling and monitoring is taken care by OpenEBS Maya Master (omm), the storage orchestration layer. The VSM storage-containers will be running on the OpenEBS Storage Hosts (osh), which typically would either have hard disks/SSDs or mounted file/block/s3 storage.
+
 
 
 #Maya overview
