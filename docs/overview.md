@@ -4,6 +4,7 @@ OpenEBS is a storage platform, written in GoLang, to deliver persistent block st
 
 #Components of OpenEBS platform
 OpenEBS platform contains three major components
+
 * Storage PODs or VSMs
 * An orchestration engine or VSM Scheduler called Maya
 * The OpenEBS hosts that provide the data store from either local disks or remote disks
