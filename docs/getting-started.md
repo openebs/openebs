@@ -9,11 +9,11 @@ In this guide, we will setup an simple OpenEBS cluster with three machines:
 - **master-01** used as OpenEBS Maya Master (omm) and 
 - **host-01** and **host-02** used as OpenEBS Storage Host (osh). 
 
-*If you are trying to use VirtualBox VMs, you can bring up the machines using the following Vagrantfile*
+*If you plan to setup using VMs on Virtual Box, you can skip down to the section of Preparing machines using Vagrant below.*
 
 ![Machine Connectivity Diagram](./images/OpenEBSNodes.png)
 
-##Prepare the machines for installation. 
+##Prepare your machines for OpenEBS installation. 
 
 Since OpenEBS is delivered through containers, the OpenEBS hosts can be run on any operating system with container engine. This guide will use Ubuntu 16.04 and docker.
 
@@ -38,5 +38,16 @@ In this guide for sake of simplicity, we will use the following directory /opt/o
 ```
 sudo mkdir -p /opt/openebs
 sudo chown -R <docker-user> /opt/openebs
+```
+
+##Setup Vagrant VMs for OpenEBS installation. 
+
+The Vagrantfile is available from github reporsitory. You can either copy/download the [Vagrantfile](https://raw.githubusercontent.com/openebs/maya/master/demo/Vagrantfile) or clone the code to your box. Ensure that you have VirtualBox 5.0.24 and above, Vagrant 1.9.0 and above. 
+
+The instructions for setting up using cloned code are as follows:
+```
+git clone https://github.com/openebs/maya.git
+cd maya/demo
+vagrant up
 ```
 
