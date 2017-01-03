@@ -5,17 +5,9 @@ This quick start guide helps you to setup a simple OpenEBS Cluster with three ma
 
 *The clients (docker-hosts) can be configured to consume the OpenEBS storage either via Network(iSCSI) or using TCMU. This guide will show connecting to storage using iSCSI.*
 
-OpenEBS is delivered through container architecture called VSM (Virtual Storage Machine), to provide storage. A VSM can be considered as Storage Pod,a set of containers - a frontend-container and one or more storage-containers. 
-
-![OpenEBS Storage Pod](./images/OpenEBSVSMTechnicalOverview.png)
-
-The frontend container takes care of providing access to the block storage, example iscsi, and handles the data input/output operations and data management functions like - snapshots, replication, caching, metering etc., 
-
-The storage container(s) are configured with a persistent backend storage using local disks or remote disks. The controller will replicate the data inot the storage-containers and the storage containers also participate in building new backends for a VSM, restoring the data from snapshots, transferring snapshots to clouds, etc., Storage-containers can be added/removed dynamically to an VSM. 
-
-The VSM/Storage Pod - containers provisioning, scheduling and monitoring is taken care by OpenEBS Maya Master (omm), the storage orchestration layer. The VSM storage-containers will be running on the OpenEBS Storage Hosts (osh), which typically would either have hard disks/SSDs or mounted file/block/s3 storage.
-
-To get started, let us use three machines, referred here as: master-01 used as OpenEBS Maya Master (omm) and host-01 and host-02 used as OpenEBS Storage Host (osh). 
+In this guide, we will setup an simple OpenEBS cluster with three machines: 
+- **master-01** used as OpenEBS Maya Master (omm) and 
+- **host-01** and **host-02** used as OpenEBS Storage Host (osh). 
 
 *If you are trying to use VirtualBox VMs, you can bring up the machines using the following Vagrantfile*
 
@@ -42,4 +34,9 @@ Typically, the storage is accessed via a different network (with high bandwidth 
 You can use *maya* to manage the local and remote disks. Optionally create RAID and filesystem layer ontop of the raw disks, etc., 
 
 In this guide for sake of simplicity, we will use the following directory /opt/openebs/. Ensure that the directory is writeable. Note that you add new replication stores at runtime and attach to VSMs. So when you move this node into production, you can move the content from local directories to local/remote disk based storage. 
+
+```
+sudo mkdir -p /opt/openebs
+sudo chown -R <docker-user> /opt/openebs
+```
 
