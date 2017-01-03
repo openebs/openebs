@@ -65,7 +65,7 @@ The backend container(s) are configured with a persistent backend storage using 
 
 The VSM/Storage Pod - containers provisioning, scheduling and monitoring is taken care by OpenEBS Maya Master (omm), the storage orchestration layer. The VSM storage-containers will be running on the OpenEBS Storage Hosts (osh), which typically would either have hard disks/SSDs or mounted file/block/s3 storage.
 
-The frontend and backend containers are launched using the (jiva image)[https://hub.docker.com/r/openebs/jiva/]. 
+The frontend and backend containers are launched using the [jiva image](https://hub.docker.com/r/openebs/jiva/).
 
 
 
