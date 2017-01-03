@@ -5,9 +5,10 @@ This quick start guide helps you to setup a simple OpenEBS Cluster with three ma
 
 *The clients (docker-hosts) can be configured to consume the OpenEBS storage either via Network(iSCSI) or using TCMU. This guide will show connecting to storage using iSCSI.*
 
-In this guide, we will setup an simple OpenEBS cluster with three machines: 
-- **master-01** used as OpenEBS Maya Master (omm) and 
-- **host-01** and **host-02** used as OpenEBS Storage Host (osh). 
+In this guide, we will setup an simple OpenEBS cluster with three machines:
+
+**master-01** used as OpenEBS Maya Master (omm) and 
+**host-01** and **host-02** used as OpenEBS Storage Host (osh). 
 
 *If you plan to setup using VMs on Virtual Box, you can skip down to the section of Preparing machines using Vagrant below.*
 
@@ -31,6 +32,7 @@ sudo apt-get install -y wget unzip
 Typically, the storage is accessed via a different network (with high bandwidth 10G or 40G et.,) than management on 1G. You will need to identify the IP address on which the management traffic flows and the interface that is used for data. 
 
 It is possible that same interface can be used for both management and data.
+
 ```
 ubuntu@host-01:~$ ip addr show
 1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1
@@ -53,6 +55,7 @@ ubuntu@host-01:~$ ip addr show
        valid_lft forever preferred_lft forever
 ubuntu@host-01:~$ 
 ```
+
 For example, we will be using the interface **enp0s8** and subnet **172.28.128.0/24**  for both management and data in this guide. 
 
 
@@ -71,6 +74,7 @@ sudo chown -R <docker-user> /opt/openebs
 The Vagrantfile is available from github reporsitory. You can either copy/download the [Vagrantfile](https://raw.githubusercontent.com/openebs/maya/master/demo/Vagrantfile) or clone the code to your box. Ensure that you have VirtualBox 5.0.24 and above, Vagrant 1.9.0 and above. 
 
 The instructions for setting up using cloned code are as follows:
+
 ```
 git clone https://github.com/openebs/maya.git
 cd maya/demo
