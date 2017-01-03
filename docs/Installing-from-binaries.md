@@ -16,15 +16,56 @@ maya version
 
 If you can see the maya version, you are all set to go!
 
+### Setup OpenEBS Maya Master (OMM)
 
-### (4) Configure and start OpenEBS Maya Master (omm)
+Verify that maya is installed and obtain the Listen IP address for Maya Master. The maya cli will connect to this IP address for scheduling and managing the VSMs.
 ```
-ubuntu@master-01:~$ maya setup-omm -self-ip=172.28.128.3
+ubuntu@master-01:~$ maya version
+Maya v'0.0.4'-dev ('6fe624e3bc71c0b053795939511eff00a18c10f3')
+ubuntu@master-01:~$ ip addr show | grep global
+    inet 10.0.2.15/24 brd 10.0.2.255 scope global enp0s3
+    inet 172.28.128.8/24 brd 172.28.128.255 scope global enp0s8
+ubuntu@master-01:~$ 
 ```
 
-### (5) Configure and start OpenEBS Storage Host (osh)
+Let us use the 172.28.128.8 as the listen IP address. Configure the machine as OMM with the following instruction. 
+```
+ubuntu@master-01:~$ maya setup-omm -self-ip=172.28.128.8
+```
+
+Verify that Maya Master is configured by running the following command:
 
 ```
-ubuntu@host-01:~$ maya setup-osh -self-ip=172.28.128.6 -omm-ips=172.28.128.3
+ubuntu@master-01:~$ maya omm-status
+Name              Address       Port  Status  Leader  Protocol  Build  Datacenter  Region
+master-01.global  172.28.128.8  4648  alive   true    2         0.5.0  dc1         global
+ubuntu@master-01:~$ 
+```
+
+### Setup OpenEBS Storage Host (OSH)
+
+Verify that maya is installed and obtain the Listen IP address for Maya Master. The maya cli will connect to this IP address for scheduling and managing the VSMs.
+```
+ubuntu@host-01:~$ maya version
+Maya v'0.0.4'-dev ('6fe624e3bc71c0b053795939511eff00a18c10f3')
+ubuntu@host-01:~$ ip addr show | grep global
+    inet 10.0.2.15/24 brd 10.0.2.255 scope global enp0s3
+    inet 172.28.128.9/24 brd 172.28.128.255 scope global enp0s8
+ubuntu@host-01:~$ 
+ 
+```
+
+Let us use the 172.28.128.8 as the listen IP address. Configure the machine as OMM with the following instruction. 
+```
+ubuntu@master-01:~$ maya setup-osh -self-ip=172.28.128.9 -omm-ips=172.28.128.8
+```
+
+Verify that Storage Host is configured by running the following command:
+
+```
+ubuntu@master-01:~$ maya omm-status
+Name              Address       Port  Status  Leader  Protocol  Build  Datacenter  Region
+master-01.global  172.28.128.8  4648  alive   true    2         0.5.0  dc1         global
+ubuntu@master-01:~$ 
 ```
 
