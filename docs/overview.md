@@ -57,7 +57,7 @@ Maya is designed to have developer friendly interfaces to configure, deploy and 
 
 OpenEBS is delivered through container architecture called VSM (Virtual Storage Machine), to provide storage. A VSM can be considered as Storage Pod,a set of containers - a frontend-container and one or more backend-containers. 
 
-![OpenEBS Storage Pod](./images/OpenEBSVSMTechnicalOverview.png)
+![OpenEBS Storage Pod](https://raw.githubusercontent.com/openebs/openebs/master/docs/images/OpenEBSVSMTechnicalOverview.png)
 
 The frontend container takes care of providing access to the block storage, example iscsi, and handles the data input/output operations and data management functions like - snapshots, replication, caching, metering etc., 
 
