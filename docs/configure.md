@@ -14,44 +14,31 @@ Modify the IP address on which the iSCSI volumes needs to be accessed by the fro
 
 ```
         meta {
-                JIVA_VOLNAME = "demo1-vsm1-vol1"
+                JIVA_VOLNAME = "demo-vsm1-vol1"
                 JIVA_VOLSIZE = "10g"
+                JIVA_FRONTEND_VERSION = "openebs/jiva:latest"
+                JIVA_FRONTEND_NETWORK = "host_static"
                 JIVA_FRONTENDIP = "172.28.128.101"
+                JIVA_FRONTENDSUBNET = "24"
+                JIVA_FRONTENDINTERFACE = "enp0s8"
         }
 
 ```
 
-Customize the frontend container parameters like the subnet mask, network interface or the version of the jiva to launch. 
-
-```
-                # Define the controller task to run
-                task "ctl" {
-                        env {
-                                JIVA_CTL_NAME = "${NOMAD_JOB_NAME}-${NOMAD_TASK_NAME}"
-                                JIVA_CTL_VERSION = "openebs/jiva:latest"
-                                JIVA_CTL_VOLNAME = "${NOMAD_META_JIVA_VOLNAME}"
-                                JIVA_CTL_VOLSIZE = "${NOMAD_META_JIVA_VOLSIZE}"
-                                JIVA_CTL_IP = "${NOMAD_META_JIVA_FRONTENDIP}"
-                                JIVA_CTL_SUBNET = "24"
-                                JIVA_CTL_IFACE = "enp0s8"
-                        }
-```
-
 Similarly, customise the backend container pamameters:
 
-```
-                # Define the controller task to run
-                task "rep-store1" {
+```                        
                         env {
                                 JIVA_REP_NAME = "${NOMAD_JOB_NAME}-${NOMAD_TASK_NAME}"
-                                JIVA_REP_VERSION = "openebs/jiva:latest"
                                 JIVA_CTL_IP = "${NOMAD_META_JIVA_FRONTENDIP}"
                                 JIVA_REP_VOLNAME = "${NOMAD_META_JIVA_VOLNAME}"
                                 JIVA_REP_VOLSIZE = "${NOMAD_META_JIVA_VOLSIZE}"
+                                JIVA_REP_VOLSTORE = "/tmp/jiva/vsm1/rep1"
+                                JIVA_REP_VERSION = "openebs/jiva:latest"
+                                JIVA_REP_NETWORK = "host_static"
+                                JIVA_REP_IFACE = "enp0s8"
                                 JIVA_REP_IP = "172.28.128.102"
                                 JIVA_REP_SUBNET = "24"
-                                JIVA_REP_IFACE = "enp0s8"
-                                JIVA_REP_VOLSTORE = "/tmp/jiva/vsm1/rep1"
                         }
 ```
 
@@ -60,14 +47,14 @@ Schedule the VSM Creation
 
 ```
 ubuntu@master-01:~/vsms$ maya vsm-create demo-vsm1.hcl 
-==> Monitoring evaluation "fdcc3770"
+==> Monitoring evaluation "f8917fad"
     Evaluation triggered by job "demo-vsm1"
-    Allocation "01752980" created: node "cbceb3d2", group "demo-vsm1-ctl"
-    Allocation "8ac55ddd" created: node "dc7fd9b9", group "rep-store2"
-    Allocation "97065884" created: node "cbceb3d2", group "rep-store1"
+    Allocation "59ecd70d" created: node "1baf7f69", group "demo-vsm1-backend-container1"
+    Allocation "d10ff4fc" created: node "b779de4d", group "demo-vsm1-fe"
+    Allocation "d196cfb3" created: node "1baf7f69", group "demo-vsm1-backend-container2"
     Evaluation status changed: "pending" -> "complete"
-==> Evaluation "fdcc3770" finished with status "complete"
-ubuntu@master-01:~/vsms$ 
+==> Evaluation "f8917fad" finished with status "complete"
+
 ```
 
 Check the status
@@ -83,27 +70,29 @@ Status      = running
 Periodic    = false
 
 Summary
-Task Group     Queued  Starting  Running  Failed  Complete  Lost
-demo-vsm1-ctl  0       0         1        0       0         0
-rep-store1     0       0         1        0       0         0
-rep-store2     0       0         1        0       0         0
+Task Group                    Queued  Starting  Running  Failed  Complete  Lost
+demo-vsm1-backend-container1  0       0         1        0       0         0
+demo-vsm1-backend-container2  0       0         1        0       0         0
+demo-vsm1-fe                  0       0         1        0       0         0
 
 Allocations
-ID        Eval ID   Node ID   Task Group     Desired  Status   Created At
-01752980  fdcc3770  cbceb3d2  demo-vsm1-ctl  run      running  01/03/17 13:10:14 UTC
-8ac55ddd  fdcc3770  dc7fd9b9  rep-store2     run      running  01/03/17 13:10:14 UTC
-97065884  fdcc3770  cbceb3d2  rep-store1     run      running  01/03/17 13:10:14 UTC
+ID        Eval ID   Node ID   Task Group                    Desired  Status   Created At
+59ecd70d  f8917fad  1baf7f69  demo-vsm1-backend-container1  run      running  01/04/17 07:39:33 UTC
+d10ff4fc  f8917fad  b779de4d  demo-vsm1-fe                  run      running  01/04/17 07:39:33 UTC
+d196cfb3  f8917fad  1baf7f69  demo-vsm1-backend-container2  run      running  01/04/17 07:39:33 UTC
 ubuntu@master-01:~/vsms$ 
+
 ```
 
 Check the osh where the VSMs are running. 
 
 ```
-ubuntu@master-01:~$ maya osh-status
+ubuntu@master-01:~/vsms$ maya osh-status
 ID        DC   Name     Class   Drain  Status
-cbceb3d2  dc1  host-02  <none>  false  ready
-dc7fd9b9  dc1  host-01  <none>  false  ready
-ubuntu@master-01:~$ 
+1baf7f69  dc1  host-02  <none>  false  ready
+b779de4d  dc1  host-01  <none>  false  ready
+ubuntu@master-01:~/vsms$ 
+
 ```
 
 
