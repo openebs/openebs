@@ -33,6 +33,7 @@ Let us use the 172.28.128.8 as the listen IP address. Configure the machine as O
 
 ```
 ubuntu@master-01:~$ maya setup-omm -self-ip=172.28.128.8
+ubuntu@master-01:~$ source ~/.profile
 ```
 
 Verify that Maya Master is configured by running the following command:
@@ -62,6 +63,7 @@ Let us use the 172.28.128.9 as the listen IP address and connect to the previous
 
 ```
 ubuntu@host-01:~$ maya setup-osh -self-ip=172.28.128.9 -omm-ips=172.28.128.8
+ubuntu@host-01:~$ source ~/.profile
 ```
 
 Verify that Storage Host is configured by running the following command:
