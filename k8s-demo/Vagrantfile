@@ -1,0 +1,103 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# Vagrantfile API/syntax version. Don't touch unless you know what you're doing!
+VAGRANTFILE_API_VERSION = "2"
+Vagrant.require_version ">= 1.6.0"
+
+# K8s Master Nodes
+M_NODES = ENV['M_NODES'] || 1
+
+# K8s Minion Nodes
+H_NODES = ENV['H_NODES'] || 2
+
+# Master node Memory & CPUs
+M_MEM = ENV['M_MEM'] || 512
+M_CPUS = ENV['M_CPUS'] || 1
+
+# Minion Host Memory & CPUs
+H_MEM = ENV['H_MEM'] || 1024
+H_CPUS = ENV['H_CPUS'] || 1
+
+
+
+# Generic installer script common for server(s) & client(s)
+# This expects arguments that provide runtime values
+$installer = <<SCRIPT
+#!/bin/bash
+
+echo Will run the common installer script ...
+
+# Update apt and get dependencies
+sudo apt-get update
+sudo apt-get install -y unzip curl wget
+
+SCRIPT
+
+required_plugins = %w(vagrant-cachier)
+
+required_plugins.each do |plugin|
+  need_restart = false
+  unless Vagrant.has_plugin? plugin
+    system "vagrant plugin install #{plugin}"
+    need_restart = true
+  end
+  exec "vagrant #{ARGV.join(' ')}" if need_restart
+end
+
+
+def configureVM(vmCfg, hostname, cpus, mem)
+
+  vmCfg.vm.box = "ubuntu/xenial64"
+  
+  vmCfg.vm.hostname = hostname
+  vmCfg.vm.network "private_network", type: "dhcp"
+
+  
+  #Adding Vagrant-cachier
+  if Vagrant.has_plugin?("vagrant-cachier")
+     vmCfg.cache.scope = :machine
+     vmCfg.cache.enable :apt
+     vmCfg.cache.enable :gem
+  end
+  
+  # Set resources w.r.t Virtualbox provider
+  vmCfg.vm.provider "virtualbox" do |vb|
+    vb.memory = mem
+    vb.cpus = cpus
+    vb.customize ["modifyvm", :id, "--cableconnected1", "on"]
+  end
+  
+  # Script will make some directories before installation procedure
+  vmCfg.vm.provision "shell", inline: $installer, privileged: true
+  
+  return vmCfg
+end
+
+# Entry point of this Vagrantfile
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+
+
+  # Maya Master related only !!
+  1.upto(M_NODES.to_i) do |i|
+    hostname = "master-%02d" % [i]
+    cpus = M_CPUS
+    mem = M_MEM
+    
+    config.vm.define hostname do |vmCfg|
+      vmCfg = configureVM(vmCfg, hostname, cpus, mem)
+    end     
+  end
+  
+  # OpenEBS Host related only !!
+  1.upto(H_NODES.to_i) do |i|
+    hostname = "host-%02d" % [i]
+    cpus = H_CPUS
+    mem = H_MEM
+    
+    config.vm.define hostname do |vmCfg|
+      vmCfg = configureVM(vmCfg, hostname, cpus, mem)
+    end
+  end
+
+end
