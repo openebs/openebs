@@ -33,7 +33,7 @@ form possible.
 - Join the discussions at [signup](https://openebsslacksignup.herokuapp.com/)
   - Already signed up ? Head to [openebs-users](https://openebs-community.slack.com/messages/openebs-users/)
 - Want to raise an issue ?
-  - [Generic or Not too sure](https://github.com/openebs/openebs/issues)
+  - If it is a generic (or `not really sure`), you can still raise it at [issues](https://github.com/openebs/openebs/issues)
   - Project specific issues can be raised at individual project level.
 - Want to help with fixes and features:
   - Have a look at [open issues](https://github.com/issues?q=user%3Aopenebs+is%3Aopen)
