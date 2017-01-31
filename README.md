@@ -6,7 +6,7 @@
 
 http://www.openebs.io/
 
-> OpenEBS is a Software Defined Storage (`SDS`) platform, written in GoLang, that provides the block storage 
+OpenEBS is a Software Defined Storage (`SDS`) platform, written in GoLang, that provides the block storage 
 containers called **Virtual Storage Machines** or `VSMs`. 
 
 Some of the features provided by a single VSM are:
@@ -18,7 +18,7 @@ Some of the features provided by a single VSM are:
 
 ## Performant storage delivered
 
-> OpenEBS can scale to millions of VSMs seamlessly as it manages the metadata of the block storage system at 
+OpenEBS can scale to millions of VSMs seamlessly as it manages the metadata of the block storage system at 
 a file level. The block storage for each VSM is managed as one single file or directory. The IO to this file
 is managed through large size chunks rather than the typical small size blocks. This enables to OpenEBS to 
 provide higher performance for each VSM and to easily scale to very large number of VSMs. 
