@@ -26,10 +26,17 @@ under openebs organization. One may refer to the pinned repositories to begin wi
 
 ## Contributing
 
-OpenEBS is completely Open Source and is built by making use of other Open Source projects (listed below). The project is in the early stages of the development and we welcome your feedback and contributions in any form possible.
-- Join the Discussion at https://gitter.im/openebs/Lobby
-- Raise an issue https://github.com/openebs/openebs/issues
-- Help with fixes and features https://github.com/issues?q=user%3Aopenebs+is%3Aopen
+OpenEBS is completely Open Source and is built by making use of other Open Source projects (listed below). 
+The project is in the early stages of the development and we welcome your feedback and contributions in any 
+form possible.
+
+- Join the discussions at [signup](https://openebsslacksignup.herokuapp.com/)
+  - Already signed up ? Head to [openebs-users](https://openebs-community.slack.com/messages/openebs-users/)
+- Want to raise an issue ?
+  - [Generic or Not too sure](https://github.com/openebs/openebs/issues)
+  - Project specific issues can be raised at individual project level.
+- Want to help with fixes and features:
+  - Have a look at [open issues](https://github.com/issues?q=user%3Aopenebs+is%3Aopen)
 
 ## Credits
 
