@@ -16,14 +16,14 @@ Some of the features provided by a single VSM are:
 - full set of storage management APIs,
 - can back up the application consistent data to another VSM or an S3 compatible storage.
 
-## Performant storage delivered
+## Performant Storage Delivered
 
 OpenEBS can scale to millions of VSMs seamlessly as it manages the metadata of the block storage system at 
 a file level. The block storage for each VSM is managed as one single file or directory. The IO to this file
-is managed through large size chunks rather than the typical small size blocks. This enables to OpenEBS to 
-provide higher performance for each VSM and to easily scale to very large number of VSMs. 
+is managed through large size chunks rather than the typical small size blocks. This enables OpenEBS to 
+deliver higher performance for each VSM and to easily scale to very large number of VSMs. 
 
-## Quick demo of OpenEBS 
+## Quick Demo of OpenEBS 
 
 [![OpenEBS Demo](https://s7.postimg.org/adw357irf/openebs_demo_png.png)](https://www.youtube.com/watch?v=jeeWIFiC5LQ)
 
