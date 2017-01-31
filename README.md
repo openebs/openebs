@@ -6,9 +6,22 @@
 
 http://www.openebs.io/
 
-OpenEBS is a Software Defined Storage (SDS) platform, written in GoLang, that provides the block storage containers called `Virtual Storage Machines` or VSMs. A VSM is a fully isolated block storage container, has it's own iSCSI stack, full set of storage management APIs and can back up the application consistent data to another VSM or an S3 compatible storage.
+> OpenEBS is a Software Defined Storage (`SDS`) platform, written in GoLang, that provides the block storage 
+containers called **Virtual Storage Machines** or `VSMs`. 
 
-OpenEBS can scale to millions of VSMs seamlessly as it manages the metadata of the block storage system at a file level. The block storage for each VSM is managed as one single file or directory. The IO to this file is managed through large size chunks rather than the typical small size blocks. This enables to OpenEBS to provide higher performance for each VSM and to easilyh scale to very large number of VSMs. 
+Some of the features provided by a single VSM are:
+
+- is a set of fully isolated block storage containers,
+- has it's own iSCSI stack, 
+- full set of storage management APIs,
+- can back up the application consistent data to another VSM or an S3 compatible storage.
+
+## Performant storage delivered
+
+> OpenEBS can scale to millions of VSMs seamlessly as it manages the metadata of the block storage system at 
+a file level. The block storage for each VSM is managed as one single file or directory. The IO to this file
+is managed through large size chunks rather than the typical small size blocks. This enables to OpenEBS to 
+provide higher performance for each VSM and to easily scale to very large number of VSMs. 
 
 ## Quick demo of OpenEBS 
 
@@ -19,10 +32,11 @@ OpenEBS can scale to millions of VSMs seamlessly as it manages the metadata of t
 OpenEBS can be setup in few easy steps either on Physical Machines or VMs. 
 Please follow our [Getting Started](docs/getting-started.md) documentation 
 
-## Source Code
+## Show me the Code
 
-This is a meta-repository for OpenEBS. The actual source code is located in other repositories 
-under openebs organization. One may refer to the pinned repositories to begin with.
+This is a meta-repository for OpenEBS. One will find various documentation related artifacts
+in this repository. The actual source code is located in other repositories under openebs 
+organization. One may refer to the pinned repositories to begin with.
 
 ## Contributing
 
