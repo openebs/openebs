@@ -44,7 +44,7 @@ OpenEBS is completely Open Source and is built by making use of other Open Sourc
 The project is in the early stages of the development and we welcome your feedback and contributions in any 
 form possible.
 
-- Join the discussions at [signup](https://openebsslacksignup.herokuapp.com/)
+- Join our discussions at [slack](https://openebsslacksignup.herokuapp.com/)
   - Already signed up ? Head to [openebs-users](https://openebs-community.slack.com/messages/openebs-users/)
 - Want to raise an issue ?
   - If it is a generic (or `not really sure`), you can still raise it at [issues](https://github.com/openebs/openebs/issues)
