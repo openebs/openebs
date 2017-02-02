@@ -1,0 +1,7 @@
+site_name: OpenEBS
+
+pages:
+- Overview: overview.md
+- Getting Started: getting-started.md
+
+theme: readthedocs
