@@ -1,7 +1,0 @@
-site_name: OpenEBS
-
-pages:
-- Home: overview.md
-- Getting Started: getting-started.md
-
-theme: readthedocs
