@@ -6,22 +6,22 @@
 
 http://www.openebs.io/
 
-OpenEBS is a Software Defined Storage (`SDS`) platform, written in GoLang, that provides the block storage 
-containers called **Virtual Storage Machines** or `VSMs`. 
+OpenEBS is purpose built storage for containerized environments, written in GoLang, built upon block storage 
+containers we call **Virtual Storage Machines** or `VSMs`. 
 
 Some of the features provided by a single VSM are:
 
 - is a set of fully isolated block storage containers,
 - has it's own iSCSI stack, 
 - full set of storage management APIs,
-- can back up the application consistent data to another VSM or an S3 compatible storage.
+- can distribute application consistent data to another VSM or an S3 compatible storage.
 
 ## Performant Storage Delivered
 
-OpenEBS can scale to millions of VSMs seamlessly as it manages the metadata of the block storage system at 
-a file level. The block storage for each VSM is managed as one single file or directory. The IO to this file
+OpenEBS can scale to an arbitrarily large number of VSMs as it manages the metadata of the block storage system at 
+a file level. The block storage for each VSM is managed as one single file or directory. Further, the IO to this file
 is managed through large size chunks rather than the typical small size blocks. This enables OpenEBS to 
-deliver higher performance for each VSM and to easily scale to very large number of VSMs. 
+deliver higher performance for each VSM and to  scale to a large number of VSMs. 
 
 ## Quick Demo of OpenEBS 
 
@@ -34,15 +34,15 @@ Please follow our [Getting Started](docs/getting-started.md) documentation
 
 ## Show me the Code
 
-This is a meta-repository for OpenEBS. One will find various documentation related artifacts
-in this repository. The actual source code is located in other repositories under openebs 
-organization. One may refer to the pinned repositories to begin with.
+This is a meta-repository for OpenEBS. Here please find various documentation related artifacts.
+The actual source code is located in other repositories under the OpenEBS 
+organization. Please start with the pinned repositories.
 
 ## Contributing
 
-OpenEBS is completely Open Source and is built by making use of other Open Source projects (listed below). 
-The project is in the early stages of the development and we welcome your feedback and contributions in any 
-form possible.
+OpenEBS is completely Open Source and is makes use of other Open Source projects (listed below). 
+The project is in the early stages of development and we welcome your feedback and contributions in any 
+form possible.  If you have not already, **please make our day and star us above**.  
 
 - Join our discussions at [slack](https://openebsslacksignup.herokuapp.com/)
   - Already signed up ? Head to [openebs-users](https://openebs-community.slack.com/messages/openebs-users/)
