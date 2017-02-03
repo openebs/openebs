@@ -60,7 +60,7 @@ SCRIPT
 #kubeadm join --token=$1 $2
 #SCRIPT
 
-required_plugins = %w(vagrant-cachier)
+required_plugins = %w(vagrant-cachier vagrant-triggers)
 
 required_plugins.each do |plugin|
   need_restart = false
