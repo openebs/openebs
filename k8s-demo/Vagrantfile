@@ -19,7 +19,10 @@ M_CPUS = ENV['M_CPUS'] || 1
 H_MEM = ENV['H_MEM'] || 1024
 H_CPUS = ENV['H_CPUS'] || 1
 
-
+#Local Variables
+master_ip_address = %Q(ifconfig | grep -oP "inet addr:\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}" | grep -oP "\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}" | tail -n 2 | head -n 1)
+get_master_ip_address = ""
+token = "a5f0cb.caa312d12724203d"
 
 # Generic installer script common for server(s) & client(s)
 # This expects arguments that provide runtime values
@@ -44,7 +47,20 @@ apt-get install -y kubelet kubeadm kubectl kubernetes-cni
 
 SCRIPT
 
-required_plugins = %w(vagrant-cachier)
+$kubeadminit = <<SCRIPT
+#!/bin/bash
+echo Will run the kubeadm init script ...
+kubeadm init --api-advertise-addresses=$1 --token=$2
+SCRIPT
+
+#Will be used in coming revisions
+#$kubeadmjoin = <<SCRIPT
+#!/bin/bash
+#echo Will run the kubeadm join script ...
+#kubeadm join --token=$1 $2
+#SCRIPT
+
+required_plugins = %w(vagrant-cachier vagrant-triggers)
 
 required_plugins.each do |plugin|
   need_restart = false
@@ -69,6 +85,8 @@ def configureVM(vmCfg, hostname, cpus, mem)
      vmCfg.cache.scope = :machine
      vmCfg.cache.enable :apt
      vmCfg.cache.enable :gem
+     #To fix the apt permission issue.
+     vmCfg.cache.synced_folder_opts = {owner: "_apt", group: "_apt"}
   end
   
   # Set resources w.r.t Virtualbox provider
@@ -96,6 +114,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     
     config.vm.define hostname do |vmCfg|
       vmCfg = configureVM(vmCfg, hostname, cpus, mem)
+      vmCfg.vm.provision :shell, inline: "echo Setting up the Master using IPAdress: $1", :args => "`#{master_ip_address}`"
+      vmCfg.vm.provision :shell, inline: "echo Setting up the Master using Token: $1", :args => "#{token}"
+      vmCfg.vm.provision :shell, inline: $kubeadminit, :args => "`#{master_ip_address}` #{token}", privileged: true
     end     
   end
   
@@ -107,7 +128,24 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     
     config.vm.define hostname do |vmCfg|
       vmCfg = configureVM(vmCfg, hostname, cpus, mem)
+      #We want to run this only when the VM is first provisioned and get the Master IP to join the cluster
+      vmCfg.vm.provision :trigger, :force => true, :stdout => true, :stderr => true do |trigger|
+         trigger.fire do
+            master_hostname = "master-01"
+            get_ip_address = %Q(vagrant ssh #{master_hostname}  -c 'ifconfig | grep -oP "inet addr:\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}" | grep -oP "\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}" | tail -n 2 | head -n 1')       
+            get_master_ip_address = `#{get_ip_address}`
+            info"Getting the Master IP to join the cluster..."
+            if get_master_ip_address == ""
+               info"The Kubernetes Master is down, bring it up and manually run:"
+               info"kubeadm --token=<token> <master_ip_address>"
+               info"in order to join the cluster."
+            else
+               info"Setting up the Minion using IPAddress: #{get_master_ip_address}"
+               info"Setting up the Minion using Token: #{token}"
+               @machine.communicate.sudo("kubeadm join --token=#{token} #{get_master_ip_address.strip}")
+            end  
+         end
+      end
     end
   end
-
 end
