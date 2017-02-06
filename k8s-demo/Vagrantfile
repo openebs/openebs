@@ -137,7 +137,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
             info"Getting the Master IP to join the cluster..."
             if get_master_ip_address == ""
                info"The Kubernetes Master is down, bring it up and manually run:"
-               info"kubeadm --token=<token> <master_ip_address>"
+               info"kubeadm join --token=<token> <master_ip_address>"
                info"in order to join the cluster."
             else
                info"Setting up the Minion using IPAddress: #{get_master_ip_address}"
