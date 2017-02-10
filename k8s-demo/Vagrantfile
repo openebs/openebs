@@ -14,7 +14,7 @@ H_NODES = ENV['H_NODES'] || 2
 # Master node Memory & CPUs
 M_MEM = ENV['M_MEM'] || 512
 M_CPUS = ENV['M_CPUS'] || 1
-0
+
 # Minion Host Memory & CPUs
 H_MEM = ENV['H_MEM'] || 1024
 H_CPUS = ENV['H_CPUS'] || 1
