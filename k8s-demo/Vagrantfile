@@ -88,7 +88,7 @@ def configureVM(vmCfg, hostname, cpus, mem)
      vmCfg.cache.enable :apt
      vmCfg.cache.enable :gem
      #To fix the apt permission issue.
-     vmCfg.cache.synced_folder_opts = {owner: "_apt", group: "_apt"}
+     vmCfg.cache.synced_folder_opts = {owner: "_apt"}
   end
   
   # Set resources w.r.t Virtualbox provider
