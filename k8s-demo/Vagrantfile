@@ -6,10 +6,16 @@ VAGRANTFILE_API_VERSION = "2"
 Vagrant.require_version ">= 1.6.0"
 
 # K8s Master Nodes
-M_NODES = ENV['M_NODES'] || 1
+KM_NODES = ENV['KM_NODES'] || 1
 
 # K8s Minion Nodes
-H_NODES = ENV['H_NODES'] || 2
+KH_NODES = ENV['KH_NODES'] || 1
+
+# Maya Master Nodes
+MM_NODES = ENV['MM_NODES'] || 1
+
+# Maya Host Nodes
+MH_NODES = ENV['MH_NODES'] || 1
 
 # Master node Memory & CPUs
 M_MEM = ENV['M_MEM'] || 512
@@ -19,19 +25,22 @@ M_CPUS = ENV['M_CPUS'] || 1
 H_MEM = ENV['H_MEM'] || 1024
 H_CPUS = ENV['H_CPUS'] || 1
 
+RELEASE_TAG="0.0.4"
+
 #Local Variables
-master_ip_address = %Q(ifconfig | grep -oP "inet addr:\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}" | grep -oP "\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}" | tail -n 2 | head -n 1)
-get_master_ip_address = ""
+machine_ip_address = %Q(ifconfig | grep -oP "inet addr:\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}" | grep -oP "\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}" | tail -n 2 | head -n 1)
+master_ip_address = ""
+host_ip_address = ""
 get_token = ""
 token = ""
 
 
 # Generic installer script common for server(s) & client(s)
 # This expects arguments that provide runtime values
-$installer = <<SCRIPT
+$kubeinstaller = <<SCRIPT
 #!/bin/bash
 
-echo Will run the common installer script ...
+echo Running the Kubernetes installer...
 
 # Update apt and get dependencies
 sudo apt-get update
@@ -53,6 +62,23 @@ $kubeadminit = <<SCRIPT
 #!/bin/bash
 echo Will run the kubeadm init script ...
 kubeadm init --api-advertise-addresses=$1
+SCRIPT
+
+$mayainstaller = <<SCRIPT
+#!/bin/bash
+
+echo Running the Maya installer...
+
+# Update apt and get dependencies
+sudo apt-get update
+sudo apt-get install -y unzip curl wget
+
+# Install Maya binaries
+wget https://github.com/openebs/maya/releases/download/$1/maya-linux_amd64.zip
+unzip maya-linux_amd64.zip
+sudo mv maya /usr/bin
+rm -rf maya-linux_amd64.zip
+
 SCRIPT
 
 #Will be used in coming revisions
@@ -88,7 +114,7 @@ def configureVM(vmCfg, hostname, cpus, mem)
      vmCfg.cache.enable :apt
      vmCfg.cache.enable :gem
      #To fix the apt permission issue.
-     vmCfg.cache.synced_folder_opts = {owner: "_apt", group: "_apt"}
+     #vmCfg.cache.synced_folder_opts = {owner: "_apt", group: "_apt"}
   end
   
   # Set resources w.r.t Virtualbox provider
@@ -99,7 +125,7 @@ def configureVM(vmCfg, hostname, cpus, mem)
   end
   
   # Script will make some directories before installation procedure
-  vmCfg.vm.provision "shell", inline: $installer, privileged: true
+  #vmCfg.vm.provision "shell", inline: $installer, privileged: true
   
   return vmCfg
 end
@@ -108,35 +134,39 @@ end
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
 
-  # Maya Master related only !!
-  1.upto(M_NODES.to_i) do |i|
-    hostname = "master-%02d" % [i]
+  # K8s Master related only !!
+  1.upto(KM_NODES.to_i) do |i|
+    hostname = "kubemaster-%02d" % [i]
     cpus = M_CPUS
     mem = M_MEM
     
     config.vm.define hostname do |vmCfg|
       vmCfg = configureVM(vmCfg, hostname, cpus, mem)
-      vmCfg.vm.provision :shell, inline: "echo Setting up the Master using IPAddress: $1", :args => "`#{master_ip_address}`"
-      vmCfg.vm.provision :shell, inline: $kubeadminit, :args => "`#{master_ip_address}`", privileged: true
+      # Script will make some directories before installation procedure
+      vmCfg.vm.provision :shell, inline: $kubeinstaller, privileged: true
+      vmCfg.vm.provision :shell, inline: "echo Setting up the Master using IPAddress: $1", :args => "`#{machine_ip_address}`"
+      vmCfg.vm.provision :shell, inline: $kubeadminit, :args => "`#{machine_ip_address}`", privileged: true
     end     
   end
   
-  # OpenEBS Host related only !!
-  1.upto(H_NODES.to_i) do |i|
-    hostname = "host-%02d" % [i]
+  # K8s Minions related only !!
+  1.upto(KH_NODES.to_i) do |i|
+    hostname = "kubeminion-%02d" % [i]
     cpus = H_CPUS
     mem = H_MEM
     
     config.vm.define hostname do |vmCfg|
       vmCfg = configureVM(vmCfg, hostname, cpus, mem)
+      # Script will make some directories before installation procedure
+      vmCfg.vm.provision :shell, inline: $kubeinstaller, privileged: true
       #We want to run this only when the VM is first provisioned and get the Master IP to join the cluster
       vmCfg.vm.provision :trigger, :force => true, :stdout => true, :stderr => true do |trigger|
          trigger.fire do
             info"Getting the Master IP to join the cluster..."
-            master_hostname = "master-01"
+            master_hostname = "kubemaster-01"
             get_ip_address = %Q(vagrant ssh #{master_hostname}  -c 'ifconfig | grep -oP "inet addr:\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}" | grep -oP "\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}" | tail -n 2 | head -n 1')            
-            get_master_ip_address = `#{get_ip_address}`            
-            if get_master_ip_address == ""
+            master_ip_address = `#{get_ip_address}`            
+            if master_ip_address == ""
                info"The Kubernetes Master is down, bring it up and manually run:"
                info"kubeadm join --token=<token> <master_ip_address>"
                info"in order to join the cluster."
@@ -145,14 +175,77 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
             else               
                get_token = %Q(vagrant ssh #{master_hostname} -c 'kubectl -n kube-system get secret clusterinfo -o yaml | grep token-map | cut -d ":" -f2 | cut -d " " -f2 | base64 -d | sed "s|{||g;s|}||g" | sed "s|:|.|g" | xargs echo')
                token = `#{get_token}`
-               info"Setting up the Minion using IPAddress: #{get_master_ip_address}"
+               info"Setting up the Minion using IPAddress: #{master_ip_address}"
                info"Setting up the Minion using Token: #{token}"
                if token != ""
-                  @machine.communicate.sudo("kubeadm join --token=#{token.strip} #{get_master_ip_address.strip}")
+                  @machine.communicate.sudo("kubeadm join --token=#{token.strip} #{master_ip_address.strip}")
                else
                   info"Token cannot be empty. SSH into the Master and run the below command to get the token:"
                   info"kubectl -n kube-system get secret clusterinfo -o yaml | grep token-map | cut -d \":\" -f2 | cut -d \" \" -f2 | base64 -d | sed \"s|{||g;s|}||g\" | sed \"s|:|.|g\" | xargs echo"
                end
+            end  
+         end
+      end
+    end
+  end
+  
+  # Maya Master related only !!
+  1.upto(MM_NODES.to_i) do |i|
+    hostname = "mayamaster-%02d" % [i]
+    cpus = M_CPUS
+    mem = M_MEM
+    
+    config.vm.define hostname do |vmCfg|
+      vmCfg = configureVM(vmCfg, hostname, cpus, mem)
+      # Script will make some directories before installation procedure
+      vmCfg.vm.provision :shell, inline: $mayainstaller, :args => "#{RELEASE_TAG}", privileged: true
+      #We want to run this only when the VM is first provisioned and get the Master IP to join the cluster
+      vmCfg.vm.provision :trigger, :force => true, :stdout => true, :stderr => true do |trigger|
+         trigger.fire do
+            info"Getting the Master IP to join the cluster..."            
+            get_ip_address = %Q(vagrant ssh #{hostname}  -c 'ifconfig | grep -oP "inet addr:\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}" | grep -oP "\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}" | tail -n 2 | head -n 1')            
+            master_ip_address = `#{get_ip_address}`            
+            if master_ip_address == ""
+               info"The Maya Master is down, bring it up and manually run:"
+               info"maya setup-omm -self-ip=<master_ip_address>"
+               info"in order to join the cluster."               
+            else               
+	       info"Setting up the node using IPAddress: #{master_ip_address.strip}"                                             
+               @machine.communicate.sudo("maya setup-omm -self-ip=#{master_ip_address.strip}")
+               @machine.communicate.sudo("echo 'export NOMAD_ADDR=http://#{master_ip_address.strip}:4646' >> /home/ubuntu/.profile")               
+            end  
+         end
+      end      
+    end     
+  end
+
+  # Maya Host related only !!
+  1.upto(MH_NODES.to_i) do |i|
+    hostname = "mayahost-%02d" % [i]
+    cpus = H_CPUS
+    mem = H_MEM
+    
+    config.vm.define hostname do |vmCfg|
+      vmCfg = configureVM(vmCfg, hostname, cpus, mem)
+      # Script will make some directories before installation procedure
+      vmCfg.vm.provision :shell, inline: $mayainstaller, :args => "#{RELEASE_TAG}", privileged: true      
+      #We want to run this only when the VM is first provisioned and get the Master IP to join the cluster
+      vmCfg.vm.provision :trigger, :force => true, :stdout => true, :stderr => true do |trigger|
+         trigger.fire do
+            info"Getting the Master IP to join the cluster..."
+            master_hostname = "mayamaster-01"
+            get_ip_address = %Q(vagrant ssh #{master_hostname}  -c 'ifconfig | grep -oP "inet addr:\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}" | grep -oP "\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}" | tail -n 2 | head -n 1')            
+            master_ip_address = `#{get_ip_address}`            
+            if master_ip_address == ""
+               info"The Maya Master is down, bring it up and manually run:"
+               info"maya setup-osh -self-ip=<host_ip_address> -omm-ips=<master_ip_address>"
+               info"in order to join the cluster."               
+            else
+               get_ip_address = %Q(vagrant ssh #{hostname}  -c 'ifconfig | grep -oP "inet addr:\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}" | grep -oP "\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}" | tail -n 2 | head -n 1')      
+               host_ip_address = `#{get_ip_address}`	       
+               info"Setting up the node using IPAddress: #{host_ip_address.strip}"                              
+               @machine.communicate.sudo("maya setup-osh -self-ip=#{host_ip_address.strip} -omm-ips=#{master_ip_address.strip}")
+               @machine.communicate.sudo("echo 'export NOMAD_ADDR=http://#{master_ip_address.strip}:4646' >> /home/ubuntu/.profile")               
             end  
          end
       end
