@@ -1,0 +1,8 @@
+# Operated by cluster admin - Acts on Storage Provider
+kind: StorageClass
+apiVersion: storage.k8s.io/v1beta1
+metadata:
+  name: slow-gce-sc
+provisioner: kubernetes.io/gce-pd
+parameters:
+  type: pd-standard

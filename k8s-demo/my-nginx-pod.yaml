@@ -1,0 +1,16 @@
+# Operated by an user
+kind: Pod
+apiVersion: v1
+metadata:
+  name: my-nginx-pod
+spec:
+  volumes:
+    - name: my-nginx-pd
+      persistentVolumeClaim:
+        claimName: fast-ebs-pvc
+  containers:
+    - name: my-nginx-fe-con
+      image: dockerfile/nginx
+      volumeMounts:
+      - mountPath: "/var/www/html"
+        name: my-nginx-pd
