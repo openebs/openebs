@@ -308,8 +308,3 @@ The command should output the status of the host nodes.
 ID        DC   Name         Class   Drain  Status
 f3ca046e  dc1  mayahost-01  <none>  false  ready
 ```
-## License
-
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
-
-## Acknowledgments
