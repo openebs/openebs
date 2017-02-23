@@ -1,4 +1,6 @@
+# Creates a sample VSM with single frontend and backend controller. 
 job "demo-vsm1" {
+
 	datacenters = ["dc1"]
 
 	# Restrict our job to only linux. We can specify multiple
@@ -97,63 +99,6 @@ job "demo-vsm1" {
 		                JIVA_REP_NETWORK = "host_static"
 				JIVA_REP_IFACE = "enp0s8"
 				JIVA_REP_IP = "172.28.128.102"
-				JIVA_REP_SUBNET = "24"
-			}
-
-			config {
-				command = "launch-jiva-rep-with-ip"
-			}
-
-			# We must specify the resources required for
-			# this task to ensure it runs on a machine with
-			# enough capacity.
-			resources {
-				cpu = 500 # 500 MHz
-				memory = 256 # 256MB
-				network {
-					mbits = 100
-				}
-			}
-
-		}
-	}
-
-	# Create a 'backend container' group. 
-	group "demo-vsm1-backend-container2" {
-		# Configure the restart policy for the task group. If not provided, a
-		# default is used based on the job type.
-		restart {
-			# The number of attempts to run the job within the specified interval.
-			attempts = 3
-			interval = "5m"
-			delay = "25s"
-			mode = "delay"
-		}
-
-		constraint {
-			# All groups in this job should be scheduled on different hosts.
-            operator  = "distinct_hosts"
-            value     = "true"
-        }
-
-		# Define the parameters for the backend container
-		task "be-store2" {
-			# Use a docker wrapper to run the task.
-			driver = "raw_exec"
-			artifact {
-				source = "https://raw.githubusercontent.com/openebs/jiva/master/scripts/launch-jiva-rep-with-ip"
-			}
-
-			env {
-				JIVA_REP_NAME = "${NOMAD_JOB_NAME}-${NOMAD_TASK_NAME}"
-				JIVA_CTL_IP = "${NOMAD_META_JIVA_FRONTENDIP}"
-				JIVA_REP_VOLNAME = "${NOMAD_META_JIVA_VOLNAME}"
-				JIVA_REP_VOLSIZE = "${NOMAD_META_JIVA_VOLSIZE}"
-				JIVA_REP_VOLSTORE = "/tmp/jiva/vsm1/rep2"
-				JIVA_REP_VERSION = "openebs/jiva:latest"
-		                JIVA_REP_NETWORK = "host_static"
-				JIVA_REP_IFACE = "enp0s8"
-				JIVA_REP_IP = "172.28.128.103"
 				JIVA_REP_SUBNET = "24"
 			}
 
