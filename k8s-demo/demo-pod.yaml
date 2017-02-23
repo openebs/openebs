@@ -26,6 +26,6 @@ spec:
     iscsi:
       targetPortal: 172.28.128.101:3260      
       iqn: iqn.2016-09.com.openebs.jiva:demo-vsm1-vol1
-      lun: 0
+      lun: 1
       fsType: ext4
-      readOnly: true
+      readOnly: false
