@@ -131,6 +131,9 @@ def configureVM(vmCfg, hostname, cpus, mem)
   
   # Set resources w.r.t Virtualbox provider
   vmCfg.vm.provider "virtualbox" do |vb|
+    #Uncomment the following line, to launch the Virtual Box console. 
+    # - Useful if debugging an slow-start issue
+    #vb.gui = true
     vb.memory = mem
     vb.cpus = cpus
     vb.customize ["modifyvm", :id, "--cableconnected1", "on"]
