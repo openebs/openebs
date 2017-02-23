@@ -118,6 +118,10 @@ def configureVM(vmCfg, hostname, cpus, mem)
 
   vmCfg.vm.box = "ubuntu/xenial64"
   
+  #Default timeout is 300 sec for boot. 
+  #Uncomment the following line and set the desired timeout value. 
+  vmCfg.vm.boot_timeout = 300
+	
   vmCfg.vm.hostname = hostname
   vmCfg.vm.network "private_network", type: "dhcp"
 
