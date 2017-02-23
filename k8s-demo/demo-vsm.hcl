@@ -60,7 +60,7 @@ job "demo-vsm1" {
 				cpu = 500 # 500 MHz
 				memory = 256 # 256MB
 				network {
-					mbits = 20
+					mbits = 100
 				}
 			}
 
