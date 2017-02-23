@@ -55,7 +55,9 @@ sudo apt-get install vagrant
 #### VirtualBox
 ##### Remove an existing copy of VirtualBox if you have one
 ```
-sudo apt remove virtualbox
+sudo apt-get remove --purge virtualbox
+sudo rm ~/"VirtualBox VMs" -Rf
+sudo rm ~/.config/VirtualBox/ -Rf
 ```
 ##### Open the /etc/apt/sources.list file:
 ```
@@ -82,7 +84,7 @@ sudo apt install virtualbox-5.1
 sudo apt-get install git
 ```
 ## Vagrantfile
-We will using a Vagrantfile for setting up these nodes. We define the way the nodes have to be setup and form a cluster. 
+We will using a Vagrantfile for setting up these nodes. 
 
 ### Running the Vagrant file
 1. Launch the Terminal.
@@ -90,187 +92,8 @@ We will using a Vagrantfile for setting up these nodes. We define the way the no
 ```
 git clone https://github.com/openebs/openebs.git
 ```
-
-Change directory to the location where the Vagrantfile has been placed.The Vagrantfile is split into the following sections:
-
-1. Define the characteristics of the Nodes.
-2. Specify the plugins needed by Vagrant to build the Nodes.
-3. Scripts to install binaries for Kubernetes nodes and setting up a K8s cluster.
-4. Scripts to install binaries for OpenEBS Maya nodes and setting up a cluster.
-
-
-### Define the characteristics of the Nodes
-```
-#Recommended minimum configuration
-# Kube Master node Memory & CPUs
-KM_MEM = ENV['KM_MEM'] || 2048
-KM_CPUS = ENV['KM_CPUS'] || 2
-
-# Master node Memory & CPUs
-M_MEM = ENV['M_MEM'] || 1024
-M_CPUS = ENV['M_CPUS'] || 1
-
-# Minion Host Memory & CPUs
-H_MEM = ENV['H_MEM'] || 1024
-H_CPUS = ENV['H_CPUS'] || 1
-```
-### Required plugins for Vagrant
-```
-required_plugins = %w(vagrant-cachier vagrant-triggers)
-
-required_plugins.each do |plugin|
-  need_restart = false
-  unless Vagrant.has_plugin? plugin
-    system "vagrant plugin install #{plugin}"
-    need_restart = true
-  end
-  exec "vagrant #{ARGV.join(' ')}" if need_restart
-end
-```
-### Install scripts for Kubernetes.
-```
-$kubeinstaller = <<SCRIPT
-#!/bin/bash
-echo Will run the common installer script ...
-# Update apt and get dependencies
-sudo apt-get update
-sudo apt-get install -y unzip curl wget
-# Install docker and K8s
-curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
-cat <<EOF > /etc/apt/sources.list.d/kubernetes.list
-deb http://apt.kubernetes.io/ kubernetes-xenial main
-EOF
-apt-get update
-# Install docker if you don't have it already.
-apt-get install -y docker.io
-apt-get install -y kubelet kubeadm kubectl kubernetes-cni
-SCRIPT
-
-#Will be called during the VM creation
-vmCfg.vm.provision "shell", inline: $kubeinstaller, privileged: true
-
-```
-### Master Node Setup
-```
-$kubeadminit = <<SCRIPT
-#!/bin/bash
-echo Will run the kubeadm init script ...
-kubeadm init --api-advertise-addresses=$1
-kubectl create -f https://git.io/weave-kube
-SCRIPT
-
-#Will be called when setting up the Master Node
-vmCfg.vm.provision :shell, inline: $kubeadminit, :args => "`#{master_ip_address}` #{token}", privileged: true
-```
-
-### Minion Nodes Setup - uses vagrant-triggers
-```
-       vmCfg.vm.provision :trigger, :force => true, :stdout => true, :stderr => true do |trigger|
-         trigger.fire do
-            info"Getting the Master IP to join the cluster..."
-            master_hostname = "kubemaster-01"
-            get_ip_address = %Q(vagrant ssh #{master_hostname}  -c 'ifconfig | grep -oP "inet addr:\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}" | grep -oP "\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}" | tail -n 3 | head -n 1')            
-            master_ip_address = `#{get_ip_address}`            
-            if master_ip_address == ""
-               info"The Kubernetes Master is down, bring it up and manually run:"
-               info"kubeadm join --token=<token> <master_ip_address>"
-               info"in order to join the cluster."
-               info"The Token can be obtained by running the following command on the Master Node:"
-               info"kubectl -n kube-system get secret clusterinfo -o yaml | grep token-map | cut -d \":\" -f2 | cut -d \" \" -f2 | base64 -d | sed \"s|{||g;s|}||g\" | sed \"s|:|.|g\" | xargs echo"
-            else                           
-               get_token = %Q(vagrant ssh #{master_hostname} -c 'kubectl -n kube-system get secret clusterinfo -o yaml | grep token-map | cut -d ":" -f2 | cut -d " " -f2 | base64 -d | sed "s|{||g;s|}||g" | sed "s|:|.|g" | xargs echo')
-               token = `#{get_token}`
-               get_ip_address = %Q(vagrant ssh #{hostname}  -c 'ifconfig | grep -oP "inet addr:\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}" | grep -oP "\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}" | tail -n 2 | head -n 1')      
-               host_ip_address = `#{get_ip_address}`
-               @machine.communicate.sudo("echo \"#{master_ip_address.strip} #{master_hostname}\" >> /etc/hosts")
-               append_to_hosts = %Q(vagrant ssh #{master_hostname} -c 'echo #{host_ip_address.strip} #{hostname} | sudo tee -a /etc/hosts')               
-               `#{append_to_hosts}`
-               info"Setting up the Minion using IPAddress: #{master_ip_address}"
-               info"Setting up the Minion using Token: #{token}"
-               if token != ""
-                  get_cluster_ip = %Q(vagrant ssh #{master_hostname} -c 'kubectl get svc -o yaml | grep clusterIP | cut -d ":" -f2 | cut -d " " -f2')
-                  cluster_ip = `#{get_cluster_ip}`
-                  @machine.communicate.sudo("kubeadm join --token=#{token.strip} #{master_ip_address.strip}")
-                  info"Joining the CNI Network..."
-                  @machine.communicate.sudo("route add #{cluster_ip.strip} gw #{master_ip_address.strip}")
-               else
-                  info"Token cannot be empty. SSH into the Master and run the below command to get the token:"
-                  info"kubectl -n kube-system get secret clusterinfo -o yaml | grep token-map | cut -d \":\" -f2 | cut -d \" \" -f2 | base64 -d | sed \"s|{||g;s|}||g\" | sed \"s|:|.|g\" | xargs echo"
-               end
-            end  
-         end
-      end
-```
-### Install scripts for OpenEBS.
-```
-$mayainstaller = <<SCRIPT
-#!/bin/bash
-
-echo Running the Maya installer...
-
-# Update apt and get dependencies
-sudo apt-get update
-sudo apt-get install -y unzip curl wget
-
-# Install Maya binaries
-wget https://github.com/openebs/maya/releases/download/$1/maya-linux_amd64.zip
-unzip maya-linux_amd64.zip
-sudo mv maya /usr/bin
-rm -rf maya-linux_amd64.zip
-
-SCRIPT
-
-#Will be called during the VM creation
-vmCfg.vm.provision :shell, inline: $mayainstaller, :args => "#{RELEASE_TAG}", privileged: true
-
-```
-### Master Node Setup - uses vagrant-triggers
-```
-#Will be called when setting up the Master Node
-vmCfg.vm.provision :trigger, :force => true, :stdout => true, :stderr => true do |trigger|
-    trigger.fire do
-      info"Getting the Master IP to join the cluster..."            
-      get_ip_address = %Q(vagrant ssh #{hostname}  -c 'ifconfig | grep -oP "inet addr:\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}" | grep -oP "\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}" | tail -n 2 | head -n 1')            
-      master_ip_address = `#{get_ip_address}`            
-      if master_ip_address == ""
-          info"The Maya Master is down, bring it up and manually run:"
-          info"maya setup-omm -self-ip=<master_ip_address>"
-          info"in order to join the cluster."               
-      else               
-    info"Setting up the node using IPAddress: #{master_ip_address.strip}"                                             
-          @machine.communicate.sudo("maya setup-omm -self-ip=#{master_ip_address.strip}")
-          @machine.communicate.sudo("echo 'export NOMAD_ADDR=http://#{master_ip_address.strip}:4646' >> /home/ubuntu/.profile")               
-      end  
-    end
-end
-```
-
-### Host Nodes Setup - uses vagrant-triggers
-```
-      vmCfg.vm.provision :trigger, :force => true, :stdout => true, :stderr => true do |trigger|
-         trigger.fire do
-            info"Getting the Master IP to join the cluster..."
-            master_hostname = "mayamaster-01"            
-            get_ip_address = %Q(vagrant ssh #{master_hostname}  -c 'ifconfig | grep -oP "inet addr:\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}" | grep -oP "\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}" | tail -n 2 | head -n 1')            
-            master_ip_address = `#{get_ip_address}`            
-            if master_ip_address == ""
-               info"The Maya Master is down, bring it up and manually run:"
-               info"maya setup-osh -self-ip=<host_ip_address> -omm-ips=<master_ip_address>"
-               info"in order to join the cluster."               
-            else               
-               get_ip_address = %Q(vagrant ssh #{hostname}  -c 'ifconfig | grep -oP "inet addr:\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}" | grep -oP "\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}" | tail -n 2 | head -n 1')      
-               host_ip_address = `#{get_ip_address}`	       
-               info"Setting up the node using IPAddress: #{host_ip_address.strip}"                              
-               @machine.communicate.sudo("maya setup-osh -self-ip=#{host_ip_address.strip} -omm-ips=#{master_ip_address.strip}")
-               @machine.communicate.sudo("echo 'export NOMAD_ADDR=http://#{master_ip_address.strip}:4646' >> /home/ubuntu/.profile")                              
-            end  
-         end
-      end
-```
-
-### Running the Vagrant file
-1. Launch the Terminal.
-2. Run the following command.
+3. Change directory to the location where the Vagrantfile has been placed.
+4. Run the following command.
 
 ```
 vagrant up
@@ -281,7 +104,7 @@ Once the nodes have been setup:
 
 #### SSH into the Kubernetes Master Node and run the following command.
 ```
-sudo kubectl get nodes
+kubectl get nodes
 ```
 The command should output the number of nodes in the cluster and their current state.
 ```
@@ -290,6 +113,36 @@ kubeminion-01   Ready          43m
 kubemaster-01   Ready,master   1h
 
 ```
+```
+ubuntu@kubemaster-01:~$ kubectl get pods --all-namespaces
+```
+The above command will ouput the status of the pods created:
+```
+NAMESPACE     NAME                                    READY     STATUS    RESTARTS   AGE
+kube-system   dummy-2088944543-1t7hc                  1/1       Running   0          22m
+kube-system   etcd-kubemaster-01                      1/1       Running   0          21m
+kube-system   kube-apiserver-kubemaster-01            1/1       Running   0          22m
+kube-system   kube-controller-manager-kubemaster-01   1/1       Running   0          21m
+kube-system   kube-discovery-1769846148-nzbd1         1/1       Running   0          22m
+kube-system   kube-dns-2924299975-jt7wz               4/4       Running   0          20m
+kube-system   kube-proxy-5wrcp                        1/1       Running   0          15m
+kube-system   kube-proxy-p2n9v                        1/1       Running   0          20m
+kube-system   kube-scheduler-kubemaster-01            1/1       Running   0          21m
+kube-system   weave-net-6t9pz                         2/2       Running   0          15m
+kube-system   weave-net-frt55                         2/2       Running   0          20m
+```
+
+Note: The below issue has been identified to cause problems for POD creation. 
+```
+https://github.com/openebs/openebs/issues/26
+```
+The issue also contains the solution where a couple of steps have to be manually performed before any pods are created.
+
+For more usages of ```kubectl``` refer to:
+```
+https://kubernetes.io/docs/user-guide/kubectl-cheatsheet/
+```
+
 #### SSH into the OpenEBS Master Node and run the following commands
 ```
 sudo maya omm-status
