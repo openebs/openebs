@@ -28,68 +28,7 @@ Verify that you have the following software installed, with atleast at the minim
 3.Git 
 ```
 
-### Installing
 
-We will setup the prerequisites required for the environment as below:
-#### Vagrant:
-##### Update the packages info from repositories
-```
-sudo apt-get update
-```
-##### Check the Vagrant package info (optional)
-```
-apt-cache show vagrant
-```
-The output should be similar to:
-```
-Package: vagrant
-Priority: optional
-Section: universe/admin
-Installed-Size: 2466
-Maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
-Original-Maintainer: Antonio Terceiro <terceiro@debian.org>
-Architecture: all
-Version: 1.8.1+dfsg-1
-Depends: bsdtar, bundler, curl, openssh-client, ruby-childprocess (>= 0.3.7), ruby-erubis (>= 2.7.0), ruby-i18n (>= 0.6.0), ruby-listen, ruby-log4r (>= 1.1.9), ruby-net-scp (>= 1.1.0), ruby-net-sftp, ruby-net-ssh (>= 1:2.6.6), ruby-rest-client, ruby-nokogiri, ruby-rb-inotify, ruby
-Suggests: virtualbox (>= 4.0)
-Filename: pool/universe/v/vagrant/vagrant_1.8.1+dfsg-1_all.deb
-...
-```
-##### Install Vagrant
-```
-sudo apt-get install vagrant
-```
-#### VirtualBox
-##### Remove an existing copy of VirtualBox if you have one
-```
-sudo apt-get remove --purge virtualbox
-sudo rm ~/"VirtualBox VMs" -Rf
-sudo rm ~/.config/VirtualBox/ -Rf
-```
-##### Open the /etc/apt/sources.list file:
-```
-sudo nano -w /etc/apt/sources.list
-```
-##### Append the following line to the file
-```
-deb http://download.virtualbox.org/virtualbox/debian xenial contrib
-```
-##### Press Ctrl+O to save the file. Then press Ctrl+X to close the file.
-
-##### Get the Oracle GPG public key and import it into Ubuntu 16.04
-```
-wget -q https://www.virtualbox.org/download/oracle_vbox_2016.asc -O- | sudo apt-key add -
-```
-##### Run the following commands to install VirtualBox
-```
-sudo apt update
-
-sudo apt install virtualbox-5.1
-```
-#### Git
-```
-sudo apt-get install git
-```
 ## Vagrantfile
 We will using a Vagrantfile for setting up these nodes. 
 
