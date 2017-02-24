@@ -29,16 +29,16 @@ Verify that you have the following software installed, with atleast at the minim
 
 #### Verify
 ```
-ubuntu-hos:~/t$ vagrant version
+ubuntu-host:~/$ vagrant version
 Installed Version: 1.9.1
 Latest Version: 1.9.1
  
 You're running an up-to-date version of Vagrant!
-ubuntu-host$ vboxmanage --version
+ubuntu-host:~/$ vboxmanage --version
 5.1.14r112924
 ubuntu-hos:~/$ git version
 git version 2.7.4
-ubuntu-hos:~/$ 
+ubuntu-host:~/$ 
 
 ```
 
@@ -57,8 +57,8 @@ ls $demo-folder/openebs/k8s-demo/Vagrantfile
 #### Verify
 
 ```
-ubuntu-hos:~/$ cd $demo-folder/openebs/k8s-demo/
-ubuntu-hos:~/demo-folder/openebs/k8s-demo$ vagrant status
+ubuntu-host:~/$ cd $demo-folder/openebs/k8s-demo/
+ubuntu-host:~/demo-folder/openebs/k8s-demo$ vagrant status
 Current machine states:
 
 kubemaster-01             not created (virtualbox)
@@ -87,7 +87,7 @@ Depending on your system configuration, you can edit the Vagrantfile or pass the
 A value of 0 for the above variables will skip the installation of that type. For example, to install only Kubernetes you can run the following command:
 
 ```
-ubuntu-hos:~/demo-folder/openebs/k8s-demo$ MH_NODES=0 MM_NODES=0 vagrant status
+ubuntu-host:~/demo-folder/openebs/k8s-demo$ MH_NODES=0 MM_NODES=0 vagrant status
 Current machine states:
 
 kubemaster-01             not created (virtualbox)
@@ -116,7 +116,7 @@ This step, can take few minutes depending on your network speed. The required va
 #### Verify the VM installation
 
 ```
-ubuntu-hos:~/demo-folder/openebs/k8s-demo$ vagrant status
+ubuntu-host:~/demo-folder/openebs/k8s-demo$ vagrant status
 Current machine states:
 
 kubemaster-01             running (virtualbox)
@@ -127,7 +127,7 @@ osh-01                    running (virtualbox)
 This environment represents multiple VMs. The VMs are all listed
 above with their current state. For more information about a specific
 VM, run `vagrant status NAME`.
-ubuntu-hos:~/demo-folder/openebs/k8s-demo$ 
+ubuntu-host:~/demo-folder/openebs/k8s-demo$ 
 ```
 
 Note: The network slowness can abort the process of installation, since a default timeout of 300 seconds is specified for the VMs to be launched. This can be modified by editing the Vagrantfile ( vmCfg.vm.boot_timeout ) value. If the installation aborts in between, make sure to clean-up before starting with the installation again.
@@ -141,7 +141,7 @@ vagrant destroy
 Use the kubectl from within the Kubernetes master to get the current status. 
 
 ```
-ubuntu-hos:~/demo-folder/openebs/k8s-demo$ vagrant ssh kubemaster-01
+ubuntu-host:~/demo-folder/openebs/k8s-demo$ vagrant ssh kubemaster-01
 ... snipped ...
 ubuntu@kubemaster-01:~$ kubectl get nodes
 NAME            STATUS         AGE
@@ -182,7 +182,7 @@ https://kubernetes.io/docs/user-guide/kubectl-cheatsheet/
 Use the mayactl from within the OpenEBS Maya Master to get the current status. 
 
 ```
-ubuntu-hos:~/demo-folder/openebs/k8s-demo$ vagrant ssh omm-01
+ubuntu-host:~/demo-folder/openebs/k8s-demo$ vagrant ssh omm-01
 ... snipped ...
 ubuntu@omm-01:~$ 
 ubuntu@omm-01:~$ maya omm-status
