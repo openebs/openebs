@@ -25,4 +25,11 @@ You will have the following machines ready to use:
 - OpenEBS Maya Master (omm-01)
 - OpenEBS Storage Host (osh-01)
 
-If this is your first time here, you can follow through our [Step-by-step Installation Tutorial for Ubuntu 16.04] (./tutorial-ubuntu1604-vagrant.md)
+Please refer to our [Step-by-step Installation Tutorial for Ubuntu 16.04] (./tutorial-ubuntu1604-vagrant.md), if:
+- this is your first time setting up the demo
+- you would like to launch multiple minion nodes or openebs storage hosts
+- you would like to just setup only a Kubernetes Cluster or OpenEBS Cluster for dev/testing.
+
+## Next Steps
+- Configure a Stateless Hellow-World Pod
+- Configure MySQL Pod with OpenEBS Storage
