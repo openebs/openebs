@@ -209,3 +209,7 @@ https://github.com/openebs/openebs/issues?utf8=%E2%9C%93&q=label%3Ademo%2Fk8s%20
 Some of the issues observed:
 - Unable to upgrade to VirtualBox 5.1
 - weave pod, is stuck in CrashLoop
+
+## Next Steps
+- [Configure a Hello-World App](./run-k8s-hello-world.md)
+- Configure MySQL Pod with OpenEBS Storage
