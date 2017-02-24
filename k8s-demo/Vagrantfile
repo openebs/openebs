@@ -58,6 +58,9 @@ apt-get update
 # Install docker if you don't have it already.
 apt-get install -y docker.io
 apt-get install -y kubelet kubeadm kubectl kubernetes-cni
+
+#Install JSON Parser for patching kube-proxy
+apt-get install -y jq
 SCRIPT
 
 $kubeadminit = <<SCRIPT
@@ -69,6 +72,14 @@ kubeadm init --api-advertise-addresses=$1
 
 #Install the CNI network for Kubernetes
 kubectl create -f https://git.io/weave-kube
+SCRIPT
+
+$kubeproxypatch =<<SCRIPT
+
+echo Patching the kube-proxy for CNI Networks...
+
+#Patch kube-proxy to run with --proxy-mode=userspace
+kubectl -n kube-system get ds -l 'component=kube-proxy' -o json | jq '.items[0].spec.template.spec.containers[0].command |= .+ ["--proxy-mode=userspace"]' | kubectl apply -f - && kubectl -n kube-system delete pods -l 'component=kube-proxy'
 SCRIPT
 
 
@@ -166,6 +177,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       #Update the hosts file with the IP obtained.
       vmCfg.vm.provision :shell, inline: 'sed -i "/$1/ s/.*/$2\t$3/g" /etc/hosts', :args => "#{hostname} `#{machine_ip_address}` #{hostname}", privileged: true      
       vmCfg.vm.provision :shell, inline: $kubeadminit, :args => "`#{machine_ip_address}`", privileged: true
+      
+      #Patching kube-proxy so that the pods are created properly.
+      vmCfg.vm.provision :shell, inline: $kubeproxypatch, privileged: false
       vmCfg.vm.provision :shell, inline: $kubepodsetup, privileged: false
     end     
   end
