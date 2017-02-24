@@ -10,17 +10,18 @@ The following types of VMs can be launched:
 
 Depending on your need, you can also use this Vagrantfile, to only setup a Kubernetes Cluster or just OpenEBS Cluster or both. The number of nodes under each category is also configurable. 
 
+The Kubernetes cluster is setup, in this Vagrantfile using "kubeadm". 
 
-## Getting Started
+## Running the setup on Ubuntu 16.04
 
-Setting up Kubernetes was a complicated task until the recent release of Kubernetes 1.4. Kubernetes 1.4+ includes a tool called kubeadm which eases the process of setting up a cluster between the nodes.We are going to setup this cluster using the Kubernetes binaries instead of cloning from the repository.
+The following instructions have been verified on : 
+(a) Laptop installed with Ubuntu 16.04
+(b) Windows with Ubuntu 16.04 VM
 
-We will create a Vagrantfile which will use the kubeadm tool to create the nodes and form a cluster between them.
-
-We will be downloading the OpenEBS Maya binaries from the OpenEBS Maya releases.
 ### Prerequisites
 
-To get started with the process, we would initially need the following be installed on the Ubuntu box:
+Verify that you have the following software installed, with atleast at the minimum version mentioned next to them.
+
 ```
 1.Vagrant (>=1.9.1)
 2.VirtualBox 5.1
