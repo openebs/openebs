@@ -30,16 +30,16 @@ Verify that you have the following software installed, with atleast at the minim
 
 #### Verify
 ```
-ubuntu-host$ vagrant version
+ubuntu-hos:~/t$ vagrant version
 Installed Version: 1.9.1
 Latest Version: 1.9.1
  
 You're running an up-to-date version of Vagrant!
 ubuntu-host$ vboxmanage --version
 5.1.14r112924
-ubuntu-host$ git version
+ubuntu-hos:~/$ git version
 git version 2.7.4
-kiran@kmaya:~/github/openebs/openebs/k8s-demo$ 
+ubuntu-hos:~/$ 
 
 ```
 
@@ -55,11 +55,55 @@ cd openebs/k8s-demo
 ls $demo-folder/openebs/k8s-demo/Vagrantfile
 ```
 
-You should see that Vagrantfile is available on your machine now. 
+#### Verify
+
+```
+ubuntu-hos:~/$ cd $demo-folder/openebs/k8s-demo/
+ubuntu-hos:~/demo-folder/openebs/k8s-demo$ vagrant status
+Current machine states:
+
+kubemaster-01             not created (virtualbox)
+kubeminion-01             not created (virtualbox)
+omm-01                    not created (virtualbox)
+osh-01                    not created (virtualbox)
+
+This environment represents multiple VMs. The VMs are all listed
+above with their current state. For more information about a specific
+VM, run `vagrant status NAME`.
+```
 
 ### Configure Nodes
 
 By default, 4 VMs will be created with the following CPU/Memory configuration. 
+
+Kubernetes Master requires 2G RAM and 2 CPU
+Kubernetes Minion, OpenEBS Master and OpenEBS Host are configured with 1GB RAM and 1 CPU. 
+
+Depending on your system configuration, you can edit the Vagrantfile or pass the modified files as environment files to specify:
+(a) Number of Nodes under each category:
+- Kubernetes Minion hosts ( KH_NODES) 
+- OpenEBS Maya Master ( MM_NODES )
+- OpenEBS Storage Host ( MH_NODES )
+
+A value of 0 for the above variables will skip the installation of that type. For example, to install only Kubernetes you can run the following command:
+
+```
+ubuntu-hos:~/demo-folder/openebs/k8s-demo$ MH_NODES=0 MM_NODES=0 vagrant status
+Current machine states:
+
+kubemaster-01             not created (virtualbox)
+kubeminion-01             not created (virtualbox)
+
+This environment represents multiple VMs. The VMs are all listed
+above with their current state. For more information about a specific
+VM, run `vagrant status NAME`.
+```
+
+(b) RAM and CPU for Kubernetes Master ( KM_MEM and KM_CPUS)
+
+(c) RAM and CPU for OpenEBS Maya Master ( M_MEM and M_CPUS)
+
+(c) RAM and CPU for OpenEBS Storage Host or Kubernetes Minion ( H_MEM and H_CPUS)
 
 
 ### Launch Kubernetes and OpenEBS Cluster
