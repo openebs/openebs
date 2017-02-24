@@ -15,8 +15,8 @@ The Kubernetes cluster is setup, in this Vagrantfile using "kubeadm".
 ## Running the setup on Ubuntu 16.04
 
 The following instructions have been verified on : 
-(a) Laptop installed with Ubuntu 16.04
-(b) Windows with Ubuntu 16.04 VM
+- Laptop installed with Ubuntu 16.04
+- Laptop installed Windows 10 and Ubuntu 16.04 VM (created using VMWare Player 12)
 
 ### Prerequisites
 
