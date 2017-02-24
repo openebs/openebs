@@ -66,6 +66,8 @@ echo Will run the kubeadm init script ...
 
 #Run the kubeadm command with the master-ip
 kubeadm init --api-advertise-addresses=$1
+
+#Install the CNI network for Kubernetes
 kubectl create -f https://git.io/weave-kube
 SCRIPT
 
@@ -161,6 +163,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       # Script will make some directories before installation procedure      
       vmCfg.vm.provision :shell, inline: $kubeinstaller, privileged: true
       vmCfg.vm.provision :shell, inline: "echo Setting up the Master using IPAddress: $1", :args => "`#{machine_ip_address}`"      
+      #Update the hosts file with the IP obtained.
       vmCfg.vm.provision :shell, inline: 'sed -i "/$1/ s/.*/$2\t$3/g" /etc/hosts', :args => "#{hostname} `#{machine_ip_address}` #{hostname}", privileged: true      
       vmCfg.vm.provision :shell, inline: $kubeadminit, :args => "`#{machine_ip_address}`", privileged: true
       vmCfg.vm.provision :shell, inline: $kubepodsetup, privileged: false
