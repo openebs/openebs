@@ -1,4 +1,4 @@
-# Installting Kubernetes and OpenEBS Clusters on Ubuntu 16.04
+# Installing Kubernetes and OpenEBS Clusters on Ubuntu 16.04
 
 This tutorial, provides detailed instructions on how to setup a Kubernetes and OpenEBS Cluster using the Vagrantfile provided in this folder.
 The following types of VMs can be launched:
@@ -19,7 +19,7 @@ The following instructions have been verified on :
 
 ### Prerequisites
 
-Verify that you have the following software installed, with atleast at the minimum version mentioned next to them.
+Verify that you have the required software installed, with atleast minimum specified version. 
 
 ```
 1.Vagrant (>=1.9.1)
