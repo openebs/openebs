@@ -172,33 +172,42 @@ kube-system   weave-net-6t9pz                         2/2       Running   0     
 kube-system   weave-net-frt55                         2/2       Running   0          20m
 ```
 
-
-Note: The below issue has been identified to cause problems for POD creation. 
-```
-https://github.com/openebs/openebs/issues/26
-```
-The issue also contains the solution where a couple of steps have to be manually performed before any pods are created.
-
-For more usages of ```kubectl``` refer to:
+For more usage options of ```kubectl``` refer to:
 ```
 https://kubernetes.io/docs/user-guide/kubectl-cheatsheet/
 ```
 
-#### SSH into the OpenEBS Master Node and run the following commands
-```
-sudo maya omm-status
-```
-The command should output the status of the master node.
-```
-Name                  Address       Port  Status  Leader  Protocol  Build  Datacenter  Region
-mayamaster-01.global  172.28.128.6  4648  alive   true    2         0.5.0  dc1         global
-```
+
+#### Verify the OpenEBS Cluster Status
+
+Use the mayactl from within the OpenEBS Maya Master to get the current status. 
 
 ```
-sudo maya osh-status
+ubuntu-hos:~/demo-folder/openebs/k8s-demo$ vagrant ssh omm-01
+... snipped ...
+ubuntu@omm-01:~$ 
+ubuntu@omm-01:~$ maya omm-status
+Name           Address       Port  Status  Leader  Protocol  Build  Datacenter  Region
+omm-01.global  172.28.128.5  4648  alive   true    2         0.5.0  dc1         global
 ```
-The command should output the status of the host nodes.
+
+Use the below command to check the openebs storage host status
 ```
-ID        DC   Name         Class   Drain  Status
-f3ca046e  dc1  mayahost-01  <none>  false  ready
+ubuntu@omm-01:~$
+ubuntu@omm-01:~$ maya osh-status
+ID        DC   Name    Class   Drain  Status
+3f56a738  dc1  osh-01  <none>  false  ready
+ubuntu@omm-01:~$
 ```
+
+
+### Known Issues
+
+Check out the issues section for known issues and possible workarounds for some of the commom glitches while setting up kubernetes clusters on Ubunut/VirtualBox. 
+
+https://github.com/openebs/openebs/issues?utf8=%E2%9C%93&q=label%3Ademo%2Fk8s%20
+
+Some of the issues observed:
+- Unable to upgrade to VirtualBox 5.1
+- weave pod, is stuck in CrashLoop
+
