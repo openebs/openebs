@@ -106,27 +106,53 @@ VM, run `vagrant status NAME`.
 (c) RAM and CPU for OpenEBS Storage Host or Kubernetes Minion ( H_MEM and H_CPUS)
 
 
-### Launch Kubernetes and OpenEBS Cluster
+### Install Kubernetes and OpenEBS Cluster
 
 ```
 cd $demo-folder/openebs/k8s-demo
 vagrant up
 ```
+This step, can take few minutes depending on your network speed. The required vagrant plugins are installed (for caching the vagrant boxes), the ubuntu-xenial box is download and the required software packages for each of the node are downloaded and installed. 
 
-#### Verify the installation
-Once the nodes have been setup:
+#### Verify the VM installation
 
-#### SSH into the Kubernetes Master Node and run the following command.
 ```
-kubectl get nodes
+ubuntu-hos:~/demo-folder/openebs/k8s-demo$ vagrant status
+Current machine states:
+
+kubemaster-01             running (virtualbox)
+kubeminion-01             running (virtualbox)
+omm-01                    running (virtualbox)
+osh-01                    running (virtualbox)
+
+This environment represents multiple VMs. The VMs are all listed
+above with their current state. For more information about a specific
+VM, run `vagrant status NAME`.
+ubuntu-hos:~/demo-folder/openebs/k8s-demo$ 
 ```
-The command should output the number of nodes in the cluster and their current state.
+
+Note: The network slowness can abort the process of installation, since a default timeout of 300 seconds is specified for the VMs to be launched. This can be modified by editing the Vagrantfile ( vmCfg.vm.boot_timeout ) value. If the installation aborts in between, make sure to clean-up before starting with the installation again.
 ```
-NAME        STATUS         AGE
-kubeminion-01   Ready          43m
+cd $demo-folder/openebs/k8s-demo
+vagrant destroy
+```
+
+#### Verify the Kubernetes Cluster Status
+
+Use the kubectl from within the Kubernetes master to get the current status. 
+
+```
+ubuntu-hos:~/demo-folder/openebs/k8s-demo$ vagrant ssh kubemaster-01
+... snipped ...
+ubuntu@kubemaster-01:~$ kubectl get nodes
+NAME            STATUS         AGE
 kubemaster-01   Ready,master   1h
-
+kubeminion-01   Ready          57m
+ubuntu@kubemaster-01:~$ 
 ```
+
+Check the status of the system pods. 
+
 ```
 ubuntu@kubemaster-01:~$ kubectl get pods --all-namespaces
 ```
@@ -145,6 +171,7 @@ kube-system   kube-scheduler-kubemaster-01            1/1       Running   0     
 kube-system   weave-net-6t9pz                         2/2       Running   0          15m
 kube-system   weave-net-frt55                         2/2       Running   0          20m
 ```
+
 
 Note: The below issue has been identified to cause problems for POD creation. 
 ```
