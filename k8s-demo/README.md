@@ -32,4 +32,4 @@ Please refer to our [Step-by-step Installation Tutorial for Ubuntu 16.04] (./tut
 
 ## Next Steps
 - [Configure a Hello-World App](./run-k8s-hello-world.md)
-- Configure MySQL Pod with OpenEBS Storage
+- [Configure MySQL Pod with OpenEBS Storage](./run-mysql-openebs.md)
