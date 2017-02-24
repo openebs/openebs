@@ -122,7 +122,7 @@ def configureVM(vmCfg, hostname, cpus, mem)
   
   #Default timeout is 300 sec for boot. 
   #Uncomment the following line and set the desired timeout value. 
-  vmCfg.vm.boot_timeout = 300
+  #vmCfg.vm.boot_timeout = 300
 	
   vmCfg.vm.hostname = hostname
   vmCfg.vm.network "private_network", type: "dhcp"
@@ -138,7 +138,7 @@ def configureVM(vmCfg, hostname, cpus, mem)
   # Set resources w.r.t Virtualbox provider
   vmCfg.vm.provider "virtualbox" do |vb|
     #Uncomment the following line, to launch the Virtual Box console. 
-    # - Useful if debugging an slow-start issue
+    #Useful for debugging cases, where the VM doesn't allow login into console
     #vb.gui = true
     vb.memory = mem
     vb.cpus = cpus
