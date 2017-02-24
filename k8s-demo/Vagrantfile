@@ -223,7 +223,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   
   # Maya Master related only !!
   1.upto(MM_NODES.to_i) do |i|
-    hostname = "mayamaster-%02d" % [i]
+    hostname = "omm-%02d" % [i]
     cpus = M_CPUS
     mem = M_MEM
     
@@ -254,7 +254,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   # Maya Host related only !!
   1.upto(MH_NODES.to_i) do |i|
-    hostname = "mayahost-%02d" % [i]
+    hostname = "osh-%02d" % [i]
     cpus = H_CPUS
     mem = H_MEM
     
@@ -266,7 +266,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       vmCfg.vm.provision :trigger, :force => true, :stdout => true, :stderr => true do |trigger|
          trigger.fire do
             info"Getting the Master IP to join the cluster..."
-            master_hostname = "mayamaster-01"            
+            master_hostname = "omm-01"            
             get_ip_address = %Q(vagrant ssh #{master_hostname}  -c 'ifconfig | grep -oP "inet addr:\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}" | grep -oP "\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}" | tail -n 2 | head -n 1')            
             master_ip_address = `#{get_ip_address}`            
             if master_ip_address == ""
