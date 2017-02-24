@@ -1,10 +1,12 @@
-# Installation and setup of Kubernetes and OpenEBS Clusters
+# Using OpenEBS Storage with Kubernetes
 
-The Vagrantfile automates the process of setting up the Kubernetes and OpenEBS Clusters. The following types of VMs can be launched:
-1. Kubernetes Master (kubemaster-xx)
-2. Kubernetes Minion (kubeminion-xx)
-3. OpenEBS Maya Master (omm-xx)
-4. OpenEBS Storage Host (osh-xx)
+In this document, we will use Vagrant and Virtualbox to automate the process of setting up Kubernetes and OpenEBS Cluster. The Vagrantfile automates the process of setting up the Kubernetes and OpenEBS Clusters. 
+
+The following types of VMs can be launched:
+- Kubernetes Master (kubemaster-xx)
+- Kubernetes Minion (kubeminion-xx)
+- OpenEBS Maya Master (omm-xx)
+- OpenEBS Storage Host (osh-xx)
 
 Depending on your need, you can also use this Vagrantfile, to only setup a Kubernetes Cluster or just OpenEBS Cluster or both. The number of nodes under each category is also configurable. 
 
