@@ -115,6 +115,15 @@ cp -u demo*.yaml /home/ubuntu/demo/k8s/spec 2>/dev/null || :
 
 SCRIPT
 
+$kubeminionsetup = <<SCRIPT
+#Copy iscsid.conf file with increased timeout values
+cd /vagrant/
+cp -u iscsid.conf /etc/iscsi/ 2>/dev/null || :
+
+SCRIPT
+
+	
+	
 required_plugins = %w(vagrant-cachier vagrant-triggers)
 
 required_plugins.each do |plugin|
@@ -194,6 +203,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       vmCfg = configureVM(vmCfg, hostname, cpus, mem)
       # Script will make some directories before installation procedure      
       vmCfg.vm.provision :shell, inline: $kubeinstaller, privileged: true
+      vmCfg.vm.provision :shell, inline: $kubeminionsetup, privileged: true
       vmCfg.vm.provision :shell, inline: 'sed -i "/$1/ s/.*/$2\t$3/g" /etc/hosts', :args => "#{hostname} `#{machine_ip_address}` #{hostname}", privileged: true
       #We want to run this only when the VM is first provisioned and get the Master IP to join the cluster
 
