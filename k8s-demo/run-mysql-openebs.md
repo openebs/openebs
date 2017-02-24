@@ -149,3 +149,9 @@ Volumes:
     ReadOnly:		false
 ```
 
+```
+ubuntu@kubemaster-01:~$ kubectl get pods
+NAME      READY     STATUS    RESTARTS   AGE
+mysql     1/1       Running   4          11m
+ubuntu@kubemaster-01:~$ 
+```
