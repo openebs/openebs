@@ -1,6 +1,6 @@
 # Running MySQL on Kubernetes Cluster with OpenEBS Storage
 
-In this example, we will run a simple hello-world web application, that responds with "Hello World" for an HTTP request. The web application Docker image is available at [tutum/hello-world](https://hub.docker.com/r/tutum/hello-world/). 
+In this example, we will run a MySQL database over an OpenEBS Storage. 
 
 ### Prerequisites
 
@@ -26,7 +26,6 @@ ubuntu@kubemaster-01:~$
 
 ubuntu@kubemaster-01:~$ kubectl get pods --all-namespaces
 NAMESPACE     NAME                                    READY     STATUS    RESTARTS   AGE
-default       hello-world                             1/1       Running   0          24m
 kube-system   dummy-2088944543-9m94d                  1/1       Running   0          56m
 kube-system   etcd-kubemaster-01                      1/1       Running   0          55m
 kube-system   kube-apiserver-kubemaster-01            1/1       Running   0          56m
@@ -71,7 +70,8 @@ ubuntu@omm-01:~/demo/maya/spec$ maya vsm-create demo-vsm.hcl
 ==> Evaluation "075e3e0b" finished with status "complete"
 ubuntu@omm-01:~/demo/maya/spec$ 
 ```
-Check that the Frontend and the Backend Containers are running. 
+Check that the Frontend and the Backend Containers are running. Give this a few minutes when launching for the first time, to allow the docker image to be downloaded.
+
 ```
 ubuntu@osh-01:~$ sudo docker ps
 CONTAINER ID        IMAGE                 COMMAND                  CREATED             STATUS              PORTS               NAMES
@@ -149,9 +149,20 @@ Volumes:
     ReadOnly:		false
 ```
 
+Once the volume is mounted and database is initialized, the pod status turns to running. 
+
 ```
 ubuntu@kubemaster-01:~$ kubectl get pods
 NAME      READY     STATUS    RESTARTS   AGE
 mysql     1/1       Running   4          11m
 ubuntu@kubemaster-01:~$ 
 ```
+
+## Known Issues
+If the MySQL keeps restarting check the following on the minion nodes
+- service iscsid status
+  (Should show the status as connected)
+- sudo docker logs *mysql container id*
+  (To get mysql container id, you may need to issue - sudo docker ps -a )
+- If the error says, directory not empty, clear it. *mount | grep jiva*
+
