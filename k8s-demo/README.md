@@ -1,9 +1,13 @@
-# Kubernetes Cluster Setup with OpenEBS for Ubuntu 16.04
+# Installation and setup of Kubernetes and OpenEBS Clusters
 
-This document explains the construction of a basic kubernetes cluster setup that uses OpenEBS for persistance:
+The Vagrantfile automates the process of setting up the Kubernetes and OpenEBS Clusters. The following types of VMs can be launched:
+1. Kubernetes Master (kubemaster-xx)
+2. Kubernetes Minion (kubeminion-xx)
+3. OpenEBS Maya Master (omm-xx)
+4. OpenEBS Storage Host (osh-xx)
 
-1. Kubernetes  - 1 Master and 1 Minion Node
-2. OpenEBS Maya  - 1 Master and 1 Host Node
+Depending on your need, you can also use this Vagrantfile, to only setup a Kubernetes Cluster or just OpenEBS Cluster or both. The number of nodes under each category is also configurable. 
+
 
 ## Getting Started
 
