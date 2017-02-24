@@ -28,24 +28,48 @@ Verify that you have the following software installed, with atleast at the minim
 3.Git 
 ```
 
-
-## Vagrantfile
-We will using a Vagrantfile for setting up these nodes. 
-
-### Running the Vagrant file
-1. Launch the Terminal.
-2. Get the K8s demo project by cloning it from the repository
+#### Verify
 ```
+ubuntu-host$ vagrant version
+Installed Version: 1.9.1
+Latest Version: 1.9.1
+ 
+You're running an up-to-date version of Vagrant!
+ubuntu-host$ vboxmanage --version
+5.1.14r112924
+ubuntu-host$ git version
+git version 2.7.4
+kiran@kmaya:~/github/openebs/openebs/k8s-demo$ 
+
+```
+
+### Download
+
+Setup your local directory, where the demo code will be downloaded. Let us call this as $demo-folder
+
+```
+mkdir $demo-folder
+cd $demo-folder
 git clone https://github.com/openebs/openebs.git
+cd openebs/k8s-demo
+ls $demo-folder/openebs/k8s-demo/Vagrantfile
 ```
-3. Change directory to the location where the Vagrantfile has been placed.
-4. Run the following command.
+
+You should see that Vagrantfile is available on your machine now. 
+
+### Configure Nodes
+
+By default, 4 VMs will be created with the following CPU/Memory configuration. 
+
+
+### Launch Kubernetes and OpenEBS Cluster
 
 ```
+cd $demo-folder/openebs/k8s-demo
 vagrant up
 ```
 
-### Verify the configuration
+#### Verify the installation
 Once the nodes have been setup:
 
 #### SSH into the Kubernetes Master Node and run the following command.
