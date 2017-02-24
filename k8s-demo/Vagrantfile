@@ -90,17 +90,17 @@ SCRIPT
 
 $mayavsmsetup = <<SCRIPT
 #Copy any maya job files if available
-mkdir -p /home/ubuntu/DEMO/maya/jobs
+mkdir -p /home/ubuntu/demo/maya/spec
 cd /vagrant/
-cp -u demo*.hcl /home/ubuntu/DEMO/maya/jobs 2>/dev/null || :
+cp -u demo*.hcl /home/ubuntu/demo/maya/spec 2>/dev/null || :
 
 SCRIPT
 
 $kubepodsetup = <<SCRIPT
 #Copy any pod yaml files if available
-mkdir -p /home/ubuntu/DEMO/k8s/yamls
+mkdir -p /home/ubuntu/demo/k8s/spec
 cd /vagrant/
-cp -u demo*.yaml /home/ubuntu/DEMO/k8s/yamls 2>/dev/null || :
+cp -u demo*.yaml /home/ubuntu/demo/k8s/spec 2>/dev/null || :
 
 SCRIPT
 
