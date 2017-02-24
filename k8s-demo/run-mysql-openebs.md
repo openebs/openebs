@@ -117,3 +117,35 @@ spec:
       readOnly: false
 ubuntu@kubemaster-01:~/demo/k8s/spec$ 
 ```
+
+Start the MySQL pod
+```
+ubuntu@kubemaster-01:~/demo/k8s/spec$ kubectl create -f demo-mysql-iscsi.yaml 
+pod "mysql" created
+ubuntu@kubemaster-01:~/demo/k8s/spec$ 
+```
+
+```
+ubuntu@kubemaster-01:~/demo/k8s/spec$ kubectl get pods
+NAME      READY     STATUS              RESTARTS   AGE
+mysql     0/1       ContainerCreating   0          54s
+ubuntu@kubemaster-01:~/demo/k8s/spec$ 
+
+ubuntu@kubemaster-01:~/demo/k8s/spec$ kubectl describe pod mysql
+
+```
+
+Check the Volume Configuration status:
+
+```
+Volumes:
+  demo-vsm1-vol1:
+    Type:		ISCSI (an ISCSI Disk resource that is attached to a kubelet's host machine and then exposed to the pod)
+    TargetPortal:	172.28.128.101:3260
+    IQN:		iqn.2016-09.com.openebs.jiva:demo-vsm1-vol1
+    Lun:		1
+    ISCSIInterface	default
+    FSType:		ext4
+    ReadOnly:		false
+```
+
