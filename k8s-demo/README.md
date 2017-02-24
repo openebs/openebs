@@ -31,5 +31,5 @@ Please refer to our [Step-by-step Installation Tutorial for Ubuntu 16.04] (./tut
 - you would like to just setup only a Kubernetes Cluster or OpenEBS Cluster for dev/testing.
 
 ## Next Steps
-- Configure a Stateless Hellow-World Pod
+- [Configure a Hello-World App](./run-k8s-hello-world.md)
 - Configure MySQL Pod with OpenEBS Storage
