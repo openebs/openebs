@@ -1,0 +1,40 @@
+# Operated by cluster admin
+# Acts on OpenEBS Storage Provider
+kind: StorageClass
+apiVersion: storage.k8s.io/v1beta1
+metadata:
+  name: fast-openebs-sc
+provisioner: kubernetes.io/openebs
+parameters:
+  type: ssd
+
+# Operated by an admin
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: fast-openebs-pvc
+  annotations:
+    volume.beta.kubernetes.io/storage-class: fast-openebs-sc
+spec:
+  accessModes:
+    - ReadWriteOnce    
+  resources:
+    requests:
+      storage: 3Gi
+
+# Operated by an user
+kind: Pod
+apiVersion: v1
+metadata:
+  name: my-nginx-on-openebs-pod
+spec:
+  volumes:
+    - name: my-nginx-openebs-pv
+      persistentVolumeClaim:
+        claimName: fast-openebs-pvc
+  containers:
+    - name: my-nginx-fe-con
+      image: dockerfile/nginx
+      volumeMounts:
+      - mountPath: "/var/www/html"
+        name: my-nginx-openebs-pv
