@@ -16,8 +16,9 @@ omm-01                    running (virtualbox)
 osh-01                    running (virtualbox)
 ```
 
-Verify that your Kubernetes Nodes
+Verify the status of the Kubernetes Nodes
 ```
+ubuntu-host:~/$ vagrant ssh kubemaster-01
 ubuntu@kubemaster-01:~$ kubectl get nodes
 NAME            STATUS         AGE
 kubemaster-01   Ready,master   56m
@@ -60,6 +61,7 @@ ubuntu@omm-01:~$
 Similar to K8s pod, OpenEBS storage also can be specified via the spec file. A default spec file is located on the OpenEBS Maya Master under demo/maya/spec. 
 
 ```
+ubuntu-host:~/$ vagrant ssh omm-01
 ubuntu@omm-01:~$ cd demo/maya/spec/
 ubuntu@omm-01:~/demo/maya/spec$ maya vsm-create demo-vsm.hcl 
 ==> Monitoring evaluation "075e3e0b"
@@ -73,6 +75,7 @@ ubuntu@omm-01:~/demo/maya/spec$
 Check that the Frontend and the Backend Containers are running. Give this a few minutes when launching for the first time, to allow the docker image to be downloaded.
 
 ```
+ubuntu-host:~/$ vagrant ssh osh-01
 ubuntu@osh-01:~$ sudo docker ps
 CONTAINER ID        IMAGE                 COMMAND                  CREATED             STATUS              PORTS               NAMES
 b3197282c1c1        openebs/jiva:latest   "launch replica --..."   53 seconds ago      Up 53 seconds                           demo-vsm1-be-store1
@@ -83,6 +86,7 @@ ubuntu@osh-01:~$
 ### Configure the MySQL K8s Pod to use the OpenEBS Volume (via iSCSI)
 
 ```
+ubuntu-host:~/$ vagrant ssh kubemaster-01
 ubuntu@kubemaster-01:~/demo/k8s/spec$ cat demo-mysql-iscsi.yaml 
 ---
 apiVersion: v1
@@ -120,6 +124,7 @@ ubuntu@kubemaster-01:~/demo/k8s/spec$
 
 Start the MySQL pod
 ```
+ubuntu-host:~/$ vagrant ssh kubemaster-01
 ubuntu@kubemaster-01:~/demo/k8s/spec$ kubectl create -f demo-mysql-iscsi.yaml 
 pod "mysql" created
 ubuntu@kubemaster-01:~/demo/k8s/spec$ 
