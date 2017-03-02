@@ -87,6 +87,7 @@ ubuntu@osh-01:~$
 
 ```
 ubuntu-host:~/$ vagrant ssh kubemaster-01
+ubuntu@kubemaster-01:~$ cd demo/k8s/spec/
 ubuntu@kubemaster-01:~/demo/k8s/spec$ cat demo-mysql-iscsi.yaml 
 ---
 apiVersion: v1
@@ -124,7 +125,6 @@ ubuntu@kubemaster-01:~/demo/k8s/spec$
 
 Start the MySQL pod
 ```
-ubuntu-host:~/$ vagrant ssh kubemaster-01
 ubuntu@kubemaster-01:~/demo/k8s/spec$ kubectl create -f demo-mysql-iscsi.yaml 
 pod "mysql" created
 ubuntu@kubemaster-01:~/demo/k8s/spec$ 
