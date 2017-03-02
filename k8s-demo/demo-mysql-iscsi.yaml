@@ -12,6 +12,9 @@ spec:
         cpu: 0.5
     name: mysql
     image: mysql
+    args:
+      - "--ignore-db-dir"
+      - "lost+found"
     env:
       - name: MYSQL_ROOT_PASSWORD
         value: k8sDem0
