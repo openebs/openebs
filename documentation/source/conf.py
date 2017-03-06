@@ -47,7 +47,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'doctut'
-copyright = '2017, raghav'
+copyright = '2017, Apache License'
 author = 'raghav'
 
 # The version info for the project you're documenting, acts as replacement for
