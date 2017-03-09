@@ -16,14 +16,14 @@ The content here is organised as follows:
 |
 |---hyperconverged ( install/setup instructions and usage examples )
 |
-|---demo ( scripts, vagrantfiles, providers for terraform, ansible etc., used either in dedicated or hypercoverged model )
+|---demo ( scripts, providers for vagrant, terraform, ansible etc., used either in dedicated/hypercoverged mode )
 |
-|---flexvolume (K8s volume drivers used either in dedicated or hypercoverged model)
+|---flexvolume (K8s volume drivers used either in dedicated/hypercoverged mode)
 |  |--- openebs-iscsi
 |  |--- openebs-tcmu
 |  |--- openebs-localdisks
 |  
-|---tests (e2e tests using the usage examples under dedicated and hypercoverged model)
+|---tests (e2e tests using the usage examples under dedicated and hypercoverged mode)
 |
 |  
 ```
