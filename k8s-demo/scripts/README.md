@@ -61,6 +61,7 @@ You will have the following machines ready to use:
 
 ## How-T0
 - [Setup Passwordless SSH](./setup-passwordless-ssh.md)
+
 ## Next Steps
-- [Configure a Hello-World App](../k8sdemo/run-k8s-hello-world.md)
-- [Configure MySQL Pod with OpenEBS Storage](../k8sdemo/run-mysql-openebs.md)
+- [Configure a Hello-World App](../run-k8s-hello-world.md)
+- [Configure MySQL Pod with OpenEBS Storage](../run-mysql-openebs.md)
