@@ -1,6 +1,6 @@
 # Using OpenEBS with K8s
 
-This folder contains the software components, usage instructions and examples of using OpenEBS with K8s. 
+This folder contains the software components (plugins, scripts, drivers etc.,), usage instructions and application examples of using OpenEBS with K8s. 
 
 OpenEBS can be deployed along-side Kubernetes master and minions (hyper-converged) or can be deployed in dedicated mode, connecting via the K8s FlexVolume plugins. 
 
