@@ -1,6 +1,6 @@
-# Using OpenEBS Storage with Kubernetes
+# Kubernetes with Dedicated OpenEBS Storage
 
-We have made it easy to setup an demo environment for trying OpenEBS Storage with Kubernetes Cluster. 
+Vagrant simplifies the setting up an demo environment for using with OpenEBS Storage with Kubernetes Cluster. 
 
 All you need is an Ubuntu 16.04 Host/VM with 8+ GB RAM and 8+ Core CPU installed with:
 - Vagrant 1.9.1 or above
@@ -13,7 +13,7 @@ Setup your local demo directory, say **demo**
 mkdir demo
 cd demo
 git clone https://github.com/openebs/openebs.git
-cd openebs/k8s-demo
+cd openebs/k8s/demo
 vagrant up
 ```
 
