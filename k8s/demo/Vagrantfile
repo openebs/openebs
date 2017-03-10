@@ -1,38 +1,37 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-#Vagrantfile for configuring kubernetes with openebs either in the dedicated or hyperconverged mode. 
+#Specify the OpenEBS Deployment Mode - dedicated=1 (default) or hyperconverged=2
+DEPLOY_MODE_NONE = 0 
 DEPLOY_MODE_DEDICATED = 1
 DEPLOY_MODE_HC = 2
 DEPLOY_MODE=ENV['OPENEBS_DEPLOY_MODE'] || 1
 
-# K8s Master Nodes
+#Specify the release versions to be installed
+MAYA_RELEASE_TAG = ENV['MAYA_RELEASE_TAG'] || "0.0.5"
+
+#Specify the number of Kubernetes Master nodes, CPU/RAM per node. 
 KM_NODES = ENV['KM_NODES'] || 1
-
-# K8s Minion Nodes
-KH_NODES = ENV['KH_NODES'] || 1
-
-# Maya Master Nodes
-MM_NODES = ENV['MM_NODES'] || 1
-
-# Maya Host Nodes
-MH_NODES = ENV['MH_NODES'] || 1
-
-# Kube Master node Memory & CPUs
 KM_MEM = ENV['KM_MEM'] || 2048
 KM_CPUS = ENV['KM_CPUS'] || 2
 
-# Master node Memory & CPUs
-M_MEM = ENV['M_MEM'] || 1024
-M_CPUS = ENV['M_CPUS'] || 1
+#Specify the number of Kubernetes Minion nodes, CPU/RAM per node. 
+KH_NODES = ENV['KH_NODES'] || 1
+HH_MEM = ENV['KH_MEM'] || 1024
+HH_CPUS = ENV['KH_CPUS'] || 1
 
-# Minion Host Memory & CPUs
-H_MEM = ENV['H_MEM'] || 1024
-H_CPUS = ENV['H_CPUS'] || 1
+#Specify the number of OpenEBS Master nodes, CPU/RAM per node. (Applicable only for dedicated mode)
+MM_NODES = ENV['MM_NODES'] || 1
+MM_MEM = ENV['MM_MEM'] || 1024
+MM_CPUS = ENV['MM_CPUS'] || 1
 
-RELEASE_TAG = ENV['MAYA_RELEASE_TAG'] || "0.0.5"
+#Specify the number of OpenEBS Storage Host nodes, CPU/RAM per node. (Applicable only for dedicated mode)
+MH_NODES = ENV['MH_NODES'] || 1
+MH_MEM = ENV['MH_MEM'] || 1024
+MH_CPUS = ENV['MH_CPUS'] || 1
 
 # Don't touch below this line, unless you know what you're doing!
+
 # Vagrantfile API/syntax version.
 VAGRANTFILE_API_VERSION = "2"
 Vagrant.require_version ">= 1.9.1"
@@ -202,8 +201,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # K8s Minions related only !!
   1.upto(KH_NODES.to_i) do |i|
     hostname = "kubeminion-%02d" % [i]
-    cpus = H_CPUS
-    mem = H_MEM
+    cpus = KH_CPUS
+    mem = KH_MEM
     
     config.vm.define hostname do |vmCfg|
       vmCfg = configureVM(vmCfg, hostname, cpus, mem)
@@ -254,13 +253,13 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # Maya Master related only !!
   1.upto(MM_NODES.to_i) do |i|
     hostname = "omm-%02d" % [i]
-    cpus = M_CPUS
-    mem = M_MEM
+    cpus = MM_CPUS
+    mem = MM_MEM
     
     config.vm.define hostname do |vmCfg|
       vmCfg = configureVM(vmCfg, hostname, cpus, mem)
       # Script will make some directories before installation procedure
-      vmCfg.vm.provision :shell, inline: $mayainstaller, :args => "#{RELEASE_TAG}", privileged: true
+      vmCfg.vm.provision :shell, inline: $mayainstaller, :args => "#{MAYA_RELEASE_TAG}", privileged: true
       #We want to run this only when the VM is first provisioned and get the Master IP to join the cluster
       vmCfg.vm.provision :trigger, :force => true, :stdout => true, :stderr => true do |trigger|
          trigger.fire do
@@ -285,13 +284,13 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # Maya Host related only !!
   1.upto(MH_NODES.to_i) do |i|
     hostname = "osh-%02d" % [i]
-    cpus = H_CPUS
-    mem = H_MEM
+    cpus = MH_CPUS
+    mem = MH_MEM
     
     config.vm.define hostname do |vmCfg|
       vmCfg = configureVM(vmCfg, hostname, cpus, mem)
       # Script will make some directories before installation procedure
-      vmCfg.vm.provision :shell, inline: $mayainstaller, :args => "#{RELEASE_TAG}", privileged: true      
+      vmCfg.vm.provision :shell, inline: $mayainstaller, :args => "#{MAYA_RELEASE_TAG}", privileged: true      
       #We want to run this only when the VM is first provisioned and get the Master IP to join the cluster
       vmCfg.vm.provision :trigger, :force => true, :stdout => true, :stderr => true do |trigger|
          trigger.fire do
