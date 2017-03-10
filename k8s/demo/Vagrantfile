@@ -5,10 +5,13 @@
 #- Launch VMs auto-configured with kubernetes cluster with dedicated openebs
 #- Launch VMs auto-configured with kubernetes cluster with hyperconverged openebs
 #- Launch VMs for manual installation of kubernetes or maya clusters or both 
-#- Specify the number of VMs / node types and CPU/RAM for each type of node
-#- Specify how kubernetes cluster can be deployed - kubeadm, cargo, manual
+#
+#The configurable options include:
+#- Specify the number of VMs / node types 
+#- Specify the CPU/RAM for each type of node
+#- Specify the desired kubernetes cluster installation option - kubeadm, cargo, manual
 #- Specify the base operating system - Ubuntu, CentOS, etc., 
-#- Specify the pod network - flannel, weave, calico, etc,. 
+#- Specify the kubernetes pod network - flannel, weave, calico, etc,. 
 #- In case of dedicated, specify the storage network - host, etc.,
 
 #Specify the OpenEBS Deployment Mode - dedicated=1 (default) or hyperconverged=2
@@ -27,8 +30,8 @@ KM_CPUS = ENV['KM_CPUS'] || 2
 
 #Specify the number of Kubernetes Minion nodes, CPU/RAM per node. 
 KH_NODES = ENV['KH_NODES'] || 1
-HH_MEM = ENV['KH_MEM'] || 1024
-HH_CPUS = ENV['KH_CPUS'] || 1
+KH_MEM = ENV['KH_MEM'] || 1024
+KH_CPUS = ENV['KH_CPUS'] || 1
 
 #Specify the number of OpenEBS Master nodes, CPU/RAM per node. (Applicable only for dedicated mode)
 MM_NODES = ENV['MM_NODES'] || 1
