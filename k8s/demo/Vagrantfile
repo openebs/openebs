@@ -1,6 +1,16 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
+#This is parameterized Vagrantfile, that can used for any of the following:
+#- Launch VMs auto-configured with kubernetes cluster with dedicated openebs
+#- Launch VMs auto-configured with kubernetes cluster with hyperconverged openebs
+#- Launch VMs for manual installation of kubernetes or maya clusters or both 
+#- Specify the number of VMs / node types and CPU/RAM for each type of node
+#- Specify how kubernetes cluster can be deployed - kubeadm, cargo, manual
+#- Specify the base operating system - Ubuntu, CentOS, etc., 
+#- Specify the pod network - flannel, weave, calico, etc,. 
+#- In case of dedicated, specify the storage network - host, etc.,
+
 #Specify the OpenEBS Deployment Mode - dedicated=1 (default) or hyperconverged=2
 DEPLOY_MODE_NONE = 0 
 DEPLOY_MODE_DEDICATED = 1
