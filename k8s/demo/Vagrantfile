@@ -121,7 +121,7 @@ $mayavsmsetup = <<SCRIPT
 #Copy any maya job files if available
 mkdir -p /home/ubuntu/demo/maya/spec
 cd /vagrant/
-cp -u demo*.hcl /home/ubuntu/demo/maya/spec 2>/dev/null || :
+cp -u specs/demo*.hcl /home/ubuntu/demo/maya/spec 2>/dev/null || :
 
 SCRIPT
 
@@ -129,16 +129,16 @@ $kubepodsetup = <<SCRIPT
 #Copy any pod yaml files if available
 mkdir -p /home/ubuntu/demo/k8s/spec
 cd /vagrant/
-cp -u demo*.yaml /home/ubuntu/demo/k8s/spec 2>/dev/null || :
+cp -u specs/demo*.yaml /home/ubuntu/demo/k8s/spec 2>/dev/null || :
 
 SCRIPT
 
-$kubeminionsetup = <<SCRIPT
+#$kubeminionsetup = <<SCRIPT
 #Copy iscsid.conf file with increased timeout values
-cd /vagrant/
-cp -u iscsid.conf /etc/iscsi/ 2>/dev/null || :
-
-SCRIPT
+#cd /vagrant/
+#cp -u iscsid.conf /etc/iscsi/ 2>/dev/null || :
+#
+#SCRIPT
 
 	
 	
@@ -221,7 +221,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       vmCfg = configureVM(vmCfg, hostname, cpus, mem)
       # Script will make some directories before installation procedure      
       vmCfg.vm.provision :shell, inline: $kubeinstaller, privileged: true
-      vmCfg.vm.provision :shell, inline: $kubeminionsetup, privileged: true
+      # vmCfg.vm.provision :shell, inline: $kubeminionsetup, privileged: true
       vmCfg.vm.provision :shell, inline: 'sed -i "/$1/ s/.*/$2\t$3/g" /etc/hosts', :args => "#{hostname} `#{machine_ip_address}` #{hostname}", privileged: true
       #We want to run this only when the VM is first provisioned and get the Master IP to join the cluster
 
