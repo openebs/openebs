@@ -34,9 +34,7 @@ Please follow our [Getting Started](docs/getting-started.md) documentation
 
 ## Show me the Code
 
-This is a meta-repository for OpenEBS. Here please find various documentation related artifacts.
-The actual source code is located in other repositories under the OpenEBS 
-organization. Please start with the pinned repositories.
+This is a meta-repository for OpenEBS. Here please find various documentation related artifacts and code related to integrating OpenEBS with popular orchestration engines like kubernetes, swarm, mesos, rancher, etc., The core storage and storage orchestration source code is distributed in other repositories under the OpenEBS organization. Please start with the pinned repositories or with [OpenEBS Architecture](./contribute/design/README.md) document. 
 
 ## Contributing
 
@@ -51,6 +49,7 @@ form possible.  If you have not already, **please make our day and star us above
   - Project specific issues can be raised at individual project level.
 - Want to help with fixes and features:
   - Have a look at [open issues](https://github.com/issues?q=user%3Aopenebs+is%3Aopen)
+  - Have a look at [contributing guide](./CONTRIBUTING.md)
 
 ## Credits
 
