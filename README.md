@@ -53,7 +53,8 @@ form possible.  If you have not already, **please make our day and star us above
 
 ## Credits
 
-- VSMs are containers running on `Docker` (https://github.com/docker/docker)
+- A VSM is a bunch of containers
+  - Currently `Docker` engine based container (https://github.com/docker/docker)
 - Persistent Storage and Replication for OpenEBS VSMs from forked Rancher's `Longhorn` (https://github.com/openebs/longhorn)
 - iSCSI Frontent for OpenEBS VSMs from forked gostor's `gotgt` (https://github.com/openebs/gotgt)
 - VSMs are managed and scheduled via HashiCorp's `Nomad` (https://github.com/hashicorp/nomad)
