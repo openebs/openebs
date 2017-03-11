@@ -44,7 +44,7 @@ To download and install, you will require wget and unzip to be present on the op
 Prepare Network
 -----------------
 
-ypically, the storage is accessed via a different network (with high bandwidth 10G or 40G et.,) than management on 1G. You will need to identify the IP address on which the management traffic flows and the interface that is used for data.
+Typically, the storage is accessed via a different network (with high bandwidth 10G or 40G et.,) than management on 1G. You will need to identify the IP address on which the management traffic flows and the interface that is used for data.
 
 It is possible that same interface can be used for both management and data.::
   

@@ -106,7 +106,7 @@ maya is the only binary that needs to be installed on the machine to turn the ma
 Software Requirements
 -----------------------
 
-On your machine, ensure the following: - golang is installed. Verify $GOPATH environment variable is set and $GOPATH/bin is included in your $PATH - git is installed for downloading the source - zip and unzip packages are required for creating and distributing the depedencies
+On your machine, ensure the following: - golang is installed. Verify $GOPATH environment variable is set and $GOPATH/bin is included in your $PATH - git is installed for downloading the source - zip and unzip packages are required for creating and distributing the dependencies.
 
 Download Source, Compile and Install maya 
 -------------------------------------------
