@@ -1,2 +1,3 @@
 k8s-demo/.vagrant/
 k8s-demo/*.log
+documentation/build/
