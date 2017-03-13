@@ -17,37 +17,20 @@ OpenEBS, being container native, seamlessely integrates easily into the containe
 
 VSMs are the heart of the OpenEBS - enterprise storage functionality delivered in containers. VSMs provide persistent storage for containers, with resliency against system failures via a distrubuted architecture, faster access to the storage, snapshot and backup capabilities. In addition, provides mechanism for monitoring the usage and enforcing QoS policies. 
 
-VSMs are scheduled onto the container hosts using Orchestration Engines. VSMs consume the disk storage from the local host or  remote storage using volume plugins (k8s flexvolumes). 
+VSMs are scheduled onto the container hosts using Orchestration Engines. VSMs consume the disk storage from the local host or  remote storage using volume plugins (k8s flexvolumes). VSMs are described in yaml files, just like application pods. The VSMs can be deployed through K8s Pods, Deployments, Services, StatefulSets etc., 
 
-VSMs are described in yaml files, just like application pods. The VSMs can be deployed through K8s Pods, Deployments, Services, StatefulSets etc., 
+Further details on the VSM can be found under the following two repositories - openebs/longhorn, the golang block storage functionality and openeb/jiva contains the packaging and ci functionality. 
 
 ### Maya ( aka storage orchestrator )
 
-Maya builds on top of the orchestration engines capabilities in terms of container runtime, scheduling, monitoring etc., and extends the capabilities of the orchestration engines to orchestarte and manage storage. Maya is a set of storage utilities, orchestration plugins and services, that integrate into the container orchestration engines like kubernetes, docker swarm, nomad etc.,
+Maya makes the storage infrastructure programmable via yaml files that the DevOps can define and commit, just like the container clusters or containerized applications. Maya builds on top of the container orchestration engine capabilities in terms of runtime, scheduling, monitoring etc., and extends the capabilities to orchestrate and simplify the management of storage. Maya will learn and provide storage metrics to the container schedulers for better placements of pods as well as storage migration between hosts within/across cluster(s).
 
-Maya makes the storage infrastructure programmable via yaml files that the DevOps can define and commit, just like the container clusters or containerized applications. Maya services monitor, learn and provide storage metrics to the container schedulers for better placements of pods as well as storage migration between hosts within/across cluster(s).
+Maya is a set of components that can be further divided as follows:
+- Services : These encapsulate a specific functionality like api-server, storage-manager, storage-analytics, sml-engine (storage machine learning engine), that are either installed as binary services are container services. These will be either be running on the Container Control Plane (like the api-server), or on Container-Runtime/Minion hosts ( like storage-manager ) or can be completely out-of-band (storage-analytics). Each of these services are developed under their own repository under the OpenEBS organization. 
 
-OpenEBS Maya comprises of the following: 
-- maya ( a cli )
-- maya-apiserver
-- maya-stg-interface
-- maya-sml-engine
-- maya-stg-analytics
-- maya-plugins-k8s
-- maya-plugins-docker
-- maya-plugins-nomad
-- maya-plugins-mesos
-- maya-ui
+- Plugins : Maya allows the OpenEBS storage to be run along side any orchestration engine like kubernetes, docker swarm, nomad etc., This is made possible by the maya orchestration engine plugins. For example, one of the ways in which Kubernetes can consume OpenEBS Storage is via the K8s FlexVolume Plugin (openebs-iscsi). The plugin's are also used extensively in the hyperconverged mode to integrated into the various orchestration capabilities. The plugin libraries are developed under the main openebs/openebs repository, under the respective container orchestrator directory. 
 
-OpenEBS can also be deployed in the dedicated environment like the traditial software defined storage, and can be connected via the storage plugins. 
+- Tools : CLI/UI tools that will help with installation or management of tasks. One of the first tools under heavy development is [maya] (https://github.com/openebs/maya), that aims the simplying the installation of OpenEBS components or plugins. 
 
 
-##Detailed Design Documents
-
-The following tables contains the details about the OpenEBS components - their design, design status, implementation status, code repositories, etc., 
-
-| Document | Status | Implementation Repository |
-|----------|--------|---------------------------|
-| [Jiva/VSM](./jiva.md) | WIP | [jiva](https://github.com/openebs/jiva) |
-| [Maya Server](./maya-server.md) | WIP | [mayaserver](https://github.com/openebs/mayaserver) |
-| [Maya CLI](./maya.md) | WIP |[maya](https://github.com/openebs/maya) |
+*Note: OpenEBS can also be deployed in the dedicated environment like the traditional software defined storage, and can be connected via the storage plugins.*
