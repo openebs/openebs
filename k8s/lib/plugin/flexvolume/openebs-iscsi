@@ -28,12 +28,20 @@ ismounted() {
 domount() {
     MNTPATH="$1"
     VOLUME_SRC=$(echo "$2" | jq -r '.source')
+    FSTYPE=$(echo "$2" | jq -r '.["kubernetes.io/fsType"]')
+    OPENEBS_API_URL=$(echo "$2" | jq -r '.openebsApiUrl')
+    SIZE=$(echo "$2" | jq -r '.size')
     #echo $MNTPATH >> /usr/libexec/kubernetes/kubelet-plugins/volume/exec/cb~temp/dump.txt
     MOUNT_OPTIONS=$(echo $2 | jq -r '.mountOptions')
-    
+ 
     # To visualize the JSON parameters received by FlexVolume
-    #echo $2 >> /usr/libexec/kubernetes/kubelet-plugins/volume/exec/cb~temp/dump.txt
-    #echo $1 >> /usr/libexec/kubernetes/kubelet-plugins/volume/exec/cb~temp/mount_dump.txt
+    
+    echo $2 >> /usr/libexec/kubernetes/kubelet-plugins/volume/exec/openebs~openebs-iscsi/data_dump.txt
+    echo $1 >> /usr/libexec/kubernetes/kubelet-plugins/volume/exec/openebs~openebs-iscsi/data_dump.txt
+    echo $OPENEBS_API_URL >> /usr/libexec/kubernetes/kubelet-plugins/volume/exec/openebs~openebs-iscsi/data_dump.txt
+    echo $SIZE >> /usr/libexec/kubernetes/kubelet-plugins/volume/exec/openebs~openebs-iscsi/data_dump.txt
+    echo $FSTYPE >> /usr/libexec/kubernetes/kubelet-plugins/volume/exec/openebs~openebs-iscsi/data_dump.txt
+    echo $VOLUME_SRC >> /usr/libexec/kubernetes/kubelet-plugins/volume/exec/openebs~openebs-iscsi/data_dump.txt
 
         if [ $(ismounted) -eq 1 ] ; then
             log "{\"status\": \"Success\"}"
@@ -72,8 +80,8 @@ unmount() {
 }
 
 getvolumename() {
-    SOURCE=$(echo $1 | jq -r '.source')
-    MOUNT_OPTIONS=$(echo $1 | jq -r '.mountOptions')
+    SOURCE=$(echo $2 | jq -r '.source')
+    MOUNT_OPTIONS=$(echo $2 | jq -r '.mountOptions')
 
     log "{\"status\": \"Success\", \"volumeName\": \"${SOURCE}/${MOUNT_OPTIONS}\"}"
     exit 0

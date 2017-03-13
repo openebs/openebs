@@ -15,7 +15,9 @@ spec:
   - name: "openebs-iscsi"
     flexVolume:
       driver: "openebs/openebs-iscsi"
+      fsType: "ext4"
       options:
         source: "/tmp/openebs-iscsi"
         mountOptions: "dir_mode=0755,file_mode=0644,rw"
-
+        openebsApiUrl: "http://172.28.128.10:5656/latest/"
+        size: "10Gi"
