@@ -9,7 +9,7 @@
 #The configurable options include:
 #- Specify the number of VMs / node types 
 #- Specify the CPU/RAM for each type of node
-#- Specify the desired kubernetes cluster installation option - kubeadm, cargo, manual
+#- Specify the desired kubernetes cluster installation option - kubeadm, kargo, manual
 #- Specify the base operating system - Ubuntu, CentOS, etc., 
 #- Specify the kubernetes pod network - flannel, weave, calico, etc,. 
 #- In case of dedicated, specify the storage network - host, etc.,
