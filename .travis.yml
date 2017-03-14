@@ -1,0 +1,17 @@
+language: go
+dist: trusty
+sudo: required
+install: true
+env:
+  global:
+    - GOARCH=amd64
+before_install:
+  - sleep 15
+  - sudo apt-get install -y
+  - sudo apt-get install -y curl
+script:
+  - make build
+notifications:
+  email:
+    recipients:
+      - kiran.mova@cloudbyte.com
