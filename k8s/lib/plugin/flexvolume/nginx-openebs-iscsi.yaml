@@ -21,3 +21,4 @@ spec:
         mountOptions: "dir_mode=0755,file_mode=0644,rw"
         openebsApiUrl: "http://172.28.128.10:5656/latest/"
         size: "10Gi"
+        debug: "1"

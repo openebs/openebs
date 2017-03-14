@@ -7,6 +7,7 @@ usage() {
     err "\t$0 unmount <mount dir>"
     err "\t$0 getvolumename <json params>"
     exit 1
+
 }
 err() {
     echo -ne $* 1>&2
@@ -31,58 +32,53 @@ domount() {
     FSTYPE=$(echo "$2" | jq -r '.["kubernetes.io/fsType"]')
     OPENEBS_API_URL=$(echo "$2" | jq -r '.openebsApiUrl')
     SIZE=$(echo "$2" | jq -r '.size')
-    #echo $MNTPATH >> /usr/libexec/kubernetes/kubelet-plugins/volume/exec/cb~temp/dump.txt
+    DEBUG=$(echo "$2" | jq -r '.debug')
     MOUNT_OPTIONS=$(echo $2 | jq -r '.mountOptions')
- 
-    # To visualize the JSON parameters received by FlexVolume
-    
-    echo $2 >> /usr/libexec/kubernetes/kubelet-plugins/volume/exec/openebs~openebs-iscsi/data_dump.txt
-    echo $1 >> /usr/libexec/kubernetes/kubelet-plugins/volume/exec/openebs~openebs-iscsi/data_dump.txt
-    echo $OPENEBS_API_URL >> /usr/libexec/kubernetes/kubelet-plugins/volume/exec/openebs~openebs-iscsi/data_dump.txt
-    echo $SIZE >> /usr/libexec/kubernetes/kubelet-plugins/volume/exec/openebs~openebs-iscsi/data_dump.txt
-    echo $FSTYPE >> /usr/libexec/kubernetes/kubelet-plugins/volume/exec/openebs~openebs-iscsi/data_dump.txt
-    echo $VOLUME_SRC >> /usr/libexec/kubernetes/kubelet-plugins/volume/exec/openebs~openebs-iscsi/data_dump.txt
 
-        if [ $(ismounted) -eq 1 ] ; then
-            log "{\"status\": \"Success\"}"
-            exit 0
-        fi
+    # Print logs
+    LOGS="Mount Path is: $MNTPATH\nVolume Source is: $VOLUME_SRC\nFile System of the Volume is:$FSTYPE\nOpenEBS API URL: $OPENEBS_API_URL\nSize of the Volume: $SIZE\nMount Options for the Volume: $MOUNT_OPTIONS\nJSON Data received by openebs-iscsi driver:\n$2"
 
-        sudo mkdir -p ${MNTPATH} &> /dev/null
-        sudo mkdir -p ${VOLUME_SRC} &> /dev/null
+    if [ ${DEBUG} == "1" ] ; then
+        sudo mkdir -p /tmp/logs/openebs-iscsi/
+        echo -e $LOGS >>  /tmp/logs/openebs-iscsi/openebs-iscsi.log
+    fi
 
-        sudo mount -o rw,noexec,nosuid,nodev,bind "${VOLUME_SRC}" "${MNTPATH}" &> /dev/null
-
-        if [ $? -ne 0 ]; then
-                2>&1
-
-               err '{ "status": "Failure", "message": "Failed to mount device '${VOLUME_SRC}' at '${MNTPATH}' , volume_src: '${VOLUME_SRC}'"}'
-               exit 1
-        fi
-        log '{"status": "Success"}'
-
+    if [ $(ismounted) -eq 1 ] ; then
+        log "{\"status\": \"Success\"}"
         exit 0
+    fi
+
+    sudo mkdir -p ${MNTPATH} &> /dev/null
+    sudo mkdir -p ${VOLUME_SRC} &> /dev/null
+    sudo mount -o rw,noexec,nosuid,nodev,bind "${VOLUME_SRC}" "${MNTPATH}" &> /dev/null
+
+    if [ $? -ne 0 ]; then
+        2>&1
+        err '{ "status": "Failure", "message": "Failed to mount device '${VOLUME_SRC}' at '${MNTPATH}' , volume_src: '${VOLUME_SRC}'"}'
+        exit 1
+    fi
+    log '{"status": "Success"}'
+    exit 0
 }
 
 unmount() {
-        MNTPATH=$1
-        if [ $(ismounted) -eq 0 ] ; then
-            log "{\"status\": \"Success\"}"
-            exit 0
-        fi
+    MNTPATH=$1
+    if [ $(ismounted) -eq 0 ] ; then
+      log "{\"status\": \"Success\"}"
+      exit 0
+    fi
 
-        umount ${MNTPATH} &> /dev/null
-        if [ $? -ne 0 ]; then
-            err "{ \"status\": \"Failed\", \"message\": \"Failed to unmount volume at ${MNTPATH}\"}"                exit 1
-        fi
-        log '{"status": "Success"}'
-        exit 0
+    umount ${MNTPATH} &> /dev/null
+    if [ $? -ne 0 ]; then
+      err "{ \"status\": \"Failed\", \"message\": \"Failed to unmount volume at ${MNTPATH}\"}"                exit 1
+    fi
+    log '{"status": "Success"}'
+    exit 0
 }
 
 getvolumename() {
     SOURCE=$(echo $2 | jq -r '.source')
     MOUNT_OPTIONS=$(echo $2 | jq -r '.mountOptions')
-
     log "{\"status\": \"Success\", \"volumeName\": \"${SOURCE}/${MOUNT_OPTIONS}\"}"
     exit 0
 }
@@ -90,12 +86,12 @@ getvolumename() {
 op=$1
 
 if [ "$op" = "init" ]; then
-        log '{"status": "Success"}'
-        exit 0
+    log '{"status": "Success"}'
+    exit 0
 fi
 
 if [ $# -lt 2 ]; then
-        usage
+    usage
 fi
 
 shift
@@ -111,8 +107,11 @@ case "$op" in
         getvolumename $*
         ;;
     *)
-        err "{ \"status\": \"Not supported\" }"
-        exit 1
+
+err "{ \"status\": \"Not supported\" }"
+exit 1
+
 esac
 
 exit 1;
+
