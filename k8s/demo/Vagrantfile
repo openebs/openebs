@@ -18,7 +18,9 @@
 DEPLOY_MODE_NONE = 0 
 DEPLOY_MODE_DEDICATED = 1
 DEPLOY_MODE_HC = 2
-DEPLOY_MODE=ENV['OPENEBS_DEPLOY_MODE'] || 1
+
+#Changed DEPLOY_MODE from Constant to Local variable deploy_Mode to avoid rewrite warnings on constants.
+deploy_Mode=ENV['OPENEBS_DEPLOY_MODE'] || 1
 
 #Specify the release versions to be installed
 MAYA_RELEASE_TAG = ENV['MAYA_RELEASE_TAG'] || "0.0.9"
@@ -133,6 +135,13 @@ cp -u specs/demo*.yaml /home/ubuntu/demo/k8s/spec 2>/dev/null || :
 
 SCRIPT
 
+$installerscripts = <<SCRIPT
+#Copy setup files - Needed for vagrant-triggers plugin.
+mkdir -p /home/ubuntu/demo/installer/scripts
+cd /vagrant/
+cp -u scripts/setup*.sh /home/ubuntu/demo/installer/scripts 2>/dev/null || :
+SCRIPT
+
 #$kubeminionsetup = <<SCRIPT
 #Copy iscsid.conf file with increased timeout values
 #cd /vagrant/
@@ -189,48 +198,55 @@ end
 # Entry point of this Vagrantfile
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
-  config.vm.define "default", autostart:false do |default|
-    default.vm.box = "ubuntu/xenial64"
-  end 
+    #Check for invalid deployment modes and default to DEDICATED MODE.  
+    if ((deploy_Mode.to_i < DEPLOY_MODE_NONE.to_i) || (deploy_Mode.to_i > DEPLOY_MODE_HC.to_i))
+        puts "Invalid value set for OPENEBS_DEPLOY_MODE"
+        puts "Usage: OPENEBS_DEPLOY_MODE=0 for NONE"
+        puts "Usage: OPENEBS_DEPLOY_MODE=1 for DEDICATED"
+        puts "Usage: OPENEBS_DEPLOY_MODE=2 for HYPERCONVERGED"
+        puts "Defaulting to DEDICATED MODE. Do you want to continue?(y/n):"
+        input = STDIN.gets.chomp
+        while 1 do
+           if(input == "n")
+             Kernel.exit!(0)
+           elsif(input == "y")
+             break
+           else
+             puts "Invalid input type: 'y' or 'n'"
+             input = STDIN.gets.chomp
+           end
+        end
+        deploy_Mode = 1
+    end   
   
-  if ((DEPLOY_MODE.to_i >= DEPLOY_MODE_NONE.to_i) && (DEPLOY_MODE.to_i <= DEPLOY_MODE_HC.to_i))
     # K8s Master related only !!
     1.upto(KM_NODES.to_i) do |i|
       hostname = "kubemaster-%02d" % [i]
       cpus = KM_CPUS
-      mem = KM_MEM
-      
+      mem = KM_MEM            
       config.vm.define hostname do |vmCfg|
         vmCfg = configureVM(vmCfg, hostname, cpus, mem)
 
         # Run in dedicated deployment mode or hyperconverged mode
-        if ((DEPLOY_MODE.to_i == DEPLOY_MODE_DEDICATED.to_i) || (DEPLOY_MODE.to_i == DEPLOY_MODE_HC.to_i))
-
-          # Script will make some directories before installation procedure      
-          vmCfg.vm.provision :shell, inline: $kubeinstaller, privileged: true
-          vmCfg.vm.provision :shell, inline: "echo Setting up the Master using IPAddress: $1", :args => "`#{machine_ip_address}`"      
-          #Update the hosts file with the IP obtained.
-          vmCfg.vm.provision :shell, inline: 'sed -i "/$1/ s/.*/$2\t$3/g" /etc/hosts', :args => "#{hostname} `#{machine_ip_address}` #{hostname}", privileged: true      
-          vmCfg.vm.provision :shell, inline: $kubeadminit, :args => "`#{machine_ip_address}`", privileged: true
-        
-          #Patching kube-proxy so that the pods are created properly.
-          vmCfg.vm.provision :shell, inline: $kubeproxypatch, privileged: false
+        if ((deploy_Mode.to_i == DEPLOY_MODE_DEDICATED.to_i) || (deploy_Mode.to_i == DEPLOY_MODE_HC.to_i))
+          # Install Kubernetes Master.
+          vmCfg.vm.provision :shell, path: "scripts/setup_k8s_master.sh", privileged: true        
+          # Kubernetes Pods - Yaml files location:          
           vmCfg.vm.provision :shell, inline: $kubepodsetup, privileged: false
         end
-      end     
+      end           
     end
     
     # K8s Minions related only !!
     1.upto(KH_NODES.to_i) do |i|
       hostname = "kubeminion-%02d" % [i]
       cpus = KH_CPUS
-      mem = KH_MEM
-      
+      mem = KH_MEM            
       config.vm.define hostname do |vmCfg|
         vmCfg = configureVM(vmCfg, hostname, cpus, mem)
 
         # Run in dedicated deployment mode or hyperconverged mode
-        if ((DEPLOY_MODE.to_i == DEPLOY_MODE_DEDICATED.to_i) || (DEPLOY_MODE.to_i == DEPLOY_MODE_HC.to_i))
+        if ((deploy_Mode.to_i == DEPLOY_MODE_DEDICATED.to_i) || (deploy_Mode.to_i == DEPLOY_MODE_HC.to_i))
 
           # Script will make some directories before installation procedure      
           vmCfg.vm.provision :shell, inline: $kubeinstaller, privileged: true
@@ -239,111 +255,105 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
           #We want to run this only when the VM is first provisioned and get the Master IP to join the cluster
 
           vmCfg.vm.provision :trigger, :force => true, :stdout => true, :stderr => true do |trigger|
-              trigger.fire do
-                info"Getting the Master IP to join the cluster..."
-                master_hostname = "kubemaster-01"
-                get_ip_address = %Q(vagrant ssh #{master_hostname}  -c 'ifconfig | grep -oP "inet addr:\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}" | grep -oP "\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}" | tail -n 3 | head -n 1')            
-                master_ip_address = `#{get_ip_address}`            
-                if master_ip_address == ""
-                    info"The Kubernetes Master is down, bring it up and manually run:"
-                    info"kubeadm join --token=<token> <master_ip_address>"
-                    info"in order to join the cluster."
-                    info"The Token can be obtained by running the following command on the Master Node:"
+            trigger.fire do
+              info"Getting the Master IP to join the cluster..."
+              master_hostname = "kubemaster-01"
+              get_ip_address = %Q(vagrant ssh #{master_hostname}  -c 'ifconfig | grep -oP "inet addr:\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}" | grep -oP "\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}" | tail -n 3 | head -n 1')            
+              master_ip_address = `#{get_ip_address}`            
+              if master_ip_address == ""
+                  info"The Kubernetes Master is down, bring it up and manually run:"
+                  info"kubeadm join --token=<token> <master_ip_address>"
+                  info"in order to join the cluster."
+                  info"The Token can be obtained by running the following command on the Master Node:"
+                  info"kubectl -n kube-system get secret clusterinfo -o yaml | grep token-map | cut -d \":\" -f2 | cut -d \" \" -f2 | base64 -d | sed \"s|{||g;s|}||g\" | sed \"s|:|.|g\" | xargs echo"
+              else                           
+                  get_token = %Q(vagrant ssh #{master_hostname} -c 'kubectl -n kube-system get secret clusterinfo -o yaml | grep token-map | cut -d ":" -f2 | cut -d " " -f2 | base64 -d | sed "s|{||g;s|}||g" | sed "s|:|.|g" | xargs echo')
+                  token = `#{get_token}`
+                  get_ip_address = %Q(vagrant ssh #{hostname}  -c 'ifconfig | grep -oP "inet addr:\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}" | grep -oP "\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}" | tail -n 2 | head -n 1')      
+                  host_ip_address = `#{get_ip_address}`
+                  @machine.communicate.sudo("echo \"#{master_ip_address.strip} #{master_hostname}\" >> /etc/hosts")
+                  append_to_hosts = %Q(vagrant ssh #{master_hostname} -c 'echo #{host_ip_address.strip} #{hostname} | sudo tee -a /etc/hosts')               
+                  `#{append_to_hosts}`
+                  info"Setting up the Minion using IPAddress: #{master_ip_address}"
+                  info"Setting up the Minion using Token: #{token}"
+                  if token != ""
+                    get_cluster_ip = %Q(vagrant ssh #{master_hostname} -c 'kubectl get svc -o yaml | grep clusterIP | cut -d ":" -f2 | cut -d " " -f2')
+                    cluster_ip = `#{get_cluster_ip}`
+                    @machine.communicate.sudo("kubeadm join --token=#{token.strip} #{master_ip_address.strip}")
+                    info"Joining the CNI Network..."
+                    @machine.communicate.sudo("route add #{cluster_ip.strip} gw #{master_ip_address.strip}")
+                  else
+                    info"Token cannot be empty. SSH into the Master and run the below command to get the token:"
                     info"kubectl -n kube-system get secret clusterinfo -o yaml | grep token-map | cut -d \":\" -f2 | cut -d \" \" -f2 | base64 -d | sed \"s|{||g;s|}||g\" | sed \"s|:|.|g\" | xargs echo"
-                else                           
-                    get_token = %Q(vagrant ssh #{master_hostname} -c 'kubectl -n kube-system get secret clusterinfo -o yaml | grep token-map | cut -d ":" -f2 | cut -d " " -f2 | base64 -d | sed "s|{||g;s|}||g" | sed "s|:|.|g" | xargs echo')
-                    token = `#{get_token}`
-                    get_ip_address = %Q(vagrant ssh #{hostname}  -c 'ifconfig | grep -oP "inet addr:\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}" | grep -oP "\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}" | tail -n 2 | head -n 1')      
-                    host_ip_address = `#{get_ip_address}`
-                    @machine.communicate.sudo("echo \"#{master_ip_address.strip} #{master_hostname}\" >> /etc/hosts")
-                    append_to_hosts = %Q(vagrant ssh #{master_hostname} -c 'echo #{host_ip_address.strip} #{hostname} | sudo tee -a /etc/hosts')               
-                    `#{append_to_hosts}`
-                    info"Setting up the Minion using IPAddress: #{master_ip_address}"
-                    info"Setting up the Minion using Token: #{token}"
-                    if token != ""
-                      get_cluster_ip = %Q(vagrant ssh #{master_hostname} -c 'kubectl get svc -o yaml | grep clusterIP | cut -d ":" -f2 | cut -d " " -f2')
-                      cluster_ip = `#{get_cluster_ip}`
-                      @machine.communicate.sudo("kubeadm join --token=#{token.strip} #{master_ip_address.strip}")
-                      info"Joining the CNI Network..."
-                      @machine.communicate.sudo("route add #{cluster_ip.strip} gw #{master_ip_address.strip}")
-                    else
-                      info"Token cannot be empty. SSH into the Master and run the below command to get the token:"
-                      info"kubectl -n kube-system get secret clusterinfo -o yaml | grep token-map | cut -d \":\" -f2 | cut -d \" \" -f2 | base64 -d | sed \"s|{||g;s|}||g\" | sed \"s|:|.|g\" | xargs echo"
-                    end
-                end  
-              end
+                  end
+              end  
+            end
           end
         end
-      end
+      end      
     end
     
-    if ((DEPLOY_MODE.to_i == DEPLOY_MODE_DEDICATED.to_i) || (DEPLOY_MODE.to_i == DEPLOY_MODE_NONE.to_i))
-      # Maya Master related only !!
-      1.upto(MM_NODES.to_i) do |i|
-        hostname = "omm-%02d" % [i]
-        cpus = MM_CPUS
-        mem = MM_MEM
-        
+    # Maya Master related only !!
+    1.upto(MM_NODES.to_i) do |i|
+      hostname = "omm-%02d" % [i]
+      cpus = MM_CPUS
+      mem = MM_MEM
+
+      if ((deploy_Mode.to_i == DEPLOY_MODE_DEDICATED.to_i) || (deploy_Mode.to_i == DEPLOY_MODE_NONE.to_i))     
         config.vm.define hostname do |vmCfg|
           vmCfg = configureVM(vmCfg, hostname, cpus, mem)
 
           # Run in dedicated deployment mode
-          if DEPLOY_MODE.to_i == DEPLOY_MODE_DEDICATED.to_i
-            # Script will make some directories before installation procedure
-            vmCfg.vm.provision :shell, inline: $mayainstaller, :args => "#{MAYA_RELEASE_TAG}", privileged: true
-            #We want to run this only when the VM is first provisioned and get the Master IP to join the cluster
+          if deploy_Mode.to_i == DEPLOY_MODE_DEDICATED.to_i
+
+            # Install OpenEBS Maya Master
+            vmCfg.vm.provision :shell, path: "scripts/setup_omm.sh", :args => "-r #{MAYA_RELEASE_TAG}", privileged: true
+            
             vmCfg.vm.provision :trigger, :force => true, :stdout => true, :stderr => true do |trigger|
               trigger.fire do
-                  info"Getting the Master IP to join the cluster..."            
-                  get_ip_address = %Q(vagrant ssh #{hostname}  -c 'ifconfig | grep -oP "inet addr:\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}" | grep -oP "\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}" | tail -n 2 | head -n 1')            
-                  master_ip_address = `#{get_ip_address}`            
-                  if master_ip_address == ""
-                    info"The Maya Master is down, bring it up and manually run:"
-                    info"maya setup-omm -self-ip=<master_ip_address>"
-                    info"in order to join the cluster."               
-                  else               
-                    info"Setting up the node using IPAddress: #{master_ip_address.strip}"                                             
-                    @machine.communicate.sudo("maya setup-omm -self-ip=#{master_ip_address.strip}")
-                    @machine.communicate.sudo("echo 'export NOMAD_ADDR=http://#{master_ip_address.strip}:4646' >> /home/ubuntu/.profile")               
-                  end  
+                get_ip_address = %Q(vagrant ssh #{hostname}  -c 'ifconfig | grep -oP "inet addr:\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}" | grep -oP "\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}" | tail -n 2 | head -n 1')      
+                host_ip_address = `#{get_ip_address}`                
+                @machine.communicate.sudo("echo 'export NOMAD_ADDR=http://#{host_ip_address.strip}:4646' >> /home/ubuntu/.profile")                
               end
             end
+            # Maya Jobs - HCL files location:
             vmCfg.vm.provision :shell, inline: $mayavsmsetup, privileged: false
           end      
-        end     
+        end
       end
+    end    
 
-      # Maya Host related only !!
-      1.upto(MH_NODES.to_i) do |i|
-        hostname = "osh-%02d" % [i]
-        cpus = MH_CPUS
-        mem = MH_MEM
-        
+    # Maya Host related only !!
+    1.upto(MH_NODES.to_i) do |i|
+      hostname = "osh-%02d" % [i]
+      cpus = MH_CPUS
+      mem = MH_MEM
+
+      if ((deploy_Mode.to_i == DEPLOY_MODE_DEDICATED.to_i) || (deploy_Mode.to_i == DEPLOY_MODE_NONE.to_i))      
         config.vm.define hostname do |vmCfg|
           vmCfg = configureVM(vmCfg, hostname, cpus, mem)
-
+          
           # Run in dedicated deployment mode
-          if DEPLOY_MODE.to_i == DEPLOY_MODE_DEDICATED.to_i
-            # Script will make some directories before installation procedure
-            vmCfg.vm.provision :shell, inline: $mayainstaller, :args => "#{MAYA_RELEASE_TAG}", privileged: true      
+          if deploy_Mode.to_i == DEPLOY_MODE_DEDICATED.to_i
+
+            #Copy scripts to the demo folder.
+            vmCfg.vm.provision :shell, inline: $installerscripts, privileged: false
+
             #We want to run this only when the VM is first provisioned and get the Master IP to join the cluster
             vmCfg.vm.provision :trigger, :force => true, :stdout => true, :stderr => true do |trigger|
               trigger.fire do
-                  info"Getting the Master IP to join the cluster..."
-                  master_hostname = "omm-01"            
-                  get_ip_address = %Q(vagrant ssh #{master_hostname}  -c 'ifconfig | grep -oP "inet addr:\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}" | grep -oP "\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}" | tail -n 2 | head -n 1')            
-                  master_ip_address = `#{get_ip_address}`            
-                  if master_ip_address == ""
-                    info"The Maya Master is down, bring it up and manually run:"
-                    info"maya setup-osh -self-ip=<host_ip_address> -omm-ips=<master_ip_address>"
-                    info"in order to join the cluster."               
-                  else               
-                    get_ip_address = %Q(vagrant ssh #{hostname}  -c 'ifconfig | grep -oP "inet addr:\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}" | grep -oP "\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}" | tail -n 2 | head -n 1')      
-                    host_ip_address = `#{get_ip_address}`	       
-                    info"Setting up the node using IPAddress: #{host_ip_address.strip}"                              
-                    @machine.communicate.sudo("maya setup-osh -self-ip=#{host_ip_address.strip} -omm-ips=#{master_ip_address.strip}")
-                    @machine.communicate.sudo("echo 'export NOMAD_ADDR=http://#{master_ip_address.strip}:4646' >> /home/ubuntu/.profile")                              
-                  end  
+                info"Getting the Master IP to join the cluster..."
+                master_hostname = "omm-01"            
+                get_ip_address = %Q(vagrant ssh #{master_hostname}  -c 'ifconfig | grep -oP "inet addr:\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}" | grep -oP "\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}" | tail -n 2 | head -n 1')            
+                master_ip_address = `#{get_ip_address}`            
+                if master_ip_address == ""
+                  info"The OpenEBS Maya Master is down, bring it up and manually run: setup_osh.sh script on OpenEBS Storage Host."                              
+                else
+                  get_ip_address = %Q(vagrant ssh #{hostname}  -c 'ifconfig | grep -oP "inet addr:\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}" | grep -oP "\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}" | tail -n 2 | head -n 1')      
+                  host_ip_address = `#{get_ip_address}`                                                          
+                  @machine.communicate.sudo("bash /home/ubuntu/demo/installer/scripts/setup_osh.sh -i #{master_ip_address.strip} -r #{MAYA_RELEASE_TAG}")
+                  @machine.communicate.sudo("echo 'export NOMAD_ADDR=http://#{host_ip_address.strip}:4646' >> /home/ubuntu/.profile")
+                end  
               end
             end
           end
@@ -351,4 +361,3 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       end
     end
   end
-end
