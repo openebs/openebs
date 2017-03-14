@@ -30,7 +30,7 @@ deps: _build_check_docker
 	@echo ""
 	@echo "INFO:\tverifying dependencies for OpenEBS ..."
 
-_build_tests_vdbench:
+_build_tests_vdbench_image:
 	@echo "INFO: Building container image for performing vdbench tests"
 
 
@@ -38,11 +38,7 @@ _push_test_vdbench_image:
 	@echo "INFO: Publish container (openebs/test-vdbench)"
 
 
-#
-# Will build the go based binaries
-# The binaries will be placed at $GOPATH/bin/
-#
-build: deps _build_test_vdbench _push_test_vdbench_image
+build: deps _build_tests_vdbench_image _push_tests_vdbench_image
 
 
 #

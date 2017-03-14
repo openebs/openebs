@@ -1,4 +1,3 @@
-language: go
 dist: trusty
 sudo: required
 install: true
