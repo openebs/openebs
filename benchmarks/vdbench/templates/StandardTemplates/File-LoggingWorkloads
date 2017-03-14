@@ -1,0 +1,3 @@
+fsd=fsd-datadir1,anchor=/datadir1,depth=1,width=1,files=256,size=10M
+fwd=fwd1,fsd=fsd*,rdpct=0,xfersize=(4k,10,8k,10,16k,10,32k,10,64k,10,128k,10,256k,10,512k,10,1M,20),fileio=(random,shared),threads=256
+rd=rd1,fwd=fwd*,elapsed=600,interval=1,fwdrate=max,format=yes
