@@ -1,12 +1,12 @@
-#OpenEBS Design and Architecture
+# OpenEBS Design and Architecture
 
-##Overview
+## Overview
 
 OpenEBS is a open source storage platform delivering containerized block storage for containers. OpenEBS aims at making storage instrastructure programmable, easy-to-use, consumed by applications via self-service. OpenEBS takes storage software upgrade seriously.
 
 The storage is containerized through concept called VSM or "Virtual Storage Machine". VSMs are fully isolated user space storage engines that present the block storage at the front end through iSCSI, NBD or TCMU protocol and consume raw storage from a local OpenEBS host or remote storage. OpenEBS uses maya, a storage orchestration engine that helps in managing local and remote storage, integrate into the container orchestrators like Kubernetes, Docker Swarm, Nomad etc., manages QoS policies for VSMs.
 
-##Architecture
+## Architecture
 
 In the following diagram, we use Kubernetes as an example, but the concepts applies to other orchestration engines as well. 
 ![OpenEBS Deployment](../../documentation/source/_static/architecture-overview-hc.png)
