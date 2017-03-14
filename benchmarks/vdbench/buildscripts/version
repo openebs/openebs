@@ -1,0 +1,5 @@
+#!/bin/bash
+
+RELEASE_TAG="dev"
+COMMIT=$(git rev-parse --short HEAD)
+VERSION="${RELEASE_TAG}-${COMMIT}"

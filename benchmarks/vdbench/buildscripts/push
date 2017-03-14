@@ -1,0 +1,15 @@
+#!/bin/bash
+set -e
+
+source "$(dirname $0)/version"
+IMAGEID=$( docker images -q openebs/tests-vdbench:${VERSION} )
+
+if [ ! -z "${DNAME}" ] && [ ! -z "${DPASS}" ]; 
+then 
+  docker login -u "${DNAME}" -p "${DPASS}"; 
+  #Push to docker hub repository with latest tag
+  docker tag ${IMAGEID} openebs/tests-vdbench:latest
+  docker push openebs/tests-vdbench:latest; 
+else
+  echo "No docker credentials provided. Skip uploading openebs/tests-vdbench:${VERSION} to docker hub"; 
+fi;
