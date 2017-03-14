@@ -32,11 +32,12 @@ deps: _build_check_docker
 
 _build_tests_vdbench_image:
 	@echo "INFO: Building container image for performing vdbench tests"
+	cd benchmarks/vdbench && docker build -t openebs/tests-vdbench .
 
 
 _push_tests_vdbench_image:
 	@echo "INFO: Publish container (openebs/test-vdbench)"
-        cd benchmarks/vdbench && docker build -t openebs/tests-vdbench .
+	cd benchmarks/vdbench/buildscripts && ./push
 
 
 build: deps _build_tests_vdbench_image _push_tests_vdbench_image
