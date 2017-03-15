@@ -1,3 +1,0 @@
-fsd=fsd-datadir1,anchor=/datadir1,depth=1,width=1,files=256,size=10M
-fwd=fwd1,fsd=fsd*,rdpct=50,xfersize=(4k,100),fileio=random,threads=4,fileselect=random
-rd=rd1,fwd=fwd*,elapsed=600,interval=1,fwdrate=max,format=yes
