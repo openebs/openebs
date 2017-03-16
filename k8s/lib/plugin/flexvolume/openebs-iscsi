@@ -26,6 +26,87 @@ ismounted() {
     fi
 }
 
+#TBD 
+#Form the yaml spec to be sent to the OpenEBS URL
+# using the input parameters sent through kubectl/yaml
+#createvolumespec() {
+#    Args:
+#        - VOLUMENAME
+#        - VOLUMESIZE
+#    Create a file called - openebs-${VOLUMENAME}-pvc.yaml in the current directory
+#      with the following content:
+#---------------------------------------------------------
+# kind: PersistentVolumeClaim
+# apiVersion: v1
+# metadata:
+#  name: ${VOLUMENAME}
+# spec:
+#  accessModes:
+#    - ReadWriteOnce
+#  resources:
+#    requests:
+#      storage: ${VOLUMESIZE}
+#---------------------------------------------------------
+#}
+
+
+#TBD 
+#Clear the volumespec created for sending to OpenEBS URL
+#clearvolumespec() {
+#    Args:
+#        - VOLUMENAME
+#    Delete the file - openebs-${VOLUMENAME}-pvc.yaml in the current directory
+#    (This file will be present, if the previous volume was created.)
+#}
+
+#TBD
+#This method will check with OpenEBS URL if the volume already exists
+#checkvolumeexists() {
+#    Args:
+#        - VOLUMENAME
+#        - OPENEBS_API_URL
+#    Steps:
+#        - curl ${OPENEBS_API_URL}/volume/info/${VOLUMENAME}
+#          the success response will be:
+#          ---------------------------------------------
+#          {
+#             "Spec": {"AccessModes":null,"Capacity":null,"ClaimRef":null,"OpenEBS":{ "volumeID":"" },PersistentVolumeReclaimPolicy":"","StorageClassName":"" },
+#             "Status": {"Message":"","Phase":"","Reason":"running"},
+#             "annotations":{"targetportal":"172.28.128.101:3260","iqn":"iqn.2016-09.com.openebs.jiva:demo-vsm1-vol1"},
+#             "creationTimestamp":null,
+#             "name":"demo-vsm1-vol1"
+#          }
+#          ---------------------------------------------
+#          return success or extract the target portal, iqn details from the response
+#}
+
+#TBD
+#This method will issue the create-volume api to OpenEBS URL
+#createvolume() {
+#    Args:
+#        - VOLUMENAME
+#        - VOLUMESIZE
+#        - OPENEBS_API_URL
+#    Steps:
+#        - createvolumespec( ${VOLUMENAME}, ${VOLUMESIZE})
+#        - curl -k -H "Content-Type: application/yaml" \
+#            -XPOST -d"$(cat ./openebs-${VOLUMENAME}-pvc.yaml)" \
+#            ${OPENEBS_API_URL}/volumes/
+#        - wait in loop, till volume is created
+#            checkvolumeexists(${VOLUMENAME}, ${OPENEBS_API_URL})
+#}
+
+#TBD - May not be used with the current version of FlexVolume
+#This method will issue the delete-volume api to OpenEBS URL
+#deletevolume() {
+#    Args:
+#        - VOLUMENAME
+#        - OPENEBS_API_URL
+#    Steps:
+#        - deletevolumespec()
+#        - curl ${OPENEBS_API_URL}/volume/delete/${VOLUMENAME}
+#}
+
 domount() {
     MNTPATH="$1"
     VOLUME_SRC=$(echo "$2" | jq -r '.source')
@@ -49,6 +130,23 @@ domount() {
     fi
 
     sudo mkdir -p ${MNTPATH} &> /dev/null
+
+    #The following two steps will be replaced by creating the volume
+    # by issuing curl requests to OpenEBS API SERVER. The pseudo code
+    # is as follows:
+    #
+    #targetportal, iqn, rc = checkvolumeexists()
+    #if rc is failed {
+    #  createvolumespec()
+    #  createvolume()
+    #  targetportal, iqn, rc = checkvolumeexists()
+    #}
+    #
+    #use iscsiadm to connect to targetportal,iqn,lun1
+    #format the mounted disk
+    #mount the volume
+    #clearvolumespec()
+
     sudo mkdir -p ${VOLUME_SRC} &> /dev/null
     sudo mount -o rw,noexec,nosuid,nodev,bind "${VOLUME_SRC}" "${MNTPATH}" &> /dev/null
 
