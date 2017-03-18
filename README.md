@@ -30,7 +30,7 @@ deliver higher performance for each VSM and to  scale to a large number of VSMs.
 ## Installation and Getting Started
 
 OpenEBS can be setup in few easy steps either on Physical Machines or VMs. 
-Please follow our [Getting Started](docs/getting-started.md) documentation 
+Please follow our [Getting Started](k8s/dedicated/README.md) documentation 
 
 ## Show me the Code
 
