@@ -5,7 +5,7 @@ machineip="0.0.0.0"
 hostname=`hostname`
 masterhostname=""
 masterip=""
-releasetag="0.0.5"
+releasetag="0.0.1.0"
 usage="Usage : $(basename "$0") -i Master_IPAddress -r Release_Version"
 
 #Functions:
