@@ -7,8 +7,8 @@ usage() {
     err "\t$0 unmount <mount dir>"
     err "\t$0 getvolumename <json params>"
     exit 1
-
 }
+
 err() {
     echo -ne $* 1>&2
 }
@@ -26,86 +26,87 @@ ismounted() {
     fi
 }
 
-#TBD 
-#Form the yaml spec to be sent to the OpenEBS URL
-# using the input parameters sent through kubectl/yaml
-#createvolumespec() {
-#    Args:
-#        - VOLUMENAME
-#        - VOLUMESIZE
-#    Create a file called - openebs-${VOLUMENAME}-pvc.yaml in the current directory
-#      with the following content:
-#---------------------------------------------------------
-# kind: PersistentVolumeClaim
-# apiVersion: v1
-# metadata:
-#  name: ${VOLUMENAME}
-# spec:
-#  accessModes:
-#    - ReadWriteOnce
-#  resources:
-#    requests:
-#      storage: ${VOLUMESIZE}
-#---------------------------------------------------------
-#}
+createvolumespec(){
+    VOLUMENAME=$1
+    VOLUMESIZE=$2
+    echo -e "kind: PersistentVolumeClaim\napiVersion: v1\nmetadata:\n name: ${VOLUMENAME}\nspec:\n  accessModes:\n    - ReadWriteOnce\n  resources:\n    requests:\n      storage: ${VOLUMESIZE}\n" > "/tmp/logs/openebs-iscsi/openebs-${VOLUMENAME}-pvc.yaml"
+}
 
+clearvolumespec(){
+    VOLUMENAME=$1
+    sudo rm -rf /tmp/logs/openebs-iscsi/openebs-${VOLUMENAME}-pvc.yaml
+}
 
-#TBD 
-#Clear the volumespec created for sending to OpenEBS URL
-#clearvolumespec() {
-#    Args:
-#        - VOLUMENAME
-#    Delete the file - openebs-${VOLUMENAME}-pvc.yaml in the current directory
-#    (This file will be present, if the previous volume was created.)
-#}
+checkvolumeexists(){
+    OPENEBS_API_URL=$2 #(echo "$2" | jq -r '.openebsApiUrl')
+    VOLUMENAME=$1      #(echo $2 | jq -r '.name')
+    curl "${OPENEBS_API_URL}/volume/info/${VOLUMENAME}" > /tmp/logs/openebs-iscsi/checkvolumeexists.json
 
-#TBD
-#This method will check with OpenEBS URL if the volume already exists
-#checkvolumeexists() {
-#    Args:
-#        - VOLUMENAME
-#        - OPENEBS_API_URL
-#    Steps:
-#        - curl ${OPENEBS_API_URL}/volume/info/${VOLUMENAME}
-#          the success response will be:
-#          ---------------------------------------------
-#          {
-#             "Spec": {"AccessModes":null,"Capacity":null,"ClaimRef":null,"OpenEBS":{ "volumeID":"" },PersistentVolumeReclaimPolicy":"","StorageClassName":"" },
-#             "Status": {"Message":"","Phase":"","Reason":"running"},
-#             "annotations":{"targetportal":"172.28.128.101:3260","iqn":"iqn.2016-09.com.openebs.jiva:demo-vsm1-vol1"},
-#             "creationTimestamp":null,
-#             "name":"demo-vsm1-vol1"
-#          }
-#          ---------------------------------------------
-#          return success or extract the target portal, iqn details from the response
-#}
+    response= `cat /tmp/logs/openebs-iscsi/checkvolumeexists.json | jq -r '.error_code'`
+    if [ $response == "404" ] ; then
+        echo 0
+    else
+        targetportal= `cat /tmp/logs/openebs-iscsi/checkvolumeexists.json | jq -r '.annotations.targetportal'`
+        iqn= `cat /tmp/logs/openebs-iscsi/checkvolumeexists.json | jq -r '.annotations.iqn'`
+        data="${targetportal}\n${iqn}"
+        echo -e "${data}" > /tmp/logs/temp.txt
+        echo 1
+    fi
+}
+createvolume(){
+    VOLUMENAME=$1
+    OPENEBS_API_URL=$2
+    VOLUMESIZE=$3
 
-#TBD
-#This method will issue the create-volume api to OpenEBS URL
-#createvolume() {
-#    Args:
-#        - VOLUMENAME
-#        - VOLUMESIZE
-#        - OPENEBS_API_URL
-#    Steps:
-#        - createvolumespec( ${VOLUMENAME}, ${VOLUMESIZE})
-#        - curl -k -H "Content-Type: application/yaml" \
-#            -XPOST -d"$(cat ./openebs-${VOLUMENAME}-pvc.yaml)" \
-#            ${OPENEBS_API_URL}/volumes/
-#        - wait in loop, till volume is created
-#            checkvolumeexists(${VOLUMENAME}, ${OPENEBS_API_URL})
-#}
+    # Check if volume already exists
+    status=`checkvolumeexists "${VOLUMENAME}" "${OPENEBS_API_URL}"`
+    if [ "${status}" -ne 0 ] ; then
+       # Volume already exists
+       exit 0
+    fi
+    
+    # if it doesn't exist
+    createvolumespec "${VOLUMENAME}" "${VOLUMESIZE}"
 
-#TBD - May not be used with the current version of FlexVolume
-#This method will issue the delete-volume api to OpenEBS URL
-#deletevolume() {
-#    Args:
-#        - VOLUMENAME
-#        - OPENEBS_API_URL
-#    Steps:
-#        - deletevolumespec()
-#        - curl ${OPENEBS_API_URL}/volume/delete/${VOLUMENAME}
-#}
+    # Wait for response from server
+
+    until $(curl --output /tmp/logs/openebs-iscsi/createvolume.json --silent --fail -k -H "Content-Type: application/yaml" \
+            -XPOST -d "$(cat tmp/logs/openebs-iscsi/openebs-${VOLUMENAME}-pvc.yaml)" \
+            "${OPENEBS_API_URL}/volumes/"); do
+    printf '.'
+    sleep 5 
+    done
+
+    # curl -k -H "Content-Type: application/yaml" \
+    #         -XPOST -d "$(cat tmp/logs/openebs-iscsi/openebs-${VOLUMENAME}-pvc.yaml)" \
+    #         "${OPENEBS_API_URL}/volumes/" > /tmp/logs/openebs-iscsi/createvolume.json
+
+    status=`checkvolumeexists "${VOLUMENAME}" "${OPENEBS_API_URL}"`
+    if [ "${status}" == 0 ] ; then
+       # Error while creating volume
+       # Create a log file and append the error.
+       echo 0
+    else
+        # Volume created successfully
+        # Create a log file and append the response.
+        clearvolumespec "${VOLUMENAME}"
+        echo 1
+    fi
+}
+deletevolume() {
+    OPENEBS_API_URL=$1
+    VOLUMENAME=$2
+    curl "${OPENEBS_API_URL}"/volume/delete/"${VOLUMENAME}" > /tmp/logs/openebs-iscsi/deletevolume.json 
+    response= `cat /tmp/logs/openebs-iscsi/deletevolume.json | jq -r '.Status.Reason'`
+    if [ "${response}" == "complete" ] ; then
+        # Volume Deleted.
+        clearvolumespec "${VOLUMENAME}"
+        echo 0
+    else
+        # Error while deleting volume.
+        echo 1
+    fi
+}
 
 domount() {
     MNTPATH="$1"
@@ -115,7 +116,7 @@ domount() {
     SIZE=$(echo "$2" | jq -r '.size')
     DEBUG=$(echo "$2" | jq -r '.debug')
     MOUNT_OPTIONS=$(echo $2 | jq -r '.mountOptions')
-
+    createvolumespec
     # Print logs
     LOGS="Mount Path is: $MNTPATH\nVolume Source is: $VOLUME_SRC\nFile System of the Volume is:$FSTYPE\nOpenEBS API URL: $OPENEBS_API_URL\nSize of the Volume: $SIZE\nMount Options for the Volume: $MOUNT_OPTIONS\nJSON Data received by openebs-iscsi driver:\n$2"
 
@@ -124,31 +125,37 @@ domount() {
         echo -e $LOGS >>  /tmp/logs/openebs-iscsi/openebs-iscsi.log
     fi
 
-    if [ $(ismounted) -eq 1 ] ; then
+    if [ $(ismounted) == 1 ] ; then
         log "{\"status\": \"Success\"}"
         exit 0
     fi
 
-    sudo mkdir -p ${MNTPATH} &> /dev/null
+    status=`checkvolumeexists "${VOLUMENAME}" "${OPENEBS_API_URL}"`
+    if [ status -ne 0 ] ; then
+       # Volume already exists
+       exit 0
+    fi
+    data=(`cat "/tmp/logs/temp.txt"`)
+    i=0
+    for t in "${data[@]}"
+    do
+    declare "var$i"=$t
+    i=$((i+1))
+    done
+    targetportal="${var0}";
+    iqn="${var1}";
 
-    #The following two steps will be replaced by creating the volume
-    # by issuing curl requests to OpenEBS API SERVER. The pseudo code
-    # is as follows:
-    #
-    #targetportal, iqn, rc = checkvolumeexists()
-    #if rc is failed {
-    #  createvolumespec()
-    #  createvolume()
-    #  targetportal, iqn, rc = checkvolumeexists()
-    #}
-    #
+    # createvolume
+    status=`createvolume "${VOLUMENAME}" "$OPENEBS_API_URL" "${SIZE}"`
+    if [ "${status}" == 0 ] ; then
+        exit 0
+      # Volume Creation Failed
+    fi
+    
+    #TBD
     #use iscsiadm to connect to targetportal,iqn,lun1
     #format the mounted disk
     #mount the volume
-    #clearvolumespec()
-
-    sudo mkdir -p ${VOLUME_SRC} &> /dev/null
-    sudo mount -o rw,noexec,nosuid,nodev,bind "${VOLUME_SRC}" "${MNTPATH}" &> /dev/null
 
     if [ $? -ne 0 ]; then
         2>&1
@@ -212,4 +219,3 @@ exit 1
 esac
 
 exit 1;
-

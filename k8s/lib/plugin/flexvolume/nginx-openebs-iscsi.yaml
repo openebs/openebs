@@ -17,6 +17,7 @@ spec:
       driver: "openebs/openebs-iscsi"
       fsType: "ext4"
       options:
+        name: "demo-vsm1-vol1"
         source: "/tmp/openebs-iscsi"
         mountOptions: "dir_mode=0755,file_mode=0644,rw"
         openebsApiUrl: "http://172.28.128.10:5656/latest/"
