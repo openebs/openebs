@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/openebs/jiva.svg?branch=master)](https://travis-ci.org/openebs/jiva)
 [![Docker Pulls](https://img.shields.io/docker/pulls/openebs/jiva.svg)](https://hub.docker.com/r/openebs/jiva/)
-[![Slack](https://img.shields.io/badge/chat !!!-slack-ff1493.svg)]( https://openebsslacksignup.herokuapp.com/)
+[![Slack](https://img.shields.io/badge/chat!!!-slack-ff1493.svg)]( https://openebsslacksignup.herokuapp.com/)
 
 http://www.openebs.io/
 
