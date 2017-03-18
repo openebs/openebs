@@ -3,7 +3,7 @@
 #Variables:
 machineip="0.0.0.0"
 hostname=`hostname`
-releasetag="0.0.5"
+releasetag="0.0.1.0"
 usage="Usage : $(basename "$0") -r Release_Version"
 
 #Functions:
