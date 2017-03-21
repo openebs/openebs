@@ -69,15 +69,6 @@ cp -u scripts/setup*.sh /home/ubuntu/demo/installer/scripts 2>/dev/null || :
 
 SCRIPT
 
-#$kubeminionsetup = <<SCRIPT
-#Copy iscsid.conf file with increased timeout values
-#cd /vagrant/
-#cp -u iscsid.conf /etc/iscsi/ 2>/dev/null || :
-#
-#SCRIPT
-
-	
-	
 required_plugins = %w(vagrant-cachier vagrant-triggers)
 
 required_plugins.each do |plugin|
