@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #Variables:
-machineip="0.0.0.0"
+machineip=
 hostname=`hostname`
 
 #Functions:
@@ -43,6 +43,24 @@ function patch_kube_proxy(){
     kubectl -n kube-system get ds -l 'component=kube-proxy' -o json | jq '.items[0].spec.template.spec.containers[0].command |= .+ ["--proxy-mode=userspace"]' | kubectl apply -f - && kubectl -n kube-system delete pods -l 'component=kube-proxy'
 }
 
+function download_specs(){
+
+    specurl="https://api.github.com/repos/openebs/openebs/contents/k8s/demo/specs"
+    mapfile -t downloadurls < <(curl -sS $specurl | grep "download_url" | awk '{print $2}' | tr -d '",')
+    
+    #Create demo directory and download specs
+    mkdir -p /home/ubuntu/demo/k8s/spec
+    cd /home/ubuntu/demo/k8s/spec    
+    
+    length=${#downloadurls[@]}
+    for ((i = 0; i != length; i++)); do
+        if [ -z "${downloadurls[i]##*yaml*}" ] ;then
+            wget "${downloadurls[i]}"
+        fi
+    done
+    
+}
+
 #Code
 #Get the ip of the machine
 machineip=`get_machine_ip`
@@ -63,3 +81,6 @@ setup_k8s_master
 echo Patching the kube-proxy for CNI Networks...
 patch_kube_proxy
 
+#Download the specs for the demo
+echo Downloading samples for demo...
+download_specs
