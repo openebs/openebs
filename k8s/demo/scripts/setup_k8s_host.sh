@@ -14,7 +14,7 @@ function install_kubernetes(){
 
     # Update apt and get dependencies
     sudo apt-get update
-    sudo apt-get install -y unzip curl wget
+    sudo apt-get install -y unzip curl wget jq
 
     # Install docker and K8s
     curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
@@ -41,6 +41,20 @@ function setup_k8s_minion(){
 
 function join_cni_network(){
     sudo route add $clusterip gw $masterip
+}
+
+function setup_openebs_flexvolumes() {
+    K8S_VOL_PLUGINDIR="/usr/libexec/kubernetes/kubelet-plugins/volume/exec/"
+    sudo mkdir -p ${K8S_VOL_PLUGINDIR}
+
+    ## Install the plugin for dedicated openebs-iscsi storage
+    sudo mkdir -p ${K8S_VOL_PLUGINDIR}/openebs~openebs-iscsi
+    wget https://raw.githubusercontent.com/openebs/openebs/master/k8s/lib/plugin/flexvolume/openebs-iscsi 
+    chmod +x openebs-iscsi 
+    sudo mv openebs-iscsi ${K8S_VOL_PLUGINDIR}/openebs~openebs-iscsi/
+
+    ## Restart the kubelet for the new volume plugins to take effect
+    sudo systemctl restart kubelet.service    
 }
 
 function show_help() {
@@ -180,3 +194,7 @@ setup_k8s_minion
 #Add route to the minion ip to the cluster ip
 echo Joining the CNI Network...
 join_cni_network
+
+#Install the OpenEBS FlexVolume Plugins
+setup_openebs_flexvolumes
+
