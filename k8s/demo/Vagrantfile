@@ -60,86 +60,13 @@ token = ""
 
 
 # Generic installer script common for server(s) & client(s)
-# This expects arguments that provide runtime values
-$kubeinstaller = <<SCRIPT
-#!/bin/bash
-echo Running the Kubernetes installer...
-
-# Update apt and get dependencies
-sudo apt-get update
-sudo apt-get install -y unzip curl wget
-
-# Install docker and K8s
-curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
-cat <<EOF > /etc/apt/sources.list.d/kubernetes.list
-deb http://apt.kubernetes.io/ kubernetes-xenial main
-EOF
-apt-get update
-# Install docker if you don't have it already.
-apt-get install -y docker.io
-apt-get install -y kubelet kubeadm kubectl kubernetes-cni
-
-#Install JSON Parser for patching kube-proxy
-apt-get install -y jq
-SCRIPT
-
-$kubeadminit = <<SCRIPT
-#!/bin/bash
-echo Will run the kubeadm init script ...
-
-#Run the kubeadm command with the master-ip
-kubeadm init --api-advertise-addresses=$1
-
-#Install the CNI network for Kubernetes
-kubectl create -f https://git.io/weave-kube
-SCRIPT
-
-$kubeproxypatch =<<SCRIPT
-
-echo Patching the kube-proxy for CNI Networks...
-
-#Patch kube-proxy to run with --proxy-mode=userspace
-kubectl -n kube-system get ds -l 'component=kube-proxy' -o json | jq '.items[0].spec.template.spec.containers[0].command |= .+ ["--proxy-mode=userspace"]' | kubectl apply -f - && kubectl -n kube-system delete pods -l 'component=kube-proxy'
-SCRIPT
-
-
-$mayainstaller = <<SCRIPT
-#!/bin/bash
-echo Running the Maya installer...
-
-# Update apt and get dependencies
-sudo apt-get update
-sudo apt-get install -y unzip curl wget
-
-# Install Maya binaries
-wget https://github.com/openebs/maya/releases/download/$1/maya-linux_amd64.zip
-unzip maya-linux_amd64.zip
-sudo mv maya /usr/bin
-rm -rf maya-linux_amd64.zip
-
-SCRIPT
-
-$mayavsmsetup = <<SCRIPT
-#Copy any maya job files if available
-mkdir -p /home/ubuntu/demo/maya/spec
-cd /vagrant/
-cp -u specs/demo*.hcl /home/ubuntu/demo/maya/spec 2>/dev/null || :
-
-SCRIPT
-
-$kubepodsetup = <<SCRIPT
-#Copy any pod yaml files if available
-mkdir -p /home/ubuntu/demo/k8s/spec
-cd /vagrant/
-cp -u specs/demo*.yaml /home/ubuntu/demo/k8s/spec 2>/dev/null || :
-
-SCRIPT
-
 $installerscripts = <<SCRIPT
+#!/bin/bash
 #Copy setup files - Needed for vagrant-triggers plugin.
 mkdir -p /home/ubuntu/demo/installer/scripts
 cd /vagrant/
 cp -u scripts/setup*.sh /home/ubuntu/demo/installer/scripts 2>/dev/null || :
+
 SCRIPT
 
 #$kubeminionsetup = <<SCRIPT
@@ -212,7 +139,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
            elsif(input == "y")
              break
            else
-             puts "Invalid input type: 'y' or 'n'"
+             puts "Invalid input: type 'y' or 'n'"
              input = STDIN.gets.chomp
            end
         end
@@ -229,10 +156,11 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
         # Run in dedicated deployment mode or hyperconverged mode
         if ((deploy_Mode.to_i == DEPLOY_MODE_DEDICATED.to_i) || (deploy_Mode.to_i == DEPLOY_MODE_HC.to_i))
+          
+          # Copy scripts to the demo folder.
+          vmCfg.vm.provision :shell, inline: $installerscripts, privileged: false
           # Install Kubernetes Master.
-          vmCfg.vm.provision :shell, path: "scripts/setup_k8s_master.sh", privileged: true        
-          # Kubernetes Pods - Yaml files location:          
-          vmCfg.vm.provision :shell, inline: $kubepodsetup, privileged: false
+          vmCfg.vm.provision :shell, path: "scripts/setup_k8s_master.sh", privileged: true          
         end
       end           
     end
@@ -248,43 +176,28 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         # Run in dedicated deployment mode or hyperconverged mode
         if ((deploy_Mode.to_i == DEPLOY_MODE_DEDICATED.to_i) || (deploy_Mode.to_i == DEPLOY_MODE_HC.to_i))
 
-          # Script will make some directories before installation procedure      
-          vmCfg.vm.provision :shell, inline: $kubeinstaller, privileged: true
-          # vmCfg.vm.provision :shell, inline: $kubeminionsetup, privileged: true
-          vmCfg.vm.provision :shell, inline: 'sed -i "/$1/ s/.*/$2\t$3/g" /etc/hosts', :args => "#{hostname} `#{machine_ip_address}` #{hostname}", privileged: true
-          #We want to run this only when the VM is first provisioned and get the Master IP to join the cluster
-
+          # Copy scripts to the demo folder.
+          vmCfg.vm.provision :shell, inline: $installerscripts, privileged: false
+          
+          # We want to run this only when the VM is first provisioned and get the Master IP to join the cluster
           vmCfg.vm.provision :trigger, :force => true, :stdout => true, :stderr => true do |trigger|
             trigger.fire do
               info"Getting the Master IP to join the cluster..."
               master_hostname = "kubemaster-01"
               get_ip_address = %Q(vagrant ssh #{master_hostname}  -c 'ifconfig | grep -oP "inet addr:\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}" | grep -oP "\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}" | tail -n 3 | head -n 1')            
               master_ip_address = `#{get_ip_address}`            
-              if master_ip_address == ""
-                  info"The Kubernetes Master is down, bring it up and manually run:"
-                  info"kubeadm join --token=<token> <master_ip_address>"
-                  info"in order to join the cluster."
-                  info"The Token can be obtained by running the following command on the Master Node:"
-                  info"kubectl -n kube-system get secret clusterinfo -o yaml | grep token-map | cut -d \":\" -f2 | cut -d \" \" -f2 | base64 -d | sed \"s|{||g;s|}||g\" | sed \"s|:|.|g\" | xargs echo"
+              if master_ip_address == ""            
+                  info"The Kubernetes Master is down, bring it up and manually run: setup_k8s_host.sh script on Kubernetes Minion."
               else                           
                   get_token = %Q(vagrant ssh #{master_hostname} -c 'kubectl -n kube-system get secret clusterinfo -o yaml | grep token-map | cut -d ":" -f2 | cut -d " " -f2 | base64 -d | sed "s|{||g;s|}||g" | sed "s|:|.|g" | xargs echo')
-                  token = `#{get_token}`
-                  get_ip_address = %Q(vagrant ssh #{hostname}  -c 'ifconfig | grep -oP "inet addr:\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}" | grep -oP "\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}" | tail -n 2 | head -n 1')      
-                  host_ip_address = `#{get_ip_address}`
-                  @machine.communicate.sudo("echo \"#{master_ip_address.strip} #{master_hostname}\" >> /etc/hosts")
-                  append_to_hosts = %Q(vagrant ssh #{master_hostname} -c 'echo #{host_ip_address.strip} #{hostname} | sudo tee -a /etc/hosts')               
-                  `#{append_to_hosts}`
-                  info"Setting up the Minion using IPAddress: #{master_ip_address}"
-                  info"Setting up the Minion using Token: #{token}"
+                  token = `#{get_token}`                  
+                  
                   if token != ""
                     get_cluster_ip = %Q(vagrant ssh #{master_hostname} -c 'kubectl get svc -o yaml | grep clusterIP | cut -d ":" -f2 | cut -d " " -f2')
-                    cluster_ip = `#{get_cluster_ip}`
-                    @machine.communicate.sudo("kubeadm join --token=#{token.strip} #{master_ip_address.strip}")
-                    info"Joining the CNI Network..."
-                    @machine.communicate.sudo("route add #{cluster_ip.strip} gw #{master_ip_address.strip}")
+                    cluster_ip = `#{get_cluster_ip}`                    
+                    @machine.communicate.sudo("bash /home/ubuntu/demo/installer/scripts/setup_k8s_host.sh --masterip=#{master_ip_address.strip} --token=#{token.strip} --clusterip=#{cluster_ip.strip}")
                   else
-                    info"Token cannot be empty. SSH into the Master and run the below command to get the token:"
-                    info"kubectl -n kube-system get secret clusterinfo -o yaml | grep token-map | cut -d \":\" -f2 | cut -d \" \" -f2 | base64 -d | sed \"s|{||g;s|}||g\" | sed \"s|:|.|g\" | xargs echo"
+                    info"Invalid Token. Check your Kubernetes setup."
                   end
               end  
             end
@@ -306,8 +219,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
           # Run in dedicated deployment mode
           if deploy_Mode.to_i == DEPLOY_MODE_DEDICATED.to_i
 
+            # Copy scripts to the demo folder.
+            vmCfg.vm.provision :shell, inline: $installerscripts, privileged: false
             # Install OpenEBS Maya Master
-            vmCfg.vm.provision :shell, path: "scripts/setup_omm.sh", :args => "-r #{MAYA_RELEASE_TAG}", privileged: true
+            vmCfg.vm.provision :shell, path: "scripts/setup_omm.sh", :args => "--releasetag=#{MAYA_RELEASE_TAG}", privileged: true
             
             vmCfg.vm.provision :trigger, :force => true, :stdout => true, :stderr => true do |trigger|
               trigger.fire do
@@ -315,9 +230,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
                 host_ip_address = `#{get_ip_address}`                
                 @machine.communicate.sudo("echo 'export NOMAD_ADDR=http://#{host_ip_address.strip}:4646' >> /home/ubuntu/.profile")                
               end
-            end
-            # Maya Jobs - HCL files location:
-            vmCfg.vm.provision :shell, inline: $mayavsmsetup, privileged: false
+            end            
           end      
         end
       end

@@ -1,14 +1,11 @@
 #!/bin/bash
 
-#Variables:
-machineip="0.0.0.0"
-hostname=`hostname`
-masterhostname=""
-masterip=""
-releasetag="0.0.1.0"
-usage="Usage : $(basename "$0") -i Master_IPAddress -r Release_Version"
+# Variables:
+machineip=
+masterip=
+releasetag=
 
-#Functions:
+# Functions:
 function get_machine_ip(){
     ifconfig | grep -oP "inet addr:\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}" | grep -oP "\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}" | tail -n 2 | head -n 1
 }
@@ -19,7 +16,11 @@ function install_osh(){
     sudo apt-get install -y unzip curl wget
 
     # Install Maya binaries
-    wget https://github.com/openebs/maya/releases/download/$releasetag/maya-linux_amd64.zip
+    if [ -z "$releasetag" ]; then
+        wget $(curl -sS $releaseurl | grep "browser_download_url" | awk '{print $2}' | tr -d '"' | head -n 2 | tail -n 1)
+    else    
+        wget https://github.com/openebs/maya/releases/download/$releasetag/maya-linux_amd64.zip
+    fi
     unzip maya-linux_amd64.zip
     sudo mv maya /usr/bin
     rm -rf maya-linux_amd64.zip
@@ -29,42 +30,87 @@ function setup_osh(){
     maya setup-osh -self-ip=$machineip -omm-ips=$masterip
 }
 
-#Code
-#Code:
-#Check whether we recieved the release version else show usage.
-# Reset if getopts was used previously
-OPTIND=1 
+function show_help() {
+    cat << EOF
+    Usage : $(basename "$0") --releasetag=[OpenEBS Maya Release Version]
+    Installs the OpenEBS Maya Version 
+    
+    -h|--help                           Display this help and exit.
+    -r|--release Maya Release Version   IP of kubemaster to join the cluster.    
+EOF
+}
+
+# Code:
+ 
 if (($# == 0)); then
-    echo $usage
+    show_help
     exit 2
 fi
 
-while getopts ":i:r:" options; do
-    case $options in        
-        i)  masterip=$OPTARG
-            ;;        
-        r)  releasetag=$OPTARG        
-            ;;    
-        \?) echo $usage
-            exit 1;;
-        *)  echo $usage
-            exit 1;;
+while :; do
+    case $1 in
+        -h|-\?|--help)  # Call a "show_help" function to display a synopsis, then exit.
+                        show_help
+                        exit
+                        ;;
+        
+        -i|--masterip)  # Takes an option argument, ensuring it has been specified.
+                        if [ -n "$2" ]; then
+                            masterip=$2
+                            shift
+                        else
+                            printf 'ERROR: "--masterip" requires a non-empty option argument.\n' >&2
+                            exit 1
+                        fi
+                        ;;
+        
+        --masterip=?*)  # Delete everything up to "=" and assign the remainder.
+                        masterip=${1#*=} 
+                        ;;
+        
+        --masterip=)    # Handle the case of an empty --masterip=
+                        printf 'ERROR: "--masterip" requires a non-empty option argument.\n' >&2
+                        exit 1
+                        ;;
+
+        -r|--releasetag) # Takes an option argument, ensuring it has been specified.
+                        if [ -n "$2" ]; then
+                            releasetag=$2
+                            shift
+                        else
+                            printf 'ERROR: "--token" requires a non-empty option argument.\n' >&2
+                            exit 1
+                        fi
+                        ;;
+        
+        --releasetag=?*) # Delete everything up to "=" and assign the remainder.
+                        releasetag=${1#*=} 
+                        ;;
+        
+        --releasetag=)  # Handle the case of an empty --token=
+                        printf 'ERROR: "--releasetag" requires a non-empty option argument.\n' >&2
+                        exit 1
+                        ;;
+        
+        --)             # End of all options.
+                        shift
+                        break
+                        ;;
+        
+        -?*)
+                        printf 'WARN: Unknown option (ignored): %s\n' "$1" >&2
+                        ;;
+
+        *)              # Default case: If no more options then break out of the loop.
+                        break
     esac
+shift
 done
 
-if [ "x" != "x$masterip" ]; then
-    if [ "x" == "x$releasetag" ]; then
-        echo "-i [option] requires -r [option]"
-        echo $usage
-        exit
-    fi
-fi
-if [ "x" != "x$releasetag" ]; then
-    if [ "x" == "x$masterip" ]; then
-        echo "-r [option] requires -i [option]"
-        echo $usage
-        exit
-    fi
+if [ -z "$masterip" ]; then
+    echo "MasterIP is mandatory."
+    show_help
+    exit    
 fi
 
 #Get the ip of the machine
