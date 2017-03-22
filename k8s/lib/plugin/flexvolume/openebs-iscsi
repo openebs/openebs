@@ -19,6 +19,14 @@
 # The exchanged spec files are located in /tmp/openebs/specs
 #
 
+#Initialize the logs and specs directory, if not already created
+#TBD : Check if this can be moved into the init section
+
+OEBSDEBUG=false
+SPECS_DIR="/tmp/openebs/specs"
+OLOGS_DIR="/tmp/logs/openebs-iscsi"
+mkdir -p ${OLOGS_DIR}
+mkdir -p ${SPECS_DIR}
 
 usage() {
     err "Invalid usage. Usage: "
@@ -29,13 +37,24 @@ usage() {
     exit 1
 }
 
+#Error response returned to the K8s-FlexVolume
+#The response should be a valid json. 
 err() {
     echo -ne $* 1>&2
 }
 
+#Success response returned to the K8s-FlexVolume
+#The response should be a valid json. 
 log() {
     echo -ne $* >&1
 }
+
+#Dump the debug information into a seperate logger
+#TBD : Check how to push this information into K8s loggers
+debug() {
+    if [ ${OEBSDEBUG} ]; then  echo -e $* >>  ${OLOGS_DIR}/openebs-iscsi.log; fi
+}
+
 
 ismounted() {
     MOUNT=`findmnt -n ${MNTPATH} 2>/dev/null | cut -d' ' -f1`
@@ -49,37 +68,60 @@ ismounted() {
 createvolumespec(){
     VOLUMENAME=$1
     VOLUMESIZE=$2
-    sudo mkdir -p /tmp/openebs/specs
-    echo -e "kind: PersistentVolumeClaim\napiVersion: v1\nmetadata:\n name: ${VOLUMENAME}\nspec:\n  accessModes:\n    - ReadWriteOnce\n  resources:\n    requests:\n      storage: ${VOLUMESIZE}\n" > "/tmp/openebs/specs/openebs-${VOLUMENAME}-pvc.yaml"
+
+    debug "createvolumespec for ${VOLUMENAME} of size ${VOLUMESIZE}"
+    #Clear the previously created volume spec
+    #TBD : Handle the case of multiple invocations
+    clearvolumespec ${VOLUMENAME}
+
+    echo -e "kind: PersistentVolumeClaim\n \
+apiVersion: v1\n \
+metadata:\n \
+name: ${VOLUMENAME}\n \
+spec:\n  accessModes:\n \
+    - ReadWriteOnce\n \
+resources:\n \
+   requests:\n \
+     storage: ${VOLUMESIZE}\n" > "${SPECS_DIR}/openebs-${VOLUMENAME}-pvc.yaml"
+
+    debug "createvolumespec created - ${SPECS_DIR}/openebs-${VOLUMENAME}-pvc.yaml"
+
 }
 
 clearvolumespec(){
     VOLUMENAME=$1
-    sudo rm -rf "/tmp/openebs/specs/openebs-${VOLUMENAME}-pvc.yaml"
+    debug "clearvolumespec ${VOLUMENAME}"
+    sudo rm -rf "${SPECS_DIR}/openebs-${VOLUMENAME}-pvc.yaml"
 }
 
 checkvolumeexists(){
     VOLUMENAME=$1      
     OPENEBS_API_URL=$2     
   
-    echo -e "checkvolumeexists ${VOLUMENAME} ${OPENEBS_API_URL}/volume/info/${VOLUMENAME}" >>  /tmp/logs/openebs-iscsi/openebs-iscsi.log
+    debug "checkvolumeexists ${VOLUMENAME} ${OPENEBS_API_URL}/volume/info/${VOLUMENAME}"
+
     # Get curl response as well as HTTP Code
-    response=$(curl --write-out %{http_code} --silent --output /tmp/logs/openebs-iscsi/checkvolumeexists.json "${OPENEBS_API_URL}/volume/info/${VOLUMENAME}")
-    #response=$(jq -r '.error_code' /tmp/logs/openebs-iscsi/checkvolumeexists.json)
-    if [ "${response}" == 404 ] ; then
-        # Volume doesn't exist
-        echo -e "checkvolumeexists - response is 404" >>  /tmp/logs/openebs-iscsi/openebs-iscsi.log
-        echo 0
-    else
+    response=$( curl --write-out %{http_code} --silent \
+                    --output /tmp/logs/openebs-iscsi/checkvolumeexists.json \
+                    "${OPENEBS_API_URL}/volume/info/${VOLUMENAME}" )
+
+    debug "checkvolumeexists - response code ${response} :" 
+    debug "checkvolumeexists - response $(cat /tmp/logs/openebs-iscsi/checkvolumeexists.json )" 
+
+    if [ "${response}" == 200 ] ; then
         # Volume Exists
-        echo -e "checkvolumeexists - response is assumed to be 200" >>  /tmp/logs/openebs-iscsi/openebs-iscsi.log
         targetportal=$(jq -r '.annotations.targetportal' /tmp/logs/openebs-iscsi/checkvolumeexists.json)
         iqn=$(jq -r '.annotations.iqn' /tmp/logs/openebs-iscsi/checkvolumeexists.json)
         data="${targetportal}\n${iqn}"
         echo -e "${data}" > /tmp/logs/openebs-iscsi/specs.txt
+        debug "checkvolumeexists - extracted details $(cat /tmp/logs/openebs-iscsi/specs.txt )" 
         echo 1
+    else
+        # Volume doesn't exist
+        echo 0
     fi
 }
+
 createvolume(){
     VOLUMENAME=$1
     OPENEBS_API_URL=$2
@@ -136,14 +178,15 @@ domount() {
     OPENEBS_API_URL=$(echo "$2" | jq -r '.openebsApiUrl')
     VOLUMENAME=$(echo "$2" | jq -r '.name')
     SIZE=$(echo "$2" | jq -r '.size')
-    DEBUG=$(echo "$2" | jq -r '.debug')
+    DEBUGIN=$(echo "$2" | jq -r '.debug')
     MOUNT_OPTIONS=$(echo "$2" | jq -r '.mountOptions')
 
     # Print logs
     LOGS="Mount Path is: $MNTPATH\nVolume Source is: $VOLUME_SRC\nFile System of the Volume is:$FSTYPE\nOpenEBS API URL: $OPENEBS_API_URL\nSize of the Volume: $SIZE\nMount Options for the Volume: $MOUNT_OPTIONS\nJSON Data received by openebs-iscsi driver:\n$2"
 
-    if [ "${DEBUG}" == "1" ] ; then
-        sudo mkdir -p /tmp/logs/openebs-iscsi/
+    if [ "${DEBUGIN}" == "1" ] ; then
+        OEBSDEBUG=true
+        #sudo mkdir -p /tmp/logs/openebs-iscsi/
         echo -e "${LOGS}" >>  /tmp/logs/openebs-iscsi/openebs-iscsi.log
     fi
 
