@@ -155,6 +155,7 @@ createvolume(){
         echo 1
     fi
 }
+
 deletevolume() {
     OPENEBS_API_URL=$1
     VOLUMENAME=$2
@@ -172,54 +173,61 @@ deletevolume() {
 }
 
 domount() {
+    #TBD Validate that the required parameters have been obtained.
+
     MNTPATH="$1"
+    DEBUGIN=$(echo "$2" | jq -r '.debug')
+    if [ "${DEBUGIN}" == "1" ] ; then
+        OEBSDEBUG=true
+    fi
+    debug "domount $1 $2"
+
+
     VOLUME_SRC=$(echo "$2" | jq -r '.source')
     FSTYPE=$(echo "$2" | jq -r '.["kubernetes.io/fsType"]')
+    MOUNT_OPTIONS=$(echo "$2" | jq -r '.mountOptions')
     OPENEBS_API_URL=$(echo "$2" | jq -r '.openebsApiUrl')
     VOLUMENAME=$(echo "$2" | jq -r '.name')
     SIZE=$(echo "$2" | jq -r '.size')
-    DEBUGIN=$(echo "$2" | jq -r '.debug')
-    MOUNT_OPTIONS=$(echo "$2" | jq -r '.mountOptions')
 
     # Print logs
-    LOGS="Mount Path is: $MNTPATH\nVolume Source is: $VOLUME_SRC\nFile System of the Volume is:$FSTYPE\nOpenEBS API URL: $OPENEBS_API_URL\nSize of the Volume: $SIZE\nMount Options for the Volume: $MOUNT_OPTIONS\nJSON Data received by openebs-iscsi driver:\n$2"
-
-    if [ "${DEBUGIN}" == "1" ] ; then
-        OEBSDEBUG=true
-        #sudo mkdir -p /tmp/logs/openebs-iscsi/
-        echo -e "${LOGS}" >>  /tmp/logs/openebs-iscsi/openebs-iscsi.log
-    fi
+    debug "domount Mount Path is : $MNTPATH"
+    debug "domount Volume Source is : $VOLUME_SRC"
+    debug "domount FS Type is : $FSTYPE"
+    debug "domount Mount Options is : $MOUNT_OPTIONS"
+    debug "domount OpenEBS API URL: $OPENEBS_API_URL"
+    debug "domount Volume Name: $VOLUMENAME"
+    debug "domount Volume Size: $SIZE"
 
     if [ $(ismounted) == 1 ] ; then
         log "{\"status\": \"Success\"}"
+        debug "domount volume is already mounted"
         exit 0
     fi
 
     status=$(checkvolumeexists "${VOLUMENAME}" "${OPENEBS_API_URL}")
-    if [ "${status}" -ne 0 ] ; then
-       # Volume already exists
-       exit 0
-    else
+    if [ "${status}" -eq 0 ] ; then
         # Volume doesn't exist, create Volume
-        status=$(createvolume "${VOLUMENAME}" "$OPENEBS_API_URL" "${SIZE}")
-        if [ "${status}" == 0 ] ; then
-            # Volume Creation Failed
-            exit 0
-
-        else
-            # Volume successfully created, get target portal and iqn values.
-            data=($(cat "/tmp/logs/openebs-iscsi/specs.txt"))
-            i=0
-            for t in "${data[@]}"
-            do
-                declare "var$i"=$t
-                i=$((i+1))
-            done
-            
-            targetportal="${var0}";
-            iqn="${var1}";
-        fi
+        debug "domount create a new volume at $OPENEBS_API_URL"
+        createvolume "${VOLUMENAME}" "$OPENEBS_API_URL" "${SIZE}"
     fi
+
+    # Volume successfully created, get target portal and iqn values.
+    # TBD - Add validation to check that the specs exist
+    # TBD - Add validation to handle multiple volume creation
+    data=($(cat "/tmp/logs/openebs-iscsi/specs.txt"))
+    i=0
+    for t in "${data[@]}"
+    do
+        declare "var$i"=$t
+        i=$((i+1))
+    done
+    targetportal="${var0}";
+    iqn="${var1}";
+
+    debug "domount volume at $targetportal and $iqn"
+    err "{ \"status\": \"Failed\", \"message\": \"WIP Failed to mount volume at ${MNTPATH}\"}"
+    exit 1
 
     #TBD
     #use iscsiadm to connect to targetportal,iqn,lun1
