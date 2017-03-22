@@ -225,15 +225,14 @@ domount() {
     targetportal="${var0}";
     iqn="${var1}";
 
-    #TBD Handle error cases
-    #TBD Handle multi-vsm scenario
+    #TBD 
     debug "domount volume at $targetportal and $iqn"
-    debug $(sudo iscsiadm -m discovery -t st -p $targetportal)
-    debug $(sudo iscsiadm -m node -l -T $iqn -p $targetportal)
+    debug $(sudo iscsiadm -m discovery -t st -p $targetportal 2>&1)
+    debug $(sudo iscsiadm -m node -l -T $iqn -p $targetportal 2>&1)
     devx=$(sudo iscsiadm -m session -P 3 |grep -i "Attached scsi disk" | awk '{print $4}')
     debug "domount - mounted iscsi device /dev/$devx as ${MNTPATH}" 
     sudo mkdir -p ${MNTPATH}
-    sudo mkfs.ext4 -F /dev/$devx
+    debug $(sudo mkfs.ext4 -F /dev/$devx)
     sudo mount -t ext4 /dev/$devx ${MNTPATH}
 
     if [ $? -ne 0 ]; then
