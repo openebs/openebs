@@ -74,15 +74,16 @@ createvolumespec(){
     #TBD : Handle the case of multiple invocations
     clearvolumespec ${VOLUMENAME}
 
-    echo -e "kind: PersistentVolumeClaim\n \
-apiVersion: v1\n \
-metadata:\n \
-name: ${VOLUMENAME}\n \
-spec:\n  accessModes:\n \
-    - ReadWriteOnce\n \
-resources:\n \
-   requests:\n \
-     storage: ${VOLUMESIZE}\n" > "${SPECS_DIR}/openebs-${VOLUMENAME}-pvc.yaml"
+    echo -e "kind: PersistentVolumeClaim\n\
+apiVersion: v1\n\
+metadata:\n\
+  name: ${VOLUMENAME}\n\
+spec:\n\
+  accessModes:\n\
+    - ReadWriteOnce\n\
+  resources:\n\
+    requests:\n\
+      storage: ${VOLUMESIZE}\n" > "${SPECS_DIR}/openebs-${VOLUMENAME}-pvc.yaml"
 
     debug "createvolumespec created - ${SPECS_DIR}/openebs-${VOLUMENAME}-pvc.yaml"
 
@@ -137,13 +138,21 @@ createvolume(){
     # if it doesn't exist
     createvolumespec "${VOLUMENAME}" "${VOLUMESIZE}"
 
+    # Get curl response as well as HTTP Code
+    response=$( curl --write-out %{http_code} --silent \
+                    --output /tmp/logs/openebs-iscsi/createvolume.json \
+                    --silent -k -H "Content-Type: application/yaml" \
+                    -XPOST -d "$(cat /tmp/openebs/specs/openebs-${VOLUMENAME}-pvc.yaml)" \
+                    "${OPENEBS_API_URL}/volumes/" )
+
+    sleep 30 
     # Wait for response from server
-    until $(curl --output /tmp/logs/openebs-iscsi/createvolume.json --silent --fail -k -H "Content-Type: application/yaml" \
-           -XPOST -d "$(cat /tmp/openebs/specs/openebs-${VOLUMENAME}-pvc.yaml)" \
-          "${OPENEBS_API_URL}/volumes/"); do
+    # until $(curl --output /tmp/logs/openebs-iscsi/createvolume.json --silent --fail -k -H "Content-Type: application/yaml" \
+    #        -XPOST -d "$(cat /tmp/openebs/specs/openebs-${VOLUMENAME}-pvc.yaml)" \
+    #       "${OPENEBS_API_URL}/volumes/"); do
     #printf '.'
-    sleep 5 
-    done
+    # sleep 5 
+    # done
 
     status=$(checkvolumeexists "${VOLUMENAME}" "${OPENEBS_API_URL}")
     if [ "${status}" == 0 ] ; then
