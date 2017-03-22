@@ -30,6 +30,10 @@ function setup_osh(){
     maya setup-osh -self-ip=$machineip -omm-ips=$masterip
 }
 
+function prepare_osh() {
+    sudo docker pull openebs/jiva:latest
+}
+
 function show_help() {
     cat << EOF
     Usage : $(basename "$0") --releasetag=[OpenEBS Maya Release Version]
@@ -123,3 +127,7 @@ install_osh
 #Join the Cluster
 echo Setting up the Host using IPAddress: $machineip
 setup_osh
+
+#Prepare for VSMs
+echo Downloading latest VSM image
+prepare_osh
