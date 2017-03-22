@@ -1,5 +1,25 @@
 #!/bin/bash
 
+# This file implements the K8s FlexVolume Interface
+#  for dedicated OpenEBS Storage, using iscsi to 
+#  connect to the OpenEBS VSM/Volume. 
+#
+# This file should be placed in the flexvolume plugin dir 
+# on all the  k8s minion nodes
+# 
+# This version only support two functions:
+# - mount : create an VSM if not already present and mount it 
+# - unmount : unmount the volume 
+#
+# Debug mode can be enabled by specifying "debug : 1", in the
+#  flexvolume options in the k8s yaml spec file. The logs will
+#  be stored under /tmp/logs/openebs-iscsi/openebs-iscsi.log
+#
+# For interacting with the OpenEBS storage, json/yaml files are used. 
+# The exchanged spec files are located in /tmp/openebs/specs
+#
+
+
 usage() {
     err "Invalid usage. Usage: "
     err "\t$0 init"
