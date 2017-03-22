@@ -41,15 +41,18 @@ clearvolumespec(){
 checkvolumeexists(){
     VOLUMENAME=$1      
     OPENEBS_API_URL=$2     
- 
+  
+    echo -e "checkvolumeexists ${VOLUMENAME} ${OPENEBS_API_URL}/volume/info/${VOLUMENAME}" >>  /tmp/logs/openebs-iscsi/openebs-iscsi.log
     # Get curl response as well as HTTP Code
     response=$(curl --write-out %{http_code} --silent --output /tmp/logs/openebs-iscsi/checkvolumeexists.json "${OPENEBS_API_URL}/volume/info/${VOLUMENAME}")
     #response=$(jq -r '.error_code' /tmp/logs/openebs-iscsi/checkvolumeexists.json)
     if [ "${response}" == 404 ] ; then
         # Volume doesn't exist
+        echo -e "checkvolumeexists - response is 404" >>  /tmp/logs/openebs-iscsi/openebs-iscsi.log
         echo 0
     else
         # Volume Exists
+        echo -e "checkvolumeexists - response is assumed to be 200" >>  /tmp/logs/openebs-iscsi/openebs-iscsi.log
         targetportal=$(jq -r '.annotations.targetportal' /tmp/logs/openebs-iscsi/checkvolumeexists.json)
         iqn=$(jq -r '.annotations.iqn' /tmp/logs/openebs-iscsi/checkvolumeexists.json)
         data="${targetportal}\n${iqn}"
@@ -111,6 +114,7 @@ domount() {
     VOLUME_SRC=$(echo "$2" | jq -r '.source')
     FSTYPE=$(echo "$2" | jq -r '.["kubernetes.io/fsType"]')
     OPENEBS_API_URL=$(echo "$2" | jq -r '.openebsApiUrl')
+    VOLUMENAME=$(echo "$2" | jq -r '.name')
     SIZE=$(echo "$2" | jq -r '.size')
     DEBUG=$(echo "$2" | jq -r '.debug')
     MOUNT_OPTIONS=$(echo "$2" | jq -r '.mountOptions')
