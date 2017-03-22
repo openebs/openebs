@@ -7,7 +7,7 @@ releasetag=
 
 # Functions:
 function get_machine_ip(){
-    ifconfig | grep -oP "inet addr:\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}" | grep -oP "\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}" | tail -n 2 | head -n 1
+    ifconfig | grep -oP "inet addr:\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}" | grep -oP "\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}" | sort | tail -n 1 | head -n 1
 }
 
 function install_osh(){
@@ -28,6 +28,10 @@ function install_osh(){
 
 function setup_osh(){
     maya setup-osh -self-ip=$machineip -omm-ips=$masterip
+}
+
+function prepare_osh() {
+    sudo docker pull openebs/jiva:latest
 }
 
 function show_help() {
@@ -123,3 +127,7 @@ install_osh
 #Join the Cluster
 echo Setting up the Host using IPAddress: $machineip
 setup_osh
+
+#Prepare for VSMs
+echo Downloading latest VSM image
+prepare_osh
