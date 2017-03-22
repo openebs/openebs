@@ -1,5 +1,25 @@
 #!/bin/bash
 
+# This file implements the K8s FlexVolume Interface
+#  for dedicated OpenEBS Storage, using iscsi to 
+#  connect to the OpenEBS VSM/Volume. 
+#
+# This file should be placed in the flexvolume plugin dir 
+# on all the  k8s minion nodes
+# 
+# This version only support two functions:
+# - mount : create an VSM if not already present and mount it 
+# - unmount : unmount the volume 
+#
+# Debug mode can be enabled by specifying "debug : 1", in the
+#  flexvolume options in the k8s yaml spec file. The logs will
+#  be stored under /tmp/logs/openebs-iscsi/openebs-iscsi.log
+#
+# For interacting with the OpenEBS storage, json/yaml files are used. 
+# The exchanged spec files are located in /tmp/openebs/specs
+#
+
+
 usage() {
     err "Invalid usage. Usage: "
     err "\t$0 init"
@@ -41,15 +61,18 @@ clearvolumespec(){
 checkvolumeexists(){
     VOLUMENAME=$1      
     OPENEBS_API_URL=$2     
- 
+  
+    echo -e "checkvolumeexists ${VOLUMENAME} ${OPENEBS_API_URL}/volume/info/${VOLUMENAME}" >>  /tmp/logs/openebs-iscsi/openebs-iscsi.log
     # Get curl response as well as HTTP Code
     response=$(curl --write-out %{http_code} --silent --output /tmp/logs/openebs-iscsi/checkvolumeexists.json "${OPENEBS_API_URL}/volume/info/${VOLUMENAME}")
     #response=$(jq -r '.error_code' /tmp/logs/openebs-iscsi/checkvolumeexists.json)
     if [ "${response}" == 404 ] ; then
         # Volume doesn't exist
+        echo -e "checkvolumeexists - response is 404" >>  /tmp/logs/openebs-iscsi/openebs-iscsi.log
         echo 0
     else
         # Volume Exists
+        echo -e "checkvolumeexists - response is assumed to be 200" >>  /tmp/logs/openebs-iscsi/openebs-iscsi.log
         targetportal=$(jq -r '.annotations.targetportal' /tmp/logs/openebs-iscsi/checkvolumeexists.json)
         iqn=$(jq -r '.annotations.iqn' /tmp/logs/openebs-iscsi/checkvolumeexists.json)
         data="${targetportal}\n${iqn}"
@@ -111,6 +134,7 @@ domount() {
     VOLUME_SRC=$(echo "$2" | jq -r '.source')
     FSTYPE=$(echo "$2" | jq -r '.["kubernetes.io/fsType"]')
     OPENEBS_API_URL=$(echo "$2" | jq -r '.openebsApiUrl')
+    VOLUMENAME=$(echo "$2" | jq -r '.name')
     SIZE=$(echo "$2" | jq -r '.size')
     DEBUG=$(echo "$2" | jq -r '.debug')
     MOUNT_OPTIONS=$(echo "$2" | jq -r '.mountOptions')

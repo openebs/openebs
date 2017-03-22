@@ -24,6 +24,6 @@ spec:
         name: "demo-vsm1-vol1"
         source: "/tmp/openebs-iscsi"
         mountOptions: "dir_mode=0755,file_mode=0644,rw"
-        openebsApiUrl: "http://172.28.128.5:5656/latest/"
+        openebsApiUrl: "http://172.28.128.5:5656/latest"
         size: "10Gi"
         debug: "1"
