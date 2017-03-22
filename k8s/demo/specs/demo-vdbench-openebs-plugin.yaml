@@ -25,5 +25,5 @@ spec:
         source: "/tmp/openebs-iscsi"
         mountOptions: "dir_mode=0755,file_mode=0644,rw"
         openebsApiUrl: "http://172.28.128.5:5656/latest"
-        size: "10Gi"
+        size: "5G"
         debug: "1"
