@@ -225,18 +225,20 @@ domount() {
     targetportal="${var0}";
     iqn="${var1}";
 
+    #TBD Handle error cases
+    #TBD Handle multi-vsm scenario
     debug "domount volume at $targetportal and $iqn"
-    err "{ \"status\": \"Failed\", \"message\": \"WIP Failed to mount volume at ${MNTPATH}\"}"
-    exit 1
-
-    #TBD
-    #use iscsiadm to connect to targetportal,iqn,lun1
-    #format the mounted disk
-    #mount the volume
+    debug $(sudo iscsiadm -m discovery -t st -p $targetportal)
+    debug $(sudo iscsiadm -m node -l -T $iqn -p $targetportal)
+    devx=$(sudo iscsiadm -m session -P 3 |grep -i "Attached scsi disk" | awk '{print $4}')
+    debug "domount - mounted iscsi device /dev/$devx as ${MNTPATH}" 
+    sudo mkdir -p ${MNTPATH}
+    sudo mkfs.ext4 -F /dev/$devx
+    sudo mount -t ext4 /dev/$devx ${MNTPATH}
 
     if [ $? -ne 0 ]; then
         2>&1
-        err '{ "status": "Failure", "message": "Failed to mount device '${VOLUME_SRC}' at '${MNTPATH}' , volume_src: '${VOLUME_SRC}'"}'
+        err '{ "status": "Failure", "message": "Failed to mount device '${MNTPATH}' , volume_src: '${devx}'"}'
         exit 1
     fi
     log '{"status": "Success"}'
