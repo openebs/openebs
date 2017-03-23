@@ -74,7 +74,8 @@ createvolumespec(){
     #TBD : Handle the case of multiple invocations
     clearvolumespec ${VOLUMENAME}
 
-    echo -e "kind: PersistentVolumeClaim\n\
+    echo -e "---\
+kind: PersistentVolumeClaim\n\
 apiVersion: v1\n\
 metadata:\n\
   name: ${VOLUMENAME}\n\
@@ -192,18 +193,12 @@ domount() {
     debug "domount $1 $2"
 
 
-    VOLUME_SRC=$(echo "$2" | jq -r '.source')
-    FSTYPE=$(echo "$2" | jq -r '.["kubernetes.io/fsType"]')
-    MOUNT_OPTIONS=$(echo "$2" | jq -r '.mountOptions')
     OPENEBS_API_URL=$(echo "$2" | jq -r '.openebsApiUrl')
     VOLUMENAME=$(echo "$2" | jq -r '.name')
     SIZE=$(echo "$2" | jq -r '.size')
 
     # Print logs
     debug "domount Mount Path is : $MNTPATH"
-    debug "domount Volume Source is : $VOLUME_SRC"
-    debug "domount FS Type is : $FSTYPE"
-    debug "domount Mount Options is : $MOUNT_OPTIONS"
     debug "domount OpenEBS API URL: $OPENEBS_API_URL"
     debug "domount Volume Name: $VOLUMENAME"
     debug "domount Volume Size: $SIZE"
