@@ -118,6 +118,7 @@ checkvolumeexists(){
         echo 1
     else
         # Volume doesn't exist
+        echo -e "Volume Doesn't already exist" >> /tmp/logs/openebs-iscsi/openebs-iscsi.log
         echo 0
     fi
 }
@@ -128,15 +129,18 @@ createvolume(){
     VOLUMESIZE=$3
 
     # Check if volume already exists
+    echo -e "Above status check in checkvolumeexists" >> /tmp/logs/openebs-iscsi/openebs-iscsi.log
     status=$(checkvolumeexists "${VOLUMENAME}" "${OPENEBS_API_URL}")
     if [ "${status}" -ne 0 ] ; then
        # Volume already exists
+       echo -e "Inside create volume ${status}" >> /tmp/logs/openebs-iscsi/openebs-iscsi.log
        exit 0
     fi
     
     # if it doesn't exist
+    echo -e "Above createvolumespec" >> /tmp/logs/openebs-iscsi/openebs-iscsi.log
     createvolumespec "${VOLUMENAME}" "${VOLUMESIZE}"
-
+    echo -e "After create volumespec" >> /tmp/logs/openebs-iscsi/openebs-iscsi.log
     # Wait for response from server
     until $(curl --output /tmp/logs/openebs-iscsi/createvolume.json --silent --fail -k -H "Content-Type: application/yaml" \
            -XPOST -d "$(cat /tmp/openebs/specs/openebs-${VOLUMENAME}-pvc.yaml)" \
@@ -148,10 +152,12 @@ createvolume(){
     status=$(checkvolumeexists "${VOLUMENAME}" "${OPENEBS_API_URL}")
     if [ "${status}" == 0 ] ; then
        # Error while creating volume
+    echo -e "Error while creating volume, status is: $status" >> /tmp/logs/openebs-iscsi/openebs-iscsi.log
        echo 0
     else
         # Volume created successfully
-        clearvolumespec "${VOLUMENAME}"
+        echo -e "Volume created successfully" >> /tmp/logs/openebs-iscsi/openebs-iscsi.log
+        #clearvolumespec "${VOLUMENAME}"
         echo 1
     fi
 }
@@ -164,7 +170,7 @@ deletevolume() {
     response=$(jq -r '.Status.Reason' /tmp/logs/openebs-iscsi/deletevolume.json)
     if [ "${response}" == "complete" ] ; then
         # Volume Deleted.
-        clearvolumespec "${VOLUMENAME}"
+        #clearvolumespec "${VOLUMENAME}"
         echo 1
     else
         # Error while deleting volume.
