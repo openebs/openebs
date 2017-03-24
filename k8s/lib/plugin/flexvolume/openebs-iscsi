@@ -21,7 +21,6 @@
 
 #Initialize the logs and specs directory, if not already created
 #TBD : Check if this can be moved into the init section
-
 OEBSDEBUG=false
 SPECS_DIR="/tmp/openebs/specs"
 OLOGS_DIR="/tmp/logs/openebs-iscsi"
@@ -69,10 +68,10 @@ createvolumespec(){
     VOLUMENAME=$1
     VOLUMESIZE=$2
 
-    debug "createvolumespec for ${VOLUMENAME} of size ${VOLUMESIZE}"
+    #debug "createvolumespec for ${VOLUMENAME} of size ${VOLUMESIZE}"
     #Clear the previously created volume spec
     #TBD : Handle the case of multiple invocations
-    clearvolumespec ${VOLUMENAME}
+    #clearvolumespec ${VOLUMENAME}
 
     echo -e "---\
 kind: PersistentVolumeClaim\n\
@@ -100,27 +99,37 @@ checkvolumeexists(){
     VOLUMENAME=$1      
     OPENEBS_API_URL=$2     
   
-    debug "checkvolumeexists ${VOLUMENAME} ${OPENEBS_API_URL}/volume/info/${VOLUMENAME}"
+    #debug "checkvolumeexists ${VOLUMENAME} ${OPENEBS_API_URL}/volume/info/${VOLUMENAME}"
 
     # Get curl response as well as HTTP Code
-    response=$( curl --write-out %{http_code} --silent \
-                    --output /tmp/logs/openebs-iscsi/checkvolumeexists.json \
-                    "${OPENEBS_API_URL}/volume/info/${VOLUMENAME}" )
+    response=$( curl --write-out %{http_code} --silent --output /tmp/logs/openebs-iscsi/checkvolumeexists.json "${OPENEBS_API_URL}/volume/info/${VOLUMENAME}" )
+    status=$(jq -r '.Status.Reason' /tmp/logs/openebs-iscsi/checkvolumeexists.json)
 
-    debug "checkvolumeexists - response code ${response} :" 
-    debug "checkvolumeexists - response $(cat /tmp/logs/openebs-iscsi/checkvolumeexists.json )" 
-
-    if [ "${response}" == 200 ] ; then
+    #debug "checkvolumeexists - response code ${response} :" 
+    #debug "checkvolumeexists - response $(cat /tmp/logs/openebs-iscsi/checkvolumeexists.json )" 
+    echo "Response code in checkvolumeexists method is ${response}" >> "/tmp/logs/openebs-iscsi/openebs-iscsi.log"
+    if [[ "${response}" == "200" ]] && [[ "${status}" == "pending" ]] ; then
         # Volume Exists
         targetportal=$(jq -r '.annotations.targetportal' /tmp/logs/openebs-iscsi/checkvolumeexists.json)
         iqn=$(jq -r '.annotations.iqn' /tmp/logs/openebs-iscsi/checkvolumeexists.json)
         data="${targetportal}\n${iqn}"
-        echo -e "${data}" > /tmp/logs/openebs-iscsi/specs.txt
+        echo -e "${data}" > "/tmp/logs/openebs-iscsi/specs.txt"
         debug "checkvolumeexists - extracted details $(cat /tmp/logs/openebs-iscsi/specs.txt )" 
+        echo -e "Inside check volume, VSM is in Pending State.. Response from openebs api server is ${response} output is 1" >> "/tmp/logs/openebs-iscsi/openebs-iscsi.log"
         echo 1
+
+    elif [[ "${response}" == "200" ]] && [[ "${status}" == "complete" ]] ; then
+        targetportal=$(jq -r '.annotations.targetportal' /tmp/logs/openebs-iscsi/checkvolumeexists.json)
+        iqn=$(jq -r '.annotations.iqn' /tmp/logs/openebs-iscsi/checkvolumeexists.json)
+        data="${targetportal}\n${iqn}"
+        echo -e "${data}" > "/tmp/logs/openebs-iscsi/specs.txt"
+        debug "checkvolumeexists - extracted details $(cat /tmp/logs/openebs-iscsi/specs.txt )" 
+        echo -e "Inside check volume, VSM is in Complete State.. Response from openebs api server is ${response}, output is 2" >> "/tmp/logs/openebs-iscsi/openebs-iscsi.log"
+        echo 2
     else
         # Volume doesn't exist
-        echo -e "Volume Doesn't already exist" >> /tmp/logs/openebs-iscsi/openebs-iscsi.log
+        echo -e "Volume Doesn't already exist" >> "/tmp/logs/openebs-iscsi/openebs-iscsi.log"
+        echo -e "Inside check volume, response from openebs api server is ${response}, output is 0" >> "/tmp/logs/openebs-iscsi/openebs-iscsi.log"
         echo 0
     fi
 }
@@ -131,44 +140,66 @@ createvolume(){
     VOLUMESIZE=$3
 
     # Check if volume already exists
-    echo -e "Above status check in checkvolumeexists" >> /tmp/logs/openebs-iscsi/openebs-iscsi.log
+    echo -e "Calling checkvolumeexists from createvolume method" >> "/tmp/logs/openebs-iscsi/openebs-iscsi.log"
     status=$(checkvolumeexists "${VOLUMENAME}" "${OPENEBS_API_URL}")
     if [ "${status}" -ne 0 ] ; then
        # Volume already exists
-       echo -e "Inside create volume ${status}" >> /tmp/logs/openebs-iscsi/openebs-iscsi.log
+       echo -e "Inside create volume ${status}" >> "/tmp/logs/openebs-iscsi/openebs-iscsi.log"
        exit 0
     fi
     
     # if it doesn't exist
-    echo -e "Above createvolumespec" >> /tmp/logs/openebs-iscsi/openebs-iscsi.log
+    echo -e "Above createvolumespec" >> "/tmp/logs/openebs-iscsi/openebs-iscsi.log"
     createvolumespec "${VOLUMENAME}" "${VOLUMESIZE}"
 
     # Get curl response as well as HTTP Code
-    response=$( curl --write-out %{http_code} --silent \
-                    --output /tmp/logs/openebs-iscsi/createvolume.json \
-                    --silent -k -H "Content-Type: application/yaml" \
-                    -XPOST -d "$(cat /tmp/openebs/specs/openebs-${VOLUMENAME}-pvc.yaml)" \
-                    "${OPENEBS_API_URL}/volumes/" )
 
-    sleep 30 
-    # Wait for response from server
-    # until $(curl --output /tmp/logs/openebs-iscsi/createvolume.json --silent --fail -k -H "Content-Type: application/yaml" \
-    #        -XPOST -d "$(cat /tmp/openebs/specs/openebs-${VOLUMENAME}-pvc.yaml)" \
-    #       "${OPENEBS_API_URL}/volumes/"); do
-    #printf '.'
-    # sleep 5 
-    # done
+#   response=$( curl --write-out %{http_code} --silent --output "/tmp/logs/openebs-iscsi/createvolume.json" --silent -k -H "Content-Type: application/yaml" -XPOST -d $(cat "/tmp/openebs/specs/openebs-${VOLUMENAME}-pvc.yaml") "${OPENEBS_API_URL}/volumes/")
+    
+     echo "Issuing curl to create volume in create volume method" >> "/tmp/logs/openebs-iscsi/openebs-iscsi.log"
 
-    status=$(checkvolumeexists "${VOLUMENAME}" "${OPENEBS_API_URL}")
-    if [ "${status}" == 0 ] ; then
-       # Error while creating volume
-    echo -e "Error while creating volume, status is: $status" >> /tmp/logs/openebs-iscsi/openebs-iscsi.log
-       echo 0
-    else
-        # Volume created successfully
-        echo -e "Volume created successfully" >> /tmp/logs/openebs-iscsi/openebs-iscsi.log
-        #clearvolumespec "${VOLUMENAME}"
+    curl --write-out %{http_code} --output "/tmp/logs/openebs-iscsi/createvolume.json" --silent --fail -k -H "Content-Type: application/yaml" -XPOST -d "$(cat /tmp/openebs/specs/openebs-${VOLUMENAME}-pvc.yaml)" "${OPENEBS_API_URL}/volumes/"
+    status=$(jq -r '.annotations.evalstatus' /tmp/logs/openebs-iscsi/createvolume.json)
+    #cat /tmp/logs/openebs-iscsi/createvolume.json | jq -r '.annotations.evalstatus'
+    if [ $status == "complete" ]; then
+        echo "Inside Create volume, Volume Creation complete..Response code from ${response}" >> "/tmp/logs/openebs-iscsi/openebs-iscsi.log"
         echo 1
+    
+    else
+    # Total 10 attempts to create a volume    
+        i=1
+        while [ $i -lt 10 ]
+        do       
+            echo -e "Calling checkvolumeexists from createvolume method $i" >> "/tmp/logs/openebs-iscsi/openebs-iscsi.log"     
+            status=$(checkvolumeexists "${VOLUMENAME}" "${OPENEBS_API_URL}")
+            
+            # Pending State
+            if [[ "${status}" == 1 ]] ; then
+                #VSM in pending state
+                echo -e "VSM created, but in pending state response is: $response" >> "/tmp/logs/openebs-iscsi/openebs-iscsi.log"
+                echo 0
+
+            # Complete State
+            elif [[ "${status}" == 2 ]]; then
+                # Volume created successfully
+                echo -e "VSM created successfully, response is: $response" >> "/tmp/logs/openebs-iscsi/openebs-iscsi.log"
+                #clearvolumespec "${VOLUMENAME}"
+                break
+                echo 1
+
+            # Volume Creation Error. Volume not created. ${status}=0 
+            else
+                echo -e "Error while creating VSM, response is: $response" >> "/tmp/logs/openebs-iscsi/openebs-iscsi.log"
+                echo 0
+            fi
+            
+            if [ $i == 10 ]; then
+               echo "Exceeded number of requests to maya server.. Response code from ${response}" >> "/tmp/logs/openebs-iscsi/openebs-iscsi.log"
+            fi
+            
+            i=$((i+1))
+            sleep 10
+        done
     fi
 }
 
@@ -176,7 +207,7 @@ deletevolume() {
     OPENEBS_API_URL=$1
     VOLUMENAME=$2
 
-    curl "${OPENEBS_API_URL}/volume/delete/${VOLUMENAME}" > /tmp/logs/openebs-iscsi/deletevolume.json 
+    curl "${OPENEBS_API_URL}/volume/delete/${VOLUMENAME}" > "/tmp/logs/openebs-iscsi/deletevolume.json "
     response=$(jq -r '.Status.Reason' /tmp/logs/openebs-iscsi/deletevolume.json)
     if [ "${response}" == "complete" ] ; then
         # Volume Deleted.
@@ -214,12 +245,28 @@ domount() {
         debug "domount volume is already mounted"
         exit 0
     fi
-
+    echo "" > "/tmp/logs/openebs-iscsi/openebs-iscsi.log"
+    echo -e "Calling checkvolumeexists from domount method" >> "/tmp/logs/openebs-iscsi/openebs-iscsi.log"
     status=$(checkvolumeexists "${VOLUMENAME}" "${OPENEBS_API_URL}")
     if [ "${status}" -eq 0 ] ; then
         # Volume doesn't exist, create Volume
         debug "domount create a new volume at $OPENEBS_API_URL"
-        createvolume "${VOLUMENAME}" "$OPENEBS_API_URL" "${SIZE}"
+        status_volume=$( createvolume "${VOLUMENAME}" "$OPENEBS_API_URL" "${SIZE}" )
+        if [[ $status_volume == 0 ]]; then
+            echo -e "In do Mount method, volume creation failed, status is $status" >> "/tmp/logs/openebs-iscsi/openebs-iscsi.log"            
+            exit 0
+
+        elif [[ $status_volume == 1 ]]; then
+            echo -e "In do Mount method, Volume Created successfully $status" >> "/tmp/logs/openebs-iscsi/openebs-iscsi.log"            
+        else
+            echo -e "Unknown Error" >> "/tmp/logs/openebs-iscsi/openebs-iscsi.log"            
+        fi
+
+    elif [[ "${status}" -eq 1 ]]; then
+        #statements
+        echo -e "In do Mount method, volume In Pending State" >> "/tmp/logs/openebs-iscsi/openebs-iscsi.log"
+    else
+        echo -e "In do Mount method, volume already created" >> "/tmp/logs/openebs-iscsi/openebs-iscsi.log"
     fi
 
     # Volume successfully created, get target portal and iqn values.
@@ -242,11 +289,13 @@ domount() {
     devx=$(sudo iscsiadm -m session -P 3 |grep -i "Attached scsi disk" | awk '{print $4}')
     # The device can take a few more seconds to appear under /dev
     waiti=0
-    while devx==""; do
+    #while [ $i -lt 10 ]
+    while [ "${devx}" == "" ]
+    do
         sleep 5
         devx=$(iscsiadm -m session -P 3 |grep -i "Attached scsi disk" | awk '{print $4}')
         waiti=waiti+1
-        if waiti==5; then
+        if [ "${waiti}" == 5 ]; then
                 break
         else
                 continue
