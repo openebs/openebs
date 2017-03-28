@@ -224,14 +224,52 @@ domount() {
     #TBD Validate that the required parameters have been obtained.
 
     MNTPATH="$1"
+    echo "Mount Path ${MNTPATH}" >> ${OLOGS_DIR}/openebs-iscsi.log
+
+    if [ -n "$MNTPATH" ] ; then
+        echo "Mount Path ${MNTPATH}" >> ${OLOGS_DIR}/openebs-iscsi.log
+    else
+        echo "Mount Path Not specified" >> ${OLOGS_DIR}/openebs-iscsi.log
+        exit 0
+    fi
+
     DEBUGIN=$(echo "$2" | jq -r '.debug')
     if [ "${DEBUGIN}" == "1" ] ; then
         OEBSDEBUG=true
     fi
+
     debug "domount $1 $2"
+
+    ip_regex="(^http://)[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+:5656/latest+$"
+
     OPENEBS_API_URL=$(echo "$2" | jq -r '.openebsApiUrl')
-    VOLUMENAME=$(echo "$2" | jq -r '.name')
+    
+    if [ "${OPENEBS_API_URL}" =~ "${ip_regex}" ] && [ -n "$OPENEBS_API_URL" ]
+    then
+        echo "Valid OPENEBS_API_URL" >> ${OLOGS_DIR}/openebs-iscsi.log
+    else
+        echo "Invalid OPENEBS_API_URL..Try again" >> ${OLOGS_DIR}/openebs-iscsi.log
+        exit 0
+    fi
+
     SIZE=$(echo "$2" | jq -r '.size')
+    # If size is not specified, set 5GB as default size
+
+    if [ -n "${SIZE}" ] ; then
+        echo "Valid Volume Size" >> ${OLOGS_DIR}/openebs-iscsi.log
+    else
+        SIZE="5G"
+        echo "Volume Size not specified. Setting 5GB as default" >> ${OLOGS_DIR}/openebs-iscsi.log
+    fi
+
+    VOLUMENAME=$(echo "$2" | jq -r '.name')
+    # Volume name not specified
+    if [ -n "$VOLUMENAME" ] ; then
+        echo "Volume Name: ${VOLUMENAME}" >> ${OLOGS_DIR}/openebs-iscsi.log
+    else
+        echo "No Volume Name Provided.. Please retry.." >> ${OLOGS_DIR}/openebs-iscsi.log
+        exit 0
+    fi    
 
     # Print logs
     debug "domount Mount Path is : $MNTPATH"
@@ -244,7 +282,7 @@ domount() {
         debug "domount volume is already mounted"
         exit 0
     fi
-    echo -e "Calling checkvolumeexists from domount method" > ${OLOGS_DIR}/openebs-iscsi.log
+    echo -e "Calling checkvolumeexists from domount method" >> ${OLOGS_DIR}/openebs-iscsi.log
     status=$(checkvolumeexists "${VOLUMENAME}" "${OPENEBS_API_URL}")
     status_volume=0
     if [ "${status}" == 0 ] ; then
@@ -274,7 +312,13 @@ domount() {
 
     # Volume successfully created, get target portal and iqn values.
     # TBD - Add validation to check that the specs exist
-    # TBD - Add validation to handle multiple volume creation
+
+    if [ ! -f "/tmp/logs/openebs-iscsi/specs.txt" ]; then
+        echo "Specs file not found!"
+    fi
+
+    # TBD - Add validation to handle multiple volume creation- Left
+
     data=($(cat "/tmp/logs/openebs-iscsi/specs.txt"))
     i=0
     for t in "${data[@]}"
@@ -292,7 +336,7 @@ domount() {
     devx=$(sudo iscsiadm -m session -P 3 |grep -i "Attached scsi disk" | awk '{print $4}')
     # The device can take a few more seconds to appear under /dev
     waiti=0
-    while [ "${devx}"=="" ]; do
+    while [ "${devx}" == "" ]; do
         sleep 5
         devx=$(iscsiadm -m session -P 3 |grep -i "Attached scsi disk" | awk '{print $4}')
         waiti=$((waiti+1))
