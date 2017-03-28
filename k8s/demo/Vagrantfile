@@ -117,7 +117,9 @@ end
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
     #Dont look for updates
-    config.vbguest.auto_update = false
+    if Vagrant.has_plugin?("vagrant-vbguest") then
+        config.vbguest.auto_update = false
+    end
 
     #Check for invalid deployment modes and default to DEDICATED MODE.  
     if ((deploy_Mode.to_i < DEPLOY_MODE_NONE.to_i) || (deploy_Mode.to_i > DEPLOY_MODE_HC.to_i))
