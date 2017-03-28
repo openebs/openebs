@@ -23,7 +23,7 @@ DEPLOY_MODE_HC = 2
 deploy_Mode=ENV['OPENEBS_DEPLOY_MODE'] || 1
 
 #Specify the release versions to be installed
-MAYA_RELEASE_TAG = ENV['MAYA_RELEASE_TAG'] || "0.2-RC1"
+MAYA_RELEASE_TAG = ENV['MAYA_RELEASE_TAG'] || "0.2-RC2"
 
 #Specify the number of Kubernetes Master nodes, CPU/RAM per node. 
 KM_NODES = ENV['KM_NODES'] || 1
@@ -41,7 +41,7 @@ MM_MEM = ENV['MM_MEM'] || 1024
 MM_CPUS = ENV['MM_CPUS'] || 1
 
 #Specify the number of OpenEBS Storage Host nodes, CPU/RAM per node. (Applicable only for dedicated mode)
-MH_NODES = ENV['MH_NODES'] || 1
+MH_NODES = ENV['MH_NODES'] || 2
 MH_MEM = ENV['MH_MEM'] || 1024
 MH_CPUS = ENV['MH_CPUS'] || 1
 
@@ -117,7 +117,9 @@ end
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
     #Dont look for updates
-    config.vbguest.auto_update = false
+    if Vagrant.has_plugin?("vagrant-vbguest") then
+        config.vbguest.auto_update = false
+    end
 
     #Check for invalid deployment modes and default to DEDICATED MODE.  
     if ((deploy_Mode.to_i < DEPLOY_MODE_NONE.to_i) || (deploy_Mode.to_i > DEPLOY_MODE_HC.to_i))

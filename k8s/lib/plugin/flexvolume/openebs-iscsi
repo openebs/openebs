@@ -282,7 +282,8 @@ domount() {
         debug "domount volume is already mounted"
         exit 0
     fi
-    echo -e "Calling checkvolumeexists from domount method" >> ${OLOGS_DIR}/openebs-iscsi.log
+
+    echo -e "Calling checkvolumeexists from domount method" > ${OLOGS_DIR}/openebs-iscsi.log
     status=$(checkvolumeexists "${VOLUMENAME}" "${OPENEBS_API_URL}")
     status_volume=0
     if [ "${status}" == 0 ] ; then
