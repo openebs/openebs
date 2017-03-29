@@ -36,7 +36,7 @@ function show_help() {
     Installs the OpenEBS Maya Version 
     
     -h|--help                           Display this help and exit.
-    -r|--release Maya Release Version   IP of kubemaster to join the cluster.    
+    -r|--release Maya Release Version   Maya Release Version to install.    
 EOF
 }
 
