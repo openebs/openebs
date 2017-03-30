@@ -224,7 +224,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
               trigger.fire do
                 get_ip_address = %Q(vagrant ssh #{hostname}  -c 'ifconfig | grep -oP "inet addr:\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}" | grep -oP "\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}" | sort | tail -n 1 | head -n 1')      
                 host_ip_address = `#{get_ip_address}`                
-                @machine.communicate.sudo("echo 'export NOMAD_ADDR=http://#{host_ip_address.strip}:4646' >> /home/ubuntu/.profile")                
+                @machine.communicate.sudo("echo 'export NOMAD_ADDR=http://#{host_ip_address.strip}:4646' >> /home/ubuntu/.profile") 
+		@machine.communicate.sudo("echo 'export MAPI_ADDR=http://#{host_ip_address.strip}:5656' >> /home/ubuntu/.profile")
               end
             end            
           end      
@@ -262,6 +263,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
                   host_ip_address = `#{get_ip_address}`                                                          
                   @machine.communicate.sudo("bash /home/ubuntu/demo/installer/scripts/setup_osh.sh -i #{master_ip_address.strip} -r #{MAYA_RELEASE_TAG}")
                   @machine.communicate.sudo("echo 'export NOMAD_ADDR=http://#{host_ip_address.strip}:4646' >> /home/ubuntu/.profile")
+		  @machine.communicate.sudo("echo 'export MAPI_ADDR=http://#{host_ip_address.strip}:5656' >> /home/ubuntu/.profile")
                 end  
               end
             end
