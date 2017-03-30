@@ -31,7 +31,7 @@ function get_machine_ip(){
 }
 
 function setup_k8s_master(){
-    sudo kubeadm init --api-advertise-addresses=$machineip
+    sudo kubeadm init --apiserver-advertise-address=$machineip
     kubectl create -f https://git.io/weave-kube
 }
 
