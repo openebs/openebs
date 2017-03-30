@@ -20,7 +20,7 @@ EOF
     sudo apt-get update
     # Install docker if you don't have it already.
     sudo apt-get install -y docker.io
-    sudo apt-get install -y kubelet kubeadm kubectl kubernetes-cni
+    sudo apt-get install -y --allow-unauthenticated kubelet kubeadm kubectl kubernetes-cni
 
     #Install JSON Parser for patching kube-proxy
     sudo apt-get install -y jq
@@ -31,8 +31,9 @@ function get_machine_ip(){
 }
 
 function setup_k8s_master(){
+    #sudo kubeadm init --apiserver-advertise-address=$machineip
     sudo kubeadm init --apiserver-advertise-address=$machineip
-    kubectl create -f https://git.io/weave-kube
+    sudo kubectl create --kubeconfig=/etc/kubernetes/admin.conf -f https://git.io/weave-kube
 }
 
 function update_hosts(){
@@ -40,7 +41,9 @@ function update_hosts(){
 }
 
 function patch_kube_proxy(){
-    kubectl -n kube-system get ds -l 'component=kube-proxy' -o json | jq '.items[0].spec.template.spec.containers[0].command |= .+ ["--proxy-mode=userspace"]' | kubectl apply -f - && kubectl -n kube-system delete pods -l 'component=kube-proxy'
+    sudo kubectl --kubeconfig=/etc/kubernetes/admin.conf -n kube-system get ds -l 'component=kube-proxy' -o json | \
+        jq '.items[0].spec.template.spec.containers[0].command |= .+ ["--proxy-mode=userspace"]' | \ 
+        sudo kubectl apply --kubeconfig=/etc/kubernetes/admin.conf -f - && sudo kubectl --kubeconfig=/etc/kubernetes/admin.conf -n kube-system delete pods -l 'component=kube-proxy'
 }
 
 function download_specs(){
