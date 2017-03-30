@@ -230,7 +230,8 @@ domount() {
         echo "Mount Path ${MNTPATH}" >> ${OLOGS_DIR}/openebs-iscsi.log
     else
         echo "Mount Path Not specified" >> ${OLOGS_DIR}/openebs-iscsi.log
-        exit 0
+        err '{ "status": "Failure", "message": "Mount Path Not Specified in yaml file-> '${OPENEBS_API_URL}'"}'
+        exit 1
     fi
 
     DEBUGIN=$(echo "$2" | jq -r '.debug')
@@ -243,14 +244,24 @@ domount() {
     ip_regex="(^http://)[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+:5656/latest+$"
 
     OPENEBS_API_URL=$(echo "$2" | jq -r '.openebsApiUrl')
-    
-    if [ "${OPENEBS_API_URL}" =~ "${ip_regex}" ] && [ -n "$OPENEBS_API_URL" ]
-    then
-        echo "Valid OPENEBS_API_URL" >> ${OLOGS_DIR}/openebs-iscsi.log
+
+    if [ -n "$OPENEBS_API_URL" ] ; then
+        # OPENEBS_API_URL is set
+        if [[ "${OPENEBS_API_URL}" =~ ${ip_regex} ]]; then
+        # OPENEBS_API_URL is Valid
+            echo "Valid OPENEBS_API_URL" >> ${OLOGS_DIR}/openebs-iscsi.log
+        else
+        # OPENEBS_API_URL is Invalid
+            echo "Invalid OPENEBS_API_URL-> ${OPENEBS_API_URL}...Try again" >> ${OLOGS_DIR}/openebs-iscsi.log
+            err '{ "status": "Failure", "message": "Invalid OPENEBS_API_URL-> '${OPENEBS_API_URL}'"}'
+            exit 1
+        fi
     else
-        echo "Invalid OPENEBS_API_URL..Try again" >> ${OLOGS_DIR}/openebs-iscsi.log
-        exit 0
-    fi
+        # OPENEBS_API_URL Not Set in yaml file
+        echo "OPENEBS_API_URL Not Specified in yaml file..Try again" >> ${OLOGS_DIR}/openebs-iscsi.log
+        err '{ "status": "Failure", "message": "OPENEBS_API_URL Not Specified in yaml file"}'
+        exit 1
+    fi 
 
     SIZE=$(echo "$2" | jq -r '.size')
     # If size is not specified, set 5GB as default size
@@ -263,14 +274,29 @@ domount() {
     fi
 
     VOLUMENAME=$(echo "$2" | jq -r '.name')
-    # Volume name not specified
+    # Volume name mentioned
     if [ -n "$VOLUMENAME" ] ; then
         echo "Volume Name: ${VOLUMENAME}" >> ${OLOGS_DIR}/openebs-iscsi.log
     else
-        echo "No Volume Name Provided.. Please retry.." >> ${OLOGS_DIR}/openebs-iscsi.log
-        exit 0
+    # Volume name not mentioned
+        echo "No Volume Name Specified in yaml file.. Try again" >> ${OLOGS_DIR}/openebs-iscsi.log
+        err '{ "status": "Failure", "message": "Volume Name Not Specified in yaml file"}'
+        exit 1
     fi    
-
+    # Generating a unique volume name based from MNTPATH. This handles multiple volume creation.
+    # Everytime a pod is created with same volume name, based on MNTPATH, an additional value is
+    # Added to the volume-name, which makes volume-name unique.
+    # For example: 
+    # MNTHPATH="/var/lib/kubelet/pods/9d5376fa-13a5-11e7-bcd1-0261a6564108/volumes/openebs~openebs-iscsi/demo-vsm1-vol1"
+    # unique_string: 9d5376fa
+    # VolumeName: demo-vsm1-vol1
+    # UNIQUE_VOLUME_NAME: demo-vsm1-vol1-9d5376fa
+     
+    unique_string=`echo "${MNTPATH}" | grep -oP '/var/lib/kubelet/pods/\s*\K.*(?=/volumes)' | \
+    awk '{split($0,a,"-"); print a[1]}'`
+    
+    echo -e "UNIQUE VOLUME NAME is :${UNIQUE_VOLUME_NAME}" >> ${OLOGS_DIR}/openebs-iscsi.log
+    UNIQUE_VOLUME_NAME="${MNTPATH}-${unique_string}"
     # Print logs
     debug "domount Mount Path is : $MNTPATH"
     debug "domount OpenEBS API URL: $OPENEBS_API_URL"
@@ -284,12 +310,12 @@ domount() {
     fi
 
     echo -e "Calling checkvolumeexists from domount method" > ${OLOGS_DIR}/openebs-iscsi.log
-    status=$(checkvolumeexists "${VOLUMENAME}" "${OPENEBS_API_URL}")
+    status=$(checkvolumeexists "${UNIQUE_VOLUME_NAME}" "${OPENEBS_API_URL}")
     status_volume=0
     if [ "${status}" == 0 ] ; then
         # Volume doesn't exist, create Volume
         debug "domount create a new volume at $OPENEBS_API_URL"
-        status_volume=$( createvolume "${VOLUMENAME}" "$OPENEBS_API_URL" "${SIZE}" )
+        status_volume=$( createvolume "${UNIQUE_VOLUME_NAME}" "$OPENEBS_API_URL" "${SIZE}" )
         if [[ "${status_volume}" == 0 ]]; then
             echo -e "domount: volume creation failed, status is $status." >> ${OLOGS_DIR}/openebs-iscsi.log
             exit 0
@@ -318,7 +344,7 @@ domount() {
         echo "Specs file not found!"
     fi
 
-    # TBD - Add validation to handle multiple volume creation- Left
+    # TBD - Add validation to handle multiple volume creation- Done
 
     data=($(cat "/tmp/logs/openebs-iscsi/specs.txt"))
     i=0
