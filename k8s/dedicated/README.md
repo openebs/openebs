@@ -25,3 +25,4 @@ The demo setup will provide you with the following machines:
 
 ## Next Steps
 - [Create a OpenEBS VSM and use it as data directory for MySQL](./run-mysql-openebs.md)
+- [Run vdbench tests on OpenEBS storage from Kubernetes](./running-vdbench-tests-with-openebs.md)
