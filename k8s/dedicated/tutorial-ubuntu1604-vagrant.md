@@ -237,5 +237,6 @@ Some of the issues observed:
 - weave pod, is stuck in CrashLoop
 
 ## Next Steps
-- [Configure a Hello-World App](./run-k8s-hello-world.md)
-- [Configure MySQL Pod with OpenEBS Storage](./run-mysql-openebs.md)
+- [Run a Hello-World App](./run-k8s-hello-world.md)
+- [Run VDBench Tests on OpenEBS Storage](./running-vdbench-tests-with-openebs.md)
+- [Run MySQL Pod with OpenEBS Storage](./run-mysql-openebs.md)
