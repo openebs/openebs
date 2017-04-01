@@ -65,6 +65,7 @@ kubemaster-01             not created (virtualbox)
 kubeminion-01             not created (virtualbox)
 omm-01                    not created (virtualbox)
 osh-01                    not created (virtualbox)
+osh-02                    not created (virtualbox)
 
 This environment represents multiple VMs. The VMs are all listed
 above with their current state. For more information about a specific
@@ -73,7 +74,7 @@ VM, run `vagrant status NAME`.
 
 ### Configure Nodes
 
-By default, 4 VMs will be created with the following CPU/Memory configuration. 
+By default, 5 VMs will be created with the following CPU/Memory configuration. 
 
 Kubernetes Master requires 2G RAM and 2 CPU
 Kubernetes Minion, OpenEBS Master and OpenEBS Host are configured with 1GB RAM and 1 CPU. 
@@ -105,6 +106,26 @@ VM, run `vagrant status NAME`.
 (c) RAM and CPU for OpenEBS Storage Host or Kubernetes Minion ( H_MEM and H_CPUS)
 
 
+### Download Vagrant VirtualBoxes for OpenEBS and K8s
+
+If you are installing for the first time on the host, the vagrant will need to download the virtualbox images. If you are running on a low speed network, the download can take considerable time. We recommend that you perform the following two steps during a low traffic window. 
+
+```
+cd $demo-folder/openebs/k8s-demo
+vagrant box add openebs/k8s-1.5.5
+vagrant box add openebs/openebs-0.2
+```
+
+#### Verify 
+
+```
+ubuntu-host:~/demo-folder/openebs/k8s-demo$ vagrant box list | grep openebs
+openebs/k8s-1.5.5      (virtualbox, 2017033101)
+openebs/openebs-0.2    (virtualbox, 2017033102)
+ubuntu-host:~/demo-folder/openebs/k8s-demo$ 
+```
+It is possible that, you may have a later versions downloaded. Thats ok!
+
 ### Install Kubernetes and OpenEBS Cluster
 
 ```
@@ -123,6 +144,7 @@ kubemaster-01             running (virtualbox)
 kubeminion-01             running (virtualbox)
 omm-01                    running (virtualbox)
 osh-01                    running (virtualbox)
+osh-02                    running (virtualbox)
 
 This environment represents multiple VMs. The VMs are all listed
 above with their current state. For more information about a specific
@@ -187,7 +209,10 @@ ubuntu-host:~/demo-folder/openebs/k8s-demo$ vagrant ssh omm-01
 ubuntu@omm-01:~$ 
 ubuntu@omm-01:~$ maya omm-status
 Name           Address       Port  Status  Leader  Protocol  Build  Datacenter  Region
-omm-01.global  172.28.128.5  4648  alive   true    2         0.5.0  dc1         global
+omm-01.global  172.28.128.4  4648  alive   true    2         0.5.5  dc1         global
+
+m-apiserver listening at http://172.28.128.4:5656
+
 ```
 
 Use the below command to check the openebs storage host status
@@ -195,7 +220,8 @@ Use the below command to check the openebs storage host status
 ubuntu@omm-01:~$
 ubuntu@omm-01:~$ maya osh-status
 ID        DC   Name    Class   Drain  Status
-3f56a738  dc1  osh-01  <none>  false  ready
+e57020e9  dc1  osh-02  <none>  false  ready
+b6789013  dc1  osh-01  <none>  false  ready
 ubuntu@omm-01:~$
 ```
 
@@ -211,5 +237,6 @@ Some of the issues observed:
 - weave pod, is stuck in CrashLoop
 
 ## Next Steps
-- [Configure a Hello-World App](./run-k8s-hello-world.md)
-- [Configure MySQL Pod with OpenEBS Storage](./run-mysql-openebs.md)
+- [Run a Hello-World App](./run-k8s-hello-world.md)
+- [Run VDBench Tests on OpenEBS Storage](./running-vdbench-tests-with-openebs.md)
+- [Run MySQL Pod with OpenEBS Storage](./run-mysql-openebs.md)
