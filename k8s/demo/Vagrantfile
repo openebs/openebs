@@ -247,6 +247,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
           # Run in dedicated deployment mode
           if deploy_Mode.to_i == DEPLOY_MODE_DEDICATED.to_i
 
+            vmCfg.vm.provision :shell, 
+            inline: "rm /var/lib/dpkg/lock",                
+            privileged: true              
+
             # Install OpenEBS Maya Master
             if MAYA_RELEASE_TAG == ""
               vmCfg.vm.provision :shell, 
