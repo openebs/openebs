@@ -1,9 +1,11 @@
-#Contributing to OpenEBS
+# Contributing to OpenEBS
 
-Great!! We are always on the lookout for more OpenEBS hackers. You can get started by reading this Overview, Setup OpenEBS on your machine and start contributing in any of the following ways:
+Great!! We are always on the lookout for more OpenEBS hackers. You can get started by reading this [Overview](./contribute/design/README.md)
+
+OpenEBS is innovation in OpenSource. You are welcome to contribute in any way you can and all the help you can provide is very much appreciated. 
 
 - Raise Issues on either the functionality or documentation
-- Improve Documentation 
+- Submit Changes to Improve Documentation 
 - Submit Proposals for new Features/Enhancements 
 - Submit Changes to the Source Code
 
@@ -18,11 +20,17 @@ When Raising issues, please specify the following:
 - Errors and log messages that are thrown by the sofware
 
 
-## Submit Documentation Changes
+## Submit Change to Improve Documentation
+
+Getting Documentation Right is Hard! Please raise a PR with you proposed changes. 
 
 ## Submit Proposals for New Features
 
+There is always something more that is required, to make it easier to suit your use-cases. Feel free to join the discussion on the features or raise a new PR with your proposed change. 
+
 ## Contributing to Source Code
+
+Provide PRs for bug fixes or enhancements.
 
 ### Sign your work
 
