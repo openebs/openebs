@@ -25,6 +25,9 @@ deploy_Mode=ENV['OPENEBS_DEPLOY_MODE'] || 1
 #Specify the release versions to be installed
 MAYA_RELEASE_TAG = ENV['MAYA_RELEASE_TAG'] || "0.2-RC3"
 
+#TODO - Verify
+#LC_ALL is not set on OsX, it will inherit it from SSH on Linux though,
+#so might want it to be a conditional
 ENV['LC_ALL']="en_US.UTF-8"
 
 #Specify the number of Kubernetes Master nodes, CPU/RAM per node. 
