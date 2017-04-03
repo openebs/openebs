@@ -103,7 +103,7 @@ Vagrant.configure("2") do |config|
     privileged: true
 
     config.vm.provision :shell,
-    inline: "cat /dev/null > ~/.bash_history && history -c && exit",
+    path: "boxes/openebs/cleanup_k8s.sh",
     privileged: true
 
   elsif box_Mode.to_i == BOX_MODE_OPENEBS.to_i
@@ -133,7 +133,7 @@ Vagrant.configure("2") do |config|
     privileged: true
 
     config.vm.provision :shell,
-    inline: "cat /dev/null > ~/.bash_history && history -c && exit",
+    path: "boxes/openebs/cleanup_openebs.sh",
     privileged: true
 
   end
