@@ -12,6 +12,7 @@ spec:
         cpu: 0.5
     name: tests-fio
     image: openebs/tests-fio
+    tty: true
     volumeMounts:
     - mountPath: /datadir1
       name: demo-vsm1-vol1
