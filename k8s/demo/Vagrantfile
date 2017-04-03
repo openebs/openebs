@@ -25,6 +25,8 @@ deploy_Mode=ENV['OPENEBS_DEPLOY_MODE'] || 1
 #Specify the release versions to be installed
 MAYA_RELEASE_TAG = ENV['MAYA_RELEASE_TAG'] || "0.2-RC2"
 
+ENV['LC_ALL']="en_US.UTF-8"
+
 #Specify the number of Kubernetes Master nodes, CPU/RAM per node. 
 KM_NODES = ENV['KM_NODES'] || 1
 KM_MEM = ENV['KM_MEM'] || 2048
