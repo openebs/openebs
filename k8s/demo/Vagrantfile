@@ -23,7 +23,7 @@ DEPLOY_MODE_HC = 2
 deploy_Mode=ENV['OPENEBS_DEPLOY_MODE'] || 1
 
 #Specify the release versions to be installed
-MAYA_RELEASE_TAG = ENV['MAYA_RELEASE_TAG'] || "0.2-RC2"
+MAYA_RELEASE_TAG = ENV['MAYA_RELEASE_TAG'] || "0.2-RC3"
 
 ENV['LC_ALL']="en_US.UTF-8"
 
@@ -106,8 +106,7 @@ def configureVM(vmCfg, hostname, cpus, mem)
     #vb.gui = true
     vb.memory = mem
     vb.cpus = cpus
-    vb.customize ["modifyvm", :id, "--cableconnected1", "on"]
-    vb.customize ["modifyvm", :id, "--uartmode1", "file", File.join(Dir.pwd, "ubuntu-xenial-16.04-cloudimg-console.log")]
+    vb.customize ["modifyvm", :id, "--cableconnected1", "on"]   
   end  
   
   return vmCfg
@@ -151,6 +150,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       mem = KM_MEM            
       config.vm.define hostname do |vmCfg|
         vmCfg.vm.box = "openebs/k8s-1.5.5"
+	      vmCfg.vm.provider "virtualbox" do |vb|
+           vb.customize ["modifyvm", :id, "--uartmode1", "file", File.join(Dir.pwd, "openebs-k8s-1.5.5-cloudimg-console.log")]
+        end
         vmCfg = configureVM(vmCfg, hostname, cpus, mem)
 
         # Run in dedicated deployment mode or hyperconverged mode
@@ -172,6 +174,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       mem = KH_MEM            
       config.vm.define hostname do |vmCfg|
         vmCfg.vm.box = "openebs/k8s-1.5.5"
+	      vmCfg.vm.provider "virtualbox" do |vb|
+           vb.customize ["modifyvm", :id, "--uartmode1", "file", File.join(Dir.pwd, "openebs-k8s-1.5.5-cloudimg-console.log")]
+        end
         vmCfg = configureVM(vmCfg, hostname, cpus, mem)
 
         # Run in dedicated deployment mode or hyperconverged mode
@@ -244,15 +249,14 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         (deploy_Mode.to_i == DEPLOY_MODE_NONE.to_i))     
         config.vm.define hostname do |vmCfg|
           vmCfg.vm.box = "openebs/openebs-0.2"
+	        vmCfg.vm.provider "virtualbox" do |vb|
+           vb.customize ["modifyvm", :id, "--uartmode1", "file", File.join(Dir.pwd, "openebs-openebs-0.2-cloudimg-console.log")]
+          end
           vmCfg = configureVM(vmCfg, hostname, cpus, mem)
 
           # Run in dedicated deployment mode
           if deploy_Mode.to_i == DEPLOY_MODE_DEDICATED.to_i
-
-            vmCfg.vm.provision :shell, 
-            inline: "rm /var/lib/dpkg/lock",                
-            privileged: true              
-
+                  
             # Install OpenEBS Maya Master
             if MAYA_RELEASE_TAG == ""
               vmCfg.vm.provision :shell, 
@@ -302,6 +306,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         (deploy_Mode.to_i == DEPLOY_MODE_NONE.to_i))
         config.vm.define hostname do |vmCfg|
           vmCfg.vm.box = "openebs/openebs-0.2"
+	        vmCfg.vm.provider "virtualbox" do |vb|
+           vb.customize ["modifyvm", :id, "--uartmode1", "file", File.join(Dir.pwd, "openebs-openebs-0.2-cloudimg-console.log")]
+          end
           vmCfg = configureVM(vmCfg, hostname, cpus, mem)
           
           # Run in dedicated deployment mode
