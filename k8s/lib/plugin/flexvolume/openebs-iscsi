@@ -24,9 +24,6 @@
 OEBSDEBUG=false
 SPECS_DIR="/tmp/openebs/specs"
 OLOGS_DIR="/tmp/logs/openebs-iscsi"
-CHECK_VOLUME="${OLOGS_DIR}/checkvolumeexists.json"
-CREATE_VOLUME="${OLOGS_DIR}/createvolume.json"
-DELETE_VOLUME="${OLOGS_DIR}/deletevolume.json"
 mkdir -p "${OLOGS_DIR}"
 mkdir -p "${SPECS_DIR}"
 
@@ -145,9 +142,9 @@ checkvolumeexists(){
     OPENEBS_API_URL=$2     
   
     debug "checkvolumeexists ${VOLUMENAME} ${OPENEBS_API_URL}/volume/info/${VOLUMENAME}"
-
+    OUTPUT_FILE="${OLOGS_DIR}/checkvolumeexists-${VOLUMENAME}.json" 
     # Get curl response as well as HTTP Code
-    response=$( curl --write-out %{http_code} --silent --output ${CHECK_VOLUME} \
+    response=$( curl --write-out %{http_code} --silent --output ${OUTPUT_FILE} \
     "${OPENEBS_API_URL}/volume/info/${VOLUMENAME}" )
     if [ "${response}" == "200" ] ; then
         status=$( jq -r '.Status.Reason' ${CHECK_VOLUME} )
@@ -159,7 +156,7 @@ checkvolumeexists(){
     debug "checkvolumeexists - response code ${response} :" 
     debug "checkvolumeexists - response $(cat ${CHECK_VOLUME} )" 
     result=0
-    echo "Response in checkvolumeexists is ${response}" >> ${OLOGS_DIR}/openebs-iscsi.log
+    echo "Response in checkvolumeexists is ${response}" >> "${OLOGS_DIR}/openebs-iscsi.log"
         # Volume in Pending State
     if [[ "${response}" == "200" ]] && [[ "${status}" == "pending" ]] ; then
         targetportal=$(jq -r '.annotations.targetportal' ${CHECK_VOLUME})
@@ -167,7 +164,7 @@ checkvolumeexists(){
         data="${targetportal}\n${iqn}"
         echo -e "${data}" > "/tmp/logs/openebs-iscsi/specs.txt"
         debug "checkvolumeexists - extracted details $(cat $SPECS_DIR/specs.txt )" 
-        echo -e "checkvolumeexists: VSM is in Pending State." >> ${OLOGS_DIR}/openebs-iscsi.log
+        echo -e "checkvolumeexists: VSM is in Pending State." >> "${OLOGS_DIR}/openebs-iscsi.log"
         result=1
 
         # Volume in Running State
@@ -177,11 +174,11 @@ checkvolumeexists(){
         data="${targetportal}\n${iqn}"
         echo -e "${data}" > "/tmp/logs/openebs-iscsi/specs.txt"
         debug "checkvolumeexists - extracted details $(cat /tmp/logs/openebs-iscsi/specs.txt )" 
-        echo -e "checkvolumeexists: VSM is in Complete State." >> ${OLOGS_DIR}/openebs-iscsi.log
+        echo -e "checkvolumeexists: VSM is in Complete State." >> "${OLOGS_DIR}/openebs-iscsi.log"
         result=2
     else
         # Volume doesn't exist
-        echo -e "checkvolumeexists: Volume Doesn't already exist" >> ${OLOGS_DIR}/openebs-iscsi.log
+        echo -e "checkvolumeexists: Volume Doesn't already exist" >> "${OLOGS_DIR}/openebs-iscsi.log"
         result=0
     fi
     echo "${result}"
@@ -192,12 +189,13 @@ createvolume(){
     OPENEBS_API_URL=$2
     VOLUMESIZE=$3
     output=0
+    OUTPUT_FILE="${OLOGS_DIR}/createvolume-${VOLUMENAME}.json" 
     # Check if volume already exists
-    echo -e "Calling checkvolumeexists from createvolume method" >> ${OLOGS_DIR}/openebs-iscsi.log
+    echo -e "Calling checkvolumeexists from createvolume method" >> "${OLOGS_DIR}/openebs-iscsi.log"
     status=$(checkvolumeexists "${VOLUMENAME}" "${OPENEBS_API_URL}")
     
     # if it doesn't exist
-    echo -e "Above createvolumespec" >> ${OLOGS_DIR}/openebs-iscsi.log
+    echo -e "Above createvolumespec" >> "${OLOGS_DIR}/openebs-iscsi.log"
     $(createvolumespec "${VOLUMENAME}" "${VOLUMESIZE}")
 
     # Get curl response as well as HTTP Code
@@ -212,8 +210,8 @@ createvolume(){
 deletevolume() {
     OPENEBS_API_URL=$1
     VOLUMENAME=$2
-
-    $( curl "${OPENEBS_API_URL}/volume/delete/${VOLUMENAME}" > ${DELETE_VOLUME}) 
+    OUTPUT_FILE="${OLOGS_DIR}/deletevolume-${VOLUMENAME}.json" 
+    $( curl "${OPENEBS_API_URL}/volume/delete/${VOLUMENAME}" > ${OUTPUT_FILE}) 
     response=$( jq -r '.Status.Reason' ${DELETE_VOLUME})
     if [ "${response}" == "complete" ] ; then
         # Volume Deleted.
@@ -249,7 +247,7 @@ domount() {
         debug "domount volume is already mounted"
         exit 0
     fi
-    echo -e "Calling checkvolumeexists from domount method" > ${OLOGS_DIR}/openebs-iscsi.log
+    echo -e "Calling checkvolumeexists from domount method" > "${OLOGS_DIR}/openebs-iscsi.log"
     status=$(checkvolumeexists "${VOLUMENAME}" "${OPENEBS_API_URL}")
     status_volume=0
     if [ "${status}" == 0 ] ; then
@@ -257,24 +255,23 @@ domount() {
         debug "domount create a new volume at $OPENEBS_API_URL"
         status_volume=$( createvolume "${VOLUMENAME}" "$OPENEBS_API_URL" "${SIZE}" )
         if [[ "${status_volume}" == 0 ]]; then
-            echo -e "domount: volume creation failed, status is $status." >> ${OLOGS_DIR}/openebs-iscsi.log
-            exit 0
+            echo -e "domount: volume creation failed, status is $status." >> "${OLOGS_DIR}/openebs-iscsi.log"
         elif [[ "${status_volume}" == 1 ]]; then
-            echo -e "domount: Volume In Pending State $status." >> ${OLOGS_DIR}/openebs-iscsi.log          
+            echo -e "domount: Volume In Pending State $status." >> "${OLOGS_DIR}/openebs-iscsi.log"
             #statements
         elif [[ "${status_volume}" == 2 ]]; then
-            echo -e "domount: Volume Created successfully $status." >> ${OLOGS_DIR}/openebs-iscsi.log
+            echo -e "domount: Volume Created successfully $status." >> "${OLOGS_DIR}/openebs-iscsi.log"
         else
-            echo -e "domount: Unknown Error." >> ${OLOGS_DIR}/openebs-iscsi.log      
+            echo -e "domount: Unknown Error." >> "${OLOGS_DIR}/openebs-iscsi.log"     
         fi
 
     # Volume already Created, but is in Pending State
     elif [[ "${status}" -eq 1 ]]; then
-        echo -e "Creating a timeout loop" >> ${OLOGS_DIR}/openebs-iscsi.log
+        echo -e "Creating a timeout loop" >> "${OLOGS_DIR}/openebs-iscsi.log"
         output=$( check_volume_status )
     else
         # Volume already created, and is in Success State
-        echo -e "domount: volume already created" >> ${OLOGS_DIR}/openebs-iscsi.log
+        echo -e "domount: volume already created" >> "${OLOGS_DIR}/openebs-iscsi.log"
     fi
 
     # Volume successfully created, get target portal and iqn values.
