@@ -332,11 +332,17 @@ unmount() {
       exit 1
     fi
     
-    VOLUME_NAME=`basename ${MNTPATH}`
-    debug "dounmount volume ${VOLUME_NAME} and ${MNTPATH}"
-    #TBD
+    #TBD : Add validations
     #Check if the volume exists using iscsiadm sessions
     #Logout of the session for this specific volume 
+    volume_name=`basename ${MNTPATH}`
+    debug "dounmount volume ${volume_name} and ${MNTPATH}"
+    target_iqn=$(sudo iscsiadm -m session | grep ${volume_name} | awk '{print $4}')
+    target_portal=$(sudo iscsiadm -m session | grep ${volume_name} | awk '{print $3}' | awk -F ',' '{print $1}')
+    debug "dounmount volume with iqn ${target_iqn} and portal ${target_portal}"
+    debug $(sudo iscsiadm -m node -u -T ${target_iqn} -p ${target_portal} 2>&1)
+    debug $(sudo iscsiadm -m node -o delete -T ${target_iqn} -p ${target_portal} 2>&1)
+
 
     log '{"status": "Success"}'
     exit 0
