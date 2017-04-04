@@ -332,6 +332,13 @@ unmount() {
       err "{ \"status\": \"Failed\", \"message\": \"Failed to unmount volume at ${MNTPATH}\"}"
       exit 1
     fi
+    
+    VOLUME_NAME=`basename ${MNTPATH}`
+    debug "dounmount volume ${VOLUME_NAME} and ${MNTPATH}"
+    #TBD
+    #Check if the volume exists using iscsiadm sessions
+    #Logout of the session for this specific volume 
+
     log '{"status": "Success"}'
     exit 0
 }
