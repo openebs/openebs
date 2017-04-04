@@ -70,15 +70,15 @@ ubuntu@kubemaster-01:~/demo/k8s/spec$ cat demo-vdbench-openebs-plugin.yaml
 apiVersion: v1
 kind: Pod
 metadata:
-  name: test-vdbench
+  name: tests-vdbench
   labels:
-    name: test-vdbench
+    name: tests-vdbench
 spec:
   containers:
   - resources:
       limits:
         cpu: 0.5
-    name: test-vdbench
+    name: tests-vdbench
     image: openebs/tests-vdbench
     volumeMounts:
     - mountPath: /datadir1
@@ -99,14 +99,14 @@ The yaml ships with an default address for the openebsApiUrl. Modify this with t
 Start the VDBench pod
 ```
 ubuntu@kubemaster-01:~/demo/k8s/spec$ kubectl create -f demo-vdbench-openebs-plugin.yaml
-pod "test-vdbench" created
+pod "tests-vdbench" created
 ubuntu@kubemaster-01:~/demo/k8s/spec$ 
 ```
 
 ```
 ubuntu@kubemaster-01:~/demo/k8s/spec$ kubectl get pods
 NAME           READY     STATUS              RESTARTS   AGE
-test-vdbench   0/1       ContainerCreating   0          24s
+tests-vdbench   0/1       ContainerCreating   0          24s
 ubuntu@kubemaster-01:~/demo/k8s/spec$ 
 ```
 
@@ -115,12 +115,12 @@ Once the volume is mounted and database is initialized, the pod status turns to 
 ```
 ubuntu@kubemaster-01:~$ kubectl get pods
 NAME           READY     STATUS    RESTARTS   AGE
-test-vdbench   1/1       Running   0          9m
+tests-vdbench   1/1       Running   0          9m
 ubuntu@kubemaster-01:~$ 
 ```
 
 You can check on the output by runnin the following command:
 ```
-ubuntu@kubemaster-01:~$ kubectl logs -f test-vdbench
+ubuntu@kubemaster-01:~$ kubectl logs -f tests-vdbench
 ```
 
