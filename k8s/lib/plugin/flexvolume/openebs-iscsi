@@ -147,20 +147,20 @@ checkvolumeexists(){
     response=$( curl --write-out %{http_code} --silent --output ${OUTPUT_FILE} \
     "${OPENEBS_API_URL}/volume/info/${VOLUMENAME}" )
     if [ "${response}" == "200" ] ; then
-        status=$( jq -r '.Status.Reason' ${CHECK_VOLUME} )
+        status=$( jq -r '.Status.Reason' ${OUTPUT_FILE} )
     else
         status="unknown"
     fi
 
 
     debug "checkvolumeexists - response code ${response} :" 
-    debug "checkvolumeexists - response $(cat ${CHECK_VOLUME} )" 
+    debug "checkvolumeexists - response $(cat ${OUTPUT_FILE} )" 
     result=0
     echo "Response in checkvolumeexists is ${response}" >> "${OLOGS_DIR}/openebs-iscsi.log"
         # Volume in Pending State
     if [[ "${response}" == "200" ]] && [[ "${status}" == "pending" ]] ; then
-        targetportal=$(jq -r '.annotations.targetportal' ${CHECK_VOLUME})
-        iqn=$(jq -r '.annotations.iqn' ${CHECK_VOLUME})
+        targetportal=$(jq -r '.annotations.targetportal' ${OUTPUT_FILE})
+        iqn=$(jq -r '.annotations.iqn' ${OUTPUT_FILE})
         data="${targetportal}\n${iqn}"
         echo -e "${data}" > "/tmp/logs/openebs-iscsi/specs.txt"
         debug "checkvolumeexists - extracted details $(cat $SPECS_DIR/specs.txt )" 
@@ -169,8 +169,8 @@ checkvolumeexists(){
 
         # Volume in Running State
     elif [[ "${response}" == "200" ]] && [[ "${status}" == "running" ]] ; then
-        targetportal=$(jq -r '.annotations.targetportal' ${CHECK_VOLUME})
-        iqn=$(jq -r '.annotations.iqn' ${CHECK_VOLUME})
+        targetportal=$(jq -r '.annotations.targetportal' ${OUTPUT_FILE})
+        iqn=$(jq -r '.annotations.iqn' ${OUTPUT_FILE})
         data="${targetportal}\n${iqn}"
         echo -e "${data}" > "/tmp/logs/openebs-iscsi/specs.txt"
         debug "checkvolumeexists - extracted details $(cat /tmp/logs/openebs-iscsi/specs.txt )" 
@@ -199,7 +199,7 @@ createvolume(){
     $(createvolumespec "${VOLUMENAME}" "${VOLUMESIZE}")
 
     # Get curl response as well as HTTP Code
-    return_code=$( curl --write-out %{http_code} --output ${CREATE_VOLUME} --silent \
+    return_code=$( curl --write-out %{http_code} --output ${OUTPUT_FILE} --silent \
      --fail -k -H "Content-Type: application/yaml" -XPOST -d  \
      "$(cat /tmp/openebs/specs/openebs-${VOLUMENAME}-pvc.yaml)" "${OPENEBS_API_URL}/volumes/" )
 
@@ -212,7 +212,7 @@ deletevolume() {
     VOLUMENAME=$2
     OUTPUT_FILE="${OLOGS_DIR}/deletevolume-${VOLUMENAME}.json" 
     $( curl "${OPENEBS_API_URL}/volume/delete/${VOLUMENAME}" > ${OUTPUT_FILE}) 
-    response=$( jq -r '.Status.Reason' ${DELETE_VOLUME})
+    response=$( jq -r '.Status.Reason' ${OUTPUT_FILE})
     if [ "${response}" == "complete" ] ; then
         # Volume Deleted.
         clearvolumespec "${VOLUMENAME}"
@@ -295,7 +295,7 @@ domount() {
     debug "devx is $devx"
     # The device can take a few more seconds to appear under /dev
     waiti=0
-    while [ "${devx}"=="" ]; do
+    while [ "${devx}" == "" ]; do
         sleep 5
         devx=$(sudo iscsiadm -m session -P 3 2>&1 |grep -i "Attached scsi disk" | awk '{print $4}')
         debug "devx is $devx during $waiti"
