@@ -50,15 +50,15 @@ Setup your local directory, where the demo code will be downloaded. Let us call 
 mkdir $demo-folder
 cd $demo-folder
 git clone https://github.com/openebs/openebs.git
-cd openebs/k8s-demo
-ls $demo-folder/openebs/k8s-demo/Vagrantfile
+cd openebs/k8s/demo
+ls $demo-folder/openebs/k8s/demo/Vagrantfile
 ```
 
 #### Verify
 
 ```
-ubuntu-host:~/$ cd $demo-folder/openebs/k8s-demo/
-ubuntu-host:~/demo-folder/openebs/k8s-demo$ vagrant status
+ubuntu-host:~/$ cd $demo-folder/openebs/k8s/demo/
+ubuntu-host:~/demo-folder/openebs/k8s/demo$ vagrant status
 Current machine states:
 
 kubemaster-01             not created (virtualbox)
@@ -72,46 +72,17 @@ above with their current state. For more information about a specific
 VM, run `vagrant status NAME`.
 ```
 
-### Configure Nodes
+### Changing Number of Nodes
 
-By default, 5 VMs will be created with the following CPU/Memory configuration. 
+By default, 5 VMs will be created as shown above. To create these VMs, you will need around 10GB RAM and 6 CPU. Depending on your system configuration, you can edit the Vagrantfile to create lesser or more nodes. Please check the customization instructions [here](./customizing-demo-vagrant-setup.md)
 
-Kubernetes Master requires 2G RAM and 2 CPU
-Kubernetes Minion, OpenEBS Master and OpenEBS Host are configured with 1GB RAM and 1 CPU. 
 
-Depending on your system configuration, you can edit the Vagrantfile or pass the modified files as environment files to specify:
-(a) Number of Nodes under each category:
-- Kubernetes Minion hosts ( KH_NODES) 
-- OpenEBS Maya Master ( MM_NODES )
-- OpenEBS Storage Host ( MH_NODES )
+### Working with Slow Internet
 
-A value of 0 for the above variables will skip the installation of that type. For example, to install only Kubernetes you can run the following command:
+If you are installing for the first time on the host, the vagrant will need to download the virtualbox images. If you are running on a low speed internet, the download can take considerable time. We recommend that you perform the following two steps, prior to issuing the "vagrant up" command below. Both the images put together will require around 1500MB. 
 
 ```
-ubuntu-host:~/demo-folder/openebs/k8s-demo$ MH_NODES=0 MM_NODES=0 vagrant status
-Current machine states:
-
-kubemaster-01             not created (virtualbox)
-kubeminion-01             not created (virtualbox)
-
-This environment represents multiple VMs. The VMs are all listed
-above with their current state. For more information about a specific
-VM, run `vagrant status NAME`.
-```
-
-(b) RAM and CPU for Kubernetes Master ( KM_MEM and KM_CPUS)
-
-(c) RAM and CPU for OpenEBS Maya Master ( M_MEM and M_CPUS)
-
-(c) RAM and CPU for OpenEBS Storage Host or Kubernetes Minion ( H_MEM and H_CPUS)
-
-
-### Download Vagrant VirtualBoxes for OpenEBS and K8s
-
-If you are installing for the first time on the host, the vagrant will need to download the virtualbox images. If you are running on a low speed network, the download can take considerable time. We recommend that you perform the following two steps during a low traffic window. 
-
-```
-cd $demo-folder/openebs/k8s-demo
+cd $demo-folder/openebs/k8s/demo
 vagrant box add openebs/k8s-1.5.5
 vagrant box add openebs/openebs-0.2
 ```
@@ -119,17 +90,17 @@ vagrant box add openebs/openebs-0.2
 #### Verify 
 
 ```
-ubuntu-host:~/demo-folder/openebs/k8s-demo$ vagrant box list | grep openebs
+ubuntu-host:~/demo-folder/openebs/k8s/demo$ vagrant box list | grep openebs
 openebs/k8s-1.5.5      (virtualbox, 2017033101)
 openebs/openebs-0.2    (virtualbox, 2017033102)
-ubuntu-host:~/demo-folder/openebs/k8s-demo$ 
+ubuntu-host:~/demo-folder/openebs/k8s/demo$ 
 ```
 It is possible that, you may have a later versions downloaded. Thats ok!
 
 ### Install Kubernetes and OpenEBS Cluster
 
 ```
-cd $demo-folder/openebs/k8s-demo
+cd $demo-folder/openebs/k8s/demo
 vagrant up
 ```
 This step, can take few minutes depending on your network speed. The required vagrant plugins are installed (for caching the vagrant boxes), the ubuntu-xenial box is download and the required software packages for each of the node are downloaded and installed. 
@@ -137,7 +108,7 @@ This step, can take few minutes depending on your network speed. The required va
 #### Verify the VM installation
 
 ```
-ubuntu-host:~/demo-folder/openebs/k8s-demo$ vagrant status
+ubuntu-host:~/demo-folder/openebs/k8s/demo$ vagrant status
 Current machine states:
 
 kubemaster-01             running (virtualbox)
@@ -149,12 +120,12 @@ osh-02                    running (virtualbox)
 This environment represents multiple VMs. The VMs are all listed
 above with their current state. For more information about a specific
 VM, run `vagrant status NAME`.
-ubuntu-host:~/demo-folder/openebs/k8s-demo$ 
+ubuntu-host:~/demo-folder/openebs/k8s/demo$ 
 ```
 
 Note: The network slowness can abort the process of installation, since a default timeout of 300 seconds is specified for the VMs to be launched. This can be modified by editing the Vagrantfile ( vmCfg.vm.boot_timeout ) value. If the installation aborts in between, make sure to clean-up before starting with the installation again.
 ```
-cd $demo-folder/openebs/k8s-demo
+cd $demo-folder/openebs/k8s/demo
 vagrant destroy
 ```
 
@@ -163,7 +134,7 @@ vagrant destroy
 Use the kubectl from within the Kubernetes master to get the current status. 
 
 ```
-ubuntu-host:~/demo-folder/openebs/k8s-demo$ vagrant ssh kubemaster-01
+ubuntu-host:~/demo-folder/openebs/k8s/demo$ vagrant ssh kubemaster-01
 ... snipped ...
 ubuntu@kubemaster-01:~$ kubectl get nodes
 NAME            STATUS         AGE
@@ -204,7 +175,7 @@ https://kubernetes.io/docs/user-guide/kubectl-cheatsheet/
 Use the mayactl from within the OpenEBS Maya Master to get the current status. 
 
 ```
-ubuntu-host:~/demo-folder/openebs/k8s-demo$ vagrant ssh omm-01
+ubuntu-host:~/demo-folder/openebs/k8s/demo$ vagrant ssh omm-01
 ... snipped ...
 ubuntu@omm-01:~$ 
 ubuntu@omm-01:~$ maya omm-status
@@ -226,6 +197,11 @@ ubuntu@omm-01:~$
 ```
 
 
+
+## Next Steps
+- [Run VDBench Tests on OpenEBS Storage](./running-vdbench-tests-with-openebs.md)
+- [Run MySQL Pod with OpenEBS Storage](./run-mysql-openebs.md)
+
 ### Known Issues
 
 Check out the issues section for known issues and possible workarounds for some of the commom glitches while setting up kubernetes clusters on Ubunut/VirtualBox. 
@@ -235,8 +211,3 @@ https://github.com/openebs/openebs/issues?utf8=%E2%9C%93&q=label%3Ademo%2Fk8s%20
 Some of the issues observed:
 - Unable to upgrade to VirtualBox 5.1
 - weave pod, is stuck in CrashLoop
-
-## Next Steps
-- [Run a Hello-World App](./run-k8s-hello-world.md)
-- [Run VDBench Tests on OpenEBS Storage](./running-vdbench-tests-with-openebs.md)
-- [Run MySQL Pod with OpenEBS Storage](./run-mysql-openebs.md)

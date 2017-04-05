@@ -12,6 +12,8 @@ spec:
         cpu: 0.5
     name: tests-fio
     image: openebs/tests-fio
+    command: ["/fio_runner.sh"]
+    args: ["Basic", "600"]
     tty: true
     volumeMounts:
     - mountPath: /datadir1

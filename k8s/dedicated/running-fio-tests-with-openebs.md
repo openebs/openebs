@@ -1,6 +1,6 @@
-# Running vdbench tests on Kubernetes Cluster with OpenEBS Storage
+# Running fio tests on Kubernetes Cluster with OpenEBS Storage
 
-In this example, we will have run vdbench pod with OpenEBS Storage. 
+In this example, we will start running fio pod (fio-tests) with OpenEBS Storage. 
 
 ### Prerequisites
 
@@ -65,21 +65,24 @@ ubuntu@omm-01:~$
 ```
 ubuntu-host:~/$ vagrant ssh kubemaster-01
 ubuntu@kubemaster-01:~$ cd demo/k8s/spec/
-ubuntu@kubemaster-01:~/demo/k8s/spec$ cat demo-vdbench-openebs-plugin.yaml 
+ubuntu@kubemaster-01:~/demo/k8s/spec$ cat demo-fio-openebs-plugin.yaml 
 ---
 apiVersion: v1
 kind: Pod
 metadata:
-  name: tests-vdbench
+  name: tests-fio
   labels:
-    name: tests-vdbench
+    name: tests-fio
 spec:
   containers:
   - resources:
       limits:
         cpu: 0.5
-    name: tests-vdbench
-    image: openebs/tests-vdbench
+    name: tests-fio
+    image: openebs/tests-fio
+    command: ["/fio_runner.sh"]
+    args: ["Basic", "600"]
+    tty: true
     volumeMounts:
     - mountPath: /datadir1
       name: demo-vsm1-vol1
@@ -90,23 +93,23 @@ spec:
       options:
         name: "demo-vsm1-vol1"
         openebsApiUrl: "http://172.28.128.4:5656/latest"
-        size: "5G"
-ubuntu@kubemaster-01:~/demo/k8s/spec$ 
+        size: "2G" 
 ```
+
 The yaml ships with an default address for the openebsApiUrl. Modify this with the correct address, noted in the previous step. 
 
 
-Start the VDBench pod
+Start the fio pod
 ```
-ubuntu@kubemaster-01:~/demo/k8s/spec$ kubectl create -f demo-vdbench-openebs-plugin.yaml
-pod "tests-vdbench" created
+ubuntu@kubemaster-01:~/demo/k8s/spec$ kubectl create -f demo-fio-openebs-plugin.yaml
+pod "tests-fio" created
 ubuntu@kubemaster-01:~/demo/k8s/spec$ 
 ```
 
 ```
 ubuntu@kubemaster-01:~/demo/k8s/spec$ kubectl get pods
-NAME           READY     STATUS              RESTARTS   AGE
-tests-vdbench   0/1       ContainerCreating   0          24s
+NAME        READY     STATUS              RESTARTS   AGE
+tests-fio   0/1       ContainerCreating   0          4s
 ubuntu@kubemaster-01:~/demo/k8s/spec$ 
 ```
 
@@ -115,12 +118,12 @@ Once the volume is mounted and database is initialized, the pod status turns to 
 ```
 ubuntu@kubemaster-01:~$ kubectl get pods
 NAME           READY     STATUS    RESTARTS   AGE
-tests-vdbench   1/1       Running   0          9m
+tests-fio   1/1       Running   0          9m
 ubuntu@kubemaster-01:~$ 
 ```
 
-You can check on the output by runnin the following command:
+You can check on the output by running the following command:
 ```
-ubuntu@kubemaster-01:~$ kubectl logs -f tests-vdbench
+ubuntu@kubemaster-01:~$ kubectl logs -f tests-fio
 ```
 
