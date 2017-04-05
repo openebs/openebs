@@ -149,7 +149,12 @@ checkvolumeexists(){
     # Get curl response as well as HTTP Code
     response=$( curl --write-out %{http_code} --silent --output ${CHECK_VOLUME} \
     "${OPENEBS_API_URL}/volume/info/${VOLUMENAME}" )
-    status=$( jq -r '.Status.Reason' ${CHECK_VOLUME} )
+    if [ "${response}" == "200" ] ; then
+        status=$( jq -r '.Status.Reason' ${CHECK_VOLUME} )
+    else
+        status="unknown"
+    fi
+
 
     debug "checkvolumeexists - response code ${response} :" 
     debug "checkvolumeexists - response $(cat ${CHECK_VOLUME} )" 
@@ -196,7 +201,7 @@ createvolume(){
     $(createvolumespec "${VOLUMENAME}" "${VOLUMESIZE}")
 
     # Get curl response as well as HTTP Code
-    $( curl --write-out %{http_code} --output ${CREATE_VOLUME} --silent \
+    return_code=$( curl --write-out %{http_code} --output ${CREATE_VOLUME} --silent \
      --fail -k -H "Content-Type: application/yaml" -XPOST -d  \
      "$(cat /tmp/openebs/specs/openebs-${VOLUMENAME}-pvc.yaml)" "${OPENEBS_API_URL}/volumes/" )
 
@@ -289,12 +294,14 @@ domount() {
     debug "domount volume at $targetportal and $iqn"
     debug $(sudo iscsiadm -m discovery -t st -p $targetportal 2>&1)
     debug $(sudo iscsiadm -m node -l -T $iqn -p $targetportal 2>&1)
-    devx=$(sudo iscsiadm -m session -P 3 |grep -i "Attached scsi disk" | awk '{print $4}')
+    devx=$(sudo iscsiadm -m session -P 3 2>&1 |grep -i "Attached scsi disk" | awk '{print $4}')
+    debug "devx is $devx"
     # The device can take a few more seconds to appear under /dev
     waiti=0
     while [ "${devx}"=="" ]; do
         sleep 5
-        devx=$(iscsiadm -m session -P 3 |grep -i "Attached scsi disk" | awk '{print $4}')
+        devx=$(sudo iscsiadm -m session -P 3 2>&1 |grep -i "Attached scsi disk" | awk '{print $4}')
+        debug "devx is $devx during $waiti"
         waiti=$((waiti+1))
         if [ "${waiti}" == 5 ]; then
                 break
