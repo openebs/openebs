@@ -93,7 +93,7 @@ spec:
         size: "5G"
 ubuntu@kubemaster-01:~/demo/k8s/spec$ 
 ```
-The yaml ships with an default address for the openebsApiUrl. Modify this with the correct address, noted in the previous step. 
+The yaml ships with an default address for the openebsApiUrl. Modify this with the correct m-apiserver address, noted in the previous step. 
 
 
 Start the VDBench pod
