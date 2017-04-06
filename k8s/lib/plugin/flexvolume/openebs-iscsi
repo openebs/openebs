@@ -149,7 +149,10 @@ checkvolumeexists(){
     debug "checkvolumeexists ${VOLUMENAME} ${OPENEBS_API_URL}/volume/info/${VOLUMENAME}"
 
     # Get curl response as well as HTTP Code
+<<<<<<< HEAD
 
+=======
+>>>>>>> master
     response=$( curl --write-out %{http_code} --silent --output ${CHECK_VOLUME} "${OPENEBS_API_URL}/volume/info/${VOLUMENAME}" )
     if [ "${response}" == "200" ] ; then
         status=$( jq -r '.Status.Reason' ${CHECK_VOLUME} )
