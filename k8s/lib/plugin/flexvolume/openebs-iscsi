@@ -313,11 +313,11 @@ domount() {
         fi
     done
     debug "domount - mounting iscsi device /dev/$devx as ${MNTPATH}" 
-    sudo mkdir -p "${MNTPATH}"
+    mkdir -p ${MNTPATH} &> /dev/null
     debug $(sudo mkfs.ext4 -F "/dev/$devx" 2>&1)
-    # sudo mount -o bind -t "ext4" "/dev/$devx" "${MNTPATH}" &> /dev/null
+    # sudo mount -o bind -t "ext 4" "/dev/$devx" "${MNTPATH}" &> /dev/null
     #sudo mount -o rw,noexec,nosuid,nodev,bind -t "ext4" "/dev/$devx" "${MNTPATH}" &> /dev/null
-    mount "/dev/$devx" "${MNTPATH}"
+    sudo mount "/dev/${devx}" ${MNTPATH} &> /dev/null
     if [ $? -ne 0 ]; then
         2>&1
         err '{ "status": "Failure", "message": "Failed to mount device '${MNTPATH}' , volume_src: '${devx}'"}'
