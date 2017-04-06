@@ -149,26 +149,22 @@ checkvolumeexists(){
     debug "checkvolumeexists ${VOLUMENAME} ${OPENEBS_API_URL}/volume/info/${VOLUMENAME}"
 
     # Get curl response as well as HTTP Code
-<<<<<<< HEAD
-
-=======
->>>>>>> master
     response=$( curl --write-out %{http_code} --silent --output ${CHECK_VOLUME} "${OPENEBS_API_URL}/volume/info/${VOLUMENAME}" )
     if [ "${response}" == "200" ] ; then
-        status=$( jq -r '.Status.Reason' ${CHECK_VOLUME} )
+        status=$( jq -r '.Status.Reason' ${OUTPUT_FILE} )
     else
         status="unknown"
     fi
 
 
     debug "checkvolumeexists - response code ${response} :" 
-    debug "checkvolumeexists - response $(cat ${CHECK_VOLUME} )" 
+    debug "checkvolumeexists - response $(cat ${OUTPUT_FILE} )" 
     result=0
     echo "Response in checkvolumeexists is ${response}" >> ${OLOGS_DIR}/openebs-iscsi.log
         # Volume in Pending State
     if [[ "${response}" == "200" ]] && [[ "${status}" == "pending" ]] ; then
-        targetportal=$(jq -r '.annotations.targetportal' ${CHECK_VOLUME})
-        iqn=$(jq -r '.annotations.iqn' ${CHECK_VOLUME})
+        targetportal=$(jq -r '.annotations.targetportal' ${OUTPUT_FILE})
+        iqn=$(jq -r '.annotations.iqn' ${OUTPUT_FILE})
         data="${targetportal}\n${iqn}"
         echo -e "${data}" > /tmp/logs/openebs-iscsi/specs.txt
         debug "checkvolumeexists - extracted details $(cat $SPECS_DIR/specs.txt )" 
@@ -177,8 +173,8 @@ checkvolumeexists(){
 
         # Volume in Running State
     elif [[ "${response}" == "200" ]] && [[ "${status}" == "running" ]] ; then
-        targetportal=$(jq -r '.annotations.targetportal' ${CHECK_VOLUME})
-        iqn=$(jq -r '.annotations.iqn' ${CHECK_VOLUME})
+        targetportal=$(jq -r '.annotations.targetportal' ${OUTPUT_FILE})
+        iqn=$(jq -r '.annotations.iqn' ${OUTPUT_FILE})
         data="${targetportal}\n${iqn}"
         echo -e "${data}" > /tmp/logs/openebs-iscsi/specs.txt
         debug "checkvolumeexists - extracted details $(cat /tmp/logs/openebs-iscsi/specs.txt )" 
