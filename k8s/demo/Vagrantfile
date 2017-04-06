@@ -23,7 +23,7 @@ DEPLOY_MODE_HC = 2
 deploy_Mode=ENV['OPENEBS_DEPLOY_MODE'] || 1
 
 #Specify the release versions to be installed
-MAYA_RELEASE_TAG = ENV['MAYA_RELEASE_TAG'] || "0.2-RC3"
+MAYA_RELEASE_TAG = ENV['MAYA_RELEASE_TAG'] || "0.2"
 
 #TODO - Verify
 #LC_ALL is not set on OsX, it will inherit it from SSH on Linux though,
@@ -93,7 +93,6 @@ def configureVM(vmCfg, hostname, cpus, mem)
   vmCfg.vm.provision "shell", inline: <<-SHELL
       echo "ubuntu:ubuntu" | sudo chpasswd
   SHELL
-
   
   #Adding Vagrant-cachier
   if Vagrant.has_plugin?("vagrant-cachier")
@@ -286,11 +285,11 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
                 host_ip_address = `#{get_ip_address}`
 
-                @machine.communicate.sudo("echo 'export \
-                NOMAD_ADDR=http://#{host_ip_address.strip}:4646' >> \
+                @machine.communicate.sudo("echo \
+		'export NOMAD_ADDR=http://#{host_ip_address.strip}:4646' >> \
                 /home/ubuntu/.profile") 
-		            @machine.communicate.sudo("echo 'export \
-                MAPI_ADDR=http://#{host_ip_address.strip}:5656' >> \
+		@machine.communicate.sudo("echo \
+		'export MAPI_ADDR=http://#{host_ip_address.strip}:5656' >> \
                 /home/ubuntu/.profile")
               end
             end            
@@ -355,15 +354,18 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
                   @machine.communicate.sudo("bash \
                   /home/ubuntu/demo/maya/scripts/configure_osh.sh \
                   --masterip=#{master_ip_address.strip} \
-                  --releasetag=#{MAYA_RELEASE_TAG}")
+                  --releasetag=#{MAYA_RELEASE_TAG}")		 
                   end
 
-                  @machine.communicate.sudo("echo 'export \
-                  NOMAD_ADDR=http://#{host_ip_address.strip}:4646' >> \
+                  @machine.communicate.sudo("echo \
+		  'export NOMAD_ADDR=http://#{host_ip_address.strip}:4646' >> \
                   /home/ubuntu/.profile")
-		              @machine.communicate.sudo("echo 'export \
-                  MAPI_ADDR=http://#{host_ip_address.strip}:5656' >> \
+		  @machine.communicate.sudo("echo \
+		  'export MAPI_ADDR=http://#{host_ip_address.strip}:5656' >> \
                   /home/ubuntu/.profile")
+
+		  @machine.communicate.sudo("docker pull \
+		  openebs/jiva")
                 end  
               end
             end
