@@ -23,18 +23,13 @@ a file level. The block storage for each VSM is managed as one single file or di
 is managed through large size chunks rather than the typical small size blocks. This enables OpenEBS to 
 deliver higher performance for each VSM and to  scale to a large number of VSMs. 
 
-## Quick Demo of OpenEBS 
-
-[![OpenEBS Demo](https://s7.postimg.org/adw357irf/openebs_demo_png.png)](https://www.youtube.com/watch?v=jeeWIFiC5LQ)
-
 ## Installation and Getting Started
 
 OpenEBS can be setup in few easy steps either on Physical Machines or VMs. 
 Please follow our [Getting Started](k8s/dedicated/README.md) documentation 
 
-## Show me the Code
-
-This is a meta-repository for OpenEBS. Here please find various documentation related artifacts and code related to integrating OpenEBS with popular orchestration engines like kubernetes, swarm, mesos, rancher, etc., The core storage and storage orchestration source code is distributed in other repositories under the OpenEBS organization. Please start with the pinned repositories or with [OpenEBS Architecture](./contribute/design/README.md) document. 
+## Status
+We are in the alpha stage with active development underway. See our [Project Tracker](https://github.com/openebs/openebs/wiki/Project-Tracker) for more details.
 
 ## Contributing
 
@@ -50,6 +45,10 @@ form possible.  If you have not already, **please make our day and star us above
 - Want to help with fixes and features:
   - Have a look at [open issues](https://github.com/issues?q=user%3Aopenebs+is%3Aopen)
   - Have a look at [contributing guide](./CONTRIBUTING.md)
+
+## Show me the Code
+
+This is a meta-repository for OpenEBS. Here please find various documentation related artifacts and code related to integrating OpenEBS with popular orchestration engines like kubernetes, swarm, mesos, rancher, etc., The core storage and storage orchestration source code is distributed in other repositories under the OpenEBS organization. Please start with the pinned repositories or with [OpenEBS Architecture](./contribute/design/README.md) document. 
 
 ## Credits
 
