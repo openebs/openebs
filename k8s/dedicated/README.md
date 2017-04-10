@@ -24,6 +24,12 @@ OpenEBS 0.2 supports host-based networking for the containers.
 
 (c) **Kubernetes FlexVolume - OpenEBS Driver (openebs-iscsi)**, is the one that helps in dynamically provisioning and connecting to the block storage offered by the VSMs. This driver needs to be installed on all the Kubernetes minion nodes.
 
+## Install Options
+
+You can manually setup the OpenEBS Cluster on your machines.
+- [Setup OpenEBS Cluster on Ubuntu 16.04](https://github.com/openebs/openebs/blob/master/k8s/dedicated/tutorial-ubuntu-1604-baremetal.md)
+
+## Getting Started using Vagrant
 
 To help you quickly get started, we have setup an Vagrantfile that will launch 5 Ubuntu VMs, for creating a single node Kubernetes Cluster and a two node OpenEBS Cluster. If this is your first time with Vagrant, you can follow through our [Step-by-step Installation Tutorial for Ubuntu 16.04](./tutorial-ubuntu1604-vagrant.md).
 
