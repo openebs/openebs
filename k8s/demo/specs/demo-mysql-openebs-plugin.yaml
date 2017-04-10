@@ -30,5 +30,5 @@ spec:
       driver: "openebs/openebs-iscsi"
       options:
         name: "demo-vsm1-vol1"
-        openebsApiUrl: "http://172.28.128.5:5656/latest"
+        openebsApiUrl: "http://172.28.128.4:5656/latest"
         size: "5G"
