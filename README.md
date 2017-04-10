@@ -33,7 +33,7 @@ We are in the alpha stage with active development underway. See our [Project Tra
 
 ## Contributing
 
-OpenEBS is completely Open Source and is makes use of other Open Source projects (listed below). 
+OpenEBS is completely Open Source and makes use of other Open Source projects [listed below](https://github.com/openebs/openebs#credits). 
 The project is in the early stages of development and we welcome your feedback and contributions in any 
 form possible.  If you have not already, **please make our day and star us above**.  
 
