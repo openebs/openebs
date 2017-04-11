@@ -1,7 +1,5 @@
 # Deploying dedicated OpenEBS Cluster for Kubernetes
 
-If you have not already familiarized with Kubernetes concepts, please take a moment to go through the basics of [Kubernetes](https://kubernetes.io/docs/tutorials/kubernetes-basics/). It is ok, if you dont have a kubernetes cluster installed, we have got that covered for you. 
-
 OpenEBS provides Storage via Containers (called as VSMs). The VSMs are launched on Docker via container orchestration engine. Thus the deployment of the OpenEBS Cluster (as show in the diagram below) closely resembles that of a Container Orchestrator like Kubernetes. 
 
 ![Dedicated Deployment Image](https://github.com/openebs/openebs/blob/master/documentation/source/_static/dedicated-with-podsv0.2.png)
