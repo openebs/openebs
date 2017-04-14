@@ -14,6 +14,7 @@ kubemaster-01             running (virtualbox)
 kubeminion-01             running (virtualbox)
 omm-01                    running (virtualbox)
 osh-01                    running (virtualbox)
+osh-02                    running (virtualbox)
 ```
 
 Verify the status of the Kubernetes Nodes
@@ -48,47 +49,23 @@ ubuntu-host:~/$ vagrant ssh omm-01
 ...snipped...
 ubuntu@omm-01:~$ maya omm-status
 Name           Address       Port  Status  Leader  Protocol  Build  Datacenter  Region
-omm-01.global  172.28.128.5  4648  alive   true    2         0.5.0  dc1         global
+omm-01.global  172.28.128.4  4648  alive   true    2         0.5.5  dc1         global
+
+m-apiserver listening at http://172.28.128.4:5656
 ubuntu@omm-01:~$ maya osh-status
 ID        DC   Name    Class   Drain  Status
-7c2943b2  dc1  osh-01  <none>  false  ready
+e57020e9  dc1  osh-02  <none>  false  ready
+b6789013  dc1  osh-01  <none>  false  ready
 ubuntu@omm-01:~$ 
 ```
 
 
-### Create the volume on OpenEBS 
-
-Similar to K8s pod, OpenEBS storage also can be specified via the spec file. A default spec file is located on the OpenEBS Maya Master under demo/maya/spec. 
-
-```
-ubuntu-host:~/$ vagrant ssh omm-01
-ubuntu@omm-01:~$ cd demo/maya/spec/
-ubuntu@omm-01:~/demo/maya/spec$ maya vsm-create demo-vsm.hcl 
-==> Monitoring evaluation "075e3e0b"
-    Evaluation triggered by job "demo-vsm1"
-    Allocation "c6e12b6c" created: node "7c2943b2", group "demo-vsm1-backend-container1"
-    Allocation "db8a17b4" created: node "7c2943b2", group "demo-vsm1-fe"
-    Evaluation status changed: "pending" -> "complete"
-==> Evaluation "075e3e0b" finished with status "complete"
-ubuntu@omm-01:~/demo/maya/spec$ 
-```
-Check that the Frontend and the Backend Containers are running. Give this a few minutes when launching for the first time, to allow the docker image to be downloaded.
-
-```
-ubuntu-host:~/$ vagrant ssh osh-01
-ubuntu@osh-01:~$ sudo docker ps
-CONTAINER ID        IMAGE                 COMMAND                  CREATED             STATUS              PORTS               NAMES
-b3197282c1c1        openebs/jiva:latest   "launch replica --..."   53 seconds ago      Up 53 seconds                           demo-vsm1-be-store1
-19c2be95741b        openebs/jiva:latest   "launch controller..."   53 seconds ago      Up 53 seconds                           demo-vsm1-fe
-ubuntu@osh-01:~$ 
-```
-
-### Configure the MySQL K8s Pod to use the OpenEBS Volume (via iSCSI)
+### Configure the MySQL K8s Pod to use the OpenEBS Volume
 
 ```
 ubuntu-host:~/$ vagrant ssh kubemaster-01
 ubuntu@kubemaster-01:~$ cd demo/k8s/spec/
-ubuntu@kubemaster-01:~/demo/k8s/spec$ cat demo-mysql-iscsi.yaml 
+ubuntu@kubemaster-01:~/demo/k8s/spec$ cat demo-mysql-openebs-plugin.yaml
 ---
 apiVersion: v1
 kind: Pod
@@ -114,18 +91,19 @@ spec:
       name: demo-vsm1-vol1
   volumes:
   - name: demo-vsm1-vol1
-    iscsi:
-      targetPortal: 172.28.128.101:3260      
-      iqn: iqn.2016-09.com.openebs.jiva:demo-vsm1-vol1
-      lun: 1
-      fsType: ext4
-      readOnly: false
+    flexVolume:
+      driver: "openebs/openebs-iscsi"
+      options:
+        name: "demo-vsm1-vol1"
+        openebsApiUrl: "http://172.28.128.4:5656/latest"
+        size: "5G"
 ubuntu@kubemaster-01:~/demo/k8s/spec$ 
 ```
+**Note:** The yaml ships with an default address for the openebsApiUrl. Modify this with the correct address, noted in the previous step.
 
 Start the MySQL pod
 ```
-ubuntu@kubemaster-01:~/demo/k8s/spec$ kubectl create -f demo-mysql-iscsi.yaml 
+ubuntu@kubemaster-01:~/demo/k8s/spec$ kubectl create -f demo-mysql-openebs-plugin.yaml
 pod "mysql" created
 ubuntu@kubemaster-01:~/demo/k8s/spec$ 
 ```
@@ -135,23 +113,6 @@ ubuntu@kubemaster-01:~/demo/k8s/spec$ kubectl get pods
 NAME      READY     STATUS              RESTARTS   AGE
 mysql     0/1       ContainerCreating   0          54s
 ubuntu@kubemaster-01:~/demo/k8s/spec$ 
-
-ubuntu@kubemaster-01:~/demo/k8s/spec$ kubectl describe pod mysql
-
-```
-
-Check the Volume Configuration status:
-
-```
-Volumes:
-  demo-vsm1-vol1:
-    Type:		ISCSI (an ISCSI Disk resource that is attached to a kubelet's host machine and then exposed to the pod)
-    TargetPortal:	172.28.128.101:3260
-    IQN:		iqn.2016-09.com.openebs.jiva:demo-vsm1-vol1
-    Lun:		1
-    ISCSIInterface	default
-    FSType:		ext4
-    ReadOnly:		false
 ```
 
 Once the volume is mounted and database is initialized, the pod status turns to running. 
@@ -163,11 +124,11 @@ mysql     1/1       Running   4          11m
 ubuntu@kubemaster-01:~$ 
 ```
 
-## Known Issues
+## TIPS
 If the MySQL keeps restarting check the following on the minion nodes
 - service iscsid status
   (Should show the status as connected)
 - sudo docker logs *mysql container id*
   (To get mysql container id, you may need to issue - sudo docker ps -a )
-- If the error says, directory not empty, clear it. *mount | grep jiva*
+
 

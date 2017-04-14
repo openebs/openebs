@@ -2,16 +2,16 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: mysql
+  name: percona
   labels:
-    name: mysql
+    name: percona
 spec:
   containers:
   - resources:
       limits:
         cpu: 0.5
-    name: mysql
-    image: mysql
+    name: percona
+    image: percona
     args:
       - "--ignore-db-dir"
       - "lost+found"
@@ -20,7 +20,7 @@ spec:
         value: k8sDem0
     ports:
       - containerPort: 3306
-        name: mysql
+        name: percona
     volumeMounts:
     - mountPath: /var/lib/mysql
       name: demo-vsm1-vol1
