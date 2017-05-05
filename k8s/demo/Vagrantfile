@@ -228,18 +228,16 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
                   ')
                   
                   token_name = `#{get_token_name}`                  
-                  info"Got token_name as #{token_name}"
 
                   get_token = %Q(vagrant ssh \
                   #{master_hostname} -c \
-                  'kubectl -n kube-system get secrets #{token_name} \
-                  -o yaml | grep token-map | cut -d ":" -f2 \
+                  'kubectl -n kube-system get secrets #{token_name.strip} \
+                  -o yaml | grep token-secret | cut -d ":" -f2 \
                   | cut -d " " -f2 | base64 -d \
                   | sed "s|{||g;s|}||g" \
                   | sed "s|:|.|g" | xargs echo')
                   
                   token = `#{get_token}`                  
-                  info"Got token as #{token}"
                   
                   if token != ""
                     get_cluster_ip = %Q(vagrant ssh \
