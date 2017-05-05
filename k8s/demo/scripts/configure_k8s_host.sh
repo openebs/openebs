@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -x
 
 # Note:This script assumes the user has the permission to ssh into the master machine.
 # Variables:
@@ -20,7 +20,7 @@ function update_hosts(){
 }
 
 function setup_k8s_minion(){
-    sudo kubeadm join --token=$token $masterip
+    sudo kubeadm join --token=$token ${masterip}:6443
 }
 
 function join_cni_network(){

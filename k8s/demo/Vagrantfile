@@ -224,14 +224,15 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
                   #{master_hostname} -c \
                   'kubectl -n kube-system get secrets \
                   | grep bootstrap-token | cut -d " " -f1\
+                  | cut -d "-" -f3\
                   | sed "s|\r||g" \
                   ')
                   
-                  token_name = `#{get_token_name}`                  
+                  token_name = `#{get_token_name}`               
 
                   get_token = %Q(vagrant ssh \
                   #{master_hostname} -c \
-                  'kubectl -n kube-system get secrets #{token_name.strip} \
+                  'kubectl -n kube-system get secrets bootstrap-token-#{token_name.strip} \
                   -o yaml | grep token-secret | cut -d ":" -f2 \
                   | cut -d " " -f2 | base64 -d \
                   | sed "s|{||g;s|}||g" \
@@ -246,11 +247,14 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
                     | cut -d ":" -f2 | cut -d " " -f2')
 
                     cluster_ip = `#{get_cluster_ip}`
+                    info"Got the masterip as #{master_ip_address.strip}..."
+                    info"Got the token as #{token_name.strip}.#{token.strip}..."
+                    info"Got the cluster ip as #{cluster_ip.strip}..."
 
                     @machine.communicate.sudo("bash \
                     /vagrant/scripts/configure_k8s_host.sh \
                     --masterip=#{master_ip_address.strip} \
-                    --token=#{token.strip} \
+                    --token=#{token_name.strip}.#{token.strip} \
                     --clusterip=#{cluster_ip.strip}")
                   else
                     info"Invalid Token. Check your Kubernetes setup."
