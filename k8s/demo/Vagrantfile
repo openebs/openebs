@@ -20,7 +20,7 @@ DEPLOY_MODE_DEDICATED = 1
 DEPLOY_MODE_HC = 2
 
 #Changed DEPLOY_MODE from Constant to Local variable deploy_Mode to avoid rewrite warnings on constants.
-deploy_Mode=ENV['OPENEBS_DEPLOY_MODE'] || 1
+deploy_Mode=ENV['OPENEBS_DEPLOY_MODE'] || 2
 
 #Specify the release versions to be installed
 MAYA_RELEASE_TAG = ENV['MAYA_RELEASE_TAG'] || "0.2"
@@ -63,6 +63,8 @@ machine_ip_address = %Q(ifconfig | grep -oP \
             | sort | tail -n 1 | head -n 1)
 master_ip_address = ""
 host_ip_address = ""
+get_token_name = ""
+token_name = ""
 get_token = ""
 token = ""
 
@@ -151,7 +153,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       cpus = KM_CPUS
       mem = KM_MEM            
       config.vm.define hostname do |vmCfg|
-        vmCfg.vm.box = "openebs/k8s-1.5.5"
+        vmCfg.vm.box = "openebs/k8s-1.6.2"
 	      vmCfg.vm.provider "virtualbox" do |vb|
            vb.customize ["modifyvm", :id, "--uartmode1", "file", File.join(Dir.pwd, "openebs-k8s-1.5.5-cloudimg-console.log")]
         end
@@ -163,8 +165,18 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
           
           # Install Kubernetes Master.
           vmCfg.vm.provision :shell, 
-          inline: "/bin/bash /home/ubuntu/demo/k8s/scripts/configure_k8s_master.sh", 
+          inline: "/bin/bash /vagrant/scripts/configure_k8s_master.sh", 
           privileged: true          
+
+          # Setup K8s Credentials
+          vmCfg.vm.provision :shell, 
+          inline: "/bin/bash /vagrant/scripts/configure_k8s_cred.sh", 
+          privileged: false          
+
+          # Setup Weave
+          vmCfg.vm.provision :shell, 
+          inline: "/bin/bash /vagrant/scripts/configure_k8s_weave.sh", 
+          privileged: false          
         end
       end           
     end
@@ -175,7 +187,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       cpus = KH_CPUS
       mem = KH_MEM            
       config.vm.define hostname do |vmCfg|
-        vmCfg.vm.box = "openebs/k8s-1.5.5"
+        vmCfg.vm.box = "openebs/k8s-1.6.2"
 	      vmCfg.vm.provider "virtualbox" do |vb|
            vb.customize ["modifyvm", :id, "--uartmode1", "file", File.join(Dir.pwd, "openebs-k8s-1.5.5-cloudimg-console.log")]
         end
@@ -208,15 +220,26 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
                   bring it up and manually run: \
                   configure_k8s_host.sh script on Kubernetes Minion."
               else                           
+                  get_token_name = %Q(vagrant ssh \
+                  #{master_hostname} -c \
+                  'kubectl -n kube-system get secrets \
+                  | grep bootstrap-token | cut -d " " -f1\
+                  | sed "s|\r||g" \
+                  ')
+                  
+                  token_name = `#{get_token_name}`                  
+                  info"Got token_name as #{token_name}"
+
                   get_token = %Q(vagrant ssh \
                   #{master_hostname} -c \
-                  'kubectl -n kube-system get secret clusterinfo \
+                  'kubectl -n kube-system get secrets #{token_name} \
                   -o yaml | grep token-map | cut -d ":" -f2 \
                   | cut -d " " -f2 | base64 -d \
                   | sed "s|{||g;s|}||g" \
                   | sed "s|:|.|g" | xargs echo')
                   
                   token = `#{get_token}`                  
+                  info"Got token as #{token}"
                   
                   if token != ""
                     get_cluster_ip = %Q(vagrant ssh \
@@ -227,7 +250,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
                     cluster_ip = `#{get_cluster_ip}`
 
                     @machine.communicate.sudo("bash \
-                    /home/ubuntu/demo/k8s/scripts/configure_k8s_host.sh \
+                    /vagrant/scripts/configure_k8s_host.sh \
                     --masterip=#{master_ip_address.strip} \
                     --token=#{token.strip} \
                     --clusterip=#{cluster_ip.strip}")
