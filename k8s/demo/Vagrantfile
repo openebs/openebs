@@ -153,9 +153,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       cpus = KM_CPUS
       mem = KM_MEM            
       config.vm.define hostname do |vmCfg|
-        vmCfg.vm.box = "openebs/k8s-1.6.2"
+        vmCfg.vm.box = "openebs/k8s-1.6"
 	      vmCfg.vm.provider "virtualbox" do |vb|
-           vb.customize ["modifyvm", :id, "--uartmode1", "file", File.join(Dir.pwd, "openebs-k8s-1.5.5-cloudimg-console.log")]
+           vb.customize ["modifyvm", :id, "--uartmode1", "file", File.join(Dir.pwd, "openebs-k8s-1.6-cloudimg-console.log")]
         end
         vmCfg = configureVM(vmCfg, hostname, cpus, mem)
 
@@ -187,9 +187,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       cpus = KH_CPUS
       mem = KH_MEM            
       config.vm.define hostname do |vmCfg|
-        vmCfg.vm.box = "openebs/k8s-1.6.2"
+        vmCfg.vm.box = "openebs/k8s-1.6"
 	      vmCfg.vm.provider "virtualbox" do |vb|
-           vb.customize ["modifyvm", :id, "--uartmode1", "file", File.join(Dir.pwd, "openebs-k8s-1.5.5-cloudimg-console.log")]
+           vb.customize ["modifyvm", :id, "--uartmode1", "file", File.join(Dir.pwd, "openebs-k8s-1.6-cloudimg-console.log")]
         end
         vmCfg = configureVM(vmCfg, hostname, cpus, mem)
 
@@ -204,7 +204,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
           :stdout => true, 
           :stderr => true do |trigger|
             trigger.fire do
-              info"Getting the Master IP to join the cluster..."
+              info"Getting the Master IP and Token to join the cluster..."
               master_hostname = "kubemaster-01"
               
               get_ip_address = %Q(vagrant ssh \
@@ -247,9 +247,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
                     | cut -d ":" -f2 | cut -d " " -f2')
 
                     cluster_ip = `#{get_cluster_ip}`
-                    info"Got the masterip as #{master_ip_address.strip}..."
-                    info"Got the token as #{token_name.strip}.#{token.strip}..."
-                    info"Got the cluster ip as #{cluster_ip.strip}..."
+                    info"Using Master IP  - #{master_ip_address.strip}"
+                    info"Using Token -  #{token_name.strip}.#{token.strip}"
 
                     @machine.communicate.sudo("bash \
                     /vagrant/scripts/configure_k8s_host.sh \
