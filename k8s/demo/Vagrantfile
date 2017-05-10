@@ -20,7 +20,7 @@ DEPLOY_MODE_DEDICATED = 1
 DEPLOY_MODE_HC = 2
 
 #Changed DEPLOY_MODE from Constant to Local variable deploy_Mode to avoid rewrite warnings on constants.
-deploy_Mode=ENV['OPENEBS_DEPLOY_MODE'] || 2
+deploy_Mode=ENV['OPENEBS_DEPLOY_MODE'] || 1
 
 #Specify the release versions to be installed
 MAYA_RELEASE_TAG = ENV['MAYA_RELEASE_TAG'] || "0.2"
@@ -387,6 +387,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 		  @machine.communicate.sudo("echo \
 		  'export MAPI_ADDR=http://#{host_ip_address.strip}:5656' >> \
                   /home/ubuntu/.profile")
+
+                  info"Fetching the latest jiva image"
 
 		  @machine.communicate.sudo("docker pull \
 		  openebs/jiva")

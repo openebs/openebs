@@ -34,8 +34,8 @@ function disable_controller_attach_detach() {
      /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
     sudo sed -i "s/\$KUBELET_AUTHZ_ARGS/\$KUBELET_AUTHZ_ARGS \$KUBELET_VOL_ARGS/g" \
      /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
-    sudo systemctl daemon-reload
-    sudo systemctl restart kubelet
+    #sudo systemctl daemon-reload
+    #sudo systemctl restart kubelet
 }
 
 function show_help() {
