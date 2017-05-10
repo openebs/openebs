@@ -21,7 +21,7 @@
 
 #Initialize the logs and specs directory, if not already created
 #TBD : Check if this can be moved into the init section
-OEBSDEBUG=false
+OEBSDEBUG=true
 SPECS_DIR="/tmp/openebs/specs"
 OLOGS_DIR="/tmp/logs/openebs-iscsi"
 CHECK_VOLUME="${OLOGS_DIR}/checkvolumeexists.json"
@@ -57,6 +57,15 @@ debug() {
     if [ ${OEBSDEBUG} ]; then  echo -e $* >>  ${OLOGS_DIR}/openebs-iscsi.log; fi
 }
 
+
+# Print all the arguments into a log file
+_printallargs() {
+    if [ ${OEBSDEBUG} ]; then
+        for i in $*; do
+            echo -e $i >>  ${OLOGS_DIR}/openebs-iscsi.log; 
+        done
+    fi
+}
 
 ismounted() {
     MOUNT=`findmnt -n ${MNTPATH} 2>/dev/null | cut -d' ' -f1`
@@ -359,11 +368,14 @@ unmount() {
 }
 
 getvolumename() {
-    SOURCE=$(echo $2 | jq -r '.source')
-    MOUNT_OPTIONS=$(echo $2 | jq -r '.mountOptions')
-    log "{\"status\": \"Success\", \"volumeName\": \"${SOURCE}/${MOUNT_OPTIONS}\"}"
+    _printallargs $*
+    VOLUME_NAME=$(echo $1 | jq -r '.name')
+    log "{\"status\": \"Success\", \"volumeName\": \"${VOLUME_NAME}\"}"
     exit 0
 }
+
+
+_printallargs $*
 
 op=$1
 
