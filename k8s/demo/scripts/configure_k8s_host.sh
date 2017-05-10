@@ -27,6 +27,17 @@ function join_cni_network(){
     sudo route add $clusterip gw $masterip
 }
 
+#To make the minion backward compatible, disable
+# the functionality of controller attach/detach
+function disable_controller_attach_detach() {
+    sudo sed -i "/KUBELET_AUTHZ_ARGS=/aEnvironment=\"KUBELET_VOL_ARGS=--enable-controller-attach-detach=false\"" \
+     /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
+    sudo sed -i "s/\$KUBELET_AUTHZ_ARGS/\$KUBELET_AUTHZ_ARGS \$KUBELET_VOL_ARGS/g" \
+     /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
+    sudo systemctl daemon-reload
+    sudo systemctl restart kubelet
+}
+
 function show_help() {
     cat << EOF
     Usage : $(basename "$0") --masterip=<KubeMaster IP> --token=<Token> --clusterip=<Cluster IP>
@@ -170,6 +181,10 @@ update_hosts
 echo Setting up the Minion using IPAddress: $machineip
 echo Setting up the Minion using Token: $token 
 setup_k8s_minion
+
+echo Patch the kubelet startup script to disable attach/detach controller
+disable_controller_attach_detach
+
 
 #Add route to the minion ip to the cluster ip
 echo Joining the CNI Network...
