@@ -1,0 +1,26 @@
+---
+- hosts: localhost
+
+  roles:
+    - inventory
+      
+- hosts: openebs-mayamaster
+
+  roles:
+    - master
+    - {role: vagrant, when: is_vagrant_vm | bool} 
+
+- hosts: openebs-mayahosts
+
+  roles:
+    - hosts
+    - {role: vagrant, when: is_vagrant_vm | bool}
+
+- hosts: localhost  
+
+  roles:
+    - {role: localhost, when: run_demo | bool} 
+    - {role: volume, when: run_demo | bool}
+    - {role: fio, when: run_demo | bool}
+    - {role: cleanup, when: run_demo | bool}
+

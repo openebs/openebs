@@ -1,0 +1,27 @@
+---
+- name: Wait until I/O completion
+  wait_for:
+    timeout: 120 
+
+- name: Confirm cleanup step
+  pause:
+    prompt: 'Please confirm you want to proceed with cleanup! Press return to continue. Press Ctrl+c and then "a" to abort'
+
+- name: Unmount the ext4 filesystem
+  mount: 
+    name: /mnt/iscsi
+    state: absent 
+  become: true
+
+- name: Tear down iSCSI sessions
+  open_iscsi: 
+    login: no
+    target: "{{hostvars[groups['openebs-mayamaster'][0]]['openebs_target_iqn']}}"
+
+- name: Tear down the storage containers
+  shell: source ~/.profile; maya vsm-stop {{openebs_vol_name}}
+  args: 
+    executable: /bin/bash
+  ignore_errors: false 
+  delegate_to: "{{groups['openebs-mayamaster'].0}}"
+  tags: ['vol_delete']

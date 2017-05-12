@@ -1,0 +1,25 @@
+---
+#Option to run the sample demo of OpenEBS
+#Accepted Entries(true, false): default:true
+
+run_demo: true
+
+#Option specifically for vagrant VMs.
+#Accepted Entries(true, false): default:false
+
+is_vagrant_vm: false
+  
+#User-defined size for the volume that openebs creates:
+#Accepted Entries(Valid Volume Sizes): default:5G
+
+openebs_vol_size: 5G
+
+#Available CIDR for allocating IP Addresses for containers
+#Accepted Entries (Valid CIDR): default:172.28.128.1/24
+
+cn_network_cidr: 172.28.128.1/24 
+
+#Network interface for CIDR.
+#Accepted Entries (Valid Network Interface): default:enp0s8
+
+cn_interface: enp0s8

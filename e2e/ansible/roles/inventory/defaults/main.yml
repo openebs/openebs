@@ -1,0 +1,4 @@
+---
+inventory_script_path: "{{hostvars['localhost'].playbook_dir}}/files"
+
+inventory_input_path: "{{hostvars['localhost'].playbook_dir}}/inventory"

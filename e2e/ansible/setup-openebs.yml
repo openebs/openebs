@@ -1,0 +1,14 @@
+---
+- hosts: openebs-mayamaster
+
+  roles:
+    - master
+    - {role: vagrant, when: is_vagrant_vm | bool} 
+
+- hosts: openebs-mayahosts
+
+  roles:
+    - hosts
+    - {role: vagrant, when: is_vagrant_vm | bool}
+
+

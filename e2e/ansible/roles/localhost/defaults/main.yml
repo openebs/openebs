@@ -1,0 +1,8 @@
+---
+deb_local_packages:
+  - docker.io
+  - open-iscsi
+  - fio
+
+pip_local_packages:
+  - 'docker-py==1.9.0'
