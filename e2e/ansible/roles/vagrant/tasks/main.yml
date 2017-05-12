@@ -1,0 +1,12 @@
+---
+- name: Update Nomad IP in .profile  
+  lineinfile:
+    destfile : /home/{{hostvars[inventory_hostname]['ansible_ssh_user']}}/.profile
+    line: export NOMAD_ADDR=http://{{hostvars[groups['openebs-mayamaster'][0]]['ansible_ssh_host']}}:4646
+    state: present
+
+- name: Update M-APIServer IP in .profile
+  lineinfile:
+    destfile : /home/{{hostvars[inventory_hostname]['ansible_ssh_user']}}/.profile
+    line: export MAPI_ADDR=http://{{hostvars[groups['openebs-mayamaster'][0]]['ansible_ssh_host']}}:5656
+    state: present

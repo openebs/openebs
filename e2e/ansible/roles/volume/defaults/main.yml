@@ -1,0 +1,4 @@
+---
+openebs_vol_name: volume
+
+openebs_vol_size: 5G
