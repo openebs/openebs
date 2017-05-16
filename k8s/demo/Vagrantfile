@@ -63,6 +63,8 @@ machine_ip_address = %Q(ifconfig | grep -oP \
             | sort | tail -n 1 | head -n 1)
 master_ip_address = ""
 host_ip_address = ""
+get_token_name = ""
+token_name = ""
 get_token = ""
 token = ""
 
@@ -151,9 +153,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       cpus = KM_CPUS
       mem = KM_MEM            
       config.vm.define hostname do |vmCfg|
-        vmCfg.vm.box = "openebs/k8s-1.5.5"
+        vmCfg.vm.box = "openebs/k8s-1.6"
 	      vmCfg.vm.provider "virtualbox" do |vb|
-           vb.customize ["modifyvm", :id, "--uartmode1", "file", File.join(Dir.pwd, "openebs-k8s-1.5.5-cloudimg-console.log")]
+           vb.customize ["modifyvm", :id, "--uartmode1", "file", File.join(Dir.pwd, "openebs-k8s-1.6-cloudimg-console.log")]
         end
         vmCfg = configureVM(vmCfg, hostname, cpus, mem)
 
@@ -163,8 +165,18 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
           
           # Install Kubernetes Master.
           vmCfg.vm.provision :shell, 
-          inline: "/bin/bash /home/ubuntu/demo/k8s/scripts/configure_k8s_master.sh", 
+          inline: "/bin/bash /vagrant/scripts/configure_k8s_master.sh", 
           privileged: true          
+
+          # Setup K8s Credentials
+          vmCfg.vm.provision :shell, 
+          inline: "/bin/bash /vagrant/scripts/configure_k8s_cred.sh", 
+          privileged: false          
+
+          # Setup Weave
+          vmCfg.vm.provision :shell, 
+          inline: "/bin/bash /vagrant/scripts/configure_k8s_weave.sh", 
+          privileged: false          
         end
       end           
     end
@@ -175,9 +187,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       cpus = KH_CPUS
       mem = KH_MEM            
       config.vm.define hostname do |vmCfg|
-        vmCfg.vm.box = "openebs/k8s-1.5.5"
+        vmCfg.vm.box = "openebs/k8s-1.6"
 	      vmCfg.vm.provider "virtualbox" do |vb|
-           vb.customize ["modifyvm", :id, "--uartmode1", "file", File.join(Dir.pwd, "openebs-k8s-1.5.5-cloudimg-console.log")]
+           vb.customize ["modifyvm", :id, "--uartmode1", "file", File.join(Dir.pwd, "openebs-k8s-1.6-cloudimg-console.log")]
         end
         vmCfg = configureVM(vmCfg, hostname, cpus, mem)
 
@@ -192,7 +204,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
           :stdout => true, 
           :stderr => true do |trigger|
             trigger.fire do
-              info"Getting the Master IP to join the cluster..."
+              info"Getting the Master IP and Token to join the cluster..."
               master_hostname = "kubemaster-01"
               
               get_ip_address = %Q(vagrant ssh \
@@ -208,10 +220,20 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
                   bring it up and manually run: \
                   configure_k8s_host.sh script on Kubernetes Minion."
               else                           
+                  get_token_name = %Q(vagrant ssh \
+                  #{master_hostname} -c \
+                  'kubectl -n kube-system get secrets \
+                  | grep bootstrap-token | cut -d " " -f1\
+                  | cut -d "-" -f3\
+                  | sed "s|\r||g" \
+                  ')
+                  
+                  token_name = `#{get_token_name}`               
+
                   get_token = %Q(vagrant ssh \
                   #{master_hostname} -c \
-                  'kubectl -n kube-system get secret clusterinfo \
-                  -o yaml | grep token-map | cut -d ":" -f2 \
+                  'kubectl -n kube-system get secrets bootstrap-token-#{token_name.strip} \
+                  -o yaml | grep token-secret | cut -d ":" -f2 \
                   | cut -d " " -f2 | base64 -d \
                   | sed "s|{||g;s|}||g" \
                   | sed "s|:|.|g" | xargs echo')
@@ -225,11 +247,13 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
                     | cut -d ":" -f2 | cut -d " " -f2')
 
                     cluster_ip = `#{get_cluster_ip}`
+                    info"Using Master IP  - #{master_ip_address.strip}"
+                    info"Using Token -  #{token_name.strip}.#{token.strip}"
 
                     @machine.communicate.sudo("bash \
-                    /home/ubuntu/demo/k8s/scripts/configure_k8s_host.sh \
+                    /vagrant/scripts/configure_k8s_host.sh \
                     --masterip=#{master_ip_address.strip} \
-                    --token=#{token.strip} \
+                    --token=#{token_name.strip}.#{token.strip} \
                     --clusterip=#{cluster_ip.strip}")
                   else
                     info"Invalid Token. Check your Kubernetes setup."
@@ -363,6 +387,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 		  @machine.communicate.sudo("echo \
 		  'export MAPI_ADDR=http://#{host_ip_address.strip}:5656' >> \
                   /home/ubuntu/.profile")
+
+                  info"Fetching the latest jiva image"
 
 		  @machine.communicate.sudo("docker pull \
 		  openebs/jiva")
