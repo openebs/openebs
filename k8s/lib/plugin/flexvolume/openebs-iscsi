@@ -105,9 +105,11 @@ check_volume_status(){
     # If it remains in pending state, after timeout period expires, control passes to the script. 
     i=1
     output=0
+    VOLUMENAME=$1   
+    OPENEBS_API_URL=$2
         while [ "${i}" -lt 11 ]
         do       
-            echo -e "Calling checkvolumeexists. Attempt ${i} of 10"
+            echo -e "Calling checkvolumeexists. Attempt ${i} of 10" >> "${OLOGS_DIR}/openebs-iscsi.log" 
             status=$(checkvolumeexists "${VOLUMENAME}" "${OPENEBS_API_URL}")
             
             # Pending State
@@ -131,7 +133,7 @@ check_volume_status(){
             fi
             
             if [ "${i}" == 10 ]; then
-               echo "Exceeded number of requests to maya server.." >> "${OLOGS_DIR}/openebs-iscsi.log" 
+               echo "Exceeded number of requests to maya server." >> "${OLOGS_DIR}/openebs-iscsi.log" 
             fi
             
             i=$((i+1))
@@ -149,6 +151,7 @@ checkvolumeexists(){
     # Get curl response as well as HTTP Code
     response=$( curl --write-out %{http_code} --silent --output ${CHECK_VOLUME} \
     "${OPENEBS_API_URL}/volume/info/${VOLUMENAME}" )
+    
     if [ "${response}" == "200" ] ; then
         status=$( jq -r '.Status.Reason' ${CHECK_VOLUME} )
     else
@@ -165,7 +168,7 @@ checkvolumeexists(){
         targetportal=$(jq -r '.annotations.targetportal' ${CHECK_VOLUME})
         iqn=$(jq -r '.annotations.iqn' ${CHECK_VOLUME})
         data="${targetportal}\n${iqn}"
-        echo -e "${data}" > "/tmp/logs/openebs-iscsi/specs.txt"
+        echo -e "${data}" > /tmp/logs/openebs-iscsi/specs.txt
         debug "checkvolumeexists - extracted details $(cat $SPECS_DIR/specs.txt )" 
         echo -e "checkvolumeexists: VSM is in Pending State." >> ${OLOGS_DIR}/openebs-iscsi.log
         result=1
@@ -175,7 +178,7 @@ checkvolumeexists(){
         targetportal=$(jq -r '.annotations.targetportal' ${CHECK_VOLUME})
         iqn=$(jq -r '.annotations.iqn' ${CHECK_VOLUME})
         data="${targetportal}\n${iqn}"
-        echo -e "${data}" > "/tmp/logs/openebs-iscsi/specs.txt"
+        echo -e "${data}" > /tmp/logs/openebs-iscsi/specs.txt
         debug "checkvolumeexists - extracted details $(cat /tmp/logs/openebs-iscsi/specs.txt )" 
         echo -e "checkvolumeexists: VSM is in Complete State." >> ${OLOGS_DIR}/openebs-iscsi.log
         result=2
@@ -205,7 +208,7 @@ createvolume(){
      --fail -k -H "Content-Type: application/yaml" -XPOST -d  \
      "$(cat /tmp/openebs/specs/openebs-${VOLUMENAME}-pvc.yaml)" "${OPENEBS_API_URL}/volumes/" )
 
-    output=$( check_volume_status )
+    output=$( check_volume_status "${VOLUMENAME}" "${OPENEBS_API_URL}" )
     echo $output
 }
 
@@ -271,7 +274,7 @@ domount() {
     # Volume already Created, but is in Pending State
     elif [[ "${status}" -eq 1 ]]; then
         echo -e "Creating a timeout loop" >> ${OLOGS_DIR}/openebs-iscsi.log
-        output=$( check_volume_status )
+        output=$(check_volume_status "${VOLUMENAME}" "${OPENEBS_API_URL}")
     else
         # Volume already created, and is in Success State
         echo -e "domount: volume already created" >> ${OLOGS_DIR}/openebs-iscsi.log
@@ -298,7 +301,7 @@ domount() {
     debug "devx is $devx"
     # The device can take a few more seconds to appear under /dev
     waiti=0
-    while [ "${devx}"=="" ]; do
+    while [ "${devx}" == "" ]; do
         sleep 5
         devx=$(sudo iscsiadm -m session -P 3 2>&1 |grep -i "Attached scsi disk" | awk '{print $4}')
         debug "devx is $devx during $waiti"
@@ -309,12 +312,12 @@ domount() {
                 continue
         fi
     done
-
     debug "domount - mounting iscsi device /dev/$devx as ${MNTPATH}" 
-    sudo mkdir -p "${MNTPATH}"
+    mkdir -p ${MNTPATH} &> /dev/null
     debug $(sudo mkfs.ext4 -F "/dev/$devx" 2>&1)
-    sudo mount -t ext4 "/dev/$devx" "${MNTPATH}" 
-
+    # sudo mount -o bind -t "ext 4" "/dev/$devx" "${MNTPATH}" &> /dev/null
+    #sudo mount -o rw,noexec,nosuid,nodev,bind -t "ext4" "/dev/$devx" "${MNTPATH}" &> /dev/null
+    sudo mount "/dev/${devx}" ${MNTPATH} &> /dev/null
     if [ $? -ne 0 ]; then
         2>&1
         err '{ "status": "Failure", "message": "Failed to mount device '${MNTPATH}' , volume_src: '${devx}'"}'
@@ -323,7 +326,7 @@ domount() {
     fi
     debug "domount - mounted iscsi device /dev/$devx as ${MNTPATH}" 
     log '{"status": "Success"}'
-    
+
     exit 0
 }
 unmount() {
