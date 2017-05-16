@@ -34,7 +34,7 @@
 
 - name: fio docker image pull
   docker_image:
-    name: "{{openebs_container}}"
+    name: "{{openebs_image}}"
     state: present
     pull: true
     timeout: 120
@@ -43,7 +43,8 @@
 - name: fio docker instantiate
   docker_container:
     name: fio-runner
-    image: "{{openebs_container}}"
+    image: "{{openebs_image}}"
+    command: /fio_runner.sh Basic "{{fio_run_duration}}" 
     volumes:
       - /mnt/iscsi:/datadir1
     state: started
