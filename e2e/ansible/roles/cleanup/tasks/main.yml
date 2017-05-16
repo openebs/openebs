@@ -18,6 +18,10 @@
     login: no
     target: "{{hostvars[groups['openebs-mayamaster'][0]]['openebs_target_iqn']}}"
 
+- name: Remove stale node entries for ISCSI target
+  shell: iscsiadm -m node -T "{{hostvars[groups['openebs-mayamaster'][0]]['openebs_target_iqn']}}" -o delete
+  become: true
+
 - name: Tear down the storage containers
   shell: source ~/.profile; maya vsm-stop {{openebs_vol_name}}
   args: 

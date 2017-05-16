@@ -1,3 +1,28 @@
 ---
-- include: playbooks/test-fio.yml
+# This .yml runs tests against the openebs setup
 
+###########################################################################################
+# TC NAME: test-fio
+# TC DETAILS: Runs fio with a basic rw workload profile on the storage from a container
+# TC NOTES:  
+#    a) Volume properties can be set in ./roles/volume/defaults/main.yml 
+#    b) fio run duration can be set in ./roles/fio/defaults/main.yml
+# 
+- include: playbooks/test-fio.yml
+#
+###########################################################################################
+# TC NAME: test-iometer
+# TC DETAILS: Sets up env for IOmeter run on the storage by running dynamo from container
+# TC NOTES: 
+#    a) Keep IOmeter application started on a windows machine before running playbook  
+#    b) Windows IOmeter host IP address can be set in ./roles/iometer/defaults/main.yml
+#    c) Volume properties can be set in ./roles/volume/defaults/main.yml
+#
+#- hosts: localhost
+#  tasks:
+#     - shell: echo "{{hostvars['localhost'].playbook_dir}}"/files
+#       register: files_path
+#
+#- include: playbooks/test-iometer.yml dockerfile_path="{{files_path.stdout}}"
+#
+###########################################################################################
