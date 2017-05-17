@@ -50,6 +50,5 @@ VM, run `vagrant status NAME`.
 Just use *vagrant up* to bring up the cluster. 
 
 ```
-```
 ubuntu-host:~/k8s-demo$ vagrant up
 ```
