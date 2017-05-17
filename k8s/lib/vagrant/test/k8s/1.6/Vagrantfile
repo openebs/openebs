@@ -255,6 +255,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
                     --masterip=#{master_ip_address.strip} \
                     --token=#{token_name.strip}.#{token.strip} \
                     --clusterip=#{cluster_ip.strip}")
+
+                    @machine.communicate.sudo("sudo systemctl daemon-reload")
+                    @machine.communicate.sudo("sudo systemctl restart kubelet")
                   else
                     info"Invalid Token. Check your Kubernetes setup."
                   end
