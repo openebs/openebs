@@ -42,46 +42,48 @@ def appendRemoteKeyInLocal(key, authorized_key_path, ip):
     executeCmd(key_append_cmd)
     logging.debug ("******** Remote key for %s has been added into authorized_keys in LocalHost ********", ip)
 
-def generateInventory(boxlist, path):
+def validateHostCodes(machinelist, codes):
+    """ Validates the host codes against a supported list """
+
+    codelist = list(codes)
+    for i in machinelist:
+        if i[0].lower() not in codelist:
+            logging.info ("******** Inventory generation failed, please check host code '%s' ********", i[0])
+            exit()
+
+def generateInventory(config, boxlist, path, codes):
     """ Generates inventory.cfg file using configparser module  """
 
-    config = configparser.ConfigParser()
     c = 1
     for i in boxlist:
-        if i[0].lower() == 'master':
-            hostgroupname = 'openebs-maya%s' %(i[0])
-            hostaliasname = 'maya%s ansible_ssh_host' %(i[0])
-            m_user = "\"{{ lookup('env','%s') }}\"" %(i[2])
-            m_passwd = "\"{{ lookup('env','%s') }}\"" %(i[3])
+        hostgroupname = codes[i[0]]
+        user = "\"{{ lookup('env','%s') }}\"" %(i[2])
+        passwd = "\"{{ lookup('env','%s') }}\"" %(i[3])
+
+        if c == 1:
+            hostaliasname = '%s0%s ansible_ssh_host' %(i[0], c)
             config[hostgroupname] = {hostaliasname:i[1]}
-            with open(path, 'w') as configfile:
-                config.write(configfile)
-            varsgroupname = 'openebs-maya%s:vars' %(i[0])
-            config[varsgroupname] = {'ansible_ssh_user': m_user}
-            config[varsgroupname]['ansible_ssh_pass'] = m_passwd
+            f = open(path, 'w')
+            config.write(f)
+            f.close()
+            c = c + 1
+
+            varsgroupname = '%s:vars' %(hostgroupname)
+            config[varsgroupname] = {'ansible_ssh_user': user}
+            config[varsgroupname]['ansible_ssh_pass'] = passwd
             config[varsgroupname]['ansible_ssh_extra_args'] = "'-o StrictHostKeyChecking=no'"
-            with open(path, 'w') as configfile:
-                config.write(configfile)
-        elif i[0].lower() == 'host':
-            hostgroupname = 'openebs-maya%ss' %(i[0])
-            h_user = "\"{{ lookup('env','%s') }}\"" %(i[2])
-            h_passwd = "\"{{ lookup('env','%s') }}\"" %(i[3])
-            if c == 1:
-                hostaliasname = 'maya%s0%s ansible_ssh_host' %(i[0], c)
-                config[hostgroupname] = {hostaliasname:i[1]}
-                with open(path, 'w') as configfile:
-                    config.write(configfile)
-                c = c + 1
-            elif c > 1:
-                hostaliasname = 'maya%s0%s ansible_ssh_host' %(i[0], c)
-                config[hostgroupname][hostaliasname] = i[1]
-                with open(path, 'w') as configfile:
-                    config.write(configfile)
-                c = c + 1
-            varsgroupname = 'openebs-maya%ss:vars' %(i[0])
-            config[varsgroupname] = {'ansible_ssh_user': h_user}
-            config[varsgroupname]['ansible_ssh_pass'] = h_passwd
-            config[varsgroupname]['ansible_ssh_extra_args'] = "'-o StrictHostKeyChecking=no'"
+            f = open(path, 'w')
+            config.write(f)
+            f.close()
+
+        elif c > 1:
+            hostaliasname = '%s0%s ansible_ssh_host' %(i[0], c)
+            config[hostgroupname][hostaliasname] = i[1]
+            f = open(path, 'w')
+            config.write(f)
+            f.close()
+            c = c + 1
+    
     logging.info ("******** Inventory config generated successfully ********")
 
 def replace(file, pattern, subst):
@@ -120,11 +122,13 @@ def main():
     key_append_path = '~/.ssh/authorized_keys'
     key_gen_cmd = 'echo -e  "y\n"|ssh-keygen -q -t rsa -N "" -f ~/.ssh/id_rsa'
 
+    # Create the configparser object
+    config = configparser.ConfigParser()
+    
     # Specify path for inventory
     ansible_path = os.path.dirname(os.path.dirname(os.path.realpath(sys.argv[0])))
     ansible_cfg_path = ansible_path + 'ansible.cfg'
     default_inventory_path = ansible_path + '/inventory/'
-    config = configparser.ConfigParser()
     try:
         config.read_file(open(ansible_cfg_path))
         inventory_path = ansible_path + config.get('defaults', 'inventory')
@@ -146,6 +150,10 @@ def main():
     # Initiate log file
     clearLogCmd = '> %s' %(logfile)
     executeCmd(clearLogCmd)
+
+    # Initialize dictionary holding supported host codes
+    SupportedHostCodes = {'mayamaster': 'openebs-mayamasters', 'mayahost': 'openebs-mayahosts',\
+            'kubemaster': 'kubernetes-kubemasters', 'kubeminion': 'kubernetes-kubeminions'}
       
     # Create list of tuples containing individual machine info
     HostList = []
@@ -156,7 +164,11 @@ def main():
                 try:
                     HostList.append((tmp[0],tmp[1],tmp[2],tmp[3].rstrip('\n')))
                 except:pass
+
+    # Validate the host code read from machines.in
+    validateHostCodes(HostList, SupportedHostCodes)
     
+
     # Generate SSH key on localhost
     LocalKey = getLocalKey(key_gen_cmd, key_rsa_path )
 
@@ -183,9 +195,15 @@ def main():
         except:
             logging.info ("******** Passwordless SSH setup failed b/w localhost & %s," \
                     "please verify host connectivity********", box_ip)
-   
+
     # Generate Ansible hosts file from 'machines.in'
-    generateInventory(HostList, inventory_path)
+    codes = list(SupportedHostCodes)
+    for i in codes:
+        codeSubList = []
+        for j in HostList:
+            if i in j:
+                codeSubList.append(j)
+        generateInventory(config, codeSubList, inventory_path, SupportedHostCodes)
 
     # Sanitize the Ansible inventory file
     replace(inventory_path, " = ", "=" )
