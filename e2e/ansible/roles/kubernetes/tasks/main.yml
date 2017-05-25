@@ -1,0 +1,45 @@
+---
+- name: Get Package Updates
+  apt:
+    update_cache: yes
+  become: true
+
+- name: Add apt-key
+  apt_key:
+    url: "https://packages.cloud.google.com/apt/doc/apt-key.gpg"
+    state: present
+  become: true
+
+- name: Add Kubernetes apt repository
+  apt_repository:
+    repo: deb http://apt.kubernetes.io/ kubernetes-xenial main
+    state: present
+  become: true
+
+- name: Get Package Updates
+  apt:
+    update_cache: yes
+  become: true
+
+- name: Install APT Packages
+  apt:
+    name: "{{ item }}" 
+    state: present
+  become: true
+  with_items: "{{ k8s_deb_packages }}"
+
+- name: Create Directory
+  file:
+    path: "{{ k8s_images_path }}"
+    state: directory
+
+- name: Copy TAR to remote
+  copy:
+    src: "{{ k8s_images }}"
+    dest: "{{ k8s_images_path }}"
+
+- name: Copy local deb files to K8s-Master and K8s-Minions
+  copy:
+   src: "{{ item }}"
+   dest: "{{ k8s_images_path }}"
+  with_items: "{{ k8s_dpkg_packages }}"

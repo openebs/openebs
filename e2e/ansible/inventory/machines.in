@@ -1,23 +1,25 @@
-# This is an input file used by the OpenEBS ansible framework to
-# generate the 'hosts' file (otherwise called ansible inventory)
-# It consists of multiple comma-separated lines which specify machine
-# details in the following manner :
+# This is a input file used by OpenEBS for generating the hosts.
 #
-# hostcode,ip address,env var for username, env var for password
+# This file contains the mappings of IP addresses to host names and login 
+# details for that host. Each entry should be kept on an individual line. 
+# The IP address should be placed in the first column followed by the 
+# corresponding host name.
+# The IP address and the host name should be separated by at least one
+# comma.
 #
-# For Example:
-# mayamaster,20.10.26.11,MAYAMASTER_USER_NAME,MAYAHOST_USER_PASSWORD
-# mayahost,20.10.26.12,MAYAHOST_USER_NAME,MAYAHOST_USER_PASSWORD
-# mayahost,20.10.26.13,MAYAHOST_USER_NAME,MAYAHOST_USER_PASSWORD
+# Additionally, comments (such as these) may be inserted on individual
+# lines or before the machine name denoted by a '#' symbol.
 #
-# NOTES:
-# 1. Please ensure supported host codes are provided, failing which
-#    the inventory generation will not proceed. Current supported
-#    codes include 'mayamaster', 'mayahost', 'kubemaster', 'kubeminion'
-#
-# 2. Lines can be commented (such as these) by inserting '#' symbol
-#    before the host code
+# For example:
+#master,20.10.26.11,MACHINES_USER_NAME,MACHINES_USER_PASSWORD
+#host,20.10.26.12,USER_NAME,USER_PASSWORD
+#host,20.10.26.14,USER_NAME,USER_PASSWORD
 
-mayamaster,20.10.49.11,MAYAMASTER_USER_NAME,MAYAHOST_USER_PASSWORD
-mayahost,20.10.49.12,MAYAHOST_USER_NAME,MAYAHOST_USER_PASSWORD
-mayahost,20.10.49.13,MAYAHOST_USER_NAME,MAYAHOST_USER_PASSWORD
+
+#master,20.10.49.11,MACHINES_USER_NAME,MACHINES_USER_PASSWORD
+#host,20.10.49.12,USER_NAME,USER_PASSWORD
+#host,20.10.49.13,USER_NAME,USER_PASSWORD
+
+kubemaster,20.10.49.11,MACHINES_USER_NAME,MACHINES_USER_PASSWORD
+kubeminion,20.10.49.12,USER_NAME,USER_PASSWORD
+kubeminion,20.10.49.13,USER_NAME,USER_PASSWORD
