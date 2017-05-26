@@ -1,3 +1,8 @@
+###############################################################################
+# This is an input file used by the OpenEBS ansible framework to
+# generate the 'hosts' file (otherwise called ansible inventory)
+# It consists of multiple comma-separated lines which specify the
+# machine details in the following manner :
 # This is a input file used by OpenEBS for generating the hosts.
 #
 # This file contains the mappings of IP addresses to host names and login 
@@ -10,6 +15,21 @@
 # Additionally, comments (such as these) may be inserted on individual
 # lines or before the machine name denoted by a '#' symbol.
 #
+# NOTES:
+#
+# 1. Please ensure supported host codes are provided, failing which
+# the inventory generation will not proceed. Current supported
+# codes include 'mayamaster', 'mayahost', 'kubemaster', 'kubeminion'
+#
+# 2. A dictionary of supported codes is present in the python script
+# generate_inventory.py, which can be updated by interested users to 
+# include additional hostcodes 
+#
+# 3. Lines can be commented (such as these) by inserting '#' symbol
+# before the host code
+#
+################################################################################
+
 # For example:
 #master,20.10.26.11,MACHINES_USER_NAME,MACHINES_USER_PASSWORD
 #host,20.10.26.12,USER_NAME,USER_PASSWORD
