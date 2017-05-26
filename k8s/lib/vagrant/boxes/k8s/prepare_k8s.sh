@@ -29,6 +29,8 @@ cd /home/ubuntu/setup/k8s
 scriptlength=${#scriptdownloadurls[@]}
 for ((i = 0; i != scriptlength; i++)); do
     if [ -z "${scriptdownloadurls[i]##*configure_k8s_master.sh*}" -o \
+         -z "${scriptdownloadurls[i]##*configure_k8s_cred.sh*}" -o \
+         -z "${scriptdownloadurls[i]##*configure_k8s_weave.sh*}" -o \
          -z "${scriptdownloadurls[i]##*configure_k8s_host.sh*}" ] ;then
         wget "${scriptdownloadurls[i]}"
     fi
