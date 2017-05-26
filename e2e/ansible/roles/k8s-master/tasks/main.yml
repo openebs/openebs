@@ -1,0 +1,45 @@
+---
+- name: Create Directory
+  file:
+    path: "{{ weave_images_path }}"
+    state: directory
+
+- name: Copy TAR and Pod YAML to remote
+  copy:
+    src: "{{ item }}"
+    dest: "{{ weave_images_path }}"
+  with_items: "{{ weave_depends }}"
+
+- name: Copy Script to remote
+  copy:
+    src: "{{ configure_scripts[2] }}"
+    dest: "{{ k8s_images_path }}"
+    mode: "u+rwx"
+
+- name: Load images from Archive
+  command: docker load --input "{{ k8s_images }}"
+  args:
+    chdir: "{{ k8s_images_path }}"
+  become: true
+
+- name: Load images from Archive
+  command: docker load --input "{{ weave_depends[0] }}"
+  args:
+    chdir: "{{ weave_images_path }}"
+  become: true
+
+- name: Install deb packages
+  apt:
+    deb: "{{ k8s_images_path }}/{{ item }}"
+  with_items: "{{ k8s_dpkg_packages }}"
+
+- name: kubeadm init
+  script: "{{ configure_scripts[0] }}"
+
+- name: Copy k8s credentials to $HOME
+  script: "{{ configure_scripts[1] }}"
+
+- name: Patch kube-proxy for CNI Networks
+  shell: source ~/.profile; "{{ k8s_images_path }}/{{ configure_scripts[2] }}" 
+  args:
+    executable: /bin/bash
