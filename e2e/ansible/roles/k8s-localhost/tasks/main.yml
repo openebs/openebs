@@ -45,7 +45,6 @@
   retries: 3  
   with_items: "{{ k8s_images }}"
   become: true
-  tags: fetch_k8_images  
 
 - name: Print K8s image names
   shell: printf "{{ item }}\n" >> imagelist.tmp
