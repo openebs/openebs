@@ -21,3 +21,5 @@
   become: true
   register: result
   notify: Restart M_APIServer
+
+- meta: flush_handlers
