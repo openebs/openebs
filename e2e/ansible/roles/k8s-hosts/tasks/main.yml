@@ -73,3 +73,8 @@
           --masterip={{hostvars[groups['kubernetes-kubemasters'][0]]['ansible_ssh_host']}} 
           --token={{result_token_name.stdout}}.{{result_token.stdout}} 
           --clusterip={{result_cluster.stdout}}"
+  notify: 
+    - Reload systemd
+    - Restart kubelet
+
+- meta: flush_handlers 
