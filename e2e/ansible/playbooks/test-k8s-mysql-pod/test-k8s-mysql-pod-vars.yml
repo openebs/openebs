@@ -5,9 +5,4 @@ pod_yaml_alias: demo-mysql-openebs-plugin.yaml
 
 mysql_vol_size: 5G
 
-openebs_iscsi_driver: https://raw.githubusercontent.com/openebs/openebs/v0.2/k8s/lib/plugin/flexvolume/openebs-iscsi
-
-flexvol_driver_alias: openebs-iscsi
-
-flexvol_driver_path: /usr/libexec/kubernetes/kubelet-plugins/volume/exec/openebs~openebs-iscsi/
 

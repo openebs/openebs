@@ -33,6 +33,9 @@
     deb: "{{ k8s_images_path }}/{{ item }}"
   with_items: "{{ k8s_dpkg_packages }}"
 
+- name: kubeadm reset before init
+  command: kubeadm reset 
+
 - name: kubeadm init
   script: "{{ configure_scripts[0] }}"
 

@@ -1,14 +1,24 @@
 ---
 - hosts: openebs-mayamasters
-
   roles:
     - master
     - {role: vagrant, when: is_vagrant_vm | bool} 
 
 - hosts: openebs-mayahosts
-
   roles:
     - hosts
     - {role: vagrant, when: is_vagrant_vm | bool}
 
+- hosts: localhost
+  roles: 
+    - k8s-localhost 
 
+- hosts: kubernetes-kubemasters
+  roles:
+    - k8s-master
+
+- hosts: kubernetes-kubeminions
+  roles: 
+    - k8s-hosts
+
+   

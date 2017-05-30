@@ -21,8 +21,19 @@
       args: 
         executable: /bin/bash
       register: result
-      delegate_to: "{{groups['openebs-mayamasters'].0}}"      
+      delegate_to: "{{groups['openebs-mayamasters'].0}}"     
+      ignore_errors: true
+      no_log: true
  
+    - name: 
+      debug: 
+        msg: "Ending play, m-apiserver is unreachable"
+      when: "'m-apiserver' not in result.stderr"
+
+    - name: 
+      meta: end_play
+      when: "'m-apiserver' not in result.stderr"
+    
     - name: Fetch m-API server location    
       shell: "echo {{result.stderr_lines[2]}} | grep -i 'm-apiserver' | awk '{print $4}'"
       register: result_mAPI
@@ -41,37 +52,6 @@
         line: "        size: \"{{mysql_vol_size}}\""
       delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
-    - name: Get the openebs-iscsi flexvolume driver
-      get_url:
-        url: "{{ openebs_iscsi_driver }}"
-        dest: "{{ ansible_env.HOME}}/{{ flexvol_driver_alias }}"
-        force: yes
-      register: result
-      until:  "'OK' in result.msg"
-      delay: 5
-      retries: 3
-      delegate_to: "{{ item }}"
-      with_items: "{{ groups['kubernetes-kubeminions'] }}" 
-      become: true
-
-    - name: Create flexvol driver destination 
-      file: 
-        path: "{{ flexvol_driver_path }}"
-        state: directory
-        mode: 0755
-      delegate_to: "{{ item }}"
-      with_items: "{{ groups['kubernetes-kubeminions'] }}" 
- 
-    - name: Copy script to flexvol driver location
-      copy: 
-        src: "{{ ansible_env.HOME }}/{{ flexvol_driver_alias }}"
-        dest: "{{ flexvol_driver_path }}"
-        mode: "u+rwx"
-        force: yes
-        remote_src: yes
-      delegate_to: "{{ item }}"
-      with_items: "{{ groups['kubernetes-kubeminions'] }}" 
-       
     - name: Deploy mysql pod
       shell: source ~/.profile; kubectl create -f demo-mysql-openebs-plugin.yaml
       args: 
