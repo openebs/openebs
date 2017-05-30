@@ -1,0 +1,13 @@
+---
+mysql_plugin_link: https://raw.githubusercontent.com/openebs/openebs/8e33dac25b2c86f9228a98335b07f45585e51485/k8s/demo/specs/demo-mysql-openebs-plugin.yaml
+
+pod_yaml_alias: demo-mysql-openebs-plugin.yaml
+
+mysql_vol_size: 5G
+
+openebs_iscsi_driver: https://raw.githubusercontent.com/openebs/openebs/v0.2/k8s/lib/plugin/flexvolume/openebs-iscsi
+
+flexvol_driver_alias: openebs-iscsi
+
+flexvol_driver_path: /usr/libexec/kubernetes/kubelet-plugins/volume/exec/openebs~openebs-iscsi/
+

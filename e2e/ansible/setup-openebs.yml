@@ -1,5 +1,5 @@
 ---
-- hosts: openebs-mayamaster
+- hosts: openebs-mayamasters
 
   roles:
     - master

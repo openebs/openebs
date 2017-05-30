@@ -1,2 +1,2 @@
 - name: Setup Maya      
-  command: maya setup-osh -self-ip={{hostvars[inventory_hostname]['ansible_ssh_host']}} -omm-ips={{hostvars[groups['openebs-mayamaster'][0]]['ansible_ssh_host']}}
+  command: maya setup-osh -self-ip={{hostvars[inventory_hostname]['ansible_ssh_host']}} -omm-ips={{hostvars[groups['openebs-mayamasters'][0]]['ansible_ssh_host']}}
