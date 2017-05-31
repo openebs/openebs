@@ -2,7 +2,7 @@
 - name: Establish ISCSI Connection
   open_iscsi:
     show_nodes: yes
-    portal: "{{hostvars[groups['openebs-mayamaster'][0]]['openebs_target_portal']}}"
+    portal: "{{hostvars[groups['openebs-mayamasters'][0]]['openebs_target_portal']}}"
     discover: yes
     login: yes
   register: result

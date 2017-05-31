@@ -64,6 +64,31 @@
     token: "{{ result_token }}"
   delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
   delegate_facts: True
+
+- name: Get the openebs-iscsi flexvolume driver
+  get_url:
+    url: "{{ openebs_iscsi_driver }}"
+    dest: "{{ ansible_env.HOME}}/{{ flexvol_driver_alias }}"
+    force: yes
+  register: result
+  until:  "'OK' in result.msg"
+  delay: 5
+  retries: 3
+  become: true
+
+- name: Create flexvol driver destination
+  file:
+    path: "{{ flexvol_driver_path }}"
+    state: directory
+    mode: 0755
+
+- name: Copy script to flexvol driver location
+  copy:
+    src: "{{ ansible_env.HOME }}/{{ flexvol_driver_alias }}"
+    dest: "{{ flexvol_driver_path }}"
+    mode: "u+rwx"
+    force: yes
+    remote_src: yes
           
 - name: Reset kubeadm
   command: kubeadm reset

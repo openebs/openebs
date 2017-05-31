@@ -1,0 +1,70 @@
+- hosts: localhost
+ 
+  vars_files: 
+    - test-k8s-mysql-pod-vars.yml
+ 
+  tasks:
+    - name: Download YAML for mysql plugin
+      get_url: 
+        url: "{{ mysql_plugin_link }}"
+        dest: "{{ ansible_env.HOME}}/{{ pod_yaml_alias }}"
+        force: yes
+      register: result
+      until:  "'OK' in result.msg"
+      delay: 5
+      retries: 3
+      delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+      become: true
+
+    - name: Get m-API server info 
+      shell: source ~/.profile; maya omm-status
+      args: 
+        executable: /bin/bash
+      register: result
+      delegate_to: "{{groups['openebs-mayamasters'].0}}"     
+      ignore_errors: true
+      no_log: true
+ 
+    - name: 
+      debug: 
+        msg: "Ending play, m-apiserver is unreachable"
+      when: "'m-apiserver' not in result.stderr"
+
+    - name: 
+      meta: end_play
+      when: "'m-apiserver' not in result.stderr"
+    
+    - name: Fetch m-API server location    
+      shell: "echo {{result.stderr_lines[2]}} | grep -i 'm-apiserver' | awk '{print $4}'"
+      register: result_mAPI
+
+    - name: Replace mAPI server location in plugin YAML
+      lineinfile:
+        path: "{{ ansible_env.HOME}}/{{ pod_yaml_alias }}"
+        regexp: "openebsApiUrl:"
+        line: "        openebsApiUrl: \"{{result_mAPI.stdout}}/latest\""
+      delegate_to: "{{groups['kubernetes-kubemasters'].0}}" 
+            
+    - name: Replace volume size in plugin YAML
+      lineinfile:
+        path: "{{ ansible_env.HOME }}/{{ pod_yaml_alias }}"
+        regexp: "size:"
+        line: "        size: \"{{mysql_vol_size}}\""
+      delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+    - name: Deploy mysql pod
+      shell: source ~/.profile; kubectl create -f demo-mysql-openebs-plugin.yaml
+      args: 
+        executable: /bin/bash
+      delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+    - name: Confirm pod status is running
+      shell: source ~/.profile; kubectl get pods
+      args: 
+        executable: /bin/bash
+      delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+      register: result
+      until: "'Running' in result.stdout_lines[1]"
+      delay: 100 
+      retries: 3
+      

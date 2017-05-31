@@ -17,7 +17,19 @@
   become: true
   delegate_to: 127.0.0.1 
 
-## KUBERNETES ROLE PREPARATION
+## Common preparation tasks
+
+- name: Create files directory in kubernetes role
+  file:
+    path: "{{ playbook_dir }}/roles/{{item}}/files"
+    state: directory
+    mode: 0755
+  with_items:
+    - kubernetes
+    - k8s-master
+    - k8s-hosts
+
+## kubernetes role preparation
 
 - name: Get .deb kubernetes packages google cloud 
   get_url: 

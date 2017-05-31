@@ -8,7 +8,7 @@
 #    a) Volume properties can be set in ./roles/volume/defaults/main.yml 
 #    b) fio run duration can be set in ./roles/fio/defaults/main.yml
 # 
-- include: playbooks/test-fio.yml
+#- include: playbooks/test-fio.yml
 #
 ###########################################################################################
 # TC NAME: test-iometer
@@ -26,3 +26,11 @@
 #- include: playbooks/test-iometer.yml dockerfile_path="{{files_path.stdout}}"
 #
 ###########################################################################################
+# TC NAME: test-k8s-mysql-pod
+# TC DETAILS: Deploys mysql pod on a k8s cluster with storage provisioned by flexvol driver
+# TC NOTES:           
+#    
+#- include: playbooks/test-k8s-mysql-pod/test-k8s-mysql-pod.yml
+#
+###########################################################################################
+

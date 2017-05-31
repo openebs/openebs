@@ -16,10 +16,10 @@
 - name: Tear down iSCSI sessions
   open_iscsi: 
     login: no
-    target: "{{hostvars[groups['openebs-mayamaster'][0]]['openebs_target_iqn']}}"
+    target: "{{hostvars[groups['openebs-mayamasters'][0]]['openebs_target_iqn']}}"
 
 - name: Remove stale node entries for ISCSI target
-  shell: iscsiadm -m node -T "{{hostvars[groups['openebs-mayamaster'][0]]['openebs_target_iqn']}}" -o delete
+  shell: iscsiadm -m node -T "{{hostvars[groups['openebs-mayamasters'][0]]['openebs_target_iqn']}}" -o delete
   become: true
 
 - name: Tear down the storage containers
@@ -27,5 +27,5 @@
   args: 
     executable: /bin/bash
   ignore_errors: false 
-  delegate_to: "{{groups['openebs-mayamaster'].0}}"
+  delegate_to: "{{groups['openebs-mayamasters'].0}}"
   tags: ['vol_delete']
