@@ -64,12 +64,14 @@
 
 - name: TAR the K8s images 
   shell: docker save $(cat imagelist.tmp) -o k8s_images.tar
+  become: true
 
 - name: Remove the .tmp file created to hold image list
   file: path="{{playbook_dir}}/imagelist.tmp" state=absent
 
 - name: Move K8s_images.tar into kubernetes role
   shell: mv {{playbook_dir}}/k8s_images.tar {{ playbook_dir }}/roles/kubernetes/files
+  become: true
 
 - name: Remove K8s images from K8s-localhost
   docker_image:
@@ -111,12 +113,14 @@
 
 - name: TAR the weave images
   shell: docker save $(cat imagelist.tmp) -o weave_images.tar
+  become: true
 
 - name: Remove the .tmp file created to hold image list
   file: path="{{playbook_dir}}/imagelist.tmp" state=absent
 
 - name: Move weave_images.tar into k8s-master role
   shell: mv {{playbook_dir}}/weave_images.tar {{ playbook_dir }}/roles/k8s-master/files
+  become: true
 
 - name: Remove weave images from K8s-localhost
   docker_image:
