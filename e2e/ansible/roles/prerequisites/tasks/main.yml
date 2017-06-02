@@ -4,6 +4,5 @@
     name: "{{ item }}"
     state: present
   with_items: "{{ pip_pre_packages }}"
-  become: true
   delegate_to: 127.0.0.1
 

@@ -1,0 +1,8 @@
+---
+percona_mysql_plugin_link: https://raw.githubusercontent.com/openebs/openebs/88d02b8bfea4e5ef0ee94d4359a180f1c203684d/k8s/demo/specs/demo-percona-mysql-openebs-plugin.yaml
+
+pod_yaml_alias: demo-percona-mysql-openebs-plugin.yaml
+
+percona_mysql_vol_size: 5G
+
+

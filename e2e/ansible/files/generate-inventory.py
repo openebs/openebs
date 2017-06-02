@@ -71,6 +71,7 @@ def generateInventory(config, boxlist, path, codes):
             varsgroupname = '%s:vars' %(hostgroupname)
             config[varsgroupname] = {'ansible_ssh_user': user}
             config[varsgroupname]['ansible_ssh_pass'] = passwd
+            config[varsgroupname]['ansible_become_pass'] = passwd
             config[varsgroupname]['ansible_ssh_extra_args'] = "'-o StrictHostKeyChecking=no'"
             f = open(path, 'w')
             config.write(f)
@@ -84,8 +85,6 @@ def generateInventory(config, boxlist, path, codes):
             f.close()
             c = c + 1
     
-    logging.info ("******** Inventory config generated successfully ********")
-
 def replace(file, pattern, subst):
     """ Replace extra spaces around assignment operator in inventory """
 
@@ -152,18 +151,21 @@ def main():
     executeCmd(clearLogCmd)
 
     # Initialize dictionary holding supported host codes
-    SupportedHostCodes = {'mayamaster': 'openebs-mayamasters', 'mayahost': 'openebs-mayahosts',\
+    SupportedHostCodes = {'localhost': None, 'mayamaster': 'openebs-mayamasters', 'mayahost': 'openebs-mayahosts',\
             'kubemaster': 'kubernetes-kubemasters', 'kubeminion': 'kubernetes-kubeminions'}
       
-    # Create list of tuples containing individual machine info
-    HostList = []
+    # Create list of tuples containing individual machine info & initialize localhost password
+    HostList = []; local_password = None
     with open(Hosts, "rb") as fp:
         for i in fp.readlines():
             tmp = i.split(",")
             if "#" not in tmp[0]:
-                try:
-                    HostList.append((tmp[0],tmp[1],tmp[2],tmp[3].rstrip('\n')))
-                except:pass
+                if tmp[0] == "localhost":
+                    local_password = tmp[3].rstrip('\n')
+                else:
+                    try:
+                        HostList.append((tmp[0],tmp[1],tmp[2],tmp[3].rstrip('\n')))
+                    except:pass
 
     # Validate the host code read from machines.in
     validateHostCodes(HostList, SupportedHostCodes)
@@ -204,6 +206,19 @@ def main():
             if i in j:
                 codeSubList.append(j)
         generateInventory(config, codeSubList, inventory_path, SupportedHostCodes)
+    
+    logging.info ("******** Inventory config generated successfully ********") 	
+    
+    # Insert localhost line into beginning of inventory file
+    if local_password:
+        lpasswd = "\"{{ lookup('env','%s') }}\"" %(local_password)
+        localhostString = "localhost ansible_connection=local ansible_become_pass=%s\n\n" %(lpasswd) 
+        with open(inventory_path, 'rb') as f:
+            with open('hosts.tmp', 'wb') as f2:
+                f2.write(localhostString)
+                f2.write(f.read())
+        os.rename('hosts.tmp', inventory_path)
+
 
     # Sanitize the Ansible inventory file
     replace(inventory_path, " = ", "=" )

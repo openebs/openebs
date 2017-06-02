@@ -4,3 +4,4 @@
     name: m-apiserver
     state: restarted
     enabled: yes
+  become: true

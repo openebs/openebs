@@ -7,7 +7,7 @@ run_demo: true
 #Option specifically for vagrant VMs.
 #Accepted Entries(true, false): default:false
 
-is_vagrant_vm: false
+is_vagrant_vm: true 
   
 #User-defined size for the volume that openebs creates:
 #Accepted Entries(Valid Volume Sizes): default:5G

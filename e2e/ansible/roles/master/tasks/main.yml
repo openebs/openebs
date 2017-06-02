@@ -1,6 +1,7 @@
 ---
 - name: Setup Maya      
   command: maya setup-omm -self-ip="{{hostvars[inventory_hostname]['ansible_ssh_host']}}"
+  become: true
 
 - name: Update INI file
   ini_file:
