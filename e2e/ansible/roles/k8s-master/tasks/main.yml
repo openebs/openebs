@@ -32,12 +32,15 @@
   apt:
     deb: "{{ k8s_images_path }}/{{ item }}"
   with_items: "{{ k8s_dpkg_packages }}"
+  become: true
 
 - name: kubeadm reset before init
-  command: kubeadm reset 
+  command: kubeadm reset
+  become: true
 
 - name: kubeadm init
   script: "{{ configure_scripts[0] }}"
+  become: true
 
 - name: Copy k8s credentials to $HOME
   script: "{{ configure_scripts[1] }}"
