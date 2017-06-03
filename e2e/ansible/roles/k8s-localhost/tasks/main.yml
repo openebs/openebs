@@ -14,7 +14,6 @@
     name: "{{ item }}"
     state: present
   with_items: "{{ pip_local_packages }}"
-  become: true
   delegate_to: 127.0.0.1 
 
 ## Common preparation tasks
@@ -43,7 +42,6 @@
   with_together: 
     - "{{ k8s_deb_packages }}"
     - "{{ k8s_deb_package_alias }}"
-  become: true
 
 - name: Fetch K8s images from gcr.io/google_containers
   docker_image: 
@@ -92,7 +90,6 @@
   delay: 5
   retries: 3 
   with_items: "{{ k8s_master_scripts }}"
-  become: true
 
 - name: Fetch weave images from dockerhub
   docker_image:
@@ -138,7 +135,6 @@
   until:  "'OK' in result.msg"
   delay: 5
   retries: 3
-  become: true
 
 ## K8S-HOSTS ROLE PREPARATION
 
@@ -152,8 +148,19 @@
   delay: 5
   retries: 3 
   with_items: "{{ k8s_host_scripts }}"
-  become: true
-  
-  
 
-  
+- name: Get Current User
+  command: whoami 
+  register: user
+
+- name: Change Folder Permissions
+  file:
+    path: "{{ item }}"
+    owner: "{{ user.stdout }}"
+    group: "{{ user.stdout }}"
+    recurse: true
+  become: true
+  with_items:
+    - "{{ playbook_dir }}/roles/k8s-hosts/files"
+    - "{{ playbook_dir }}/roles/k8s-master/files"
+    - "{{ playbook_dir }}/roles/kubernetes/files"

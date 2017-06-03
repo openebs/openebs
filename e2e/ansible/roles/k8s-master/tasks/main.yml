@@ -4,15 +4,20 @@
     path: "{{ weave_images_path }}"
     state: directory
 
-- name: Copy TAR and Pod YAML to remote
+- name: Copy TAR to remote
   copy:
-    src: "{{ item }}"
+    src: "{{ weave_depends[0] }}"
     dest: "{{ weave_images_path }}"
-  with_items: "{{ weave_depends }}"
+  become: true
+
+- name: Copy Pod YAML to remote
+  copy:
+    src: "{{ weave_depends[1] }}"
+    dest: "{{ weave_images_path }}"
 
 - name: Copy Script to remote
   copy:
-    src: "{{ configure_scripts[2] }}"
+    src: "{{ configure_scripts[1] }}"
     dest: "{{ k8s_images_path }}"
     mode: "u+rwx"
 
@@ -42,10 +47,32 @@
   script: "{{ configure_scripts[0] }}"
   become: true
 
-- name: Copy k8s credentials to $HOME
-  script: "{{ configure_scripts[1] }}"
+- name: Get Current User
+  command: whoami
+  register: user
+
+- name: Copy k8s credentials to $HOME 
+  copy:
+    src: "/etc/kubernetes/admin.conf" 
+    remote_src: True
+    dest: "{{ ansible_env.HOME}}"
+  become: true
+
+- name: Change file permissions
+  file:
+    path: "{{ ansible_env.HOME }}"
+    owner: "{{ user.stdout }}"
+    group: "{{ user.stdout }}"     
+    state: directory
+  become: true
+
+- name: Update KUBECONFIG in .profile
+  lineinfile:
+    destfile : "{{ansible_env.HOME}}/.profile"
+    line: export KUBECONFIG=$HOME/admin.conf
+    state: present
 
 - name: Patch kube-proxy for CNI Networks
-  shell: source ~/.profile; "{{ k8s_images_path }}/{{ configure_scripts[2] }}" 
+  shell: source ~/.profile; "{{ k8s_images_path }}/{{ configure_scripts[1] }}" 
   args:
     executable: /bin/bash

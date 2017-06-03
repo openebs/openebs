@@ -43,7 +43,6 @@ k8s_images:
 # Links for scripts to be placed into K8s-master role's .files 
 
 k8s_master_scripts: 
-  - https://raw.githubusercontent.com/openebs/openebs/master/k8s/lib/scripts/configure_k8s_cred.sh
   - https://raw.githubusercontent.com/openebs/openebs/master/k8s/lib/scripts/configure_k8s_master.sh
   - https://raw.githubusercontent.com/openebs/openebs/master/k8s/lib/scripts/configure_k8s_weave.sh
 
