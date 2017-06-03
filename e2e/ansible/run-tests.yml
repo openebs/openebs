@@ -33,4 +33,10 @@
 #- include: playbooks/test-k8s-mysql-pod/test-k8s-mysql-pod.yml
 #
 ###########################################################################################
-
+# TC NAME: test-k8s-percona-mysql-pod
+# TC DETAILS: Deploys percona pod on k8s cluster with storage provisioned by flexvol driver
+# TC NOTES:           
+#    
+#- include: playbooks/test-k8s-percona-mysql-pod/test-k8s-percona-mysql-pod.yml
+#
+###########################################################################################

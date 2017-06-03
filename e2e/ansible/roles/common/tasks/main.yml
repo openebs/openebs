@@ -13,25 +13,23 @@
 
 - name: Create Directory
   file:
-    path: /home/{{hostvars[inventory_hostname]['ansible_ssh_user']}}/demo/openebs/
+    path: "{{ansible_env.HOME}}/demo/openebs/"
     state: directory
-  become: true
 
 - name: Download Maya
   get_url:
     url: "{{ item }}"
-    dest:  /home/{{hostvars[inventory_hostname]['ansible_ssh_user']}}/demo/openebs/
+    dest:  "{{ansible_env.HOME}}/demo/openebs/"
     force: yes
   register: result
   until:  "'OK' in result.msg"
   delay: 5
   retries: 3
   with_items: "{{ openebs_maya_url }}"
-  become: true
 
 - name: Unzip Maya
   unarchive:
-    src: /home/{{ hostvars[inventory_hostname]['ansible_ssh_user'] }}/demo/openebs/maya-linux_amd64.zip
+    src: "{{ansible_env.HOME}}/demo/openebs/maya-linux_amd64.zip"
     dest: /usr/bin/
     remote_src: True
   become: true

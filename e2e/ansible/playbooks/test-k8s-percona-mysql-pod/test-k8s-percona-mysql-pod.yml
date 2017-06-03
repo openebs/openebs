@@ -1,7 +1,7 @@
 - hosts: localhost
  
   vars_files: 
-    - test-k8s-mysql-pod-vars.yml
+    - test-k8s-percona-mysql-pod-vars.yml
  
   tasks:
 
@@ -14,7 +14,7 @@
 
     - name: Download YAML for mysql plugin
       get_url: 
-        url: "{{ mysql_plugin_link }}"
+        url: "{{ percona_mysql_plugin_link }}"
         dest: "{{ result_kube_home.stdout }}/{{ pod_yaml_alias }}"
         force: yes
       register: result
@@ -56,10 +56,10 @@
       lineinfile:
         path: "{{ result_kube_home.stdout }}/{{ pod_yaml_alias }}"
         regexp: "size:"
-        line: "        size: \"{{mysql_vol_size}}\""
+        line: "        size: \"{{percona_mysql_vol_size}}\""
       delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
-    - name: Deploy mysql pod
+    - name: Deploy percona mysql pod
       shell: source ~/.profile; kubectl create -f {{ pod_yaml_alias }} 
       args: 
         executable: /bin/bash

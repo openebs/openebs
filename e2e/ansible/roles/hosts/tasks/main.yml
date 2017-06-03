@@ -6,7 +6,7 @@
 
 - name:
   debug:
-  msg: "Ending play, Master UNREACHABLE."
+    msg: "Ending play, Master UNREACHABLE."
   when: "'FAILED' in result_status.stdout"
 
 - name: Ending Playbook Run - Master is not UP.
@@ -15,3 +15,4 @@
 
 - name: Setup Maya      
   command: maya setup-osh -self-ip={{hostvars[inventory_hostname]['ansible_ssh_host']}} -omm-ips={{hostvars[groups['openebs-mayamasters'][0]]['ansible_ssh_host']}}
+  become: true
