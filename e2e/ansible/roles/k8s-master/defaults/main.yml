@@ -4,7 +4,6 @@
 
 configure_scripts:
   - configure_k8s_master.sh
-  - configure_k8s_cred.sh
   - configure_k8s_weave.sh
 
 weave_depends:

@@ -75,7 +75,6 @@
   until:  "'OK' in result.msg"
   delay: 5
   retries: 3
-  become: true
 
 - name: Create flexvol driver destination
   file:
