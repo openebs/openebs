@@ -1,4 +1,4 @@
-# Ansible PLaybooks
+# Ansible Playbooks
 -------------------
 
 Holds test folders which contain the test playbook yaml file along with associated variable and cleanup routine yamls. 
