@@ -34,6 +34,8 @@ More details about Ansible and its advantages can be found in here : http://docs
 
 A broad listing of the folders in this project is provided below. 
 
+```
+ansible
 ├── files
 ├── inventory
 │   └── group_vars
@@ -59,10 +61,15 @@ A broad listing of the folders in this project is provided below.
     ├── vagrant
     └── volume
   
+```
+## LIMITATIONS
 
+Currently, the ansible playbooks are written to work with Ubuntu hosts. Going ahead, they will be enhanced to work on 
+other linux flavours 
 
+### CONTRIBUTIONS
 
-
+If you'd like to contribute, please fork the repository and use a feature branch. Pull requests are warmly welcome.
 
 
 
