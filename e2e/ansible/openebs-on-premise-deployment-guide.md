@@ -17,7 +17,7 @@ The Kubernetes cluster is setup, in this framework using "kubeadm"
 
 The following instructions have been verified on:
 
-- Baremetal & VMware virtual machines installed with Ubuntu server 16.04 64 bit 
+- Baremetal & VMware virtual machines installed with Ubuntu 16.04 64 bit 
 - Ubuntu 16.04 64 bit Vagrant VMs running on Windows 10 (Vagrant (>=1.9.1), VirtualBox 5.1)
 
 ### Pre-Requisites
@@ -52,10 +52,20 @@ testuser@OpenEBSClient:~$ git clone https://github.com/openebs/openebs.git
 testuser@OpenEBSClient:~$ ls
 openebs
 testuser@OpenEBSClient:~$ cd openebs/e2e/ansible/
-testuser@OpenEBSClient:~/openebs/e2e/ansible$ ls
-ansible.cfg  files      playbooks  pre-requisites.yml  roles          setup-openebs.yml
-ci.yml       inventory  plugins    README.md           run-tests.yml  Vagrantfile
-testuser@OpenEBSClient:~/openebs/e2e/ansible$
+testuser@OpenEBSClient:~/openebs/e2e/ansible$ ls -l
+total 68
+-rw-rw-r--  1 testuser testuser 14441 Jun  5 09:29 ansible.cfg
+-rw-rw-r--  1 testuser testuser   470 Jun  5 09:29 ci.yml
+drwxrwxr-x  2 testuser testuser  4096 Jun  5 09:29 files
+drwxrwxr-x  3 testuser testuser  4096 Jun  5 10:00 inventory
+drwxrwxr-x  4 testuser testuser  4096 Jun  5 09:29 playbooks
+drwxrwxr-x  3 testuser testuser  4096 Jun  5 09:29 plugins
+-rw-rw-r--  1 testuser testuser    57 Jun  5 09:29 pre-requisites.yml
+-rw-rw-r--  1 testuser testuser  7058 Jun  5 09:29 README.md
+drwxrwxr-x 17 testuser testuser  4096 Jun  5 09:29 roles
+-rw-rw-r--  1 testuser testuser  1864 Jun  5 09:29 run-tests.yml
+-rw-rw-r--  1 testuser testuser   379 Jun  5 09:29 setup-openebs.yml
+-rw-rw-r--  1 testuser testuser  4221 Jun  5 09:29 Vagrantfile
 ```
 ### Setup Environment For OpenEBS Installation 
 
@@ -64,19 +74,12 @@ testuser@OpenEBSClient:~/openebs/e2e/ansible$
   ```.profile``` of the localhost user which will be running the ansible code/playbooks, i.e., the ansible_user.
 
 - Edit the ```inventory/machines.in``` file to place the latest HostCode, IP, username variable, password variable for all the boxes 
-  setup, as shown in the example below (Ensure that the notes in the .in file are followed)
-  
-  ```
-  testuser@OpenEBSClient:~/openebs/e2e/ansible$ cat inventory/machines.in
-  mayamaster,20.10.49.11,MACHINES_USER_NAME,MACHINES_USER_PASSWORD
-  mayahost,20.10.49.13,USER_NAME,USER_PASSWORD
-  ```
+  setup. For more details on editing machines.in refer the [Inventory README](inventory/README.md)
   
 - Edit the global variables file ```inventory/group_vars/all.yml``` to reflect the desired storage volume properties and network CIDR
-  that will be used by the maya api server to allot the IP for the volume containers (This is needed when performing the setup
-  validation through application deployment)
+  that will be used by the maya api server to allot the IP for the volume containers 
   
-- Execute the pre-requisites.yml ansible playbook to generate the ansible inventory, i.e., 'hosts' file from the data provided in the 
+- Execute the pre-requisites ansible playbook to generate the ansible inventory, i.e., 'hosts' file from the data provided in the 
   machines.in file
   
   ```
@@ -99,37 +102,36 @@ testuser@OpenEBSClient:~/openebs/e2e/ansible$
   ```
 - verify that the Kubernetes & OpenEBS cluster are up with the nodes having joined the masters.
 
-  Check status of the maya-master, which, in the current example is running the m-api server
+  Check status of the maya-master and OpenEBS storage nodes, which are registered with the maya-master
   
   ```
   karthik@MayaMaster:~$ maya omm-status
   Name               Address      Port  Status  Leader  Protocol  Build  Datacenter  Region
   MayaMaster.global  20.10.49.11  4648  alive   true    2         0.5.5  dc1         global
-  ```
-  Check status of the OpenEBS-storage nodes which have registered with the maya-master
   
-  ```
+  m-apiserver listening at http://20.10.49.11:5656
+  
   karthik@MayaMaster:~$ maya osh-status
   ID        DC   Name        Class   Drain  Status
   564dfe3c  dc1  MayaHost01  <none>  false  ready
   564dd2e3  dc1  MayaHost02  <none>  false  ready
   ```
   
-  Check status of the Kubernetes minions on the kubernetes master
+  Check status of the Kubernetes cluster
   
   ```
-  karthik@MayaMaster:~$ kubectl get nodes
+  karthik@KubeMaster:~$ kubectl get nodes
   NAME         STATUS    AGE       VERSION
-  mayahost01   Ready     2d        v1.6.3
-  mayahost02   Ready     2d        v1.6.3
-  mayamaster   Ready     2d        v1.6.3
+  kubehost01   Ready     2d        v1.6.3
+  kubehost02   Ready     2d        v1.6.3
+  kubemaster   Ready     2d        v1.6.3
   ```
   
-### Test the OpenEBS setup
+### Run sample applications on the OpenEBS setup
 
 - Test the openebs setup installed using the above steps by deploying a sample application pod
 
-- Edit the ansible/run-tests.yml to run either the test-k8s-mysql-pod or test-k8s-percona-mysql-pod testcase and execute 
+- Edit the ansible/run-tests.yml to run either the _test-k8s-mysql-pod_ or _test-k8s-percona-mysql-pod_ testcase and execute 
   the playbook
 
   ```
@@ -138,13 +140,13 @@ testuser@OpenEBSClient:~/openebs/e2e/ansible$
 - Verify that the pod is deployed on the Kubernetes minion, by executing the this command on the Kubernetes master :
 
   ```
-  karthik@MayaMaster:~$ kubectl get pod
+  karthik@KubeMaster:~$ kubectl get pod
   NAME      READY     STATUS    RESTARTS   AGE
   percona   1/1       Running   0          2m
   ```
-- More details about the pod, execute the command ``` kubectl desribe pod <pod name> ```
+- For more details about the pod, execute the command ``` kubectl describe pod <pod name> ```
 
-- Verify that the storage volume is receiving I/O by checking the increments to DataUpdateIndex in the output of the stats 
+- Verify that the storage volume is receiving I/O by checking the increments to _DataUpdateIndex_ in the output of the stats 
   command issued on the maya-master : 
 
   ``` 
@@ -170,7 +172,7 @@ testuser@OpenEBSClient:~/openebs/e2e/ansible$
   - Sometimes, the minions take time to join the Kubernetes master. This could be caused due to slow internet or less resources
     on the box. The time could range between a few seconds to a few minutes
     
-  - As with minions above, the OpenEBS volume containers (Jiva containers) may take some time to get initialized (could involve 
+  - As with minions above, the OpenEBS volume containers (Jiva containers) may take some time to get initialized (involves 
     a docker pull) before they are ready to serve I/O. Any pod deployment (which uses the openebs iscsi flexvol driver) done while 
     this is still in process is seen to get queued and resume once the storage is ready
     
