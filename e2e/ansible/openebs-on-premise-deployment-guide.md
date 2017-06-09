@@ -1,11 +1,11 @@
-# OpenEBS-On-Premise-Deployment-Guide
+# OpenEBS On Premise Deployment Guide
 -------------------------------------
 
 This guide provides detailed instructions to perform the on-premise deployment of OpenEBS. The end goal of these steps is to have a functional : 
 
 - Kubernetes cluster (K8s master & K8s minions/host) configured with the OpenEBS iSCSI flexvol driver, 
-- OpenEBS maya master 
-- OpenEBS storage Hosts
+- OpenEBS Maya master 
+- OpenEBS Storage Hosts
 
 Depending on your need, you can either setup only the Kubernetes cluster or the OpenEBS cluster or both. The number of nodes in each
 category is configurable.
@@ -57,7 +57,7 @@ ansible.cfg  files      playbooks  pre-requisites.yml  roles          setup-open
 ci.yml       inventory  plugins    README.md           run-tests.yml  Vagrantfile
 testuser@OpenEBSClient:~/openebs/e2e/ansible$
 ```
-### Setup environment for OpenEBS installation 
+### Setup Environment For OpenEBS Installation 
 
 - Setup environment variables for the usernames and passwords of all the boxes which have been brought up in the previous steps 
   on the test-harness (this machine will be interchangeably used with the term 'localhost'). Ensure that these are setup in the
