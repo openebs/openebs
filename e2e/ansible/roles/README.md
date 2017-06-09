@@ -5,9 +5,9 @@ Ansible "roles" are reusable abstractions which can be created based on an overa
 tasks, and can be included into playbooks. Each role has a default structure with ```vars```, ```defaults``` ,```tasks```,
 ```meta``` and ```handler``` folders, with each containing a ```main.yml``` file. 
 
-- The ```vars``` & ```defaults``` folders consist of variables used by the tasks in the role. 
+- The vars & defaults folders consist of variables used by the tasks in the role. 
 - The meta folder contains role dependencies, i.e., tasks to be run before running current role tasks
-- The handler takes care of service handling and is invoked by the "notify" keyword inside tasks
+- The handler takes care of service handling and is invoked by the ```notify``` keyword inside tasks
 
 A brief outline of the functions associated with above components is described below :
 
@@ -27,7 +27,7 @@ A brief outline of the functions associated with above components is described b
 
 - localhost : Configures the client machine to run FIO container
 
-- fio : Runs fio profile in a test container after mounting block storage
+- fio : Runs FIO profile in a test container after mounting block storage
 
 - cleanup : Tear down iSCSI sessions & destroys volume on the storage nodes
 
