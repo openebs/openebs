@@ -6,6 +6,28 @@ ansible tasks are executed.
 
 A brief description of the files in this directory is given below : 
 
-- machines.in : Input file used by the pre-requisites.yml playbook to generate the ansible ```hosts``` file
+- machines.in : Input file consisting of comma separated lines used by the pre-requisites playbook to generate ansible ```hosts``` 
+  file
 - hosts : Default inventory file referred to in the playbooks
 - group_vars/all.yml : Contains global variables for ansible playbooks 
+
+The machines.in needs to be updated with the details of the hosts used in the openebs setup prior to execution of the ansible 
+playbooks. Provided below are some instructions to consider while doing this
+
+- Specify the machine details in the following manner : 
+
+    hostcode,ipaddress,env(username),env(password) where, 
+
+- hostcode is an identifier for the host machine and will be the name by which ansible will identify the machine. Ensure supported 
+  host codes are provided, failing which inventory generation will not proceed. Current supported codes include 'localhost, 'mayamaster',
+  'mayahost', 'kubemaster', 'kubeminion'
+  
+- A dictionary of supported codes ("SupportedHostCodes") is present in the python script files/generate_inventory.py, which can be 
+  updated by interested users to include additional hostcodes
+  
+- The 'localhost' hostcode is a mandatory line in this file and has a default IP of 127.0.0.1
+
+- Ensure the environment variables are set in the .profile of the ansible user
+
+- Lines can be commented (such as these) by inserting '#' symbol before the host code
+
