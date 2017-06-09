@@ -1,0 +1,4 @@
+# Define the RBAC rules ( ClusterRoles / 
+# Define the Service Account
+# Launch the maya-apiserver ( deployment )
+# Launch the maya-storagemanager ( deameon set)
