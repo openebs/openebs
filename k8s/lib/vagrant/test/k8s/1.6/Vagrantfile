@@ -20,7 +20,7 @@ DEPLOY_MODE_DEDICATED = 1
 DEPLOY_MODE_HC = 2
 
 #Changed DEPLOY_MODE from Constant to Local variable deploy_Mode to avoid rewrite warnings on constants.
-deploy_Mode=ENV['OPENEBS_DEPLOY_MODE'] || 1
+deploy_Mode=ENV['OPENEBS_DEPLOY_MODE'] || 2
 
 #Specify the release versions to be installed
 MAYA_RELEASE_TAG = ENV['MAYA_RELEASE_TAG'] || "0.2"
@@ -36,7 +36,7 @@ KM_MEM = ENV['KM_MEM'] || 2048
 KM_CPUS = ENV['KM_CPUS'] || 2
 
 #Specify the number of Kubernetes Minion nodes, CPU/RAM per node. 
-KH_NODES = ENV['KH_NODES'] || 1
+KH_NODES = ENV['KH_NODES'] || 2
 KH_MEM = ENV['KH_MEM'] || 1024
 KH_CPUS = ENV['KH_CPUS'] || 2
 
@@ -155,7 +155,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       config.vm.define hostname do |vmCfg|
         vmCfg.vm.box = "openebs/k8s-1.6"
 	      vmCfg.vm.provider "virtualbox" do |vb|
-           vb.customize ["modifyvm", :id, "--uartmode1", "file", File.join(Dir.pwd, "openebs-k8s-1.6-cloudimg-console.log")]
+           vb.customize ["modifyvm", :id, "--uartmode1", "file", File.join(Dir.pwd, "kubemaster-%02d-console.log" % [i] )]
         end
         vmCfg = configureVM(vmCfg, hostname, cpus, mem)
 
@@ -189,7 +189,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       config.vm.define hostname do |vmCfg|
         vmCfg.vm.box = "openebs/k8s-1.6"
 	      vmCfg.vm.provider "virtualbox" do |vb|
-           vb.customize ["modifyvm", :id, "--uartmode1", "file", File.join(Dir.pwd, "openebs-k8s-1.6-cloudimg-console.log")]
+           vb.customize ["modifyvm", :id, "--uartmode1", "file", File.join(Dir.pwd, "kubeminion-%02d-console.log" % [i] )]
         end
         vmCfg = configureVM(vmCfg, hostname, cpus, mem)
 
