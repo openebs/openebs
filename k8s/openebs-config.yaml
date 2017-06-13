@@ -20,3 +20,52 @@
 #   persistentvolumeclaims, where as remote disks can be used 
 #   for backup-jobs persistentvolumeclaims. 
 
+# Define a storage pool for launching the replicas using
+#  local directory or mounted directory from the minion nodes
+#  
+apiVersion: openebs.io/v1alpha1
+kind: Pool
+metadata:
+  name: hostdir-tmp-openebs
+  type: hostdir
+spec:
+  path: "/tmp/openebs" 
+  maxVolSize: 10G #Max Volume Size
+  maxAllocatedSize: 10G #Max Total Space allocated from this directory/mount
+  nodes: [ "all" ]
+---  
+apiVersion: openebs.io/v1alpha1
+kind: Pool
+metadata:
+  name: iscsi-vol1
+  type: iscsi
+spec:
+  portal: "192.168.1.1:3260" 
+  iqn: "iqn.2012-09.account-name:vol1" 
+  lun: 1
+  mountpath: "/mnt/openebs-vol1"
+  maxSize: 10G #Max Volume Size
+  maxAllocatedSize: 10G #Max Total Space allocated from this directory/mount
+  nodes: [ "all" ]
+---  
+apiVersion: openebs.io/v1alpha1
+kind: Pool
+metadata:
+  name: lvm-vol1
+  type: lvm
+spec:
+  devices: [ "/dev/sdc", "/dev/sdd" ]
+  mountpath: "/mnt/lvm-vol1"
+  maxSize: 10G #Max Volume Size
+  maxAllocatedSize: 10G #Max Total Space allocated from this directory/mount
+  nodes: [ "all" ]
+---  
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+   name: openebs-basic
+provisioner: openebs.io/iscsi
+parameters:
+  pool: any
+  replica: 2
+  size: 5G
