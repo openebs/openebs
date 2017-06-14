@@ -5,4 +5,15 @@ pod_yaml_alias: demo-mysql-openebs-plugin.yaml
 
 mysql_vol_size: 5G
 
+files:
+  - Dockerfile
+  - MySQLLoadGenerate.sh
+
+deb_packages:
+  - python-pip
+
+pip_packages:
+  - 'docker-py==1.9.0'
+
+mysql_load_duration: 120
 

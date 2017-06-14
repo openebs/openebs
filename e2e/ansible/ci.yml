@@ -1,26 +1,42 @@
 ---
-- hosts: localhost
+## Create the hosts file
 
+- hosts: localhost
   roles:
     - inventory
+
+## Setup the OpenEBS maya master
       
 - hosts: openebs-mayamasters
-
   roles:
     - master
     - {role: vagrant, when: is_vagrant_vm | bool} 
 
-- hosts: openebs-mayahosts
+## Setup the OpenEBS storage nodes
 
+- hosts: openebs-mayahosts
   roles:
     - hosts
     - {role: vagrant, when: is_vagrant_vm | bool}
 
-- hosts: localhost  
+## Prepare the test harness for kubernetes role execution
 
+- hosts: localhost
   roles:
-    - {role: localhost, when: run_demo | bool} 
-    - {role: volume, when: run_demo | bool}
-    - {role: fio, when: run_demo | bool}
-    - {role: cleanup, when: run_demo | bool}
+    - k8s-localhost
 
+## Setup the kubernetes master
+
+- hosts: kubernetes-kubemasters
+  roles:
+    - k8s-master
+
+## Setup the kubernetes minions
+
+- hosts: kubernetes-kubeminions
+  roles:
+    - k8s-hosts
+
+## Run the OpenEBS test suite
+
+- include: run-tests.yml 

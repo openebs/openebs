@@ -8,35 +8,35 @@
 #    a) Volume properties can be set in ./roles/volume/defaults/main.yml 
 #    b) fio run duration can be set in ./roles/fio/defaults/main.yml
 # 
-#- include: playbooks/test-fio.yml
+#- include: playbooks/test-fio/fio-prerequisites.yml
 #
-###########################################################################################
-# TC NAME: test-iometer
-# TC DETAILS: Sets up env for IOmeter run on the storage by running dynamo from container
-# TC NOTES: 
-#    a) Keep IOmeter application started on a windows machine before running playbook  
-#    b) Windows IOmeter host IP address can be set in ./roles/iometer/defaults/main.yml
-#    c) Volume properties can be set in ./roles/volume/defaults/main.yml
+#- include: playbooks/test-fio/fio.yml
 #
-#- hosts: localhost
-#  tasks:
-#     - shell: echo "{{hostvars['localhost'].playbook_dir}}"/files
-#       register: files_path
-#
-#- include: playbooks/test-iometer.yml dockerfile_path="{{files_path.stdout}}"
+#- include: playbooks/test-fio/fio-cleanup.yml
+#  when: clean | bool
 #
 ###########################################################################################
 # TC NAME: test-k8s-mysql-pod
 # TC DETAILS: Deploys mysql pod on a k8s cluster with storage provisioned by flexvol driver
 # TC NOTES:           
 #    
-#- include: playbooks/test-k8s-mysql-pod/test-k8s-mysql-pod.yml
+#- include: playbooks/test-k8s-mysql-pod/k8s-mysql-pod-prerequisites.yml
+#
+#- include: playbooks/test-k8s-mysql-pod/k8s-mysql-pod.yml
+#
+#- include: playbooks/test-k8s-mysql-pod/k8s-mysql-pod-cleanup.yml
+#  when: clean | bool
 #
 ###########################################################################################
 # TC NAME: test-k8s-percona-mysql-pod
 # TC DETAILS: Deploys percona pod on k8s cluster with storage provisioned by flexvol driver
 # TC NOTES:           
 #    
-#- include: playbooks/test-k8s-percona-mysql-pod/test-k8s-percona-mysql-pod.yml
+#- include: playbooks/test-k8s-percona-mysql-pod/k8s-percona-pod-prerequisites.yml
+#
+#- include: playbooks/test-k8s-percona-mysql-pod/k8s-percona-pod.yml
+#
+#- include: playbooks/test-k8s-percona-mysql-pod/k8s-percona-pod-cleanup.yml
+#  when: clean | bool
 #
 ###########################################################################################
