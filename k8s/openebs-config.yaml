@@ -70,13 +70,3 @@ spec:
   maxSize: 10G #Max Volume Size
   maxAllocatedSize: 10G #Max Total Space allocated from this directory/mount
   nodes: [ "all" ]
----  
-apiVersion: storage.k8s.io/v1
-kind: StorageClass
-metadata:
-   name: openebs-basic
-provisioner: openebs.io/iscsi
-parameters:
-  pool: any
-  replica: 2
-  size: 5G

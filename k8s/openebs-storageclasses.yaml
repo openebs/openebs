@@ -1,0 +1,10 @@
+# Define a storage classes supported by OpenEBS
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+   name: openebs-basic
+provisioner: openebs.io/iscsi
+parameters:
+  pool: any
+  replica: "2"
+  size: 5G
