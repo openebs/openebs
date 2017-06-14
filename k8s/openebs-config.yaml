@@ -1,6 +1,17 @@
 # Define a new api (configuration) - openebs.io/v1aplha1
+# ------------------------------------------------------
+# Purspose of this configuration spec file :
+# ==========================================
+# OpenEBS maya is expected to identify and create the storage tiers in a given
+# node or cluster. Though Maya can act on the available local storage and 
+# remote storage automatically, the storage admin (human) may want to manage 
+# resources manually. This config file is expected to provide such options
+# 
+# What should this spec cover ?
+# =============================
 # Include the details on how storage will be allocated for the replicas
 # The options can include:
+# - Manual or automatic
 # - host-directory-path 
 # - lvm using local or remote disks (connected via iscsi/fc/nbd)
 # Will also contain details on how to use:
