@@ -44,7 +44,7 @@
   docker_container:
     name: fio-runner
     image: "{{openebs_image}}"
-    command: /fio_runner.sh Basic "{{fio_run_duration}}" 
+    command: /fio_runner.sh Basic "{{io_run_duration}}" 
     volumes:
       - /mnt/iscsi:/datadir1
     state: started

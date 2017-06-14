@@ -1,7 +1,7 @@
 - hosts: localhost
  
   vars_files: 
-    - test-k8s-mysql-pod-vars.yml
+    - k8s-mysql-pod-vars.yml 
  
   tasks:
 
@@ -71,7 +71,53 @@
         executable: /bin/bash
       delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
       register: result
-      until: "'Running' in result.stdout_lines[1]"
+      until: "'mysql' and 'Running' in result.stdout_lines[1]"
       delay: 300 
       retries: 6
-      
+     
+    - name: Get $HOME of K8s minion for kubernetes user
+      shell: source ~/.profile; echo $HOME
+      args:
+        executable: /bin/bash
+      register: result_kube_home
+      delegate_to: "{{groups['kubernetes-kubeminions'].0}}"      
+
+    - name: Get IP address of mysql pod
+      shell: source ~/.profile; kubectl describe pod mysql
+      args:
+        executable: /bin/bash
+      delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+      register: result_IP
+
+    - name: Set IP of Pod to variable
+      set_fact:
+        pod_ip: "{{ result_IP.stdout_lines[7].split()[1] }}"
+
+    - name: Copy files into kube minion
+      copy:
+        src: "{{ item }}"
+        dest: "{{ result_kube_home.stdout }}"
+      with_items: "{{ files }}"
+      delegate_to: "{{ groups['kubernetes-kubeminions'].0 }}"
+
+    - name: Build the mysql-client image
+      docker_image:
+        name: mysql-client
+        state: present
+        path: "{{ result_kube_home.stdout }}"
+        rm: true
+        timeout: 600
+      become: true
+      delegate_to: "{{ groups['kubernetes-kubeminions'].0 }}"
+
+    - name: mysql-client docker instantiate
+      docker_container:
+        name: client
+        image: mysql-client
+        network_mode: host
+        command: timelimit -t {{ mysql_load_duration }} sh MySQLLoadGenerate.sh {{ pod_ip }} > /dev/null 2>&1
+        state: started
+      become: true
+      delegate_to: "{{ groups['kubernetes-kubeminions'].0 }}"
+
+

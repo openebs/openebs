@@ -1,15 +1,9 @@
 ---
-#Option to run the sample demo of OpenEBS
-#Accepted Entries(true, false): default:true
+#########################################
+# OpenEBS Deployment Specifications     #
+#########################################
 
-run_demo: true
-
-#Option specifically for vagrant VMs.
-#Accepted Entries(true, false): default:false
-
-is_vagrant_vm: true 
-  
-#User-defined size for the volume that openebs creates:
+#User-defined size for the volume that openebs creates
 #Accepted Entries(Valid Volume Sizes): default:5G
 
 openebs_vol_size: 5G
@@ -17,9 +11,38 @@ openebs_vol_size: 5G
 #Available CIDR for allocating IP Addresses for containers
 #Accepted Entries (Valid CIDR): default:172.28.128.1/24
 
-cn_network_cidr: 172.28.128.1/24 
+cn_network_cidr: 20.10.49.110/25
 
-#Network interface for CIDR.
+#Network interface for CIDR
 #Accepted Entries (Valid Network Interface): default:enp0s8
 
-cn_interface: enp0s8
+cn_interface: ens160
+
+#Mode of openEBS deployment 
+#Accepted Entries (dedicated, hyperconverged): default:dedicated 
+
+deployment_mode: dedicated
+
+#Option specifically for vagrant VMs
+#Accepted Entries(true, false): default:false
+
+is_vagrant_vm: true
+
+#########################################
+# Ansible Runtime Specifications        #
+#########################################
+
+#Option to run the sample demo of OpenEBS
+#Accepted Entries(true, false): default:true
+
+run_demo: true
+
+#########################################
+# OpenEBS Test Specifications           #
+#########################################
+
+#Option to run cleanup functions in tests
+#Accepted Entries(true, false): default:true
+
+clean: true
+

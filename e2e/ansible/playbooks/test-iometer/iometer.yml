@@ -2,8 +2,6 @@
 - hosts: localhost  
 
   roles:
-    - {role: localhost, when: run_demo | bool} 
     - {role: volume, when: run_demo | bool}
     - {role: iometer, when: run_demo | bool}
-    - {role: cleanup, when: run_demo | bool}
 

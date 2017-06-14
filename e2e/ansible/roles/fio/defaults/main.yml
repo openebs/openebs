@@ -1,4 +1,3 @@
 ---
 openebs_image: openebs/tests-fio
 
-fio_run_duration: 300 #in sec
