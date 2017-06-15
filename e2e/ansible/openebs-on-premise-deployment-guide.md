@@ -30,7 +30,7 @@ The following instructions have been verified on:
 
 - All linux machines are required to have : 
   
-  - Basic development packages (dpkg-dev,gcc,g++,libc6-dev,make)
+  - Basic development packages (dpkg-dev,gcc,g++,libc6-dev,make,libssl-dev,sshpass)
   - Python2.7-minimal 
   - SSH services enabled
   
