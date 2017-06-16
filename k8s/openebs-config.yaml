@@ -37,10 +37,10 @@
 apiVersion: openebs.io/v1alpha1
 kind: Pool
 metadata:
-  name: hostdir-tmp-openebs
+  name: hostdir-var
   type: hostdir
 spec:
-  path: "/tmp/openebs" 
+  path: "/var/openebs" 
   maxVolSize: 10G #Max Volume Size
   maxAllocatedSize: 10G #Max Total Space allocated from this directory/mount
   nodes: [ "all" ]
