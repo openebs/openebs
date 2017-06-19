@@ -8,3 +8,23 @@ parameters:
   pool: hostdir-var
   replica: "2"
   size: 5G
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+   name: openebs-percona
+provisioner: openebs.io/iscsi
+parameters:
+  pool: hostdir-var
+  replica: "2"
+  size: 5G
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+   name: openebs-jupyter
+provisioner: openebs.io/iscsi
+parameters:
+  pool: hostdir-var
+  replica: "2"
+  size: 5G

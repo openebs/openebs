@@ -32,7 +32,7 @@ apiVersion: v1
 metadata:
   name: demo-vol1-claim
 spec:
-  storageClassName: openebs-basic
+  storageClassName: openebs-jupyter
   accessModes:
     - ReadWriteOnce
   resources:
