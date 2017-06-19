@@ -47,6 +47,7 @@ spec:
   ports:
   - name: ui
     port: 8888
+    nodePort: 32424
     protocol: TCP
   selector:
     name: openebs-ds-pod
