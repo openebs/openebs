@@ -25,5 +25,5 @@ def sshToOtherClient(ip, usrname, pwd, cmd):
     if not error and output:
         return output
     else:
-       return error
+        return error
 

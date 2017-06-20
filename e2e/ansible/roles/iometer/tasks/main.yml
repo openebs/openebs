@@ -20,7 +20,7 @@
   docker_image:
     name: "{{iometer_image}}"
     state: present
-    path: "{{dockerfile_path}}"
+    path: "{{role_path}}/Dockerfile"
     rm: true
     timeout: 600
   become: true

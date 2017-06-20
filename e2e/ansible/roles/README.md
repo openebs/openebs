@@ -13,7 +13,9 @@ A brief outline of the functions associated with above components is described b
 
 - prerequisites : Installs python packages necessary for inventory generation
 
-- inventory : Generates the hosts file based on entries in machines.in
+- inventory : Generates the hosts file based on entries in machines.in. The also role provides an option to
+              setup passwordless SSH between the ansible host (localhost)  and the target hosts. In case the 
+              same is setup, the hosts file will not contain hostvars for the ansible_ssh_password
 
 - common : Installs apt packages common to Maya Server & Storage Node cluster
 

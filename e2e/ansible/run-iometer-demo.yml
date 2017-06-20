@@ -6,13 +6,7 @@
 #    b) Windows IOmeter host IP address can be set in ./roles/iometer/defaults/main.yml
 #    c) Volume properties can be set in ./roles/volume/defaults/main.yml
 #
-#- include: playbooks/test-iometer/iometer-prerequisites.yml
-#
-#- hosts: localhost
-#  tasks:
-#     - shell: echo "{{hostvars['localhost'].playbook_dir}}"/files
-#       register: files_path
-#
-#- include: playbooks/test-iometer/iometer.yml dockerfile_path="{{files_path.stdout}}"
+- include: playbooks/test-iometer/iometer-prerequisites.yml
+- include: playbooks/test-iometer/iometer.yml 
 #
 ###########################################################################################
