@@ -1,6 +1,12 @@
 ---
+- name: Source the env 
+  shell : source ~/.profile
+  args:
+    executable: /bin/bash
+  delegate_to: 127.0.0.1
+
 - name: Generate Inventory
-  command: "python {{inventory_script_path}}/generate-inventory.py {{inventory_input_path}}/machines.in"
+  command: "python {{role_path}}/files/generate-inventory.py {{inventory_input_path}}/machines.in"
   delegate_to: 127.0.0.1
 
 - name: Sync Inventory

@@ -73,6 +73,9 @@ drwxrwxr-x 17 testuser testuser  4096 Jun  5 09:29 roles
   on the test-harness (this machine will be interchangeably used with the term 'localhost'). Ensure that these are setup in the
   ```.profile``` of the localhost user which will be running the ansible code/playbooks, i.e., the ansible_user.
 
+- Ensure that the env variables setup in the previous step are available in the current user session. Perform 
+```source ~/.profile``` to achieve the same and verify via ```echo $VARIABLE```
+
 - Edit the ```inventory/machines.in``` file to place the latest HostCode, IP, username variable, password variable for all the boxes 
   setup. For more details on editing machines.in refer the [Inventory README](inventory/README.md)
   
