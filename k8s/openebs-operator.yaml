@@ -21,7 +21,13 @@ metadata:
   name: openebs-maya-operator
 rules:
 - apiGroups: ["*"]
-  resources: ["services","pods","deployments"]
+  resources: ["services","pods","deployments", "events"]
+  verbs: ["*"]
+- apiGroups: ["*"]
+  resources: ["persistentvolumes","persistentvolumeclaims"]
+  verbs: ["*"]
+- apiGroups: ["storage.k8s.io"]
+  resources: ["storageclasses"]
   verbs: ["*"]
 ---
 # Bind the Service Account with the Role Privileges.
@@ -76,4 +82,28 @@ spec:
   selector:
     name: maya-apiserver
   sessionAffinity: None
+---
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: openebs-provisioner
+  namespace: default
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        name: openebs-provisioner
+    spec:
+      serviceAccountName: openebs-maya-operator
+      containers:
+      - name: openebs-provisioner
+        imagePullPolicy: Always
+        image: openebs/openebs-k8s-provisioner:ci
+        env:
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+
 
