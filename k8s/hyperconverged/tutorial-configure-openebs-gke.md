@@ -35,5 +35,31 @@ sudo service open-iscsi status
 ## Step 3 : Running Stateful workloads with OpenEBS Storage. 
 
 
+## Appendix
+
+### Setting kubernetes cluster admin context
+
+To create/modify service accounts and grant previleges, kubectl needs to be run with admin previleges. The following commands help to setup and use the admin context for Google Container Engine via the Google Cloud Shell. 
+
+#### Step 1: Initialize credentails to allow kubectl to execute commands on the container cluster. 
+```
+gcloud container clusters list
+gcloud container clusters get-credentials demo-openebs03 --zone us-central1-a
+```
+
+#### Step 2 : Setup the admin context
+
+- Access the credentails information from : Google Cloud Platform -> Container Engine -> (cluster) -> Show Credentials. 
+- Save the "Cluster CA Certificate" to ~/.kube/admin.key
+- Create a admin config context from the config shell
+```
+gcloud container clusters list
+kubectl config set-context demo-openebs03 --cluster=gke_strong-eon-153112_us-central1-a_demo-openebs03 --user=cluster-admin
+```
+
+
+
+
+
 
 
