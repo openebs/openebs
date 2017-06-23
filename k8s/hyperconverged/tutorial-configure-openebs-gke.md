@@ -14,6 +14,22 @@ You can either use an existing container cluster or create a new one using, Logi
 
 ### Add iSCSI Support
 
+SSH into the nodes of the cluster to install open-iscsi package. OpenEBS 0.3 uses iscsi to connect to the block volumes. 
+
+```
+sudo apt-get update
+sudo apt-get install open-iscsi
+sudo service open-iscsi restart
+```
+
+#### Verify that iSCSI is configured
+
+Check that initiator name is configured and iscsi service is running
+```
+sudo cat /etc/iscsi/initiatorname.iscsi
+sudo service open-iscsi status
+```
+
 ## Step 2 : Run OpenEBS Operator
 
 ## Step 3 : Running Stateful workloads with OpenEBS Storage. 
