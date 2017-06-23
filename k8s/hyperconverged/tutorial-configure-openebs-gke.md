@@ -32,6 +32,19 @@ sudo service open-iscsi status
 
 ## Step 2 : Run OpenEBS Operator
 
+Download the latest OpenEBS Operator Files
+```
+git clone https://github.com/openebs/openebs.git
+cd openebs/k8s
+```
+
+Setup the kubectl to run in admin context. (See Appendix below for creating an admin context in GCP). The below command will prompt for username/password. Provide username as "admin" and password for the admin can be obtained from : Google Cloud Platform -> Container Engine -> (cluster) -> Show Credentials
+```
+kubectl config use-context demo-openebs03
+kubectl apply -f openebs-operator.yaml
+kubectl config use-context gke_strong-eon-153112_us-central1-a_demo-openebs03
+```
+
 ## Step 3 : Running Stateful workloads with OpenEBS Storage. 
 
 
