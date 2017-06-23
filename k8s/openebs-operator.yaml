@@ -99,7 +99,7 @@ spec:
       containers:
       - name: openebs-provisioner
         imagePullPolicy: Always
-        image: openebs/openebs-k8s-provisioner:ci
+        image: openebs/openebs-k8s-provisioner:0.3-RC2
         env:
         - name: NODE_NAME
           valueFrom:
