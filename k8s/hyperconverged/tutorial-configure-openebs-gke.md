@@ -45,6 +45,14 @@ kubectl apply -f openebs-operator.yaml
 kubectl config use-context gke_strong-eon-153112_us-central1-a_demo-openebs03
 ```
 
+Add OpenEBS related Storage Classes, that can then be used by developers/apps. 
+
+```
+kubectl apply -f openebs-storageclasses.yaml
+```
+
+Note: The persistent storage is carved out from the space available on the nodes (default host directory : /var/openebs). There are efforts underway to provide administrator with additional options of consuming the storage (as outlined in "openebs-config.yaml"). These are slated to work hand-in-hand with the local storage manager of the kubernetes that is due in Kubernetes 1.7/1.8. 
+
 ## Step 3 : Running Stateful workloads with OpenEBS Storage. 
 
 
