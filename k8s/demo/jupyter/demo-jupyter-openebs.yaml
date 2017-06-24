@@ -1,17 +1,17 @@
 apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
-  name: openebs-ds-pod
+  name: jupyter-server
   namespace: default
 spec:
   replicas: 1
   template:
     metadata:
       labels:
-        name: openebs-ds-pod
+        name: jupyter-server
     spec:
       containers:
-      - name: openebs-ds-pod
+      - name: jupyter-server
         imagePullPolicy: Always
         image: satyamz/docker-jupyter:v0.4
         ports:
@@ -20,17 +20,17 @@ spec:
         - name: GIT_REPO
           value: https://github.com/vharsh/plot-demo.git
         volumeMounts:
-        - name: demo-vol1
+        - name: data-vol
           mountPath: /mnt/data
       volumes:
-      - name: demo-vol1
+      - name: data-vol
         persistentVolumeClaim:
-          claimName: demo-vol1-claim
+          claimName: jupyter-data-vol-claim
 ---
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
-  name: demo-vol1-claim
+  name: jupyter-data-vol-claim
 spec:
   storageClassName: openebs-jupyter
   accessModes:
@@ -42,7 +42,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: openebs-ds-service
+  name: jupyter-service
 spec:
   ports:
   - name: ui
@@ -50,7 +50,7 @@ spec:
     nodePort: 32424
     protocol: TCP
   selector:
-    name: openebs-ds-pod
+    name: jupyter-server
   sessionAffinity: None
   type: NodePort
 
