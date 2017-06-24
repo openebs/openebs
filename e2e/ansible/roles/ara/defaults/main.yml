@@ -1,0 +1,15 @@
+---
+ara_apt_packages: 
+  - gcc 
+  - python-dev
+  - libffi-dev
+  - libssl-dev
+  - python-pip
+  - libxml2-dev
+  - libxslt1-dev
+
+ara_pip_packages:
+  - tox
+  - ara 
+
+ara_webserver_port: 9191

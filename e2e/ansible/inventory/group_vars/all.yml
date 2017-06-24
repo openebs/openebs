@@ -37,6 +37,8 @@ is_vagrant_vm: true
 
 run_demo: true
 
+ara_setup: true 
+
 #########################################
 # OpenEBS Test Specifications           #
 #########################################
