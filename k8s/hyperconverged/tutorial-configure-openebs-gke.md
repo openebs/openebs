@@ -68,12 +68,17 @@ Some sample yaml files for stateful workoads using OpenEBS are provided in the [
 ```
 kubectl apply -f demo/jupyter/demo-jupyter-openebs.yaml
 ```
-The above command will create the following:
-- Launch a Jupyter Server
-- Checkout the Notebook (specified in the yaml) file and make it available to use in the UI
+The above command will create the following, which can be verified using the corresponding kubectl commands:
+- Launch a Jupyter Server, with the specified notebook file from github
+  (kubectl get deployments)
 - Create an OpenEBS Volume and mounts to the Jupyter Server Pod (/mnt/data)
+  (kubectl get pvc)
+  (kubectl get pv)
+  (kubectl get pods)
 - Expose the Jupyter Server to external world via the http://NodeIP:32424 (NodeIP is any of the minion nodes external IP)
-- To access the Jupyter Server over the internet, set the firewall rules to allow traffic on port 32424 in you GCP / Networking / Firewalls
+  (kubectl get pods)
+
+Note:To access the Jupyter Server over the internet, set the firewall rules to allow traffic on port 32424 in you GCP / Networking / Firewalls
 
 
 
