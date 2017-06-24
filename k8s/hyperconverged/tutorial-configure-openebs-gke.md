@@ -55,6 +55,27 @@ Note: The persistent storage is carved out from the space available on the nodes
 
 ## Step 3 : Running Stateful workloads with OpenEBS Storage. 
 
+All you need to do, to use OpenEBS as persistent storage for your Stateful workloads, is to set the Storage Class in the PVC to the OpenEBS Storage Class.
+
+Get the list of storage classes using the below command. Choose the storage class that best suits your application. 
+
+```
+kubectl get sc
+```
+
+Some sample yaml files for stateful workoads using OpenEBS are provided in the [openebs/k8s/demo](https://github.com/openebs/openebs/tree/master/k8s/demo)
+
+```
+kubectl apply -f demo/jupyter/demo-jupyter-openebs.yaml
+```
+The above command will create the following:
+- Launch a Jupyter Server
+- Checkout the Notebook (specified in the yaml) file and make it available to use in the UI
+- Create an OpenEBS Volume and mounts to the Jupyter Server Pod (/mnt/data)
+- Expose the Jupyter Server to external world via the http://NodeIP:32424 (NodeIP is any of the minion nodes external IP)
+- To access the Jupyter Server over the internet, set the firewall rules to allow traffic on port 32424 in you GCP / Networking / Firewalls
+
+
 
 ## Appendix
 
