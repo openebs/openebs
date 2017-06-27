@@ -10,8 +10,13 @@ it can also be used to automate the on-premise deployment of OpenEBS.
 
 In its current form, this project performs an automated setup of:
 
-- Kubernetes cluster (K8s-master, K8s-minions) configured with OpenEBS flexvol driver for Kubernetes
+- Kubernetes cluster (K8s-master, K8s-minions)
 - OpenEBS cluster (openEBS-maya server,openEBS-storage hosts)
+
+The OpenEBS installation can be performed either in __dedicated mode__, with the openebs storage services
+running directly on linux machines (same as the ones hosting kubernetes cluster OR distinct boxes) OR
+in __hyperconverged mode__, where the maya-server and openebs storage hosts are run as pods on the kubernetes
+cluster
 
 The detailed steps to perform this on-premise installation can be found here : 
 
@@ -40,8 +45,8 @@ ansible
 ├── inventory
 │   └── group_vars
 ├── playbooks
-│   ├── test-k8s-mysql-pod
-│   └── test-k8s-percona-mysql-pod ..etc..,
+│   ├ dedicated
+│   └ hyperconverged
 ├── plugins
 │   └── callback
 └── roles
