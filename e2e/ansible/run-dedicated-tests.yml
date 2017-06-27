@@ -1,5 +1,5 @@
 ---
-# This .yml runs tests against the openebs setup
+# This .yml runs tests against the dedicated openebs setup
 
 ###########################################################################################
 # TC NAME: test-fio

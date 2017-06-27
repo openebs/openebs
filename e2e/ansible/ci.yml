@@ -1,42 +1,15 @@
 ---
-## Create the hosts file
+- include: pre-requisites.yml
 
-- hosts: localhost
-  roles:
-    - inventory
+- include: setup-kubernetes.yml
 
-## Setup the OpenEBS maya master
-      
-- hosts: openebs-mayamasters
-  roles:
-    - master
-    - {role: vagrant, when: is_vagrant_vm | bool} 
+- include: setup-openebs.yml
 
-## Setup the OpenEBS storage nodes
+- include: run-dedicated-tests.yml
+  when: deployment_mode == "dedicated"
 
-- hosts: openebs-mayahosts
-  roles:
-    - hosts
-    - {role: vagrant, when: is_vagrant_vm | bool}
+- include: run-hyperconverged-tests.yml
+  when: deployment_mode == "hyperconverged"
 
-## Prepare the test harness for kubernetes role execution
+ 
 
-- hosts: localhost
-  roles:
-    - k8s-localhost
-
-## Setup the kubernetes master
-
-- hosts: kubernetes-kubemasters
-  roles:
-    - k8s-master
-
-## Setup the kubernetes minions
-
-- hosts: kubernetes-kubeminions
-  roles:
-    - k8s-hosts
-
-## Run the OpenEBS test suite
-
-- include: run-tests.yml 

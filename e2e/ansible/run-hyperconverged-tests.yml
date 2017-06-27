@@ -1,0 +1,16 @@
+---
+# This .yml runs tests against the hyperconverged openebs setup
+
+###########################################################################################
+# TC NAME: test-k8s-percona-mysql-pod
+# TC DETAILS: Deploys percona pod on k8s cluster with storage provisioned by openebs provisioner 
+# TC NOTES:           
+#    
+- include: playbooks/hyperconverged/test-k8s-percona-mysql-pod/k8s-percona-pod-prerequisites.yml
+#
+- include: playbooks/hyperconverged/test-k8s-percona-mysql-pod/k8s-percona-pod.yml
+#
+- include: playbooks/hyperconverged/test-k8s-percona-mysql-pod/k8s-percona-pod-cleanup.yml
+  when: clean | bool
+#
+###########################################################################################
