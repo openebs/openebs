@@ -80,7 +80,21 @@ drwxrwxr-x 17 testuser testuser  4096 Jun  5 09:29 roles
   setup. For more details on editing machines.in refer the [Inventory README](inventory/README.md)
   
 - Edit the global variables file ```inventory/group_vars/all.yml``` to reflect the desired storage volume properties and network CIDR
-  that will be used by the maya api server to allot the IP for the volume containers 
+  that will be used by the maya api server to allot the IP for the volume containers. Also update the ansible run-time properties to 
+  reflect the machine type (is_vagrant) and whether the playbook execution needs to be recorded using the Ansible Run Analysis framework 
+  (setup_ara)
+  
+- Execute the setup_ara playbook to install the ARA notification plugins and custom modules. This step will cause changes to 
+  the ansible configuration file ansible.cfg (though a backup will be taken at the time of execution in case you need to revert). A web 
+  URL is provided as a playbook run message at the end of the ara setup procedure, which can be used to track all the playbook run 
+  details after this point (_Optional_)
+  
+  ```
+  testuser@OpenEBSClient:~/openebs/e2e/ansible$ ansible-playbook setup_ara.yml
+  ```
+  
+- Note that the above playbook needs to be run separately and not as part of any the "master" playbook run as the changes to ansible 
+  default configuration may file to take effect dynamically
   
 - Execute the pre-requisites ansible playbook to generate the ansible inventory, i.e., 'hosts' file from the data provided in the 
   machines.in file
