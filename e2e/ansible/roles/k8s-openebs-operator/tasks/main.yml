@@ -40,7 +40,7 @@
   args:
     executable: /bin/bash
   register: result_pod
-  until: "'maya-apiserver' and 'Running' in result_pod.stdout_lines[1]"
+  until: "'maya-apiserver' and 'Running' in result_pod.stdout_lines[1] and 'openebs-provisioner' and 'Running' in result_pod.stdout_lines[2]"
   delay: 300
   retries: 6
 
@@ -54,6 +54,21 @@
     executable: /bin/bash
   register: result_vers
   failed_when: "'Maya' not in result_vers.stdout"
+
+- name: Deploy the openebs storageclasses yml
+  shell: source ~/.profile; kubectl apply -f {{ openebs_storageclasses_alias }}
+  args:
+    executable: /bin/bash
+
+- name: Confirm that openebs storage classes are created
+  shell: source ~/.profile; kubectl get sc
+  args:
+    executable: /bin/bash
+  register: result_sc
+  until: "'openebs.io/provisioner-iscsi' in result_sc.stdout"
+  delay: 10
+  retries: 6
+
 
 
 

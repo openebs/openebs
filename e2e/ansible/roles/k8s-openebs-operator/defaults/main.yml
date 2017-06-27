@@ -3,4 +3,8 @@ openebs_operator_link: https://raw.githubusercontent.com/openebs/openebs/master/
 
 openebs_operator_alias: openebs-operator.yaml 
 
+openebs_storageclasses_link: https://raw.githubusercontent.com/openebs/openebs/master/k8s/openebs-storageclasses.yaml
+
+openebs_storageclasses_alias: openebs-storageclasses.yaml
+
 
