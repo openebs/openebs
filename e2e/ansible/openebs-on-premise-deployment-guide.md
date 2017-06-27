@@ -95,17 +95,38 @@ drwxrwxr-x 17 testuser testuser  4096 Jun  5 09:29 roles
   testuser@OpenEBSClient:~/openebs/e2e/ansible/inventory$ ls -ltr hosts
   -rw-rw-r-- 1 testuser testuser 1482 Jun  5 10:00 hosts
   ```
-### OpenEBS Installation
+- OpenEBS installation can be performed in dedicated mode, where the kubernetes and openebs clusters are setup individually on the linux 
+  boxes (same or distinct) OR in hyperconverged mode, where the openebs storage services run as pods on the kubernetes cluster itself
+  
+  The subsequent sections explain the installation procedure for both the dedicated and hyperconverged mode.
 
-- Execute the setup-openebs ansible playbook to create the Kubernetes and OpenEBS clusters. This playbook installs the requisite
-  package dependencies on the machines, updates the configuration files on the boxes and sets it up to serve applications.
+### OpenEBS Installation - Dedicated Mode
+
+- Update the ```inventory/group_vars/all.yml``` with the appropriate value ("dedicated") for the key "deployment_mode" 
+
+- Execute the setup-kubernetes ansible playbook to create the kubernetes cluster followed by the setup-openebs playbook to install the 
+  maya-apiserver and openebs storage cluster. These playbooks install the requisite  dependencies on the machines, update the 
+  configuration files on the boxes and sets it up to serve applications.
   
   ```
-  testuser@OpenEBSClient:~/openebs/e2e/ansible$ ansible-playbook setup-openebs.yml 
+  testuser@OpenEBSClient:~/openebs/e2e/ansible$ ansible-playbook setup-kubernetes.yml 
   ```
-- verify that the Kubernetes & OpenEBS cluster are up with the nodes having joined the masters.
+  ```
+  testuser@OpenEBSClient:~/openebs/e2e/ansible$ ansible-playbook setup-kubernetes.yml 
+  ```
+- verify that the Kubernetes & OpenEBS clusters are up with the nodes having joined the masters :
 
-  Check status of the maya-master and OpenEBS storage nodes, which are registered with the maya-master
+  Check status of the Kubernetes cluster
+  
+  ```
+  karthik@KubeMaster:~$ kubectl get nodes
+  NAME         STATUS    AGE       VERSION
+  kubehost01   Ready     2d        v1.6.3
+  kubehost02   Ready     2d        v1.6.3
+  kubemaster   Ready     2d        v1.6.3
+  ```
+
+  Check status of the maya-master and OpenEBS storage nodes 
   
   ```
   karthik@MayaMaster:~$ maya omm-status
@@ -119,65 +140,123 @@ drwxrwxr-x 17 testuser testuser  4096 Jun  5 09:29 roles
   564dfe3c  dc1  MayaHost01  <none>  false  ready
   564dd2e3  dc1  MayaHost02  <none>  false  ready
   ```
+### OpenEBS Installation - Hyperconverged Mode
+
+- Update the ```inventory/group_vars/all.yml``` with the appropriate value ("hyperconverged") for the key "deployment_mode" 
+
+- In this mode, the openebs maya-apiserver and openebs-storage provisioner are run as deployments on the kubernetes cluster with 
+  associated pods, and the kubernetes hosts act as the openebs storage hosts as well. These are setup using an openebs-operator on 
+  the kubernetes cluster. The setup also involves integration of openebs storage-classes into the kubernetes cluster. These essentially 
+  define the storage profile - such as size, number of replicas, type of pool atec..,and also the provisioner associated with it. 
   
-  Check status of the Kubernetes cluster
+  Applications can consume storage by specifying a persistent volume claim in which the storage class is an openebs-storage class.
   
+- First, setup the kubernetes cluster using the setup-kubernetes playbook, followed by the setup-openebs playbook (same commands as the 
+  dedicated installation explained in previous section) to deploy the openebs pods. Internally, this runs the _hyperconverged_ ansible 
+  role which executes the the openebs-operator and integrates openebs-storageclasses into the kubernetes cluster 
+  
+- Verify that the kubernetes cluster is up using the ```kubectl get nodes``` command
+
+- Verify that the maya-apiserver and openebs-provisioner are deployed successfully on the kubernetes cluster
+
   ```
-  karthik@KubeMaster:~$ kubectl get nodes
-  NAME         STATUS    AGE       VERSION
-  kubehost01   Ready     2d        v1.6.3
-  kubehost02   Ready     2d        v1.6.3
-  kubemaster   Ready     2d        v1.6.3
+  karthik@MayaMaster:~$ kubectl get deployments
+  NAME                  DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE
+  maya-apiserver        1         1         1            1           4h
+  openebs-provisioner   1         1         1            1           4h
+  ```
+  ```
+  karthik@MayaMaster:~$ kubectl get pods
+  NAME                                   READY     STATUS    RESTARTS   AGE
+  maya-apiserver-1633167387-v4sf1        1/1       Running   0          4h
+  openebs-provisioner-1174174075-n989p   1/1       Running   0          4h
+  ```
+- Verify that the openebs storage-classes are applied successfully 
+
+  ```
+  karthik@MayaMaster:~$ kubectl get sc
+  NAME              TYPE
+  openebs-basic     openebs.io/provisioner-iscsi
+  openebs-jupyter   openebs.io/provisioner-iscsi
+  openebs-percona   openebs.io/provisioner-iscsi
   ```
   
 ### Run sample applications on the OpenEBS setup
 
 - Test the openebs setup installed using the above steps by deploying a sample application pod
 
-- Edit the ansible/run-tests.yml to run either the _test-k8s-mysql-pod_ or _test-k8s-percona-mysql-pod_ testcase and execute 
-  the playbook
+- run-dedicated-tests.yml can be used to run tests on the dedicated installation and run-hyperconverged-tests.yml on the hyperconverged 
+  installation
+
+- By default, all tests are commented in the above playbooks. Uncomment the desired test and execute the playbook. In the example shown 
+  below, a percona mysql DB is deployed on a hyperconverged installation
 
   ```
-  ciuser@OpenEBSClient:~/openebs/e2e/ansible$ ansible-playbook run-tests.yml
+  ciuser@OpenEBSClient:~/openebs/e2e/ansible$ ansible-playbook run-hyperconverged-tests.yml
   ```
-- Verify that the pod is deployed on the Kubernetes minion, by executing the this command on the Kubernetes master :
+- Verify that the pod is deployed on the Kubernetes minion along with the openebs storage pods created as per the storage-class in the 
+  persistent volume claim, by executing the this command on the Kubernetes master :
 
   ```
-  karthik@KubeMaster:~$ kubectl get pod
-  NAME      READY     STATUS    RESTARTS   AGE
-  percona   1/1       Running   0          2m
+  karthik@MayaMaster:~$ kubectl get pods
+  NAME                                                            READY     STATUS    RESTARTS   AGE
+  maya-apiserver-1633167387-v4sf1                                 1/1       Running   0          4h
+  openebs-provisioner-1174174075-n989p                            1/1       Running   0          4h
+  percona                                                         1/1       Running   0          2m
+  pvc-4644787a-5b1f-11e7-bf1c-000c298ff5fc-ctrl-693727538-dph14   1/1       Running   0          2m
+  pvc-4644787a-5b1f-11e7-bf1c-000c298ff5fc-rep-871457607-l392p    1/1       Running   0          2m
+  pvc-4644787a-5b1f-11e7-bf1c-000c298ff5fc-rep-871457607-n9m73    1/1       Running   0          2m
+
   ```
+  
+  In case of a dedicated installation, the application pod alone will be seen in the output of above command
+  
 - For more details about the pod, execute the command ``` kubectl describe pod <pod name> ```
 
-- Verify that the storage volume is receiving I/O by checking the increments to _DataUpdateIndex_ in the output of the stats 
-  command issued on the maya-master : 
-
-  ``` 
-  karthik@MayaMaster:~$ maya vsm-stats demo-vsm1-vol1
-  ------------------------------------
-
-  IQN: iqn.2016-09.com.openebs.jiva:demo-vsm1-vol1
-  Volume: demo-vsm1-vol1
-  Portal: 20.10.49.44
-  Size: 5G
-
-  Replica         Status      DataUpdateIndex
-  20.10.49.68     Online      2408
-  20.10.49.53     Online      2408
-  ------------------------------------
+- The storage volume (i.e., the persistent volume) associated with the persistent volume claim can be viewed using the vsm-list command 
+  in the maya-apiserver pod
+  
+  ```
+  karthik@MayaMaster:~$ kubectl exec maya-apiserver-1633167387-v4sf1 -c maya-apiserver -- maya vsm-list
+  Name                                      Status
+  pvc-a2a6d71f-5b21-11e7-bf1c-000c298ff5fc  Running
   ```
   
-  ## Tips & Gotchas
+- Verify that the storage volume is receiving I/O by checking the increments to _DataUpdateIndex_ in the output of the vsm-stats 
+  command issued in the maya-apiserver pod. Also available in the command output are some additional performance stats
   
-  - Use the -v flag while running the playbooks to enable verbose output & logging. Increase the number of 'v's to increase the
-    verbosity
+  ```
+  karthik@MayaMaster:~$ kubectl exec maya-apiserver-1633167387-v4sf1 -c maya-apiserver -- maya vsm-stats pvc-a2a6d71f-5b21-11e7-bf1c-  
+  000c298ff5fc
+  ------------------------------------
+     IQN: iqn.2016-09.com.openebs.jiva:pvc-a2a6d71f-5b21-11e7-bf1c-000c298ff5fc
+  Volume: pvc-a2a6d71f-5b21-11e7-bf1c-000c298ff5fc
+  Portal: 10.104.223.35:3260
+    Size: 5G
+
+  Replica         Status      DataUpdateIndex
+  10.36.0.2       Online      2857
+  10.44.0.3       Online      2857
+  ------------------------------------
+   r/s|   w/s|   r(MB/s)|   w(MB/s)|   rLat(ms)|   wLat(ms)|   rBlk(KB)|   wBlk(KB)|
+     0|     3|     0.000|     1.109|      0.000|     10.602|          0|        378|
+  karthik@MayaMaster:~$
+  ```
+  In case of dedicated installations, the ```maya vsm-list``` and ```maya vsm-stats``` command can be executed directly on the maya 
+  server host console  
+
+  
+## Tips & Gotchas
+  
+- Use the -v flag while running the playbooks to enable verbose output & logging. Increase the number of 'v's to increase the
+  verbosity
     
-  - Sometimes, the minions take time to join the Kubernetes master. This could be caused due to slow internet or less resources
-    on the box. The time could range between a few seconds to a few minutes
+- Sometimes, the minions take time to join the Kubernetes master. This could be caused due to slow internet or less resources
+  on the box. The time could range between a few seconds to a few minutes
     
-  - As with minions above, the OpenEBS volume containers (Jiva containers) may take some time to get initialized (involves 
-    a docker pull) before they are ready to serve I/O. Any pod deployment (which uses the openebs iscsi flexvol driver) done while 
-    this is still in process is seen to get queued and resume once the storage is ready
+- As with minions above, the OpenEBS volume containers (Jiva containers) may take some time to get initialized (involves 
+  a docker pull) before they are ready to serve I/O. Any pod deployment (which uses the openebs iscsi flexvol driver) done while 
+  this is still in process is seen to get queued and resume once the storage is ready
     
     
 
