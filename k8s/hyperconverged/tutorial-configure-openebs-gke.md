@@ -40,7 +40,7 @@ git clone https://github.com/openebs/openebs.git
 cd openebs/k8s
 ```
 
-Setup the kubectl to run in admin context. (See Appendix below for creating an admin context in GCP). The below command will prompt for username/password. Provide username as "admin" and password for the admin can be obtained from : Google Cloud Platform -> Container Engine -> (cluster) -> Show Credentials
+Setup the kubectl to run in admin context. [See Appendix below for creating an admin context in GCP](https://github.com/openebs/openebs/blob/master/k8s/hyperconverged/tutorial-configure-openebs-gke.md#setting-kubernetes-cluster-admin-context). The below command will prompt for username/password. Provide username as "admin" and password for the admin can be obtained from : Google Cloud Platform -> Container Engine -> (cluster) -> Show Credentials
 ```
 kubectl config use-context demo-openebs03
 kubectl apply -f openebs-operator.yaml
