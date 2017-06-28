@@ -1,0 +1,82 @@
+{
+  "apiVersion": "apps/v1beta1",
+  "kind": "StatefulSet",
+  "metadata": {
+    "name": "pgset"
+  },
+  "spec": {
+    "serviceName": "pgset",
+    "replicas": 2,
+    "template": {
+      "metadata": {
+        "labels": {
+          "app": "pgset"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "pgset",
+            "image": "crunchydata/crunchy-postgres:centos7-9.6-1.4.0",
+            "ports": [
+              {
+                "containerPort": 5432,
+                "name": "postgres"
+              }
+            ],
+            "env": [{
+                "name": "PG_MASTER_USER",
+                "value": "master"
+            }, {
+                "name": "PGHOST",
+                "value": "/tmp"
+            }, {
+                "name": "PG_MODE",
+                "value": "master"
+            }, {
+                "name": "PG_MASTER_PASSWORD",
+                "value": "password"
+            }, {
+                "name": "PG_USER",
+                "value": "testuser"
+            }, {
+                "name": "PG_PASSWORD",
+                "value": "password"
+            }, {
+                "name": "PG_DATABASE",
+                "value": "userdb"
+            }, {
+                "name": "PG_ROOT_PASSWORD",
+                "value": "password"
+            }],
+            "volumeMounts": [
+              {
+                "name": "pgdata",
+                "mountPath": "/pgdata",
+		"readOnly": false
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "volumeClaimTemplates": [
+      {
+        "metadata": {
+          "name": "pgdata"
+        },
+        "spec": {
+          "accessModes": [
+            "ReadWriteOnce"
+          ],
+	  "storageClassName": "openebs-basic",
+          "resources": {
+            "requests": {
+              "storage": "400M"
+            }
+          }
+        }
+      }
+    ]
+  }
+}
