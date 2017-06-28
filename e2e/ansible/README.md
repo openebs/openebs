@@ -44,9 +44,10 @@ ansible
 ├── files
 ├── inventory
 │   └── group_vars
+|   └── host_vars
 ├── playbooks
-│   ├ dedicated
-│   └ hyperconverged
+│   └── dedicated
+│   └── hyperconverged
 ├── plugins
 │   └── callback
 └── roles
