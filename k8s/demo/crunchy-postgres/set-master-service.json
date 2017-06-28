@@ -1,0 +1,23 @@
+{
+        "kind": "Service",
+        "apiVersion": "v1",
+        "metadata": {
+            "name": "pgset-master",
+            "labels": {
+                "name": "pgset-master"
+            }
+        },
+        "spec": {
+            "ports": [{
+                "protocol": "TCP",
+                "port": 5432,
+                "targetPort": 5432,
+                "nodePort": 0
+            }],
+            "selector": {
+                "name": "pgset-master"
+            },
+            "type": "ClusterIP",
+            "sessionAffinity": "None"
+        }
+}

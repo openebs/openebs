@@ -1,0 +1,23 @@
+{
+        "kind": "Service",
+        "apiVersion": "v1",
+        "metadata": {
+            "name": "pgset-replica",
+            "labels": {
+                "name": "pgset-replica"
+            }
+        },
+        "spec": {
+            "ports": [{
+                "protocol": "TCP",
+                "port": 5432,
+                "targetPort": 5432,
+                "nodePort": 0
+            }],
+            "selector": {
+                "name": "pgset-replica"
+            },
+            "type": "ClusterIP",
+            "sessionAffinity": "None"
+        }
+}
