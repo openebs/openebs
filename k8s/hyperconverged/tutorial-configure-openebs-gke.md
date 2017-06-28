@@ -12,6 +12,8 @@ You can either use an existing container cluster or create a new one using, Logi
 - Size - (Minimum 3)
 - Cluster Version - (1.6.4+)
 
+*Note: The example commands below were run on a container cluser named (demo-openebs03) in zone (us-central1-a). The project unique id (strong-eon-153112). When copy/pasting the command, make sure to use the details from your project.*
+
 ### Add iSCSI Support
 
 SSH into the nodes of the cluster to install open-iscsi package. OpenEBS 0.3 uses iscsi to connect to the block volumes. 
