@@ -14,7 +14,8 @@
     name: "{{ item }}"
     state: present
   with_items: "{{ pip_local_packages }}"
-  delegate_to: 127.0.0.1 
+  delegate_to: 127.0.0.1
+  become: true 
 
 ## Common preparation tasks
 

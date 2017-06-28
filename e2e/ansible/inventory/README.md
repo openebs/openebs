@@ -10,6 +10,7 @@ A brief description of the files in this directory is given below :
   file
 - hosts : Default inventory file referred to in the playbooks
 - group_vars/all.yml : Contains global variables for ansible playbooks 
+- host_vars/localhost.yml : Contains localhost attributes such as sudo password which are needed for privilege escalation
 
 The machines.in needs to be updated with the details of the hosts used in the openebs setup prior to execution of the ansible 
 playbooks. Provided below are some instructions to consider while doing this
@@ -31,3 +32,27 @@ playbooks. Provided below are some instructions to consider while doing this
 
 - Lines can be commented (such as these) by inserting '#' symbol before the host code
 
+The contents of a typical ansible inventory 'hosts' file is as shown below :
+
+```
+localhost ansible_connection=local ansible_become_pass="{{ lookup('env','LOCAL_USER_PASSWORD') }}"
+
+[openebs-mayamasters]
+mayamaster01 ansible_ssh_host=20.10.49.11
+
+[openebs-mayamasters:vars]
+ansible_ssh_user="{{ lookup('env','MACHINES_USER_NAME') }}"
+ansible_ssh_pass="{{ lookup('env','MACHINES_USER_PASSWORD') }}"
+ansible_become_pass="{{ lookup('env','MACHINES_USER_PASSWORD') }}"
+ansible_ssh_extra_args='-o StrictHostKeyChecking=no'
+
+[openebs-mayahosts]
+mayahost01 ansible_ssh_host=20.10.49.12
+mayahost02 ansible_ssh_host=20.10.49.13
+
+[openebs-mayahosts:vars]
+ansible_ssh_user="{{ lookup('env','USER_NAME') }}"
+ansible_ssh_pass="{{ lookup('env','USER_PASSWORD') }}"
+ansible_become_pass="{{ lookup('env','USER_PASSWORD') }}"
+ansible_ssh_extra_args='-o StrictHostKeyChecking=no'
+```

@@ -1,0 +1,3 @@
+---
+ansible_connection: local 
+ansible_become_pass: "{{ lookup('env','LOCAL_USER_PASSWORD') }}"
