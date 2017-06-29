@@ -4,7 +4,7 @@ This tutorial, provides detailed instructions on how to setup and use OpenEBS in
 
 ## Step 1 : Preparing your Container Cluster 
 
-You can either use an existing container cluster or create a new one using, Login to your Google Cloud Platoform -> Container Engine -> Create Container Cluster. The minimum requirements for the cluster are as follows:
+You can either use an existing container cluster or create a new one using, Login to your Google Cloud Platform -> Container Engine -> Create Container Cluster. The minimum requirements for the cluster are as follows:
 
 ### Minimum Requirements
 - Machine Type - (Minimum 2 vCPUs)
@@ -16,7 +16,7 @@ You can either use an existing container cluster or create a new one using, Logi
 
 ### Add iSCSI Support
 
-SSH into the nodes of the cluster to install open-iscsi package. OpenEBS 0.3 uses iscsi to connect to the block volumes. 
+SSH into the nodes of the cluster (Google Cloud Platform --> Compute Engine --> VM instances) to install open-iscsi package. OpenEBS 0.3 uses iscsi to connect to the block volumes.
 
 ```
 sudo apt-get update
@@ -32,7 +32,7 @@ sudo cat /etc/iscsi/initiatorname.iscsi
 sudo service open-iscsi status
 ```
 
-## Step 2 : Run OpenEBS Operator
+## Step 2 : Run OpenEBS Operator (via Google Cloud Shell)
 
 Download the latest OpenEBS Operator Files
 ```
