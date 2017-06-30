@@ -1,0 +1,87 @@
+- hosts: localhost
+ 
+  vars_files: 
+    - k8s-jupyter-pod-vars.yml 
+ 
+  tasks:
+
+    - name: Get $HOME of K8s master for kubernetes user
+      shell: source ~/.profile; echo $HOME
+      args: 
+        executable: /bin/bash
+      register: result_kube_home
+      delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+    - name: Download YAML for jupyter notebook server plugin
+      get_url: 
+        url: "{{ jupyter_plugin_link }}"
+        dest: "{{ result_kube_home.stdout }}/{{ pod_yaml_alias }}"
+        force: yes
+      register: result
+      until:  "'OK' in result.msg"
+      delay: 5
+      retries: 3
+      delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+    - name: Check whether maya-apiserver is deployed
+      shell: source ~/.profile; kubectl get pods | grep maya-apiserver
+      args: 
+        executable: /bin/bash
+      register: result
+      delegate_to: "{{groups['kubernetes-kubemasters'].0}}"     
+
+    - name: 
+      debug: 
+        msg: "Ending play, maya-apiserver is not running"
+      when: "'Running' not in result.stdout"
+
+    - name: 
+      meta: end_play
+      when: "'Running' not in result.stdout"
+    
+    - name: Replace volume size in plugin YAML
+      lineinfile:
+        path: "{{ result_kube_home.stdout }}/{{ pod_yaml_alias }}"
+        regexp: "storage:"
+        line: "      storage: \"{{jupyter_server_vol_size}}\""
+      delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+    - name: Deploy jupyter notebook server pod
+      shell: source ~/.profile; kubectl create -f {{ pod_yaml_alias }} 
+      args: 
+        executable: /bin/bash
+      delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+    - name: Confirm pod status is running
+      shell: source ~/.profile; kubectl get pods | grep jupyter
+      args: 
+        executable: /bin/bash
+      delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+      register: result
+      until: "'jupyter' and 'Running' in result.stdout"
+      delay: 300 
+      retries: 6
+
+    - name: Verify that the jupyter notebook server is a cluster service
+      shell: source ~/.profile; kubectl get svc 
+      args:
+        executable: /bin/bash
+      delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+      register: result_service
+      failed_when: "'jupyter-service' not in result_service.stdout"
+
+      
+       
+                  
+
+
+
+
+
+
+
+
+
+
+       
+     
