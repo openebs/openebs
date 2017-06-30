@@ -7,10 +7,10 @@ Follow the steps given below:
 
 To run the kubernetes cluster on local machine you need Vagrant box. If you do not have vagrant box then follow steps given [here.](https://github.com/openebs/openebs/tree/master/k8s/lib/vagrant/test/k8s/1.6#installing-kubernetes-16-and-openebs-clusters-on-ubuntu-1604)
 
-## Step 2: Checkout OpenEBS repository
+## Step 2. Download OpenEBS Vagrantfile
 
 ```
-$ git clone https://github.com/openebs/openebs.git
+$ wget https://raw.githubusercontent.com/openebs/openebs/master/k8s/lib/vagrant/test/k8s/1.6/Vagrantfile
 ```
 
 ## Step 3: Bring k8s cluster up
@@ -22,7 +22,7 @@ openebs@openebs:~/openebs/k8s/lib/vagrant/test/k8s/1.6$ vagrant up
 
 It will bring up one kubemaster and two kubeminions
 
-## Step 4: ssh to kubemater
+## Step 4: ssh to kubemaster
 
 ```
 openebs@openebs:~/openebs/k8s/lib/vagrant/test/k8s/1.6$ vagrant ssh kubemaster-01
