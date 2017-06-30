@@ -1,0 +1,8 @@
+---
+jupyter_plugin_link: https://raw.githubusercontent.com/openebs/openebs/master/k8s/demo/jupyter/demo-jupyter-openebs.yaml 
+pod_yaml_alias: demo-jupyter-openebs.yaml
+
+jupyter_server_vol_size: 5G
+
+ 
+ 
