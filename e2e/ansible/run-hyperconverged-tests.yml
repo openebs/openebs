@@ -3,7 +3,7 @@
 
 ###########################################################################################
 # TC NAME: test-k8s-percona-mysql-pod
-# TC DETAILS: Deploys percona pod on k8s cluster with storage provisioned by openebs provisioner 
+# TC DETAILS: Deploys percona pod on k8s cluster with openebs storage
 # TC NOTES:           
 #    
 - include: playbooks/hyperconverged/test-k8s-percona-mysql-pod/k8s-percona-pod-prerequisites.yml
@@ -11,6 +11,28 @@
 - include: playbooks/hyperconverged/test-k8s-percona-mysql-pod/k8s-percona-pod.yml
 #
 - include: playbooks/hyperconverged/test-k8s-percona-mysql-pod/k8s-percona-pod-cleanup.yml
+  when: clean | bool
+#
+###########################################################################################
+# TC NAME: test-k8s-jupyter-server-pod 
+# TC DETAILS: Deploys jupyet notebook server on k8s cluster with openebs storage
+# TC NOTES:           
+#    
+- include: playbooks/hyperconverged/test-k8s-jupyter-server-pod/k8s-jupyter-pod.yml
+#
+- include: playbooks/hyperconverged/test-k8s-jupyter-server-pod/k8s-jupyter-pod-cleanup.yml
+  when: clean | bool
+#
+###########################################################################################
+# TC NAME: test-k8s-crunchy-postgres
+# TC DETAILS: Deploys a postgresql cluster on k8s cluster with openebs storage
+# TC NOTES:           
+#    
+- include: playbooks/hyperconverged/test-k8s-crunchy-postgres/k8s-crunchy-pg-prerequisites.yml
+#
+- include: playbooks/hyperconverged/test-k8s-crunchy-postgres/k8s-crunchy-pg.yml
+#
+- include: playbooks/hyperconverged/test-k8s-crunchy-postgres/k8s-crunchy-pg-cleanup.yml
   when: clean | bool
 #
 ###########################################################################################

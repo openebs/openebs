@@ -6,7 +6,7 @@
 #    b) Windows IOmeter host IP address can be set in ./roles/iometer/defaults/main.yml
 #    c) Volume properties can be set in ./roles/volume/defaults/main.yml
 #
-- include: playbooks/test-iometer/iometer-prerequisites.yml
-- include: playbooks/test-iometer/iometer.yml 
+- include: playbooks/dedicated/test-iometer/iometer-prerequisites.yml
+- include: playbooks/dedicated/test-iometer/iometer.yml 
 #
 ###########################################################################################
