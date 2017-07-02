@@ -55,6 +55,16 @@
   register: result_vers
   failed_when: "'Maya' not in result_vers.stdout"
 
+- name: Download YAML for openebs storage classes
+  get_url:
+    url: "{{ openebs_storageclasses_link }}"
+    dest: "{{ ansible_env.HOME }}/{{ openebs_storageclasses_alias }}"
+    force: yes
+  register: result
+  until:  "'OK' in result.msg"
+  delay: 5
+  retries: 3
+
 - name: Deploy the openebs storageclasses yml
   shell: source ~/.profile; kubectl apply -f {{ openebs_storageclasses_alias }}
   args:

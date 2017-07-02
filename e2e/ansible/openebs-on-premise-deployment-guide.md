@@ -94,7 +94,7 @@ drwxrwxr-x 17 testuser testuser  4096 Jun  5 09:29 roles
   ```
   
 - Note that the above playbook needs to be run separately and not as part of any the "master" playbook run as the changes to ansible 
-  default configuration may file to take effect dynamically
+  default configuration may fail to take effect dynamically
   
 - Execute the pre-requisites ansible playbook to generate the ansible inventory, i.e., 'hosts' file from the data provided in the 
   machines.in file

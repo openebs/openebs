@@ -1,0 +1,16 @@
+- hosts: localhost
+ 
+  vars_files: 
+    - k8s-crunchy-pg-vars.yml
+ 
+  tasks:
+    
+    - name: Install subversion on K8S-master
+      apt:
+        name: "{{ item }}"
+        state: present
+      with_items: "{{ deb_packages }}"
+      become: true 
+      delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+
+      
