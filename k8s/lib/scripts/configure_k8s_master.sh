@@ -13,7 +13,7 @@ function get_machine_ip(){
 
 function setup_k8s_master() {
     sudo kubeadm init --apiserver-advertise-address=$machineip \
-    --kubernetes-version=v1.6.2        
+    --kubernetes-version=v1.7.0
 }
 
 function update_hosts(){
