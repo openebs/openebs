@@ -21,7 +21,7 @@ cn_interface: ens160
 #Mode of openEBS deployment 
 #Accepted Entries (dedicated, hyperconverged): default:dedicated 
 
-deployment_mode: dedicated
+deployment_mode: hyperconverged 
 
 #Option specifically for vagrant VMs
 #Accepted Entries(true, false): default:false
@@ -38,6 +38,8 @@ is_vagrant_vm: true
 run_demo: true
 
 ara_setup: true 
+
+slack_notify: true
 
 #########################################
 # OpenEBS Test Specifications           #

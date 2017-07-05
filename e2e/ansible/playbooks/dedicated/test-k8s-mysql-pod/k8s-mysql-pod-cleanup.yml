@@ -1,36 +1,29 @@
 ---
-- hosts: localhost
+- name: Wait {{ mysql_load_duration }} sec for I/O completion
+  wait_for:
+    timeout: "{{ mysql_load_duration }}"
 
-  vars_files:
-    - k8s-mysql-pod-vars.yml 
+- name: Delete mysql pod 
+  shell: source ~/.profile; kubectl delete -f {{ pod_yaml_alias }}
+  args:
+    executable: /bin/bash
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
-  tasks: 
-    
-    - name: Wait {{ mysql_load_duration }} sec for I/O completion
-      wait_for:
-        timeout: "{{ mysql_load_duration }}"
+- name: Confirm pod has been deleted
+  shell: source ~/.profile; kubectl get pods
+  args:
+    executable: /bin/bash
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+  register: result
+  until: "'mysql' not in result.stdout"
+  delay: 10
+  retries: 3
 
-    - name: Delete mysql pod 
-      shell: source ~/.profile; kubectl delete -f {{ pod_yaml_alias }}
-      args:
-        executable: /bin/bash
-      delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-
-    - name: Confirm pod has been deleted
-      shell: source ~/.profile; kubectl get pods
-      args:
-        executable: /bin/bash
-      delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-      register: result
-      until: "'mysql' not in result.stdout"
-      delay: 10
-      retries: 3
-
-    - name: Tear down the OpenEBS volume
-      shell: source ~/.profile; maya vsm-stop demo-vsm1-vol1 
-      args:
-        executable: /bin/bash
-      ignore_errors: false
-      delegate_to: "{{groups['openebs-mayamasters'].0}}"
+- name: Tear down the OpenEBS volume
+  shell: source ~/.profile; maya vsm-stop demo-vsm1-vol1 
+  args:
+    executable: /bin/bash
+  ignore_errors: false
+  delegate_to: "{{groups['openebs-mayamasters'].0}}"
 
    
