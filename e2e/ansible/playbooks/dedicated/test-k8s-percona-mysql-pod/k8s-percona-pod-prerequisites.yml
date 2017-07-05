@@ -1,23 +1,16 @@
-- hosts: localhost
- 
-  vars_files: 
-    - k8s-percona-pod-vars.yml 
- 
-  tasks:
-    
-    - name: Install python-pip on K8S-minion
-      apt:
-        name: "{{ item }}"
-        state: present
-      with_items: "{{ deb_packages }}"
-      become: true 
-      delegate_to: "{{ groups['kubernetes-kubeminions'].0 }}"
+- name: Install python-pip on K8S-minion
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items: "{{ deb_packages }}"
+  become: true 
+  delegate_to: "{{ groups['kubernetes-kubeminions'].0 }}"
 
-    - name: Install PIP packages on K8s-minion
-      pip: 
-        name: "{{ item }}"
-        state: present
-      with_items: "{{ pip_packages }}"
-      delegate_to: "{{ groups['kubernetes-kubeminions'].0 }}" 
-      become: true  
+- name: Install PIP packages on K8s-minion
+  pip: 
+    name: "{{ item }}"
+    state: present
+  with_items: "{{ pip_packages }}"
+  delegate_to: "{{ groups['kubernetes-kubeminions'].0 }}" 
+  become: true  
       

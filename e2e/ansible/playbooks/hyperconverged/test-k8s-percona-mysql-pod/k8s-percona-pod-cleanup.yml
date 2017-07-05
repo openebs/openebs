@@ -1,30 +1,23 @@
 ---
-- hosts: localhost
+- name: Wait {{ mysql_load_duration }} sec for I/O completion
+  wait_for:
+    timeout: "{{ mysql_load_duration }}" 
 
-  vars_files:
-    - k8s-percona-pod-vars.yml 
+- name: Delete percona mysql pod 
+  shell: source ~/.profile; kubectl delete -f {{ pod_yaml_alias }}
+  args:
+    executable: /bin/bash
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
-  tasks:
-
-    - name: Wait {{ mysql_load_duration }} sec for I/O completion
-      wait_for:
-        timeout: "{{ mysql_load_duration }}" 
-
-    - name: Delete percona mysql pod 
-      shell: source ~/.profile; kubectl delete -f {{ pod_yaml_alias }}
-      args:
-        executable: /bin/bash
-      delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-
-    - name: Confirm percona pod has been deleted
-      shell: source ~/.profile; kubectl get pods
-      args:
-        executable: /bin/bash
-      delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-      register: result
-      until: "'percona' not in result.stdout"
-      delay: 120 
-      retries: 6
+- name: Confirm percona pod has been deleted
+  shell: source ~/.profile; kubectl get pods
+  args:
+    executable: /bin/bash
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+  register: result
+  until: "'percona' not in result.stdout"
+  delay: 120 
+  retries: 6
 
 
    
