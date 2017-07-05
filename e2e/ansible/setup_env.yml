@@ -1,0 +1,35 @@
+---
+# Takes 'run_ci' and 'ci_mode' as extra vars
+# Copies the machines.in & Vagrantfile templates into respective directories based on the extra vars
+# Updates inventory/group_vars/all.yml based on the extra vars
+
+- hosts: localhost
+  tasks:
+   - block:
+       - name: Copy the machines.in template to inventory dir
+         copy:
+           src: "{{ playbook_dir }}/templates/{{ ci_mode }}/machines.{{ ci_mode }}"
+           dest: "{{ inventory_dir }}/machines.in"
+
+       - name: Copy the Vagrantfile template to ansible dir  
+         copy: 
+           src: "{{ playbook_dir }}/templates/{{ ci_mode }}/Vagrantfile.{{ ci_mode }}"
+           dest: "{{ playbook_dir }}/Vagrantfile"
+
+       - name: Change OpenEBS mode in all.yml
+         lineinfile: 
+           path: "{{ inventory_dir }}/group_vars/all.yml"
+           regexp: "deployment_mode:"
+           line: "deployment_mode: {{ ci_mode }}"
+           backup: yes
+       
+     rescue:
+       - debug: 
+           msg: "Env setup failed, please pass a valid ci_mode as argument"
+
+     when: run_ci == "yes" and ci_mode is defined
+
+
+              
+
+
