@@ -81,8 +81,8 @@ drwxrwxr-x 17 testuser testuser  4096 Jun  5 09:29 roles
   
 - Edit the global variables file ```inventory/group_vars/all.yml``` to reflect the desired storage volume properties and network CIDR
   that will be used by the maya api server to allot the IP for the volume containers. Also update the ansible run-time properties to 
-  reflect the machine type (is_vagrant) and whether the playbook execution needs to be recorded using the Ansible Run Analysis framework 
-  (setup_ara)
+  reflect the machine type (is_vagrant), whether the playbook execution needs to be recorded using the Ansible Run Analysis framework 
+  (setup_ara), whether slack notifications are needed (in case they are required, a $SLACK_TOKEN env variable needs to be setup. The token is usually the last part of the slack webhook URL which is user generated)  etc.., 
   
 - Execute the setup_ara playbook to install the ARA notification plugins and custom modules. This step will cause changes to 
   the ansible configuration file ansible.cfg (though a backup will be taken at the time of execution in case you need to revert). A web 
