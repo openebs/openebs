@@ -6,21 +6,21 @@ OpenEBS provides Storage via Containers (called as VSMs). The VSMs are launched 
 
 Just as you would see your apps/containers running in Docker on the Kubernetes minion nodes, the storage required for your stateful apps/containers will be provided by VSMs (Storage Containers) running in Docker on the OpenEBS Storage hosts 
 
-An dedicated OpenEBS Cluster comprises of three parts:
+A dedicated OpenEBS Cluster comprises of three parts:
 
-(a) **OpenEBS Maya Master ( omm )**, contains the functionality of the control plane ( like Kubernetes Master), participating in the provisioning and monitoring of the VSMs. Since VSMs are storage containers, albeit containers, the OMM defers the actual scheduling and launching of the containers to the container orchestration engines, and focuses on providing storage aware inputs only. OpenEBS 0.2 uses Nomad as a container scheduler, thus requiring the following components to be installed on OMM:
+(1) **OpenEBS Maya Master ( omm )**, contains the functionality of the control plane ( like Kubernetes Master ), participating in the provisioning and monitoring of the VSMs. Since VSMs are storage containers, albeit containers, the OMM defers the actual scheduling and launching of the containers to the container orchestration engines, and focuses on providing storage aware inputs only. OpenEBS 0.2 uses Nomad as a container scheduler, thus requiring the following components to be installed on OMM:
 - Maya CLI
 - Maya API Server 
 - Nomad Server and Consul Server
 
-(b) **OpenEBS Storage Hosts (osh)**, are where the VSM containers are launched. These are the nodes, where data is persisted onto the local disks or remote disks. The VSM software (containerized) takes care of replicating the data to peer container in another osh node for data persistence and high availability. The osh nodes, primarily comprise of:
+(2) **OpenEBS Storage Hosts (osh)**, are where the VSM containers are launched. These are the nodes, where data is persisted onto the local disks or remote disks. The VSM software (containerized) takes care of replicating the data to peer container in another osh node for data persistence and high availability. The osh nodes, primarily comprise of:
 - Maya CLI
 - Docker
 - Nomad Agent and Consul Agent
 
 OpenEBS 0.2 supports host-based networking for the containers. 
 
-(c) **Kubernetes FlexVolume - OpenEBS Driver (openebs-iscsi)**, is the one that helps in dynamically provisioning and connecting to the block storage offered by the VSMs. This driver needs to be installed on all the Kubernetes minion nodes.
+(3) **Kubernetes FlexVolume - OpenEBS Driver (openebs-iscsi)**, is the one that helps in dynamically provisioning and connecting to the block storage offered by the VSMs. This driver needs to be installed on all the Kubernetes minion nodes.
 
 ## Install Options
 
