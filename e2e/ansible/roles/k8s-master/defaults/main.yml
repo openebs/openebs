@@ -7,10 +7,10 @@ configure_scripts:
   - configure_k8s_weave.sh
 
 weave_depends:
-  - weave_images.tar
+  - weave_images_{{ k8s_version }}.tar
   - weave-daemonset-k8s-1.6.yaml
 
-k8s_images: k8s_images.tar
+k8s_images: k8s_images_{{ k8s_version }}.tar
 
 weave_images_path: "{{ ansible_env.HOME}}/setup/weave"
 
