@@ -14,6 +14,7 @@ weave_version: 1.9.4
 #list of kubernetes versions released.
 #do not tamper the list unless you know
 #what you are doing...
+
 k8s_version_list:
   - 1.6.2
   - 1.6.3
@@ -63,7 +64,13 @@ is_vagrant_vm: true
 
 run_demo: true
 
+#Option to setup Ansible Runtime Analysis playbook recorder
+#Accepted Entries(true, false): default:true
+
 ara_setup: true 
+
+#Option to enable slack notifications to specified channel
+#Accepted Entries(true, false): default:true
 
 slack_notify: true
 
@@ -75,3 +82,16 @@ slack_notify: true
 #Accepted Entries(true, false): default:true
 
 clean: true
+
+#########################################
+# OpenEBS CI Specifications             #
+#########################################
+
+#Option to select type of CI build
+#Accepted Entries(quick, normal): default:normal
+#quick build uses preconfigured VMs, 
+#normal builds upon vanilla VMs
+
+build_type: normal
+
+
