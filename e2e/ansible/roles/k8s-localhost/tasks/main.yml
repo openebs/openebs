@@ -44,40 +44,48 @@
     - "{{ k8s_deb_packages }}"
     - "{{ k8s_deb_package_alias }}"
 
-- name: Fetch K8s images from gcr.io/google_containers
-  docker_image: 
-    name: "{{item}}"
-    state: present
-    pull: true
-    force: yes
-  register: result
-  until: "'Pulled image' and item in result.actions[0]"
-  delay: 60
-  retries: 3  
-  with_items: "{{ k8s_images }}"
-  become: true
+- name: Check whether deb packages and images are already downloaded
+  stat: 
+    path: "{{ playbook_dir }}/roles/kubernetes/files/k8s_images_{{ k8s_version }}.tar"
+  register: stat_result
 
-- name: Print K8s image names
-  shell: printf "{{ item }}\n" >> imagelist.tmp
-  with_items: "{{ k8s_images }}"
+- block:
+    - name: Fetch K8s images from gcr.io/google_containers
+      docker_image: 
+        name: "{{item}}"
+        state: present
+        pull: true
+        force: yes
+      register: result
+      until: "'Pulled image' and item in result.actions[0]"
+      delay: 60
+      retries: 3  
+      with_items: "{{ k8s_images }}"
+      become: true
 
-- name: TAR the K8s images 
-  shell: docker save $(cat imagelist.tmp) -o k8s_images.tar
-  become: true
+    - name: Print K8s image names
+      shell: printf "{{ item }}\n" >> imagelist.tmp
+      with_items: "{{ k8s_images }}"
 
-- name: Remove the .tmp file created to hold image list
-  file: path="{{playbook_dir}}/imagelist.tmp" state=absent
+    - name: TAR the K8s images 
+      shell: docker save $(cat imagelist.tmp) -o k8s_images_{{ k8s_version }}.tar
+      become: true
 
-- name: Move K8s_images.tar into kubernetes role
-  shell: mv {{playbook_dir}}/k8s_images.tar {{ playbook_dir }}/roles/kubernetes/files
-  become: true
+    - name: Remove the .tmp file created to hold image list
+      file: path="{{playbook_dir}}/imagelist.tmp" state=absent
 
-- name: Remove K8s images from K8s-localhost
-  docker_image:
-    name: "{{ item }}" 
-    state: absent
-  with_items: "{{ k8s_images }}"
-  become: true
+    - name: Move K8s_images_{{ k8s_version }}.tar into kubernetes role
+      shell: mv {{playbook_dir}}/k8s_images_{{ k8s_version }}.tar {{ playbook_dir }}/roles/kubernetes/files
+      become: true
+
+    - name: Remove K8s images from K8s-localhost
+      docker_image:
+        name: "{{ item }}" 
+        state: absent
+      with_items: "{{ k8s_images }}"
+      become: true
+  
+  when: stat_result.stat.exists == false 
 
 ## K8S-MASTER ROLE PREPARATION
 
@@ -92,40 +100,43 @@
   retries: 3 
   with_items: "{{ k8s_master_scripts }}"
 
-- name: Fetch weave images from dockerhub
-  docker_image:
-    name: "{{ item }}"
-    state: present
-    pull: true
-    force: yes
-  register: result
-  until: "'Pulled image' and item in result.actions[0]"
-  delay: 60
-  retries: 3
-  with_items: "{{ weave_images }}" 
-  become: true
+- block: 
+    - name: Fetch weave images from dockerhub
+      docker_image:
+        name: "{{ item }}"
+        state: present
+        pull: true
+        force: yes
+      register: result
+      until: "'Pulled image' and item in result.actions[0]"
+      delay: 60
+      retries: 3
+      with_items: "{{ weave_images }}" 
+      become: true
 
-- name: Print weave image names
-  shell: printf "{{ item }}\n" >> imagelist.tmp
-  with_items: "{{ weave_images }}"
+    - name: Print weave image names
+      shell: printf "{{ item }}\n" >> imagelist.tmp
+      with_items: "{{ weave_images }}"
 
-- name: TAR the weave images
-  shell: docker save $(cat imagelist.tmp) -o weave_images.tar
-  become: true
+    - name: TAR the weave images
+      shell: docker save $(cat imagelist.tmp) -o weave_images_{{ weave_version }}.tar
+      become: true
 
-- name: Remove the .tmp file created to hold image list
-  file: path="{{playbook_dir}}/imagelist.tmp" state=absent
+    - name: Remove the .tmp file created to hold image list
+      file: path="{{playbook_dir}}/imagelist.tmp" state=absent
 
-- name: Move weave_images.tar into k8s-master role
-  shell: mv {{playbook_dir}}/weave_images.tar {{ playbook_dir }}/roles/k8s-master/files
-  become: true
+    - name: Move weave_images_{{ weave_version }}.tar into k8s-master role
+      shell: mv {{playbook_dir}}/weave_images_{{ weave_version }}.tar {{ playbook_dir }}/roles/k8s-master/files
+      become: true
 
-- name: Remove weave images from K8s-localhost
-  docker_image:
-    name: "{{ item }}" 
-    state: absent
-  with_items: "{{ weave_images }}"
-  become: true
+    - name: Remove weave images from K8s-localhost
+      docker_image:
+        name: "{{ item }}" 
+        state: absent
+      with_items: "{{ weave_images }}"
+      become: true
+  
+  when: stat_result.stat.exists == false
 
 - name: Fetch the weave .yaml template from GitHub
   get_url:

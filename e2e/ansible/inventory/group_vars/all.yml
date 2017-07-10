@@ -1,4 +1,21 @@
----
+#########################################
+# Kubernetes Deployment Specification   #
+#########################################
+
+#Kubernetes Version to be used for deployment
+#Accepted Entries (Valid Kubernetes Version): default:1.6.3
+
+k8s_version: 1.6.3
+weave_version: 1.9.4
+
+k8s_version_list:
+  - 1.6.2
+  - 1.6.3
+  - 1.6.4
+  - 1.6.5
+  - 1.6.6
+  - 1.7.0
+
 #########################################
 # OpenEBS Deployment Specifications     #
 #########################################
@@ -49,4 +66,3 @@ slack_notify: true
 #Accepted Entries(true, false): default:true
 
 clean: true
-
