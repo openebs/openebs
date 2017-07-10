@@ -13,17 +13,19 @@
   meta: end_play
   when: "'FAILED' in result_status.stdout"
 
-- name: Load images from Archive
-  command: docker load --input "{{ k8s_images }}"
-  args:
-    chdir: "{{ k8s_images_path }}"
-  become: true
+- block:
+    - name: Load images from Archive
+      command: docker load --input "{{ k8s_images }}"
+      args:
+        chdir: "{{ k8s_images_path }}"
+      become: true
 
-- name: Install deb packages
-  apt:
-    deb: "{{ k8s_images_path }}/{{ item }}"
-  with_items: "{{ k8s_dpkg_packages }}"
-  become: true
+    - name: Install deb packages
+      apt:
+        deb: "{{ k8s_images_path }}/{{ item }}"
+      with_items: "{{ k8s_dpkg_packages }}"
+      become: true
+  when: build_type == "normal"
 
 - name: Get Token Name from Master
   shell: >

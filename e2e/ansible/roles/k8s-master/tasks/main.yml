@@ -1,14 +1,31 @@
 ---
+- name: Get Current User
+  command: whoami
+  register: user
+
+- stat:
+    path: "{{ weave_images_path }}"
+  register: status
+
 - name: Create Directory
   file:
     path: "{{ weave_images_path }}"
     state: directory
-
-- name: Copy TAR to remote
-  copy:
-    src: "{{ weave_depends[0] }}"
-    dest: "{{ weave_images_path }}"
   become: true
+  when: status.stat.isdir is not defined
+
+- stat:
+    path: "{{ weave_images_path }}"
+  register: status
+
+- name: Change Folder Permissions
+  file:
+    path: "{{ weave_images_path }}"
+    owner: "{{ user.stdout }}"
+    group: "{{ user.stdout }}"
+    recurse: true
+  become: true
+  when: status.stat.isdir is defined and status.stat.isdir
 
 - name: Copy Pod YAML to remote
   copy:
@@ -21,24 +38,34 @@
     dest: "{{ k8s_images_path }}"
     mode: "u+rwx"
 
-- name: Load images from Archive
-  command: docker load --input "{{ k8s_images }}"
-  args:
-    chdir: "{{ k8s_images_path }}"
-  become: true
+- block:
 
-- name: Load images from Archive
-  command: docker load --input "{{ weave_depends[0] }}"
-  args:
-    chdir: "{{ weave_images_path }}"
-  become: true
+   - name: Copy TAR to remote
+     copy:
+       src: "{{ weave_depends[0] }}"
+       dest: "{{ weave_images_path }}"
+     become: true
 
-- name: Install deb packages
-  apt:
-    deb: "{{ k8s_images_path }}/{{ item }}"
-  with_items: "{{ k8s_dpkg_packages }}"
-  become: true
+   - name: Load images from Archive
+     command: docker load --input "{{ k8s_images }}"
+     args:
+       chdir: "{{ k8s_images_path }}"
+     become: true
 
+   - name: Load images from Archive
+     command: docker load --input "{{ weave_depends[0] }}"
+     args:
+       chdir: "{{ weave_images_path }}"
+     become: true
+
+   - name: Install deb packages
+     apt:
+       deb: "{{ k8s_images_path }}/{{ item }}"
+     with_items: "{{ k8s_dpkg_packages }}"
+     become: true
+
+  when: build_type == "normal"
+ 
 - name: kubeadm reset before init
   command: kubeadm reset
   become: true

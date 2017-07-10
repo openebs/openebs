@@ -28,10 +28,33 @@
   become: true
   with_items: "{{ k8s_deb_packages }}"
 
+- name: Get Current User
+  command: whoami
+  register: user
+
+- stat:
+    path: "{{ k8s_images_path }}"
+  register: status
+
 - name: Create Directory
   file:
     path: "{{ k8s_images_path }}"
     state: directory
+  become: true
+  when: status.stat.isdir is not defined
+
+- stat:
+    path: "{{ k8s_images_path }}"
+  register: status
+
+- name: Change Folder Permissions
+  file:
+    path: "{{ k8s_images_path }}"
+    owner: "{{ user.stdout }}"
+    group: "{{ user.stdout }}"
+    recurse: true
+  become: true
+  when: status.stat.isdir is defined and status.stat.isdir
 
 - name: Copy TAR to remote
   copy:

@@ -100,6 +100,12 @@
   retries: 3 
   with_items: "{{ k8s_master_scripts }}"
 
+- name: Change Kubernetes version in configure scripts
+  replace:
+    path: "{{ playbook_dir }}/roles/k8s-master/files/configure_k8s_master.sh"
+    regexp: "--kubernetes-version=v1.[0-9].[0-9]"
+    replace: "--kubernetes-version=v{{ k8s_version }}"
+
 - block: 
     - name: Fetch weave images from dockerhub
       docker_image:

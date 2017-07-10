@@ -12,7 +12,7 @@ Vagrant.configure("2") do |config|
 
   # Every Vagrant development environment requires a box. You can search for
   # boxes at https://atlas.hashicorp.com/search.
-  config.vm.box = "openebs/test"
+  config.vm.box = "ubuntu/xenial64"
 
   # Disable automatic box update checking. If you disable this, then
   # boxes will only be checked for updates when the user runs
@@ -54,7 +54,7 @@ Vagrant.configure("2") do |config|
   #
   #   # Customize the amount of memory on the VM:
   #   vb.memory = "1024"
-    vb.customize ["modifyvm", :id, "--uartmode1", "file", File.join(Dir.pwd, "openebs-test.log")]
+    vb.customize ["modifyvm", :id, "--uartmode1", "file", File.join(Dir.pwd, "build-box.log")]
   end
   #
   # View the documentation for the provider you are using for more
@@ -79,15 +79,27 @@ Vagrant.configure("2") do |config|
   config.vm.define "HCMaster" do |vmCfg|
     vmCfg.vm.network "private_network", ip: "172.28.128.31"
     vmCfg.vm.hostname = "hcm-01"
+
+    vmCfg.vm.provision :shell,
+    inline: "sudo apt-get install -y python-minimal",
+    privileged: true
   end
 
   config.vm.define "HCHost-01" do |vmCfg|
     vmCfg.vm.network "private_network", ip: "172.28.128.32"
-    vmCfg.vm.hostname = "hch-01"        
+    vmCfg.vm.hostname = "hch-01"
+
+    vmCfg.vm.provision :shell,
+    inline: "sudo apt-get install -y python-minimal",
+    privileged: true        
   end
 
   config.vm.define "HCHost-02" do |vmCfg|
     vmCfg.vm.network "private_network", ip: "172.28.128.33"
-    vmCfg.vm.hostname = "hch-02"    
+    vmCfg.vm.hostname = "hch-02"
+
+    vmCfg.vm.provision :shell,
+    inline: "sudo apt-get install -y python-minimal",
+    privileged: true    
   end
 end
