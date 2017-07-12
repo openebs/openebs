@@ -1,7 +1,7 @@
 ---
 - hosts: localhost
-  roles: 
-    - k8s-localhost 
+  roles:
+    - {role: k8s-localhost, when: build_type == "normal"} 
 
 - hosts: kubernetes-kubemasters
   roles:
