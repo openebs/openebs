@@ -24,7 +24,8 @@ OpenEBS can scale to include an  arbitrarily large number of containerized stora
  
 ## Installation and Getting Started
  
-OpenEBS can be setup in few easy steps.  We have a Vagrant environment available that includes a sample Kubernetes deployment and synthetic load you can use to simulate the performance of OpenEBS. . 
+OpenEBS can be setup in few easy steps.  You can get going on GCE to try it out quickly here:  https://github.com/openebs/openebs/blob/master/k8s/hyperconverged/tutorial-configure-openebs-gke.md
+Also, we have a Vagrant environment available that includes a sample Kubernetes deployment and synthetic load you can use to simulate the performance of OpenEBS. 
 Please follow our [Getting Started](k8s/dedicated/README.md) documentation 
  
 ## Status
