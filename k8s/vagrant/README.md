@@ -1,8 +1,6 @@
-# Installing Kubernetes 1.6 and OpenEBS Clusters on Ubuntu 16.04
+# Installing Kubernetes Clusters on Ubuntu 16.04 using Vagrant
 
-This Vagrantfile helps in setting up VirtualBox VMs with the following configuration: 
-- Kubernetes 1.6 Cluster with Master and Minion nodes using kubeadm
-- OpenEBS Cluster ( on dedicated VMs) 
+OpenEBS provides vagrant boxes with prepackaged kuberentes images. There are different vagrant boxes created depending on the kubernetes release. The Vagrantfiles are organized here based on the kubernetes version used by the box. A deployer can choose the Vagrantfile, based on his choice of kubernetes version. 
 
 This Vagrantfile can be used on laptop or Baremetal server installed with Ubuntu 16.04 and Virtualization Enabled
 
@@ -18,7 +16,7 @@ Verify that you have the following required software installed on your Ubuntu 16
 
 ## Download and Verify 
 
-Setup your local directory, where the demo code will be downloaded. Let us call this as $demo-folder
+Dowload the required Vagrantfile. You can use wget to download a specific vagrant file, like shown below - or you can just close the repository locally. 
 
 ```
 mkdir k8s-demo
@@ -50,3 +48,5 @@ Just use *vagrant up* to bring up the cluster.
 ```
 ubuntu-host:~/k8s-demo$ vagrant up
 ```
+
+
