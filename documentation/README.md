@@ -10,6 +10,7 @@ Sphinx is used for building the OpenEBS documentation.  http://www.sphinx-doc.or
 To build the documentation on your local machine, you will require Python 2.7 or latest and Sphinx
 ```
 pip install Sphinx
+pip install sphinx_rtd_theme
 ```
 
 ### Build
