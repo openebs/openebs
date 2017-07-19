@@ -1,29 +1,18 @@
-.. doctut documentation master file, created by
-   sphinx-quickstart on Thu Feb 23 11:28:26 2017.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
+OpenEBS Documentation
+======================================
 
-OpenEBS documentation
-==============================
-
-		
-Guide
-^^^^^^^
-
+Contents:
 
 .. toctree::
-   :maxdepth: 2
-   
-   Overview.rst
-   Prepare_your_system.rst
-   installations.rst
-   
+    :maxdepth: 2
+    :caption: Getting Started
 
+    overview
+    Install and Configure <install/index>
 
+.. toctree::
+    :maxdepth: 1
+    :caption: Release Notes
 
-Indices and tables
-==================
+    changelog
 
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`

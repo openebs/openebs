@@ -47,8 +47,8 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'openebs'
-copyright = '2017, Apache License'
-author = 'raghav'
+copyright = '2017, Apache 2.0 License'
+author = 'OpenEBS Authors'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -103,6 +103,16 @@ html_static_path = ['_static']
 # Output file base name for HTML help builder.
 htmlhelp_basename = 'openebsdoc'
 
+html_logo = '_static/logo-medium-size.png'
+html_favicon = "_static/favicon.png"
+
+# Variables to be used by templates
+#html_context = {
+#    'css_files': [
+#        '_static/theme_overrides.css',
+#        ],
+#}
+
 
 # -- Options for LaTeX output ---------------------------------------------
 
@@ -129,7 +139,7 @@ latex_elements = {
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
     (master_doc, 'openebs.tex', 'OpenEBS Documentation',
-     'raghav', 'manual'),
+     '[author]', 'manual'),
 ]
 
 
