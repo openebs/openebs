@@ -20,6 +20,10 @@
   args:
     executable: /bin/bash
   register: result
+  until:  "'OK' in result.stdout"
+  delay: 20
+  retries: 3
+  ignore_errors: true  
 
 - name: 
   debug: 
