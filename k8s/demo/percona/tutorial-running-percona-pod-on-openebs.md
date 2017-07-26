@@ -116,13 +116,72 @@ Note: It may take some time for pods to start as the images need to be pulled an
 
 ## Step-3: Run a database client container to generate SQL load 
 
-To test the pod, run a mysql client container that runs a load generation script which performs simple sql queries to simulate storage traffic. 
+To test the pod, you can invoke a mysql client container that runs a load generation script, which in turn performs simple sql queries to simulate storage traffic. Follow the below sequence of steps to achieve this. It can be run on any node _in_ the kubernetes cluster. 
 
- 
+Pull the mysql-client container image from dockerhub
 
+```
+sudo docker pull openebs/tests-mysql-client:latest 
+```
 
+Get the IP address of the percona application pod. This can be obtained by executing kubectl describe on the percona pod
 
+```
+karthik@MayaMaster:~$ kubectl describe pod percona | grep IP
+IP:             10.44.0.3
+``` 
 
+Run the mysql-client container with interactive bash shell and host network options 
 
+```
+sudo docker run -it -h sql-load --net host openebs/tests-mysql-client /bin/bash
+```
+In the container console, run the shell script MySQLLoadGenerate.sh with pod IP address as argument. Optionally, ```timelimit``` can be used to specify the load duration. In the example below, the load generation runs for 500 seconds, after which the test container exits
+
+```
+timelimit -t 500 sh MySQLLoadGenerate.sh 10.44.0.3 > /dev/null 2>&1 & 
+```
+
+## Step-4: View performance and storage consumption stats using mayactl 
+
+Performance and capacity usage stats on the OpenEBS storage volume can be viewed by executing the following mayactl command inside the maya-apiserver pod. Follow the below sequence of steps to achieve this
+
+Start an interactive bash console for the maya-apiserver container  
+
+```
+kubectl exec -it maya-apiserver-1633167387-5ss2w /bin/bash
+```
+
+Lookup the storage volume name using the ```vsm-list``` command
+
+```
+karthik@MayaMaster:~$ kubectl exec -it maya-apiserver-1633167387-5ss2w /bin/bash
+root@maya-apiserver-1633167387-5ss2w:/# maya vsm-list
+Name                                      Status
+pvc-016e9a68-71c1-11e7-9fea-000c298ff5fc  Running
+```
+
+Get the performance and capacity usage stats using the ```vsm-stats``` command.  
+
+```
+root@maya-apiserver-1633167387-5ss2w:/# maya vsm-stats pvc-016e9a68-71c1-11e7-9fea-000c298ff5fc
+------------------------------------
+    IQN: iqn.2016-09.com.openebs.jiva:pvc-016e9a68-71c1-11e7-9fea-000c298ff5fc
+ Volume: pvc-016e9a68-71c1-11e7-9fea-000c298ff5fc
+ Portal: 10.109.70.220:3260
+   Size: 5G
+
+Replica         Status      DataUpdateIndex
+10.36.0.3       Online      4341
+10.44.0.2       Online      4340
+------------------------------------
+   r/s|   w/s|   r(MB/s)|   w(MB/s)|   rLat(ms)|   wLat(ms)|   rBlk(KB)|   wBlk(KB)|
+     0|    14|     0.000|    14.000|      0.000|     71.325|          0|       1024|
+```
+The above command can be invoked with ```watch``` by providing a desired interval to continuously monitor stats
+
+```
+watch -n 1 maya vsm-stats pvc-016e9a68-71c1-11e7-9fea-000c298ff5fc
+```
 
 
