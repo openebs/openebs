@@ -1,0 +1,18 @@
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: sql-loadgen
+spec:
+  template:
+    metadata:
+      name: sql-loadgen
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: sql-loadgen
+        image: openebs/tests-mysql-client
+        command: ["/bin/bash"]
+        args: ["-c", "timelimit -t 300 sh MySQLLoadGenerate.sh 10.36.0.3 > /dev/null 2>&1; exit 0"]
+        tty: true 
+
