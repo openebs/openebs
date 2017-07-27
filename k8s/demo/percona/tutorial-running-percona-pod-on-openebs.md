@@ -127,8 +127,8 @@ karthik@MayaMaster:~$ kubectl describe pod percona | grep IP
 IP:             10.44.0.3
 ``` 
 
-Edit the below line in sql load generation job yaml to pass the desired load duration and percona pod IP as arguments.
-In this example, the job runs for 300s
+Edit the below line in sql-loadgen job yaml to pass the desired load duration and percona pod IP as arguments.
+In this example, the job performs sql queries on pod with IP address 10.44.0.3 for 300s
 
 ```
 args: ["-c", "timelimit -t 300 sh MySQLLoadGenerate.sh 10.44.0.3 > /dev/null 2>&1; exit 0"]
