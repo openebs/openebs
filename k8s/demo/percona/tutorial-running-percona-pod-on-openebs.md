@@ -6,7 +6,7 @@ This tutorial provides detailed instructions on how to run a percona-mysql appli
 
 Pre-requisites include the following: 
 
-- A fully configured kubernetes cluster (versions 1.6.3 & upwards have been tested) with kube master and at least one kube minion. This maybe created on cloud platforms like GKE, on-premise virtual machines (vagrant/VMware/Hyper-V) or bare-metal boxes
+- A fully configured kubernetes cluster (versions 1.6.3/4/6 & 1.7.0 have been tested) with kube master and at least one kube minion. This maybe created on cloud platforms like GKE, on-premise virtual machines (vagrant/VMware/Hyper-V) or bare-metal boxes
 
   Note: 
 
@@ -116,13 +116,9 @@ Note: It may take some time for pods to start as the images need to be pulled an
 
 ## Step-3: Run a database client container to generate SQL load 
 
-To test the pod, you can invoke a mysql client container that runs a load generation script, which in turn performs simple sql queries to simulate storage traffic. Follow the below sequence of steps to achieve this. It can be run on any node _in_ the kubernetes cluster. 
+To test the pod, you can run a kubernetes job, in which a mysql client container runs a load generation script (which in turn performs simple sql queries) to simulate storage traffic. 
 
-Pull the mysql-client container image from dockerhub
-
-```
-sudo docker pull openebs/tests-mysql-client:latest 
-```
+Follow the below sequence of steps to achieve this. It can be run on any node _in_ the kubernetes cluster. 
 
 Get the IP address of the percona application pod. This can be obtained by executing kubectl describe on the percona pod
 
@@ -131,15 +127,17 @@ karthik@MayaMaster:~$ kubectl describe pod percona | grep IP
 IP:             10.44.0.3
 ``` 
 
-Run the mysql-client container with interactive bash shell and host network options 
+Edit the below line in sql load generation job yaml to pass the desired load duration and percona pod IP as arguments.
+In this example, the job runs for 300s
 
 ```
-sudo docker run -it -h sql-load --net host openebs/tests-mysql-client /bin/bash
+args: ["-c", "timelimit -t 300 sh MySQLLoadGenerate.sh 10.44.0.3 > /dev/null 2>&1; exit 0"]
 ```
-In the container console, run the shell script MySQLLoadGenerate.sh with pod IP address as argument. Optionally, ```timelimit``` can be used to specify the load duration. In the example below, the load generation runs for 500 seconds, after which the test container exits
+
+Run the load generation job
 
 ```
-timelimit -t 500 sh MySQLLoadGenerate.sh 10.44.0.3 > /dev/null 2>&1 & 
+kubectl apply -f sql-loadgen.yaml 
 ```
 
 ## Step-4: View performance and storage consumption stats using mayactl 
@@ -166,17 +164,25 @@ Get the performance and capacity usage stats using the ```vsm-stats``` command.
 ```
 root@maya-apiserver-1633167387-5ss2w:/# maya vsm-stats pvc-016e9a68-71c1-11e7-9fea-000c298ff5fc
 ------------------------------------
-    IQN: iqn.2016-09.com.openebs.jiva:pvc-016e9a68-71c1-11e7-9fea-000c298ff5fc
- Volume: pvc-016e9a68-71c1-11e7-9fea-000c298ff5fc
- Portal: 10.109.70.220:3260
-   Size: 5G
+ IQN     : iqn.2016-09.com.openebs.jiva:pvc-016e9a68-71c1-11e7-9fea-000c298ff5fc
+ Volume  : pvc-016e9a68-71c1-11e7-9fea-000c298ff5fc
+ Portal  : 10.109.70.220:3260
+ Size    : 5G
 
-Replica         Status      DataUpdateIndex
-10.36.0.3       Online      4341
-10.44.0.2       Online      4340
-------------------------------------
+      Replica|   Status|   DataUpdateIndex|
+             |         |                  |
+    10.36.0.3|   Online|              4341|
+    10.44.0.2|   Online|              4340|
+
+------------ Performance Stats ----------
+
    r/s|   w/s|   r(MB/s)|   w(MB/s)|   rLat(ms)|   wLat(ms)|   rBlk(KB)|   wBlk(KB)|
      0|    14|     0.000|    14.000|      0.000|     71.325|          0|       1024|
+
+------------ Capacity Stats -------------
+   Logical(GB)|   Used(GB)| 
+      0.074219|   0.000000|
+
 ```
 The above command can be invoked with ```watch``` by providing a desired interval to continuously monitor stats
 
