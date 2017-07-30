@@ -1,0 +1,12 @@
+---
+test_name: libiscsi_test_suite 
+
+volume_def: test-pvc.yaml
+
+test_list: run-tests.out 
+
+deb_packages:
+  - libiscsi-bin
+  
+
+

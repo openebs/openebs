@@ -1,0 +1,142 @@
+---
+- hosts: localhost
+
+  vars_files:
+    - libiscsi-vars.yml
+
+  tasks: 
+   - block: 
+   
+       - include: libiscsi-prerequisites.yml 
+
+       - name: Get $HOME of K8s master for kubernetes user
+         shell: source ~/.profile; echo $HOME
+         args:
+           executable: /bin/bash
+         register: result_kube_home
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+       - name: Copy the volume claim to kube master
+         copy: 
+           src: "{{ volume_def }}"
+           dest: "{{ result_kube_home.stdout }}"
+         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+        
+       - name: Create a storage volume via a pvc 
+         shell: source ~/.profile; kubectl apply -f "{{ volume_def }}"
+         args:
+           executable: /bin/bash
+         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+
+       - name: Confirm volume container is running 
+         shell: source ~/.profile; kubectl get pods | grep pvc
+         args:
+           executable: /bin/bash
+         register: result
+         until: "'ctrl' and 'Running' in result.stdout_lines[0] and 'rep' and 'Running' in result.stdout_lines[1]"
+         delay: 30
+         retries: 6
+         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+        
+       - name: Get storage ctrl pod name
+         shell: source ~/.profile; kubectl get pods | grep ctrl
+         args:
+           executable: /bin/bash
+         register: ctrl_name
+         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+        
+       - name: Set ctrl pod name to variable 
+         set_fact: 
+           ctrl_pod_name: "{{ ctrl_name.stdout.split()[0] }}"
+
+       - name: Get IP address of ctrl pod
+         shell: source ~/.profile; kubectl describe pod {{ ctrl_pod_name }} | grep IP
+         args:
+           executable: /bin/bash
+         register: ctrl_IP
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+    
+       - name: Set IP of Pod to variable
+         set_fact:
+           ctrl_ip: "{{ ctrl_IP.stdout_lines[0].split()[1]}}" 
+
+       - name: Get $HOME of K8s minion for kubernetes user
+         shell: source ~/.profile; echo $HOME
+         args:
+           executable: /bin/bash
+         register: result_kube_home
+         delegate_to: "{{groups['kubernetes-kubeminions'].0}}"
+
+       - name: Copy libiscsi test list into kube minion
+         copy:
+           src: "{{ test_list }}"
+           dest: "{{ result_kube_home.stdout }}"
+         delegate_to: "{{ groups['kubernetes-kubeminions'].0 }}"
+
+       - name: Discover the iSCSI target using iscsi-ls 
+         shell: iscsi-ls iscsi://{{ ctrl_ip }}
+         register: target
+         delegate_to: "{{ groups['kubernetes-kubeminions'].0 }}"
+
+       - name: Set target iqn to variable 
+         set_fact:
+           iqn: "{{ target.stdout.split()[0] | regex_replace('Target:','')}}"
+
+       - name: Create log directory for libiscsi test run
+         file: 
+           path: "{{ result_kube_home.stdout }}/libiscsi_suite_logs"
+           state: directory
+         delegate_to: "{{ groups['kubernetes-kubeminions'].0 }}"
+
+       - name: Get test list from test file 
+         command: cat {{ result_kube_home.stdout }}/{{ test_list }}       
+         register: tests
+         delegate_to: "{{ groups['kubernetes-kubeminions'].0 }}"
+ 
+       - name: Run the libiscsi test suites
+         shell: >
+           iscsi-test-cu --test={{ item }} 
+           iscsi://{{ ctrl_ip }}/{{ iqn }}/1 
+           --dataloss --allow-sanitize 
+           > {{ result_kube_home.stdout }}/libiscsi_suite_logs/{{ item }}.log 
+           2>&1
+         args:
+           executable: /bin/bash
+         delegate_to: "{{ groups['kubernetes-kubeminions'].0 }}"
+         with_items: "{{ tests.stdout_lines }}"
+         ignore_errors: true
+
+       - name: Generate test summary 
+         script: parse.sh {{ result_kube_home.stdout }}/libiscsi_suite_logs
+         delegate_to: "{{ groups['kubernetes-kubeminions'].0 }}"
+         register: summary
+
+       - name: Display the test status
+         debug:
+           msg: "{{ summary.stdout }}"
+
+       - include: libiscsi-cleanup.yml
+
+       - set_fact:
+           flag: "Pass"
+           flag_msg: "Ran libiscsi test suite successfully"
+
+     rescue: 
+        - set_fact: 
+            flag_msg: "Failed to run libiscsi test suite"
+            
+     always:
+       - block:
+
+           - name: Send test status slack notification
+             slack:
+               token: "{{ lookup('env','SLACK_TOKEN') }}"
+               msg: '{{ ansible_date_time.time }} {{ flag_msg }}'   
+        
+           - name: Send test details slack notification
+             slack:
+               token: "{{ lookup('env','SLACK_TOKEN') }}"
+               msg: "{{ summary.stdout }}"
+             when: flag == "Pass"
+         
+         when: slack_notify | bool and lookup('env','SLACK_TOKEN')
