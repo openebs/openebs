@@ -66,7 +66,7 @@ kops create cluster --cloud=aws \
 ## Creating Cluster On AWS Using Terraform File
 
 - terraform usually looks for terraform file(.tf) in the location where the terraform commands are run.
-- Run the command *terraform plan* to see the preview of the changes to the AWS infrasructure.
+- Run the command *terraform plan* to see the preview of the changes to the AWS infrastructure.
 - terraform outputs a chuck of JSON data containing the changes that would be applied on AWS.
 - *terraform plan* command also acts as a verifier of terraform files. It outputs any errors that the terraform file might have, that could break the creation of the infrastructure when running the *terraform apply* command.
 - Run the command *terraform apply* to initiate the creation of the infrastructure.
