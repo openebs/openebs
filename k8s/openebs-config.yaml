@@ -18,10 +18,10 @@
 # - backup storage from S3
 # The above configuration can be specified at a cluster level or
 # per node (minion) 
-
-# The storage-manager(s) will look for updates on this spec 
+#
+# The storage-manager(s) or maya-agents will look for updates on this spec 
 # and take the appropriate actions. 
-
+# 
 # This file will also specify the different storage tiers
 # that will be used to associate with storage-classes
 # For example:
@@ -29,20 +29,140 @@
 #   disk. The local ssd disks will be used for high-performance
 #   persistentvolumeclaims, where as remote disks can be used 
 #   for backup-jobs persistentvolumeclaims. 
-
+#
+# Notes on Implementation
+# =============================
+# The configuration is specified as Custom Resources called 
+# - StorageBackendAdaptors and StorageBackends
+# - RawStorageAdaptors and RawStorages
+#
+# RawStorageAdaptor : Provide information about types of 
+#  raw storage to be consumed by openebs like - local directory, 
+#  amazon ebs, google gpd, etc.,
+#
+# RawStorage : Is a single block of storage - like a directory, 
+#  local disk, ebs disk, gpd disk, etc., 
+#
+# StorageBackendAdaptor : Provides information about types of storage
+#  pools that can be created using the raw storage and provided as 
+#  persistent storage backends to openebs volumes. The storage pool types
+#  can be as simple as a directory, whole-disk, partition or can be
+#  based on lvm, ext4 etc.,  
+#
+# StorageBackend : Is a single volume mount provided to the openebs
+#  volume containers. A backend can be 
+#  - sub/full directory created from RawStorage(directory), 
+#  - partition/full disk from a RawStorage(disk) 
+#  - lvm created using multiple RawStorage(disk)s.
+#
+# Custom Resource Definitions
+# =============================
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  # name must match the spec fields below, and be in the form: <plural>.<group>
+  name: rawstorageadaptors.openebs.io
+spec:
+  # group name to use for REST API: /apis/<group>/<version>
+  group: openebs.io
+  # version name to use for REST API: /apis/<group>/<version>
+  version: v1alpha1
+  # either Namespaced or Cluster
+  scope: Cluster
+  names:
+    # plural name to be used in the URL: /apis/<group>/<version>/<plural>
+    plural: rawstorageadaptors
+    # singular name to be used as an alias on the CLI and for display
+    singular: rawstorageadaptor
+    # kind is normally the CamelCased singular type. Your resource manifests use this.
+    kind: RawStorageAdaptor
+    # shortNames allow shorter string to match your resource on the CLI
+    shortNames:
+    - rsa
+---
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  # name must match the spec fields below, and be in the form: <plural>.<group>
+  name: rawstorages.openebs.io
+spec:
+  # group name to use for REST API: /apis/<group>/<version>
+  group: openebs.io
+  # version name to use for REST API: /apis/<group>/<version>
+  version: v1alpha1
+  # either Namespaced or Cluster
+  scope: Cluster
+  names:
+    # plural name to be used in the URL: /apis/<group>/<version>/<plural>
+    plural: rawstorages
+    # singular name to be used as an alias on the CLI and for display
+    singular: rawstorage
+    # kind is normally the CamelCased singular type. Your resource manifests use this.
+    kind: RawStorage
+    # shortNames allow shorter string to match your resource on the CLI
+    shortNames:
+    - rs
+---
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  # name must match the spec fields below, and be in the form: <plural>.<group>
+  name: storagebackendadaptors.openebs.io
+spec:
+  # group name to use for REST API: /apis/<group>/<version>
+  group: openebs.io
+  # version name to use for REST API: /apis/<group>/<version>
+  version: v1alpha1
+  # either Namespaced or Cluster
+  scope: Cluster
+  names:
+    # plural name to be used in the URL: /apis/<group>/<version>/<plural>
+    plural: storagebackendadaptors
+    # singular name to be used as an alias on the CLI and for display
+    singular: storagebackendadaptor
+    # kind is normally the CamelCased singular type. Your resource manifests use this.
+    kind: StorageBackendAdaptor
+    # shortNames allow shorter string to match your resource on the CLI
+    shortNames:
+    - sba
+---
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  # name must match the spec fields below, and be in the form: <plural>.<group>
+  name: storagebackends.openebs.io
+spec:
+  # group name to use for REST API: /apis/<group>/<version>
+  group: openebs.io
+  # version name to use for REST API: /apis/<group>/<version>
+  version: v1alpha1
+  # either Namespaced or Cluster
+  scope: Cluster
+  names:
+    # plural name to be used in the URL: /apis/<group>/<version>/<plural>
+    plural: storagebackends
+    # singular name to be used as an alias on the CLI and for display
+    singular: storagebackend
+    # kind is normally the CamelCased singular type. Your resource manifests use this.
+    kind: StorageBackend
+    # shortNames allow shorter string to match your resource on the CLI
+    shortNames:
+    - sb
+---
 # Define a storage pool for launching the replicas using
 #  local directory or mounted directory from the minion nodes
 #  
-#apiVersion: openebs.io/v1alpha1
-#kind: Pool
-#metadata:
-#  name: hostdir-var
-#  type: hostdir
-#spec:
-#  path: "/var/openebs" 
-#  maxVolSize: 10G #Max Volume Size
-#  maxAllocatedSize: 10G #Max Total Space allocated from this directory/mount
-#  nodes: [ "all" ]
+apiVersion: openebs.io/v1alpha1
+kind: StorageBackendAdaptor
+metadata:
+  name: sba-hostdir
+  type: hostdir
+spec:
+  path: "/var/openebs" 
+  maxVolSize: 10G #Max Volume Size
+  maxAllocatedSize: 100G #Max Total Space allocated from this directory/mount
+  nodes: [ "all" ]
+#TODO - Yet to review the below lines and convert them into valid CRs
 #---  
 #apiVersion: openebs.io/v1alpha1
 #kind: Pool
