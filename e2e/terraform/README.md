@@ -1,92 +1,171 @@
 # OpenEBS On The Cloud - Deployment Using Terraform and kops (Kubernetes Operations)
 
-*Terraform* enables you to safely and predictably create, change, and improve production infrastructure. It is an open source tool that codifies APIs into declarative configuration files that can be shared amongst team members, treated as code, edited, reviewed, and versioned.
+The purpose of this user guide is to provide the instructions to set up a Kubernetes cluster on AWS (Amazon Web Services) and have OpenEBS running in hyperconverged mode.
 
-*kops (Kubernetes Operations)* helps you create, destroy, upgrade and maintain production-grade, highly available, Kubernetes clusters from the command line.
+## Pre-requisites
 
-The purpose of this user guide is to provide the user with instructions to set up a Kubernetes cluster on AWS (Amazon Web Services) and have OpenEBS running in hyperconverged mode in the cluster.
+---
 
-**Pre-requisites:**
+Follow the steps below to setup-up the pre-requisites:
 
-- Active AWS account.
-- Hashicorp terraform >= 0.9.11
-- kops >= 1.6.2
+**Amazon Web Services (AWS):**
 
-## Prepare AWS For kops And Terraform
+- Signup for AWS [here](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html).
 
-- Signup for AWS (Amazon Web Services).
-- Amazon provides a AccessKeyID and a SecretAccessKey for the user.
-- Save the AccessKeyID and a SecretAccessKey as environment variables in your local machine.
+People who already have an AWS account can skip the above step.
+
+- Start your browser.
+- Open *AWS Management Console*.
+- Select *IAM* under *Security, Identity & Compliance*.
+- In the *Dashboard*, click on *Users*.
+- Click on *Add User* button.
+- For the *User name* textbox, give *openebsuser01* as the username.
+- Select *Access Type* as *Programmatic access*.
+- Click on *Next Permissions* button.
+- Click on *Next Review* button.
+- Click on *Create User* button.
+
+A user, named *openebsuser01* would have been created and an *Access key ID* and a *Secret access key*
+would have been assigned to him.
 
 ```
+For Example:
+User              Access key ID             Secret access key
+openebsuser01     AKIAI3MRLHNGU6CNKJQE      udxZi33tvSptXCky31kEt4KLRS6LSMMsmmdLx501
+```
+
+>Record the *Access key ID* and the *Secret access key* as AWS will not show it to you again.
+
+**kops, terraform and awscli:**
+
+The following tools have to be installed on your local workstation:
+
+- `awscli`
+- `kops >= 1.6.2`
+- `terraform >= 0.9.11`
+
+We have created a script that does most of the work for you. Download the script file called `oebs-cloud.sh`.
+
+```
+$ mkdir -p openebs
+$ cd openebs
+$ wget https://raw.githubusercontent.com/openebs/openebs/master/e2e/terraform/oebs-cloud.sh
+$ chmod +x oebs-cloud.sh
+```
+
+List the operations performed by the script:
+```
+$ ./oebs-cloud.sh
+Usage : oebs-cloud.sh --setup-local-env
+        oebs-cloud.sh --create-cluster-config
+        oebs-cloud.sh --ssh-aws-ec2
+
+Sets Up OpenEBS On AWS
+
+-h|--help                       Display this help and exit.
+--setup-local-env               Sets up, AWSCLI, Terraform and KOPS.
+--create-cluster-config         Generates a terraform file(.tf) and Passwordless SSH
+--ssh-aws-ec2                   SSH to Kubernetes Master on EC2 instance.
+
+```
+
+Lets go ahead and install the tools, run the following command:
+
+```
+ ./oebs-cloud.sh --setup-local-env
+```
+
+The command will install `awscli`, `terraform` and `kops` on the workstation.
+
+**Updating .profile file:**
+
+The tools `awscli` and `kops` require the AWS credentials to access AWS services.
+
+- Let us use the credentials that were generated earlier for the user *openebsuser01*.
+- Add the path */usr/local/bin* to PATH environment variable.
+
+```
+$ vim ~/.profile
+
+# Add the AWS credentials as environment variables in .profile
 export AWS_ACCESS_KEY_ID=<access key>
 export AWS_SECRET_ACCESS_KEY=<secret key>
+
+# Add /usr/local/bin to PATH
+PATH="$HOME/bin:$HOME/.local/bin:/usr/local/bin:$PATH"
+
+$ source ~/.profile
 ```
 
-- In AWS create a IAM (Identity and Access Management) user group.
-- Assign the following permissions to the group.
+## Creating The Config For Cluster
 
-  - AmazonEC2FullAccess
-  - AmazonRoute53FullAccess
-  - AmazonS3FullAccess
-  - IAMFullAccess
-  - AmazonVPCFullAccess
+---
 
-- Now create a new user and add him to the group created earlier.
-
-## Use kops To Create The Terraform File
-
-- *kops* has the ability to output a configuration file that *terraform* can utilize to bring up the infrastructure.
-- We will be using *kops create cluster* command to create a cluster of:
-
+- We will be generating a terraform file(.tf) that will later spawn:
   - One Master
   - Two Minions
-
-- Copy the below command in a terminal.
+- Run the following command in a terminal.
 
 ```
-kops create cluster --cloud=aws \
---master-size=t2.micro \
---master-zones=us-east-1a \
---node-count=2 \
---node-size=t2.micro \
---zones=us-east-1a \
---ssh-public-key=/home/ubuntu/.ssh/id_rsa.pub \
---image=ami-9c3f6ce7 \
---target=terraform \
---out=. \
---name=openebs.k8s.local
-``` 
+$ ./oebs-cloud.sh --create-cluster-config
+```
 
-- Note the --target=terraform and --out=.\ parameters, these parameters tell kops to output a terraform file (.tf) in the current directory.
-- The generated terraform file(.tf), is named kubernetes.tf by default.
-- kops establishes a passwordless SSH connection between the local workstation and the remote EC2 instances.
-- kops also dumps the SSH connection details that can be used to connect to the remote EC2 instances.
+- A terraform file(.tf), named `kubernetes.tf` is generated in the same directory.
+- Passwordless SSH connection between the local workstation and the remote EC2 instances is also established.
 
-## Creating Cluster On AWS Using Terraform File
+## Create Cluster On AWS Using terraform
 
-- terraform usually looks for terraform file(.tf) in the location where the terraform commands are run.
-- Run the command *terraform plan* to see the preview of the changes to the AWS infrastructure.
-- terraform outputs a chuck of JSON data containing the changes that would be applied on AWS.
-- *terraform plan* command also acts as a verifier of terraform files. It outputs any errors that the terraform file might have, that could break the creation of the infrastructure when running the *terraform apply* command.
-- Run the command *terraform apply* to initiate the creation of the infrastructure.
+---
 
-## Route 53-Based DNS Vs Gossip-Based DNS
+- Verify the success of your `terraform` installation, by running the below command.
 
-Creating a Kubernetes cluster using kops requires a top-level domain or a sub domain and setting up Route 53 hosted zones. This domain allows the worker nodes to discover the master and the master to discover all the etcd servers. This is also needed for kubectl to be able to talk directly with the master.
+```
+$ terraform
+Usage: terraform [--version] [--help] <command> [args]
 
-But from a development point of view, the Route 53 hosted domains are charged and is not part of the Free-Tier that AWS offers.
+The available commands for execution are listed below.
+The most common, useful commands are shown first, followed by
+less common or more advanced commands. If you're just getting
+started with Terraform, stick with the common commands. For the
+other commands, please read the help and docs before usage.
 
-With the release of kops 1.6.2, Kubernetes has introduced a gossip-based DNS-free protocol, which is based on Weave Mesh. This protocol allows the master and worker nodes to be discoverable without having a registered domain. But the protocol requires that while creating the cluster, the name that is provided to the cluster must end with *.k8s.local*
+Common commands:
+    apply              Builds or changes infrastructure
+    console            Interactive console for Terraform interpolations
+# ...
+```
+
+- Run the command `terraform init` to initialize `terraform`.
+- Run the command `terraform plan` from the directory where the generated terraform file(.tf) is placed.
+- `terraform` outputs a chuck of JSON data containing the changes that would be applied on AWS.
+- `terraform plan` command also verifies your terraform files(.tf) and outputs any errors that it encountered.
+- Fix these errors and re-verify with `terraform plan` before running the `terraform apply` command.
+- Run the command `terraform apply` to initiate the creation of the infrastructure.
+
+## SSH To The Master Node
+
+---
+
+- From your workstation run the below command to connect to the EC2 instance running the Kubernetes Master.
+
+```
+$ ./oebs-cloud.sh --ssh-aws-ec2
+```
+
+- You should now be running inside the EC2 instance.
 
 ## Deploy OpenEBS On AWS
 
-Deploying OpenEBS requires Kubernetes to be already available on the EC2 instances. Lets verify if a Kubernetes cluster has been created.
+---
 
-- SSH into the master node of the cluster and type the following command on the terminal.
+Deploying OpenEBS requires Kubernetes to be already running on the EC2 instances. Lets verify if a Kubernetes cluster has been created.
 
 ```
-kubectl get nodes
+ubuntu@ip-172-20-53-140:~$ kubectl get nodes 
+NAME                            STATUS    AGE       VERSION 
+ip-172-20-36-126.ec2.internal   Ready     1m        v1.7.0 
+ip-172-20-37-115.ec2.internal   Ready     1m        v1.7.0 
+ip-172-20-53-140.ec2.internal   Ready     3m        v1.7.0
 ```
 
 - This will output any cluster information if the cluster was created.
@@ -104,4 +183,4 @@ kubectl create -f openebs-operator.yaml
 kubectl create -f openebs-storageclasses.yaml
 ```
 
-We should now have a working OpenEBS deployment on AWS (Amazon Web Services.)
+We should now have a working OpenEBS deployment on AWS (Amazon Web Services).
