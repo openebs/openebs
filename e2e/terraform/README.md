@@ -1,10 +1,10 @@
-# OpenEBS On The Cloud - Deployment Using Terraform and kops (Kubernetes Operations)
+# OpenEBS on the Cloud - Deployment using Terraform and kops (Kubernetes Operations)
 
 The purpose of this user guide is to provide the instructions to set up a Kubernetes cluster on AWS (Amazon Web Services) and have OpenEBS running in hyperconverged mode.
 
 ## Pre-requisites
 
-Follow the steps below to setup-up the pre-requisites:
+Perform the following procedure to setup-up the pre-requisites:
 
 **Amazon Web Services (AWS):**
 
@@ -15,26 +15,26 @@ People who already have an AWS account can skip the above step.
 - Start your browser.
 - Open *AWS Management Console*.
 - Select *IAM* under *Security, Identity & Compliance*.
-- In the *Dashboard*, click on *Users*.
-- Click on *Add User* button.
-- For the *User name* textbox, give *openebsuser01* as the username.
+- In the *Dashboard*, click *Users*.
+- Click *Add User* button.
+- In the *User name* textbox, enter *openebsuser01* as the username.
 - Select *Access Type* as *Programmatic access*.
-- Click on *Next Permissions* button.
+- Click *Next Permissions*.
 - Select *Attach existing policies directly*.
-- In the *Search Box* type *IAMFullAccess* and select the listed permission.
-- Click on *Next Review* button.
-- Click on *Create User* button.
+- In the *Search Box* enter *IAMFullAccess* and select the listed permission.
+- Click *Next Review*.
+- Click *Create User*.
 
-A user, named *openebsuser01* would have been created and an *Access key ID* and a *Secret access key*
-would have been assigned to him.
+A user, named *openebsuser01* will be created and an *Access key ID* and a *Secret access key*
+will be assigned.
 
 ```
-For Example:
+Example:
 User              Access key ID             Secret access key
 openebsuser01     AKIAI3MRLHNGU6CNKJQE      udxZi33tvSptXCky31kEt4KLRS6LSMMsmmdLx501
 ```
 
->Record the *Access key ID* and the *Secret access key* as AWS will not show it to you again.
+>Note the *Access key ID* and the *Secret access key* as AWS will not display it again.
 
 **kops, terraform and awscli:**
 
@@ -69,7 +69,7 @@ Sets Up OpenEBS On AWS
 
 ```
 
-Lets go ahead and install the tools, run the following command:
+Run the following command to install the tools:
 
 ```
 $ ./oebs-cloud.sh --setup-local-env
@@ -81,8 +81,8 @@ The command will install `awscli`, `terraform` and `kops` on the workstation.
 
 The tools `awscli` and `kops` require the AWS credentials to access AWS services.
 
-- Let us use the credentials that were generated earlier for the user *openebsuser01*.
-- Add the path */usr/local/bin* to PATH environment variable.
+- Use the credentials that were generated earlier for the user *openebsuser01*.
+- Add path */usr/local/bin* to the PATH environment variable.
 
 ```
 $ vim ~/.profile
@@ -97,27 +97,26 @@ PATH="$HOME/bin:$HOME/.local/bin:/usr/local/bin:$PATH"
 $ source ~/.profile
 ```
 
-## Creating The Config For Cluster
-
+## Creating the Config For Cluster
 - We will be generating a terraform file(.tf) that will later spawn:
   - One Master
-  - Two Minions
+  - Two Minion
 - Run the following command in a terminal.
 
 ```
 $ ./oebs-cloud.sh --create-cluster-config
 ```
 
-- A terraform file(.tf), named `kubernetes.tf` is generated in the same directory.
-- Passwordless SSH connection between the local workstation and the remote EC2 instances is also established.
+- A terraform file `kubernetes.tf` is generated in the same directory.
+- Passwordless SSH connection between the local workstation and the remote EC2 instances is established.
 
-## Create Cluster On AWS Using terraform
+## Create Cluster on AWS using Terraform
 
-- Verify the success of your `terraform` installation, by running the below command.
+- Run the following command to verify successful installation of `terraform`.
 
 ```
 $ terraform
-Usage: terraform [--version] [--help] <command> [args]
+Usage: terraform [--version] [--help] <comman> [args]
 
 The available commands for execution are listed below.
 The most common, useful commands are shown first, followed by
@@ -132,15 +131,15 @@ Common commands:
 ```
 
 - Run the command `terraform init` to initialize `terraform`.
-- Run the command `terraform plan` from the directory where the generated terraform file(.tf) is placed.
-- `terraform` outputs a chuck of JSON data containing the changes that would be applied on AWS.
-- `terraform plan` command also verifies your terraform files(.tf) and outputs any errors that it encountered.
+- Run the command `terraform plan` from the directory where the generated terraform file (.tf) is placed.
+- `terraform` outputs a chunk of JSON data containing changes that would be applied on AWS.
+- `terraform plan` command verifies your terraform files (.tf) and outputs any errors that it encountered.
 - Fix these errors and re-verify with `terraform plan` before running the `terraform apply` command.
-- Run the command `terraform apply` to initiate the creation of the infrastructure.
+- Run the command `terraform apply` to initiate creation of the infrastructure.
 
-## SSH To The Master Node
+## SSH to the Master Node
 
-- From your workstation run the below command to connect to the EC2 instance running the Kubernetes Master.
+- From your workstation, run the following command to connect to the EC2 instance running the Kubernetes Master.
 
 ```
 $ ./oebs-cloud.sh --ssh-aws-ec2
@@ -148,9 +147,9 @@ $ ./oebs-cloud.sh --ssh-aws-ec2
 
 - You should now be running inside the EC2 instance.
 
-## Deploy OpenEBS On AWS
+## Deploy OpenEBS on AWS
 
-Deploying OpenEBS requires Kubernetes to be already running on the EC2 instances. Lets verify if a Kubernetes cluster has been created.
+Deploying OpenEBS requires Kubernetes to be already running on the EC2 instances. Verify if a Kubernetes cluster has been created.
 
 ```
 ubuntu@ip-172-20-53-140:~$ kubectl get nodes 
@@ -160,7 +159,7 @@ ip-172-20-37-115.ec2.internal   Ready     1m        v1.7.0
 ip-172-20-53-140.ec2.internal   Ready     3m        v1.7.0
 ```
 
-- This will output any cluster information if the cluster was created.
+- This will output any cluster information if the cluster was already created.
 - Download the *openebs-operator* and *openebs-storage-classes* yamls from the below location.
 
 ```
@@ -168,7 +167,7 @@ wget https://raw.githubusercontent.com/openebs/openebs/master/k8s/openebs-operat
 wget https://raw.githubusercontent.com/openebs/openebs/master/k8s/openebs-storageclasses.yaml
 ```
 
-- Apply the *openebs-operator* and *openebs-storage-classes* to the Kubernetes cluster.
+- Apply *openebs-operator* and *openebs-storage-classes* to the Kubernetes cluster.
 
 ```
 kubectl create -f openebs-operator.yaml
