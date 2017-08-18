@@ -38,12 +38,6 @@ openebsuser01     AKIAI3MRLHNGU6CNKJQE      udxZi33tvSptXCky31kEt4KLRS6LSMMsmmdL
 
 **kops, terraform and awscli:**
 
-The following tools have to be installed on your local workstation:
-
-- `awscli`
-- `kops >= 1.6.2`
-- `terraform >= 0.9.11`
-
 We have created a script that does most of the work for you. Download the script file called `oebs-cloud.sh`.
 
 ```
@@ -54,6 +48,7 @@ $ chmod +x oebs-cloud.sh
 ```
 
 List the operations performed by the script:
+
 ```
 $ ./oebs-cloud.sh
 Usage : oebs-cloud.sh --setup-local-env
@@ -69,13 +64,17 @@ Sets Up OpenEBS On AWS
 
 ```
 
-Run the following command to install the tools:
+Run the following command to install the required tools:
 
 ```
 $ ./oebs-cloud.sh --setup-local-env
 ```
 
-The command will install `awscli`, `terraform` and `kops` on the workstation.
+The command will install the below tools on the workstation:
+
+- `awscli`
+- `kops >= 1.6.2`
+- `terraform >= 0.9.11`
 
 **Updating .profile file:**
 
@@ -132,9 +131,9 @@ Common commands:
 
 - Run the command `terraform init` to initialize `terraform`.
 - Run the command `terraform plan` from the directory where the generated terraform file (.tf) is placed.
-- `terraform` outputs a chunk of JSON data containing changes that would be applied on AWS.
-- `terraform plan` command verifies your terraform files (.tf) and outputs any errors that it encountered.
-- Fix these errors and re-verify with `terraform plan` before running the `terraform apply` command.
+  - `terraform` outputs a chunk of JSON data containing changes that would be applied on AWS.
+  - `terraform plan` command verifies your terraform files (.tf) and outputs any errors that it encountered.
+  - Fix these errors and re-verify with `terraform plan` before running the `terraform apply` command.
 - Run the command `terraform apply` to initiate creation of the infrastructure.
 
 ## SSH to the Master Node
