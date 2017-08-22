@@ -7,29 +7,33 @@ Contents:
     :maxdepth: 2
     :caption: Getting Started
 
-    Introducing Open EBS
+    Introducing OpenEBS <overview>
     Components and Architecture
     Why OpenEBS
     Tools and Storage
     Usecases
     
 .. toctree::
-    :maxdepth: 3
-    :caption: Install and Configure <install/index>
+    :maxdepth: 2
+    :caption: Install and Configure
     
-    
+    Install <install/index>
 
 .. toctree::
     :maxdepth: 1
     :caption: Release Notes
 
+    changelog
+    
 .. toctree::
     :maxdepth: 1
     :caption: Hardware Compatibility List/Matrix
+    
+    hcl
     
 .. toctree::
     :maxdepth: 1
     :caption: Troubleshooting
     
-    changelog
+    troubleshooting
 
