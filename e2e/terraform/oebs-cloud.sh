@@ -122,7 +122,7 @@ function create_terraform_file() {
     --node-size=t2.micro \
     --zones=us-east-1a \
     --image=ami-2757f631 \
-    --state=s3://openebs-k8s-local-state-store \
+    --state=s3://openebs-k8s-`echo $s3_bucket_name`-local-state-store \
     --target=terraform \
     --out=. \
     --name=openebs.k8s.local
