@@ -3,6 +3,7 @@
 set -e
 
 master_dns_name=
+s3_bucket_name=
 
 function show_help() {
     cat << EOF
@@ -98,8 +99,12 @@ function create_terraform_file() {
     
     # Wait for AWS to refresh
     sleep 60
+
+    # Create unique S3 bucket name for each user
+    # Amazon S3 bucket names are universal
+    s3_bucket_name=`echo $(mktemp)| tr '[:upper:]' '[:lower:]' | cut -d '.' -f 2`
     
-    aws s3api create-bucket --bucket openebs-k8s-local-state-store
+    aws s3api create-bucket --bucket openebs-k8s-`echo $s3_bucket_name`-local-state-store
 
     if [ -e ~/.ssh/id_rsa.pub ];then
         echo "Using Public Key for Passwordless SSH."
