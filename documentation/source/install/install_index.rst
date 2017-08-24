@@ -4,7 +4,7 @@ Contents:
     :maxdepth: 2
     :caption: Install and Configure
 
-    Prerequisites <index> rename to install.rst?
+    Prerequisites <prepare_your_system>  
     Using OpenEBS with Kubernetes on local machine 
     Using OpenEBS with Kubernetes on Google Container Engine
     Deploying OpenEBS on Cloud using Terraform and kops (Kubernetes Operations)
