@@ -9,11 +9,7 @@ Contents:
     :caption: Getting Started
 
     Introducing OpenEBS <overview>
-    Why/Benefits OpenEBS? 
-    Components and Architecture
-    Why OpenEBS
-    Tools and Storage
-    Usecases
+    
     
 .. toctree::
     :maxdepth: 2
@@ -26,10 +22,12 @@ Contents:
     :maxdepth: 1
     :caption: Troubleshooting
     
-    Troubleshooting
+    Troubleshooting <troubleshooting>
 
 ..toctree::
    ::maxdepth: 1
    :caption: Release Notes
+   
+   Changelog <releasenotes>
    
    
