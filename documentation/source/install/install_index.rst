@@ -1,12 +1,12 @@
-Contents:
+<Contents:
 
 .. toctree::
     :maxdepth: 2
     :caption: Install and Configure
 
-    Prerequisites <prepare_your_system>  
-    Using OpenEBS with Kubernetes on local machine 
-    Using OpenEBS with Kubernetes on Google Container Engine
-    Deploying OpenEBS on Cloud using Terraform and kops (Kubernetes Operations)
-    Deploying OpenEBS On Premise
-    Usecases - Percona DB
+    Prerequisites <prerequisites>  
+    Using OpenEBS with Kubernetes on local machine <install_local_mc>
+    Using OpenEBS with Kubernetes on Google Container Engine <install_google_cont>
+    Deploying OpenEBS on Cloud using Terraform and kops (Kubernetes Operations) <deploy_terraform_kops>
+    Deploying OpenEBS On Premise <deploy_premise>
+    Usecases - Percona DB <install_usecases>
