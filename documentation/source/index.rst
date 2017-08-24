@@ -1,3 +1,4 @@
+
 OpenEBS Documentation
 ======================================
 
@@ -8,6 +9,7 @@ Contents:
     :caption: Getting Started
 
     Introducing OpenEBS <overview>
+    Why/Benefits OpenEBS? 
     Components and Architecture
     Why OpenEBS
     Tools and Storage
@@ -15,25 +17,19 @@ Contents:
     
 .. toctree::
     :maxdepth: 2
-    :caption: Install and Configure
+    :caption: Install and Configure 
     
-    Install <install/index>
-
-.. toctree::
-    :maxdepth: 1
-    :caption: Release Notes
-
-    changelog
+    Install and Configure <install_index>
     
-.. toctree::
-    :maxdepth: 1
-    :caption: Hardware Compatibility List/Matrix
-    
-    hcl
     
 .. toctree::
     :maxdepth: 1
     :caption: Troubleshooting
     
-    troubleshooting
+    Troubleshooting
 
+..toctree::
+   ::maxdepth: 1
+   :caption: Release Notes
+   
+   
