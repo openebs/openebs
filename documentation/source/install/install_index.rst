@@ -1,6 +1,6 @@
 .. toctree::
     :maxdepth: 2
-    :caption: Install and Configure
+    :caption: Overview
 
     Installing OpenEBS <install/installing>
 
