@@ -26,10 +26,11 @@ Contents:
     :maxdepth: 1
     :caption: Troubleshooting
     
-    Troubleshooting
+    Troubleshooting <troubleshooting>
 
-..toctree::
-   ::maxdepth: 1
+.. toctree::
+   :maxdepth: 1
    :caption: Release Notes
    
+   Release Notes <releasenotes>
    
