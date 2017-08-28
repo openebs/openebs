@@ -22,11 +22,11 @@ Contents:
     :maxdepth: 1
     :caption: Troubleshooting
     
-    Overview </troubleshooting/troubleshooting>
+    Overview <troubleshooting/troubleshooting>
 
 .. toctree::
    :maxdepth: 1
    :caption: Release Notes
    
-   Changelog </release_notes/releasenotes>
+   Changelog <release_notes/releasenotes>
    
