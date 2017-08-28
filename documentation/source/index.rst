@@ -15,7 +15,7 @@ Contents:
     :maxdepth: 2
     :caption: Install and Configure 
     
-    Overview </install/install_index>
+    Overview <https://github.com/mahebbar/openebs/blob/master/documentation/source/install/install_index.rst>
     
     
 .. toctree::
