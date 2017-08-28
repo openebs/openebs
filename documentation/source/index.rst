@@ -8,9 +8,6 @@ Contents:
     :maxdepth: 2
     :caption: Getting Started
 
-
-    Overview <overview>
-=======
     Introducing OpenEBS <overview>
 
     
@@ -19,7 +16,7 @@ Contents:
     :maxdepth: 2
     :caption: Install and Configure 
     
-    Overview <https://github.com/mahebbar/openebs/blob/master/documentation/source/install/install_index.rst>
+    Overview <install/install_index>
     
     
 .. toctree::
@@ -28,8 +25,7 @@ Contents:
     
 
     Overview <troubleshooting/troubleshooting>
-    =======
-    Troubleshooting <troubleshooting>
+   
 
 
 .. toctree::
@@ -38,8 +34,7 @@ Contents:
    
 
    Changelog <release_notes/releasenotes>
-   =======
-   Changelog <releasenotes>
+   
    
 
    
