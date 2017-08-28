@@ -8,7 +8,11 @@ Contents:
     :maxdepth: 2
     :caption: Getting Started
 
+
     Overview <overview>
+=======
+    Introducing OpenEBS <overview>
+
     
     
 .. toctree::
@@ -22,11 +26,20 @@ Contents:
     :maxdepth: 1
     :caption: Troubleshooting
     
+
     Overview <troubleshooting/troubleshooting>
+    =======
+    Troubleshooting <troubleshooting>
+
 
 .. toctree::
    :maxdepth: 1
    :caption: Release Notes
    
+
    Changelog <release_notes/releasenotes>
+   =======
+   Changelog <releasenotes>
+   
+
    
