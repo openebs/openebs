@@ -8,25 +8,25 @@ Contents:
     :maxdepth: 2
     :caption: Getting Started
 
-    Introducing OpenEBS <overview>
+    Overview <overview>
     
     
 .. toctree::
     :maxdepth: 2
     :caption: Install and Configure 
     
-    Install and Configure <install/install_index>
+    Overview </install/install_index>
     
     
 .. toctree::
     :maxdepth: 1
     :caption: Troubleshooting
     
-    Troubleshooting <troubleshooting/troubleshooting>
+    Overview </troubleshooting/troubleshooting>
 
 .. toctree::
    :maxdepth: 1
    :caption: Release Notes
    
-   Release Notes <release_notes/releasenotes>
+   Changelog </release_notes/releasenotes>
    
