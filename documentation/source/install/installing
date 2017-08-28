@@ -2,8 +2,6 @@
     :maxdepth: 6
     :caption: Installing OpenEBS
 
-    Installing OpenEBS <install/installing>
-    
     Prerequisites <prerequisites> 
    
     Using OpenEBS with Kubernetes on local machine <install_local_mc>
