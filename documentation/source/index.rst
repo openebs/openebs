@@ -16,7 +16,7 @@ Contents:
     :maxdepth: 2
     :caption: Install and Configure 
     
-    Overview <install/install_index>
+    Overview <install/install_overview>
     
     
 .. toctree::
