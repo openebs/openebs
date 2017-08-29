@@ -1,11 +1,4 @@
-.. _getting_started:
 
-
-***********************************
-Prepare your system (Setup Guide)
-***********************************
-
-.. _installing-docdir:
 
 Getting started
 ==================
