@@ -15,8 +15,8 @@ master-01 used as OpenEBS Maya Master (omm) and host-01 and host-02 used as Open
 
 If you plan to setup using VMs on Virtual Box, you can skip down to the section of Preparing machines using Vagrant below.
 
-.. image:: source/_static/gettingstarted.png
-
+.. figure :: /_static/gettingstarted.png
+    :align: center
 
 .. _fetching-the-data:
 
