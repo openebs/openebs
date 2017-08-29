@@ -1,11 +1,9 @@
-.. _getting_started:
+
 
 
 *********************************
 Installing OpenEBS with Kubernetes on a Local Machine
 *********************************
-
-.. _installing-docdir:
 
 Installing from binaries
 =============================
