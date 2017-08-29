@@ -13,7 +13,7 @@ Contents:
     
     
 .. toctree::
-    :maxdepth: 8
+    :maxdepth: 2
     :caption: Install and Configure 
     
     Overview <install/install_overview>
