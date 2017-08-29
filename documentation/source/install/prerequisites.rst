@@ -18,7 +18,6 @@ If you plan to setup using VMs on Virtual Box, you can skip down to the section 
 .. figure :: /_static/gettingstarted.png
     :align: center
 
-.. _fetching-the-data:
 
 Prepare your machines for OpenEBS installation
 ================================================
