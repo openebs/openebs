@@ -1,5 +1,5 @@
-Installing OpenEBS
-========================
+Installing OpenEBS Overview
+==========================
 
 <<TBD>>
 
@@ -7,7 +7,7 @@ Installing OpenEBS
 For more details on prerequisites, platform specific installations, deployments, and usecases, see the following:
 
 .. toctree::
-    :maxdepth: 8
+    :maxdepth: 2
 
     Prerequisites <prerequisites>
     Using OpenEBS with Kubernetes on local machine <install_local_mc>
