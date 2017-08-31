@@ -19,16 +19,12 @@ Contents:
     
     Overview <install/install_overview>
     Hosted Solutions
-      Google Cloud
-        Setting up OpenEBS with Kubernetes on Google Container Engine <install/install_google_cont>
-      Amazon Cloud
-        Deploying OpenEBS on Cloud using Terraform and kops (Kubernetes Operations) <install/deploy_terraform_kops>
+      Google Cloud <install/install_google_cont>
+      Amazon Cloud <install/deploy_terraform_kops>
     
     On-Premise Solutions
-      Vagrant
-          Setting up OpenEBS with Kubernetes on a Local Machine <install/install_local_mc>
-      Virtual Machines
-          Deploying OpenEBS on Premise <install/deploy_premise>
+      Vagrant <install/install_local_mc>
+      Virtual Machines <install/deploy_premise>
   
     
 .. toctree::
