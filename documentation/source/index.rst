@@ -15,15 +15,27 @@ Contents:
     
 .. toctree::
     :maxdepth: 2
-    :caption: Install and Configure test
+    :caption: Setup
     
     Overview <install/install_overview>
-    Prerequisites <install/prerequisites>
-    Installing OpenEBS with Kubernetes on a Local Machine <install/install_local_mc>
-    Installing OpenEBS with Kubernetes on Google Container Engine <install/install_google_cont>
-    Deploying OpenEBS on Cloud using Terraform and kops (Kubernetes Operations) <install/deploy_terraform_kops>
-    Deploying OpenEBS on Premise <install/deploy_premise>
-    Usecases - Percona DB <install/install_usecases> 
+    Hosted Solutions
+      Google Cloud
+        Setting up OpenEBS with Kubernetes on Google Container Engine <install/install_google_cont>
+      Amazon Cloud
+        Deploying OpenEBS on Cloud using Terraform and kops (Kubernetes Operations) <install/deploy_terraform_kops>
+    
+    On-Premise Solutions
+      Vagrant
+          Setting up OpenEBS with Kubernetes on a Local Machine <install/install_local_mc>
+      Virtual Machines
+          Deploying OpenEBS on Premise <install/deploy_premise>
+  
+    
+.. toctree::
+    :maxdepth: 1
+    :caption: Usecases
+    
+    Percona DB <install/install_usecases> 
     
 .. toctree::
     :maxdepth: 1
