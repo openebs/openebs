@@ -18,6 +18,12 @@
   command: python -c "import os,ara; print(os.path.dirname(ara.__file__))"
   register: ara_location  
 
+- name: Create plugins folder in playbook directory if it doesn't exist
+  file:
+    path: "{{ playbook_dir }}/plugins/callback"
+    recurse: yes
+    state: directory
+
 - name: Copy ara callback plugin to openebs custom plugins location
   copy: 
     src: "{{ ara_location.stdout }}/plugins/callbacks/log_ara.py"  
