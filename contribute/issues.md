@@ -1,6 +1,6 @@
 # List of labels for issues and PRs on OpenEBS Project
 
-This document provides list of labels and their purpose. This labels can be attached to issues and PRs.
+This document provides list of labels and their purpose. These labels can be attached to issues and PRs.
 
 
 | Sr. No  |  Labels |  Label description |
