@@ -1,29 +1,23 @@
-.. _getting_started:
+******************
+Prerequisites
+******************
 
+Setting up OpenEBS cluster
+===========================
 
-***********************************
-Prepare your system (Setup Guide)
-***********************************
+This section helps you to setup a simple OpenEBS Cluster with three machines, VMs or Servers. OpenEBS is both a scale-out and scale-up solution. The OpenEBS cluster created using this section can be taken into production and scaled up later to meet changing storage demands, by adding additional machines to the cluster.
 
-.. _installing-docdir:
+The clients (docker-hosts) can be configured to consume the OpenEBS storage either via Network(iSCSI) or using TCMU. This section helps you connect to the storage using iSCSI.
 
-Getting started
-==================
-
-This quick start guide helps you to setup a simple OpenEBS Cluster with three machines, VMs or Servers. OpenEBS is both a scale-out and scale-up solution. The OpenEBS cluster created using this guide can be taken into production and can be scaled later, to meet changing storage demands, by adding additional machines to the cluster.
-
-The clients (docker-hosts) can be configured to consume the OpenEBS storage either via Network(iSCSI) or using TCMU. This guide will show connecting to storage using iSCSI.
-
-In this guide, we will setup an simple OpenEBS cluster with three machines:
+In this section, you will setup a simple OpenEBS cluster with three machines:
 
 master-01 used as OpenEBS Maya Master (omm) and host-01 and host-02 used as OpenEBS Storage Host (osh).
 
 If you plan to setup using VMs on Virtual Box, you can skip down to the section of Preparing machines using Vagrant below.
 
-.. image:: _static/gettingstarted.png
+.. figure:: /_static/gettingstarted.png
+    :align: center
 
-
-.. _fetching-the-data:
 
 Prepare your machines for OpenEBS installation
 ================================================
