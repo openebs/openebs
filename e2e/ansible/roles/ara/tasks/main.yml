@@ -18,6 +18,12 @@
   command: python -c "import os,ara; print(os.path.dirname(ara.__file__))"
   register: ara_location  
 
+- name: Create plugins folder in playbook directory if it doesn't exist
+  file:
+    path: "{{ playbook_dir }}/plugins/callback"
+    recurse: yes
+    state: directory
+
 - name: Copy ara callback plugin to openebs custom plugins location
   copy: 
     src: "{{ ara_location.stdout }}/plugins/callbacks/log_ara.py"  
@@ -33,7 +39,7 @@
     src: "{{ ara_location.stdout }}/plugins/modules"
     dest: "{{ playbook_dir }}/plugins"
 
-- name: Update ansible.cfg with ara module library
+- name: Update ansible.cfg with ara module library path
   ini_file:
     path: "{{ playbook_dir }}/ansible.cfg"
     section: defaults
@@ -41,7 +47,14 @@
     value: "./plugins/modules"
     backup: yes
 
-- name: Update ansible.cfg with ara action plugins 
+- name: Update ansible.cfg with callback plugin path
+  ini_file:
+    path: "{{ playbook_dir }}/ansible.cfg"
+    section: defaults
+    option: callback_plugins
+    value: "./plugins/callback"
+
+- name: Update ansible.cfg with ara action plugins path
   ini_file:
     path: "{{ playbook_dir }}/ansible.cfg"
     section: defaults
