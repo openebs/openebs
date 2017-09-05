@@ -1,4 +1,5 @@
 
+
 OpenEBS Documentation
 ======================================
 
@@ -15,10 +16,23 @@ Contents:
     
 .. toctree::
     :maxdepth: 2
-    :caption: Install and Configure 
+    :caption: Setup
     
-    Overview <https://github.com/mahebbar/openebs/blob/master/documentation/source/install/install_index.rst>
+    Overview <install/install_overview>
+    Hosted Solutions
+      Google Cloud <install/install_google_cont>
+      Amazon Cloud <install/deploy_terraform_kops>
     
+    On-Premise Solutions
+      Vagrant <install/install_local_mc>
+      Virtual Machines <install/deploy_premise>
+  
+    
+.. toctree::
+    :maxdepth: 1
+    :caption: Usecases
+    
+    Percona DB <install/install_usecases> 
     
 .. toctree::
     :maxdepth: 1
@@ -26,8 +40,7 @@ Contents:
     
 
     Overview <troubleshooting/troubleshooting>
-    =======
-    Troubleshooting <troubleshooting>
+   
 
 
 .. toctree::
@@ -36,8 +49,3 @@ Contents:
    
 
    Changelog <release_notes/releasenotes>
-   =======
-   Changelog <releasenotes>
-   
-
-   
