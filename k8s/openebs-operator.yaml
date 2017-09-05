@@ -65,7 +65,7 @@ spec:
       containers:
       - name: maya-apiserver
         imagePullPolicy: Always
-        image: openebs/m-apiserver:0.3-RC3
+        image: openebs/m-apiserver:0.3-RC4
         ports:
         - containerPort: 5656
 ---
