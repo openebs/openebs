@@ -1,25 +1,17 @@
-.. _getting_started:
 
+.. _overview:
 
-***************
+********
 Overview
-***************
-
-.. _installing-docdir:
-
-Introducing OpenEBS 
-======================
-
+********
 OpenEBS is a storage platform, written in GoLang, to deliver persistent block storage for container eco system. The storage itself is containerized through a storage POD concept called VSM or "Virtual Storage Machine". VSMs are scheduled and managed using an orchestrator engine called "Maya". VSMs are fully isolated user space storage engines that present the block storage at the front end through iSCSI, NBD or TCMU protocol and consume raw storage from a local OpenEBS host or remote storage.
 
 .. <<TBD>> Include why OpenEBS/Benefits <<TBD>>
 
-.. _fetching-the-data:
-
 ..
    Virtual Tour of OpenEBS
    =======================
-   Include video about OpenEBS Project <<TBD>>
+  <<TBD>> Include video about OpenEBS <<TBD>>
 
 Components and Architecture
 ============================
@@ -44,6 +36,7 @@ The backend data store for Jiva containers come either through locally managed d
 
 .. image:: _static/architecture.png
 
+=======
 ..
   OpenEBS Usecases/Examples
    =========================

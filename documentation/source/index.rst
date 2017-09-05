@@ -9,9 +9,10 @@ Contents:
     :maxdepth: 2
     :caption: Getting Started
 
-    Introducing OpenEBS <overview>
 
-    
+    Overview 
+    =========
+    Introducing OpenEBS <overview>
     
 .. toctree::
     :maxdepth: 2
