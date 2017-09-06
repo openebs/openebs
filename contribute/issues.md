@@ -103,7 +103,7 @@ As name suggests, this contains general category labels and they are self explan
 |---|---|
 | architecting | If something needs design changes/brainstorming |
 | documentation  |  Related to documentation |
-| wip:WorkInProgress | Means work in progress |
+| work-in-progress | Means work in progress |
 | website | Issues related to website  |
 | release-note | Need release note|
 | ready-for-review | PR is ready for review |
