@@ -2,14 +2,23 @@
 
 This document describes the process for improving developer documentation by creating PRs.
 
-Developer documentation is available under the folder : openebs/openebs/contribute
+Developer documentation is available under the folder: [openebs/contribute](https://github.com/openebs/openebs/tree/master/contribute)
 
-The developer documenation include anything that will help other developers like:
+The developer documenation includes anything that will help community like:
 - Architecture and Design documentation
 - Technical or Research Notes
 - FAQ
 - Process Documentation 
 - Generic / Miscellaneous Notes
+
+At a very high level, the process to contribute and improve is pretty simple:
+- Sumit an Issue describing your proposed change
+- Create your development branch
+- Commit your changes
+- Submit your Pull Request
+
+The following sections describe some guidelines that can come in handy with the above process. 
+*Followed by the guidelines, is a cheat sheet with frequently used git commands.*
 
 ## Submit an Issue describing your proposed change.
 
@@ -37,4 +46,34 @@ You can also help with some existing issues under this category available at [de
 - Incorporate review comments, if any, in the development branch. 
 - Once the PR is accepted, close the branch. 
 
+# Git Cheat Sheet 
+
+Fork the openebs/openebs repository into your account, referred in the below instructions as $user. 
+
+## Setting up Development Environment
+```
+git clone https://github.com/$user/openebs.git
+cd openebs/
+git remote add upstream https://github.com/openebs/openebs.git
+git remote set-url --push upstream no_push
+git remote -v
+```
+
+## Synchronizing your local master with remote(or upstream) master
+```
+git checkout master
+git fetch upstream master
+git rebase upstream/master
+git status
+git push origin master
+```
+
+## Synchronizing (or rebase) your local branch with remote(or upstream) master
+```
+git checkout <branch-name>
+git fetch upstream master
+git rebase upstream/master
+git status
+git push
+```
 
