@@ -50,7 +50,7 @@ Labels prefixed with *area* indicates that which area issue or PR belong. Here, 
 | area/ci  | Continuous integration specific  |
 | area/high-availability  | High availability  |
 | area/storage | Storage specific  |
-| area/ML  |  Machine learning specific |
+| area/machine-learning  |  Machine learning specific |
 
 ---
 
