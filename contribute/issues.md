@@ -30,6 +30,7 @@ Labels prefixed with *kind* indicate the type of issue and PR. Suppose, you want
 ### Help
 
 Labels prefixed with *help* implies that issue needs some help from community/users. Further, you can adjust the level of help required, by specifying small, medium, large etc.
+
 | Label | Description |
 |---|---|
 | help/small  | Need small help on docs (beginner level)|
@@ -41,6 +42,7 @@ Labels prefixed with *help* implies that issue needs some help from community/us
 ## Area
 
 Labels prefixed with *area* indicates that which area issue or PR belong. Here, area implies component of the OpenEBS project. It will be easier to sort an issue based on the area of user's interest.
+
 | Label | Description |
 |---|---|
 | area/maya  | Maya Specific  |
