@@ -30,8 +30,12 @@ explain why.
 **Anything else we need to know?**:
 
 **Environment**:
-- Maya version (use `maya version`):
-- M-apiserver version (use `m-apiserver version`):
+- kubectl get nodes
+- kubectl get pods --all-namespaces
+- kubectl get services
+- kubectl get sc
+- kubectl get pv
+- kubectl get pvc
 - OS (e.g. from /etc/os-release):
 - Kernel (e.g. `uname -a`):
 - Install tools:
