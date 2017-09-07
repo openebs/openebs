@@ -60,12 +60,12 @@ Labels prefixed with *size* defines the size of change done in particular PR.
 
 | Label | Description |
 |---|---|
-| size/L | Size of change is large |
-| size/M | Size of change is medium |
-| size/S | Size of change is small |
-| size/XL | Size of change is extra large |
-| size/XS | Size of change is extra small |
-| size/XXL | Size of change is very large |
+| size/L | Size of change is large/7 commits probably |
+| size/M | Size of change is medium/5 commits probably |
+| size/S | Size of change is small/3 commits probably |
+| size/XL | Size of change is extra large/10 commits probably |
+| size/XS | Size of change is extra small/1 commit probably |
+| size/XXL | Size of change is very large/15 commits probably |
 
 ---
 
