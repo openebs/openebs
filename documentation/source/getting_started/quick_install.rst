@@ -1,23 +1,25 @@
-You can install OpenEBS instantly using the following procedure.
+This section allows you to setup OpenEBS instantly.
 
-Prerequisite:
--------------
-You must have Kubernetes installed.
+Prerequisites:
+--------------
+You must have the following:
 
-1. Install Open-ISCSI using the following commands at the command prompt:
+* Kubernetes installed.
+* iSCSI initiator enabled on your minion nodes. The procedure to setup iSCSI initiator will differ based on your host Operating System (OS). 
 
-   **On Ubuntu -**
+The following example allows you set up Open-iSCSI on **Ubuntu**. Use the following commands at the command prompt:
 
-   * sudo apt-get update 
-   * sudo apt-get install open-iscsi
+  * sudo apt-get update 
+  * sudo apt-get install open-iscsi
 
-   **On CoreOS - ??**
+Setting up OpenEBS 
+==================
+Perform this procedure to run OpenEBS operator. Use the following commands at the command prompt:
 
-2. Run Kubernetes operator using the following commands at the command prompt:
-
-   *  kubectl create/apply -f openebs-operator.yaml
-   *  kubectl create/apply -f openebs-storageclasses.yaml
+   1.  kubectl create/apply -f openebs-operator.yaml
+   2.  kubectl create/apply -f openebs-storageclasses.yaml
 
 **See Also:**
+
     `Amazon Cloud`_
           .. _Amazon Cloud: http://openebs.readthedocs.io/en/latest/install/deploy_terraform_kops.html
