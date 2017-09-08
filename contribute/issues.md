@@ -67,7 +67,11 @@ Labels prefixed with *size* defines the size of change done in particular PR.
 | size/XS | Size of change is extra small/1 commit probably |
 | size/XXL | Size of change is very large/15 commits probably |
 
-    NOTE: Please do not club major changes into single. It'll be difficult for reviewer to review big PR. In that case, reviewer may discard your PR and will ask you create multiple PRs.
+#### NOTE:
+
+```
+Please do not club major changes into single PR. It'll be difficult for reviewer to review big PR. In that case, reviewer may discard your PR and will ask you create multiple PRs.
+```
 
 ---
 
