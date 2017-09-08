@@ -6,13 +6,13 @@ OpenEBS Documentation
 Contents:
 
 .. toctree::
-    :maxdepth: 2
+    :maxdepth: 3
     :caption: Getting Started
 
 
-    Overview 
-    =========
-    Introducing OpenEBS <overview>
+    Introducing OpenEBS <getting_started/overview>
+    Components and Architecture <getting_started/components_architecture>
+    Quick Install <getting_started/quick_install>
     
 .. toctree::
     :maxdepth: 2
