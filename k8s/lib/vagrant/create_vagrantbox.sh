@@ -1,5 +1,7 @@
 #!/bin/bash
 
+kube-version="1.7.5"
+
 function fetch_k8s_scripts(){
     mkdir -p workdir/scripts/k8s/    
     cp ../scripts/configure_k8s_master.sh workdir/scripts/k8s/
@@ -25,6 +27,23 @@ echo Gathering sample k8s specs
 fetch_specs
 
 echo Launch VM
+vagrant up
+vagrant package --output workdir/kubernetes-${kube-version}.box
+
+
+echo Test the new box
+vagrant box add --name openebs/k8s-test-box workdir/kubernetes-${kube-version}.box 
+mkdir workdir/test 
+currdir=`pwd`
+cp test/k8s/Vagrantfile workdir/test/
+cd workdir/test; 
+vagrant up
+#vagrant destroy -f
+#vagrant box remove openebs/k8s-test-box
+cd $currdir
+
+echo Destroy the default vm
+#vagrant destroy default
 
 echo Clear working directory
-cleanup
+#cleanup
