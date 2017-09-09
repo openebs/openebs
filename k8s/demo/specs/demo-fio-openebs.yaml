@@ -17,7 +17,7 @@ spec:
     tty: true
     volumeMounts:
     - mountPath: /datadir1
-      name: demo-vsm1-vol1
+      name: demo-vol1
   volumes:
     - name: demo-vol1
       persistentVolumeClaim:
