@@ -8,7 +8,7 @@ function patch_kube_proxy(){
 }
 
 function setup_k8s_weave() {
-    kubectl apply -f $HOME/setup/weave/weave-daemonset-k8s-1.6.yaml
+    kubectl apply -f $HOME/setup/weave/weave-daemonset-k8s-1.7.yaml
 }
 
 
