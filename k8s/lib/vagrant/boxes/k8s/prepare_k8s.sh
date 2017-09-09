@@ -1,11 +1,10 @@
 #!/bin/bash
-# Get the specs from github.
-specurl="https://api.github.com/repos/openebs/openebs/contents\
-/k8s/demo/specs"
 
-# Get the scripts from github.
-scripturl="https://api.github.com/repos/openebs/openebs/contents\
-/k8s/lib/scripts"
+# Location of the k8s configure scripts
+scriptloc="/vagrant/workdir/scripts/k8s/"
+
+# Location of the sample k8s spec files
+scriptloc="/vagrant/workdir/specs/"
 
 # Download and install needed packages.
 sudo apt-get update
@@ -14,36 +13,15 @@ sudo apt-get install -y unzip curl wget
 #Install JSON Parser for patching kube-proxy
 sudo apt-get install -y jq
 
-# Create the demo directory and download scripts
-mapfile -t scriptdownloadurls < <(curl -sS $scripturl \
-| grep "download_url" | awk '{print $2}' \
-| tr -d '",')
-
 mkdir -p /home/ubuntu/setup/k8s
 cd /home/ubuntu/setup/k8s
 
-scriptlength=${#scriptdownloadurls[@]}
-for ((i = 0; i != scriptlength; i++)); do
-    if [ -z "${scriptdownloadurls[i]##*configure_k8s_master.sh*}" -o \
-         -z "${scriptdownloadurls[i]##*configure_k8s_cred.sh*}" -o \
-         -z "${scriptdownloadurls[i]##*configure_k8s_weave.sh*}" -o \
-         -z "${scriptdownloadurls[i]##*configure_k8s_host.sh*}" ] ;then
-        wget "${scriptdownloadurls[i]}"
-    fi
-done
-    
-mapfile -t downloadurls < <(curl -sS $specurl \
-| grep "download_url" | awk '{print $2}' \
-| tr -d '",')
+cp ${scriptloc}/configure_k8s_master.sh .
+cp ${scriptloc}/configure_k8s_cred.sh .
+cp ${scriptloc}/configure_k8s_weave.sh .
+cp ${scriptloc}/configure_k8s_host.sh .
 
-#Create demo directory and download specs
-mkdir -p /home/ubuntu/demo/k8s/spec
 cd /home/ubuntu/demo/k8s/spec    
-
-length=${#downloadurls[@]}
-for ((i = 0; i != length; i++)); do
-    if [ -z "${downloadurls[i]##*yaml*}" ] ;then
-        wget "${downloadurls[i]}"
-    fi
-done
+cp ${scriptloc}/demo-vdbench-openebs.sh .
+cp ${scriptloc}/demo-fio-openebs.sh .
 
