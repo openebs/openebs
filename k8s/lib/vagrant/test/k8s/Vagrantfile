@@ -177,6 +177,11 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
           vmCfg.vm.provision :shell, 
           inline: "/bin/bash /home/ubuntu/setup/k8s/configure_k8s_weave.sh", 
           privileged: false          
+          
+          # Setup Dashboard
+          vmCfg.vm.provision :shell, 
+          inline: "/bin/bash /home/ubuntu/setup/k8s/configure_k8s_dashboard.sh", 
+          privileged: false          
         end
       end           
     end

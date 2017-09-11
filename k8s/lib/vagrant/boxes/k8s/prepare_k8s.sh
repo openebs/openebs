@@ -18,6 +18,7 @@ cp ${scriptloc}/configure_k8s_master.sh .
 cp ${scriptloc}/configure_k8s_cred.sh .
 cp ${scriptloc}/configure_k8s_weave.sh .
 cp ${scriptloc}/configure_k8s_host.sh .
+cp ${scriptloc}/configure_k8s_dashboard.sh .
 
 mkdir -p /home/ubuntu/demo/    
 cd /home/ubuntu/demo/
