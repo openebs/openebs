@@ -3,6 +3,7 @@
 #Variables:
 machineip=
 hostname=`hostname`
+kubeversion="v1.7.5"
 
 function get_machine_ip(){
     ifconfig | \
@@ -13,7 +14,7 @@ function get_machine_ip(){
 
 function setup_k8s_master() {
     sudo kubeadm init --apiserver-advertise-address=$machineip \
-    --kubernetes-version=v1.7.0
+    --kubernetes-version=$kubeversion
 }
 
 function update_hosts(){

@@ -111,6 +111,10 @@ Vagrant.configure("2") do |config|
     privileged: true
 
     config.vm.provision :shell, 
+    path: "boxes/k8s-dashboard/fetch_dashboard.sh",
+    privileged: true
+
+    config.vm.provision :shell, 
     path: "boxes/k8s-weave/fetch_weave.sh",
     privileged: true
 
