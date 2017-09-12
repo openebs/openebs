@@ -102,6 +102,8 @@ The connection error is expected. The next step will configure the kubectl to co
 vagrant ssh kubemaster-01 -c "cat ~/.kube/config" > demo-kube-config
 ```
 
+*Note: If you have a single kubernetes cluster on your host, you could copy the demo-kube-config to ~/.kube/config, and avoid specifiying the parameter --kubeconfig in the kubectl commands*
+
 ### Verify
 
 ```
@@ -122,5 +124,40 @@ Starting to serve on 127.0.0.1:8001
 
 Launch the URL http://127.0.0.1:8001/ui
 
+**Your local kubernetes cluster with dashboard is ready. The below steps are required only if you would like to run stateful applications with OpenEBS**
 
+## Setup OpenEBS
+
+Fetch the latest *openebs-operator.yaml* and *openebs-storageclasses.yaml* [github - openebs/openebs](../)
+
+```
+wget https://raw.githubusercontent.com/openebs/openebs/master/k8s/openebs-operator.yaml
+wget https://raw.githubusercontent.com/openebs/openebs/master/k8s/openebs-storageclasses.yaml
+```
+
+Load the OpenEBS operator and storage classes onto your kubernetes cluster
+
+```
+kubectl --kubeconfig ./demo-kube-config apply -f openebs-operator.yaml
+kubectl --kubeconfig ./demo-kube-config apply -f openebs-storageclasses.yaml
+```
+
+### Verify
+
+On successful run of the above commands, you will see output like below:
+
+```
+kiran@kmaya:~/k8s-demo$ kubectl --kubeconfig ./demo-kube-config apply -f openebs-operator.yaml
+serviceaccount "openebs-maya-operator" created
+clusterrole "openebs-maya-operator" created
+clusterrolebinding "openebs-maya-operator" created
+deployment "maya-apiserver" created
+service "maya-apiserver-service" created
+deployment "openebs-provisioner" created
+kiran@kmaya:~/k8s-demo$ kubectl --kubeconfig ./demo-kube-config apply -f openebs-storageclasses.yaml 
+storageclass "openebs-basic" created
+storageclass "openebs-percona" created
+storageclass "openebs-jupyter" created
+kiran@kmaya:~/k8s-demo$ 
+```
 
