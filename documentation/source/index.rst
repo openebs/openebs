@@ -19,13 +19,8 @@ Contents:
     :caption: Setup
     
     Overview <install/install_overview>
-    Hosted Solutions
-      Google Cloud <install/install_google_cont>
-      Amazon Cloud <install/deploy_terraform_kops>
-    
-    On-Premise Solutions
-      Vagrant <install/install_local_mc>
-      Virtual Machines <install/deploy_premise>
+    Cloud Solutions <install/cloud_solutions>
+    On-Premise Solutions <install/on_premise_solutions>
   
     
 .. toctree::

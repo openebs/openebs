@@ -1,3 +1,8 @@
+.. _setup_openebs_instantly:
+
+Setting up OpenEBS Instantly
+============================
+
 This section allows you to setup OpenEBS instantly.
 
 Prerequisites:
