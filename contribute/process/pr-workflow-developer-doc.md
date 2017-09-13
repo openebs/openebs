@@ -72,6 +72,8 @@ git push origin master
 ## Create Branch
 ```
 git branch <branch_name>
+git checkout <branch_name>
+git push --set-upstream origin <branch_name>
 ```
 
 ## Synchronizing (or rebase) your local branch with remote(or upstream) master
