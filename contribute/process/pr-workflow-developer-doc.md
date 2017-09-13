@@ -44,7 +44,8 @@ You can also help with some existing issues under this category available at [de
 - Rebase your development branch 
 - Submit the PR from the development branch to the openebs/openebs:master
 - Incorporate review comments, if any, in the development branch. 
-- Once the PR is accepted, close the branch. 
+- Once the PR is accepted, close the branch.
+- After the PR is merged the development branch in the forked repository can be deleted.
 
 # Git Cheat Sheet 
 
@@ -68,6 +69,13 @@ git status
 git push origin master
 ```
 
+## Create Branch
+```
+git branch <branch_name>
+git checkout <branch_name>
+git push --set-upstream origin <branch_name>
+```
+
 ## Synchronizing (or rebase) your local branch with remote(or upstream) master
 ```
 git checkout <branch-name>
@@ -75,5 +83,11 @@ git fetch upstream master
 git rebase upstream/master
 git status
 git push
+```
+
+## Delete Branch
+```
+git push origin --delete <branch_name>
+git branch -d <branch_name>
 ```
 
