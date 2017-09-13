@@ -5,8 +5,8 @@ Cloud Solutions
 Amazon Cloud
 =============
 
-Setting up OpenEBS with Kubernetes on Google Container Engine
--------------------------------------------------------------
+Setting up OpenEBS with Kubernetes on Amazon EC2 Instances
+----------------------------------------------------------
 
 This section provides instructions to set up a Kubernetes cluster on Amazon Web Services (AWS) and to have OpenEBS running in hyper converged mode.
 
