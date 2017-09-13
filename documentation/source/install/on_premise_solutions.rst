@@ -137,6 +137,7 @@ Setup Environment for OpenEBS Installation
 * Edit the *inventory/machines.in* file to place the latest HostCode, IP, username variable, password variable for all the machines setup. For more details on editing *machines.in*, see the Inventory README.
 
 * Edit the global variables file *inventory/group_vars/all.yml* to reflect the desired storage volume properties and network CIDR that will be used by the maya api server to allot the IP for the volume containers. Also update the ansible run-time properties to reflect the machine type (is_vagrant), whether the playbook execution needs to be recorded using the Ansible Run Analysis framework (setup_ara), whether slack notifications are needed (in case they are required, a $SLACK_TOKEN env variable needs to be setup. The token is usually the last part of the slack webhook URL which is user generated) and so on.
+
 * (Optional) Execute the setup_ara playbook to install the ARA notification plugins and custom modules. This step will cause changes to the ansible configuration file *ansible.cfg* (though a backup will be taken at the time of execution in case you need to revert). A web URL is provided as a playbook run message at the end of the ara setup procedure, which can be used to track all the playbook run details after this point.
   ::
       testuser@OpenEBSClient:~/openebs/e2e/ansible$ ansible-playbook setup_ara.yml
@@ -152,22 +153,25 @@ Setup Environment for OpenEBS Installation
         testuser@OpenEBSClient:~/openebs/e2e/ansible/inventory$ ls -ltr hosts
         -rw-rw-r-- 1 testuser testuser 1482 Jun  5 10:00 hosts
 
-* OpenEBS installation can be performed in dedicated mode, where the Kubernetes and OpenEBS clusters are setup individually on the Linux boxes (same or distinct) OR in hyperconverged mode, where the OpenEBS storage services run as pods on the Kubernetes cluster itself.
+* OpenEBS installation can be performed 
+.. in dedicated mode, where the Kubernetes and OpenEBS clusters are setup individually on the Linux boxes (same or distinct) OR 
 
-The subsequent sections explain the installation procedure for both the dedicated and hyperconverged mode.
+in hyperconverged mode, where the OpenEBS storage services run as pods on the Kubernetes cluster itself.
 
-OpenEBS Installation - Dedicated Mode
+The subsequent section explains the installation procedure for hyperconverged mode.
+
+.. OpenEBS Installation - Dedicated Mode
 -------------------------------------
 * Update the *inventory/group_vars/all.yml* with the appropriate value ("dedicated") for the key "deployment_mode".
 
-* Execute the setup-kubernetes ansible playbook to create the kubernetes cluster followed by the setup-openebs playbook to install the maya-apiserver and openebs storage cluster. These playbooks install the requisite dependencies on the machines, update the configuration files on the boxes and sets it up to serve applications.
+.. * Execute the setup-kubernetes ansible playbook to create the kubernetes cluster followed by the setup-openebs playbook to install the maya-apiserver and openebs storage cluster. These playbooks install the requisite dependencies on the machines, update the configuration files on the boxes and sets it up to serve applications.
   ::
      testuser@OpenEBSClient:~/openebs/e2e/ansible$ ansible-playbook setup-kubernetes.yml 
      testuser@OpenEBSClient:~/openebs/e2e/ansible$ ansible-playbook setup-kubernetes.yml 
 
-* Verify that the Kubernetes and OpenEBS clusters are running with the nodes having joined the masters.
+.. * Verify that the Kubernetes and OpenEBS clusters are running with the nodes having joined the masters.
 
-  Check status of the Kubernetes cluster
+..  Check status of the Kubernetes cluster
   ::
        name@KubeMaster:~$ kubectl get nodes
        NAME         STATUS    AGE       VERSION
@@ -175,15 +179,15 @@ OpenEBS Installation - Dedicated Mode
        kubehost02   Ready     2d        v1.6.3
        kubemaster   Ready     2d        v1.6.3
 
-  Check status of the maya-master and OpenEBS storage nodes
+..  Check status of the maya-master and OpenEBS storage nodes
   ::
         name@MayaMaster:~$ maya omm-status
         Name               Address      Port  Status  Leader  Protocol  Build  Datacenter  Region
         MayaMaster.global  20.10.49.11  4648  alive   true    2         0.5.5  dc1         global
 
-        m-apiserver listening at http://20.10.49.11:5656
+..        m-apiserver listening at http://20.10.49.11:5656
 
-        name@MayaMaster:~$ maya osh-status
+..        name@MayaMaster:~$ maya osh-status
         ID        DC   Name        Class   Drain  Status
         564dfe3c  dc1  MayaHost01  <none>  false  ready
         564dd2e3  dc1  MayaHost02  <none>  false  ready
@@ -197,7 +201,20 @@ OpenEBS Installation - Hyperconverged Mode
 
   Applications can consume storage by specifying a persistent volume claim in which the storage class is an openebs-storage class.
 
-* Setup the Kubernetes cluster using the setup-kubernetes playbook, followed by the setup-openebs playbook (same commands as the dedicated installation explained in previous section) to deploy the openEBS pods. Internally, this runs the hyperconverged ansible role which executes the the openebs-operator and integrates openebs-storageclasses into the Kubernetes cluster.
+* Setup the Kubernetes cluster using the setup-kubernetes playbook, followed by the setup-openebs playbook to deploy the OpenEBS pods. Internally, this runs the hyperconverged ansible role which executes the openebs-operator and integrates openebs-storage classes into the Kubernetes cluster.
+
+  * Execute the setup-kubernetes ansible playbook to create the Kubernetes cluster followed by the    setup-openebs playbook. These playbooks install the requisite dependencies on the machines, update the configuration files on the boxes and sets up Kubernetes cluster.
+    ::
+       testuser@OpenEBSClient:~/openebs/e2e/ansible$ ansible-playbook setup-kubernetes.yml 
+       testuser@OpenEBSClient:~/openebs/e2e/ansible$ ansible-playbook setup-kubernetes.yml 
+
+  * Check status of the Kubernetes cluster
+    ::
+       name@KubeMaster:~$ kubectl get nodes
+       NAME         STATUS    AGE       VERSION
+       kubehost01   Ready     2d        v1.6.3
+       kubehost02   Ready     2d        v1.6.3
+       kubemaster   Ready     2d        v1.6.3
 
 * Verify that the Kubernetes cluster is running using the kubectl get nodes command.
 
@@ -222,10 +239,9 @@ OpenEBS Installation - Hyperconverged Mode
 
 Run Sample Applications on the OpenEBS Setup
 --------------------------------------------
-
 * Test the OpenEBS setup installed using the above procedure by deploying a sample application pod.
 
-* *run-dedicated-tests.yml* can be used to run tests on the dedicated installation and *run-hyperconverged-tests.yml* on the hyperconverged installation.
+* *run-hyperconverged-tests.yml* can be used to run tests on the hyperconverged installation.
 
 * By default, all tests are commented in the above playbooks. Uncomment the desired test and execute the playbook. In the example below, a percona mysql DB is deployed on a hyperconverged installation.
   ::
@@ -242,7 +258,7 @@ Run Sample Applications on the OpenEBS Setup
      pvc-4644787a-5b1f-11e7-bf1c-000c298ff5fc-rep-871457607-l392p    1/1       Running   0          2m
      pvc-4644787a-5b1f-11e7-bf1c-000c298ff5fc-rep-871457607-n9m73    1/1       Running   0          2m
 
-For dedicated installation, the application pod alone will be seen in the output when you use the previous command.
+.. For dedicated installation, the application pod alone will be seen in the output when you use the previous command.
 
 * For more details about the pod, execute the following command.
   ::
@@ -271,7 +287,7 @@ For dedicated installation, the application pod alone will be seen in the output
          0|     3|     0.000|     1.109|      0.000|     10.602|          0|        378|
       name@MayaMaster:~$
 
-In case of dedicated installations, the maya vsm-list and maya vsm-stats commands can be executed directly on the maya server host console.
+.. In case of dedicated installations, the maya vsm-list and maya vsm-stats commands can be executed directly on the maya server host console.
 
 Tips and Gotchas
 ----------------
