@@ -2,11 +2,11 @@
 On-Premise Solutions
 ******************
 
-Vagrant
-=======
+Using Vagrant
+=============
 
-Using OpenEBS with Kubernetes on Local Machine
-----------------------------------------------
+Setting Up OpenEBS with Kubernetes on Local Machine
+---------------------------------------------------
 The following procedure helps you setup and use OpenEBS on a local machine:
 
 1. Install Vagrant Box
@@ -64,11 +64,11 @@ The *ubuntu@kubemaster-01:~$ kubectl apply -f demo/jupyter/demo-jupyter-openebs.
 
 
 
-Virtual Machines
-=================
+Using Ansible
+=============
 
-Setting up OpenEBS On-Premise
------------------------------
+Setting Up OpenEBS on Ubuntu Hosts or Virtual Machines
+------------------------------------------------------
 This section provides detailed instructions on how to perform the OpenEBS on-premise deployment. The objective of this procedure is to have the following functional.
 
 * Kubernetes cluster (K8s master & K8s minions/host) configured with the OpenEBS iSCSI flexvol driver,
