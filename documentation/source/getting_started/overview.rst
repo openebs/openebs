@@ -6,7 +6,7 @@ OpenEBS is a storage platform, written in GoLang, to deliver persistent block st
 **See Also:**
 
 Changelog_
-          .. _Changelog: http://openebs.readthedocs.io/en/latest/release_notes/releasenotes.html
+          .. _Changelog: https://github.com/openebs/openebs/releases
 
 
 .. <<TBD>> Include why OpenEBS/Benefits <<TBD>>
