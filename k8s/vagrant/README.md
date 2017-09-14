@@ -1,23 +1,23 @@
 # Installing Kubernetes Clusters on Ubuntu 16.04 using Vagrant
 
-OpenEBS provides vagrant boxes with prepackaged kuberentes images. There are different vagrant boxes created depending on the kubernetes release. The Vagrantfiles are organized here based on the kubernetes version used by the box. 
+OpenEBS provides vagrant boxes with prepackaged Kuberentes images. There are different vagrant boxes created depending on the Kubernetes release. The Vagrantfiles are organized here based on the Kubernetes version used by the box. 
 
-This Vagrantfile can be used on any machine with Virtualization Enabled, like laptop or baremetal server. 
+This Vagrantfile can be used on any machine with Virtualization *Enabled*, like laptop or baremetal server. 
 
-The below instructions will walk you through the following:
-- Verify Prerequisites
+Procedures listed in this section helps you -
+- Verify prerequisites
 - Download Vagrantfile
-- Bringup K8s Cluster
+- Setup Kubernetes Cluster
 - Install kubectl on the host 
-- Setup access to Kubernetes UI/Dashboard (Starting from Vagrantfile 1.7.5)
+- Setup access to Kubernetes UI/Dashboard (Vagrantfile version 1.7.5 onwards)
 - Setup OpenEBS
 - Launch demo pod
 
 *Note: The instructions are from an Ubuntu 16.06 host.*
 
-## Prerequisites
+## Prerequisites:
 
-Verify that you have the following required software installed on your Ubuntu 16.04 machine:
+Verify that you have the following software installed on your Ubuntu 16.04 machine:
 ```
 1.Vagrant (>=1.9.1)
 2.VirtualBox 5.1
@@ -25,7 +25,7 @@ Verify that you have the following required software installed on your Ubuntu 16
 
 ## Download and Verify 
 
-Download the required Vagrantfile. Use curl or wget or git, etc., to download the required Vagrantfile. This example uses wget.
+Download the required Vagrantfile. Use curl, wget, git and so on, to download the required Vagrantfile. This example uses wget.
 
 ```
 mkdir k8s-demo
@@ -60,7 +60,7 @@ ubuntu-host:~/k8s-demo$ vagrant up
 
 ### Verify
 
-You should see output similar to this:
+The output displayed will be similar to the following:
 ```
 kiran@kmaya:~/k8s-demo$ vagrant status
 Current machine states:
@@ -75,12 +75,12 @@ VM, run `vagrant status NAME`.
 kiran@kmaya:~/k8s-demo$ 
 ```
 
-## Install kubectl on the host
+## Install kubectl on the Host
 
-Please follow the instructions for [install kubectl from binary](https://kubernetes.io/docs/tasks/tools/install-kubectl/#install-kubectl-binary-via-curl).
+Follow the procedures for [installing kubectl from binary](https://Kubernetes.io/docs/tasks/tools/install-kubectl/#install-kubectl-binary-via-curl).
 
 ```
-curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
+curl -LO https://storage.googleapis.com/Kubernetes-release/release/$(curl -s https://storage.googleapis.com/Kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
 chmod +x ./kubectl
 sudo mv ./kubectl /usr/local/bin/kubectl
 ```
@@ -94,15 +94,15 @@ The connection to the server localhost:8080 was refused - did you specify the ri
 kiran@kmaya:~/k8s-demo$ 
 ```
 
-The connection error is expected. The next step will configure the kubectl to contact the kubernetes cluster. 
+The connection error is expected. The next step will configure the kubectl to contact the Kubernetes cluster. 
 
-## Configure kube-config from the installed cluster
+## Configure kube-config from the Installed Cluster
 
 ```
 vagrant ssh kubemaster-01 -c "cat ~/.kube/config" > demo-kube-config
 ```
 
-*Note: If you have a single kubernetes cluster on your host, you could copy the demo-kube-config to ~/.kube/config, and avoid specifiying the parameter --kubeconfig in the kubectl commands*
+*Note: If you have a single Kubernetes cluster on your host, you could copy the demo-kube-config to ~/.kube/config, and avoid specifiying the parameter --kubeconfig in the kubectl commands*
 
 ### Verify
 
@@ -124,7 +124,7 @@ Starting to serve on 127.0.0.1:8001
 
 Launch the URL http://127.0.0.1:8001/ui
 
-**Your local kubernetes cluster with dashboard is ready. The below steps are required only if you would like to run stateful applications with OpenEBS**
+**Your local Kubernetes cluster with dashboard is ready. The below steps are required only if you would like to run stateful applications with OpenEBS**
 
 ## Setup OpenEBS
 
@@ -135,7 +135,7 @@ wget https://raw.githubusercontent.com/openebs/openebs/master/k8s/openebs-operat
 wget https://raw.githubusercontent.com/openebs/openebs/master/k8s/openebs-storageclasses.yaml
 ```
 
-Load the OpenEBS operator and storage classes onto your kubernetes cluster
+Load the OpenEBS operator and storage classes onto your Kubernetes cluster
 
 ```
 kubectl --kubeconfig ./demo-kube-config apply -f openebs-operator.yaml
