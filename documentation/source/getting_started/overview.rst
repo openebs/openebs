@@ -1,3 +1,4 @@
+.. _Getting-Started:
 
 Introducing OpenEBS
 ===================
