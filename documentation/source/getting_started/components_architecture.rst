@@ -1,3 +1,5 @@
+.. _Components and Architecture:
+
 Components and Architecture
 ===========================
 This section includes OpenEBS components and architecture.

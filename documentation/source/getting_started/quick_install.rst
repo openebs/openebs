@@ -1,7 +1,7 @@
-.. _setup_openebs_instantly:
+.. _quick-start:
 
-Setting up OpenEBS Instantly
-============================
+Quick Start
+===========
 
 This section allows you to setup OpenEBS instantly.
 

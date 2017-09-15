@@ -12,6 +12,6 @@ The Kubernetes documentation provides you various Kubernetes installation option
 
        .. _Setup: https://kubernetes.io/docs/setup/
 
-If you are already an experienced Kubernetes user, you can easily setup OpenEBS on your existing Kubernetes cluster with a few simple kubectl commands. See, :ref:`setup_openebs_instantly`.
+If you are already an experienced Kubernetes user, you can easily setup OpenEBS on your existing Kubernetes cluster with a few simple kubectl commands. See, :ref:`quick-start`.
 
 We are looking for help from the community in including additional platforms where OpenEBS has been successfully deployed. Please share your story through GitHub `Issues <https://github.com/openebs/openebs/issues>`_ or `Pull requests <https://github.com/openebs/openebs/pulls>`_.
