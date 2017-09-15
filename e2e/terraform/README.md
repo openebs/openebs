@@ -17,7 +17,7 @@ People who already have an AWS account can skip the above step.
 - Select *IAM* under *Security, Identity & Compliance*.
 - In the *Dashboard*, click *Users*.
 - Click *Add User* button.
-- In the *User name* textbox, enter *openebsuser01* as the username.
+- In the *User name* textbox, type the name of the user you want to create. For Example: *openebsuser*
 - Select *Access Type* as *Programmatic access*.
 - Click *Next Permissions*.
 - Select *Attach existing policies directly*.
@@ -25,13 +25,13 @@ People who already have an AWS account can skip the above step.
 - Click *Next Review*.
 - Click *Create User*.
 
-A user, named *openebsuser01* will be created and an *Access key ID* and a *Secret access key*
+A user, named *openebsuser* will be created and an *Access key ID* and a *Secret access key*
 will be assigned.
 
 ```
 Example:
 User              Access key ID             Secret access key
-openebsuser01     AKIAI3MRLHNGU6CNKJQE      udxZi33tvSptXCky31kEt4KLRS6LSMMsmmdLx501
+openebsuser     AKIAI3MRLHNGUExample      udxZi33tvSptXCky31kEt4KLRS6LSMMsmExample
 ```
 
 >Note the *Access key ID* and the *Secret access key* as AWS will not display it again.
@@ -52,15 +52,20 @@ List the operations performed by the script:
 ```
 $ ./oebs-cloud.sh
 Usage : oebs-cloud.sh --setup-local-env
-        oebs-cloud.sh --create-cluster-config
-        oebs-cloud.sh --ssh-aws-ec2
+        oebs-cloud.sh --create-cluster-config [--ami-vm-os=[ubuntu|coreos]]
+        oebs-cloud.sh --list-aws-instances
+        oebs-cloud.sh --ssh-aws-ec2 [ ipaddress|=ipaddress]
+        oebs-cloud.sh --help
 
 Sets Up OpenEBS On AWS
 
 -h|--help                       Display this help and exit.
 --setup-local-env               Sets up, AWSCLI, Terraform and KOPS.
 --create-cluster-config         Generates a terraform file(.tf) and Passwordless SSH
---ssh-aws-ec2                   SSH to Kubernetes Master on EC2 instance.
+--ami-vm-os                     The OS to be used for the Amazon Machine Image.
+                                Defaults to Ubuntu.
+--list-aws-instances            Outputs the list of AWS instances in the cluster.
+--ssh-aws-ec2                   SSH to Amazon EC2 instance with Public IP Address.
 
 ```
 
@@ -80,7 +85,7 @@ The command will install the below tools on the workstation:
 
 The tools `awscli` and `kops` require the AWS credentials to access AWS services.
 
-- Use the credentials that were generated earlier for the user *openebsuser01*.
+- Use the credentials that were generated earlier for the user *openebsuser*.
 - Add path */usr/local/bin* to the PATH environment variable.
 
 ```
@@ -99,7 +104,7 @@ $ source ~/.profile
 ## Creating the Config For Cluster
 - We will be generating a terraform file(.tf) that will later spawn:
   - One Master
-  - Two Minion
+  - Two Nodes
 - Run the following command in a terminal.
 
 ```
@@ -108,6 +113,12 @@ $ ./oebs-cloud.sh --create-cluster-config
 
 - A terraform file `kubernetes.tf` is generated in the same directory.
 - Passwordless SSH connection between the local workstation and the remote EC2 instances is established.
+
+```
+Note:
+- The script uses *t2.micro* instance for the worker nodes, which should be well within the **Amazon Free Tier** limits.
+- But for process intensive containers you may have to modify the script to use *m3.large* instances, which could be charged.
+```
 
 ## Create Cluster on AWS using Terraform
 
@@ -158,19 +169,12 @@ ip-172-20-37-115.ec2.internal   Ready     1m        v1.7.0
 ip-172-20-53-140.ec2.internal   Ready     3m        v1.7.0
 ```
 
-- This will output any cluster information if the cluster was already created.
-- Download the *openebs-operator* and *openebs-storage-classes* yamls from the below location.
+OpenEBS is already deployment by the time you are logged into AWS (Amazon Web Services).
 
 ```
-wget https://raw.githubusercontent.com/openebs/openebs/master/k8s/openebs-operator.yaml
-wget https://raw.githubusercontent.com/openebs/openebs/master/k8s/openebs-storageclasses.yaml
-```
+ubuntu@ip-172-20-53-140:~$ kubectl get pods
+NAME                     READY     STATUS    RESTARTS   AGE
+maya-apiserver-h714w      1/1       Running   0          12m
+openebs-provisioner-5e6ij 1/1       Running   0          9m
 
-- Apply *openebs-operator* and *openebs-storage-classes* to the Kubernetes cluster.
-
 ```
-kubectl create -f openebs-operator.yaml
-kubectl create -f openebs-storageclasses.yaml
-```
-
-We should now have a working OpenEBS deployment on AWS (Amazon Web Services.)
