@@ -17,7 +17,7 @@ People who already have an AWS account can skip the above step.
 - Select *IAM* under *Security, Identity & Compliance*.
 - In the *Dashboard*, click *Users*.
 - Click *Add User* button.
-- In the *User name* textbox, type the name of the user you want to create. For Example: *openebsuser*
+- In the *User name* textbox, enter the name of the user you want to create. For example, *openebuser*.
 - Select *Access Type* as *Programmatic access*.
 - Click *Next Permissions*.
 - Select *Attach existing policies directly*.
