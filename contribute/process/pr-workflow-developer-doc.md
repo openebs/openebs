@@ -37,7 +37,8 @@ You can also help with some existing issues under this category available at [de
 
 ## Commit your changes
 - Reference the issue number along with a brief description in your commits
-- Set your commit.template to the `commit_template` file with `git config --local commit.template commit_template`
+- Set your commit.template to the `COMMIT_TEMPLATE` given in the `.github` directory.
+  `git config --local commit.template $GOPATH/src/github.com/openebs/openebs/.github`
 
 ## Submit a Pull request. 
 - Rebase your development branch 
