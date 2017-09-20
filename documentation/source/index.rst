@@ -10,7 +10,7 @@ Contents:
     :caption: Getting Started
 
 
-    Introducing OpenEBS <getting_started/overview>
+    OpenEBS Introduction <getting_started/overview>
     Components and Architecture <getting_started/components_architecture>
     Quick Install <getting_started/quick_install>
     
