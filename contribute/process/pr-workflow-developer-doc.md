@@ -36,9 +36,8 @@ You can also help with some existing issues under this category available at [de
      This change is being developed with the branch named : OpenEBS-DevDoc-PR-Workflow-#213
 
 ## Commit your changes
-- Reference the issue number along with a brief description in your commits 
-- The commit summary should be within 50 characters
-- A detailed commit message COULD be included explaining details in each file. 
+- Reference the issue number along with a brief description in your commits
+- Set your commit.template to the `commit_template` file with `git config --local commit.template commit_template`
 
 ## Submit a Pull request. 
 - Rebase your development branch 
