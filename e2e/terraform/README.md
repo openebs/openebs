@@ -102,6 +102,7 @@ $ source ~/.profile
 ```
 
 ## Creating the Config For Cluster
+
 - We will be generating a terraform file(.tf) that will later spawn:
   - One Master
   - Two Nodes
@@ -111,6 +112,8 @@ $ source ~/.profile
 $ ./oebs-cloud.sh --create-cluster-config
 ```
 
+- Running `--create-cluster-config` without any arguments defaults to `Ubuntu`.
+  - `--create-cluster-config` can be run with `--ami-vm-os=ubuntu` or `--ami-vm-os=coreos`.
 - A terraform file `kubernetes.tf` is generated in the same directory.
 - Passwordless SSH connection between the local workstation and the remote EC2 instances is established.
 
@@ -147,32 +150,81 @@ Common commands:
   - Fix these errors and re-verify with `terraform plan` before running the `terraform apply` command.
 - Run the command `terraform apply` to initiate creation of the infrastructure.
 
-## SSH to the Master Node
+## List AWS EC2 instances
+
+- From your workstation, run the following command to list the created AWS EC2 instances.
+
+```
+$ ./oebs-cloud.sh --list-aws-instances
+      Node                     Private IP Address   Public IP Address    
+nodes.openebs.k8s.local          172.20.36.126        54.90.239.23         
+nodes.openebs.k8s.local          172.20.37.115        34.224.169.116       
+masters.openebs.k8s.local        172.20.53.140        34.202.205.27        
+
+```
+
+## SSH to the Kubernetes Node
 
 - From your workstation, run the following command to connect to the EC2 instance running the Kubernetes Master.
 
+**For Ubuntu**
+
 ```
 $ ./oebs-cloud.sh --ssh-aws-ec2
+Welcome to Ubuntu 16.04 LTS (GNU/Linux 4.4.0-93-generic x86_64)
+ubuntu@ip-172-20-53-140 ~ $
 ```
 
-- You should now be running inside the EC2 instance.
+**For CoreOS**
+
+```
+$ ./oebs-cloud.sh --ssh-aws-ec2
+Container Linux by CoreOS stable (1465.6.0)
+core@ip-172-20-53-140 ~ $
+```
+
+- Running `--ssh-aws-ec2` without any arguments, by default connects you to the Kubernetes Master.
+    - `--ssh-aws-ec2` can also be run as `--ssh-aws-ec2=ipaddress`, where `ipaddress` is the Public IPAddress of the AWS EC2 instance.
+- You should now be running inside the AWS EC2 instance.
 
 ## Deploy OpenEBS on AWS
 
 Deploying OpenEBS requires Kubernetes to be already running on the EC2 instances. Verify if a Kubernetes cluster has been created.
 
+**For Ubuntu**
+
 ```
 ubuntu@ip-172-20-53-140:~$ kubectl get nodes 
 NAME                            STATUS    AGE       VERSION 
-ip-172-20-36-126.ec2.internal   Ready     1m        v1.7.0 
-ip-172-20-37-115.ec2.internal   Ready     1m        v1.7.0 
-ip-172-20-53-140.ec2.internal   Ready     3m        v1.7.0
+ip-172-20-36-126.ec2.internal   Ready     1m        v1.7.2 
+ip-172-20-37-115.ec2.internal   Ready     1m        v1.7.2 
+ip-172-20-53-140.ec2.internal   Ready     3m        v1.7.2
 ```
 
 OpenEBS is already deployment by the time you are logged into AWS (Amazon Web Services).
 
 ```
 ubuntu@ip-172-20-53-140:~$ kubectl get pods
+NAME                     READY     STATUS    RESTARTS   AGE
+maya-apiserver-h714w      1/1       Running   0          12m
+openebs-provisioner-5e6ij 1/1       Running   0          9m
+
+```
+
+**For CoreOS**
+
+```
+core@ip-172-20-53-140:~$ kubectl get nodes 
+NAME                            STATUS    AGE       VERSION 
+ip-172-20-36-126.ec2.internal   Ready     1m        v1.7.2 
+ip-172-20-37-115.ec2.internal   Ready     1m        v1.7.2 
+ip-172-20-53-140.ec2.internal   Ready     3m        v1.7.2
+```
+
+OpenEBS is already deployment by the time you are logged into AWS (Amazon Web Services).
+
+```
+core@ip-172-20-53-140:~$ kubectl get pods
 NAME                     READY     STATUS    RESTARTS   AGE
 maya-apiserver-h714w      1/1       Running   0          12m
 openebs-provisioner-5e6ij 1/1       Running   0          9m

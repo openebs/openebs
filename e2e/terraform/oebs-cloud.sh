@@ -66,6 +66,15 @@ resource "aws_security_group_rule" "allow_all_node_outbound" {
 EOF
 }
 
+function start_iscsi_services() {
+
+    cat <<'EOF' >>data/aws_launch_configuration_nodes.openebs.k8s.local_user_data
+sudo modprobe iscsi_tcp
+sudo systemctl start iscsid-initiatorname
+sudo systemctl start iscsid
+EOF
+}
+
 function setup_local_env() {
 
     echo "Installing Pre-requisites..."
@@ -192,6 +201,11 @@ function create_terraform_file() {
     --name=openebs.k8s.local
 
     add_network_rules
+
+    if [ "$ami_vm_os" = "coreos" ]; then
+        # CoreOS
+        start_iscsi_services
+    fi
     show_terraform_commands
 }
 
@@ -337,12 +351,6 @@ do
                         aws_instance_list
                         exit
                         ;;
-        
-#        --ssh-aws-ec2)  # Takes an option argument, ensuring it has been specified.
-#                        ssh_aws_ec2
-#                        exit
-#                        ;;
-
         --ssh-aws-ec2)  # Takes an option argument, 
                         # ensuring it has been specified.
                         if [ -n "$2" ]; then
