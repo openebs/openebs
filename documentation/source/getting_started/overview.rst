@@ -1,8 +1,20 @@
 .. _Getting-Started:
 
-Introducing OpenEBS
+OpenEBS Introduction
 ===================
-OpenEBS is a storage platform, written in GoLang, to deliver persistent block storage for container eco system. The storage itself is containerized through a storage POD concept called VSM or "Virtual Storage Machine". VSMs are scheduled and managed using an orchestrator engine called "Maya". VSMs are fully isolated user space storage engines that present the block storage at the front end through iSCSI, NBD or TCMU protocol and consume raw storage from a local OpenEBS host or remote storage.
+OpenEBS is a cloud native storage solution built with the goal of providing containerized storage for containers. Using OpenEBS, a developer can seamlessly get the persistent storage for the stateful applications with ease, much of it is automated, while using the popular orchestration platforms such as kubernetes.
+
+Persistent storage presents significant challenges to the developer interfacing with stateful applications such as databases. While a developer can get the initial needs of persistent storage using Docker volume plugin, kubernetes stateful sets etc, there is lots more to the storage needs of an application than just the connectivity. 
+
+Note: In the current release, the integration support is provided for kubernetes only. 
+
+Currently (OpenEBS 0.3 release), a DevOps developer gets the following from the OpenEBS solution
+
+- OpenEBS operator yaml file that installs the OpenEBS components onto a k8s cluster
+- A set of yaml files with example configuration of how to use OpenEBS storage classes 
+- A CLI for monitoring the persistent volume and its replica(s)
+
+Using the above tools, a developer can easily provision the persistent storage from the hostdir of the minion node. Much of the tasks for the developer are automated by the OpenEBS storage class,including, scheduling the volume and replicas on k8s minions, connectivity to the container via a mount point.
 
 **See Also:**
 
@@ -10,33 +22,3 @@ Changelog_
           .. _Changelog: https://github.com/openebs/openebs/releases
 
 
-.. <<TBD>> Include why OpenEBS/Benefits <<TBD>>
-
-..
-   Virtual Tour of OpenEBS
-   =======================
-  <<TBD>> Include video about OpenEBS <<TBD>>
-
-
-
-.. 
-  OpenEBS Usecases/Examples
-   =========================
-   <<TBD>>Can add examples about OpenEBS here and relevant examples with regards to various installations under specific sections.<<TBD>>
-
-.. 
-  Tools and Storage <<TBD>> To delete?? <<TBD>>
-  ==================
-
-  Built with the best tools
-  --------------------------
-
-  OpenEBS uses the best available infrastructure libraries underneath. Jiva (means "life" in Sanskrit) is the core software that runs inside the storage container. The core functionalities of Jiva include - Block storage protocol (iSCSI/TCMU/NBD) - Replication - Snapshotting - Caching to NVMe - Encryption - Backup/Restore - QoS Jiva inherits majority of its capabilities from Rancher Longhorn (https://github.com/rancher/longhorn). QoS, Caching, Backup/Restore capabilities are being added to Jiva.
-
-
-  Programmable storage
-  ----------------------
-
-  Maya is designed to have developer friendly interfaces to configure, deploy and manage the storage platform. Maya provides the configuration through YAML files and automation is made possible through ansible and/or terraform
-
-  .. image:: _static/storage.png
