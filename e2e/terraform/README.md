@@ -101,7 +101,7 @@ PATH="$HOME/bin:$HOME/.local/bin:/usr/local/bin:$PATH"
 $ source ~/.profile
 ```
 
-## Creating the Configuration for Cluster
+## Creating the Configuration File for Cluster
 
 - The script will generate a terraform file(.tf) that will later spawn:
   - One Master
