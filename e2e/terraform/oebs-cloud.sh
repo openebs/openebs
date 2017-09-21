@@ -77,7 +77,7 @@ EOF
 
 function setup_local_env() {
 
-    echo "Installing Pre-requisites..."
+    echo "Installing Prerequisites..."
 
     sudo apt-get update
     sudo apt-get install -y unzip curl wget

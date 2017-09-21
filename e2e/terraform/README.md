@@ -2,9 +2,9 @@
 
 The purpose of this user guide is to provide the instructions to set up a Kubernetes cluster on AWS (Amazon Web Services) and have OpenEBS running in hyperconverged mode.
 
-## Pre-requisites
+## Prerequisites
 
-Perform the following procedure to setup-up the pre-requisites:
+Perform the following procedure to setup-up the prerequisites:
 
 **Amazon Web Services (AWS):**
 
@@ -101,9 +101,9 @@ PATH="$HOME/bin:$HOME/.local/bin:/usr/local/bin:$PATH"
 $ source ~/.profile
 ```
 
-## Creating the Config For Cluster
+## Creating the Configuration for Cluster
 
-- We will be generating a terraform file(.tf) that will later spawn:
+- The script will generate a terraform file(.tf) that will later spawn:
   - One Master
   - Two Nodes
 - Run the following command in a terminal.
@@ -113,7 +113,7 @@ $ ./oebs-cloud.sh --create-cluster-config
 ```
 
 - Running `--create-cluster-config` without any arguments defaults to `Ubuntu`.
-  - `--create-cluster-config` can be run with `--ami-vm-os=ubuntu` or `--ami-vm-os=coreos`.
+  - You can also run `--create-cluster-config` with `--ami-vm-os=ubuntu` or `--ami-vm-os=coreos`.
 - A terraform file `kubernetes.tf` is generated in the same directory.
 - Passwordless SSH connection between the local workstation and the remote EC2 instances is established.
 
@@ -147,7 +147,7 @@ Common commands:
 - Run the command `terraform plan` from the directory where the generated terraform file (.tf) is placed.
   - `terraform` outputs a chunk of JSON data containing changes that would be applied on AWS.
   - `terraform plan` command verifies your terraform files (.tf) and outputs any errors that it encountered.
-  - Fix these errors and re-verify with `terraform plan` before running the `terraform apply` command.
+  - Fix these errors and verify again by running `terraform plan` before running the `terraform apply` command.
 - Run the command `terraform apply` to initiate creation of the infrastructure.
 
 ## List AWS EC2 instances
@@ -184,12 +184,12 @@ core@ip-172-20-53-140 ~ $
 ```
 
 - Running `--ssh-aws-ec2` without any arguments, by default connects you to the Kubernetes Master.
-    - `--ssh-aws-ec2` can also be run as `--ssh-aws-ec2=ipaddress`, where `ipaddress` is the Public IPAddress of the AWS EC2 instance.
+    - You can also run `--ssh-aws-ec2` as `--ssh-aws-ec2=ipaddress`, where `ipaddress` is the Public IPAddress of the AWS EC2 instance.
 - You should now be running inside the AWS EC2 instance.
 
 ## Deploy OpenEBS on AWS
 
-Deploying OpenEBS requires Kubernetes to be already running on the EC2 instances. Verify if a Kubernetes cluster has been created.
+Kubernetes must be running on the EC2 instances while deploying OpenEBS. Verify if a Kubernetes cluster is created.
 
 **For Ubuntu**
 
@@ -201,7 +201,7 @@ ip-172-20-37-115.ec2.internal   Ready     1m        v1.7.2
 ip-172-20-53-140.ec2.internal   Ready     3m        v1.7.2
 ```
 
-OpenEBS is already deployment by the time you are logged into AWS (Amazon Web Services).
+OpenEBS is deployed by the time you are logged into AWS (Amazon Web Services).
 
 ```
 ubuntu@ip-172-20-53-140:~$ kubectl get pods
@@ -221,7 +221,7 @@ ip-172-20-37-115.ec2.internal   Ready     1m        v1.7.2
 ip-172-20-53-140.ec2.internal   Ready     3m        v1.7.2
 ```
 
-OpenEBS is already deployment by the time you are logged into AWS (Amazon Web Services).
+OpenEBS is deployed by the time you are logged into AWS (Amazon Web Services).
 
 ```
 core@ip-172-20-53-140:~$ kubectl get pods
