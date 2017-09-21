@@ -123,7 +123,7 @@ Note:
 - But for process intensive containers you may have to modify the script to use *m3.large* instances, which could be charged.
 ```
 
-## Create Cluster on AWS using Terraform
+## Creating Cluster on AWS using Terraform
 
 - Run the following command to verify successful installation of `terraform`.
 
