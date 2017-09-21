@@ -44,3 +44,11 @@ Contents:
    
 
 ..   Changelog <release_notes/releasenotes>
+
+
+.. toctree::
+    :maxdepth: 1
+    :caption: Contributing to the OpenEBS Documents
+    
+
+    Contributing to the OpenEBS Documentation <contribute/contribute_openebs_doc>
