@@ -49,7 +49,8 @@ Creating an Issue
 Creating a Branch
 -----------------
 
-1. Go to the openebs fork (https://github.com/openebs/openebs) on Github and create a branch on the openebs fork using the following command.
+1. Create your openebs fork from (https://github.com/openebs/openebs). If you already have a forked           openebs, rebase with the master to get the latest changes. 
+2. Create a branch on the openebs fork using the following command.
    ::
      git checkout -b <issue name>-#<issue number>
 
