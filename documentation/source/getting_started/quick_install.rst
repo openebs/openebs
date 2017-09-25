@@ -5,7 +5,7 @@ Quick Start
 
 This section allows you to setup OpenEBS instantly.
 
-Prerequisites:
+Prerequisites
 --------------
 You must have the following:
 
