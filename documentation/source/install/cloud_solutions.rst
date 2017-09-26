@@ -14,8 +14,8 @@ Setting up OpenEBS with Kubernetes on Amazon Web Services
 
 This section provides instructions to set up a Kubernetes cluster on Amazon Web Services (AWS) and to have OpenEBS running in hyper converged mode.
 
-Prerequisites:
-^^^^^^^^^^^^^^
+Prerequisites
+^^^^^^^^^^^^^
 Perform the following procedure to setup the prerequisites for AWS.
 
 1.  Signup for AWS `here`_.
@@ -36,8 +36,8 @@ Perform the following procedure to setup the prerequisites for AWS.
 A *openebsuser* user will be created and an Access key ID and a Secret access key will be assigned as in the following example.
 ::
 
-    User              Access key ID             Secret access key
-    openebsuser01     AKIAI3MRLHNGUEXAMPLE      udxZi33tvSptXCky31kEt4KLRS6LSMMsmEXAMPLE
+     User              Access key ID             Secret access key
+     openebsuser     AKIAI3MRLHNGUEXAMPLE      udxZi33tvSptXCky31kEt4KLRS6LSMMsmEXAMPLE
 
 **Note:**
 
@@ -57,6 +57,14 @@ OpenEBS has created a script that does most of the work for you. Download the *o
 The list of operations performed by the *oebs-cloud.sh* script are as follows:
 ::
 
+     $ ./oebs-cloud.sh
+     Usage : 
+         oebs-cloud.sh --setup-local-env
+         oebs-cloud.sh --create-cluster-config [--ami-vm-os=[ubuntu|coreos]]
+         oebs-cloud.sh --list-aws-instances
+         oebs-cloud.sh --ssh-aws-ec2 [ ipaddress|=ipaddress]
+         oebs-cloud.sh --help
+
     $ ./oebs-cloud.sh
     Usage : 
        oebs-cloud.sh --setup-local-env
@@ -65,10 +73,13 @@ The list of operations performed by the *oebs-cloud.sh* script are as follows:
 
     Sets Up OpenEBS On AWS
 
-    -h|--help                       Displays this help and exits.
-    --setup-local-env               Sets up, AWSCLI, Terraform and KOPS.
-    --create-cluster-config         Generates a terraform file (.tf) and Passwordless SSH
-    --ssh-aws-ec2                   SSH to Kubernetes Master on EC2 instance.
+     -h|--help                       Displays this help and exits.
+     --setup-local-env               Sets up, AWSCLI, Terraform and KOPS.
+     --create-cluster-config         Generates a terraform file (.tf) and Passwordless SSH
+     --ami-vm-os                     The OS to be used for the Amazon Machine Image.
+                                     Defaults to Ubuntu.
+     --list-aws-instances            Outputs the list of AWS instances in the cluster.
+     --ssh-aws-ec2                   SSH to Amazon EC2 instance with Public IP Address.
 
 Running the following command allows you to install the required tools on your workstation.
 ::
@@ -110,7 +121,7 @@ Creating the Cluster Configuration
      * One Master
      * Two Nodes
 
-* Run the following command in a terminal:
+* Run the following command in a terminal.
 
 ::
 
@@ -131,22 +142,21 @@ Creating a Cluster on AWS using Terraform
 
 * Run the following command to verify successful installation of terraform.
 
-::
+  ::
 
-    $ terraform
-    Usage: terraform [--version] [--help] <comman> [args]
+     $ terraform
+     Usage: terraform [--version] [--help] <command> [args]
 
      The available commands for execution are listed below. The most common and useful 
      commands are shown first,followed by less common or more advanced commands. If you 
      are just getting started with Terraform, use the common commands. For other commands, 
      read the help and documentation before using them.
 
-Common commands:
-::
+     Common commands: 
 
-    apply              Builds or changes infrastructure
-    console            Interactive console for Terraform interpolations
-    # ...
+       apply              Builds or changes infrastructure
+       console            Interactive console for Terraform interpolations
+     # ...
 
 * Run the *terraform init* command to initialize terraform.
 * Run the *terraform plan* command from the directory where the generated terraform file (.tf) is placed.
@@ -158,12 +168,6 @@ Common commands:
 
 List AWS EC2 Instances
 ^^^^^^^^^^^^^^^^^^^^^^
-* From your workstation, run the following command to connect to the EC2 instance running the Kubernetes Master.
-
-::
-
-    $ ./oebs-cloud.sh --ssh-aws-ec2
-
 From your workstation, run the following command to list the AWS EC2 instances created.
 ::
 
@@ -179,18 +183,38 @@ SSH to the Kubernetes Node
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 From your workstation, run the following commands to connect to the EC2 instance running the Kubernetes Master.
 
-* Verify if Kubernetes cluster is created.
-
+**For Ubuntu**
 ::
 
-    ubuntu@ip-172-20-53-140:~$ kubectl get nodes 
-    NAME                            STATUS    AGE       VERSION 
-    ip-172-20-36-126.ec2.internal   Ready     1m        v1.7.0 
-    ip-172-20-37-115.ec2.internal   Ready     1m        v1.7.0 
-    ip-172-20-53-140.ec2.internal   Ready     3m        v1.7.0
+  $ ./oebs-cloud.sh --ssh-aws-ec2
+  Welcome to Ubuntu 16.04 LTS (GNU/Linux 4.4.0-93-generic x86_64)
+  ubuntu@ip-172-20-53-140 ~ $
 
-* This will output cluster information if the cluster was already created.
-* Download the *openebs-operator* and *openebs-storage-classes* YAMLs from the locations listed below:
+**For CoreOS**
+::
+
+  $ ./oebs-cloud.sh --ssh-aws-ec2
+  Container Linux by CoreOS stable (1465.6.0)
+  core@ip-172-20-53-140 ~ $
+
+Running *--ssh-aws-ec2* command without any arguments, by default, connects you to the Kubernetes Master. 
+
+You can also run *--ssh-aws-ec2* command as *--ssh-aws-ec2=ipaddress*, where *ipaddress* is the Public IP Address of the AWS EC2 instance.
+
+You should now be running inside the AWS EC2 instance.
+
+Deploying OpenEBS on AWS
+^^^^^^^^^^^^^^^^^^^^^^^^^^ 
+Kubernetes must be running on the EC2 instances while deploying OpenEBS. Verify if a Kubernetes cluster is created.
+
+**For Ubuntu** 
+::
+
+     ubuntu@ip-172-20-53-140:~$ kubectl get nodes 
+     NAME                            STATUS    AGE       VERSION 
+     ip-172-20-36-126.ec2.internal   Ready     1m        v1.7.2 
+     ip-172-20-37-115.ec2.internal   Ready     1m        v1.7.2 		 
+     ip-172-20-53-140.ec2.internal   Ready     3m        v1.7.2 
 
 OpenEBS is deployed by the time you log in to Amazon Web Services (AWS).
 ::
