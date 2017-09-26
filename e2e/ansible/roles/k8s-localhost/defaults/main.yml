@@ -12,17 +12,12 @@ pip_local_packages:
 # Links for .deb packages that will be installed on all K8s boxes (masters, minions), i.e, 
 # these packages will be copied into kubernetes role's .files
 
-k8s_deb_packages:
-  - https://packages.cloud.google.com/apt/pool/kubeadm_{{ k8s_version }}-00_amd64_ff5e882c88a5db71803aab900c0b341eb63038558da73c51c3d351070b0c62af.deb
-  - https://packages.cloud.google.com/apt/pool/kubectl_{{ k8s_version }}-00_amd64_05d48fa118b6538ee2bc0b864aeb09f2cede83990fc8819875f698a5dece0c9b.deb
-  - https://packages.cloud.google.com/apt/pool/kubelet_{{ k8s_version }}-00_amd64_a94b0cfa5b26939d87097dfd45260474c1effcad879e35940eb6d36e7d953d6c.deb
-  - https://packages.cloud.google.com/apt/pool/kubernetes-cni_0.5.1-00_amd64_08cbe5c42366ec3184cc91a4353f6e066f2d7325b4db1cb4f87c7dcc8c0eb620.deb
+k8s_cni_deb_package: https://packages.cloud.google.com/apt/pool/kubernetes-cni_0.5.1-00_amd64_08cbe5c42366ec3184cc91a4353f6e066f2d7325b4db1cb4f87c7dcc8c0eb620.deb
 
 k8s_deb_package_alias:
   - kubeadm.deb
   - kubectl.deb
   - kubelet.deb
-  - kubernetes-cni.deb
 
 # Container images that needs to be placed on all K8s boxes (masters, minions)
 # These images will be downloaded, tar'ed and pushed into the kubernetes role's .files

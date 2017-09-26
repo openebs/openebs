@@ -31,9 +31,13 @@
 
 ## kubernetes role preparation
 
+- name: Get .deb package details
+  shell: "curl -s https://packages.cloud.google.com/apt/dists/kubernetes-xenial/main/binary-amd64/Packages | grep _{{ k8s_version }} | awk '{print $2}' | cut -d '/' -f2"
+  register: k8s_deb_packages
+
 - name: Get .deb kubernetes packages google cloud 
   get_url: 
-    url: "{{ item.0 }}"
+    url: "https://packages.cloud.google.com/apt/pool/{{ item.0 }}"
     dest: "{{ playbook_dir }}/roles/kubernetes/files/{{item.1}}"
     force: yes
   register: result
@@ -41,8 +45,18 @@
   delay: 5
   retries: 3
   with_together: 
-    - "{{ k8s_deb_packages }}"
+    - "{{ k8s_deb_packages.stdout_lines }}"
     - "{{ k8s_deb_package_alias }}"
+
+- name: Get CNI .deb package from google cloud
+  get_url:
+    url: "{{k8s_cni_deb_package}}"
+    dest: "{{ playbook_dir }}/roles/kubernetes/files/kubernetes-cni.deb"
+    force: yes
+  register: result
+  until: "'OK' in result.msg"
+  delay: 5
+  retries: 3
 
 - name: Check whether deb packages and images are already downloaded
   stat: 
