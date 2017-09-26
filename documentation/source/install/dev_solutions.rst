@@ -145,3 +145,12 @@ Some sample YAML files for stateful workloads using OpenEBS are provided in the 
         
   .. _openebs/k8s/demo: https://github.com/openebs/openebs/tree/master/k8s/demo
 
+By default, OpenEBS launches OpenEBS Volumes with two replicas. To set one replica, as is the case with single-node Kubernetes cluster, modify the PVC spec of your applications as follows:
+::
+    kind: PersistentVolumeClaim
+    apiVersion: v1
+    metadata:
+      name: my-jiva-vsm
+        labels:
+            volumeprovisioner.mapi.openebs.io/replica-count: 1
+
