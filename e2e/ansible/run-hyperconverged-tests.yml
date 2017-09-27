@@ -31,6 +31,13 @@
 - include: playbooks/hyperconverged/test-k8s-crunchy-postgres/k8s-crunchy-pg.yml
 #
 ###########################################################################################
+# TC NAME: libiscsi-compliance-test-suite
+# TC DETAILS: Runs the libiscsi iSCSI compliance suite on openebs storage
+# TC NOTES:           
+#    
+- include: playbooks/compliance/iscsi/libiscsi.yml
+#
+###########################################################################################
 - hosts: localhost
   tasks:
     - slack: 
