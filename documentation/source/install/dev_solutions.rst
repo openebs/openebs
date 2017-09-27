@@ -119,7 +119,7 @@ When configured properly, the above kubectl command will provide output similar 
 
 
 Setup OpenEBS
----------------------------------------
+-------------
 
 Download the latest OpenEBS Operator files using the following commands.
 ::
@@ -145,12 +145,32 @@ Some sample YAML files for stateful workloads using OpenEBS are provided in the 
         
   .. _openebs/k8s/demo: https://github.com/openebs/openebs/tree/master/k8s/demo
 
-By default, OpenEBS launches OpenEBS Volumes with two replicas. To set one replica, as is the case with single-node Kubernetes cluster, modify the PVC spec of your applications as follows:
+By default, OpenEBS launches OpenEBS Volumes with two replicas. To set one replica, as is the case with single-node Kubernetes cluster, specify the ENV variable *DEFAULT_REPLICA_COUNT=1*. This is supported OpenEBS v0.4 onwards. 
+
+The following snippet of the openebs-operator.yaml -> maya-apiserver section shows the addition of DEFAULT_REPLICA_COUNT:
 ::
-    kind: PersistentVolumeClaim
-    apiVersion: v1
+    ---
+    apiVersion: apps/v1beta1
+    kind: Deployment
     metadata:
-      name: my-jiva-vsm
-        labels:
-            volumeprovisioner.mapi.openebs.io/replica-count: 1
+      name: maya-apiserver
+      namespace: default
+    spec:
+      replicas: 1
+      template:
+        metadata:
+          labels:
+            name: maya-apiserver
+        spec:
+          serviceAccountName: openebs-maya-operator
+          containers:
+          - name: maya-apiserver
+            imagePullPolicy: Always
+            image: openebs/m-apiserver:0.3-RC4
+            ports:
+            - containerPort: 5656
+            env:
+            - name: DEFAULT_REPLICA_COUNT
+              value: "1"
+    ---
 
