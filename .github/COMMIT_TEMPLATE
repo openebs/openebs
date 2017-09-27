@@ -1,0 +1,45 @@
+# Short (50 chars or less) summary of change
+# "If this commit is applied then this commit will XYZ"
+# where *XYZ* is the 50 chars summary
+
+
+# Detailed summary goes below in the form of an
+# opinionated Q&A
+# bullet points preferred over paragraphs
+
+1. Why is this change necessary ?
+# <should explain the change XYZ in more detail>
+# Eg.
+# - improves X by implementing feature A in B
+# - reduces latency between P & Q
+
+2. How does this change address the issue ?
+# Eg.
+# - mitigates case Y in Z machines.
+# - avoids situation X by a code fix
+
+
+3. How to verify this change ?
+# <should be most detailed>
+# Eg.
+# - command Z does not give error and exits
+# - this worked expectedly on X setup
+# - verify the output of command Y which exits cleanly
+
+
+4. What side effects does this change have ?
+# Eg.
+# - may/may not cause problem X while running Y
+# - may/man not cause X to crash unexpectedly
+
+5. Other details
+# All PRs must have relevant issues
+# for a
+#       - complete fix use *fix*
+#       - partial-fix use *improvement*
+# Eg.
+# fix: #1234
+# improvement: #1234
+
+# Size/*
+# Host-OS:
