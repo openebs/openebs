@@ -1,0 +1,148 @@
+# Define the Service Account
+# Define the RBAC rules for the Service Account
+# Launch the Prometheus ( deployment )
+# Launch the node-exporter ( deameon set )
+#
+# Create prometheus service account
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: prometheus
+  namespace: default
+---
+# Define Role that allows operations on K8s pods/deployments
+# in "default" namespace
+# TODO : change to new namespace, for isolated data network
+# TODO : the rules should be updated with required group/resources/verb
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRole
+metadata:
+  name: prometheus
+rules:
+- apiGroups: [""]
+  resources:
+  - nodes
+  - nodes/proxy
+  - services
+  - endpoints
+  - pods
+  verbs: ["get", "list", "watch"]
+- nonResourceURLs: ["/metrics"]
+  verbs: ["get"]
+---
+# Bind the Service Account with the Role Privileges.
+# TODO: Check if default account also needs to be there
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRoleBinding
+metadata:
+  name: prometheus
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: prometheus
+subjects:
+- kind: ServiceAccount
+  name: prometheus
+  namespace: default
+---
+# prometheus-deployment
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: prometheus-deployment
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        name: prometheus-server
+    spec:
+      serviceAccountName: prometheus
+      containers:
+        - name: prometheus
+          image: prom/prometheus:latest
+          args:
+            - "-config.file=/etc/prometheus/conf/prometheus.yml"
+            # Metrics are stored in an emptyDir volume which
+            # exists as long as the Pod is running on that Node.
+            # The data in an emptyDir volume is safe across container crashes.
+            - "-storage.local.path=/prometheus"
+          ports:
+            - containerPort: 9090
+          volumeMounts:
+            # prometheus config file stored in the given mountpath
+            - name: prometheus-server-volume
+              mountPath: /etc/prometheus/conf
+            # metrics collected by prometheus will be stored at the given mountpath.
+            - name: prometheus-storage-volume
+              mountPath: /prometheus
+      volumes:
+        - name: prometheus-server-volume
+          configMap:
+            name: prometheus-config
+        - name: prometheus-storage-volume
+          # containers in the Pod can all read and write the same files here.
+          emptyDir: {} 
+---
+# prometheus-service
+apiVersion: v1
+kind: Service
+metadata:
+  name: prometheus-service
+spec:
+  selector: # exposes any pods with the following labels as a service
+    name: prometheus-server
+  type: NodePort
+  ports:
+    - port: 80 # this Service's port (cluster-internal IP clusterIP)
+      targetPort: 9090 # pods expose this port
+      # Kubernetes master will allocate a port from a flag-configured range (default: 30000-32767),
+      # or we can set a specific port number (in our case).
+      # Each node will proxy 32514 port (the same port number on every node) into this service.
+      # Note that this Service will be visible as both NodeIP:nodePort and clusterIp:port
+      nodePort: 32514
+---
+# node-exporter will be launch as daemonset.
+apiVersion: extensions/v1beta1
+kind: DaemonSet
+metadata:
+  name: node-exporter
+spec:
+  template:
+    metadata:
+      labels:
+        app: node-exporter
+      name: node-exporter
+    spec:
+      containers:
+      - image: prom/node-exporter:latest
+        name: node-exporter
+        ports:
+        - containerPort: 9100
+          hostPort: 9100
+          name: scrape
+        volumeMounts:
+        # All the application data stored in data-disk
+        - name: data-disk
+          mountPath: /data-disk
+          readOnly: true
+        # Root disk is where OS(Node) is installed
+        - name: root-disk
+          mountPath: /root-disk
+          readOnly: true
+      # toleration  is particularly useful for situations where most pods in 
+      # the cluster should avoid scheduling onto the node. In our case we want
+      # node-exporter to run on master node also that's why tolerations added.
+      # if removed master's node metrics can't be scrapped by prometheus.
+      tolerations:
+      - effect: NoSchedule
+        operator: Exists
+      volumes:
+        - name: data-disk
+          hostPath:
+            path: /localdata
+        - name: root-disk
+          hostPath:
+            path: /
+      hostNetwork: true
+      hostPID: true
