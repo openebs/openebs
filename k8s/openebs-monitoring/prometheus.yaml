@@ -1,13 +1,18 @@
 # ConfigMap is used to run prometheus with given configuration. It helps
 # if we want to change the configuration from time to time because our 
 # requirement changes so configurations also need to change accordingly.
+# You need to restart the pods to apply these changes.
 #
-# A scrape configuration for running Prometheus on a Kubernetes cluster.
-# This uses separate scrape configs for cluster components (i.e. API server, node)
-# and services to allow each to use different authentication configs.
+# A scrape (Collect metrics) configuration for running Prometheus on a 
+# Kubernetes cluster is given below. This uses separate scrape configs 
+# for cluster components  (i.e. API server, node) and services to allow 
+# each to use different authentication configs.
 #
 # Kubernetes labels will be added as Prometheus labels on metrics via the
 # `labelmap` relabeling action.
+# labelmap: Match regex against all label names. Then copy the values of 
+# the matching labels to label names given by replacement with match group
+# references (${1}, ${2}, ...) in replacement substituted by their value.
 #
 # If you are using Kubernetes 1.7.2 or earlier, please take note of the comments
 # for the kubernetes-cadvisor job; you will need to edit or remove this job.
@@ -46,6 +51,43 @@ data:
       - source_labels: [__meta_kubernetes_pod_name]
         action: replace
         target_label: kubernetes_pod_name
+    - job_name: 'openebs-jiva-controller'
+      scheme: http
+      tls_config:
+        ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+      bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+      kubernetes_sd_configs:
+      - role: pod
+      relabel_configs:
+      - source_labels: [__meta_kubernetes_pod_label_openebs_controller]
+        regex: jiva-controller
+        action: keep
+      - source_labels: [__meta_kubernetes_pod_container_port_number]
+        action: drop
+        regex: '(.*)3260'
+      - source_labels: [__meta_kubernetes_pod_name]
+        action: replace
+        target_label: kubernetes_pod_name
+    - job_name: 'openebs-jiva-replica'
+      scheme: http
+      tls_config:
+        ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+      bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+      kubernetes_sd_configs:
+      - role: pod
+      relabel_configs:
+      - source_labels: [__meta_kubernetes_pod_label_openebs_replica]
+        regex: jiva-replica
+        action: keep
+      - source_labels: [__meta_kubernetes_pod_name]
+        action: replace
+        target_label: kubernetes_pod_name
+      - source_labels: [__meta_kubernetes_pod_container_port_number]
+        action: drop
+        regex: '(.*)9503'
+      - source_labels: [__meta_kubernetes_pod_container_port_number]
+        action: drop
+        regex: '(.*)9504'
     - job_name : 'kubelets'
       scheme: http
       tls_config:
