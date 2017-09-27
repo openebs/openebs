@@ -21,8 +21,8 @@
     executable: /bin/bash
   register: result
   until:  "'Ready' in result.stdout"
-  delay: 20
-  retries: 3
+  delay: 60
+  retries: 10
   ignore_errors: true  
 
 - name: 
