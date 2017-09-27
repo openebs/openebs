@@ -3,6 +3,10 @@
 # Launch the Prometheus ( deployment )
 # Launch the node-exporter ( deameon set )
 #
+# A service account provides an identity for processes that run in a Pod.
+# Processes in containers inside pods contact the apiserver. When they
+# do, they are authenticated as a particular Service Account.
+#
 # Create prometheus service account
 apiVersion: v1
 kind: ServiceAccount
@@ -10,27 +14,58 @@ metadata:
   name: prometheus
   namespace: default
 ---
-# Define Role that allows operations on K8s pods/deployments
-# in "default" namespace
+# RBAC, Role-based access control, is an an authorization mechanism for managing
+# permissions around Kubernetes resources. RBAC allows configuration of flexible
+# authorization policies that can be updated without cluster restarts.
+# RBAC is a way of granting users granular access to Kubernetes API resources.
+#
+# A Role is a collection of permissions. For example, a role could be defined to
+# include read permission on pods and list permission for pods. A ClusterRole is
+# just like a Role, but can be used anywhere in the cluster.
+#
 # TODO : change to new namespace, for isolated data network
 # TODO : the rules should be updated with required group/resources/verb
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRole
 metadata:
   name: prometheus
+# These are the rules to determine whether a request is allowed or denied
 rules:
+  # You can use the Kubernetes API to read and write Kubernetes resource objects
+  # via a Kubernetes API endpoint. The API group being accessed (for resource 
+  # requests only). An empty string designates the core API group.
 - apiGroups: [""]
+  # The ID or name of the resource that is being accessed (for resource requests
+  # only) –* For resource requests using get, update, patch, and delete verbs, 
+  # you must provide the resource name.
   resources:
+    # A Node may be a VM or physical machine
   - nodes
+    # nodes/proxy connect POST requests to proxy of a Node for the given HTTP req
+    # POST /api/v1/nodes/{name}/proxy
   - nodes/proxy
+    # Services are to load balance traffic across all Pods.and it Exposes an 
+    # externally accessible endpoint. In simple words they are the medium through
+    # which pods communicate.
   - services
+    # An endpoint is a URL pattern used to communicate with an API. For exp:
+    # <ip>:<port>/metrics
   - endpoints
+    # A pod is a group of one or more containers (Exp: Docker containers),with 
+    # shared storage/network, and a specification for how to run the containers.
   - pods
   verbs: ["get", "list", "watch"]
+  # nonResourceURLs are endpoints that don’t map to a traditional resource. 
+  # Things like /ui/ or /apis or /swagger.json that are used for redirects
+  # Prometheus by default look for /metrics endpoint for the differnet IP's.
 - nonResourceURLs: ["/metrics"]
   verbs: ["get"]
 ---
-# Bind the Service Account with the Role Privileges.
+# A RoleBinding maps a Role to a user or set of users, granting that Role's 
+# permissions to those users for resources in that namespace. A ClusterRole-
+# Binding allows users to be granted a ClusterRole for authorization across the 
+# entire cluster.
+#
 # TODO: Check if default account also needs to be there
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRoleBinding
@@ -77,9 +112,11 @@ spec:
             - name: prometheus-storage-volume
               mountPath: /prometheus
       volumes:
+        # Prometheus Config file will be stored in this volume 
         - name: prometheus-server-volume
           configMap:
             name: prometheus-config
+        # All the time series stored in this volume in form of .db file.
         - name: prometheus-storage-volume
           # containers in the Pod can all read and write the same files here.
           emptyDir: {} 
@@ -92,6 +129,8 @@ metadata:
 spec:
   selector: # exposes any pods with the following labels as a service
     name: prometheus-server
+  # NodePort allows you to access the Prometheus exression browser from outside cluster.
+  # Basically you are exposing your NodeIP and NodePort to outside cluster.
   type: NodePort
   ports:
     - port: 80 # this Service's port (cluster-internal IP clusterIP)
@@ -99,7 +138,7 @@ spec:
       # Kubernetes master will allocate a port from a flag-configured range (default: 30000-32767),
       # or we can set a specific port number (in our case).
       # Each node will proxy 32514 port (the same port number on every node) into this service.
-      # Note that this Service will be visible as both NodeIP:nodePort and clusterIp:port
+      # Note that this Service will be visible as both NodeIP:nodePort and clusterIp:Port
       nodePort: 32514
 ---
 # node-exporter will be launch as daemonset.
@@ -130,9 +169,25 @@ spec:
         - name: root-disk
           mountPath: /root-disk
           readOnly: true
+      # The Kubernetes scheduler’s default behavior works well for most cases 
+      # -- for example, it ensures that pods are only placed on nodes that have 
+      # sufficient free resources, it ties to spread pods from the same set 
+      # (ReplicaSet, StatefulSet, etc.) across nodes, it tries to balance out 
+      # the resource utilization of nodes, etc.
+      #
+      # But sometimes you want to control how your pods are scheduled. For example,
+      # perhaps you want to ensure that certain pods only schedule on nodes with 
+      # specialized hardware, or you want to co-locate services that communicate 
+      # frequently, or you want to dedicate a set of nodes to a particular set of 
+      # users. Ultimately, you know much more about how your applications should be
+      # scheduled and deployed than Kubernetes ever will.
+      #
+      # “taints and tolerations,” allows you to mark (“taint”) a node so that no 
+      # pods can schedule onto it unless a pod explicitly “tolerates” the taint.
       # toleration  is particularly useful for situations where most pods in 
       # the cluster should avoid scheduling onto the node. In our case we want
-      # node-exporter to run on master node also that's why tolerations added.
+      # node-exporter to run on master node also i.e, we want to collect metrics 
+      # from master node. That's why tolerations added.
       # if removed master's node metrics can't be scrapped by prometheus.
       tolerations:
       - effect: NoSchedule
