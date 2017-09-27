@@ -21,6 +21,7 @@ Contents:
     Overview <install/install_overview>
     Cloud Solutions <install/cloud_solutions>
     On-Premise Solutions <install/on_premise_solutions>
+    Developer Solutions <install/dev_solutions>
   
     
 .. toctree::
