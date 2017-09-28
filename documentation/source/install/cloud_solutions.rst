@@ -7,7 +7,7 @@ Cloud Solutions
 Amazon Cloud
 =============
 
-Setting up OpenEBS with Kubernetes on Amazon EC2 Instances
+Setting up OpenEBS with Kubernetes on Amazon Web Services
 ----------------------------------------------------------
 
 This section provides instructions to set up a Kubernetes cluster on Amazon Web Services (AWS) and to have OpenEBS running in hyper converged mode.
@@ -297,7 +297,7 @@ The *kubectl apply -f demo/jupyter/demo-jupyter-openebs.yaml* command creates th
 
 * Launch a Jupyter Server, with the specified notebook file from github (kubectl get deployments)
 * Create an OpenEBS Volume and mounts to the Jupyter Server Pod (/mnt/data) (kubectl get pvc) (kubectl get pv) (kubectl get pods)
-* Expose the Jupyter Server to external world via the http://NodeIP:32424 (NodeIP is any of the minion nodes external IP) (kubectl get pods)
+* Expose the Jupyter Server to external world via the http://NodeIP:32424 (NodeIP is any of the nodes external IP) (kubectl get pods)
 
 **Note:** To access the Jupyter Server over the internet, set the firewall rules to allow traffic on port 32424 in you GCP / Networking / Firewalls.
 
