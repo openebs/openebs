@@ -65,14 +65,14 @@ spec:
       containers:
       - name: maya-apiserver
         imagePullPolicy: Always
-        image: openebs/m-apiserver:0.4.0-RC1
+        image: openebs/m-apiserver:0.4.0
         ports:
         - containerPort: 5656
         env:
         - name: DEFAULT_CONTROLLER_IMAGE
-          value: "openebs/jiva:0.4.0-RC1"
+          value: "openebs/jiva:0.4.0"
         - name: DEFAULT_REPLICA_IMAGE
-          value: "openebs/jiva:0.4.0-RC1"
+          value: "openebs/jiva:0.4.0"
         - name: DEFAULT_REPLICA_COUNT
           value: "2"
 ---
@@ -106,7 +106,7 @@ spec:
       containers:
       - name: openebs-provisioner
         imagePullPolicy: Always
-        image: openebs/openebs-k8s-provisioner:0.4.0-RC1
+        image: openebs/openebs-k8s-provisioner:0.4.0
         env:
         - name: NODE_NAME
           valueFrom:
