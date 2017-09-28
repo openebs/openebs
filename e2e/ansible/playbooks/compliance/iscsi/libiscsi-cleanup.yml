@@ -6,7 +6,7 @@
   delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
 - name: Confirm the iSCSI target has been deleted
-  shell: source ~/.profile; kubectl get pods
+  shell: source ~/.profile; kubectl get pvc
   args:
     executable: /bin/bash
   delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
