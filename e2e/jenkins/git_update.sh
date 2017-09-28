@@ -11,6 +11,7 @@
 # export JENKINS_MASTER_IP="20.10.30.253"
 # export JENKINS_PORT="8080" 
 # export JENKINS_USER="openebs"
+# export JENKINS_PASSWORD="openebs"
 # export JENKINS_USER_API_KEY="41d9e9efee80939f116fd77e5e1cd736"
 # export JOB_NAME="jiva"
 # export BUILD_TOKEN="openebstestbuild"
@@ -23,8 +24,16 @@ source ~/.profile
 # file touched by the jenkins job to indicate run in progress
 file=ci.running
 
+# construct command to obtain jenkins crumb (in lieu of CSRF protection)
+GET_CRUMB="wget -q --auth-no-challenge --user $JENKINS_USER --password $JENKINS_PASSWORD \
+--output-document - 'http://$JENKINS_MASTER_IP:$JENKINS_PORT\
+/crumbIssuer/api/xml?xpath=concat(//crumbRequestField,\":\",//crumb)'"
+
+# obtain the jenkins crumb
+CRUMB=`eval $GET_CRUMB`
+
 # url to trigger jenkins CI job 
-ci_trigger_url="curl -f --user $JENKINS_USER:$JENKINS_USER_API_KEY \
+ci_trigger_url="curl -f -X POST -H $CRUMB --user $JENKINS_USER:$JENKINS_USER_API_KEY \
 http://$JENKINS_MASTER_IP:$JENKINS_PORT/job/$JOB_NAME/build?token=$BUILD_TOKEN"
 
 # look for file indicating ongoing CI job, exit if present 
@@ -39,13 +48,16 @@ echo "##### POLL FOR UPDATES TO THE CI FRAMEWORK #####"
 git stash
 
 # perform git pull to fetch & merge updated files from repository
-content="`git pull`"
+git pull
+
+# get changes in e2e, if any
+content=`git diff master@{1} master --name-only e2e` 
 
 # trigger/schedule a CI run if e2e/Ansible is updated 
-if [[ "$content" =~ "e2e/Ansible" ]]
+if ! [ -z "$content" ]
 then
     echo $content; echo "Triggering CI..."
-    $ci_trigger_url > /dev/null 2>&1
+    eval $ci_trigger_url > /dev/null 2>&1
     retcode=$? 
     if [ $retcode -ne 0 ] 
     then
