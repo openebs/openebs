@@ -208,7 +208,7 @@ Usecases - Jupyter
 Running Jupyter on OpenEBS
 ===========================
 
-This section provides detailed instructions on how to run a *jupyter-mysql* application pod on OpenEBS storage in a Kubernetes cluster and uses a *mysql-client* container to generate load in order to illustrate input/output traffic on the storage.
+This section provides detailed instructions on how to run a jupyter pod on OpenEBS storage in a Kubernetes cluster and uses a *jupyter ui editor* to generate load in order to illustrate input/output traffic on the storage.
 
 Prerequisites
 -------------
@@ -228,9 +228,9 @@ Verify that the Kubernetes cluster is in optimal state by using the following co
   
    name@Master:~$ kubectl get nodes
    NAME         STATUS    AGE       VERSION
-   mayahost01   Ready     5d        v1.6.3
-   mayahost02   Ready     5d        v1.6.3
-   mayamaster   Ready     5d        v1.6.3
+   host01   Ready     5d        v1.6.3
+   host02   Ready     5d        v1.6.3
+   master   Ready     5d        v1.6.3
 
 * Sufficient resources on the minions to host the OpenEBS storage pods and Jupyter application pods - This includes sufficient disk space, in this example, physical storage for the pvolume containers will be carved out from the local storage.
 
@@ -299,8 +299,8 @@ Check whether the storage classes are applied successfully using the following c
     openebs-percona   openebs.io/provisioner-iscsi
 
     
-Run jupyter-mysql Pod with OpenEBS Storage
-------------------------------------------
+Run Jupyter Pod with OpenEBS Storage
+------------------------------------
 Use OpenEBS as persistent storage for the jupyter pod by selecting an OpenEBS storage class in the persistent volume claim. A sample jupyter pod yaml (with container attributes and pvc details) is available in the OpenEBS git repository (which was cloned in the previous steps).
 ::
    name@Master:~$ cat demo-jupyter-openebs.yaml
@@ -335,10 +335,6 @@ The above command creates the following, which can be verified using the corresp
 - Creates an OpenEBS Volume and mounts to the Jupyter Server Pod (/mnt/data) (kubectl get pvc) (kubectl get pv) (kubectl get pods)
 - Exposes the Jupyter Server to external world via the http://<NodeIP>:32424 (NodeIP is any of the minion nodes external IP) (kubectl get pods)   
 
-The jupyter server dashboard can be accessed on the Kubernetes node port as in the following screen.
-
-.. image:: ../_static/jupyter.png
-
 Verify that the OpenEBS storage pods, that is, the jiva controller and jiva replicas are created and the jupyter pod is running succesfully using the following commands.
 
 ::
@@ -355,3 +351,7 @@ Verify that the OpenEBS storage pods, that is, the jiva controller and jiva repl
 **Note:**
 
 It may take some time for the pods to start as the images must be pulled and instantiated. This is also dependent on the network speed.
+
+The jupyter server dashboard can be accessed on the Kubernetes node port as in the following screen.
+
+.. image:: ../_static/jupyter.png
