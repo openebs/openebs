@@ -56,10 +56,14 @@
            line: "              \"storage\": \"{{postgres_vol_size}}\""
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
-       - name: Get the number of replicas from set.json
+       - name: Get the number of statefulset details from set.json
          command: cat {{ result_kube_home.stdout }}/crunchy-postgres/set.json
          register: jsonfile
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+       
+       - name: Register the app label
+         set_fact:
+           label: "{{(jsonfile.stdout | from_json).spec.template.metadata.labels.app}}"
 
        - name: Register the replica variable 
          set_fact:
@@ -82,7 +86,7 @@
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
        - name: Confirm the postgres statefulset is running 
-         shell: source ~/.profile; kubectl get pods | grep pgset| grep Running | wc -l
+         shell: source ~/.profile; kubectl get pods --selector=app={{ label }} | grep Running | wc -l
          args:
            executable: /bin/bash
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
