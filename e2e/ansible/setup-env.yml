@@ -20,7 +20,7 @@
          lineinfile:
            path: "{{ playbook_dir }}/Vagrantfile"
            regexp: "config.vm.box =" 
-           line: "config.vm.box = \"openebs/k8s-1.7\""
+           line: "config.vm.box = \"openebs/k8s-1.7.5\""
          when: build_type == "quick" 
 
        - name: Change OpenEBS mode in all.yml
