@@ -31,6 +31,7 @@ Add iSCSI Support
 
 On your Ubuntu host, install open-iscsi package. OpenEBS uses iSCSI to connect to the block volumes.
 ::
+    
     sudo apt-get update
     sudo apt-get install open-iscsi
     sudo service open-iscsi restart
@@ -40,6 +41,7 @@ Verify that iSCSI is configured
 
 Check that initiator name is configured and iSCSI service is running using the following commands.
 ::
+
    sudo cat /etc/iscsi/initiatorname.iscsi
    sudo service open-iscsi status
 
@@ -49,23 +51,27 @@ Download and setup Minikube and kubectl
 
 On your Ubuntu host, install minikube.
 ::
+
     curl -Lo minikube https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
     chmod +x minikube 
     sudo mv minikube /usr/local/bin/
 
 On your Ubuntu host, install kubectl.
 ::
+
     curl -Lo kubectl https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
     chmod +x kubectl 
     sudo mv kubectl /usr/local/bin/
 
 On your Ubuntu host, setup directories for storing minkube and kubectl configuration.
 ::
+
     mkdir /home/vagrant/.kube || true
     touch /home/vagrant/.kube/config
 
 On your Ubuntu host, setup ENV for minikube. Copy the following to ~/.profile.
 ::
+
     export MINIKUBE_WANTUPDATENOTIFICATION=false
     export MINIKUBE_WANTREPORTERRORPROMPT=false
     export MINIKUBE_HOME=$HOME
@@ -74,6 +80,7 @@ On your Ubuntu host, setup ENV for minikube. Copy the following to ~/.profile.
 
 On your Ubuntu host, start the minikube.
 ::
+
     sudo -E minikube start --vm-driver=none
 
 Verify that minikube is configured
@@ -81,10 +88,12 @@ Verify that minikube is configured
 
 Check that minikube is configured and it has started using the following commands.
 ::
+
     minikube status
 
 When minikube is configured properly, *minikube status* will display the following output:
 ::
+
    minikube: Running
    cluster: Running
    kubectl: Correctly Configured: pointing to minikube-vm at 127.0.0.1
@@ -92,6 +101,7 @@ When minikube is configured properly, *minikube status* will display the followi
 **Note** 
 If minikube displays errors indicating permission denied to configuration files, fix the permissions by running the following commands.
 ::
+
     sudo chown -R $USER $HOME/.kube
     sudo chgrp -R $USER $HOME/.kube
     sudo chown -R $USER $HOME/.minikube
@@ -102,11 +112,13 @@ Verify that Kubernetes is configured
 
 Check that kubectl is configured and services are running using the following commands.
 ::
+
     kubectl get pods
     kubectl get nodes
 
 When configured properly, the above kubectl commands will display output similar to following:
 ::
+
     vagrant@minikube-dev:~$ kubectl get nodes
     NAME           STATUS    AGE       VERSION
     minikube-dev   Ready     8m        v1.7.5
@@ -123,6 +135,7 @@ Setup OpenEBS
 
 Download the latest OpenEBS Operator files using the following commands.
 ::
+
    git clone https://github.com/openebs/openebs.git
    cd openebs/k8s
    kubectl apply -f openebs-operator.yaml
@@ -132,6 +145,7 @@ By default, OpenEBS launches OpenEBS Volumes with two replicas. To set one repli
 
 The following snippet of the openebs-operator.yaml -> maya-apiserver section shows the addition of DEFAULT_REPLICA_COUNT:
 ::
+
     ---
     apiVersion: apps/v1beta1
     kind: Deployment
@@ -159,7 +173,8 @@ The following snippet of the openebs-operator.yaml -> maya-apiserver section sho
 
 Add OpenEBS related storage classes, that can then be used by developers and applications using the following command.
 ::
-   kubectl apply -f openebs-storageclasses.yaml
+
+    kubectl apply -f openebs-storageclasses.yaml
 
 Running Stateful applications with OpenEBS Storage
 --------------------------------------------------
@@ -168,7 +183,8 @@ To use OpenEBS as persistent storage for your stateful workloads, set the storag
 
 Get the list of storage classes using the following command. Choose the storage class that best suits your application.
 ::
-   kubectl get sc
+
+    kubectl get sc
 
 Some sample YAML files for stateful workloads using OpenEBS are provided in the `openebs/k8s/demo`_
         

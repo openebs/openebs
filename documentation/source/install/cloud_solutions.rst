@@ -1,5 +1,7 @@
 .. _Setup:
 
+.. _here: https://portal.aws.amazon.com/gp/aws/developer/registration/index.html
+
 *****************
 Cloud Solutions
 *****************
@@ -12,13 +14,12 @@ Setting up OpenEBS with Kubernetes on Amazon Web Services
 
 This section provides instructions to set up a Kubernetes cluster on Amazon Web Services (AWS) and to have OpenEBS running in hyper converged mode.
 
-Prerequisites
-^^^^^^^^^^^^^
+Prerequisites:
+^^^^^^^^^^^^^^
 Perform the following procedure to setup the prerequisites for AWS.
 
 1.  Signup for AWS `here`_.
-            .. _here: https://portal.aws.amazon.com/gp/aws/developer/registration/index.html
-    If you already have an AWS account, skip the above step.
+      If you already have an AWS account, skip the above step.
 2.  Start your browser.
 3.  Open **AWS Management Console**.
 4.  Select **IAM** under **Security, Identity & Compliance**.
@@ -34,8 +35,9 @@ Perform the following procedure to setup the prerequisites for AWS.
 
 A *openebsuser* user will be created and an Access key ID and a Secret access key will be assigned as in the following example.
 ::
-     User              Access key ID             Secret access key
-     openebsuser     AKIAI3MRLHNGUEXAMPLE      udxZi33tvSptXCky31kEt4KLRS6LSMMsmEXAMPLE
+
+    User              Access key ID             Secret access key
+    openebsuser01     AKIAI3MRLHNGUEXAMPLE      udxZi33tvSptXCky31kEt4KLRS6LSMMsmEXAMPLE
 
 **Note:**
 
@@ -46,34 +48,32 @@ kops, terraform and awscli
  
 OpenEBS has created a script that does most of the work for you. Download the *oebs-cloud.sh* script file using the following commands.
 ::
-     $ mkdir -p openebs
-     $ cd openebs
-     $ wget https://raw.githubusercontent.com/openebs/openebs/master/e2e/terraform/oebs-cloud.sh
-     $ chmod +x oebs-cloud.sh
+
+    $ mkdir -p openebs
+    $ cd openebs
+    $ wget https://raw.githubusercontent.com/openebs/openebs/master/e2e/terraform/oebs-cloud.sh
+    $ chmod +x oebs-cloud.sh
 
 The list of operations performed by the *oebs-cloud.sh* script are as follows:
 ::
-     $ ./oebs-cloud.sh
-     Usage : 
-         oebs-cloud.sh --setup-local-env
-         oebs-cloud.sh --create-cluster-config [--ami-vm-os=[ubuntu|coreos]]
-         oebs-cloud.sh --list-aws-instances
-         oebs-cloud.sh --ssh-aws-ec2 [ ipaddress|=ipaddress]
-         oebs-cloud.sh --help
 
-     Sets Up OpenEBS On AWS
+    $ ./oebs-cloud.sh
+    Usage : 
+       oebs-cloud.sh --setup-local-env
+       oebs-cloud.sh --create-cluster-config
+       oebs-cloud.sh --ssh-aws-ec2
 
-     -h|--help                       Displays this help and exits.
-     --setup-local-env               Sets up, AWSCLI, Terraform and KOPS.
-     --create-cluster-config         Generates a terraform file (.tf) and Passwordless SSH
-     --ami-vm-os                     The OS to be used for the Amazon Machine Image.
-                                     Defaults to Ubuntu.
-     --list-aws-instances            Outputs the list of AWS instances in the cluster.
-     --ssh-aws-ec2                   SSH to Amazon EC2 instance with Public IP Address.
+    Sets Up OpenEBS On AWS
+
+    -h|--help                       Displays this help and exits.
+    --setup-local-env               Sets up, AWSCLI, Terraform and KOPS.
+    --create-cluster-config         Generates a terraform file (.tf) and Passwordless SSH
+    --ssh-aws-ec2                   SSH to Kubernetes Master on EC2 instance.
 
 Running the following command allows you to install the required tools on your workstation.
 ::
-     $ ./oebs-cloud.sh --setup-local-env
+
+    $ ./oebs-cloud.sh --setup-local-env
 
 The following tools are installed.
 
@@ -88,18 +88,19 @@ The tools **awscli** and **kops** require the AWS credentials to access AWS serv
 
 * Use the credentials that were generated earlier for the user *openebsuser*.
 * Add path */usr/local/bin* to the PATH environment variable.
+
 ::
-     
-     $ vim ~/.profile
 
-     # Add the AWS credentials as environment variables in .profile
-     export AWS_ACCESS_KEY_ID=<access key>
-     export AWS_SECRET_ACCESS_KEY=<secret key>
+    $ vim ~/.profile
 
-     # Add /usr/local/bin to PATH
-     PATH="$HOME/bin:$HOME/.local/bin:/usr/local/bin:$PATH"
+    # Add the AWS credentials as environment variables in .profile
+    export AWS_ACCESS_KEY_ID=<access key>
+    export AWS_SECRET_ACCESS_KEY=<secret key>
 
-     $ source ~/.profile
+    # Add /usr/local/bin to PATH
+    PATH="$HOME/bin:$HOME/.local/bin:/usr/local/bin:$PATH"
+
+    $ source ~/.profile
 
 Creating the Cluster Configuration
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -109,10 +110,11 @@ Creating the Cluster Configuration
      * One Master
      * Two Nodes
 
-* Run the following command in a terminal.
+* Run the following command in a terminal:
+
 ::
-     
-     $ ./oebs-cloud.sh --create-cluster-config
+
+    $ ./oebs-cloud.sh --create-cluster-config
 
 Running *--create-cluster-config* command without any arguments defaults to **Ubuntu**. You can also run *--create-cluster-config* command with *--ami-vm-os=ubuntu* or *--ami-vm-os=coreos* commands and the following occurs.  
 
@@ -125,23 +127,26 @@ Running *--create-cluster-config* command without any arguments defaults to **Ub
       - For process intensive containers you may have to modify the script to use *m3.large* instances,      which could be charged.
 
 Creating a Cluster on AWS using Terraform
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 * Run the following command to verify successful installation of terraform.
-  ::
-     $ terraform
-     Usage: terraform [--version] [--help] <command> [args]
+
+::
+
+    $ terraform
+    Usage: terraform [--version] [--help] <comman> [args]
 
      The available commands for execution are listed below. The most common and useful 
      commands are shown first,followed by less common or more advanced commands. If you 
      are just getting started with Terraform, use the common commands. For other commands, 
      read the help and documentation before using them.
 
-     Common commands: 
+Common commands:
+::
 
-       apply              Builds or changes infrastructure
-       console            Interactive console for Terraform interpolations
-     # ...
+    apply              Builds or changes infrastructure
+    console            Interactive console for Terraform interpolations
+    # ...
 
 * Run the *terraform init* command to initialize terraform.
 * Run the *terraform plan* command from the directory where the generated terraform file (.tf) is placed.
@@ -153,9 +158,15 @@ Creating a Cluster on AWS using Terraform
 
 List AWS EC2 Instances
 ^^^^^^^^^^^^^^^^^^^^^^
+* From your workstation, run the following command to connect to the EC2 instance running the Kubernetes Master.
+
+::
+
+    $ ./oebs-cloud.sh --ssh-aws-ec2
 
 From your workstation, run the following command to list the AWS EC2 instances created.
 ::
+
    $ ./oebs-cloud.sh --list-aws-instances
 
    Node                             Private IP Address   Public IP Address    
@@ -168,38 +179,22 @@ SSH to the Kubernetes Node
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 From your workstation, run the following commands to connect to the EC2 instance running the Kubernetes Master.
 
-**For Ubuntu**
+* Verify if Kubernetes cluster is created.
+
 ::
-  $ ./oebs-cloud.sh --ssh-aws-ec2
-  Welcome to Ubuntu 16.04 LTS (GNU/Linux 4.4.0-93-generic x86_64)
-  ubuntu@ip-172-20-53-140 ~ $
 
-**For CoreOS**
-::
-  $ ./oebs-cloud.sh --ssh-aws-ec2
-  Container Linux by CoreOS stable (1465.6.0)
-  core@ip-172-20-53-140 ~ $
+    ubuntu@ip-172-20-53-140:~$ kubectl get nodes 
+    NAME                            STATUS    AGE       VERSION 
+    ip-172-20-36-126.ec2.internal   Ready     1m        v1.7.0 
+    ip-172-20-37-115.ec2.internal   Ready     1m        v1.7.0 
+    ip-172-20-53-140.ec2.internal   Ready     3m        v1.7.0
 
-Running *--ssh-aws-ec2* command without any arguments, by default, connects you to the Kubernetes Master. 
-
-You can also run *--ssh-aws-ec2* command as *--ssh-aws-ec2=ipaddress*, where *ipaddress* is the Public IP Address of the AWS EC2 instance.
-
-You should now be running inside the AWS EC2 instance.
-
-Deploying OpenEBS on AWS
-^^^^^^^^^^^^^^^^^^^^^^^^^^ 
-Kubernetes must be running on the EC2 instances while deploying OpenEBS. Verify if a Kubernetes cluster is created.
-
-**For Ubuntu** 
-::
-     ubuntu@ip-172-20-53-140:~$ kubectl get nodes 
-     NAME                            STATUS    AGE       VERSION 
-     ip-172-20-36-126.ec2.internal   Ready     1m        v1.7.2 
-     ip-172-20-37-115.ec2.internal   Ready     1m        v1.7.2 		 
-     ip-172-20-53-140.ec2.internal   Ready     3m        v1.7.2 
+* This will output cluster information if the cluster was already created.
+* Download the *openebs-operator* and *openebs-storage-classes* YAMLs from the locations listed below:
 
 OpenEBS is deployed by the time you log in to Amazon Web Services (AWS).
 ::
+
    ubuntu@ip-172-20-53-140:~$ kubectl get pods
    NAME                      READY     STATUS    RESTARTS   AGE
    maya-apiserver-h714w      1/1       Running   0          12m
@@ -207,6 +202,7 @@ OpenEBS is deployed by the time you log in to Amazon Web Services (AWS).
 
 **For CoreOS**
 ::
+
     core@ip-172-20-53-140:~$ kubectl get nodes 
     NAME                            STATUS    AGE       VERSION 
     ip-172-20-36-126.ec2.internal   Ready     1m        v1.7.2 
@@ -215,6 +211,7 @@ OpenEBS is deployed by the time you log in to Amazon Web Services (AWS).
 
 OpenEBS is deployed by the time you log in to Amazon Web Services (AWS).
 ::
+
     core@ip-172-20-53-140:~$ kubectl get pods
     NAME                      READY     STATUS    RESTARTS   AGE
     maya-apiserver-h714w      1/1       Running   0          12m
@@ -224,7 +221,7 @@ OpenEBS is deployed by the time you log in to Amazon Web Services (AWS).
 Google Cloud
 =============
 Setting up OpenEBS with Kubernetes on Google Container Engine
-------------------------------------------------------------
+-------------------------------------------------------------
 This section, provides detailed instructions on how to setup and use OpenEBS in Google Container Enginer (GKE). This section uses a three node container cluster.
 
 1. Preparing your Container Cluster
@@ -248,34 +245,39 @@ Add iSCSI Support
 
 SSH into the nodes of the cluster (**Google Cloud Platform** -> **Compute Engine** -> **VM instances**) to install open-iscsi package. OpenEBS uses iSCSI to connect to the block volumes.
 ::
-   sudo apt-get update
-   sudo apt-get install open-iscsi
-   sudo service open-iscsi restart
+
+    sudo apt-get update
+    sudo apt-get install open-iscsi
+    sudo service open-iscsi restart
 
 Verify that iSCSI is configured
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Check that initiator name is configured and iSCSI service is running using the following commands.
 ::
-   sudo cat /etc/iscsi/initiatorname.iscsi
-   sudo service open-iscsi status
+
+    sudo cat /etc/iscsi/initiatorname.iscsi
+    sudo service open-iscsi status
 
 2. Run OpenEBS Operator through Google Cloud Shell
 
 Download the latest OpenEBS Operator files using the following commands.
 ::
-   git clone https://github.com/openebs/openebs.git
-   cd openebs/k8s
+
+    git clone https://github.com/openebs/openebs.git
+    cd openebs/k8s
 
 Setup the kubectl to run in admin context. See `Appendix`_ below for creating an administration context in Google Cloud Platform (GCP. The following commands will prompt you for username and password. Provide username as *admin*. Password for the admin can be obtained from **Google Cloud Platform** -> **Container Engine** -> **(cluster)** -> **Show Credentials**
 ::
-   kubectl config use-context demo-openebs03
-   kubectl apply -f openebs-operator.yaml
-   kubectl config use-context gke_strong-eon-153112_us-central1-a_demo-openebs03
+
+    kubectl config use-context demo-openebs03
+    kubectl apply -f openebs-operator.yaml
+    kubectl config use-context gke_strong-eon-153112_us-central1-a_demo-openebs03
 
 Add OpenEBS related storage classes, that can then be used by developers and applications using the following command.
 ::
-   kubectl apply -f openebs-storageclasses.yaml
+
+    kubectl apply -f openebs-storageclasses.yaml
 
 **Note:**
 
@@ -287,7 +289,8 @@ To use OpenEBS as persistent storage for your stateful workloads, set the storag
 
 Get the list of storage classes using the following command. Choose the storage class that best suits your application.
 ::
-   kubectl get sc
+
+    kubectl get sc
 
 Some sample YAML files for stateful workloads using OpenEBS are provided in the `openebs/k8s/demo`_
         
@@ -310,7 +313,8 @@ Setting Kubernetes Cluster Administration Context
 To create or modify service accounts and grant privileges, kubectl must be run with Administration privileges. The following procedure helps you setup and use the administration context for Google Container Engine through the Google Cloud Shell.
 
 1. Initialize credentials to allow kubectl to execute commands on the container cluster.
-   ::
+::
+
     gcloud container clusters list
     gcloud container clusters get-credentials demo-openebs03 --zone us-central1-a
 
@@ -319,7 +323,8 @@ To create or modify service accounts and grant privileges, kubectl must be run w
 * Access the credentails from **Google Cloud Platform** -> **Container Engine** -> **(cluster)** -> **Show Credentials**.
 * Save the *Cluster CA Certificate* to *~/.kube/admin.key*.
 * Create a administration configuration context from the configuration shell using the following commands.
-  ::
-      gcloud container clusters list
-      kubectl config set-context demo-openebs03 --cluster=gke_strong-eon-153112_us-central1-a_demo-openebs03 --user=cluster-a
 
+::
+
+    gcloud container clusters list
+    kubectl config set-context demo-openebs03 --cluster=gke_strong-eon-153112_us-central1-a_demo-openebs03 --user=cluster-a
