@@ -23,7 +23,7 @@ Verify that the Kubernetes cluster is in optimal state by using the following co
 
 :: 
   
-   name@MayaMaster:~$ kubectl get nodes
+   name@Master:~$ kubectl get nodes
    NAME         STATUS    AGE       VERSION
    mayahost01   Ready     5d        v1.6.3
    mayahost02   Ready     5d        v1.6.3
@@ -72,14 +72,14 @@ Check whether the deployments are running successfully using the following comma
 
 ::
   
-    name@MayaMaster:~$ kubectl get deployments
+    name@Master:~$ kubectl get deployments
     NAME                                            DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE
     maya-apiserver                                  1         1         1            1           2m
     openebs-provisioner                             1         1         1            1           2m
   
 ::
   
-    name@MayaMaster:~$ kubectl get pod
+    name@Master:~$ kubectl get pod
     NAME                                   READY     STATUS    RESTARTS   AGE
     maya-apiserver-1633167387-5ss2w        1/1       Running   0          24s
     openebs-provisioner-1174174075-f2ss6   1/1       Running   0          23s
@@ -89,7 +89,7 @@ Check whether the storage classes are applied successfully using the following c
 
 ::
   
-    name@MayaMaster:~$ kubectl get sc
+    name@Master:~$ kubectl get sc
     NAME              TYPE
     openebs-basic     openebs.io/provisioner-iscsi
     openebs-jupyter   openebs.io/provisioner-iscsi
@@ -111,7 +111,7 @@ Verify that the OpenEBS storage pods, that is, the jiva controller and jiva repl
 
 ::
  
-   name@MayaMaster:~$ kubectl get pods
+   name@Master:~$ kubectl get pods
    NAME                                                             READY     STATUS    RESTARTS   AGE
    maya-apiserver-1633167387-5ss2w                                  1/1       Running   0          4m
    openebs-provisioner-1174174075-f2ss6                             1/1       Running   0          4m
@@ -133,7 +133,7 @@ Get the IP address of the percona application pod. You can obtain this by execut
 
 ::
 
-    name@MayaMaster:~$ kubectl describe pod percona | grep IP
+    name@Master:~$ kubectl describe pod percona | grep IP
     IP:             10.44.0.3
 
 Edit the following line in sql-loadgen job yaml to pass the desired load duration and percona pod IP as arguments. In this example, the job performs sql queries on pod with IP address 10.44.0.3 for 300s.
@@ -164,7 +164,7 @@ Lookup the storage volume name using the *vsm-list* command
 
 ::
 
-    name@MayaMaster:~$ kubectl exec -it maya-apiserver-1633167387-5ss2w /bin/bash
+    name@Master:~$ kubectl exec -it maya-apiserver-1633167387-5ss2w /bin/bash
 
     root@maya-apiserver-1633167387-5ss2w:/# maya vsm-list
     Name                                      Status
@@ -201,3 +201,157 @@ The above command can be invoked using the *watch* command by providing a desire
 
    watch -n 1 maya vsm-stats pvc-016e9a68-71c1-11e7-9fea-000c298ff5fc
 
+******************
+Usecases - Jupyter
+******************
+ 
+Running Jupyter on OpenEBS
+===========================
+
+This section provides detailed instructions on how to run a jupyter pod on OpenEBS storage in a Kubernetes cluster and uses a *jupyter ui editor* to generate load in order to illustrate input/output traffic on the storage.
+
+Prerequisites
+-------------
+Prerequisites include the following:
+    
+* A fully configured Kubernetes cluster (versions 1.6.3/4/6 and 1.7.0 have been tested) with kube master and at least one kube minion. This maybe created on cloud platforms like GKE, on-premise virtual machines (vagrant/VMware/Hyper-V) or bare-metal boxes.
+
+**Note:**
+
+    * OpenEBS recommends using a 3-node cluster, with one master and two minions. This aids in creating storage replicas on separate minion nodes and is helpful in maintaining redundancy and data availability.
+
+    * If you are using gcp, view the appendix in this section for additional steps to set up cluster administration context and use it.
+
+Verify that the Kubernetes cluster is in optimal state by using the following commands.
+
+:: 
+  
+   name@Master:~$ kubectl get nodes
+   NAME         STATUS    AGE       VERSION
+   host01   Ready     5d        v1.6.3
+   host02   Ready     5d        v1.6.3
+   master   Ready     5d        v1.6.3
+
+* Sufficient resources on the minions to host the OpenEBS storage pods and Jupyter application pods - This includes sufficient disk space, in this example, physical storage for the pvolume containers will be carved out from the local storage.
+
+* iSCSI support on the minions - This is required for being able to consume the iSCSI target exposed by the OpenEBS volume container (that is, VSM). In ubuntu, you can install the iSCSI initiator using the following procedure.
+
+::
+  
+    sudo apt-get update
+    sudo apt-get install open-iscsi
+    sudo service open-iscsi restart
+
+Verify that iSCSI is configured using the following commands.
+
+::
+  
+    sudo cat /etc/iscsi/initiatorname.iscsi
+    sudo service open-iscsi status  
+
+Run OpenEBS Operator
+--------------------
+Download the latest OpenEBS operator files and sample *jupyter-mysql* application pod yaml on the kubemaster from the OpenEBS git repository.
+
+::
+
+    git clone https://github.com/openebs/openebs.git
+    cd openebs/k8s
+
+Apply openebs-operator on the Kubernetes cluster. This creates the maya api-server and openebs provisioner deployments.
+
+::
+  
+    kubectl apply -f openebs-operator.yaml
+
+Add the OpenEBS storage classes using the following command, that can then be used by developers to map a suitable storage profile for their applications in their respective persistent volume claims.    
+
+::
+  
+    kubectl apply -f openebs-storageclasses.yaml
+
+
+Check whether the deployments are running successfully using the following commands.
+
+::
+  
+    name@Master:~$ kubectl get deployments
+    NAME                                            DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE
+    maya-apiserver                                  1         1         1            1           2m
+    openebs-provisioner                             1         1         1            1           2m
+  
+::
+  
+    name@Master:~$ kubectl get pod
+    NAME                                   READY     STATUS    RESTARTS   AGE
+    maya-apiserver-1633167387-5ss2w        1/1       Running   0          24s
+    openebs-provisioner-1174174075-f2ss6   1/1       Running   0          23s
+
+
+Check whether the storage classes are applied successfully using the following commands.
+
+::
+  
+    name@Master:~$ kubectl get sc
+    NAME              TYPE
+    openebs-basic     openebs.io/provisioner-iscsi
+    openebs-jupyter   openebs.io/provisioner-iscsi
+    openebs-percona   openebs.io/provisioner-iscsi
+
+    
+Run Jupyter Pod with OpenEBS Storage
+------------------------------------
+Use OpenEBS as persistent storage for the jupyter pod by selecting an OpenEBS storage class in the persistent volume claim. A sample jupyter pod yaml (with container attributes and pvc details) is available in the OpenEBS git repository (which was cloned in the previous steps).
+::
+   name@Master:~$ cat demo-jupyter-openebs.yaml
+
+   ...
+
+   kind: PersistentVolumeClaim
+   apiVersion: v1
+   metadata:
+     name: jupyter-data-vol-claim
+   spec:
+     storageClassName: openebs-jupyter
+     accessModes:
+       - ReadWriteOnce
+     resources:
+       requests:
+         storage: 5G
+   ...
+
+Apply the jupyter pod yaml using the following command.
+
+::
+
+   name@Master:~$ kubectl apply -f demo-jupyter-openebs.yaml
+   deployment "jupyter-server" created
+   persistentvolumeclaim "jupyter-data-vol-claim" created
+   service "jupyter-service" created
+
+The above command creates the following, which can be verified using the corresponding kubectl commands.
+
+- Launches a Jupyter Server, with the specified notebook file from github (kubectl get deployments)
+- Creates an OpenEBS Volume and mounts to the Jupyter Server Pod (/mnt/data) (kubectl get pvc) (kubectl get pv) (kubectl get pods)
+- Exposes the Jupyter Server to external world via the http://<NodeIP>:32424 (NodeIP is any of the minion nodes external IP) (kubectl get pods)   
+
+Verify that the OpenEBS storage pods, that is, the jiva controller and jiva replicas are created and the jupyter pod is running succesfully using the following commands.
+
+::
+ 
+   name@Master:~$ kubectl get pods
+   NAME                                                             READY     STATUS    RESTARTS   AGE
+   jupyter-server-2764185079-s371g                                  1/1       Running   0          13m
+   maya-apiserver-1633167387-845fd                                  1/1       Running   0          15d
+   openebs-provisioner-1174174075-c78sj                             1/1       Running   1          15d
+   pvc-5467cfe7-a29e-11e7-b4df-000c298ff5fc-ctrl-2903536303-75h3j   1/1       Running   0          13m
+   pvc-5467cfe7-a29e-11e7-b4df-000c298ff5fc-rep-2383373508-bh0d3    1/1       Running   0          13m
+   pvc-5467cfe7-a29e-11e7-b4df-000c298ff5fc-rep-2383373508-s1kzz    1/1       Running   0          13m
+
+**Note:**
+
+It may take some time for the pods to start as the images must be pulled and instantiated. This is also dependent on the network speed.
+
+The jupyter server dashboard can be accessed on the Kubernetes node port as in the following screen.
+
+.. image:: ../_static/jupyter.png
