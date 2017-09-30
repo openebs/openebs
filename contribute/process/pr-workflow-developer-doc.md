@@ -51,7 +51,14 @@ You can also help with some existing issues under this category available at [de
 
 Fork the openebs/openebs repository into your account, referred in the below instructions as $user. 
 
-## Setting up Development Environment
+## Setting up Development Environment for OpenEBS projects
+```
+working_dir=$GOPATH/src/github.com/openebs
+mkdir -p $working_dir
+cd $working_dir
+```
+
+## The steps mentioned here are w.r.t contribution towards openebs/openebs project
 ```
 git clone https://github.com/$user/openebs.git
 cd openebs/
@@ -60,7 +67,7 @@ git remote set-url --push upstream no_push
 git remote -v
 ```
 
-## Synchronizing your local master with remote(or upstream) master
+## Synchronizing your local master(i.e. your $user/openebs project) with upstream master(i.e. openebs/openebs)
 ```
 git checkout master
 git fetch upstream master
@@ -69,20 +76,30 @@ git status
 git push origin master
 ```
 
-## Create Branch
+## Create Branch (based on feature or bug name)
 ```
 git branch <branch_name>
 git checkout <branch_name>
 git push --set-upstream origin <branch_name>
 ```
 
-## Synchronizing (or rebase) your local branch with remote(or upstream) master
+## Synchronizing (i.e rebase) your local branch with upstream master
 ```
 git checkout <branch-name>
 git fetch upstream master
 git rebase upstream/master
 git status
 git push
+```
+
+## Make changes to your local branch
+```
+# make your changes
+# keep fetching the commits from upstream master & rebase them here
+git commit
+git push
+
+# submit the PR to upstream from browser link https://github.com/$user/openebs
 ```
 
 ## Delete Branch
