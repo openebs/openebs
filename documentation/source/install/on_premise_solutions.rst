@@ -292,7 +292,7 @@ Run Sample Applications on the OpenEBS Setup
       Name                                      Status
       pvc-a2a6d71f-5b21-11e7-bf1c-000c298ff5fc  Running
      
-* Ve rify that the storage volume is receiving input/output by checking the increments to *DataUpdateIndex* in the output of the vsm-stats command issued in the maya-apiserver pod. Some additional performance statistics are also available in the command output.
+* Verify that the storage volume is receiving input/output by checking the increments to *DataUpdateIndex* in the output of the vsm-stats command issued in the maya-apiserver pod. Some additional performance statistics are also available in the command output.
   ::  
 
        name@MayaMaster:~$ kubectl exec maya-apiserver-1633167387-v4sf1 -c maya-apiserver -- maya vsm-stats pvc-a2a6d71f-5b21-11e7-bf1c-000c298ff5fc
