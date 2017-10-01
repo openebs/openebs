@@ -4,7 +4,7 @@ This document describes the process for improving developer documentation by cre
 
 Developer documentation is available under the folder: [openebs/contribute](https://github.com/openebs/openebs/tree/master/contribute)
 
-The developer documenation includes anything that will help community like:
+The developer documentation includes anything that will help the community like:
 - Architecture and Design documentation
 - Technical or Research Notes
 - FAQ
@@ -12,7 +12,7 @@ The developer documenation includes anything that will help community like:
 - Generic / Miscellaneous Notes
 
 At a very high level, the process to contribute and improve is pretty simple:
-- Sumit an Issue describing your proposed change
+- Submit an Issue describing your proposed change
 - Create your development branch
 - Commit your changes
 - Submit your Pull Request
