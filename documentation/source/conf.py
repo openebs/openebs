@@ -84,7 +84,7 @@ todo_include_todos = False
 # a list of builtin themes.
 #
 html_theme = 'sphinx_rtd_theme'
-#html_theme = 'sphinxdoc'
+# html_theme = 'sphinxdoc'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -107,11 +107,11 @@ html_logo = '_static/logo-medium-size.png'
 html_favicon = "_static/favicon.png"
 
 # Variables to be used by templates
-#html_context = {
+# html_context = {
 #    'css_files': [
 #        '_static/theme_overrides.css',
 #        ],
-#}
+# }
 
 
 # -- Options for LaTeX output ---------------------------------------------
@@ -163,6 +163,3 @@ texinfo_documents = [
      author, 'openebs', 'Containerized storage for Containers',
      'Miscellaneous'),
 ]
-
-
-
