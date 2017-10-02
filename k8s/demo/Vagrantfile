@@ -1,51 +1,51 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-#This is parameterized Vagrantfile, that can used for any of the following:
-#- Launch VMs auto-configured with kubernetes cluster with dedicated openebs
-#- Launch VMs auto-configured with kubernetes cluster with hyperconverged openebs
-#- Launch VMs for manual installation of kubernetes or maya clusters or both 
+# This is parameterized Vagrantfile, that can used for any of the following:
+#   - Launch VMs auto-configured with kubernetes cluster with dedicated openebs
+#   - Launch VMs auto-configured with kubernetes cluster with hyperconverged openebs
+#   - Launch VMs for manual installation of kubernetes or maya clusters or both 
 #
-#The configurable options include:
-#- Specify the number of VMs / node types 
-#- Specify the CPU/RAM for each type of node
-#- Specify the desired kubernetes cluster installation option - kubeadm, kargo, manual
-#- Specify the base operating system - Ubuntu, CentOS, etc., 
-#- Specify the kubernetes pod network - flannel, weave, calico, etc,. 
-#- In case of dedicated, specify the storage network - host, etc.,
+# The configurable options include:
+#   - Specify the number of VMs / node types 
+#   - Specify the CPU/RAM for each type of node
+#   - Specify the desired kubernetes cluster installation option - kubeadm, kargo, manual
+#   - Specify the base operating system - Ubuntu, CentOS, etc., 
+#   - Specify the kubernetes pod network - flannel, weave, calico, etc,. 
+#   - In case of dedicated, specify the storage network - host, etc.,
 
-#Specify the OpenEBS Deployment Mode - dedicated=1 (default) or hyperconverged=2
+# Specify the OpenEBS Deployment Mode - dedicated=1 (default) or hyperconverged=2
 DEPLOY_MODE_NONE = 0 
 DEPLOY_MODE_DEDICATED = 1
 DEPLOY_MODE_HC = 2
 
-#Changed DEPLOY_MODE from Constant to Local variable deploy_Mode to avoid rewrite warnings on constants.
+# Changed DEPLOY_MODE from Constant to Local variable deploy_Mode to avoid rewrite warnings on constants.
 deploy_Mode=ENV['OPENEBS_DEPLOY_MODE'] || 1
 
-#Specify the release versions to be installed
+# Specify the release versions to be installed
 MAYA_RELEASE_TAG = ENV['MAYA_RELEASE_TAG'] || "0.2"
 
-#TODO - Verify
-#LC_ALL is not set on OsX, it will inherit it from SSH on Linux though,
-#so might want it to be a conditional
+# TODO - Verify
+#   LC_ALL is not set on OsX, it will inherit it from SSH on Linux though,
+#   so might want it to be a conditional
 ENV['LC_ALL']="en_US.UTF-8"
 
-#Specify the number of Kubernetes Master nodes, CPU/RAM per node. 
+# Specify the number of Kubernetes Master nodes, CPU/RAM per node. 
 KM_NODES = ENV['KM_NODES'] || 1
 KM_MEM = ENV['KM_MEM'] || 2048
 KM_CPUS = ENV['KM_CPUS'] || 2
 
-#Specify the number of Kubernetes Minion nodes, CPU/RAM per node. 
+# Specify the number of Kubernetes Minion nodes, CPU/RAM per node. 
 KH_NODES = ENV['KH_NODES'] || 1
 KH_MEM = ENV['KH_MEM'] || 1024
 KH_CPUS = ENV['KH_CPUS'] || 2
 
-#Specify the number of OpenEBS Master nodes, CPU/RAM per node. (Applicable only for dedicated mode)
+# Specify the number of OpenEBS Master nodes, CPU/RAM per node. (Applicable only for dedicated mode)
 MM_NODES = ENV['MM_NODES'] || 1
 MM_MEM = ENV['MM_MEM'] || 1024
 MM_CPUS = ENV['MM_CPUS'] || 1
 
-#Specify the number of OpenEBS Storage Host nodes, CPU/RAM per node. (Applicable only for dedicated mode)
+# Specify the number of OpenEBS Storage Host nodes, CPU/RAM per node. (Applicable only for dedicated mode)
 MH_NODES = ENV['MH_NODES'] || 2
 MH_MEM = ENV['MH_MEM'] || 1024
 MH_CPUS = ENV['MH_CPUS'] || 1
@@ -56,11 +56,11 @@ MH_CPUS = ENV['MH_CPUS'] || 1
 VAGRANTFILE_API_VERSION = "2"
 Vagrant.require_version ">= 1.9.1"
 
-#Local Variables
+# Local Variables
 machine_ip_address = %Q(ifconfig | grep -oP \
-            "inet addr:\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}" \
-            | grep -oP "\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}" \
-            | sort | tail -n 1 | head -n 1)
+                     "inet addr:\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}" \
+                     | grep -oP "\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}" \
+                     | sort | tail -n 1 | head -n 1)
 master_ip_address = ""
 host_ip_address = ""
 get_token = ""
@@ -74,6 +74,7 @@ required_plugins.each do |plugin|
     system "vagrant plugin install #{plugin}"
     need_restart = true
   end
+  
   exec "vagrant #{ARGV.join(' ')}" if need_restart
 end
 
@@ -88,23 +89,23 @@ def configureVM(vmCfg, hostname, cpus, mem)
   vmCfg.vm.network "private_network", type: "dhcp"
 
   # Needed for ubuntu/xenial64 packaged boxes
-  # The default user is ubuntu for those boxes
+  #   The default user is ubuntu for those boxes
   vmCfg.ssh.username = "ubuntu"
   vmCfg.vm.provision "shell", inline: <<-SHELL
-      echo "ubuntu:ubuntu" | sudo chpasswd
+    echo "ubuntu:ubuntu" | sudo chpasswd
   SHELL
   
-  #Adding Vagrant-cachier
+  # Adding Vagrant-cachier
   if Vagrant.has_plugin?("vagrant-cachier")
-     vmCfg.cache.scope = :machine
-     vmCfg.cache.enable :apt
-     vmCfg.cache.enable :gem     
+    vmCfg.cache.scope = :machine
+    vmCfg.cache.enable :apt
+    vmCfg.cache.enable :gem     
   end
   
   # Set resources w.r.t Virtualbox provider
   vmCfg.vm.provider "virtualbox" do |vb|
-    #Uncomment the following line, to launch the Virtual Box console. 
-    #Useful for debugging cases, where the VM doesn't allow login into console
+    # Uncomment the following line, to launch the Virtual Box console. 
+    #   Useful for debugging cases, where the VM doesn't allow login into console
     #vb.gui = true
     vb.memory = mem
     vb.cpus = cpus
@@ -117,14 +118,14 @@ end
 # Entry point of this Vagrantfile
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
-    #Dont look for updates
+    # Don't look for updates
     if Vagrant.has_plugin?("vagrant-vbguest") then
-        config.vbguest.auto_update = false
+      config.vbguest.auto_update = false
     end
 
-    #Check for invalid deployment modes and default to DEDICATED MODE.  
+    # Check for invalid deployment modes and default to DEDICATED MODE.  
     if ((deploy_Mode.to_i < DEPLOY_MODE_NONE.to_i) || \
-      (deploy_Mode.to_i > DEPLOY_MODE_HC.to_i))
+        (deploy_Mode.to_i > DEPLOY_MODE_HC.to_i))
         puts "Invalid value set for OPENEBS_DEPLOY_MODE"
         puts "Usage: OPENEBS_DEPLOY_MODE=0 for NONE"
         puts "Usage: OPENEBS_DEPLOY_MODE=1 for DEDICATED"
@@ -133,14 +134,14 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         puts "Do you want to continue?(y/n):"
         input = STDIN.gets.chomp
         while 1 do
-           if(input == "n")
-             Kernel.exit!(0)
-           elsif(input == "y")
-             break
-           else
-             puts "Invalid input: type 'y' or 'n'"
-             input = STDIN.gets.chomp
-           end
+          if(input == "n")
+            Kernel.exit!(0)
+          elsif(input == "y")
+            break
+          else
+            puts "Invalid input: type 'y' or 'n'"
+            input = STDIN.gets.chomp
+          end
         end
         deploy_Mode = 1
     end   
@@ -153,13 +154,13 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       config.vm.define hostname do |vmCfg|
         vmCfg.vm.box = "openebs/k8s-1.5.5"
 	      vmCfg.vm.provider "virtualbox" do |vb|
-           vb.customize ["modifyvm", :id, "--uartmode1", "file", File.join(Dir.pwd, "openebs-k8s-1.5.5-cloudimg-console.log")]
+          vb.customize ["modifyvm", :id, "--uartmode1", "file", File.join(Dir.pwd, "openebs-k8s-1.5.5-cloudimg-console.log")]
         end
         vmCfg = configureVM(vmCfg, hostname, cpus, mem)
 
         # Run in dedicated deployment mode or hyperconverged mode
         if ((deploy_Mode.to_i == DEPLOY_MODE_DEDICATED.to_i) || \
-          (deploy_Mode.to_i == DEPLOY_MODE_HC.to_i))
+            (deploy_Mode.to_i == DEPLOY_MODE_HC.to_i))
           
           # Install Kubernetes Master.
           vmCfg.vm.provision :shell, 
@@ -177,16 +178,16 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       config.vm.define hostname do |vmCfg|
         vmCfg.vm.box = "openebs/k8s-1.5.5"
 	      vmCfg.vm.provider "virtualbox" do |vb|
-           vb.customize ["modifyvm", :id, "--uartmode1", "file", File.join(Dir.pwd, "openebs-k8s-1.5.5-cloudimg-console.log")]
+          vb.customize ["modifyvm", :id, "--uartmode1", "file", File.join(Dir.pwd, "openebs-k8s-1.5.5-cloudimg-console.log")]
         end
         vmCfg = configureVM(vmCfg, hostname, cpus, mem)
 
         # Run in dedicated deployment mode or hyperconverged mode
         if ((deploy_Mode.to_i == DEPLOY_MODE_DEDICATED.to_i) || \
-          (deploy_Mode.to_i == DEPLOY_MODE_HC.to_i))
+            (deploy_Mode.to_i == DEPLOY_MODE_HC.to_i))
 
           # This runs only when the VM is first provisioned.
-          # Get the Master IP to join the cluster.
+          #   Get the Master IP to join the cluster.
           vmCfg.vm.provision :trigger, 
           :force => true, 
           :stdout => true, 
@@ -196,44 +197,44 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
               master_hostname = "kubemaster-01"
               
               get_ip_address = %Q(vagrant ssh \
-              #{master_hostname} \
-              -c 'ifconfig | grep -oP \
-              "inet addr:\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}" \
-              | grep -oP \"\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}" \
-              | sort | tail -n 1 | head -n 1')
+                                #{master_hostname} \
+                                -c 'ifconfig | grep -oP \
+                                "inet addr:\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}" \
+                                | grep -oP \"\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}" \
+                                | sort | tail -n 1 | head -n 1')
               
               master_ip_address = `#{get_ip_address}`            
               if master_ip_address == ""            
-                  info"The Kubernetes Master is down, \
-                  bring it up and manually run: \
-                  configure_k8s_host.sh script on Kubernetes Minion."
+                info"The Kubernetes Master is down, \
+                bring it up and manually run: \
+                configure_k8s_host.sh script on Kubernetes Minion."
               else                           
-                  get_token = %Q(vagrant ssh \
-                  #{master_hostname} -c \
-                  'kubectl -n kube-system get secret clusterinfo \
-                  -o yaml | grep token-map | cut -d ":" -f2 \
-                  | cut -d " " -f2 | base64 -d \
-                  | sed "s|{||g;s|}||g" \
-                  | sed "s|:|.|g" | xargs echo')
+                get_token = %Q(vagrant ssh \
+                #{master_hostname} -c \
+                'kubectl -n kube-system get secret clusterinfo \
+                -o yaml | grep token-map | cut -d ":" -f2 \
+                | cut -d " " -f2 | base64 -d \
+                | sed "s|{||g;s|}||g" \
+                | sed "s|:|.|g" | xargs echo')
                   
-                  token = `#{get_token}`                  
+                token = `#{get_token}`                  
                   
-                  if token != ""
-                    get_cluster_ip = %Q(vagrant ssh \
-                    #{master_hostname} \
-                    -c 'kubectl get svc -o yaml | grep clusterIP \
-                    | cut -d ":" -f2 | cut -d " " -f2')
+                if token != ""
+                  get_cluster_ip = %Q(vagrant ssh \
+                  #{master_hostname} \
+                  -c 'kubectl get svc -o yaml | grep clusterIP \
+                  | cut -d ":" -f2 | cut -d " " -f2')
 
-                    cluster_ip = `#{get_cluster_ip}`
+                  cluster_ip = `#{get_cluster_ip}`
 
-                    @machine.communicate.sudo("bash \
-                    /home/ubuntu/demo/k8s/scripts/configure_k8s_host.sh \
-                    --masterip=#{master_ip_address.strip} \
-                    --token=#{token.strip} \
-                    --clusterip=#{cluster_ip.strip}")
-                  else
-                    info"Invalid Token. Check your Kubernetes setup."
-                  end
+                  @machine.communicate.sudo("bash \
+                  /home/ubuntu/demo/k8s/scripts/configure_k8s_host.sh \
+                  --masterip=#{master_ip_address.strip} \
+                  --token=#{token.strip} \
+                  --clusterip=#{cluster_ip.strip}")
+                else
+                  info"Invalid Token. Check your Kubernetes setup."
+                end
               end  
             end
           end
@@ -251,8 +252,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         (deploy_Mode.to_i == DEPLOY_MODE_NONE.to_i))     
         config.vm.define hostname do |vmCfg|
           vmCfg.vm.box = "openebs/openebs-0.2"
-	        vmCfg.vm.provider "virtualbox" do |vb|
-           vb.customize ["modifyvm", :id, "--uartmode1", "file", File.join(Dir.pwd, "openebs-openebs-0.2-cloudimg-console.log")]
+	  vmCfg.vm.provider "virtualbox" do |vb|
+            vb.customize ["modifyvm", :id, "--uartmode1", "file", File.join(Dir.pwd, "openebs-openebs-0.2-cloudimg-console.log")]
           end
           vmCfg = configureVM(vmCfg, hostname, cpus, mem)
 
@@ -278,18 +279,19 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
               trigger.fire do
 
                 get_ip_address = %Q(vagrant ssh \
-                #{hostname}  -c 'ifconfig | grep -oP \
-                "inet addr:\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}" \
-                | grep -oP "\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}" \
-                | sort | tail -n 1 | head -n 1')
+                                 #{hostname}  -c 'ifconfig | grep -oP \
+                                 "inet addr:\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}" \
+                                 | grep -oP "\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}" \
+                                 | sort | tail -n 1 | head -n 1')
 
                 host_ip_address = `#{get_ip_address}`
 
                 @machine.communicate.sudo("echo \
-		'export NOMAD_ADDR=http://#{host_ip_address.strip}:4646' >> \
+		          'export NOMAD_ADDR=http://#{host_ip_address.strip}:4646' >> \
                 /home/ubuntu/.profile") 
-		@machine.communicate.sudo("echo \
-		'export MAPI_ADDR=http://#{host_ip_address.strip}:5656' >> \
+
+		        @machine.communicate.sudo("echo \
+		          'export MAPI_ADDR=http://#{host_ip_address.strip}:5656' >> \
                 /home/ubuntu/.profile")
               end
             end            
@@ -305,11 +307,11 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       mem = MH_MEM
 
       if ((deploy_Mode.to_i == DEPLOY_MODE_DEDICATED.to_i) || \
-        (deploy_Mode.to_i == DEPLOY_MODE_NONE.to_i))
+          (deploy_Mode.to_i == DEPLOY_MODE_NONE.to_i))
         config.vm.define hostname do |vmCfg|
           vmCfg.vm.box = "openebs/openebs-0.2"
-	        vmCfg.vm.provider "virtualbox" do |vb|
-           vb.customize ["modifyvm", :id, "--uartmode1", "file", File.join(Dir.pwd, "openebs-openebs-0.2-cloudimg-console.log")]
+	  vmCfg.vm.provider "virtualbox" do |vb|
+            vb.customize ["modifyvm", :id, "--uartmode1", "file", File.join(Dir.pwd, "openebs-openebs-0.2-cloudimg-console.log")]
           end
           vmCfg = configureVM(vmCfg, hostname, cpus, mem)
           
@@ -326,10 +328,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
                 master_hostname = "omm-01"
 
                 get_ip_address = %Q(vagrant ssh \
-                #{master_hostname}  -c 'ifconfig | grep -oP \
-                "inet addr:\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}" \
-                | grep -oP "\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}" \
-                | sort | tail -n 1 | head -n 1')
+                                 #{master_hostname}  -c 'ifconfig | grep -oP \
+                                 "inet addr:\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}" \
+                                 | grep -oP "\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}" \
+                                 | sort | tail -n 1 | head -n 1')
 
                 master_ip_address = `#{get_ip_address}`
 
@@ -347,25 +349,26 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
                   host_ip_address = `#{get_ip_address}`
 
                   if MAYA_RELEASE_TAG == ""
-                  @machine.communicate.sudo("bash \
-                  /home/ubuntu/demo/maya/scripts/configure_osh.sh \
-                  --masterip=#{master_ip_address.strip}")                  
-                 else
-                  @machine.communicate.sudo("bash \
-                  /home/ubuntu/demo/maya/scripts/configure_osh.sh \
-                  --masterip=#{master_ip_address.strip} \
-                  --releasetag=#{MAYA_RELEASE_TAG}")		 
+                    @machine.communicate.sudo("bash \
+                    /home/ubuntu/demo/maya/scripts/configure_osh.sh \
+                    --masterip=#{master_ip_address.strip}")                  
+                  else
+                    @machine.communicate.sudo("bash \
+                    /home/ubuntu/demo/maya/scripts/configure_osh.sh \
+                    --masterip=#{master_ip_address.strip} \
+                    --releasetag=#{MAYA_RELEASE_TAG}")		 
                   end
 
                   @machine.communicate.sudo("echo \
-		  'export NOMAD_ADDR=http://#{host_ip_address.strip}:4646' >> \
-                  /home/ubuntu/.profile")
-		  @machine.communicate.sudo("echo \
-		  'export MAPI_ADDR=http://#{host_ip_address.strip}:5656' >> \
-                  /home/ubuntu/.profile")
+		    'export NOMAD_ADDR=http://#{host_ip_address.strip}:4646' >> \
+                    /home/ubuntu/.profile")
+		        
+                  @machine.communicate.sudo("echo \
+		    'export MAPI_ADDR=http://#{host_ip_address.strip}:5656' >> \
+                    /home/ubuntu/.profile")
 
 		  @machine.communicate.sudo("docker pull \
-		  openebs/jiva")
+		    openebs/jiva")
                 end  
               end
             end
