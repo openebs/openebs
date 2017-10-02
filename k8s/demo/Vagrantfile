@@ -252,7 +252,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         (deploy_Mode.to_i == DEPLOY_MODE_NONE.to_i))     
         config.vm.define hostname do |vmCfg|
           vmCfg.vm.box = "openebs/openebs-0.2"
-	      vmCfg.vm.provider "virtualbox" do |vb|
+	  vmCfg.vm.provider "virtualbox" do |vb|
             vb.customize ["modifyvm", :id, "--uartmode1", "file", File.join(Dir.pwd, "openebs-openebs-0.2-cloudimg-console.log")]
           end
           vmCfg = configureVM(vmCfg, hostname, cpus, mem)
@@ -310,7 +310,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
           (deploy_Mode.to_i == DEPLOY_MODE_NONE.to_i))
         config.vm.define hostname do |vmCfg|
           vmCfg.vm.box = "openebs/openebs-0.2"
-	      vmCfg.vm.provider "virtualbox" do |vb|
+	  vmCfg.vm.provider "virtualbox" do |vb|
             vb.customize ["modifyvm", :id, "--uartmode1", "file", File.join(Dir.pwd, "openebs-openebs-0.2-cloudimg-console.log")]
           end
           vmCfg = configureVM(vmCfg, hostname, cpus, mem)
