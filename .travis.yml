@@ -1,9 +1,10 @@
-dist: trusty
-sudo: required
-install: true
+language: python
+
+python:
+  - "2.7"
+
+install: "pip install -q -r requirements.txt"
+
 script:
-  - make build
-notifications:
-  email:
-    recipients:
-      - kiran.mova@cloudbyte.com
+  - cd documentation; sphinx-build -nW -b html source build
+
