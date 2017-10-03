@@ -24,9 +24,22 @@ OpenEBS can scale to include an  arbitrarily large number of containerized stora
  
 ## Installation and Getting Started
  
-OpenEBS can be setup in few easy steps.  You can get going on GCE to try it out quickly here:  https://github.com/openebs/openebs/blob/master/k8s/hyperconverged/tutorial-configure-openebs-gke.md
-Also, we have a Vagrant environment available that includes a sample Kubernetes deployment and synthetic load you can use to simulate the performance of OpenEBS. 
-Please follow our [Getting Started](k8s/dedicated/README.md) documentation 
+OpenEBS can be setup in few easy steps.  You can get going on your choice of kubernetes cluster by having open-iscsi installed on the Kubernetes nodes and running the openebs-operator using kubectl. 
+
+**Start the OpenEBS services using operator**
+```
+wget https://raw.githubusercontent.com/openebs/openebs/master/k8s/openebs-operator.yaml
+kubectl apply -f openebs-operator.yaml
+```
+**Customize or use the default storageclasses**
+```
+wget https://raw.githubusercontent.com/openebs/openebs/master/k8s/openebs-storageclasses.yaml
+kubectl apply -f openebs-storageclasses.yaml
+```
+You could also follow our [QuickStart Guide](http://openebs.readthedocs.io/en/latest/getting_started/quick_install.html).
+
+OpenEBS can be deployed on any kubernetes cluster - either in cloud, on-premise or developer laptop (minikube). Please follow our [OpenEBS Setup](http://openebs.readthedocs.io/en/latest/install/install_overview.html) documentation. Also, we have a Vagrant environment available that includes a sample Kubernetes deployment and synthetic load you can use to simulate the performance of OpenEBS. 
+
  
 ## Status
 We are approaching beta stage with active development underway. See our [Project Tracker](https://github.com/openebs/openebs/wiki/Project-Tracker) for more details.
