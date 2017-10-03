@@ -61,7 +61,7 @@ Please join us on Slack at:  https://openebs-community.slack.com/
 
 ## Show me the Code
 
-This is a meta-repository for OpenEBS. Please find various documentation related artifacts, e2e tests and code related to deploying OpenEBS with popular orchestration engines like Kubernetes, Swarm, Mesos, Rancher, and so on. The source code is available at the following locations:
+This is a meta-repository for OpenEBS. Here, [openebs/openebs](https://github.com/openebs/openebs), please find various documentation related artifacts, e2e tests and code related to deploying OpenEBS with popular orchestration engines like Kubernetes, Swarm, Mesos, Rancher, and so on. The source code is available at the following locations:
 - The core storage source code is under [openebs/jiva](https://github.com/openebs/jiva).
 - The storage orchestration source code is under [openebs/maya](https://github.com/openebs/maya).
 - While *jiva* and *maya* contain significant chunks of source code, some of the orchestration and automation code is also distributed in other repositories under the OpenEBS organization. 
