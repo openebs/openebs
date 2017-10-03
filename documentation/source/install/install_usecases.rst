@@ -1,13 +1,5 @@
-**********************
-Usecases - Percona DB
-**********************
-
-Running Percona Pod on OpenEBS
-===============================
-This section provides detailed instructions on how to run a *percona-mysql* application pod on OpenEBS storage in a Kubernetes cluster and uses a *mysql-client* container to generate load (in the form of insert and select DB queries) in order to illustrate input/output traffic on the storage.
-
 Prerequisites
--------------
+===============
 Prerequisites include the following:
     
 * A fully configured Kubernetes cluster (versions 1.6.3/4/6 and 1.7.0 have been tested) with kube master and at least one kube node. This maybe created on cloud platforms like GKE, on-premise virtual machines (vagrant/VMware/Hyper-V) or bare-metal boxes.
@@ -46,7 +38,7 @@ Verify that iSCSI is configured using the following commands.
     sudo service open-iscsi status  
 
 Run OpenEBS Operator
---------------------
+=====================
 Download the latest OpenEBS operator files and sample *percona-mysql* application pod yaml on the kubemaster from the OpenEBS git repository.
 
 ::
@@ -94,9 +86,15 @@ Check whether the storage classes are applied successfully using the following c
     openebs-jupyter   openebs.io/provisioner-iscsi
     openebs-percona   openebs.io/provisioner-iscsi
 
+
+Percona DB
+===========
+Running Percona Pod on OpenEBS
+---------------------------------
+This section provides detailed instructions on how to run a *percona-mysql* application pod on OpenEBS storage in a Kubernetes cluster and uses a *mysql-client* container to generate load (in the form of insert and select DB queries) in order to illustrate input/output traffic on the storage.
     
 Run percona-mysql Pod with OpenEBS Storage
-------------------------------------------
+--------------------------------------------
 Use OpenEBS as persistent storage for the percona pod by selecting an OpenEBS storage class in the persistent volume claim. A sample percona pod yaml (with container attributes and pvc details) is available in the OpenEBS git repository (which was cloned in the previous steps).
 
 Apply the percona pod yaml using the following commands.
@@ -124,7 +122,7 @@ Verify that the OpenEBS storage pods, that is, the jiva controller and jiva repl
 It may take some time for the pods to start as the images must be pulled and instantiated. This is also dependent on the network speed.
 
 Run a Database Client Container to Generate SQL Load
-----------------------------------------------------
+------------------------------------------------------
 
 To test the pod, you can run a Kubernetes job, in which a mysql client container runs a load generation script (which in turn performs simple sql queries) to simulate storage traffic. Run the following procedure on any node in the Kubernetes cluster.
 
@@ -149,7 +147,7 @@ Run the load generation job using the following command.
 
 
 View Performance and Storage Consumption Statistics Using mayactl
------------------------------------------------------------------
+--------------------------------------------------------------------
 
 Performance and capacity usage statistics on the OpenEBS storage volume can be viewed by executing the following *mayactl* command inside the maya-apiserver pod. 
 
@@ -200,106 +198,17 @@ The above command can be invoked using the *watch* command by providing a desire
 
    watch -n 1 maya vsm-stats pvc-016e9a68-71c1-11e7-9fea-000c298ff5fc
 
-******************
-Usecases - Jupyter
-******************
+
+Jupyter
+=========
  
 Running Jupyter on OpenEBS
-===========================
+---------------------------
 
 This section provides detailed instructions on how to run a jupyter pod on OpenEBS storage in a Kubernetes cluster and uses a *jupyter ui editor* to generate load in order to illustrate input/output traffic on the storage.
 
-Prerequisites
--------------
-Prerequisites include the following:
-    
-* A fully configured Kubernetes cluster (versions 1.6.3/4/6 and 1.7.0 have been tested) with kube master and at least one kube node. This maybe created on cloud platforms like GKE, on-premise virtual machines (vagrant/VMware/Hyper-V) or bare-metal boxes.
-
-**Note:**
-
-    * OpenEBS recommends using a 3-node cluster, with one master and two nodes. This aids in creating storage replicas on separate nodes and is helpful in maintaining redundancy and data availability.
-
-    * If you are using gcp, view the appendix in this section for additional steps to set up cluster administration context and use it.
-
-Verify that the Kubernetes cluster is in optimal state by using the following commands.
-
-:: 
-  
-   name@Master:~$ kubectl get nodes
-   NAME         STATUS    AGE       VERSION
-   host01   Ready     5d        v1.6.3
-   host02   Ready     5d        v1.6.3
-   master   Ready     5d        v1.6.3
-
-* Sufficient resources on the nodes to host the OpenEBS storage pods and Jupyter application pods - This includes sufficient disk space, in this example, physical storage for the pvolume containers will be carved out from the local storage.
-
-* iSCSI support on the nodes - This is required for being able to consume the iSCSI target exposed by the OpenEBS volume container (that is, VSM). In ubuntu, you can install the iSCSI initiator using the following procedure.
-
-::
-  
-    sudo apt-get update
-    sudo apt-get install open-iscsi
-    sudo service open-iscsi restart
-
-Verify that iSCSI is configured using the following commands.
-
-::
-  
-    sudo cat /etc/iscsi/initiatorname.iscsi
-    sudo service open-iscsi status  
-
-Run OpenEBS Operator
---------------------
-Download the latest OpenEBS operator files and sample *jupyter-mysql* application pod yaml on the kubemaster from the OpenEBS git repository.
-
-::
-
-    git clone https://github.com/openebs/openebs.git
-    cd openebs/k8s
-
-Apply openebs-operator on the Kubernetes cluster. This creates the maya api-server and openebs provisioner deployments.
-
-::
-  
-    kubectl apply -f openebs-operator.yaml
-
-Add the OpenEBS storage classes using the following command, that can then be used by developers to map a suitable storage profile for their applications in their respective persistent volume claims.    
-
-::
-  
-    kubectl apply -f openebs-storageclasses.yaml
-
-
-Check whether the deployments are running successfully using the following commands.
-
-::
-  
-    name@Master:~$ kubectl get deployments
-    NAME                                            DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE
-    maya-apiserver                                  1         1         1            1           2m
-    openebs-provisioner                             1         1         1            1           2m
-  
-::
-  
-    name@Master:~$ kubectl get pod
-    NAME                                   READY     STATUS    RESTARTS   AGE
-    maya-apiserver-1633167387-5ss2w        1/1       Running   0          24s
-    openebs-provisioner-1174174075-f2ss6   1/1       Running   0          23s
-
-
-Check whether the storage classes are applied successfully using the following commands.
-
-::
-  
-    name@Master:~$ kubectl get sc
-    NAME              TYPE
-    openebs-basic     openebs.io/provisioner-iscsi
-    openebs-jupyter   openebs.io/provisioner-iscsi
-    openebs-percona   openebs.io/provisioner-iscsi
-
-    
 Run Jupyter Pod with OpenEBS Storage
-------------------------------------
+--------------------------------------
 Use OpenEBS as persistent storage for the jupyter pod by selecting an OpenEBS storage class in the persistent volume claim. A sample jupyter pod yaml (with container attributes and pvc details) is available in the OpenEBS git repository (which was cloned in the previous steps).
 ::
    name@Master:~$ cat demo-jupyter-openebs.yaml
@@ -354,3 +263,40 @@ It may take some time for the pods to start as the images must be pulled and ins
 The jupyter server dashboard can be accessed on the Kubernetes node port as in the following screen.
 
 .. image:: https://raw.githubusercontent.com/openebs/openebs/master/documentation/source/_static/Jupyter.png
+
+Crunchy Postgres
+=================
+ 
+Running Crunchy Postgres on OpenEBS
+------------------------------------
+
+The following steps bring up a postgresql stateful set with one master and one replica on OpenEBS storage. OpenEBS has used centos-based postgresql containers from crunchy-data to achieve the same.
+
+Download the files to your host, which has access to kubectl using the following commands.
+::
+  
+  cd $HOME
+  git clone https://github.com/openebs/openebs.git
+  cd openebs/k8s/demo/crunchy-postgres
+
+Run the StatefulSet using the following command. The files are available with default images and credentails (set.json)
+::
+  
+  ./run.sh
+
+  The above step will automatically create the OpenEBS volumes required for master and replica postgresql containers. The volume details can be inspected using the following standard kubectl commands.
+  ::
+    
+    kubectl get pvc
+    kubectl get pv
+
+References
+------------
+
+The k8s spec files are based on the files provided by `CrunchyData StatefulSet with Dynamic Provisioner`_.
+
+.. _CrunchyData StatefulSet with Dynamic Provisioner: https://github.com/CrunchyData/crunchy-containers/tree/master/examples/kube/statefulset-dyn
+
+Kubernetes Blog for running `Clustered PostgreSQL using StatefulSet`_
+
+.. _Clustered PostgreSQL using StatefulSet: http://blog.kubernetes.io/2017/02/postgresql-clusters-kubernetes-statefulsets.html
