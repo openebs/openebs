@@ -10,11 +10,11 @@ Prerequisites
 -------------
 Prerequisites include the following:
     
-* A fully configured Kubernetes cluster (versions 1.6.3/4/6 and 1.7.0 have been tested) with kube master and at least one kube minion. This maybe created on cloud platforms like GKE, on-premise virtual machines (vagrant/VMware/Hyper-V) or bare-metal boxes.
+* A fully configured Kubernetes cluster (versions 1.6.3/4/6 and 1.7.0 have been tested) with kube master and at least one kube node. This maybe created on cloud platforms like GKE, on-premise virtual machines (vagrant/VMware/Hyper-V) or bare-metal boxes.
 
 **Note:**
 
-    * OpenEBS recommends using a 3-node cluster, with one master and two minions. This aids in creating storage replicas on separate minion nodes and is helpful in maintaining redundancy and data availability.
+    * OpenEBS recommends using a 3-node cluster, with one master and two nodes. This aids in creating storage replicas on separate nodes and is helpful in maintaining redundancy and data availability.
 
     * If you are using gcp, view the appendix in this section for additional steps to set up cluster administration context and use it.
 
@@ -24,13 +24,13 @@ Verify that the Kubernetes cluster is in optimal state by using the following co
   
    name@Master:~$ kubectl get nodes
    NAME         STATUS    AGE       VERSION
-   mayahost01   Ready     5d        v1.6.3
-   mayahost02   Ready     5d        v1.6.3
-   mayamaster   Ready     5d        v1.6.3
+   host01   Ready     5d        v1.6.3
+   host02   Ready     5d        v1.6.3
+   master   Ready     5d        v1.6.3
 
-* Sufficient resources on the minions to host the OpenEBS storage pods and Percona application pods - This includes sufficient disk space, in this example, physical storage for the pvolume containers will be carved out from the local storage.
+* Sufficient resources on the nodes to host the OpenEBS storage pods and Percona application pods - This includes sufficient disk space, in this example, physical storage for the pvolume containers will be carved out from the local storage.
 
-* iSCSI support on the minions - This is required for being able to consume the iSCSI target exposed by the OpenEBS volume container (that is, VSM). In ubuntu, you can install the iSCSI initiator using the following procedure.
+* iSCSI support on the nodes - This is required for being able to consume the iSCSI target exposed by the OpenEBS volume container (that is, VSM). In ubuntu, you can install the iSCSI initiator using the following procedure.
 
 ::
   
@@ -213,11 +213,11 @@ Prerequisites
 -------------
 Prerequisites include the following:
     
-* A fully configured Kubernetes cluster (versions 1.6.3/4/6 and 1.7.0 have been tested) with kube master and at least one kube minion. This maybe created on cloud platforms like GKE, on-premise virtual machines (vagrant/VMware/Hyper-V) or bare-metal boxes.
+* A fully configured Kubernetes cluster (versions 1.6.3/4/6 and 1.7.0 have been tested) with kube master and at least one kube node. This maybe created on cloud platforms like GKE, on-premise virtual machines (vagrant/VMware/Hyper-V) or bare-metal boxes.
 
 **Note:**
 
-    * OpenEBS recommends using a 3-node cluster, with one master and two minions. This aids in creating storage replicas on separate minion nodes and is helpful in maintaining redundancy and data availability.
+    * OpenEBS recommends using a 3-node cluster, with one master and two nodes. This aids in creating storage replicas on separate nodes and is helpful in maintaining redundancy and data availability.
 
     * If you are using gcp, view the appendix in this section for additional steps to set up cluster administration context and use it.
 
@@ -231,9 +231,9 @@ Verify that the Kubernetes cluster is in optimal state by using the following co
    host02   Ready     5d        v1.6.3
    master   Ready     5d        v1.6.3
 
-* Sufficient resources on the minions to host the OpenEBS storage pods and Jupyter application pods - This includes sufficient disk space, in this example, physical storage for the pvolume containers will be carved out from the local storage.
+* Sufficient resources on the nodes to host the OpenEBS storage pods and Jupyter application pods - This includes sufficient disk space, in this example, physical storage for the pvolume containers will be carved out from the local storage.
 
-* iSCSI support on the minions - This is required for being able to consume the iSCSI target exposed by the OpenEBS volume container (that is, VSM). In ubuntu, you can install the iSCSI initiator using the following procedure.
+* iSCSI support on the nodes - This is required for being able to consume the iSCSI target exposed by the OpenEBS volume container (that is, VSM). In ubuntu, you can install the iSCSI initiator using the following procedure.
 
 ::
   
@@ -332,7 +332,7 @@ The above command creates the following, which can be verified using the corresp
 
 - Launches a Jupyter Server, with the specified notebook file from github (kubectl get deployments)
 - Creates an OpenEBS Volume and mounts to the Jupyter Server Pod (/mnt/data) (kubectl get pvc) (kubectl get pv) (kubectl get pods)
-- Exposes the Jupyter Server to external world via the http://<NodeIP>:32424 (NodeIP is any of the minion nodes external IP) (kubectl get pods)   
+- Exposes the Jupyter Server to external world via the http://<NodeIP>:32424 (NodeIP is any of the nodes external IP) (kubectl get pods)   
 
 Verify that the OpenEBS storage pods, that is, the jiva controller and jiva replicas are created and the jupyter pod is running succesfully using the following commands.
 
@@ -353,4 +353,4 @@ It may take some time for the pods to start as the images must be pulled and ins
 
 The jupyter server dashboard can be accessed on the Kubernetes node port as in the following screen.
 
-.. image:: ../_static/jupyter.png
+.. image:: https://raw.githubusercontent.com/openebs/openebs/master/documentation/source/_static/Jupyter.png
