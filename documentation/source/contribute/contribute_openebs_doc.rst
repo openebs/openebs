@@ -1,5 +1,5 @@
 
-Contributing to the OpenEBS Documentation
+OpenEBS Contribution Guide
 =========================================
 
 You can access the latest documents at http://openebs.readthedocs.io/en/latest/. 
