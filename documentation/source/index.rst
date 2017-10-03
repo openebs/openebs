@@ -39,12 +39,12 @@ Contents:
    
 
 
-.. .. toctree::
+.. toctree::
    :maxdepth: 1
    :caption: Release Notes
    
 
-..   Changelog <release_notes/releasenotes>
+   Changelog <release_notes/releasenotes>
 
 
 .. toctree::
