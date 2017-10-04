@@ -45,7 +45,7 @@ spec:
  - metadata:
      name: mongo-persistent-storage
    spec:
-     storageClassName: openebs-percona
+     storageClassName: openebs-basic
      accessModes:
        - ReadWriteOnce
      resources:
