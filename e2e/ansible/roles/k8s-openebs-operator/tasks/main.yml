@@ -20,7 +20,7 @@
   args:
     executable: /bin/bash
   register: result
-  until:  "'Ready' in result.stdout"
+  until:  result.stdout == "Ready"
   delay: 60
   retries: 10
   ignore_errors: true  
