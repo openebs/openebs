@@ -13,6 +13,7 @@ Contents:
     OpenEBS Introduction <getting_started/overview>
     Components and Architecture <getting_started/components_architecture>
     Quick Install <getting_started/quick_install>
+    How does Storage High Availablility Work? <getting_started/ha_storage>
     
 .. toctree::
     :maxdepth: 2
@@ -39,12 +40,12 @@ Contents:
    
 
 
-.. .. toctree::
+.. toctree::
    :maxdepth: 1
    :caption: Release Notes
    
 
-..   Changelog <release_notes/releasenotes>
+   Changelog <release_notes/releasenotes>
 
 
 .. toctree::
