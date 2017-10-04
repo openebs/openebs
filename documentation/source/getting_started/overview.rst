@@ -8,9 +8,9 @@ Persistent storage presents significant challenges to the developer interfacing 
 
 **Note:**
 
-In the current release, the integration support is provided only for Kubernetes. 
+OpenEBS integration support is provided only for Kubernetes. 
 
-Currently (OpenEBS 0.3 release), a DevOps developer gets the following from the OpenEBS solution
+A DevOps developer gets the following from the OpenEBS solution.
 
 - OpenEBS operator yaml file that installs the OpenEBS components onto a k8s cluster
 - A set of yaml files containing configuration examples of how to use OpenEBS storage classes 
@@ -18,9 +18,21 @@ Currently (OpenEBS 0.3 release), a DevOps developer gets the following from the 
 
 Using the above tools, a developer can easily provision the persistent storage from the hostdir of the minion node. Much of the tasks for the developer are automated by the OpenEBS storage class, including, scheduling the volume and replicas on k8s minions, connectivity to the container via a mount point.
 
+Components 
+-------------
+This section includes OpenEBS components.
+
+OpenEBS platform contains storage containers:
+
+  * Storage PODs
+  * An orchestration engine or VSM Scheduler called Maya
+  * The OpenEBS hosts that provide the data store from either local disks or remote disks
+
+.. image:: ../_static/basic.png
+
 **See Also:**
 
 Changelog_
-          .. _Changelog: https://github.com/openebs/openebs/releases
+          .. _Changelog: http://openebs.readthedocs.io/en/latest/release_notes/releasenotes.html
 
 
