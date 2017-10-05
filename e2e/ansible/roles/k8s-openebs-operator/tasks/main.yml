@@ -35,25 +35,14 @@
   when: result.stdout != "Ready"
 
 - name: Deploy the openebs operator yml
-  shell: source ~/.profile; kubectl apply -f {{ openebs_operator_alias }} 
+  shell: >
+    source ~/.profile; 
+    kubectl apply -f {{ openebs_operator_alias }} 
+    | grep deployment | awk '{print $2}'
+    | tr -d '"'
   args:
     executable: /bin/bash
-  register: op_out
-
-- name: Place stdout into temp file
-  shell: echo {{item}} >> {{ ansible_env.HOME }}/op_out.log
-  args:
-    executable: /bin/bash
-  with_items: "{{op_out.stdout_lines}}"
-
-- name: Get deployment label names 
-  shell: cat {{ ansible_env.HOME }}/op_out.log | grep deployment | awk '{print $2}'
-  register: labels 
-
-- name: Remove the temp file 
-  file: 
-    path: "{{ ansible_env.HOME }}/op_out.log"
-    state: absent
+  register: labels
 
 - name: Confirm provisioner & apiserver are running
   shell: source ~/.profile; kubectl get pods --selector=name={{item}} | grep Running |wc -l 
