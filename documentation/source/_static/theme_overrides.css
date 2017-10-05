@@ -1,10 +1,13 @@
 /* override logo styling */
-.logo {
+/*.logo {
   display: block;
   width: 150px !important;
   margin: 5px;
   fill: #fff;
   background-color: #fb8225 !important;
   border-radius: 0 !important;
-}
+}*/
 
+.wy-side-nav-search {
+  background-color: #ee5a2b;
+}

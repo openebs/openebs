@@ -1,6 +1,8 @@
 
 {% extends "!layout.html" %}
 
+{% set css_files = css_files + ["_static/theme_overrides.css"] %}
+
 <div style="background-color: grey;">
 
 {% block rootrellink %}
@@ -22,5 +24,3 @@
 {% block sidebar2 %}
 </div>
 {% endblock %}
-
-
