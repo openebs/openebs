@@ -29,6 +29,7 @@ explain why.
 
 **Anything else we need to know?**:
 
+<!--
 **Environment**:
 - kubectl get nodes
 - kubectl get pods --all-namespaces
@@ -40,3 +41,4 @@ explain why.
 - Kernel (e.g. `uname -a`):
 - Install tools:
 - Others:
+-->
