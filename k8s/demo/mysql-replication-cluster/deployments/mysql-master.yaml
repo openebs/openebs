@@ -1,0 +1,63 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: mysql-master
+  labels:
+    name: mysql-master
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: mysql-master
+  template:
+    metadata:
+      labels:
+        name: mysql-master
+    spec:
+      containers:
+        - name: master
+          image: openebs/tests-mysql-master
+          args:
+            - "--ignore-db-dir"
+            - "lost+found"
+          ports:
+            - containerPort: 3306
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              value: "test"
+            - name: MYSQL_REPLICATION_USER
+              value: 'demo'
+            - name: MYSQL_REPLICATION_PASSWORD
+              value: 'demo'
+          volumeMounts:
+            - mountPath: /var/lib/mysql
+              name: demo-vol1
+      volumes:
+        - name: demo-vol1
+          persistentVolumeClaim:
+            claimName: demo-vol1-claim
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: demo-vol1-claim
+spec:
+  storageClassName: openebs-percona
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5G
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql-master
+  labels:
+    name: mysql-master
+spec:
+  ports:
+    - port: 3306
+      targetPort: 3306
+  selector:
+      name: mysql-master
