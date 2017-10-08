@@ -66,8 +66,8 @@ On your Ubuntu host, install kubectl.
 On your Ubuntu host, setup directories for storing minkube and kubectl configuration.
 ::
 
-    mkdir /home/vagrant/.kube || true
-    touch /home/vagrant/.kube/config
+    mkdir $HOME/.kube || true
+    touch $HOME/.kube/config
 
 On your Ubuntu host, setup ENV for minikube. Copy the following to ~/.profile.
 ::
