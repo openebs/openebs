@@ -48,4 +48,14 @@ parameters:
   pool: hostdir-var
   replica: "2"
   size: 5G
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+   name: openebs-redis
+provisioner: openebs.io/provisioner-iscsi
+parameters:
+  pool: hostdir-var
+  replica: "2"
+  size: 5G
 
