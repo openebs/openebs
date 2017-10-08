@@ -5,6 +5,7 @@ metadata:
   labels:
     app: redis-standalone
 spec:
+  clusterIP: None
   ports:
     - port: 6379
   selector:

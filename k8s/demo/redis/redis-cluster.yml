@@ -5,6 +5,7 @@ metadata:
   labels:
     app: redis-master
 spec:
+  clusterIP: None
   ports:
     - port: 6379
   selector:
@@ -18,6 +19,7 @@ metadata:
   labels:
     app: redis-replica
 spec:
+  clusterIP: None
   ports:
     - port: 6379
   selector:
