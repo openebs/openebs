@@ -1,0 +1,103 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-master
+  labels:
+    app: redis-master
+spec:
+  clusterIP: None
+  ports:
+    - port: 6379
+  selector:
+    app: redis-master
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-replica
+  labels:
+    app: redis-replica
+spec:
+  clusterIP: None
+  ports:
+    - port: 6379
+  selector:
+    app: redis-replica
+
+---
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  name: redis-master
+spec:
+  serviceName: redis-master
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis-master
+  template:
+    metadata:
+      name: redis-master
+      labels:
+        app: redis-master
+    spec:
+      containers:
+      - name: redis
+        image: redis:latest
+        args: [ "--appendonly","yes" ]
+        ports:
+        - containerPort: 6379
+        volumeMounts:
+        - name: redis-data
+          mountPath: /data
+  volumeClaimTemplates:
+  - metadata:
+      name: redis-data
+      annotations:
+        volume.beta.kubernetes.io/storage-class: openebs-redis
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 5G
+
+---
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  name: redis-replica
+spec:
+  serviceName: redis-replica
+  replicas: 3
+  selector:
+    matchLabels:
+      app: redis-replica
+  template:
+    metadata:
+      name: redis-replica
+      labels:
+        app: redis-replica
+    spec:
+      containers:
+      - name: redis
+        image: redis:latest
+        args: [
+          "--appendonly","yes" ,
+          "--slaveof", "redis-master", "6379"
+          ]
+        ports:
+        - containerPort: 6379
+        volumeMounts:
+        - name: redis-data
+          mountPath: /data
+  volumeClaimTemplates:
+  - metadata:
+      name: redis-data
+      annotations:
+        volume.beta.kubernetes.io/storage-class: openebs-redis
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 5G
