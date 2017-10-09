@@ -96,12 +96,20 @@ metadata:
   name: openebs-provisioner
   namespace: default
 spec:
-  replicas: 1
+  replicas: 2
   template:
     metadata:
       labels:
         name: openebs-provisioner
     spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              matchExpressions:
+                key: node
+                operator: Equal
+                values: ["minion01","minion02"]
       serviceAccountName: openebs-maya-operator
       containers:
       - name: openebs-provisioner
