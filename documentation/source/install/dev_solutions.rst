@@ -69,7 +69,7 @@ On your Ubuntu host, setup directories for storing minkube and kubectl configura
     mkdir $HOME/.kube || true
     touch $HOME/.kube/config
 
-On your Ubuntu host, setup ENV for minikube. Copy the following to ~/.profile.
+On your Ubuntu host, setup env for minikube. Copy the following to ~/.profile.
 ::
 
     export MINIKUBE_WANTUPDATENOTIFICATION=false
@@ -141,7 +141,7 @@ Download the latest OpenEBS Operator files using the following commands.
    kubectl apply -f openebs-operator.yaml
 
 **Note** 
-By default, OpenEBS launches OpenEBS Volumes with two replicas. To set one replica, as is the case with single-node Kubernetes cluster, specify the ENV variable *DEFAULT_REPLICA_COUNT=1*. This is supported in OpenEBS version 0.4 onwards. 
+By default, OpenEBS launches OpenEBS Volumes with two replicas. To set one replica, as is the case with single-node Kubernetes cluster, specify the env variable *DEFAULT_REPLICA_COUNT=1*. This is supported in OpenEBS version 0.4 onwards. 
 
 The following snippet of the openebs-operator.yaml -> maya-apiserver section shows the addition of DEFAULT_REPLICA_COUNT:
 ::
