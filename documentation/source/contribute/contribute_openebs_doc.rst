@@ -71,4 +71,8 @@ PR Approval Process
 3. Click **Approve** and **Submit review**.
 4. The approver sees that the document is approved by all the reviewers and closes the issue. The issue gets merged and the documentation is available  at http://openebs.readthedocs.io/en/latest/.
 
+*********
+TODO List
+*********
 
+.. todolist::
