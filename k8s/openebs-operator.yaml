@@ -98,9 +98,6 @@ metadata:
 spec:
   replicas: 2
   template:
-    metadata:
-      labels:
-        name: openebs-provisioner
     spec:
       affinity:
         nodeAffinity:
@@ -110,6 +107,11 @@ spec:
                 key: node
                 operator: Equal
                 values: ["minion01","minion02"]
+  template:
+    metadata:
+      labels:
+        name: openebs-provisioner
+    spec:
       serviceAccountName: openebs-maya-operator
       containers:
       - name: openebs-provisioner
