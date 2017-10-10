@@ -198,6 +198,10 @@ The above command can be invoked using the *watch* command by providing a desire
 
    watch -n 1 maya vsm-stats pvc-016e9a68-71c1-11e7-9fea-000c298ff5fc
 
+**See Also:**
+`Setting Up OpenEBS - Overview`_.
+
+.. _Setting Up OpenEBS - Overview: http://openebs.readthedocs.io/en/latest/install/install_overview.html
 
 Jupyter
 =========
@@ -212,7 +216,7 @@ Run Jupyter Pod with OpenEBS Storage
 Use OpenEBS as persistent storage for the jupyter pod by selecting an OpenEBS storage class in the persistent volume claim. A sample jupyter pod yaml (with container attributes and pvc details) is available in the OpenEBS git repository (which was cloned in the previous steps).
 ::
    name@Master:~$ cat demo-jupyter-openebs.yaml
-
+   
    ...
 
    kind: PersistentVolumeClaim
