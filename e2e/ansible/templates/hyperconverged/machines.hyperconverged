@@ -10,20 +10,20 @@
 #
 # 1. Ensure supported host codes are provided, failing which
 # the inventory generation will not proceed. Current supported
-# codes include 'localhost, 'mayamaster', 'mayahost', 'kubemaster', 
+# codes include 'localhost, 'mayamaster', 'mayahost', 'kubemaster',
 # 'kubeminion'
 #
 # 2. The 'localhost' hostcode is a mandataory line in this file
 # and has a default IP of 127.0.0.1
 #
-# 3. A dictionary of supported codes ("SupportedHostCodes") is present 
-# in the python script generate_inventory.py, which can be updated by 
+# 3. A dictionary of supported codes ("SupportedHostCodes") is present
+# in the python script generate-inventory.py, which can be updated by 
 # interested users to include additional hostcodes
 #
 # 4. Lines can be commented (such as these) by inserting '#' symbol
 # before the host code
 #
-# 5. Ensure the environment variables are set in the .profile of the 
+# 5. Ensure the environment variables are set in the .profile of the
 # ansible user
 #
 ################################################################################
