@@ -5,7 +5,7 @@ kubernetes environment.In its current state, it includes application workflow te
 The scope of the said tests is expected to evolve over time to include performance and security tests as well. 
 e2e is mostly written in ansible, that is, as ansible playbooks with docker used for test images(these include standard 
 application images from dockerhub as well as custom-built images stored in openebs/test-storage).Since the tests are performed 
-in a Kubernetes environment, the test images are typically deployed as "pods" and "jobs".Therefore they accompanied by the 
+in a Kubernetes environment, the test images are typically deployed as "pods" and "jobs".Therefore they are accompanied by the 
 respective YAML specification files.
 
 ## BUILDING BLOCKS OF OPENEBS CI
