@@ -24,7 +24,7 @@ The following schema illustrates the workflow
 
 ## CONTRIBUTING TO E2E and OPENEBS CI 
 
-Contributions are welcome !!  Before starting, a reading of the project documentation at [ReadTheDocs](http://openebs.readthedocs.io/en/latest/ ) is highly recommended. Please raise a github issue for any questions you may have on the project in general or e2e,CI in particular.
+Contributions are welcome !!  Before starting, a reading of the project documentation at [ReadTheDocs](http://openebs.readthedocs.io/en/latest/ ) is highly recommended. Please raise a github issue for any questions you may have on the project in general or e2e or CI in particular.
 You can post questions on the OpenEBS [slack channel](http://slack.openebs.io/) too.
 
 You could contribute to any of the following areas: 
