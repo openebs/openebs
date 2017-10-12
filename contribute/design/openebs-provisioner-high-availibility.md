@@ -1,44 +1,45 @@
 # High Availability for OpenEBS Volume Provisioner
-
+---
 ## Problems addressed:
 
 - `openebs-provisioner` should always be available.
-- `openebs-provisioner` should always be running on the specified/labeled nodes. 
+- `openebs-provisioner` should always be running on the specified/labeled pods. 
 - If any node in cluster goes down in that scenario the pod should be assigned to other node in the cluster.
- 
+---
 ## Solutions for above problems: 
 
 
-- Increase the `replicas` to 2 or >2 in `openebs-operator.yaml` for `openebs-provisioner`. 
+- Increase the `replicas` to 2 or >2 in `openebs-operator.yaml` for `openebs-provisioner` deployment. 
 
 
 - We need to make sure that each node is running at least one  `openebs-provisioner` pod.  
-  We need to label nodes to assign the pods on those. 
+  We need to label pods so that pods with specific labels will always be running on different nodes. 
 
   To do that execute: 
 
 ```
-kubectl label nodes kubeminion-01  node=minion01  # For node kubeminion-01
-kubectl label nodes kubeminion-02  node=minion02   # For node kubeminion-02
+kubectl label pods openebs-provisioner-1149663462-6vbvm  provisioner=P2
+kubectl label pods openebs-provisioner-1149663462-bl89g  provisioner=P1
+
 ```
 
 To make sure that nodes are labeled: 
 
 ```
-ubuntu@kubemaster-01:~/openebs/k8s$ kubectl get nodes --show-labels
-
-NAME            STATUS    AGE       VERSION   LABELS
-kubemaster-01   Ready     4h        v1.6.3    beta.kubernetes.io/arch=amd64,beta.kubernetes.io/os=linux,kubernetes.io/hostname=kubemaster-01,node-role.kubernetes.io/master=
-kubeminion-01   Ready     4h        v1.6.3    beta.kubernetes.io/arch=amd64,beta.kubernetes.io/os=linux,kubernetes.io/hostname=kubeminion-01,node=minion01
-kubeminion-02   Ready     4h        v1.6.3    beta.kubernetes.io/arch=amd64,beta.kubernetes.io/os=linux,kubernetes.io/hostname=kubeminion-02,node=minion02
-
+kubectl get pods --show-labels
+NAME                                   READY     STATUS    RESTARTS   AGE       LABELS
+maya-apiserver-1089964587-s0xgn        1/1       Running   0          37m       name=maya-apiserver,pod-template-hash=1089964587
+openebs-provisioner-1149663462-6vbvm   1/1       Running   0          23m       name=openebs-provisioner,pod-template-hash=1149663462,provisioner=P2
+openebs-provisioner-1149663462-bl89g   1/1       Running   0          37m       name=openebs-provisioner,pod-template-hash=1149663462,provisioner=P1
 
 ```
 
+---
 
-Once, we labeled the nodes we can specify these labels in the `affinity` of `openebs-provisioner` spec in `openebs-operator.yaml`
+Once, we labeled the pods. If we change the `replicas` count to 5 then 5 pods will be running. If we descrease the replica count to 2 then only two pods with label P1 and P2 will be running and other 3 pods will be deleted. 
 
 ```yaml
+
 apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
@@ -47,18 +48,24 @@ metadata:
 spec:
   replicas: 2
   template:
+    spec:
+      podAntiAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:   #<-- Affinity selector
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                  - key: provisioner	# <-- Label key for pods
+                    operator: In
+                    values:
+                    - P1		# <-- Label value for pod 1
+                    - P2		# <-- Label value for pod 2	
+              topologyKey: "kubernetes.io/hostname"
+  template:
     metadata:
       labels:
         name: openebs-provisioner
     spec:
-      affinity:
-        nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-              matchExpressions:
-                key: node			  # <-- Key of label of the node. 	
-                operator: Equal
-                values: ["minion01","minion02"]   # <-- Add the labels of the nodes as a value.
       serviceAccountName: openebs-maya-operator
       containers:
       - name: openebs-provisioner
@@ -72,6 +79,13 @@ spec:
 
 ```
 
-After this, kubernetes scheduler will take care of assigning pods to the specific nodes and it will make sure that pods are always available on specified nodes. 
+After this, kubernetes scheduler will take care of assigning pods to the specific nodes and it will make sure that specific/labeled pods are always available.
+You can change affinity selector in the Deployment spec.
 
+
+|AFFINITY SELECTOR| 	REQUIREMENTS MET  |  REQUIREMENTS NOT MET | REQUIREMENTS LOST | 
+|---|---|--- | --- |
+|`requiredDuringSchedulingIgnoredDuringExecution`  | Runs | Fails | Keeps Running |
+|`preferredDuringSchedulingIgnoredDuringExecution` |	Runs |	Runs |	Keeps Running|
+|`requiredDuringSchedulingRequiredDuringExecution` (Not recommanded) |	Runs |	Fails | Fails|
 
