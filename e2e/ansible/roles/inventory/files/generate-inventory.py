@@ -28,7 +28,7 @@
 
 import os
 import sys
-from utils import sshToOtherClient, executeCmd
+from utils import executeCmd
 from passwordless import setupSSH
 import logging
 import argparse
