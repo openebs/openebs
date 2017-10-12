@@ -58,18 +58,6 @@ spec:
         pod.alpha.kubernetes.io/initialized: "true"
     spec:
       affinity:
-        nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-            - matchExpressions:
-              - key: px/running
-                operator: NotIn
-                values:
-                - "false"
-              - key: px/enabled
-                operator: NotIn
-                values:
-                - "false"
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
             - labelSelector:
