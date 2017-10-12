@@ -99,14 +99,18 @@ spec:
   replicas: 2
   template:
     spec:
-      affinity:
-        nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-              matchExpressions:
-                key: node
-                operator: Equal
-                values: ["minion01","minion02"]
+      podAntiAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                  - key: provisioner
+                    operator: In
+                    values:
+                    - P1
+                    - P2
+              topologyKey: "kubernetes.io/hostname"
   template:
     metadata:
       labels:
@@ -122,5 +126,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: spec.nodeName
+
+
 
 
