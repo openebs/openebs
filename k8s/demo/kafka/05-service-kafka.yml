@@ -1,0 +1,13 @@
+# A headless service to create DNS records
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: broker
+  namespace: kafka
+spec:
+  ports:
+  - port: 9092
+  clusterIP: None
+  selector:
+    app: kafka
