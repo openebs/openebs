@@ -79,7 +79,6 @@ spec:
 
 ```
 
-After this, kubernetes scheduler will take care of assigning pods to the specific nodes and it will make sure that specific/labeled pods are always available.
 You can change affinity selector in the Deployment spec.
 
 
@@ -88,4 +87,12 @@ You can change affinity selector in the Deployment spec.
 |`requiredDuringSchedulingIgnoredDuringExecution`  | Runs | Fails | Keeps Running |
 |`preferredDuringSchedulingIgnoredDuringExecution` |	Runs |	Runs |	Keeps Running|
 |`requiredDuringSchedulingRequiredDuringExecution` (Not recommanded) |	Runs |	Fails | Fails|
+
+---
+
+### How `openebs-provisioner` will be Highly Available?
+ 
+	- Kubernetes scheduler will make sure that each node has atleast one pod of `openebs-provisioner`
+	- On descreasing replicas count from n (>2) to 2 will retain pods having label P1 and P2. P1 and P2 will be isolated and protected to make sure that P1 and P2 are always running. 
+
 
