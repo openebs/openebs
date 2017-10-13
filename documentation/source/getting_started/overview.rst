@@ -22,13 +22,22 @@ Components
 -------------
 This section includes OpenEBS components.
 
-OpenEBS platform contains storage containers:
+OpenEBS platform contains the following main components:
 
-  * Storage PODs
-  * An orchestration engine or VSM Scheduler called Maya
-  * The OpenEBS hosts that provide the data store from either local disks or remote disks
+  * Maya - The helper storage orchestration engine that aids the kubernetes orchestration of storage volumes
+  * Jiva - A docker image that is used to spin the storage volume containers on Kubernetes nodes
 
-.. image:: ../_static/basic.png
+Maya
+^^^^^
+OpenEBS orchestration does not pre-empt or overwrite the Kubernetes orchestration system. It rather fills the storage orchestration gaps left behind by Kubernetes. For example, in OpenEBS, storage volume provisioning workflow is handled by Kubernetes. Just like other Kubernetes storage incubators, OpenEBS provides a new storage incubator called "OpenEBS". This incubator will have a storage class called "OpenEBS-storageclass". Internally, openebs-storageclass interacts with Maya to decide on which node a given volume must be provisioned, when it must be augmented automatically in capacity and so on. Maya also helps in data protection operations such as taking snapshots, restoring from snapshots and so on.
+
+Jiva
+^^^^^
+Jiva is the docker container image for storage volume containers. In OpenEBS, the storage volumes are containerized. Each volume will have atleast one storage controller and a storage replica, each of which will be a Jiva container. The functionality embedded into the Jiva image includes the following:
+
+* iSCSI target
+* Block replication controller (if the container is a controller)
+* Block storage handler (if the container is a replica)
 
 **See Also:**
 
