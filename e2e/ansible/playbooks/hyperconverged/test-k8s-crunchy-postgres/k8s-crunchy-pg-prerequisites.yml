@@ -1,9 +1,12 @@
-- name: Install subversion on K8S-master
-  apt:
-    name: "{{ item }}"
-    state: present
-  with_items: "{{ deb_packages }}"
-  become: true 
+- name: Run apt-get update via shell
+  command: apt-get update
+  become: true
   delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+  ignore_errors: true
 
+- name: Install subversion on K8S-master
+  shell: apt-get install -y {{ item }}
+  become: true
+  with_items: "{{ deb_packages }}"
+  delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
       
