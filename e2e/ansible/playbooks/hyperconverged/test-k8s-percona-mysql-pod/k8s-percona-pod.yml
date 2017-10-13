@@ -56,8 +56,8 @@
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
          register: result
          until: "'percona' and 'Running' in result.stdout"
-         delay: 300
-         retries: 6
+         delay: 120 
+         retries: 15
      
        - name: Get $HOME of K8s minion for kubernetes user
          shell: source ~/.profile; echo $HOME

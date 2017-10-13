@@ -86,8 +86,8 @@
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
          register: setup
          until: "replicas in setup.stdout"
-         delay: 300
-         retries: 6
+         delay: 120 
+         retries: 15
 
        - name: Verify that the postgres master and replica are available as cluster services
          shell: source ~/.profile; kubectl get svc

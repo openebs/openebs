@@ -35,7 +35,7 @@
          register: result
          until: "'ctrl' and 'Running' in result.stdout_lines[0] and 'rep' and 'Running' in result.stdout_lines[1]"
          delay: 30
-         retries: 6
+         retries: 10 
          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
         
        - name: Get storage ctrl pod name
