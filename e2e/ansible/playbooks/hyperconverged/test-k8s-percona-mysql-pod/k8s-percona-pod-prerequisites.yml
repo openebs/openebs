@@ -1,10 +1,14 @@
 ---
+- name: Run apt-get update via shell
+  shell: apt-get update
+  become: true
+  delegate_to: "{{ groups['kubernetes-kubeminions'].0 }}"
+  ignore_errors: true
+
 - name: Install python-pip on K8S-minion
-  apt:
-    name: "{{ item }}"
-    state: present
-  with_items: "{{ deb_packages }}"
+  shell: apt-get install -y {{ item }}
   become: true 
+  with_items: "{{ deb_packages }}"
   delegate_to: "{{ groups['kubernetes-kubeminions'].0 }}"
 
 - name: Install PIP packages on K8s-minion

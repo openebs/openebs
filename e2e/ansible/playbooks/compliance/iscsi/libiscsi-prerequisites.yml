@@ -1,8 +1,12 @@
 ---
+- name: Run apt-get update via shell
+  shell: apt-get update
+  become: true
+  delegate_to: "{{ groups['kubernetes-kubeminions'].0 }}"
+  ignore_errors: true
+
 - name: Install libiscsi on K8S-minion
-  apt:
-    name: "{{ item }}"
-    state: present
+  shell: apt-get install -y {{ item }}
+  become: true
   with_items: "{{ deb_packages }}"
-  become: true 
   delegate_to: "{{ groups['kubernetes-kubeminions'].0 }}"
