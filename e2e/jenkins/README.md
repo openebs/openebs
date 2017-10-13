@@ -8,66 +8,70 @@
 
 ### How-to - Install Ansible and Jenkins
 
-- Download the script file _setup-build-machine_ from:
+- Download the _setup-build-machine_ script file from the following URL::
 
    ```
    wget https://raw.githubusercontent.com/openebs/openebs/master/e2e/jenkins/setup-build-machine.sh
    ```
 
 - Run the script on the workstation with a user having sudo permissions.
-- This will install jenkins and required packages.
-- A user called '_jenkins_' is created along with the jenkins installation.
+- This will install Jenkins and the required packages.
+- A user called '_jenkins_' is created when you install Jenkins.
 
 ## Continuous Integration - Step 2: Setting Up Jenkins using Web-Interface
 
-- The default way to access the jenkins server is through a browser, using the URL
+- The default way to access the Jenkins server is through a browser, using the URL:
 
    ```
    http://<jenkins-server>:8080
    ```
 
-- The first time this URL is opened, the user is provided with a path to a file in the server _/var/lib/jenkins/secrets/initialAdminPassword_.
+- When you open this URL for the first time, you are provided with a path to a file in the server. _/var/lib/jenkins/secrets/initialAdminPassword_.
 - This file contains the password for user _admin_.
-- Once logged in it redirects to a _Getting Started_ page. Click on _Install Suggested Plugins_ option.
-- The user is now prompted to create a new admin user.
-- Create a user called _openebs_ providing the essential details requested by the _Create First Admin User_ page and click on _Save and Finish_.
-- You should be seeing a message which says _Jenkins is ready!_
-- Click on _Start using Jenkins_.
-- You will logged in as user _openebs_ automatically and will be able to see his _Dashboard_.
+- Once you log in, it redirects you to a _Getting Started_ page. Click _Install Suggested Plugins_ option.
+- You are now prompted to create a new admin user.
+- Create a user called _openebs_ providing the required details requested by the _Create First Admin User_ page and click _Save and Finish_.
+- A message "_Jenkins is ready!_" is displayed..
+- Click _Start using Jenkins_.
+- You are now logged in as user _openebs_ and will be able to see your _Dashboard_.
 
 __Note:__
 
    ```
-   By default the pages in Jenkins do not refresh automatically, to enable it click on the *ENABLE AUTO REFRESH* link on the top right of the page.
+   By default, the pages in Jenkins do not refresh automatically. To enable it click on the *ENABLE AUTO REFRESH* link on the top right of the page.
    ```
 
 ## Continuous Integration - Step 3: Installing Additional Plugins
 
 - On the left side of the _Dashboard_ you have links for managing Jenkins.
-- Click on _Manage Jenkins->Manage Plugins_, you are now in the _Plugin Manager_ page.
-- You should be able to see a page with 4 tabs(_Updates-Available-Installed-Advanced_).
-- Click on the _Available_ tab and in the _Filter_ textbox search and add following 3 plugins one by one.
+- Click _Manage Jenkins->Manage Plugins_.
+- On the Plugin Manager page, the following 4 tabs are displayed:
+  - Updates
+  - Available
+  - Installed
+  - Advanced
+- Click on _Available_ and in the _Filter_ field search and add following 3 plugins.
   - Environment Injector Plugin
   - Hudson Post build task
   - Slack Notification Plugin
-- Select the _Restart Jenkins when installation is complete and no jobs are running_ to restart jenkins.
+- Select _Restart Jenkins when installation is complete and no jobs are running_ to restart Jenkins.
 
 ### Configure Slack Plugin Preferences
 
-__Note:__
+__Prerequisite:__
 
 ```
-It is a prerequisite that the Jenkins app for Slack is already installed and configured.
+Jenkins application for Slack must be installed and configured.
 ```
 
-- Click on _Manage Jenkins_.
-- Click on _Configure System_.
+- Click _Manage Jenkins_.
+- Click _Configure System_.
 - Scroll to _Global Slack Notifier Settings_.
-  - Enter the slack team's team domain in _Team Subdomain_
-  - Enter the token provided in the Jenkins app in _Integration Token_.
-  - Enter the slack channel details in _Channel_.
-  - Click on _Test Connection_. The slack should be getting a notification from Jenkins.
-  - If a notifications is recieved then click on _Apply_ and then on _Save_.
+  - Enter the slack team's team domain in _Team Subdomain_ field.
+  - Enter the token provided in the Jenkins application for Slack in _Integration Token_ field.
+  - Enter the slack channel details in _Channel_ field.
+  - Click _Test Connection_. The slack channel should be getting a notification from Jenkins.
+  - If a notification is recieved then click _Apply_ and _Save_.
   - The configuration for the Slack Plugin is complete.
 
 ## Continuous Integration - Step 4: Creating The Jobs
@@ -95,7 +99,7 @@ It is a prerequisite that the Jenkins app for Slack is already installed and con
 - Select _Git_ as the repository.
 - Provide Repository URL
 - Set the Refspec for the repository.
-- Click on Apply button - (Do this periodically to save your changes before the session times out)
+- Click _Apply_. (Do this periodically to save your changes before the session times out)
 
 ### How-to - Fill the Build Triggers Category
 
@@ -114,8 +118,8 @@ It is a prerequisite that the Jenkins app for Slack is already installed and con
 
 #### Cloning OpenEBS, Installing ARA And Setting Up The Environment
 
-- Click on _Add Build Step_ combobox and select _Execute Shell_.
-- Enter the below script in the provided shell editor.
+- Click _Add Build Step_ drop-down list and select _Execute Shell_.
+- Enter the script below in the script editor provided.
 
    ```bash
    #!/bin/bash
@@ -144,17 +148,17 @@ It is a prerequisite that the Jenkins app for Slack is already installed and con
    fi
    ```
 
-- The above script clones _openebs_ repository for running Ansible Playbooks.
+- The script clones _openebs_ repository for running Ansible Playbooks.
 - The script also sets up ARA for reporting.
-- Finally it runs the _CI.yml_ to perform _Continuous Integration_ of _OpenEBS_ modules
+- Finally it runs the _CI.yml_ to perform _Continuous Integration_ of _OpenEBS_ modules.
 
 ### How-to - Fill the Post Build Actions Category
 
 #### Adding Post Build Task And Slack Notifications
 
-- Click on the _Add post-build action_ combobox and select _Post build task_ plugin.
-  - In the _Log Text_ textbox enter text: _vagrant up_.
-  - Enter the below script in the provided script editor.
+- Click _Add post-build action_ drop-down list and select _Post build task_ plugin.
+  - In the _Log Text_ textbox enter text: _vagrant up_
+  - Enter the script below in the script editor provided.
 
    ```bash
    #!/bin/bash
@@ -170,8 +174,8 @@ It is a prerequisite that the Jenkins app for Slack is already installed and con
 
   - Select _Escalate script execution status to job status_.
 
-- Click on the _Add post-build action_ combobox and select _Post build task_ plugin.
-  - In the _Log Text_ textbox enter text: _(failed=)(\d*[1-9]\d*)_.
+- Click _Add post-build action_ drop-down list and select _Post build task_ plugin.
+  - In the _Log Text_ textbox enter text: _(failed=)(\d*[1-9]\d*)_
   - Enter the below script in the provided script editor.
   
    ```bash
@@ -181,8 +185,8 @@ It is a prerequisite that the Jenkins app for Slack is already installed and con
 
   - Select _Escalate script execution status to job status_.
 
-- Click on the *Add post-build action* combobox and select *Slack Notifications* plugin.
+- Click *Add post-build action* drop-down list and select *Slack Notifications* plugin.
   - Select _Notify Build Start_.
   - Select _Notify Failure_.
   - Select _Notify Success_.
-  - Select _Notification message includes:_ and in the combobox select _commit list with authours and titles_.
+  - Select _Notification message includes:_ and in the drop-down list select _commit list with authours and titles_.
