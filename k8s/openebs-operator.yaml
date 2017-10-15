@@ -99,17 +99,18 @@ spec:
   replicas: 2
   template:
     spec:
-      podAntiAffinity:
-        requiredDuringSchedulingIgnoredDuringExecution:
-          - weight: 100
-            podAffinityTerm:
-              labelSelector:
-                matchExpressions:
-                  - key: name
-                    operator: In
-                    values:
-                    - openebs-provisioner
-              topologyKey: "kubernetes.io/hostname"
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: name
+                      operator: In
+                      values:
+                      - openebs-provisioner
+                topologyKey: "kubernetes.io/hostname"
   template:
     metadata:
       labels:
