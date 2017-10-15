@@ -12,34 +12,11 @@
 - Increase the `replicas` to 2 or >2 in `openebs-operator.yaml` for `openebs-provisioner` deployment. 
 
 
-- We need to make sure that each node is running at least one  `openebs-provisioner` pod.  
-  We need to label pods so that pods with specific labels will always be running on different nodes. 
+- We need to make sure that each node is running at least one  `openebs-provisioner` pod. In order to do that, we're using `podAntiAffinity` method for scheduling `openebs-provisioner` pods. We have added label `name:provisioner` as a default label. 
 
-  To do that execute: 
-
-```
-kubectl label pods openebs-provisioner-1149663462-6vbvm  provisioner=P2
-kubectl label pods openebs-provisioner-1149663462-bl89g  provisioner=P1
+Sample Deployment spec for `openebs-provisioner` looks like: 
 
 ```
-
-To make sure that nodes are labeled: 
-
-```
-kubectl get pods --show-labels
-NAME                                   READY     STATUS    RESTARTS   AGE       LABELS
-maya-apiserver-1089964587-s0xgn        1/1       Running   0          37m       name=maya-apiserver,pod-template-hash=1089964587
-openebs-provisioner-1149663462-6vbvm   1/1       Running   0          23m       name=openebs-provisioner,pod-template-hash=1149663462,provisioner=P2
-openebs-provisioner-1149663462-bl89g   1/1       Running   0          37m       name=openebs-provisioner,pod-template-hash=1149663462,provisioner=P1
-
-```
-
----
-
-Once, we labeled the pods. If we change the `replicas` count to 5 then 5 pods will be running. If we descrease the replica count to 2 then only two pods with label P1 and P2 will be running and other 3 pods will be deleted. 
-
-```yaml
-
 apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
@@ -50,21 +27,20 @@ spec:
   template:
     spec:
       podAntiAffinity:
-        requiredDuringSchedulingIgnoredDuringExecution:   #<-- Affinity selector
+        requiredDuringSchedulingIgnoredDuringExecution:   # <-- Affinity Selector 
           - weight: 100
             podAffinityTerm:
               labelSelector:
                 matchExpressions:
-                  - key: provisioner	# <-- Label key for pods
+                  - key: name
                     operator: In
                     values:
-                    - P1		# <-- Label value for pod 1
-                    - P2		# <-- Label value for pod 2	
+                    - openebs-provisioner
               topologyKey: "kubernetes.io/hostname"
   template:
     metadata:
       labels:
-        name: openebs-provisioner
+        name: openebs-provisioner  # <-- Default label
     spec:
       serviceAccountName: openebs-maya-operator
       containers:
@@ -79,10 +55,11 @@ spec:
 
 ```
 
+
 You can change affinity selector in the Deployment spec.
 
 
-|AFFINITY SELECTOR| 	REQUIREMENTS MET  |  REQUIREMENTS NOT MET | REQUIREMENTS LOST | 
+| AFFINITY SELECTOR | 	REQUIREMENTS MET  |  REQUIREMENTS NOT MET | REQUIREMENTS LOST | 
 |---|---|--- | --- |
 |`requiredDuringSchedulingIgnoredDuringExecution`  | Runs | Fails | Keeps Running |
 |`preferredDuringSchedulingIgnoredDuringExecution` |	Runs |	Runs |	Keeps Running|
@@ -92,7 +69,5 @@ You can change affinity selector in the Deployment spec.
 
 ### How `openebs-provisioner` will be Highly Available?
  
-	- Kubernetes scheduler will make sure that each node has atleast one pod of `openebs-provisioner`
-	- On descreasing replicas count from n (>2) to 2 will retain pods having label P1 and P2. P1 and P2 will be isolated and protected to make sure that P1 and P2 are always running. 
-
+	- Kubernetes scheduler will make sure that each node has atleast one pod of `openebs-provisioner` labeled with `name:openebs-provisioner`.
 
