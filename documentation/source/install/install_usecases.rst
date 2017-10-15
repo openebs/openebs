@@ -157,21 +157,21 @@ Start an interactive bash console for the maya-apiserver container using the fol
    
      kubectl exec -it maya-apiserver-1633167387-5ss2w /bin/bash
 
-Lookup the storage volume name using the *vsm-list* command
+Lookup the storage volume name using the *volume-list* command
 
 ::
 
     name@Master:~$ kubectl exec -it maya-apiserver-1633167387-5ss2w /bin/bash
 
-    root@maya-apiserver-1633167387-5ss2w:/# maya vsm-list
+    root@maya-apiserver-1633167387-5ss2w:/# maya volume-list
     Name                                      Status
     pvc-016e9a68-71c1-11e7-9fea-000c298ff5fc  Running
 
-Get the performance and capacity usage statistics using the *vsm-stats* command.
+Get the performance and capacity usage statistics using the *volume-stats* command.
 
 ::
 
-    root@maya-apiserver-1633167387-5ss2w:/# maya vsm-stats pvc-016e9a68-71c1-11e7-9fea-000c298ff5fc
+    root@maya-apiserver-1633167387-5ss2w:/# maya volume-stats pvc-016e9a68-71c1-11e7-9fea-000c298ff5fc
     ------------------------------------
      IQN     : iqn.2016-09.com.openebs.jiva:pvc-016e9a68-71c1-11e7-9fea-000c298ff5fc
      Volume  : pvc-016e9a68-71c1-11e7-9fea-000c298ff5fc
@@ -196,7 +196,7 @@ The above command can be invoked using the *watch* command by providing a desire
 
 ::
 
-   watch -n 1 maya vsm-stats pvc-016e9a68-71c1-11e7-9fea-000c298ff5fc
+   watch -n 1 maya volume-stats pvc-016e9a68-71c1-11e7-9fea-000c298ff5fc
 
 
 Jupyter
