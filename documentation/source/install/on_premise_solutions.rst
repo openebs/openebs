@@ -285,17 +285,17 @@ Run Sample Applications on the OpenEBS Setup
 
       kubectl describe pod <pod name>
 
-* The storage volume that is the persistent volume associated with the persistent volume claim, can be viewed using the *vsm-list* command in the maya-apiserver pod.
+* The storage volume that is the persistent volume associated with the persistent volume claim, can be viewed using the *volume list* command in the maya-apiserver pod.
   :: 
 
-      name@MayaMaster:~$ kubectl exec maya-apiserver-1633167387-v4sf1 -c maya-apiserver -- maya vsm-list
+      name@MayaMaster:~$ kubectl exec maya-apiserver-1633167387-v4sf1 -c maya-apiserver -- maya volume list
       Name                                      Status
       pvc-a2a6d71f-5b21-11e7-bf1c-000c298ff5fc  Running
      
-* Verify that the storage volume is receiving input/output by checking the increments to *DataUpdateIndex* in the output of the vsm-stats command issued in the maya-apiserver pod. Some additional performance statistics are also available in the command output.
+* Verify that the storage volume is receiving input/output by checking the increments to *DataUpdateIndex* in the output of the `volume stats` command issued in the maya-apiserver pod. Some additional performance statistics are also available in the command output.
   ::  
 
-       name@MayaMaster:~$ kubectl exec maya-apiserver-1633167387-v4sf1 -c maya-apiserver -- maya vsm-stats pvc-a2a6d71f-5b21-11e7-bf1c-000c298ff5fc
+       name@MayaMaster:~$ kubectl exec maya-apiserver-1633167387-v4sf1 -c maya-apiserver -- maya volume stats pvc-a2a6d71f-5b21-11e7-bf1c-000c298ff5fc
       ------------------------------------
         IQN: iqn.2016-09.com.openebs.jiva:pvc-a2a6d71f-5b21-11e7-bf1c-000c298ff5fc
       Volume: pvc-a2a6d71f-5b21-11e7-bf1c-000c298ff5fc
@@ -310,7 +310,7 @@ Run Sample Applications on the OpenEBS Setup
          0|     3|     0.000|     1.109|      0.000|     10.602|          0|        378|
       name@MayaMaster:~$
 
-.. In case of dedicated installations, the maya vsm-list and maya vsm-stats commands can be executed directly on the maya server host console.
+.. In case of dedicated installations, the `maya volume list` and `maya volume stats` commands can be executed directly on the maya server host console.
 
 Tips and Gotchas
 ----------------
