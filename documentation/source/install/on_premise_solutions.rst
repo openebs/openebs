@@ -310,7 +310,7 @@ Run Sample Applications on the OpenEBS Setup
          0|     3|     0.000|     1.109|      0.000|     10.602|          0|        378|
       name@MayaMaster:~$
 
-.. In case of dedicated installations, the maya `volume list` and maya `volume stats` commands can be executed directly on the maya server host console.
+.. In case of dedicated installations, the `maya volume list` and `maya volume stats` commands can be executed directly on the maya server host console.
 
 Tips and Gotchas
 ----------------
