@@ -31,16 +31,28 @@ OpenEBS Control Plane - auguments the functionality provided by the Container Or
 
 ![OpenEBS Control Plane](../../documentation/source/_static/OpenEBS-Control-Plane.png)
 
-OpenEBS Control Plane is also delivered as micro-services that can be further divided as follows:
-- Services : Each service will encapsulate a specific functionality like maya-apiserver, maya-agent, maya-mulebot, etc., that are either installed as binary services or container services. These will be either be running as Cluster Services (like the maya-apiserver), or on every docker host or node (like maya-agent) or can be completely out-of-band like (storage-analytics in the cloud, represented as *maya cloud*). You can learn more about these services under the following repo - [openebs/maya](https://github.com/openebs/maya).
+OpenEBS Control Plane is also delivered as micro-services, where the services built can be classified as follows:
+- Plugins into Container Orchestrotors, which augument the functionality by hooking into the framework provided like:
+  - K8s Dynamic Provisioners - [openebs-provisioner](https://github.com/openebs/external-storage/tree/master/openebs)
+  - Kube Dashboard - [openebs-dashboard](https://github.com/openebs/dashboard)
+  - Extended Schema - like CRDs in case of Kubernetes to storage the OpenEBS specific configuration related data
+- Cluster Services, which provide OpenEBS specific storage intelligence like:
+  - maya-apiserver - includes the API for performing Volume operations that can translate requests nto CO specific operations
+  - maya-mulebot - uses the information gathered to suggest optimized placement and event handling tips
+  - maya-connect - allows to upload the monitoring data to maya-cloud for further storage analytics
+- Node Services, which provide OpenEBS specific storage intelligence, but run along-side kubelet like:
+  - maya-agent - includes storage management functionality 
 
-- Plugins : Maya allows the OpenEBS storage to be run along side any orchestration engine like kubernetes, docker swarm, nomad etc., This is made possible by the maya orchestration engine plugins. For example, one of the ways in which Kubernetes can consume OpenEBS Storage is via the K8s Dynamic Provisioners - [openebs-provisioner](https://github.com/openebs/external-storage/tree/master/openebs). 
+Monitoring and Tracing capabilities are added by instrumenting the above services with prometheus, heapster, grafana and jaegar. 
 
-- Tools : CLI/UI tools that will help with installation or management of tasks. One of the first tools under heavy development is [mayactl](https://github.com/openebs/maya/tree/master/cmd/mayactl), that aims at simplying the management of OpenEBS Volumes. 
+*Note: In case of K8s, the monitoring aspects like heapster can be changed in future, depending on the outcome from sig-instrumention design proposals*
 
-In the current release, OpenEBS Control supports integration with Kubenetes. OpenEBS control plane represents the volume containes as Deployments and Services similar to other Applications deployed on Kubernetes. Since these Volumes can be expressed, as YAML files, OpenEBS allows to make storage infrastructure programmable. 
+### Source Code
 
-Maya builds on top of the container orchestration engine capabilities in terms of runtime, scheduling, monitoring etc., and extends the capabilities to orchestrate and simplify the management of storage. Maya will learn and provide storage metrics to the container schedulers for better placements of pods as well as storage migration between hosts within/across cluster(s).
+- [openebs/maya](https://github.com/openebs/maya) The code for all the binaries that are specific (non-plugins) are stored in this repository - like maya-apiserver, maya-agent, maya-mulebot, maya-connect, mayactl. 
+- [openebs-dashboard](https://github.com/openebs/dashboard) A fork of the kubenetes dashboard project, that is extended with storage functionality.
+- [openebs-provisioner](https://github.com/openebs/external-storage/tree/master/openebs) is the OpenEBS K8s Provisioner forked from Kubernetes Incubator project. 
+
 
 
 *Note: In future, OpenEBS can also be deployed as a storage service (non hyperconverged) like the traditional software defined storage, and can be connected via the storage plugins.*
