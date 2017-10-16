@@ -75,15 +75,15 @@ drwxrwxr-x 17 testuser testuser  4096 Jun  5 09:29 roles
   are shown below : 
   
   ```
- # Ansible framework variables
+  # Ansible framework variables
  
- export LOCAL_USER_NAME="ciuser"
- export LOCAL_USER_PASSWORD="test"
- export NODE_USER_NAME="kart"
- export NODE_USER_PASSWORD="test"
- export MASTER_USER_NAME="kart"
- export MASTER_USER_PASSWORD="test"
- ```
+  export LOCAL_USER_NAME="ciuser"
+  export LOCAL_USER_PASSWORD="test"
+  export NODE_USER_NAME="kart"
+  export NODE_USER_PASSWORD="test"
+  export MASTER_USER_NAME="kart"
+  export MASTER_USER_PASSWORD="test"
+  ```
 
  Note: 
 
@@ -129,6 +129,7 @@ variable.
   ```
   testuser@OpenEBSClient:~/openebs/e2e/ansible$ ansible-playbook pre-requisites.yml
   ```
+  
 - Verify the generation of the hosts file in the ```openebs/e2e/ansible/inventory``` directory. Check the host-status.log in the 
   same location for details on inventory file generation in case of any issues.
   
@@ -152,6 +153,7 @@ variable.
   ```
   testuser@OpenEBSClient:~/openebs/e2e/ansible$ ansible-playbook setup-kubernetes.yml 
   ```
+  
   ```
   testuser@OpenEBSClient:~/openebs/e2e/ansible$ ansible-playbook setup-openebs.yml 
   ```
@@ -208,12 +210,14 @@ variable.
   maya-apiserver        1         1         1            1           4h
   openebs-provisioner   1         1         1            1           4h
   ```
+  
   ```
   karthik@MayaMaster:~$ kubectl get pods
   NAME                                   READY     STATUS    RESTARTS   AGE
   maya-apiserver-1633167387-v4sf1        1/1       Running   0          4h
   openebs-provisioner-1174174075-n989p   1/1       Running   0          4h
   ```
+  
 - Verify that the openebs storage-classes are applied successfully 
 
   ```
@@ -237,6 +241,7 @@ variable.
   ```
   ciuser@OpenEBSClient:~/openebs/e2e/ansible$ ansible-playbook run-hyperconverged-tests.yml
   ```
+  
 - Verify that the pod is deployed on the Kubernetes minion along with the openebs storage pods created as per the storage-class in the 
   persistent volume claim, by executing the this command on the Kubernetes master :
 
