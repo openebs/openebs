@@ -14,7 +14,7 @@ Minikube helps developers to quickly setup a single-node Kubernetes cluster for 
 
 If you are already an experienced Minikube user, you can easily setup OpenEBS on your existing Kubernetes cluster with a few simple kubectl commands. See, :ref:`quick-start`.
 
-This section provides instructions to set up Kubernetes using Minikube directly on Ubuntu 16.06 (without using any VM drivers) and to have OpenEBS running in hyperconverged mode. 
+This section provides instructions to set up Kubernetes using Minikube directly on Ubuntu 16.04 (without using any VM drivers) and to have OpenEBS running in hyperconverged mode. 
 
 Prerequisites
 ---------------
