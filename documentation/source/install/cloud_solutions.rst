@@ -245,7 +245,7 @@ OpenEBS is deployed by the time you log in to Amazon Web Services (AWS).
 Google Cloud
 =============
 Setting up OpenEBS with Kubernetes on Google Container Engine
--------------------------------------------------------------
+--------------------------------------------------------------
 This section, provides detailed instructions on how to setup and use OpenEBS in Google Container Enginer (GKE). This section uses a three node container cluster.
 
 1. Preparing your Container Cluster
@@ -264,10 +264,17 @@ Minimum requirements for container cluster are as follows:
 
 The example commands below were run on a container cluster *demo-openebs03* in zone *us-central1-a* with project unique ID *strong-eon-153112*. When you copy paste the command, ensure that you use the details from your project.
 
-Add iSCSI Support
------------------
+You can either use an existing container cluster or create a new one. To create a new cluster, go to **Google Cloud Platform** -> **Container Engine** -> **Create Container Cluster** for example, *demo-openebs03*. 
 
-SSH into the nodes of the cluster (**Google Cloud Platform** -> **Compute Engine** -> **VM instances**) to install open-iscsi package. OpenEBS uses iSCSI to connect to the block volumes.
+Add iSCSI Support
+------------------
+
+Go to **Google Cloud Platform** -> **Compute Engine** -> **VM instances** to install open-iscsi package. OpenEBS uses iSCSI to connect to the block volumes. The nodes displayed are Compute Engine VMs, and you can see them in the console. The display is similar to the following screen.
+ 
+ .. image:: ../_static/compute_engine_vms.png
+
+
+Select one of the SSH nodes displayed in the cluster and click **Google Cloud Shell** and run the following commands.
 ::
 
     sudo apt-get update
