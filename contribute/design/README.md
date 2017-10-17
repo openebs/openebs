@@ -53,7 +53,7 @@ Monitoring and Tracing capabilities are added by instrumenting the above service
 ### Source Code
 
 - [openebs/maya](https://github.com/openebs/maya) The code for all binaries that are specific (non-plugins) are stored in this repository - like maya-apiserver, maya-agent, maya-mulebot, maya-connect, mayactl and so on.
-- [openebs-dashboard](https://github.com/openebs/dashboard) A fork of the Kubenetes dashboard project, that is extended with storage functionality.
+- [openebs-dashboard](https://github.com/openebs/dashboard) A fork of the Kubernetes dashboard project, that is extended with storage functionality.
 - [openebs-provisioner](https://github.com/openebs/external-storage/tree/master/openebs) is the OpenEBS K8s Provisioner forked from Kubernetes Incubator project. 
 
 
