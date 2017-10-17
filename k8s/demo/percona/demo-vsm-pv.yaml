@@ -3,7 +3,7 @@ kind: PersistentVolume
 metadata:
   name: demo-vol1
 spec:
-  storageClassName: openebs-percona
+  storageClassName: openebs-ha
   capacity:
     storage: 5Gi
   accessModes:

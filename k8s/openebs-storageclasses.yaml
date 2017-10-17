@@ -1,61 +1,23 @@
-# Define a storage classes supported by OpenEBS
+# Define storage classes supported by OpenEBS
+# The type of storage class to be used:
+# openebs-no-replication (Examples: redis, etcd...)
+# openebs-ha (Examples: Percona, MongoDB, Cassandra, Postgres, Jupyter...)
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
-   name: openebs-basic
+   name: openebs-noreplication
 provisioner: openebs.io/provisioner-iscsi
 parameters:
   pool: hostdir-var
-  replica: "2"
+  replica: "1"
   size: 5G
 ---
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
-   name: openebs-percona
+   name: openebs-ha
 provisioner: openebs.io/provisioner-iscsi
 parameters:
   pool: hostdir-var
   replica: "2"
   size: 5G
----
-apiVersion: storage.k8s.io/v1
-kind: StorageClass
-metadata:
-   name: openebs-jupyter
-provisioner: openebs.io/provisioner-iscsi
-parameters:
-  pool: hostdir-var
-  replica: "2"
-  size: 5G
----
-apiVersion: storage.k8s.io/v1
-kind: StorageClass
-metadata:
-   name: openebs-mongodb
-provisioner: openebs.io/provisioner-iscsi
-parameters:
-  pool: hostdir-var
-  replica: "2"
-  size: 5G
----
-apiVersion: storage.k8s.io/v1
-kind: StorageClass
-metadata:
-   name: openebs-cassandra
-provisioner: openebs.io/provisioner-iscsi
-parameters:
-  pool: hostdir-var
-  replica: "2"
-  size: 5G
----
-apiVersion: storage.k8s.io/v1
-kind: StorageClass
-metadata:
-   name: openebs-redis
-provisioner: openebs.io/provisioner-iscsi
-parameters:
-  pool: hostdir-var
-  replica: "2"
-  size: 5G
-

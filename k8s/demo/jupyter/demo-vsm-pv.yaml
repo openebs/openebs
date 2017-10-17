@@ -10,7 +10,7 @@ kind: PersistentVolume
 metadata:
   name: demo-vol1
 spec:
-  storageClassName: openebs-jupyter
+  storageClassName: openebs-ha
   capacity:
     storage: 5Gi
   accessModes:
