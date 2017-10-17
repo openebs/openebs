@@ -57,19 +57,12 @@ OpenEBS has created a script that does most of the work for you. Download the *o
 The list of operations performed by the *oebs-cloud.sh* script are as follows:
 ::
 
-     $ ./oebs-cloud.sh
-     Usage : 
-         oebs-cloud.sh --setup-local-env
-         oebs-cloud.sh --create-cluster-config [--ami-vm-os=[ubuntu|coreos]]
-         oebs-cloud.sh --list-aws-instances
-         oebs-cloud.sh --ssh-aws-ec2 [ ipaddress|=ipaddress]
-         oebs-cloud.sh --help
-
     $ ./oebs-cloud.sh
     Usage : 
        oebs-cloud.sh --setup-local-env
        oebs-cloud.sh --create-cluster-config
        oebs-cloud.sh --ssh-aws-ec2
+       oebs-cloud.sh --help
 
     Sets Up OpenEBS On AWS
 
