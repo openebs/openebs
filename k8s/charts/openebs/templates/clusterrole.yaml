@@ -1,0 +1,19 @@
+{{- if .Values.rbacEnable }}
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRole
+metadata:
+  namespace: default
+  name: openebs-maya-operator
+  labels:
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+rules:
+- apiGroups: ["*"]
+  resources: ["services","pods","deployments", "events"]
+  verbs: ["*"]
+- apiGroups: ["*"]
+  resources: ["persistentvolumes","persistentvolumeclaims"]
+  verbs: ["*"]
+- apiGroups: ["storage.k8s.io"]
+  resources: ["storageclasses"]
+  verbs: ["*"]
+{{- end }}

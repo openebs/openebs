@@ -1,0 +1,29 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: maya-apiserver
+  namespace: default
+  labels:
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        name: maya-apiserver
+        chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+    spec:
+      serviceAccountName: openebs-maya-operator
+      containers:
+      - name: maya-apiserver
+        image: "{{ .Values.apiserver.image }}:{{ .Values.apiserver.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        ports: 
+        - containerPort: 5656
+        env:
+        - name: DEFAULT_CONTROLLER_IMAGE
+          value: {{ .Values.jiva.image }}
+        - name: DEFAULT_REPLICA_IMAGE
+          value: {{ .Values.jiva.image }}
+        - name: DEFAULT_REPLICA_COUNT
+          value: "{{ .Values.jiva.replicas }}"
