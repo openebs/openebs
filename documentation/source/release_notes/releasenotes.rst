@@ -49,7 +49,7 @@ Setting up OpenEBS with Kubernetes using Minikube on the Ubuntu host displayed t
 
    For example, to download v1.8.0 on Linux, enter the following command.
    ::
-      curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.8.0/bin/darwin/amd64/kubectl
+      curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.8.0/bin/linux/amd64/kubectl
 
 2. Make the kubectl binary executable.
    ::
