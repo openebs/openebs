@@ -69,7 +69,7 @@
           "accessModes": [
             "ReadWriteOnce"
           ],
-	  "storageClassName": "openebs-basic",
+	  "storageClassName": "openebs-standard",
           "resources": {
             "requests": {
               "storage": "400M"

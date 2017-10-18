@@ -2,7 +2,17 @@
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
-   name: openebs-basic
+   name: openebs-standalone
+provisioner: openebs.io/provisioner-iscsi
+parameters:
+  pool: hostdir-var
+  replica: "1"
+  size: 5G
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+   name: openebs-standard
 provisioner: openebs.io/provisioner-iscsi
 parameters:
   pool: hostdir-var

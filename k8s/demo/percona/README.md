@@ -102,7 +102,7 @@ Check whether the storage classes are applied successfully
 ```
 karthik@MayaMaster:~$ kubectl get sc
 NAME              TYPE
-openebs-basic     openebs.io/provisioner-iscsi
+openebs-standard  openebs.io/provisioner-iscsi
 openebs-jupyter   openebs.io/provisioner-iscsi
 openebs-percona   openebs.io/provisioner-iscsi
 ```
