@@ -47,9 +47,9 @@ Setting up OpenEBS with Kubernetes using Minikube on the Ubuntu host displayed t
 
 1. Download a specific/compatible version, by replacing the **$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt))** portion of the command with a specific version.
 
-   For example, to download version v1.8.0 on MacOS, enter the following command.
+   For example, to download v1.8.0 on Linux, enter the following command.
    ::
-      curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.8.0/bin/da
+      curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.8.0/bin/darwin/amd64/kubectl
 
 2. Make the kubectl binary executable.
    ::
