@@ -34,6 +34,30 @@ Issues Fixed in v0.4.0
 * #166 (https://github.com/edorid): openebs-k8s-provisioner goes into crashloopbackoff, during the first volume creation
 * #176 (https://github.com/maikotz): OpenEBS PV is unreachable after one of the replica becames unreachable.
 
+Known Issues in v0.4.0
+==============================
+* #633 (https://github.com/openebs/openebs/issues/633): 
+
+**Issue:**
+
+Setting up OpenEBS with Kubernetes using Minikube on the Ubuntu host displayed the following error.
+*error: error validating "openebs-operator.yaml": error validating data: unknown object type schema.GroupVersionKind{Group:"", Version:"v1", Kind:"ServiceAccount"}; if you choose to ignore these errors, turn validation off with --validate=false*
+
+**Resolution**
+
+1. Download a specific/compatible version, by replacing the **$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt))** portion of the command with a specific version.
+
+   For example, to download v1.8.0 on Linux, enter the following command.
+   ::
+      curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.8.0/bin/linux/amd64/kubectl
+
+2. Make the kubectl binary executable.
+   ::
+      chmod +x ./kubectl
+3. Move the binary in to your PATH.
+   :: 
+      sudo mv ./kubectl /usr/local/bin/kubectl
+
 CI Updates with v0.4.0
 =========================
 * Support for on-premise Jenkins CI for performing e2e tests
