@@ -155,7 +155,7 @@ deployment "maya-apiserver" created
 service "maya-apiserver-service" created
 deployment "openebs-provisioner" created
 kiran@kmaya:~/k8s-demo$ kubectl --kubeconfig ./demo-kube-config apply -f openebs-storageclasses.yaml 
-storageclass "openebs-basic" created
+storageclass "openebs-standard" created
 storageclass "openebs-percona" created
 storageclass "openebs-jupyter" created
 kiran@kmaya:~/k8s-demo$ 
