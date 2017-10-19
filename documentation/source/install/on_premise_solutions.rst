@@ -10,14 +10,14 @@ Setting Up OpenEBS with Kubernetes on Local Machine
 The following procedure helps you setup and use OpenEBS on a local machine:
 
 1. Install Vagrant Box
-  
+
    To run the kubernetes cluster on local machine, you need a vagrant box. If you do not have vagrant box follow the steps given `here`_.
     .. _here: https://github.com/openebs/openebs/tree/master/k8s/lib/vagrant/test/k8s/1.6#installing-kubernetes-16-and-openebs-clusters-on-ubuntu
 
 2. Download OpenEBS Vagrant file using the following command.
 ::
 
-    $ wget https://raw.githubusercontent.com/openebs/openebs/master/k8s/lib/vagrant/test/k8s/1.6/Vagrantfile
+    $ wget https://raw.githubusercontent.com/openebs/openebs/master/k8s/vagrant/1.7.5/Vagrantfile
 
 3. Bring up k8s Cluster.
 ::
@@ -49,10 +49,10 @@ It will bring up one kubemaster and two kubeminions.
    * Add OpenEBS related storage classes using the following command, that can then be used by developers or applications.
      ::
 
-         ubuntu@kubemaster-01:~/openebs/k8s$ kubectl apply -f openebs-storageclasses.yaml   
+         ubuntu@kubemaster-01:~/openebs/k8s$ kubectl apply -f openebs-storageclasses.yaml
 
-6. Run stateful workloads with OpenEBS storage.  
-   
+6. Run stateful workloads with OpenEBS storage.
+
 To use OpenEBS as persistent storage for your stateful workloads, set the storage class in the PVC to OpenEBS storage class.
 
 Get the list of storage classes using the following command. Choose the storage class that best suits your application.
@@ -169,7 +169,7 @@ Setup Environment for OpenEBS Installation
 
   1. in hyperconverged mode, where the OpenEBS storage services run as pods on the Kubernetes cluster itself.
 
-  .. 2. in dedicated mode, where the Kubernetes and OpenEBS clusters are setup individually on the Linux boxes (same or distinct) OR 
+  .. 2. in dedicated mode, where the Kubernetes and OpenEBS clusters are setup individually on the Linux boxes (same or distinct) OR
 
 
 The subsequent section explains the installation procedure for hyperconverged mode.
@@ -180,8 +180,8 @@ The subsequent section explains the installation procedure for hyperconverged mo
 
 .. * Execute the setup-kubernetes ansible playbook to create the kubernetes cluster followed by the setup-openebs playbook to install the maya-apiserver and openebs storage cluster. These playbooks install the requisite dependencies on the machines, update the configuration files on the boxes and sets it up to serve applications.
   ::
-     testuser@OpenEBSClient:~/openebs/e2e/ansible$ ansible-playbook setup-kubernetes.yml 
-     testuser@OpenEBSClient:~/openebs/e2e/ansible$ ansible-playbook setup-kubernetes.yml 
+     testuser@OpenEBSClient:~/openebs/e2e/ansible$ ansible-playbook setup-kubernetes.yml
+     testuser@OpenEBSClient:~/openebs/e2e/ansible$ ansible-playbook setup-kubernetes.yml
 
 .. * Verify that the Kubernetes and OpenEBS clusters are running with the nodes having joined the masters.
 
@@ -220,8 +220,8 @@ OpenEBS Installation - Hyperconverged Mode
   * Execute the setup-kubernetes ansible playbook to create the Kubernetes cluster followed by the    setup-openebs playbook. These playbooks install the requisite dependencies on the machines, update the configuration files on the boxes and sets up Kubernetes cluster.
     ::
 
-        testuser@OpenEBSClient:~/openebs/e2e/ansible$ ansible-playbook setup-kubernetes.yml 
-        testuser@OpenEBSClient:~/openebs/e2e/ansible$ ansible-playbook setup-kubernetes.yml 
+        testuser@OpenEBSClient:~/openebs/e2e/ansible$ ansible-playbook setup-kubernetes.yml
+        testuser@OpenEBSClient:~/openebs/e2e/ansible$ ansible-playbook setup-kubernetes.yml
 
   * Check status of the Kubernetes cluster
     ::
@@ -245,7 +245,7 @@ OpenEBS Installation - Hyperconverged Mode
       NAME                                   READY     STATUS    RESTARTS   AGE
       maya-apiserver-1633167387-v4sf1        1/1       Running   0          4h
       openebs-provisioner-1174174075-n989p   1/1       Running   0          4h
-    
+
 * Verify that the OpenEBS storage classes are applied successfully.
   ::
 
@@ -286,14 +286,14 @@ Run Sample Applications on the OpenEBS Setup
       kubectl describe pod <pod name>
 
 * The storage volume that is the persistent volume associated with the persistent volume claim, can be viewed using the *volume list* command in the maya-apiserver pod.
-  :: 
+  ::
 
       name@MayaMaster:~$ kubectl exec maya-apiserver-1633167387-v4sf1 -c maya-apiserver -- maya volume list
       Name                                      Status
       pvc-a2a6d71f-5b21-11e7-bf1c-000c298ff5fc  Running
-     
+
 * Verify that the storage volume is receiving input/output by checking the increments to *DataUpdateIndex* in the output of the `volume stats` command issued in the maya-apiserver pod. Some additional performance statistics are also available in the command output.
-  ::  
+  ::
 
        name@MayaMaster:~$ kubectl exec maya-apiserver-1633167387-v4sf1 -c maya-apiserver -- maya volume stats pvc-a2a6d71f-5b21-11e7-bf1c-000c298ff5fc
       ------------------------------------
