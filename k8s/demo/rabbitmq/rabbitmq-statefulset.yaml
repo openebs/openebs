@@ -1,0 +1,91 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  # Expose the management HTTP port on each node
+  name: rabbitmq-management
+  labels:
+    app: rabbitmq
+spec:
+  ports:
+  - port: 15672
+    name: http
+  selector:
+    app: rabbitmq
+  type: NodePort # Or LoadBalancer in production w/ proper security
+---
+apiVersion: v1
+kind: Service
+metadata:
+  # The required headless service for StatefulSets
+  name: rabbitmq
+  labels:
+    app: rabbitmq
+spec:
+  ports:
+  - port: 5672
+    name: amqp
+  - port: 4369
+    name: epmd
+  - port: 25672
+    name: rabbitmq-dist
+  clusterIP: None
+  selector:
+    app: rabbitmq
+---
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  name: rabbitmq
+spec:
+  serviceName: "rabbitmq"
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: rabbitmq
+    spec:
+      containers:
+      - name: rabbitmq
+        image: rabbitmq:3.6.6-management-alpine
+        lifecycle:
+          postStart:
+            exec:
+              command:
+              - /bin/sh
+              - -c
+              - >
+                if [ -z "$(grep rabbitmq /etc/resolv.conf)" ]; then
+                  sed "s/^search \([^ ]\+\)/search rabbitmq.\1 \1/" /etc/resolv.conf > /etc/resolv.conf.new;
+                  cat /etc/resolv.conf.new > /etc/resolv.conf;
+                  rm /etc/resolv.conf.new;
+                fi;
+                until rabbitmqctl node_health_check; do sleep 1; done;
+                if [[ "$HOSTNAME" != "rabbitmq-0" && -z "$(rabbitmqctl cluster_status | grep rabbitmq-0)" ]]; then
+                  rabbitmqctl stop_app;
+                  rabbitmqctl join_cluster rabbit@rabbitmq-0;
+                  rabbitmqctl start_app;
+                fi;
+                rabbitmqctl set_policy ha-all "." '{"ha-mode":"exactly","ha-params":3,"ha-sync-mode":"automatic"}'
+        env:
+        - name: RABBITMQ_ERLANG_COOKIE
+          valueFrom:
+            secretKeyRef:
+              name: rabbitmq-config
+              key: erlang-cookie
+        ports:
+        - containerPort: 5672
+          name: amqp
+        volumeMounts:
+        - name: rabbitmq
+          mountPath: /var/lib/rabbitmq
+  volumeClaimTemplates:
+  - metadata:
+      name: rabbitmq
+      annotations:
+        volume.beta.kubernetes.io/storage-class: openebs-standard
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 5G
