@@ -1,0 +1,25 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: openebs-provisioner
+  namespace: default
+  labels:
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        name: openebs-provisioner
+        chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+    spec:
+      serviceAccountName: openebs-maya-operator
+      containers:
+      - name: openebs-provisioner
+        image: "{{ .Values.provisioner.image }}:{{ .Values.provisioner.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        env:
+        - name: NODE_NAME
+          valueFrom: 
+            fieldRef:
+              fieldPath: spec.nodeName

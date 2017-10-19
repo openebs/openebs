@@ -1,0 +1,21 @@
+# Default values for OpenEBS
+
+## If true, create & use RBAC resources
+##
+rbacEnable: true
+
+image:
+  pullPolicy: IfNotPresent
+
+apiserver:
+  image: "openebs/m-apiserver"
+  tag: "0.4.0"
+
+provisioner:
+  image: "openebs/openebs-k8s-provisioner"
+  tag: "0.4.0"
+
+jiva:
+  image: "openebs/jiva:0.4.0"
+  replicas: 2
+
