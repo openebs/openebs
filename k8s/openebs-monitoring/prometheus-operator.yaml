@@ -57,7 +57,7 @@ rules:
   verbs: ["get", "list", "watch"]
   # nonResourceURLs are endpoints that don’t map to a traditional resource. 
   # Things like /ui/ or /apis or /swagger.json that are used for redirects
-  # Prometheus by default look for /metrics endpoint for the differnet IP's.
+  # Prometheus by default look for /metrics endpoint for the different IP's.
 - nonResourceURLs: ["/metrics"]
   verbs: ["get"]
 ---

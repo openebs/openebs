@@ -5,7 +5,7 @@ High Availability storage (HA storage) is a storage system that is continuously 
 
 OpenEBS Jiva Volume is a controller with one or more replicas. The controller is an iSCSI target whereas the replica plays the role of disk. The controller exposes the iSCSI target while the actual data is written. The controller and each individual replica run inside a dedicated container.
 
-OpenEBS Jiva Volume controller exists as a single instance but there can be multiple instances of OpenEBS Jiva volume replicas. Peristent data is synchronized between replicas. 
+OpenEBS Jiva Volume controller exists as a single instance but there can be multiple instances of OpenEBS Jiva volume replicas. Persistent data is synchronized between replicas. 
 
 OpenEBS Jiva Volume HA is based on various scenarios as explained in the following sections.
 

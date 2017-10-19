@@ -102,7 +102,7 @@ The connection error is expected. The next step will configure the kubectl to co
 vagrant ssh kubemaster-01 -c "cat ~/.kube/config" > demo-kube-config
 ```
 
-*Note: If you have a single Kubernetes cluster on your host, you could copy the demo-kube-config to ~/.kube/config, and avoid specifiying the parameter --kubeconfig in the kubectl commands*
+*Note: If you have a single Kubernetes cluster on your host, you could copy the demo-kube-config to ~/.kube/config, and avoid specifying the parameter --kubeconfig in the kubectl commands*
 
 ### Verify
 

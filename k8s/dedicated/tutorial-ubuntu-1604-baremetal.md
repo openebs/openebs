@@ -14,7 +14,7 @@ In this guide, we will walk you through the following:
 
 ## Prerequisites
 
-Identify 3 Ubuntu 16.04 machines (either Virtual Machines or Physcial Machines) which will be used for OpenEBS Cluster. In the examples below, we will assume the following hostnames and IP address. Please replace this with your machine details. 
+Identify 3 Ubuntu 16.04 machines (either Virtual Machines or Physical Machines) which will be used for OpenEBS Cluster. In the examples below, we will assume the following hostnames and IP address. Please replace this with your machine details. 
 
 ```
 master-01 ( 172.28.128.4)
