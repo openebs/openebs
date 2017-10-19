@@ -122,7 +122,7 @@ kubectl apply -f demo-percona-mysql-pvc.yaml
 ```
 
 Verify that the openebs storage pods, i.e., the jiva controller and jiva replicas
-are created and the percona pod is running succesfully
+are created and the percona pod is running successfully
 
 ```
 karthik@MayaMaster:~$ kubectl get pods

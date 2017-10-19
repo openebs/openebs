@@ -70,7 +70,7 @@ EOF
 }
 
 # Code:
-# Check whether we recieved the User and Master hostnames else Show usage
+# Check whether we received the User and Master hostnames else Show usage
 # Uses the long form of arguments now
 
 if (($# == 0)); then

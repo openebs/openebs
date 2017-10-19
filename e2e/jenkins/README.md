@@ -71,7 +71,7 @@ Jenkins application for Slack must be installed and configured.
   - Enter the token provided in the Jenkins application for Slack in _Integration Token_ field.
   - Enter the slack channel details in _Channel_ field.
   - Click _Test Connection_. The slack channel should be getting a notification from Jenkins.
-  - If a notification is recieved then click _Apply_ and _Save_.
+  - If a notification is received then click _Apply_ and _Save_.
   - The configuration for the Slack Plugin is complete.
 
 ## Continuous Integration - Step 4: Creating The Jobs

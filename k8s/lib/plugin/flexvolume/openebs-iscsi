@@ -51,7 +51,7 @@ log() {
     echo -ne $* >&1
 }
 
-#Dump the debug information into a seperate logger
+#Dump the debug information into a separate logger
 #TBD : Check how to push this information into K8s loggers
 debug() {
     if [ ${OEBSDEBUG} ]; then  echo -e $* >>  ${OLOGS_DIR}/openebs-iscsi.log; fi

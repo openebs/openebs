@@ -109,7 +109,7 @@ Apply the percona pod yaml using the following commands.
    cd demo/percona
    kubectl apply -f demo-percona-mysql-pvc.yaml
 
-Verify that the OpenEBS storage pods, that is, the jiva controller and jiva replicas are created and the percona pod is running succesfully using the following commands.
+Verify that the OpenEBS storage pods, that is, the jiva controller and jiva replicas are created and the percona pod is running successfully using the following commands.
 
 ::
  
@@ -245,7 +245,7 @@ The above command creates the following, which can be verified using the corresp
 - Creates an OpenEBS Volume and mounts to the Jupyter Server Pod (/mnt/data) (kubectl get pvc) (kubectl get pv) (kubectl get pods)
 - Exposes the Jupyter Server to external world via the http://<NodeIP>:32424 (NodeIP is any of the nodes external IP) (kubectl get pods)   
 
-Verify that the OpenEBS storage pods, that is, the jiva controller and jiva replicas are created and the jupyter pod is running succesfully using the following commands.
+Verify that the OpenEBS storage pods, that is, the jiva controller and jiva replicas are created and the jupyter pod is running successfully using the following commands.
 
 ::
  
