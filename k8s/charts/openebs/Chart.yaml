@@ -3,7 +3,7 @@ version: 0.4.0
 name: openebs
 appVersion: 0.4.0
 description: Containerized Storage for Containers
-icon: https://github.com/openebs/chitrakala/blob/master/logo/png/logo-01.png
+icon: https://raw.githubusercontent.com/openebs/chitrakala/master/logo/png/logo-01.png
 home: http://www.openebs.io/
 keywords:
   - cloud-native-storage
