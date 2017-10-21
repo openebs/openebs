@@ -25,13 +25,16 @@ Minimum requirements for using Minikube
 
 Make sure *docker* is installed on your Ubuntu host. 
  
-Steps to install Docker on Ubuntu(64 bit)
+Steps to install Docker on Ubuntu:16.04(64 bit)
 -------------------
 ::
 
-    sudo apt-get install docker-ee 
-    or
-    sudo apt-get install docker-ce
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+    sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+    sudo apt-get update
+    apt-cache policy docker-ce
+    sudo apt-get install -y docker-ce
+    
     
     
  
