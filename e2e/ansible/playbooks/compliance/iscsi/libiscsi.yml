@@ -29,13 +29,16 @@
          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
 
        - name: Confirm volume container is running 
-         shell: source ~/.profile; kubectl get pods | grep pvc
+         shell: source ~/.profile; kubectl get pods | grep pvc | grep {{item}} | grep Running | wc -l
          args:
            executable: /bin/bash
          register: result
-         until: "'ctrl' and 'Running' in result.stdout_lines[0] and 'rep' and 'Running' in result.stdout_lines[1]"
+         until: result.stdout|int >= 1
          delay: 30
-         retries: 6
+         retries: 10 
+         with_items: 
+           - ctrl
+           - rep
          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
         
        - name: Get storage ctrl pod name
@@ -122,7 +125,8 @@
            flag_msg: "Ran libiscsi test suite successfully"
 
      rescue: 
-        - set_fact: 
+        - set_fact:
+            flag: "Fail" 
             flag_msg: "Failed to run libiscsi test suite"
             
      always:

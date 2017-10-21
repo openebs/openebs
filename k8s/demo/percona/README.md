@@ -102,7 +102,7 @@ Check whether the storage classes are applied successfully
 ```
 karthik@MayaMaster:~$ kubectl get sc
 NAME              TYPE
-openebs-basic     openebs.io/provisioner-iscsi
+openebs-standard  openebs.io/provisioner-iscsi
 openebs-jupyter   openebs.io/provisioner-iscsi
 openebs-percona   openebs.io/provisioner-iscsi
 ```
@@ -122,7 +122,7 @@ kubectl apply -f demo-percona-mysql-pvc.yaml
 ```
 
 Verify that the openebs storage pods, i.e., the jiva controller and jiva replicas
-are created and the percona pod is running succesfully
+are created and the percona pod is running successfully
 
 ```
 karthik@MayaMaster:~$ kubectl get pods

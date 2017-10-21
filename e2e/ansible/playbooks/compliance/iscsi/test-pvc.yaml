@@ -3,7 +3,7 @@ apiVersion: v1
 metadata:
   name: vut 
 spec:
-  storageClassName: openebs-basic
+  storageClassName: openebs-standard
   accessModes:
     - ReadWriteOnce
   resources:

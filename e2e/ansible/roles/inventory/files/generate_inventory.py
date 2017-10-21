@@ -17,18 +17,18 @@
 #
 # Usage Examples:
 #
-# python generate-inventory.py <path>/machines.in
+# python generate_inventory.py <path>/machines.in
 #
-# python generate-inventory.py <path>/machines.in --loglevel=Debug
+# python generate_inventory.py <path>/machines.in --loglevel=Debug
 #
-# python generate-inventory.py <path>/machines.in --loglevel=Info \
+# python generate_inventory.py <path>/machines.in --loglevel=Info \
 #       --passwordless=True
 #
 ######################################################################
 
 import os
 import sys
-from utils import sshToOtherClient, executeCmd
+from utils import executeCmd
 from passwordless import setupSSH
 import logging
 import argparse

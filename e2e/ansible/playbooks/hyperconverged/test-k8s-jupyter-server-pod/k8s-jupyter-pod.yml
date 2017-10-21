@@ -30,17 +30,11 @@
          args: 
            executable: /bin/bash
          register: result
-         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"     
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+         until: "'Running' in result.stdout"
+         delay: 120
+         retries: 5
 
-       - name: 
-         debug: 
-           msg: "Ending play, maya-apiserver is not running"
-         when: "'Running' not in result.stdout"
-
-       - name: 
-         meta: end_play
-         when: "'Running' not in result.stdout"
-    
        - name: Replace volume size in plugin YAML
          lineinfile:
            path: "{{ result_kube_home.stdout }}/{{ pod_yaml_alias }}"
@@ -61,8 +55,8 @@
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
          register: result
          until: "'jupyter' and 'Running' in result.stdout"
-         delay: 300 
-         retries: 6
+         delay: 120 
+         retries: 15
 
        - name: Verify that the jupyter notebook server is a cluster service
          shell: source ~/.profile; kubectl get svc 

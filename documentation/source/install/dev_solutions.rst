@@ -14,7 +14,7 @@ Minikube helps developers to quickly setup a single-node Kubernetes cluster for 
 
 If you are already an experienced Minikube user, you can easily setup OpenEBS on your existing Kubernetes cluster with a few simple kubectl commands. See, :ref:`quick-start`.
 
-This section provides instructions to set up Kubernetes using Minikube directly on Ubuntu 16.06 (without using any VM drivers) and to have OpenEBS running in hyperconverged mode. 
+This section provides instructions to set up Kubernetes using Minikube directly on Ubuntu 16.04 (without using any VM drivers) and to have OpenEBS running in hyperconverged mode. 
 
 Prerequisites
 ---------------
@@ -24,6 +24,19 @@ Minimum requirements for using Minikube
 * RAM - (Minimum 4 GB)
 
 Make sure *docker* is installed on your Ubuntu host. 
+ 
+Steps to install Docker on Ubuntu:16.04(64 bit)
+-------------------
+::
+
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+    sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+    sudo apt-get update
+    apt-cache policy docker-ce
+    sudo apt-get install -y docker-ce
+    
+    
+    
  
 
 Add iSCSI Support

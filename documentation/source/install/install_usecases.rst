@@ -86,6 +86,11 @@ Check whether the storage classes are applied successfully using the following c
     openebs-jupyter   openebs.io/provisioner-iscsi
     openebs-percona   openebs.io/provisioner-iscsi
 
+**See Also:**
+
+`Setting Up OpenEBS - Overview`_.
+
+.. _Setting Up OpenEBS - Overview: http://openebs.readthedocs.io/en/latest/install/install_overview.html
 
 Percona DB
 ===========
@@ -104,7 +109,7 @@ Apply the percona pod yaml using the following commands.
    cd demo/percona
    kubectl apply -f demo-percona-mysql-pvc.yaml
 
-Verify that the OpenEBS storage pods, that is, the jiva controller and jiva replicas are created and the percona pod is running succesfully using the following commands.
+Verify that the OpenEBS storage pods, that is, the jiva controller and jiva replicas are created and the percona pod is running successfully using the following commands.
 
 ::
  
@@ -157,21 +162,21 @@ Start an interactive bash console for the maya-apiserver container using the fol
    
      kubectl exec -it maya-apiserver-1633167387-5ss2w /bin/bash
 
-Lookup the storage volume name using the *vsm-list* command
+Lookup the storage volume name using the *volume list* command
 
 ::
 
     name@Master:~$ kubectl exec -it maya-apiserver-1633167387-5ss2w /bin/bash
 
-    root@maya-apiserver-1633167387-5ss2w:/# maya vsm-list
+    root@maya-apiserver-1633167387-5ss2w:/# maya volume list
     Name                                      Status
     pvc-016e9a68-71c1-11e7-9fea-000c298ff5fc  Running
 
-Get the performance and capacity usage statistics using the *vsm-stats* command.
+Get the performance and capacity usage statistics using the *volume stats* command.
 
 ::
 
-    root@maya-apiserver-1633167387-5ss2w:/# maya vsm-stats pvc-016e9a68-71c1-11e7-9fea-000c298ff5fc
+    root@maya-apiserver-1633167387-5ss2w:/# maya volume stats pvc-016e9a68-71c1-11e7-9fea-000c298ff5fc
     ------------------------------------
      IQN     : iqn.2016-09.com.openebs.jiva:pvc-016e9a68-71c1-11e7-9fea-000c298ff5fc
      Volume  : pvc-016e9a68-71c1-11e7-9fea-000c298ff5fc
@@ -196,8 +201,7 @@ The above command can be invoked using the *watch* command by providing a desire
 
 ::
 
-   watch -n 1 maya vsm-stats pvc-016e9a68-71c1-11e7-9fea-000c298ff5fc
-
+   watch -n 1 maya volume stats pvc-016e9a68-71c1-11e7-9fea-000c298ff5fc
 
 Jupyter
 =========
@@ -212,9 +216,7 @@ Run Jupyter Pod with OpenEBS Storage
 Use OpenEBS as persistent storage for the jupyter pod by selecting an OpenEBS storage class in the persistent volume claim. A sample jupyter pod yaml (with container attributes and pvc details) is available in the OpenEBS git repository (which was cloned in the previous steps).
 ::
    name@Master:~$ cat demo-jupyter-openebs.yaml
-
-   ...
-
+   ..
    kind: PersistentVolumeClaim
    apiVersion: v1
    metadata:
@@ -226,7 +228,7 @@ Use OpenEBS as persistent storage for the jupyter pod by selecting an OpenEBS st
      resources:
        requests:
          storage: 5G
-   ...
+    ..
 
 Apply the jupyter pod yaml using the following command.
 
@@ -243,7 +245,7 @@ The above command creates the following, which can be verified using the corresp
 - Creates an OpenEBS Volume and mounts to the Jupyter Server Pod (/mnt/data) (kubectl get pvc) (kubectl get pv) (kubectl get pods)
 - Exposes the Jupyter Server to external world via the http://<NodeIP>:32424 (NodeIP is any of the nodes external IP) (kubectl get pods)   
 
-Verify that the OpenEBS storage pods, that is, the jiva controller and jiva replicas are created and the jupyter pod is running succesfully using the following commands.
+Verify that the OpenEBS storage pods, that is, the jiva controller and jiva replicas are created and the jupyter pod is running successfully using the following commands.
 
 ::
  

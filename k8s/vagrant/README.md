@@ -102,7 +102,7 @@ The connection error is expected. The next step will configure the kubectl to co
 vagrant ssh kubemaster-01 -c "cat ~/.kube/config" > demo-kube-config
 ```
 
-*Note: If you have a single Kubernetes cluster on your host, you could copy the demo-kube-config to ~/.kube/config, and avoid specifiying the parameter --kubeconfig in the kubectl commands*
+*Note: If you have a single Kubernetes cluster on your host, you could copy the demo-kube-config to ~/.kube/config, and avoid specifying the parameter --kubeconfig in the kubectl commands*
 
 ### Verify
 
@@ -155,7 +155,7 @@ deployment "maya-apiserver" created
 service "maya-apiserver-service" created
 deployment "openebs-provisioner" created
 kiran@kmaya:~/k8s-demo$ kubectl --kubeconfig ./demo-kube-config apply -f openebs-storageclasses.yaml 
-storageclass "openebs-basic" created
+storageclass "openebs-standard" created
 storageclass "openebs-percona" created
 storageclass "openebs-jupyter" created
 kiran@kmaya:~/k8s-demo$ 

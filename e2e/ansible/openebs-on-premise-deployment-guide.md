@@ -30,14 +30,14 @@ The following instructions have been verified on:
 
 - All linux machines are required to have : 
   
-  - Basic development packages (dpkg-dev,gcc,g++,libc6-dev,make,libssl-dev,sshpass)
+  - Basic development packages (dpkg-dev,gcc,g++,libc6-dev,make,libssl-dev,sshpass,curl)
   - Python2.7-minimal 
   - SSH services enabled
   
 - The machine used as test-harness is required to have these additionally :
   
   - Git
-  - Ansible (version >= 2.3)
+  - Ansible (version >= 2.3. It is recommended to perform ```pip install 'ansible==2.3'```)
  
 - The deployment can be performed by both root as well as non-root users. In case of the latter, ensure that the users are part
   of the sudo group. This is needed to run certain operations which require root privileges
@@ -71,27 +71,54 @@ drwxrwxr-x 17 testuser testuser  4096 Jun  5 09:29 roles
 
 - Setup environment variables for the usernames and passwords of all the boxes which have been brought up in the previous steps 
   on the test-harness (this machine will be interchangeably used with the term 'localhost'). Ensure that these are setup in the
-  ```.profile``` of the localhost user which will be running the ansible code/playbooks, i.e., the ansible_user.
+  ```.profile``` of the localhost user which will be running the ansible code/playbooks, i.e., the ansible user. Example entries 
+  are shown below : 
+  
+  ```
+  # Ansible framework variables
+ 
+  export LOCAL_USER_NAME="ciuser"
+  export LOCAL_USER_PASSWORD="test"
+  export NODE_USER_NAME="kart"
+  export NODE_USER_PASSWORD="test"
+  export MASTER_USER_NAME="kart"
+  export MASTER_USER_PASSWORD="test"
+  ```
 
-- Ensure that the env variables setup in the previous step are available in the current user session. Perform 
-```source ~/.profile``` to achieve the same and verify via ```echo $VARIABLE```
+ Note: 
+
+ - The ansible playbooks only support a single kubernetes master
+ - The machines used for the kubernetes nodes are needed to have the same user credentials. 
+ 
+ Support for multiple-masters and different credentials for each node machine will be added in subsequent releases. 
+ 
+
+- Verify that the environment variables setup in the previous step are available in the current user session. Perform 
+```source ~/.profile``` to achieve the same and confirm via ```echo $ENV_VAR```command , where ENV_VAR is the name of the environment
+variable. 
 
 - Edit the ```inventory/machines.in``` file to place the latest HostCode, IP, username variable, password variable for all the boxes 
   setup. For more details on editing machines.in refer the [Inventory README](inventory/README.md)
   
 - Edit the global variables file ```inventory/group_vars/all.yml``` to reflect the desired storage volume properties and network CIDR
   that will be used by the maya api server to allot the IP for the volume containers. Also update the ansible run-time properties to 
-  reflect the machine type (is_vagrant), whether the playbook execution needs to be recorded using the Ansible Run Analysis framework 
-  (setup_ara), whether slack notifications are needed (in case they are required, a $SLACK_TOKEN env variable needs to be setup. The token is usually the last part of the slack webhook URL which is user generated)  etc.., 
+  reflect the machine type (```is_vagrant```), whether the playbook execution needs to be recorded using the Ansible Run Analysis
+  framework (```setup_ara```), whether slack notifications are needed (in case they are required, a $SLACK_TOKEN env variable needs 
+  to be setup. The token is usually the last part of the slack webhook URL which is user generated) 
+  
+  Note: The network CIDR does not apply in case of hyperconverged mode of installation.
   
 - Execute the setup_ara playbook to install the ARA notification plugins and custom modules. This step will cause changes to 
-  the ansible configuration file ansible.cfg (though a backup will be taken at the time of execution in case you need to revert). A web 
+  the ansible configuration file ansible.cfg (A backup will be taken at the time of execution in case you need to revert). A web 
   URL is provided as a playbook run message at the end of the ara setup procedure, which can be used to track all the playbook run 
   details after this point (_Optional_)
   
   ```
   testuser@OpenEBSClient:~/openebs/e2e/ansible$ ansible-playbook setup_ara.yml
   ```
+  
+  Upon successful completion, you can view details of subsequent playbook runs on the ARA dashboard which can be accessed at 
+  ```http://<localhost public IP address>:9191```
   
 - Note that the above playbook needs to be run separately and not as part of any the "master" playbook run as the changes to ansible 
   default configuration may fail to take effect dynamically
@@ -102,6 +129,7 @@ drwxrwxr-x 17 testuser testuser  4096 Jun  5 09:29 roles
   ```
   testuser@OpenEBSClient:~/openebs/e2e/ansible$ ansible-playbook pre-requisites.yml
   ```
+  
 - Verify the generation of the hosts file in the ```openebs/e2e/ansible/inventory``` directory. Check the host-status.log in the 
   same location for details on inventory file generation in case of any issues.
   
@@ -120,13 +148,14 @@ drwxrwxr-x 17 testuser testuser  4096 Jun  5 09:29 roles
 
 - Execute the setup-kubernetes ansible playbook to create the kubernetes cluster followed by the setup-openebs playbook to install the 
   maya-apiserver and openebs storage cluster. These playbooks install the requisite  dependencies on the machines, update the 
-  configuration files on the boxes and sets it up to serve applications.
+  configuration files on the boxes and sets them up to serve applications.
   
   ```
   testuser@OpenEBSClient:~/openebs/e2e/ansible$ ansible-playbook setup-kubernetes.yml 
   ```
+  
   ```
-  testuser@OpenEBSClient:~/openebs/e2e/ansible$ ansible-playbook setup-kubernetes.yml 
+  testuser@OpenEBSClient:~/openebs/e2e/ansible$ ansible-playbook setup-openebs.yml 
   ```
 - verify that the Kubernetes & OpenEBS clusters are up with the nodes having joined the masters :
 
@@ -161,17 +190,19 @@ drwxrwxr-x 17 testuser testuser  4096 Jun  5 09:29 roles
 - In this mode, the openebs maya-apiserver and openebs-storage provisioner are run as deployments on the kubernetes cluster with 
   associated pods, and the kubernetes hosts act as the openebs storage hosts as well. These are setup using an openebs-operator on 
   the kubernetes cluster. The setup also involves integration of openebs storage-classes into the kubernetes cluster. These essentially 
-  define the storage profile - such as size, number of replicas, type of pool atec..,and also the provisioner associated with it. 
+  define the storage profile - such as size, number of replicas, type of pool and also the provisioner associated with it. 
   
   Applications can consume storage by specifying a persistent volume claim in which the storage class is an openebs-storage class.
   
 - First, setup the kubernetes cluster using the setup-kubernetes playbook, followed by the setup-openebs playbook (same commands as the 
-  dedicated installation explained in previous section) to deploy the openebs pods. Internally, this runs the _hyperconverged_ ansible 
-  role which executes the the openebs-operator and integrates openebs-storageclasses into the kubernetes cluster 
+  dedicated installation explained in previous section) to deploy the openebs pods. 
+  
+  The setup-openebs playbook runs the k8s-openebs-operator ansible role which applies the the openebs-operator and integrates the
+  openebs-storageclasses into the kubernetes cluster 
   
 - Verify that the kubernetes cluster is up using the ```kubectl get nodes``` command
 
-- Verify that the maya-apiserver and openebs-provisioner are deployed successfully on the kubernetes cluster
+- Verify that maya-apiserver and openebs-provisioner are deployed successfully on the kubernetes cluster
 
   ```
   karthik@MayaMaster:~$ kubectl get deployments
@@ -179,18 +210,20 @@ drwxrwxr-x 17 testuser testuser  4096 Jun  5 09:29 roles
   maya-apiserver        1         1         1            1           4h
   openebs-provisioner   1         1         1            1           4h
   ```
+  
   ```
   karthik@MayaMaster:~$ kubectl get pods
   NAME                                   READY     STATUS    RESTARTS   AGE
   maya-apiserver-1633167387-v4sf1        1/1       Running   0          4h
   openebs-provisioner-1174174075-n989p   1/1       Running   0          4h
   ```
+  
 - Verify that the openebs storage-classes are applied successfully 
 
   ```
   karthik@MayaMaster:~$ kubectl get sc
   NAME              TYPE
-  openebs-basic     openebs.io/provisioner-iscsi
+  openebs-standard  openebs.io/provisioner-iscsi
   openebs-jupyter   openebs.io/provisioner-iscsi
   openebs-percona   openebs.io/provisioner-iscsi
   ```
@@ -208,6 +241,7 @@ drwxrwxr-x 17 testuser testuser  4096 Jun  5 09:29 roles
   ```
   ciuser@OpenEBSClient:~/openebs/e2e/ansible$ ansible-playbook run-hyperconverged-tests.yml
   ```
+  
 - Verify that the pod is deployed on the Kubernetes minion along with the openebs storage pods created as per the storage-class in the 
   persistent volume claim, by executing the this command on the Kubernetes master :
 
@@ -227,20 +261,19 @@ drwxrwxr-x 17 testuser testuser  4096 Jun  5 09:29 roles
   
 - For more details about the pod, execute the command ``` kubectl describe pod <pod name> ```
 
-- The storage volume (i.e., the persistent volume) associated with the persistent volume claim can be viewed using the vsm-list command 
-  in the maya-apiserver pod
+- The storage volume (i.e., the persistent volume) associated with the persistent volume claim can be viewed using the volume list commandin the maya-apiserver pod
   
   ```
-  karthik@MayaMaster:~$ kubectl exec maya-apiserver-1633167387-v4sf1 -c maya-apiserver -- maya vsm-list
+  karthik@MayaMaster:~$ kubectl exec maya-apiserver-1633167387-v4sf1 -c maya-apiserver -- maya volume list
   Name                                      Status
   pvc-a2a6d71f-5b21-11e7-bf1c-000c298ff5fc  Running
   ```
   
-- Verify that the storage volume is receiving I/O by checking the increments to _DataUpdateIndex_ in the output of the vsm-stats 
+- Verify that the storage volume is receiving I/O by checking the increments to _DataUpdateIndex_ in the output of the volume stats 
   command issued in the maya-apiserver pod. Also available in the command output are some additional performance stats
   
   ```
-  karthik@MayaMaster:~$ kubectl exec maya-apiserver-1633167387-v4sf1 -c maya-apiserver -- maya vsm-stats pvc-a2a6d71f-5b21-11e7-bf1c-  
+  karthik@MayaMaster:~$ kubectl exec maya-apiserver-1633167387-v4sf1 -c maya-apiserver -- maya volume stats pvc-a2a6d71f-5b21-11e7-bf1c-  
   000c298ff5fc
   ------------------------------------
      IQN: iqn.2016-09.com.openebs.jiva:pvc-a2a6d71f-5b21-11e7-bf1c-000c298ff5fc
@@ -256,8 +289,7 @@ drwxrwxr-x 17 testuser testuser  4096 Jun  5 09:29 roles
      0|     3|     0.000|     1.109|      0.000|     10.602|          0|        378|
   karthik@MayaMaster:~$
   ```
-  In case of dedicated installations, the ```maya vsm-list``` and ```maya vsm-stats``` command can be executed directly on the maya 
-  server host console  
+  In case of dedicated installations, the ```maya volume list``` and ```maya volume stats``` command can be executed directly on the maya server host console  
 
   
 ## Tips & Gotchas

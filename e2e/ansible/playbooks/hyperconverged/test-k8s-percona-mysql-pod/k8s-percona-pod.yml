@@ -31,17 +31,11 @@
          args: 
            executable: /bin/bash
          register: result
-         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"     
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+         until: "'Running' in result.stdout"
+         delay: 120
+         retries: 5
 
-       - name: 
-         debug: 
-           msg: "Ending play, maya-apiserver is not running"
-         when: "'Running' not in result.stdout"
-
-       - name: 
-         meta: end_play
-         when: "'Running' not in result.stdout"
-    
        - name: Replace volume size in plugin YAML
          lineinfile:
            path: "{{ result_kube_home.stdout }}/{{ pod_yaml_alias }}"
@@ -62,8 +56,8 @@
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
          register: result
          until: "'percona' and 'Running' in result.stdout"
-         delay: 300 
-         retries: 6
+         delay: 120 
+         retries: 15
      
        - name: Get $HOME of K8s minion for kubernetes user
          shell: source ~/.profile; echo $HOME
@@ -90,20 +84,18 @@
          with_items: "{{ files }}"
          delegate_to: "{{ groups['kubernetes-kubeminions'].0 }}"
 
-       - name: Build the mysql-client image
+       - name: Pull the mysql-client image
          docker_image:
-           name: mysql-client
+           name: openebs/tests-mysql-client
            state: present
-           path: "{{ result_kube_home.stdout }}"
-           rm: true
-           timeout: 600
+           timeout: 120
          become: true
          delegate_to: "{{ groups['kubernetes-kubeminions'].0 }}"
 
        - name: mysql-client docker instantiate
          docker_container:
            name: client
-           image: mysql-client
+           image: openebs/tests-mysql-client
            network_mode: host
            command: timelimit -t {{ mysql_load_duration }} sh MySQLLoadGenerate.sh {{ pod_ip }} > /dev/null 2>&1
            state: started
