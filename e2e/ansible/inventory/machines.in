@@ -17,7 +17,7 @@
 # and has a default IP of 127.0.0.1
 #
 # 3. A dictionary of supported codes ("SupportedHostCodes") is present
-# in the python script generate-inventory.py, which can be updated by 
+# in the python script generate_inventory.py, which can be updated by
 # interested users to include additional hostcodes
 #
 # 4. Lines can be commented (such as these) by inserting '#' symbol

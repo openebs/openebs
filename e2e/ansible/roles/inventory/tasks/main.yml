@@ -1,6 +1,6 @@
 ---
 - name: Generate Inventory
-  shell: source ~/.profile; python {{role_path}}/files/generate-inventory.py {{inventory_input_path}}/machines.in --passwordless=True
+  shell: source ~/.profile; python {{role_path}}/files/generate_inventory.py {{inventory_input_path}}/machines.in --passwordless=True
   args:
     executable: /bin/bash
   delegate_to: 127.0.0.1

@@ -23,7 +23,7 @@ playbooks. Provided below are some instructions to consider while doing this
   host codes are provided, failing which inventory generation will not proceed. Current supported codes include 'localhost, 'mayamaster',
   'mayahost', 'kubemaster', 'kubeminion'
 
-- A dictionary of supported codes ("SupportedHostCodes") is present in the python script files/generate-inventory.py, which can be 
+- A dictionary of supported codes ("SupportedHostCodes") is present in the python script files/generate_inventory.py, which can be
   updated by interested users to include additional hostcodes
 
 - The 'localhost' hostcode is a mandatory line in this file and has a default IP of 127.0.0.1
