@@ -13,6 +13,8 @@ The current podspec for Elasticsearch creates
 
 The current Fluentd podspec reads journal logs for `kubelet` and cluster level logging by reading from `/var/log/containers` for pods running on the kubernetes cluster. 
 
+#### Note: Make sure you install Elasticsearch while executing this usecase. Fluentd and Kibana require the publicly accessible Elastic search endpoint. 
+
 ## Verify Elastic search installation
 
 ```
