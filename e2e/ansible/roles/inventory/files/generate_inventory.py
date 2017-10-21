@@ -17,11 +17,11 @@
 #
 # Usage Examples:
 #
-# python generate-inventory.py <path>/machines.in
+# python generate_inventory.py <path>/machines.in
 #
-# python generate-inventory.py <path>/machines.in --loglevel=Debug
+# python generate_inventory.py <path>/machines.in --loglevel=Debug
 #
-# python generate-inventory.py <path>/machines.in --loglevel=Info \
+# python generate_inventory.py <path>/machines.in --loglevel=Info \
 #       --passwordless=True
 #
 ######################################################################
