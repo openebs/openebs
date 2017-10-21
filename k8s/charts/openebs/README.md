@@ -26,7 +26,7 @@ helm del --purge <openebs-chart-name>
 
 ## Configuration
 
-The following tables lists the configurable parameters of the CockroachDB chart and their default values.
+The following tables lists the configurable parameters of the OpenEBS chart and their default values.
 
 | Parameter               | Description                        | Default                                                    |
 | ----------------------- | ---------------------------------- | ---------------------------------------------------------- |
