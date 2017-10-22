@@ -74,7 +74,7 @@ spec:
         - name: DEFAULT_REPLICA_IMAGE
           value: "openebs/jiva:0.4.0"
         - name: DEFAULT_REPLICA_COUNT
-          value: "1"
+          value: "2"
 ---
 apiVersion: v1
 kind: Service
