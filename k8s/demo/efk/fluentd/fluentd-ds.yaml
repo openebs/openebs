@@ -1,0 +1,155 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: fluentd
+  namespace: kube-system
+
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRole
+metadata:
+  name: fluentd
+  namespace: kube-system
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - namespaces
+  - pods
+  - pods/logs
+  verbs:
+  - get
+  - list
+  - watch
+
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: fluentd
+roleRef:
+  kind: ClusterRole
+  name: fluentd
+  apiGroup: rbac.authorization.k8s.io
+subjects:
+- kind: ServiceAccount
+  name: fluentd
+  namespace: kube-system
+- kind: ServiceAccount
+  name: default
+  namespace: kube-system   
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: fluentd
+  namespace: kube-system
+data:
+  fluent.conf: |
+
+    <source>
+      @type systemd
+      path /var/log/journal
+      filters [{ "_SYSTEMD_UNIT": "kubelet.service" }]
+      pos_file /tmp/k8s-kubelet.pos
+      tag journal.kubelet
+      read_from_head true
+      strip_underscores true
+    </source>
+
+    <source>
+      type tail
+      path /var/log/containers
+      pos_file /tmp/px-container.log.pos
+      time_format %Y-%m-%dT%H:%M:%S.%N
+      tag kubernetes.*
+      format json
+      read_from_head true
+      keep_time_key true
+    </source>
+    
+    <filter kubernetes.**>
+      type kubernetes_metadata
+    </filter>
+
+    <match journal.kubelet.**>
+       type elasticsearch
+       log_level info
+       include_tag_key true
+       logstash_prefix journal-log
+       host 127.0.0.1 ## Change this to the Elastic search host. 
+       port 9200 ## Change this to the elastic search port. 
+       logstash_format true
+       buffer_chunk_limit 2M
+       buffer_queue_limit 32
+       flush_interval 60s  
+       max_retry_wait 30
+       disable_retry_limit
+       num_threads 8
+    </match>
+
+    <match kubernetes.**>
+       type elasticsearch
+       log_level info
+       include_tag_key false
+       logstash_prefix k8s 
+       host 127.0.0.1 ## Hostname of the ES cluster.
+       port 9200
+       logstash_format true
+       buffer_chunk_limit 2M
+       buffer_queue_limit 32
+       flush_interval 60s  
+       max_retry_wait 30
+       disable_retry_limit
+       num_threads 8
+    </match>
+
+---
+apiVersion: extensions/v1beta1
+kind: DaemonSet
+metadata:
+  name: fluentd
+  namespace: kube-system
+  labels:
+    k8s-app: fluentd-logging
+    version: v1
+    kubernetes.io/cluster-service: "true"
+spec:
+  template:
+    metadata:
+      labels:
+        k8s-app: fluentd-logging
+        version: v1
+        kubernetes.io/cluster-service: "true"
+    spec:
+      serviceAccount: fluentd
+      serviceAccountName: fluentd
+      containers:
+        - name: fluentd
+          image: fluent/fluentd-kubernetes-daemonset:v0.12-debian-elasticsearch
+          securityContext:
+            privileged: true
+          volumeMounts:
+            - name: varlog
+              mountPath: /var/log
+            - name: varlibdockercontainers
+              mountPath: /var/lib/docker/containers
+            - name: posloc
+              mountPath: /tmp
+            - name: config
+              mountPath: /fluentd/etc/fluent.conf
+              subPath: fluent.conf
+      volumes:
+        - name: varlog
+          hostPath:
+            path: /var/log
+        - name: varlibdockercontainers
+          hostPath:
+            path: /var/lib/docker/containers
+        - name: config
+          configMap:
+            name: fluentd
+        - name: posloc
+          hostPath:
+            path: /tmp            

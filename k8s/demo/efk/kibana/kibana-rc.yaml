@@ -1,0 +1,43 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: kibana
+  namespace: default
+  labels:
+    component: kibana
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+     component: kibana
+  template:
+    metadata:
+      labels:
+        component: kibana
+    spec:
+      containers:
+      - name: kibana
+        image: cfontes/kibana-xpack-less:5.5.0
+        env:
+        - name: "CLUSTER_NAME"
+          value: "escluster"
+        - name: XPACK_SECURITY_ENABLED
+          value: 'false'
+        - name: XPACK_GRAPH_ENABLED
+          value: 'false'
+        - name: XPACK_ML_ENABLED
+          value: 'false'
+        - name: XPACK_REPORTING_ENABLED
+          value: 'false'
+# Important that the IP address is changed to the co-ordinator node clusterIP. This will change for each setup. 
+        - name: ELASTICSEARCH_URL
+          value: 'http://127.0.0.1:9200'
+        resources:
+          limits:
+            cpu: 1000m
+          requests:
+            cpu: 100m
+        ports:
+        - containerPort: 5601
+          name: kibana
+          protocol: TCP
