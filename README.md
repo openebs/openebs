@@ -50,10 +50,8 @@ We are approaching beta stage with active development underway. See our [Project
  
 We welcome your feedback and contributions in any form possible.  
  
-Please join us on Slack at:  https://openebs-community.slack.com/
- 
-- Join us at [openebs-slack-signup](https://openebsslacksignup.herokuapp.com/)
-  - Already signed up? Head to our discussions at [openebs-users channel](https://openebs-community.slack.com/messages/openebs-users/)
+- Join us at [Slack](https://openebsslacksignup.herokuapp.com/)
+  - Already signed up? Head to our discussions at [#openebs-users](https://openebs-community.slack.com/messages/openebs-users/)
 - Want to raise an issue?
   - If it is a generic (or `not really sure`), you can still raise it at [issues](https://github.com/openebs/openebs/issues)
   - Project specific issues can be raised at individual project level.
