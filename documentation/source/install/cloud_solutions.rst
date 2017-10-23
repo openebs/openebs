@@ -267,7 +267,7 @@ Go to **Google Cloud Platform** -> **Compute Engine** -> **VM instances** to ins
  .. image:: ../_static/compute_engine_vms.png
 
 
-Select one of the SSH nodes displayed in the cluster and click **Google Cloud Shell** and run the following commands.
+Select one of the SSH nodes displayed in the cluster, click **SSH**, and run the following commands.
 ::
 
     sudo apt-get update
@@ -277,13 +277,13 @@ Select one of the SSH nodes displayed in the cluster and click **Google Cloud Sh
 Verify that iSCSI is configured
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Check that initiator name is configured and iSCSI service is running using the following commands.
+1. Check that initiator name is configured and iSCSI service is running using the following commands.
 ::
 
     sudo cat /etc/iscsi/initiatorname.iscsi
     sudo service open-iscsi status
 
-2. Run OpenEBS Operator through Google Cloud Shell
+2. Run OpenEBS Operator by clicking **Google Cloud Shell** on the top right corner.
 
 Download the latest OpenEBS Operator files using the following commands.
 ::
@@ -291,7 +291,26 @@ Download the latest OpenEBS Operator files using the following commands.
     git clone https://github.com/openebs/openebs.git
     cd openebs/k8s
 
-Setup the kubectl to run in admin context. See `Appendix`_ below for creating an administration context in Google Cloud Platform (GCP. The following commands will prompt you for username and password. Provide username as *admin*. Password for the admin can be obtained from **Google Cloud Platform** -> **Container Engine** -> **(cluster)** -> **Show Credentials**
+To create or modify service accounts and grant privileges, kubectl must be run with Administration privileges. The following procedure helps you setup and use the administration context for Google Container Engine through the Google Cloud Shell.
+
+1. Initialize credentials to allow kubectl to execute commands on the container cluster.
+::
+
+    gcloud container clusters list
+    gcloud container clusters get-credentials demo-openebs03 --zone us-central1-a
+
+2. Setup the administration context.
+
+* Access the credentails from **Google Cloud Platform** -> **Container Engine** -> **(cluster)** -> **Show Credentials**.
+* Save the *Cluster CA Certificate* to *~/.kube/admin.key*.
+* Create a administration configuration context from the configuration shell using the following commands.
+
+::
+
+    gcloud container clusters list
+    kubectl config set-context demo-openebs03 --cluster=gke_strong-eon-153112_us-central1-a_demo-openebs03 --user=cluster-a
+
+The following commands will prompt you for a username and password. Provide username as *admin*. Password for the admin can be obtained from **Google Cloud Platform** -> **Container Engine** -> **(cluster)** -> **Show Credentials**
 ::
 
     kubectl config use-context demo-openebs03
@@ -326,29 +345,4 @@ The *kubectl apply -f demo/jupyter/demo-jupyter-openebs.yaml* command creates th
 * Create an OpenEBS Volume and mounts to the Jupyter Server Pod (/mnt/data) (kubectl get pvc) (kubectl get pv) (kubectl get pods)
 * Expose the Jupyter Server to external world via the http://NodeIP:32424 (NodeIP is any of the nodes external IP) (kubectl get pods)
 
-**Note:** To access the Jupyter Server over the internet, set the firewall rules to allow traffic on port 32424 in you GCP / Networking / Firewalls.
-
-Appendix
---------
-
-Setting Kubernetes Cluster Administration Context
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-To create or modify service accounts and grant privileges, kubectl must be run with Administration privileges. The following procedure helps you setup and use the administration context for Google Container Engine through the Google Cloud Shell.
-
-1. Initialize credentials to allow kubectl to execute commands on the container cluster.
-::
-
-    gcloud container clusters list
-    gcloud container clusters get-credentials demo-openebs03 --zone us-central1-a
-
-2. Setup the administration context.
-
-* Access the credentails from **Google Cloud Platform** -> **Container Engine** -> **(cluster)** -> **Show Credentials**.
-* Save the *Cluster CA Certificate* to *~/.kube/admin.key*.
-* Create a administration configuration context from the configuration shell using the following commands.
-
-::
-
-    gcloud container clusters list
-    kubectl config set-context demo-openebs03 --cluster=gke_strong-eon-153112_us-central1-a_demo-openebs03 --user=cluster-a
+**Note:** To access the Jupyter Server over the internet, set the firewall rules to allow traffic on port 32424 in your GCP / Networking / Firewalls.
