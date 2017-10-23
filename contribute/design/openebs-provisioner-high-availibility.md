@@ -12,7 +12,8 @@
 - Increase the `replicas` to 2 or >2 in `openebs-operator.yaml` for `openebs-provisioner` deployment. 
 
 
-- We need to make sure that each node is running at least one  `openebs-provisioner` pod. In order to do that, we're using `podAntiAffinity` method for scheduling `openebs-provisioner` pods. We have added label `name:provisioner` as a default label. 
+- Each node should always be running the specified/labeled openebs-provisioner pods on each node provided that replica count is equal to the number of nodes.
+
 
 Sample Deployment spec for `openebs-provisioner` looks like: 
 
@@ -26,17 +27,18 @@ spec:
   replicas: 2
   template:
     spec:
-      podAntiAffinity:
-        requiredDuringSchedulingIgnoredDuringExecution:   # <-- Affinity Selector 
-          - weight: 100
-            podAffinityTerm:
-              labelSelector:
-                matchExpressions:
-                  - key: name
-                    operator: In
-                    values:
-                    - openebs-provisioner
-              topologyKey: "kubernetes.io/hostname"
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:   # <-- Affinity Selector 
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: name
+                      operator: In
+                      values:
+                      - openebs-provisioner
+                topologyKey: "kubernetes.io/hostname"
   template:
     metadata:
       labels:
@@ -55,6 +57,9 @@ spec:
 
 ```
 
+## Pod Anti Affinity 
+Pod anti-affinity can prevent the scheduler from locating a new pod on the same node as pods with the same labels if the label selector on the new pod matches the label on the current pod. 
+
 
 You can change affinity selector in the Deployment spec.
 
@@ -64,6 +69,7 @@ You can change affinity selector in the Deployment spec.
 |`requiredDuringSchedulingIgnoredDuringExecution`  | Runs | Fails | Keeps Running |
 |`preferredDuringSchedulingIgnoredDuringExecution` |	Runs |	Runs |	Keeps Running|
 |`requiredDuringSchedulingRequiredDuringExecution` (Not recommanded) |	Runs |	Fails | Fails|
+
 
 ---
 
