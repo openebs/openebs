@@ -26,7 +26,7 @@ Perform this procedure to run OpenEBS operator. Use the following commands at th
    
 **Installation using helm:**
 
-  * https://github.com/openebs/openebs/blob/master/k8s/charts/openebs/README.md 
+  * [openEBS with HELM](https://github.com/openebs/openebs/blob/master/k8s/charts/openebs/README.md) 
 
 **See Also:**
 
