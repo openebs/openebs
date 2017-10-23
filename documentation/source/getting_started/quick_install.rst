@@ -25,7 +25,8 @@ Perform this procedure to run OpenEBS operator. Use the following commands at th
    2.  kubectl create/apply -f openebs-storageclasses.yaml
    
 Installation using helm:
-openebs/k8s/charts/openebs/README.md 
+
+https://github.com/openebs/openebs/blob/master/k8s/charts/openebs/README.md 
 
 **See Also:**
 
