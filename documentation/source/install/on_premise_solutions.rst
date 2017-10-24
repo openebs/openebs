@@ -14,7 +14,7 @@ Install a Vagrant Box either by downloading the vagrant file or by cloning the r
 To run the Kubernetes cluster on local machine, you need a vagrant box. If you do not have vagrant box perform the procedure given `here`_.
     .. _here: https://github.com/openebs/openebs/tree/master/k8s/lib/vagrant/test/k8s/1.6#installing-kubernetes-16-and-openebs-clusters-on-ubuntu
 
-Installing a Vagrant Box by Downloading the Vagrant File
+Installing a Vagrant Box by Downloading the Vagrantfile
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 1. Create a demo directory for example, k8s-demo using the following command.
@@ -41,8 +41,8 @@ Installing a Vagrant Box by Cloning the Repository
 
 2. Bring up k8s Cluster.
    ::
-      ubuntu@ubuntu:~$ cd openebs/k8s/lib/vagrant/test/k8s/1.6
-      ubuntu@ubuntu:~/openebs/k8s/lib/vagrant/test/k8s/1.6$ vagrant up
+      ubuntu@ubuntu:~$ cd openebs/k8s/vagrant/1.7.5
+      ubuntu@ubuntu:~/openebs/k8s/vagrant/1.7.5$ vagrant up
 
 Continue with `step 4`_.
 
