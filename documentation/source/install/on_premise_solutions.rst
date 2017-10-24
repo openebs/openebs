@@ -9,46 +9,68 @@ Setting Up OpenEBS with Kubernetes on Local Machine
 ---------------------------------------------------
 The following procedure helps you setup and use OpenEBS on a local machine:
 
-1. Install Vagrant Box
+Install a Vagrant Box either by downloading the vagrant file or by cloning the repository.
 
-   To run the kubernetes cluster on local machine, you need a vagrant box. If you do not have vagrant box follow the steps given `here`_.
+To run the Kubernetes cluster on local machine, you need a vagrant box. If you do not have vagrant box perform the procedure given `here`_.
     .. _here: https://github.com/openebs/openebs/tree/master/k8s/lib/vagrant/test/k8s/1.6#installing-kubernetes-16-and-openebs-clusters-on-ubuntu
+
+Installing a Vagrant Box by Downloading the Vagrant File
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+1. Create a demo directory for example, k8s-demo using the following command.
+   ::
+      mkdir k8s-demo
 
 2. Download OpenEBS Vagrant file using the following command.
 ::
-
+    cd k8s-demo
     $ wget https://raw.githubusercontent.com/openebs/openebs/master/k8s/vagrant/1.7.5/Vagrantfile
 
 3. Bring up k8s Cluster.
 ::
+   ubuntu@ubuntu:~/k8s-demo$ vagrant up
 
-    openebs@openebs:~$ cd openebs/k8s/lib/vagrant/test/k8s/1.6
-    openebs@openebs:~/openebs/k8s/lib/vagrant/test/k8s/1.6$ vagrant up
+It will bring up a three node Kubernetes cluster with one master and two nodes. Continue with `step 4`_.
 
-It will bring up one kubemaster and two nodes.
+Installing a Vagrant Box by Cloning the Repository
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-**Note:** If vagrant up displays the *Stderr: VBoxManage: error: VT-x is not available (VERR_VMX_NO_VMX)* error, ensure that you have enabled your VM box.
+1. Clone the OpenEBS repository using the following command.
+   ::
+      git clone http://github.com/openebs.git
 
+2. Bring up k8s Cluster.
+   ::
+      ubuntu@ubuntu:~$ cd openebs/k8s/lib/vagrant/test/k8s/1.6
+      ubuntu@ubuntu:~/openebs/k8s/lib/vagrant/test/k8s/1.6$ vagrant up
+
+Continue with `step 4`_.
+
+**Note:** If vagrant up displays the *Stderr: VBoxManage: error: VT-x is not available (VERR_VMX_NO_VMX)* error, ensure that you enable virtualization in BIOS using the following steps.
+
+  a. Open BIOS.
+  b. Open the Processor submenu.
+  c. Enable Intel Virtualization Technology (also known as Intel VT) or AMD-V depending on the brand of the processor
+
+.. _step 4: 
 4. SSH to kubemaster using the following command.
 ::
-
-    openebs@openebs:~/openebs/k8s/lib/vagrant/test/k8s/1.6$ vagrant ssh kubemaster-01
+   openebs@openebs:~/openebs/k8s/lib/vagrant/test/k8s/1.6$ vagrant ssh kubemaster-01
 
 5. Run OpenEBS Operator.
-
+   
    * Download the latest OpenEBS Operator Files inside kubemaster-01 using the following commands.
-
      ::
-
-         ubuntu@kubemaster-01:~$ git clone https://github.com/openebs/openebs
-         ubuntu@kubemaster-01:~$ cd openebs/k8s
+        
+        ubuntu@kubemaster-01:~$ git clone https://github.com/openebs/openebs
+        ubuntu@kubemaster-01:~$ cd openebs/k8s
 
    * Run OpenEBS Operator using the following command.
      ::
 
          ubuntu@kubemaster-01:~/openebs/k8s$ kubectl apply -f openebs-operator.yaml
 
-   * Add OpenEBS related storage classes using the following command, that can then be used by developers or applications.
+   * Add OpenEBS related storage classes using the following command, that can then be used by developers    or applications.
      ::
 
          ubuntu@kubemaster-01:~/openebs/k8s$ kubectl apply -f openebs-storageclasses.yaml
