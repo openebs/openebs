@@ -24,9 +24,15 @@ The following instructions have been verified on:
 
 - At least 3 linux machines of above type, i.e., either VMs or bare-metal, if deploying the setup in a hyperconverged mode 
   (with K8s as well as OpenEBS residing on the same machines) OR 5 linux machines (with K8s and OpenEBS running on separate machines)
-  
+
 - The above instruction assumes a minimal setup with a test-harness, K8s/OpenEBS master and a single K8s minion/OpenEBS node. 
   The masters and nodes can be scaled if the user so desires
+
+- The minimum system requirements for the above machines are :
+  
+  - 10GB hard disk space
+  - 1GB RAM
+  - 1 core processor 
 
 - All linux machines are required to have : 
   
