@@ -25,7 +25,9 @@ The following procedure helps you setup and use OpenEBS on a local machine:
     openebs@openebs:~$ cd openebs/k8s/lib/vagrant/test/k8s/1.6
     openebs@openebs:~/openebs/k8s/lib/vagrant/test/k8s/1.6$ vagrant up
 
-It will bring up one kubemaster and two kubeminions.
+It will bring up one kubemaster and two nodes.
+
+**Note:** If vagrant up displays the *Stderr: VBoxManage: error: VT-x is not available (VERR_VMX_NO_VMX)* error, ensure that you have enabled your VM box.
 
 4. SSH to kubemaster using the following command.
 ::
@@ -68,7 +70,7 @@ The *ubuntu@kubemaster-01:~$ kubectl apply -f demo/jupyter/demo-jupyter-openebs.
 
 * Launch a Jupyter Server, with the specified notebook file from github (kubectl get deployments)
 * Create an OpenEBS Volume and mount to the Jupyter Server Pod (/mnt/data) (kubectl get pvc) (kubectl get pv) (kubectl get pods)
-* Expose the Jupyter Server to external world through http://NodeIP:8888 (NodeIP is any of the minion nodes' external IP) (kubectl get pods)
+* Expose the Jupyter Server to external world through http://NodeIP:8888 (NodeIP is any of the nodes' external IP) (kubectl get pods)
 
 
 
@@ -79,7 +81,7 @@ Setting Up OpenEBS on Ubuntu Hosts or Virtual Machines
 ------------------------------------------------------
 This section provides detailed instructions on how to perform the OpenEBS on-premise deployment. The objective of this procedure is to have the following functional.
 
-* Kubernetes cluster (K8s master & K8s minions/host) configured with the OpenEBS iSCSI flexvol driver,
+* Kubernetes cluster (K8s master & K8s nodes/host) configured with the OpenEBS iSCSI flexvol driver,
 * OpenEBS Maya Master
 * OpenEBS Storage Hosts
 
@@ -98,7 +100,7 @@ Prerequisites:
 --------------
 * At least three Linux machines of either VMs or bare-metal, if deploying the setup in a hyperconverged mode (with K8s as well as OpenEBS residing on the same machines) or five Linux machines (with K8s and OpenEBS running on separate machines)
 
-* The above instruction assumes a minimal setup with a test-harness, K8s/OpenEBS master and a single K8s minion/OpenEBS node. The masters and nodes can be scaled if the user so desires
+* The above instruction assumes a minimal setup with a test-harness, K8s/OpenEBS master and a single K8s node/OpenEBS node. The masters and nodes can be scaled if the user so desires
 
 * All Linux machines are required to have :
 
@@ -266,7 +268,7 @@ Run Sample Applications on the OpenEBS Setup
 
       ciuser@OpenEBSClient:~/openebs/e2e/ansible$ ansible-playbook run-hyperconverged-tests.yml
 
-* Verify that the pod is deployed on the Kubernetes minion along with the OpenEBS storage pods created as per the storage-class in the persistent volume claim, by executing the following command on the Kubernetes master.
+* Verify that the pod is deployed on the Kubernetes nodes along with the OpenEBS storage pods created as per the storage-class in the persistent volume claim, by executing the following command on the Kubernetes master.
   ::
 
       name@MayaMaster:~$ kubectl get pods
@@ -316,6 +318,6 @@ Tips and Gotchas
 ----------------
 * Use the -v flag while running the playbooks to enable verbose output and logging. Increase the number of 'v's to increase the verbosity.
 
-* Sometimes, the minions take time to join the Kubernetes master. This could be caused due to slow internet or less resources on the box. The time could range between a few seconds to a few minutes.
+* Sometimes, the nodes take time to join the Kubernetes master. This could be caused due to slow internet or less resources on the box. The time could range between a few seconds to a few minutes.
 
-* As with minions above, the OpenEBS volume containers (Jiva containers) may take some time to get initialized (involves a docker pull) before they are ready to input/output. Any pod deployment (which uses the openEBS iSCSI flexvol driver) while in progress, gets queued and resumes once the storage is ready.
+* With regards to the nodes above, OpenEBS volume containers (Jiva containers) may take some time to get initialized (involves a docker pull) before they are ready to input/output. Any pod deployment (which uses the openEBS iSCSI flexvol driver) while in progress, gets queued and resumes once the storage is ready.
