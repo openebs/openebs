@@ -32,7 +32,10 @@ The following instructions have been verified on:
   
   - 10GB hard disk space
   - 1GB RAM
-  - 1 core processor 
+  - 1 core processor
+
+  Note: The min requirements are based on the scenario where the VMs are built using the vagrantfile in the ansible
+  repo.  
 
 - All linux machines are required to have : 
   
