@@ -1,16 +1,16 @@
 OpenEBS Documentation : http://openebs.readthedocs.io/en/latest/
 
-Automated builds are setup for OpenEBS documentation are at : https://readthedocs.org/projects/openebs/
+Automated builds, setup for OpenEBS documentation are at : https://readthedocs.org/projects/openebs/
 
 Sphinx is used for building the OpenEBS documentation.  http://www.sphinx-doc.org/en/stable/tutorial.html
 
 ## Contributing to Documentation
 
-Documention Content is located under *documentation/source* in reStructured (rst) files. **documentation/source/index.rst** contains the high level documentation structure (Table of Contents), which links to the content provided in other rst files either in the same directory or in child directories. 
+Documentation Content is located under *documentation/source* in reStructured (rst) files. **documentation/source/index.rst** contains the high level documentation structure (Table of Contents), which links to the content provided in other rst files either in the same directory or in child directories. 
 
 Before editing the files, familiarize yourself with the [reStructured markup](http://www.sphinx-doc.org/en/stable/rest.html#rst-primer). 
 
-After you are done with your edits, you can use the below steps to build locally. On committing to the master branch, an automatic build will be triggered and the documention will be available at the live site.
+After you are done with your edits, you can use the below steps to build locally. On committing to the master branch, an automatic build will be triggered and the documentation will be available at the live site.
 
 ## Manual or Local Build instructions
 
