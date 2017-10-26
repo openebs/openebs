@@ -37,6 +37,12 @@ data:
     # * `prometheus.io/port`: Scrape the pod on the indicated port instead of the
     # pod's declared ports (default is a port-free target if none are declared).
     scrape_configs:
+    - job_name: 'prometheus'
+      static_configs:
+      # Please change this IP to the IP of your node (VM)
+      # Because prometheus-service is running as Type NodePort
+      # So it's accessible outside the cluster.
+      - targets: ['172.28.128.3:32514']
     - job_name: 'maya-apiserver'
       scheme: http
       tls_config:
@@ -209,3 +215,18 @@ data:
         regex: 'kubernetes-(.*)'
         replacement: '${1}'
         target_label: name
+    - job_name: 'maya-agent'
+      scheme: http
+      tls_config:
+        ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+      bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+      kubernetes_sd_configs:
+      - role: pod
+      relabel_configs:
+      - source_labels: [__meta_kubernetes_pod_label_name]
+        regex: maya-agent
+        action: keep
+      - source_labels: [__meta_kubernetes_pod_name]
+        action: replace
+        target_label: kubernetes_pod_name
+
