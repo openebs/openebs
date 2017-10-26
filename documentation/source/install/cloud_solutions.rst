@@ -249,7 +249,7 @@ To create a new cluster, go to **Google Cloud Platform** -> **Container Engine**
 Minimum requirements for container cluster are as follows:
 
 * Machine Type - (Minimum 2 vCPUs)
-* Node Image - (container-vm)
+* Node Image - (Ubuntu)
 * Size - (Minimum 3)
 * Cluster Version - (1.6.4+)
 
