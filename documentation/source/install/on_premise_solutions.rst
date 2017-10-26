@@ -150,7 +150,7 @@ Setup Environment for OpenEBS Installation
 * (Optional) Execute the setup_ara playbook to install the ARA notification plugins and custom modules. This step will cause changes to the ansible configuration file *ansible.cfg* (though a backup will be taken at the time of execution in case you need to revert). A web URL is provided as a playbook run message at the end of the ara setup procedure, which can be used to track all the playbook run details after this point.
   ::
 
-      testuser@OpenEBSClient:~/openebs/e2e/ansible$ ansible-playbook setup_ara.yml
+      testuser@OpenEBSClient:~/openebs/e2e/ansible$ ansible-playbook setup-ara.yml
 
 * Note that the above playbook must be run separately and not as part of any the *master* playbook run as the changes to ansible default configuration may fail to take effect dynamically
 

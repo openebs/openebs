@@ -114,7 +114,7 @@ variable.
   details after this point (_Optional_)
   
   ```
-  testuser@OpenEBSClient:~/openebs/e2e/ansible$ ansible-playbook setup_ara.yml
+  testuser@OpenEBSClient:~/openebs/e2e/ansible$ ansible-playbook setup-ara.yml
   ```
   
   Upon successful completion, you can view details of subsequent playbook runs on the ARA dashboard which can be accessed at 
