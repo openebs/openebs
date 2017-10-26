@@ -5,14 +5,23 @@ On-Premise Solutions
 Using Vagrant
 =============
 
-Setting Up OpenEBS with Kubernetes on Local Machine
----------------------------------------------------
+Setting Up OpenEBS with Kubernetes on a Local Machine
+-------------------------------------------------------
 The following procedure helps you setup and use OpenEBS on a local machine:
 
-Install a Vagrant Box either by downloading the vagrant file or by cloning the repository.
+Prerequisites:
+----------------
 
-To run the Kubernetes cluster on local machine, you need a vagrant box. If you do not have vagrant box perform the procedure given `here`_.
-    .. _here: https://github.com/openebs/openebs/tree/master/k8s/lib/vagrant/test/k8s/1.6#installing-kubernetes-16-and-openebs-clusters-on-ubuntu
+* Vagrant (>=1.9.1)
+* VirtualBox 5.1
+* curl / wget / git and so on, to download the Vagrant file
+* Ensure virtualization is enabled at the BIOS level
+
+To run the Kubernetes cluster on a local machine, you need a vagrant box. Install and download Vagrant using the procedure available at https://www.vagrantup.com/intro/getting-started/install.html.
+
+Install and download Virtualbox using the procedure available at https://www.virtualbox.org/wiki/Downloads.
+
+Install a Vagrant Box either by downloading the vagrant file or by cloning the repository.
 
 Installing a Vagrant Box by Downloading the Vagrantfile
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -30,7 +39,34 @@ Installing a Vagrant Box by Downloading the Vagrantfile
 ::
    ubuntu@ubuntu:~/k8s-demo$ vagrant up
 
-It will bring up a three node Kubernetes cluster with one master and two nodes. Continue with `step 4`_.
+It will bring up a three node Kubernetes cluster with one master and two nodes. 
+
+4. SSH to kubemaster using the following command.
+::
+   ubuntu@ubuntu:~/k8s-demo$ vagrant ssh kubemaster-01
+
+5. Run OpenEBS Operator.
+   
+* Download the latest OpenEBS Operator Files inside kubemaster-01 using the following commands.
+  ::
+    ubuntu@kubemaster-01:~$ git clone https://github.com/openebs/openebs
+    ubuntu@kubemaster-01:~$ cd openebs/k8s
+
+* Run OpenEBS Operator using the following command.
+  ::
+   ubuntu@kubemaster-01:~/openebs/k8s$ kubectl apply -f openebs-operator.yaml
+
+* Add OpenEBS related storage classes using the following command, that can then be used by developers     or applications.
+  ::
+   ubuntu@kubemaster-01:~/openebs/k8s$ kubectl apply -f openebs-storageclasses.yaml
+
+6. Run stateful workloads with OpenEBS storage.
+
+To use OpenEBS as persistent storage for your stateful workloads, set the PVC storage class to OpenEBS storage class.
+
+Get the list of storage classes using the following command. Choose the storage class that best suits your application.
+::
+    ubuntu@kubemaster-01:~$ kubectl get sc
 
 Installing a Vagrant Box by Cloning the Repository
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -44,48 +80,8 @@ Installing a Vagrant Box by Cloning the Repository
       ubuntu@ubuntu:~$ cd openebs/k8s/vagrant/1.7.5
       ubuntu@ubuntu:~/openebs/k8s/vagrant/1.7.5$ vagrant up
 
-Continue with `step 4`_.
-
-**Note:** If vagrant up displays the *Stderr: VBoxManage: error: VT-x is not available (VERR_VMX_NO_VMX)* error, ensure that you enable virtualization in BIOS using the following steps.
-
-  a. Open BIOS.
-  b. Open the Processor submenu.
-  c. Enable Intel Virtualization Technology (also known as Intel VT) or AMD-V depending on the brand of the processor
-
-.. _step 4: 
-4. SSH to kubemaster using the following command.
-::
-   openebs@openebs:~/openebs/k8s/lib/vagrant/test/k8s/1.6$ vagrant ssh kubemaster-01
-
-5. Run OpenEBS Operator.
-   
-   * Download the latest OpenEBS Operator Files inside kubemaster-01 using the following commands.
-     ::
-        
-        ubuntu@kubemaster-01:~$ git clone https://github.com/openebs/openebs
-        ubuntu@kubemaster-01:~$ cd openebs/k8s
-
-   * Run OpenEBS Operator using the following command.
-     ::
-
-         ubuntu@kubemaster-01:~/openebs/k8s$ kubectl apply -f openebs-operator.yaml
-
-   * Add OpenEBS related storage classes using the following command, that can then be used by developers    or applications.
-     ::
-
-         ubuntu@kubemaster-01:~/openebs/k8s$ kubectl apply -f openebs-storageclasses.yaml
-
-6. Run stateful workloads with OpenEBS storage.
-
-To use OpenEBS as persistent storage for your stateful workloads, set the storage class in the PVC to OpenEBS storage class.
-
-Get the list of storage classes using the following command. Choose the storage class that best suits your application.
-::
-
-    ubuntu@kubemaster-01:~$ kubectl get sc
-
-
 Some sample yaml files for stateful workloads using OpenEBS are provided in the `openebs/k8s/demo`_.
+
  .. _openebs/k8s/demo: https://github.com/openebs/openebs/tree/master/k8s/demo
 
 The *ubuntu@kubemaster-01:~$ kubectl apply -f demo/jupyter/demo-jupyter-openebs.yaml* command creates the following, which you can verify using the corresponding kubectl commands.
@@ -93,8 +89,6 @@ The *ubuntu@kubemaster-01:~$ kubectl apply -f demo/jupyter/demo-jupyter-openebs.
 * Launch a Jupyter Server, with the specified notebook file from github (kubectl get deployments)
 * Create an OpenEBS Volume and mount to the Jupyter Server Pod (/mnt/data) (kubectl get pvc) (kubectl get pv) (kubectl get pods)
 * Expose the Jupyter Server to external world through http://NodeIP:8888 (NodeIP is any of the nodes' external IP) (kubectl get pods)
-
-
 
 Using Ansible
 =============
@@ -124,7 +118,7 @@ Prerequisites:
 
 * The above instruction assumes a minimal setup with a test-harness, K8s/OpenEBS master and a single K8s node/OpenEBS node. The masters and nodes can be scaled if the user so desires
 
-* All Linux machines are required to have :
+* All Linux machines must have the following:
 
   * Basic development packages (dpkg-dev,gcc,g++,libc6-dev,make,libssl-dev,sshpass)
   * Python2.7-minimal
@@ -135,7 +129,7 @@ Prerequisites:
   * Git
   * Ansible (version >= 2.3)
 
-* The deployment can be performed by both root as well as non-root users. In case of the latter, ensure that the users are part of the sudo group. This is required to run certain operations which require root privileges.
+* Deployment can be performed by both root as well as non-root users. In case of the latter, ensure that the users are part of the sudo group. This is required to run certain operations which require root privileges.
 
 Download
 --------
