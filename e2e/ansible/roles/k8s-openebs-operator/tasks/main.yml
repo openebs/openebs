@@ -12,7 +12,7 @@
 - name: Change m-apiserver image to desired tag in operator YAML
   replace:
     path: "{{ ansible_env.HOME }}/{{ openebs_operator_alias }}" 
-    regexp: "m-apiserver:[\\w_.-][\\w.-][\\w.-][\\w.-][\\w.-]"
+    regexp: "m-apiserver:[\\w.-]+"
     replace: "m-apiserver:{{ test_tag }}"
 
 - name: Get kubernetes master name
