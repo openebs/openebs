@@ -239,7 +239,7 @@ Google Cloud
 =============
 Setting up OpenEBS with Kubernetes on Google Container Engine
 --------------------------------------------------------------
-This section, provides detailed instructions on how to setup and use OpenEBS in Google Container Enginer (GKE). This section uses a three node container cluster.
+This section, provides detailed instructions on how to setup and use OpenEBS in Google Container Engine (GKE). This section uses a three node container cluster.
 
 1. Preparing your Container Cluster
 
