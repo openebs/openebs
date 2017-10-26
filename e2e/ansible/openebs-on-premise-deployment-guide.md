@@ -22,11 +22,11 @@ The following instructions have been verified on:
 
 ### Pre-Requisites
 
-- At least 3 linux machines of above type, i.e., either VMs or bare-metal, if deploying the setup in a hyperconverged mode 
-  (with K8s as well as OpenEBS residing on the same machines) OR 5 linux machines (with K8s and OpenEBS running on separate machines)
+- At least 3 linux machines of above type, i.e., either VMs or bare metal, if deploying the setup in a hyperconverged mode 
+  (with K8s as well as OpenEBS residing on the same machine) OR 5 linux machines (with K8s and OpenEBS running on separate machines)
 
-- The above instruction assumes a minimal setup with a test-harness, K8s/OpenEBS master and a single K8s minion/OpenEBS node. 
-  The masters and nodes can be scaled if the user so desires
+- The above instruction assumes a minimal setup with a test-harness, K8s/OpenEBS master and a single K8s node/OpenEBS node. 
+  The masters and nodes can be scaled if the user so requires.
 
 - The minimum system requirements for the above machines are :
   
@@ -34,12 +34,12 @@ The following instructions have been verified on:
   - 1GB RAM
   - 1 core processor
 
-  Note: The min requirements are based on the scenario where the VMs are built using the vagrantfile in the ansible
-  repo.  
+  Note: The minimum requirements are based on the scenario where the VMs are built using the vagrantfile in the ansible
+  repository.  
 
-- All linux machines are required to have : 
+- All linux machines require : 
   
-  - Basic development packages (dpkg-dev,gcc,g++,libc6-dev,make,libssl-dev,sshpass,curl)
+  - Basic development packages (dpkg-dev, gcc, g++, libc6-dev, make, libssl-dev, sshpass, curl)
   - Python2.7-minimal 
   - SSH services enabled
   
@@ -123,7 +123,7 @@ variable.
   details after this point (_Optional_)
   
   ```
-  testuser@OpenEBSClient:~/openebs/e2e/ansible$ ansible-playbook setup-ara.yml
+  testuser@OpenEBSClient:~/openebs/e2e/ansible$ ansible-playbook setup_ara.yml
   ```
   
   Upon successful completion, you can view details of subsequent playbook runs on the ARA dashboard which can be accessed at 
