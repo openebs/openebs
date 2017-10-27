@@ -23,4 +23,9 @@
 # For more information see the manual pages of crontab(5) and cron(8)
 # 
 # m h  dom mon dow   command
+
+SHELL=/bin/bash
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
+
 00 06 * * * cd ~/openebs && ./git_monitor.sh 
+00 23 * * * cd ~/openebs && ./tar_images.sh
