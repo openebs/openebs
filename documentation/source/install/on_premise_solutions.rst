@@ -181,7 +181,7 @@ The subsequent section explains the installation procedure for hyperconverged mo
 .. * Execute the setup-kubernetes ansible playbook to create the kubernetes cluster followed by the setup-openebs playbook to install the maya-apiserver and openebs storage cluster. These playbooks install the requisite dependencies on the machines, update the configuration files on the boxes and sets it up to serve applications.
   ::
      testuser@OpenEBSClient:~/openebs/e2e/ansible$ ansible-playbook setup-kubernetes.yml
-     testuser@OpenEBSClient:~/openebs/e2e/ansible$ ansible-playbook setup-kubernetes.yml
+     testuser@OpenEBSClient:~/openebs/e2e/ansible$ ansible-playbook setup-openebs.yml
 
 .. * Verify that the Kubernetes and OpenEBS clusters are running with the nodes having joined the masters.
 
