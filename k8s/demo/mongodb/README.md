@@ -19,11 +19,11 @@ This maybe created on cloud platforms like GKE, on-premise virtual machines (vag
 nodes. This is helpful to maintain redundancy and data availability.
 
     ```
-    test@MayaMaster:~$ kubectl get nodes
+    test@Master:~$ kubectl get nodes
     NAME         STATUS    AGE       VERSION
-    mayahost01   Ready     18h       v1.6.3
-    mayahost02   Ready     18h       v1.6.3
-    mayamaster   Ready     18h       v1.6.3
+    host01   Ready     18h       v1.6.3
+    host02   Ready     18h       v1.6.3
+    master   Ready     18h       v1.6.3
     ```
     
 - Sufficient resources on the nodes to host the OpenEBS storage pods and application pods. This includes sufficient disk space, 
@@ -81,12 +81,12 @@ kubectl apply -f openebs-storageclasses.yaml
 Check whether the deployments are running successfully.
 
 ```
-test@MayaMaster:~$ kubectl get deployments
+test@Master:~$ kubectl get deployments
 NAME                                            DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE
 maya-apiserver                                  1         1         1            1           5s
 openebs-provisioner                             1         1         1            1           6s
 
-testk@MayaMaster:~$ kubectl get pods
+testk@Master:~$ kubectl get pods
 NAME                                   READY     STATUS    RESTARTS   AGE
 maya-apiserver-1089964587-x5q15        1/1       Running   0          10s
 openebs-provisioner-1149663462-5pdcq   1/1       Running   0          9s
@@ -96,7 +96,7 @@ openebs-provisioner-1149663462-5pdcq   1/1       Running   0          9s
 Check whether the storage classes are applied successfully.
 
 ```
-test@MayaMaster:~$ kubectl get sc
+test@Master:~$ kubectl get sc
 NAME                 TYPE
 openebs-cassandra    openebs.io/provisioner-iscsi
 openebs-es-data-sc   openebs.io/provisioner-iscsi
@@ -139,7 +139,7 @@ spec:
 Apply the mongo-statefulset yaml : 
 
 ```
-test@MayaMaster:~$ kubectl apply -f mongo-statefulset.yml
+test@Master:~$ kubectl apply -f mongo-statefulset.yml
 service "mongo" created
 statefulset "mongo" created
 ```
@@ -148,7 +148,7 @@ Verify that the mongodb replicas, the mongo headless service and openebs persist
 are successfully deployed and are in "Running" state.
 
 ```
-test@MayaMaster:~$ kubectl get pods
+test@Master:~$ kubectl get pods
 NAME                                                             READY     STATUS    RESTARTS   AGE
 maya-apiserver-1089964587-x5q15                                  1/1       Running   0          8m
 mongo-0                                                          2/2       Running   0          2m
@@ -165,7 +165,7 @@ pvc-3a9ca1ec-bad7-11e7-869d-000c298ff5fc-ctrl-2347166037-vsc2t   1/1       Runni
 pvc-3a9ca1ec-bad7-11e7-869d-000c298ff5fc-rep-849715916-3w1c7     1/1       Running   0          1m
 pvc-3a9ca1ec-bad7-11e7-869d-000c298ff5fc-rep-849715916-f2f3p     1/1       Running   0          1m
 
-test@MayaMaster:~$ kubectl get svc
+test@Master:~$ kubectl get svc
 NAME                                                CLUSTER-IP       EXTERNAL-IP   PORT(S)             AGE
 kubernetes                                          10.96.0.1        <none>        443/TCP             19h
 maya-apiserver-service                              10.103.216.160   <none>        5656/TCP            8m
@@ -218,7 +218,7 @@ which the sysbench dependencies are installed (refer the prerequisites)
   Note : Replace the mongo-url param based on the appropriate IP which can be obtained by ```kubectl describe pod mongo-0 | grep IP```
     
   ```
-  test@MayaHost02:~/sysbench$ ./sysbench/sysbench --mongo-write-concern=1 --mongo-url="mongodb://10.44.0.3" --mongo-database-name=sbtest --test=./sysbench/tests/mongodb/oltp.lua --oltp_table_size=100 --oltp_tables_count=10 --num-threads=10 --rand-type=pareto --report-interval=10 --max-requests=0 --max-time=600 --oltp-point-selects=10 --oltp-simple-ranges=1 --oltp-sum-ranges=1 --oltp-order-ranges=1 --oltp-distinct-ranges=1 --oltp-index-updates=1 --oltp-non-index-updates=1 --oltp-inserts=1 run
+  test@Host02:~/sysbench$ ./sysbench/sysbench --mongo-write-concern=1 --mongo-url="mongodb://10.44.0.3" --mongo-database-name=sbtest --test=./sysbench/tests/mongodb/oltp.lua --oltp_table_size=100 --oltp_tables_count=10 --num-threads=10 --rand-type=pareto --report-interval=10 --max-requests=0 --max-time=600 --oltp-point-selects=10 --oltp-simple-ranges=1 --oltp-sum-ranges=1 --oltp-order-ranges=1 --oltp-distinct-ranges=1 --oltp-index-updates=1 --oltp-non-index-updates=1 --oltp-inserts=1 run
   ```
   The parameters used for the sysbench can be modified based on system capability and storage definition to obtain realistic benchmark figures.
     
@@ -276,7 +276,7 @@ which the sysbench dependencies are installed (refer the prerequisites)
   Take an interactive bash session into the maya-apiserver pod container 
   
   ```
-  test@MayaMaster:~$ kubectl exec -it maya-apiserver-1089964587-x5q15 /bin/bash
+  test@Master:~$ kubectl exec -it maya-apiserver-1089964587-x5q15 /bin/bash
   root@maya-apiserver-1089964587-x5q15:/#
   ```
   
@@ -320,7 +320,7 @@ which the sysbench dependencies are installed (refer the prerequisites)
   "sbtest" test database created by sysbench in the previous steps.
   
     ```
-    test@MayaMaster:~$ kubectl exec -it mongo-0 /bin/bash
+    test@Master:~$ kubectl exec -it mongo-0 /bin/bash
     root@mongo-0:/# mongo
 
     MongoDB shell version v3.4.9
