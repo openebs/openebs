@@ -80,14 +80,9 @@ def generateInventory(config, boxlist, path, codes, pwdless):
                     hostaliasname = '%s0%s ansible_ssh_host' % (i[0], c)
                     config[hostgroupname] = {hostaliasname: i[1]}
 
-# Edited
-                    # f = open(path, 'w')
-                    # f.write(config)
-                    # f.close()
-#
                     with open(path,'w') as fileStatus:
                         fileStatus.write(config)
-#
+
                     c = c + 1
 
                     varsgroupname = '%s:vars' % (hostgroupname)
@@ -100,25 +95,15 @@ def generateInventory(config, boxlist, path, codes, pwdless):
 
                     extraargs = "'-o StrictHostKeyChecking=no'"
                     config[varsgroupname]['ansible_ssh_extra_args'] = extraargs
-#  Edited
-                    # f = open(path, 'w')
-                    # config.write(f)
-                    # f.close()
-#
                     with open(path,'w') as fileStatus:
                         fileStatus.write(config)
-#
+
                 elif c > 1:
                     hostaliasname = '%s0%s ansible_ssh_host' % (i[0], c)
                     config[hostgroupname][hostaliasname] = i[1]
-# Edited
-                    # f = open(path, 'w')
-                    # config.write(f)
-                    # f.close()
-#
+
                     with open(path,'w') as fileStatus:
                         fileStatus.write(config)
-#
                     c = c + 1
 
             except KeyError as e:
@@ -129,19 +114,9 @@ def generateInventory(config, boxlist, path, codes, pwdless):
 def replace(file, pattern, subst):
     """ Replace extra spaces around assignment operator in inventory """
     """ Expecting Binary files since file permissions are for Binary only """
-# Edited
-    # file_handle = open(file, 'rb')
-    # file_string = file_handle.read()
-    # file_handle.close()
-    # file_string = (re.sub(pattern, subst, file_string))
-    # file_handle = open(file, 'wb')
-    # file_handle.write(file_string)
-    # file_handle.close()
-#
+
     with open(file,'wb+') as file_handle:
         file_handle.write(re.sub(pattern, subst, file_string))
-#
-
 
 def main():
 
