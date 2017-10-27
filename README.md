@@ -54,7 +54,7 @@ We welcome your feedback and contributions in any form possible.
   - Already signed up? Head to our discussions at [#openebs-users](https://openebs-community.slack.com/messages/openebs-users/)
 - Want to raise an issue?
   - If it is a generic (or `not really sure`), you can still raise it at [issues](https://github.com/openebs/openebs/issues)
-  - Project specific issues can be raised at individual project level.
+  - Project specific issues can be raised at github.com/openebs/openebs/issues with the individual project tag.
 - Want to help with fixes and features?
   - Have a look at [open issues](https://github.com/issues?q=user%3Aopenebs+is%3Aopen)
   - Have a look at [contributing guide](./CONTRIBUTING.md)
