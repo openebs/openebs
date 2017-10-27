@@ -20,7 +20,7 @@ Prerequisites:
 **Minimum System Requirements**  
 
 * 40GB hard disk space
-* 4GB RAM
+* 8GB RAM
 * 4 core processors
 
 To run the Kubernetes cluster on a local machine, you need a vagrant box. Install and download Vagrant using the procedure available at https://www.vagrantup.com/intro/getting-started/install.html.
