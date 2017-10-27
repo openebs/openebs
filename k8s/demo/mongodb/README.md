@@ -1,34 +1,36 @@
 # Running mongodb statefulset on OpenEBS 
 
-This tutorial provides instructions on how to run a mongodb statefulset on OpenEBS storage in a kubernetes cluster. 
-It also provides steps to generate a standard OLTP load on the database using a custom sysbench tool and test the data replication 
-across the mongodb instances.
+This tutorial provides detailed instructions to perform the following tasks : 
 
-## Pre-requisites
+- Run a mongodb statefulset on OpenEBS storage in a Kubernetes cluster 
+- Generate standard OLTP load on mongodb using a custom sysbench tool 
+- Test the data replication across the mongodb instances.
 
-Pre-requisites include the following:
+## Prerequisites
 
-- A fully configured kubernetes cluster (versions 1.6.3/4/6 & 1.7.0 have been tested) with K8S master and at least one K8S node. 
-This maybe created on cloud platforms like GKE, on-premise virtual machines (vagrant/VMware/Hyper-V) or bare-metal boxes
+Prerequisites include the following:
+
+- A fully configured Kubernetes cluster (versions 1.6.3/4/6,1.7.0 & 1.7.5 have been tested) with K8S master and at least one K8S node. 
+This maybe created on cloud platforms like GKE, on-premise virtual machines (vagrant/VMware/Hyper-V) or baremetal boxes
 
   Note:
   
-  - It is recommended to use a 3-node cluster, with one master and two nodes, as this will aid creation of storage replicas on separate 
-nodes. This is especially helpful to maintain redundancy and data availability.
+  - OpenEBS recommends using a 3-node cluster, with one master and two nodes, as this will aid creation of storage replicas on separate 
+nodes. This is helpful to maintain redundancy and data availability.
 
     ```
-    karthik@MayaMaster:~$ kubectl get nodes
+    test@MayaMaster:~$ kubectl get nodes
     NAME         STATUS    AGE       VERSION
     mayahost01   Ready     18h       v1.6.3
     mayahost02   Ready     18h       v1.6.3
     mayamaster   Ready     18h       v1.6.3
     ```
     
-- Sufficient resources on the minions to host the openebs storage pods & application pods. This includes sufficient disk space, 
-  as, in this example, physical storage for the volume containers shall be carved out from the local storage
+- Sufficient resources on the nodes to host the OpenEBS storage pods and application pods. This includes sufficient disk space, 
+  as, in this example, physical storage for the volume containers will be carved out from the local storage
   
-- iSCSI support on the minions. This is needed to be able to consume the iSCSI target exposed by the openebs volume container (i.e., VSM). 
-In ubuntu, the iSCSI initiator can be installed using the procedure below :
+- iSCSI support on the nodes. This is required to consume the iSCSI target exposed by the OpenEBS volume container. 
+In ubuntu, the iSCSI initiator can be installed using the following procedure :
 
   ```
   sudo apt-get update
@@ -55,46 +57,46 @@ In ubuntu, the iSCSI initiator can be installed using the procedure below :
 
 ## Step-1: Run OpenEBS Operator
 
-Download the latest OpenEBS operator files and sample mongodb statefulset specification yaml on the kubemaster master 
-from the OpenEBS git repo.
+Download the latest OpenEBS operator files and sample mongodb statefulset specification yaml on the Kubernetes master 
+from the OpenEBS git repository.
 
 ```
 git clone https://github.com/openebs/openebs.git
 cd openebs/k8s
 ```
 
-Apply the openebs-operator on the kubernetes cluster. This creates the maya api-server and openebs provisioner deployments.
+Apply the openebs-operator.yml on the Kubernetes cluster. This creates the maya api-server and openebs provisioner deployments.
   
 ```
 kubectl apply -f openebs-operator.yaml
 ```
 
-Add the OpenEBS storage classes, that can then be used by developers to map a suitable storage profile for their apps in their 
+Add the OpenEBS storage classes, that can be used by developers to map a suitable storage profile for their applications in their 
 respective persistent volume claims.
 
 ```
 kubectl apply -f openebs-storageclasses.yaml
 ```
 
-Check whether the deployments are running successfully
+Check whether the deployments are running successfully.
 
 ```
-karthik@MayaMaster:~$ kubectl get deployments
+test@MayaMaster:~$ kubectl get deployments
 NAME                                            DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE
 maya-apiserver                                  1         1         1            1           5s
 openebs-provisioner                             1         1         1            1           6s
 
-karthik@MayaMaster:~$ kubectl get pods
+testk@MayaMaster:~$ kubectl get pods
 NAME                                   READY     STATUS    RESTARTS   AGE
 maya-apiserver-1089964587-x5q15        1/1       Running   0          10s
 openebs-provisioner-1149663462-5pdcq   1/1       Running   0          9s
 
 ```
 
-Check whether the storage classes are applied successfully
+Check whether the storage classes are applied successfully.
 
 ```
-karthik@MayaMaster:~$ kubectl get sc
+test@MayaMaster:~$ kubectl get sc
 NAME                 TYPE
 openebs-cassandra    openebs.io/provisioner-iscsi
 openebs-es-data-sc   openebs.io/provisioner-iscsi
@@ -111,10 +113,10 @@ openebs-zk           openebs.io/provisioner-iscsi
 ## Step-2: Deploy the mongo-statefulset with openebs storage
 
 Use OpenEBS as persistent storage for the mongodb statefulset by selecting an OpenEBS storage class in the persistent volume claim. 
-A sample mongodb statefulset yaml (with container attributes and pvc details) is available in the openebs git repo.
+A sample mongodb statefulset yaml (with container attributes and pvc details) is available in the openebs git repository.
 
-The number of replicas in the statefulset can be modified as per need. This example makes use of 2 replicas. The replica count
-can be edited in the statefulset spec : 
+The number of replicas in the statefulset can be modified as required. This example makes use of 2 replicas. The replica count
+can be edited in the statefulset specification : 
 
 ```
 ---
@@ -137,16 +139,16 @@ spec:
 Apply the mongo-statefulset yaml : 
 
 ```
-karthik@MayaMaster:~$ kubectl apply -f mongo-statefulset.yml
+test@MayaMaster:~$ kubectl apply -f mongo-statefulset.yml
 service "mongo" created
 statefulset "mongo" created
 ```
 
 Verify that the mongodb replicas, the mongo headless service and openebs persistent volumes comprising the controller and replica pods 
-are successfully deployed and are in "Running" state
+are successfully deployed and are in "Running" state.
 
 ```
-karthik@MayaMaster:~$ kubectl get pods
+test@MayaMaster:~$ kubectl get pods
 NAME                                                             READY     STATUS    RESTARTS   AGE
 maya-apiserver-1089964587-x5q15                                  1/1       Running   0          8m
 mongo-0                                                          2/2       Running   0          2m
@@ -163,7 +165,7 @@ pvc-3a9ca1ec-bad7-11e7-869d-000c298ff5fc-ctrl-2347166037-vsc2t   1/1       Runni
 pvc-3a9ca1ec-bad7-11e7-869d-000c298ff5fc-rep-849715916-3w1c7     1/1       Running   0          1m
 pvc-3a9ca1ec-bad7-11e7-869d-000c298ff5fc-rep-849715916-f2f3p     1/1       Running   0          1m
 
-karthik@MayaMaster:~$ kubectl get svc
+test@MayaMaster:~$ kubectl get svc
 NAME                                                CLUSTER-IP       EXTERNAL-IP   PORT(S)             AGE
 kubernetes                                          10.96.0.1        <none>        443/TCP             19h
 maya-apiserver-service                              10.103.216.160   <none>        5656/TCP            8m
@@ -185,13 +187,13 @@ Sysbench is a multi-purpose benchmarking tool capable of running DB benchmarks a
 ### Sysbench Installation Steps :
 
 - Download the appropriate branch of Percona-Lab's sysbench fork with support for mongodb integration on the Kubernetes nodes into
-which the sysbench dependencies are installed (refer the pre-requisites)
+which the sysbench dependencies are installed (refer the prerequisites)
 
   ```
   git clone -b dev-mongodb-support-1.0 https://github.com/Percona-Lab/sysbench.git
   ```
   
-- Enter the sysbench local repo & perform the following commands in the given order :
+- Enter the sysbench local repository and perform the following commands in the given order :
 
   ```
   cd sysbench
@@ -200,12 +202,12 @@ which the sysbench dependencies are installed (refer the pre-requisites)
   ./configure
   make
   ```
-  Note : In case of errors where certain header files belonging to the libbson/libmongoc packages are not found, update the include 
-  path (One workaround for this is to place all header files inside libbson-1.0 & libmongoc-1.0 into /usr/include)
+  Note : In case of errors where some header files belonging to the libbson/libmongoc packages are not found, update the include 
+  path (One workaround for this is to place all header files inside libbson-1.0 and libmongoc-1.0 into /usr/include)
   
 ### Execute the sysbench benchmark 
   
-- First, identify the primary mongodb instance name OR its IP (In the current statefulset specification YAML, "mongo-0" is always
+- Identify the primary mongodb instance name OR its IP (In the current statefulset specification YAML, "mongo-0" is always
   configured as the primary instance that takes client I/O)
   
 - Trigger the sysbench command using the following command to :
@@ -216,11 +218,11 @@ which the sysbench dependencies are installed (refer the pre-requisites)
   Note : Replace the mongo-url param based on the appropriate IP which can be obtained by ```kubectl describe pod mongo-0 | grep IP```
     
   ```
-  karthik@MayaHost02:~/sysbench$ ./sysbench/sysbench --mongo-write-concern=1 --mongo-url="mongodb://10.44.0.3" --mongo-database-name=sbtest --test=./sysbench/tests/mongodb/oltp.lua --oltp_table_size=100 --oltp_tables_count=10 --num-threads=10 --rand-type=pareto --report-interval=10 --max-requests=0 --max-time=600 --oltp-point-selects=10 --oltp-simple-ranges=1 --oltp-sum-ranges=1 --oltp-order-ranges=1 --oltp-distinct-ranges=1 --oltp-index-updates=1 --oltp-non-index-updates=1 --oltp-inserts=1 run
+  test@MayaHost02:~/sysbench$ ./sysbench/sysbench --mongo-write-concern=1 --mongo-url="mongodb://10.44.0.3" --mongo-database-name=sbtest --test=./sysbench/tests/mongodb/oltp.lua --oltp_table_size=100 --oltp_tables_count=10 --num-threads=10 --rand-type=pareto --report-interval=10 --max-requests=0 --max-time=600 --oltp-point-selects=10 --oltp-simple-ranges=1 --oltp-sum-ranges=1 --oltp-order-ranges=1 --oltp-distinct-ranges=1 --oltp-index-updates=1 --oltp-non-index-updates=1 --oltp-inserts=1 run
   ```
-  The parameters used for the sysbench can be modified based on system capability & storage definition to obtain realistic benchmark figures.
+  The parameters used for the sysbench can be modified based on system capability and storage definition to obtain realistic benchmark figures.
     
-  The benchmark output is typically like this : 
+  The benchmark output displayed is similar to the following : 
     
   ```
   sysbench 1.0:  multi-threaded system evaluation benchmark
@@ -268,17 +270,17 @@ which the sysbench dependencies are installed (refer the pre-requisites)
       events (avg/stddev):           5137.4000/21.50
       execution time (avg/stddev):   600.0185/0.02
   ```
-- While the benchmark is in progress, performance and capacity usage stats on the OpenEBS storage volume can be viewed via mayactl
-  commands that need to be executed on the maya-apiserver pod.
+- While the benchmark is in progress, performance and capacity usage statistics on the OpenEBS storage volume can be viewed via mayactl
+  commands that must be executed on the maya-apiserver pod.
   
-  First, take an interactive bash session into the maya-apiserver pod container 
+  Take an interactive bash session into the maya-apiserver pod container 
   
   ```
-  karthik@MayaMaster:~$ kubectl exec -it maya-apiserver-1089964587-x5q15 /bin/bash
+  test@MayaMaster:~$ kubectl exec -it maya-apiserver-1089964587-x5q15 /bin/bash
   root@maya-apiserver-1089964587-x5q15:/#
   ```
   
-  Obtain the list of OpenEBS persistent volumes created by the mongodb statefulset application YAML
+  Obtain the list of OpenEBS persistent volumes created by the mongodb statefulset application YAML.
   
   ```
   root@maya-apiserver-1089964587-x5q15:/# maya volume list
@@ -312,13 +314,13 @@ which the sysbench dependencies are installed (refer the pre-requisites)
            0.214|      0.205|
   ```
      
-  ### Verify mongodb application sync 
+  ### Verify mongodb replication
   
-  - First, login into the primary instance of the mongodb statefulset via the in-built mongo shell and verify creation of the 
-  "sbtest" test database created by sysbench in the previous steps
+  - Login into the primary instance of the mongodb statefulset via the in-built mongo shell and verify creation of the 
+  "sbtest" test database created by sysbench in the previous steps.
   
     ```
-    karthik@MayaMaster:~$ kubectl exec -it mongo-0 /bin/bash
+    test@MayaMaster:~$ kubectl exec -it mongo-0 /bin/bash
     root@mongo-0:/# mongo
 
     MongoDB shell version v3.4.9
@@ -330,8 +332,8 @@ which the sysbench dependencies are installed (refer the pre-requisites)
     local   0.006GB
     sbtest  0.001GB
     ```
-  - Perform the replication status command on the master/primary instance of the statefulset. In the output, verify that the values 
-  (timestamps) for the "optimeDate" on both members are *nearly* the same
+  - Run the replication status command on the master/primary instance of the statefulset. In the output, verify that the values 
+  (timestamps) for the "optimeDate" on both members are *almost* the same
   
     ```
        rs0:PRIMARY> rs.status()
@@ -423,9 +425,9 @@ which the sysbench dependencies are installed (refer the pre-requisites)
       "ok" : 1
     }
     ```
-  - You could further confirm the presence of the DB with the same size on the secondary instances (say, mongo-1).
+  - You could further confirm the presence of the DB with the same size on the secondary instances (for exmaple, mongo-1).
   
-    Note : By default, the dbs cannot be viewed on the secondary via the show dbs command, unless we set the slave context
+    Note : By default, the dbs cannot be viewed on the secondary instance via the show dbs command, unless we set the slave context.
     
     ```
     rs0:SECONDARY> rs.slaveOk()
@@ -436,7 +438,7 @@ which the sysbench dependencies are installed (refer the pre-requisites)
     sbtest  0.001GB
     ```
    
-  - The time lag b/w the mongodb instances can be found via the following command, which can be executed on either instance
+  - The time lag between the mongodb instances can be found via the following command, which can be executed on either instance.
   
     ```
     rs0:SECONDARY> rs.printSlaveReplicationInfo()
