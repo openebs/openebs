@@ -22,15 +22,24 @@ The following instructions have been verified on:
 
 ### Pre-Requisites
 
-- At least 3 linux machines of above type, i.e., either VMs or bare-metal, if deploying the setup in a hyperconverged mode 
-  (with K8s as well as OpenEBS residing on the same machines) OR 5 linux machines (with K8s and OpenEBS running on separate machines)
-  
-- The above instruction assumes a minimal setup with a test-harness, K8s/OpenEBS master and a single K8s minion/OpenEBS node. 
-  The masters and nodes can be scaled if the user so desires
+- At least 3 linux machines of above type, i.e., either VMs or bare metal, if deploying the setup in a hyperconverged mode 
+  (with K8s as well as OpenEBS residing on the same machine) OR 5 linux machines (with K8s and OpenEBS running on separate machines)
 
-- All linux machines are required to have : 
+- The above instruction assumes a minimal setup with a test-harness, K8s/OpenEBS master and a single K8s node/OpenEBS node. 
+  The masters and nodes can be scaled if the user so requires.
+
+- The minimum system requirements for the above machines are :
   
-  - Basic development packages (dpkg-dev,gcc,g++,libc6-dev,make,libssl-dev,sshpass,curl)
+  - 10GB hard disk space
+  - 1GB RAM
+  - 1 core processor
+
+  Note: The minimum requirements are based on the scenario where the VMs are built using the vagrantfile in the ansible
+  repository.  
+
+- All linux machines require : 
+  
+  - Basic development packages (dpkg-dev, gcc, g++, libc6-dev, make, libssl-dev, sshpass, curl)
   - Python2.7-minimal 
   - SSH services enabled
   
@@ -103,12 +112,12 @@ variable.
 - Edit the global variables file ```inventory/group_vars/all.yml``` to reflect the desired storage volume properties and network CIDR
   that will be used by the maya api server to allot the IP for the volume containers. Also update the ansible run-time properties to 
   reflect the machine type (```is_vagrant```), whether the playbook execution needs to be recorded using the Ansible Run Analysis
-  framework (```setup_ara```), whether slack notifications are needed (in case they are required, a $SLACK_TOKEN env variable needs 
+  framework (```ara_setup```), whether slack notifications are needed (in case they are required, a $SLACK_TOKEN env variable needs 
   to be setup. The token is usually the last part of the slack webhook URL which is user generated) 
   
   Note: The network CIDR does not apply in case of hyperconverged mode of installation.
   
-- Execute the setup_ara playbook to install the ARA notification plugins and custom modules. This step will cause changes to 
+- Execute the setup-ara playbook to install the ARA notification plugins and custom modules. This step will cause changes to 
   the ansible configuration file ansible.cfg (A backup will be taken at the time of execution in case you need to revert). A web 
   URL is provided as a playbook run message at the end of the ara setup procedure, which can be used to track all the playbook run 
   details after this point (_Optional_)
