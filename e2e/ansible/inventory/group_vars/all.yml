@@ -8,8 +8,8 @@
 #Accepted Entries (Valid Kubernetes Version): default:1.6.3
 #Accepted Entries (Valid Weave Version): default:1.9.4
 
-k8s_version: 1.6.3
-weave_version: 1.9.4
+k8s_version: 1.7.7 
+weave_version: 2.0.4
 
 #list of kubernetes versions released.
 #do not tamper the list unless you know
@@ -25,6 +25,7 @@ k8s_version_list:
   - 1.7.2
   - 1.7.4
   - 1.7.5
+  - 1.7.7
 
 weave_version_list:
   - 1.9.4
