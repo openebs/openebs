@@ -17,6 +17,12 @@ Prerequisites:
 * curl / wget / git and so on, to download the Vagrant file
 * Ensure virtualization is enabled at the BIOS level
 
+**Minimum System Requirements**  
+
+* 40GB hard disk space
+* 4GB RAM
+* 4 core processors
+
 To run the Kubernetes cluster on a local machine, you need a vagrant box. Install and download Vagrant using the procedure available at https://www.vagrantup.com/intro/getting-started/install.html.
 
 Install and download Virtualbox using the procedure available at https://www.virtualbox.org/wiki/Downloads.
