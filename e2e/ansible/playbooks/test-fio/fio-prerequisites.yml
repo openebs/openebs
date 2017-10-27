@@ -1,0 +1,6 @@
+---
+- hosts: localhost  
+
+  roles:
+    - {role: localhost, when: run_demo | bool} 
+

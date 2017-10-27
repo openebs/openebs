@@ -1,0 +1,10 @@
+---
+- hosts: localhost  
+
+  vars_files: 
+    - fio-vars.yml
+
+  roles:
+    - {role: volume, when: run_demo | bool}
+    - {role: fio, when: run_demo | bool}
+

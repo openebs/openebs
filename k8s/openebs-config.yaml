@@ -1,0 +1,72 @@
+# Define a new api (configuration) - openebs.io/v1aplha1
+# ------------------------------------------------------
+# Purspose of this configuration spec file :
+# ==========================================
+# OpenEBS maya is expected to identify and create the storage tiers in a given
+# node or cluster. Though Maya can act on the available local storage and 
+# remote storage automatically, the storage admin (human) may want to manage 
+# resources manually. This config file is expected to provide such options
+# 
+# What should this spec cover ?
+# =============================
+# Include the details on how storage will be allocated for the replicas
+# The options can include:
+# - Manual or automatic
+# - host-directory-path 
+# - lvm using local or remote disks (connected via iscsi/fc/nbd)
+# Will also contain details on how to use:
+# - cache from nvme disks
+# - backup storage from S3
+# The above configuration can be specified at a cluster level or
+# per node (minion) 
+
+# The storage-manager(s) will look for updates on this spec 
+# and take the appropriate actions. 
+
+# This file will also specify the different storage tiers
+# that will be used to associate with storage-classes
+# For example:
+# - A node can have an lvm out of SSD disks or with a remote
+#   disk. The local ssd disks will be used for high-performance
+#   persistentvolumeclaims, where as remote disks can be used 
+#   for backup-jobs persistentvolumeclaims. 
+
+# Define a storage pool for launching the replicas using
+#  local directory or mounted directory from the minion nodes
+#  
+apiVersion: openebs.io/v1alpha1
+kind: Pool
+metadata:
+  name: hostdir-var
+  type: hostdir
+spec:
+  path: "/var/openebs" 
+  maxVolSize: 10G #Max Volume Size
+  maxAllocatedSize: 10G #Max Total Space allocated from this directory/mount
+  nodes: [ "all" ]
+---  
+apiVersion: openebs.io/v1alpha1
+kind: Pool
+metadata:
+  name: iscsi-vol1
+  type: iscsi
+spec:
+  portal: "192.168.1.1:3260" 
+  iqn: "iqn.2012-09.account-name:vol1" 
+  lun: 1
+  mountpath: "/mnt/openebs-vol1"
+  maxSize: 10G #Max Volume Size
+  maxAllocatedSize: 10G #Max Total Space allocated from this directory/mount
+  nodes: [ "all" ]
+---  
+apiVersion: openebs.io/v1alpha1
+kind: Pool
+metadata:
+  name: lvm-vol1
+  type: lvm
+spec:
+  devices: [ "/dev/sdc", "/dev/sdd" ]
+  mountpath: "/mnt/lvm-vol1"
+  maxSize: 10G #Max Volume Size
+  maxAllocatedSize: 10G #Max Total Space allocated from this directory/mount
+  nodes: [ "all" ]

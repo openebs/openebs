@@ -1,0 +1,20 @@
+---
+# Do not change the order of the scripts.
+# They have to been run in the order defined below.
+
+k8s_images: k8s_images.tar
+
+k8s_images_path: "{{ ansible_env.HOME }}/setup/kubernetes"
+
+k8s_dpkg_packages:
+  - kubelet.deb
+  - kubernetes-cni.deb
+  - kubectl.deb
+  - kubeadm.deb
+
+openebs_iscsi_driver: https://raw.githubusercontent.com/openebs/openebs/v0.2/k8s/lib/plugin/flexvolume/openebs-iscsi
+
+flexvol_driver_alias: openebs-iscsi
+
+flexvol_driver_path: /usr/libexec/kubernetes/kubelet-plugins/volume/exec/openebs~openebs-iscsi/
+

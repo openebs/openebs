@@ -1,0 +1,6 @@
+k8s/demo/.vagrant/
+k8s/demo/*.log
+k8s/demo/*test*
+documentation/build/
+k8s/lib/vagrant/*.box
+k8s/lib/vagrant/*.log

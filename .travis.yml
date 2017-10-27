@@ -1,0 +1,9 @@
+dist: trusty
+sudo: required
+install: true
+script:
+  - make build
+notifications:
+  email:
+    recipients:
+      - kiran.mova@cloudbyte.com
