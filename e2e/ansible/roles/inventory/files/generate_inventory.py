@@ -115,7 +115,7 @@ def generateInventory(config, boxlist, path, codes, pwdless):
                     # f = open(path, 'w')
                     # config.write(f)
                     # f.close()
-#                   
+#
                     with open(path,'w') as fileStatus:
                         fileStatus.write(config)
 #
@@ -128,14 +128,19 @@ def generateInventory(config, boxlist, path, codes, pwdless):
 
 def replace(file, pattern, subst):
     """ Replace extra spaces around assignment operator in inventory """
-
-    file_handle = open(file, 'rb')
-    file_string = file_handle.read()
-    file_handle.close()
-    file_string = (re.sub(pattern, subst, file_string))
-    file_handle = open(file, 'wb')
-    file_handle.write(file_string)
-    file_handle.close()
+    """ Expecting Binary files since file permissions are for Binary only """
+# Edited
+    # file_handle = open(file, 'rb')
+    # file_string = file_handle.read()
+    # file_handle.close()
+    # file_string = (re.sub(pattern, subst, file_string))
+    # file_handle = open(file, 'wb')
+    # file_handle.write(file_string)
+    # file_handle.close()
+#
+    with open(file,'wb+') as file_handle:
+        file_handle.write(re.sub(pattern, subst, file_string))
+#
 
 
 def main():
