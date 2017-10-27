@@ -112,18 +112,18 @@ variable.
 - Edit the global variables file ```inventory/group_vars/all.yml``` to reflect the desired storage volume properties and network CIDR
   that will be used by the maya api server to allot the IP for the volume containers. Also update the ansible run-time properties to 
   reflect the machine type (```is_vagrant```), whether the playbook execution needs to be recorded using the Ansible Run Analysis
-  framework (```setup_ara```), whether slack notifications are needed (in case they are required, a $SLACK_TOKEN env variable needs 
+  framework (```ara_setup```), whether slack notifications are needed (in case they are required, a $SLACK_TOKEN env variable needs 
   to be setup. The token is usually the last part of the slack webhook URL which is user generated) 
   
   Note: The network CIDR does not apply in case of hyperconverged mode of installation.
   
-- Execute the setup_ara playbook to install the ARA notification plugins and custom modules. This step will cause changes to 
+- Execute the setup-ara playbook to install the ARA notification plugins and custom modules. This step will cause changes to 
   the ansible configuration file ansible.cfg (A backup will be taken at the time of execution in case you need to revert). A web 
   URL is provided as a playbook run message at the end of the ara setup procedure, which can be used to track all the playbook run 
   details after this point (_Optional_)
   
   ```
-  testuser@OpenEBSClient:~/openebs/e2e/ansible$ ansible-playbook setup_ara.yml
+  testuser@OpenEBSClient:~/openebs/e2e/ansible$ ansible-playbook setup-ara.yml
   ```
   
   Upon successful completion, you can view details of subsequent playbook runs on the ARA dashboard which can be accessed at 
