@@ -108,7 +108,7 @@ openebs-standard     openebs.io/provisioner-iscsi
 openebs-zk           openebs.io/provisioner-iscsi
 ```
 
-## Step-2: Run the mongo-statefulse with openebs storage
+## Step-2: Deploy the mongo-statefulset with openebs storage
 
 Use OpenEBS as persistent storage for the mongodb statefulset by selecting an OpenEBS storage class in the persistent volume claim. 
 A sample mongodb statefulset yaml (with container attributes and pvc details) is available in the openebs git repo.
