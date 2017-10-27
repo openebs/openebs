@@ -79,9 +79,15 @@ def generateInventory(config, boxlist, path, codes, pwdless):
                 if c == 1:
                     hostaliasname = '%s0%s ansible_ssh_host' % (i[0], c)
                     config[hostgroupname] = {hostaliasname: i[1]}
-                    f = open(path, 'w')
-                    config.write(f)
-                    f.close()
+
+# Edited
+                    # f = open(path, 'w')
+                    # f.write(config)
+                    # f.close()
+#
+                    with open(path,'w') as fileStatus:
+                        fileStatus.write(config)
+#
                     c = c + 1
 
                     varsgroupname = '%s:vars' % (hostgroupname)
@@ -94,17 +100,25 @@ def generateInventory(config, boxlist, path, codes, pwdless):
 
                     extraargs = "'-o StrictHostKeyChecking=no'"
                     config[varsgroupname]['ansible_ssh_extra_args'] = extraargs
-
-                    f = open(path, 'w')
-                    config.write(f)
-                    f.close()
-
+#  Edited
+                    # f = open(path, 'w')
+                    # config.write(f)
+                    # f.close()
+#
+                    with open(path,'w') as fileStatus:
+                        fileStatus.write(config)
+#
                 elif c > 1:
                     hostaliasname = '%s0%s ansible_ssh_host' % (i[0], c)
                     config[hostgroupname][hostaliasname] = i[1]
-                    f = open(path, 'w')
-                    config.write(f)
-                    f.close()
+# Edited
+                    # f = open(path, 'w')
+                    # config.write(f)
+                    # f.close()
+#                   
+                    with open(path,'w') as fileStatus:
+                        fileStatus.write(config)
+#
                     c = c + 1
 
             except KeyError as e:
