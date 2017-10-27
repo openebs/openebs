@@ -43,7 +43,7 @@ In ubuntu, the iSCSI initiator can be installed using the following procedure :
   sudo cat /etc/iscsi/initiatorname.iscsi
   sudo service open-iscsi status
   ```
-- Install the following dependent packages to run mongodb-integrated sysbench I/O tool on any one of the kubernetes nodes
+- Install the following dependent packages to run mongodb-integrated sysbench I/O tool on any one of the Kubernetes nodes
   
   ```
   sudo apt-get install <packagename>:
@@ -65,7 +65,7 @@ git clone https://github.com/openebs/openebs.git
 cd openebs/k8s
 ```
 
-Apply the openebs-operator.yml on the Kubernetes cluster. This creates the maya api-server and openebs provisioner deployments.
+Apply the openebs-operator.yml on the Kubernetes cluster. This creates the maya api-server and OpenEBS provisioner deployments.
   
 ```
 kubectl apply -f openebs-operator.yaml
@@ -110,7 +110,7 @@ openebs-standard     openebs.io/provisioner-iscsi
 openebs-zk           openebs.io/provisioner-iscsi
 ```
 
-## Step-2: Deploy the mongo-statefulset with openebs storage
+## Step-2: Deploy the mongo-statefulset with OpenEBS storage
 
 Use OpenEBS as persistent storage for the mongodb statefulset by selecting an OpenEBS storage class in the persistent volume claim. 
 A sample mongodb statefulset yaml (with container attributes and pvc details) is available in the openebs git repository.
