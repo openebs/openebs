@@ -40,7 +40,7 @@ Vagrant.configure("2") do |config|
 
   # Every Vagrant development environment requires a box. You can search for
   # boxes at https://atlas.hashicorp.com/search.
-  config.vm.box = "openebs/k8s-1.7.5"
+  config.vm.box = "openebs/k8s-1.8"
 
   # Needed for ubuntu/xenial64 packaged boxes
   # The default user is ubuntu for those boxes
