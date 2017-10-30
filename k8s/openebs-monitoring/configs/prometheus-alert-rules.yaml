@@ -1,0 +1,76 @@
+kind: ConfigMap
+metadata:
+  name: prometheus-alert-rules
+apiVersion: v1
+data:
+  alert.rules: |-
+    ## alert.rules ##
+    #
+    # CPU Alerts
+    #
+    # alerts when cpu usage exceeds the given limit within the 
+    # interval of 5 min
+    # The given expression below are the queries (PromQL) to
+    # get the details.
+    ALERT NodeCPUUsage
+      IF (100 - (avg by (instance) (irate(node_cpu{name="node-exporter",mode="idle"}[5m])) * 100)) > 75
+      FOR 2m
+      LABELS { severity="warning" }  
+      ANNOTATIONS {
+        SUMMARY = "{{$labels.instance}}: High CPU usage detected",
+        DESCRIPTION = "{{$labels.instance}}: CPU usage is above 75% (current value is: {{ $value }})"
+      }
+  
+    #
+    # Disk Alerts
+    # 
+    ALERT NodeLowRootDisk
+      IF ((node_filesystem_size{mountpoint="/root-disk"} - node_filesystem_free{mountpoint="/root-disk"} ) / node_filesystem_size{mountpoint="/root-disk"} * 100) > 75
+      FOR 2m
+      LABELS { severity="warning" }
+      ANNOTATIONS {
+        SUMMARY = "{{$labels.instance}}: Low root disk space",
+        DESCRIPTION = "{{$labels.instance}}: Root disk usage is above 75% (current value is: {{ $value }})"
+      }
+
+    ALERT NodeLowDataDisk
+      IF ((node_filesystem_size{mountpoint="/data-disk"} - node_filesystem_free{mountpoint="/data-disk"} ) / node_filesystem_size{mountpoint="/data-disk"} * 100) > 75
+      FOR 2m
+      LABELS { severity="warning" }
+      ANNOTATIONS {
+        SUMMARY = "{{$labels.instance}}: Low data disk space",
+        DESCRIPTION = "{{$labels.instance}}: Data disk usage is above 75% (current value is: {{ $value }})"
+      }
+ 
+    #
+    # Node Load Alerts (5m)
+    # alerts when Load on node exceeds the given limit with in 5 min
+    ALERT NodeLoadAverage
+      IF ((node_load5 / count without (cpu, mode) (node_cpu{mode="system"})) > 1)
+      FOR 2m
+      LABELS { severity="warning" }
+      ANNOTATIONS {
+        SUMMARY = "{{$labels.instance}}: High Node Load average(5m) detected",
+        DESCRIPTION = "{{$labels.instance}}: LA is high"
+      }
+
+    #
+    # RAM Alerts
+    #
+    ALERT NodeSwapUsage
+      IF (((node_memory_SwapTotal-node_memory_SwapFree)/node_memory_SwapTotal)*100) > 75
+      FOR 2m
+      LABELS { severity="warning" }
+      ANNOTATIONS {
+        SUMMARY = "{{$labels.instance}}: High Swap usage detected",
+        DESCRIPTION = "{{$labels.instance}}: Swap usage usage is above 75% (current value is: {{ $value }})"
+      }
+
+    ALERT NodeMemoryUsage
+      IF (((node_memory_MemTotal-node_memory_MemFree-node_memory_Cached)/(node_memory_MemTotal)*100)) > 75
+      FOR 2m
+      LABELS { severity="warning" }
+      ANNOTATIONS {
+        SUMMARY = "{{$labels.instance}}: High memory usage detected",
+        DESCRIPTION = "{{$labels.instance}}: Memory usage is above 75% (current value is: {{ $value }})"
+      }  

@@ -57,7 +57,7 @@ rules:
   verbs: ["get", "list", "watch"]
   # nonResourceURLs are endpoints that don’t map to a traditional resource. 
   # Things like /ui/ or /apis or /swagger.json that are used for redirects
-  # Prometheus by default look for /metrics endpoint for the different IP's.
+  # Prometheus by default look for /metrics endpoint for the differnet IP's.
 - nonResourceURLs: ["/metrics"]
   verbs: ["get"]
 ---
@@ -103,7 +103,8 @@ spec:
             # The data in an emptyDir volume is safe across container crashes.
             - "-storage.local.path=/prometheus"
             # How long to retain samples in the local storage. 
-            - "-storage.local.retention=$(STORAGE_RETENTION)" 
+            - "-storage.local.retention=$(STORAGE_RETENTION)"
+            - "-alertmanager.url=http://alertmanager:9093" 
           ports:
             - containerPort: 9090
           env:
@@ -125,6 +126,7 @@ spec:
             limits:
               memory: "700M"
               cpu: "500m"
+          
           volumeMounts:
             # prometheus config file stored in the given mountpath
             - name: prometheus-server-volume
@@ -132,6 +134,9 @@ spec:
             # metrics collected by prometheus will be stored at the given mountpath.
             - name: prometheus-storage-volume
               mountPath: /prometheus
+            # alerting rules defined will be stored at given mountpath
+            - name: rules-volume
+              mountPath: /etc/prometheus-rules
       volumes:
         # Prometheus Config file will be stored in this volume 
         - name: prometheus-server-volume
@@ -141,6 +146,11 @@ spec:
         - name: prometheus-storage-volume
           # containers in the Pod can all read and write the same files here.
           emptyDir: {} 
+        # Rules defined in configmap will be stored in this volume
+        - name: rules-volume
+          configMap:
+            name: prometheus-alert-rules
+
 ---
 # prometheus-service
 apiVersion: v1
