@@ -3,7 +3,7 @@
 # Launch the maya-apiserver ( deployment )
 # Launch the maya-storagemanager ( deameon set )
 
-# Create Maya Service Account 
+# Create Maya Service Account
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -96,7 +96,21 @@ metadata:
   name: openebs-provisioner
   namespace: default
 spec:
-  replicas: 1
+  replicas: 2
+  template:
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: name
+                      operator: In
+                      values:
+                      - openebs-provisioner
+                topologyKey: "kubernetes.io/hostname"
   template:
     metadata:
       labels:
@@ -112,5 +126,3 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: spec.nodeName
-
-
