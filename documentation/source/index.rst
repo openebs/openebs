@@ -1,7 +1,7 @@
 
 
 OpenEBS Documentation
-==========================
+=============================
 
 Contents:
 
@@ -31,13 +31,9 @@ Contents:
     
 .. toctree::
     :maxdepth: 1
-    :caption: Troubleshooting
-    
-
+    :caption: Troubleshooting   
     Overview <troubleshooting/troubleshooting>
    
-
-
 .. toctree::
    :maxdepth: 1
    :caption: Release Notes
