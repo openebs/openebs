@@ -5,72 +5,96 @@ On-Premise Solutions
 Using Vagrant
 =============
 
-Setting Up OpenEBS with Kubernetes on Local Machine
----------------------------------------------------
+Setting Up OpenEBS with Kubernetes on a Local Machine
+-------------------------------------------------------
 The following procedure helps you setup and use OpenEBS on a local machine:
 
-1. Install Vagrant Box
+Prerequisites:
+----------------
 
-   To run the kubernetes cluster on local machine, you need a vagrant box. If you do not have vagrant box follow the steps given `here`_.
-    .. _here: https://github.com/openebs/openebs/tree/master/k8s/lib/vagrant/test/k8s/1.6#installing-kubernetes-16-and-openebs-clusters-on-ubuntu
+* Vagrant (>=1.9.1)
+* VirtualBox 5.1
+* curl / wget / git and so on, to download the Vagrant file
+* Ensure virtualization is enabled at the BIOS level
+
+**Minimum System Requirements**  
+
+* 40GB hard disk space
+* 8GB RAM
+* 4 core processors
+
+To run the Kubernetes cluster on a local machine, you need a vagrant box. Install and download Vagrant using the procedure available at https://www.vagrantup.com/intro/getting-started/install.html.
+
+Install and download Virtualbox using the procedure available at https://www.virtualbox.org/wiki/Downloads.
+
+Install a Vagrant Box either by downloading the vagrant file or by cloning the repository.
+
+Installing a Vagrant Box by Downloading the Vagrantfile
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+1. Create a demo directory for example, k8s-demo using the following command.
+   ::
+      mkdir k8s-demo
 
 2. Download OpenEBS Vagrant file using the following command.
 ::
-
+    cd k8s-demo
     $ wget https://raw.githubusercontent.com/openebs/openebs/master/k8s/vagrant/1.7.5/Vagrantfile
 
 3. Bring up k8s Cluster.
 ::
+   ubuntu@ubuntu:~/k8s-demo$ vagrant up
 
-    openebs@openebs:~$ cd openebs/k8s/lib/vagrant/test/k8s/1.6
-    openebs@openebs:~/openebs/k8s/lib/vagrant/test/k8s/1.6$ vagrant up
-
-It will bring up one kubemaster and two kubeminions.
+It will bring up a three node Kubernetes cluster with one master and two nodes. 
 
 4. SSH to kubemaster using the following command.
 ::
-
-    openebs@openebs:~/openebs/k8s/lib/vagrant/test/k8s/1.6$ vagrant ssh kubemaster-01
+   ubuntu@ubuntu:~/k8s-demo$ vagrant ssh kubemaster-01
 
 5. Run OpenEBS Operator.
+   
+* Download the latest OpenEBS Operator Files inside kubemaster-01 using the following commands.
+  ::
+    ubuntu@kubemaster-01:~$ git clone https://github.com/openebs/openebs
+    ubuntu@kubemaster-01:~$ cd openebs/k8s
 
-   * Download the latest OpenEBS Operator Files inside kubemaster-01 using the following commands.
+* Run OpenEBS Operator using the following command.
+  ::
+   ubuntu@kubemaster-01:~/openebs/k8s$ kubectl apply -f openebs-operator.yaml
 
-     ::
-
-         ubuntu@kubemaster-01:~$ git clone https://github.com/openebs/openebs
-         ubuntu@kubemaster-01:~$ cd openebs/k8s
-
-   * Run OpenEBS Operator using the following command.
-     ::
-
-         ubuntu@kubemaster-01:~/openebs/k8s$ kubectl apply -f openebs-operator.yaml
-
-   * Add OpenEBS related storage classes using the following command, that can then be used by developers or applications.
-     ::
-
-         ubuntu@kubemaster-01:~/openebs/k8s$ kubectl apply -f openebs-storageclasses.yaml
+* Add OpenEBS related storage classes using the following command, that can then be used by developers     or applications.
+  ::
+   ubuntu@kubemaster-01:~/openebs/k8s$ kubectl apply -f openebs-storageclasses.yaml
 
 6. Run stateful workloads with OpenEBS storage.
 
-To use OpenEBS as persistent storage for your stateful workloads, set the storage class in the PVC to OpenEBS storage class.
+To use OpenEBS as persistent storage for your stateful workloads, set the PVC storage class to OpenEBS storage class.
 
 Get the list of storage classes using the following command. Choose the storage class that best suits your application.
 ::
-
     ubuntu@kubemaster-01:~$ kubectl get sc
 
+Installing a Vagrant Box by Cloning the Repository
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+1. Clone the OpenEBS repository using the following command.
+   ::
+      git clone http://github.com/openebs.git
+
+2. Bring up k8s Cluster.
+   ::
+      ubuntu@ubuntu:~$ cd openebs/k8s/vagrant/1.7.5
+      ubuntu@ubuntu:~/openebs/k8s/vagrant/1.7.5$ vagrant up
 
 Some sample yaml files for stateful workloads using OpenEBS are provided in the `openebs/k8s/demo`_.
+
  .. _openebs/k8s/demo: https://github.com/openebs/openebs/tree/master/k8s/demo
 
 The *ubuntu@kubemaster-01:~$ kubectl apply -f demo/jupyter/demo-jupyter-openebs.yaml* command creates the following, which you can verify using the corresponding kubectl commands.
 
 * Launch a Jupyter Server, with the specified notebook file from github (kubectl get deployments)
 * Create an OpenEBS Volume and mount to the Jupyter Server Pod (/mnt/data) (kubectl get pvc) (kubectl get pv) (kubectl get pods)
-* Expose the Jupyter Server to external world through http://NodeIP:8888 (NodeIP is any of the minion nodes' external IP) (kubectl get pods)
-
-
+* Expose the Jupyter Server to external world through http://NodeIP:8888 (NodeIP is any of the nodes' external IP) (kubectl get pods)
 
 Using Ansible
 =============
@@ -79,7 +103,7 @@ Setting Up OpenEBS on Ubuntu Hosts or Virtual Machines
 ------------------------------------------------------
 This section provides detailed instructions on how to perform the OpenEBS on-premise deployment. The objective of this procedure is to have the following functional.
 
-* Kubernetes cluster (K8s master & K8s minions/host) configured with the OpenEBS iSCSI flexvol driver,
+* Kubernetes cluster (K8s master & K8s nodes/host) configured with the OpenEBS iSCSI flexvol driver,
 * OpenEBS Maya Master
 * OpenEBS Storage Hosts
 
@@ -98,9 +122,9 @@ Prerequisites:
 --------------
 * At least three Linux machines of either VMs or bare-metal, if deploying the setup in a hyperconverged mode (with K8s as well as OpenEBS residing on the same machines) or five Linux machines (with K8s and OpenEBS running on separate machines)
 
-* The above instruction assumes a minimal setup with a test-harness, K8s/OpenEBS master and a single K8s minion/OpenEBS node. The masters and nodes can be scaled if the user so desires
+* The above instruction assumes a minimal setup with a test-harness, K8s/OpenEBS master and a single K8s node/OpenEBS node. The masters and nodes can be scaled if the user so desires
 
-* All Linux machines are required to have :
+* All Linux machines must have the following:
 
   * Basic development packages (dpkg-dev,gcc,g++,libc6-dev,make,libssl-dev,sshpass)
   * Python2.7-minimal
@@ -111,7 +135,7 @@ Prerequisites:
   * Git
   * Ansible (version >= 2.3)
 
-* The deployment can be performed by both root as well as non-root users. In case of the latter, ensure that the users are part of the sudo group. This is required to run certain operations which require root privileges.
+* Deployment can be performed by both root as well as non-root users. In case of the latter, ensure that the users are part of the sudo group. This is required to run certain operations which require root privileges.
 
 Download
 --------
@@ -266,7 +290,7 @@ Run Sample Applications on the OpenEBS Setup
 
       ciuser@OpenEBSClient:~/openebs/e2e/ansible$ ansible-playbook run-hyperconverged-tests.yml
 
-* Verify that the pod is deployed on the Kubernetes minion along with the OpenEBS storage pods created as per the storage-class in the persistent volume claim, by executing the following command on the Kubernetes master.
+* Verify that the pod is deployed on the Kubernetes nodes along with the OpenEBS storage pods created as per the storage-class in the persistent volume claim, by executing the following command on the Kubernetes master.
   ::
 
       name@MayaMaster:~$ kubectl get pods
@@ -316,6 +340,6 @@ Tips and Gotchas
 ----------------
 * Use the -v flag while running the playbooks to enable verbose output and logging. Increase the number of 'v's to increase the verbosity.
 
-* Sometimes, the minions take time to join the Kubernetes master. This could be caused due to slow internet or less resources on the box. The time could range between a few seconds to a few minutes.
+* Sometimes, the nodes take time to join the Kubernetes master. This could be caused due to slow internet or less resources on the box. The time could range between a few seconds to a few minutes.
 
-* As with minions above, the OpenEBS volume containers (Jiva containers) may take some time to get initialized (involves a docker pull) before they are ready to input/output. Any pod deployment (which uses the openEBS iSCSI flexvol driver) while in progress, gets queued and resumes once the storage is ready.
+* With regards to the nodes above, OpenEBS volume containers (Jiva containers) may take some time to get initialized (involves a docker pull) before they are ready to input/output. Any pod deployment (which uses the openEBS iSCSI flexvol driver) while in progress, gets queued and resumes once the storage is ready.
