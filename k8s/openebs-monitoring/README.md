@@ -18,7 +18,7 @@
 
 **alertmanager.yaml:** This file is for creating deployment and alertmanager service.
 
-**alertmanager-config:** This is q configuration file for alertmanager, used to load templates and to set alerts in slack. This can be configured to set alerts at various platforms like e-mail, slack and so on.
+**alertmanager-config.yaml:** This is q configuration file for alertmanager, used to load templates and to set alerts in slack. This can be configured to set alerts at various platforms like e-mail, slack and so on.
 
 **alertmanager-templates.yaml:** This file is used to customize notifications sent to slack.
 
@@ -26,7 +26,7 @@
 
 **prometheus-config.yaml:**  This is a configuration file for prometheus, which can be used by prometheus to receive the targets and it displays the collected metrics in the Prometheus expression browser.
 
-**prometheus-env:** This file stores all the run time arguments for Prometheus.
+**prometheus-env.yaml:** This file stores all the run time arguments for Prometheus.
 
 **grafana-operator.yaml:** This file creates deployment and starts grafana service for various monitoring and analytics processes.
 
