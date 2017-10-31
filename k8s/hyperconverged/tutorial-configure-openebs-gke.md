@@ -64,12 +64,7 @@ Go to **Google Cloud Platform** -> **Compute Engine** -> **VM instances**. The n
 
 ## Step 2 : Run OpenEBS Operator (via Google Cloud Shell)
 
-Download the latest OpenEBS Operator Files
-
-```bash
-git clone https://github.com/openebs/openebs.git
-cd openebs/k8s
-```
+Before applying the OpenEBS Operator, the admin context has be set for the cluster. Follow the steps below to setup the admin context.
 
 ### Setting kubernetes cluster admin context
 
@@ -84,36 +79,41 @@ gcloud container clusters get-credentials demo-openebs03 --zone us-central1-a
 
 #### Step 2 : Setup the admin context
 
-- Access the credentails information from : Google Cloud Platform -> Container Engine -> (cluster) -> Show Credentials. 
-- Save the "Cluster CA Certificate" to ~/.kube/admin.key
-- Create a admin config context from the config shell
+Create a admin config context from the config shell:
 
 ```bash
 gcloud container clusters list
 kubectl config set-context demo-openebs03 --cluster=gke_strong-eon-153112_us-central1-a_demo-openebs03 --user=cluster-admin
 ```
 
-The below command will prompt for username/password. Provide username as "admin" and password for the admin can be obtained from : Google Cloud Platform -> Container Engine -> (cluster) -> Show Credentials
+The below command will prompt for username/password. Provide username as "admin" and password for the admin can be obtained from : Google Cloud Platform -> Container Engine -> (cluster) -> Show Credentials:
 
 ```bash
 kubectl config use-context demo-openebs03
-kubectl apply -f openebs-operator.yaml
 kubectl config use-context gke_strong-eon-153112_us-central1-a_demo-openebs03
 ```
 
-Add OpenEBS related Storage Classes, that can then be used by developers/apps. 
+Download the latest OpenEBS Operator Files:
 
 ```bash
+git clone https://github.com/openebs/openebs.git
+cd openebs/k8s
+```
+
+Apply OpenEBS Operator and add related OpenEBS Storage Classes, that can then be used by developers/apps:
+
+```bash
+kubectl apply -f openebs-operator.yaml
 kubectl apply -f openebs-storageclasses.yaml
 ```
 
 Note: The persistent storage is carved out from the space available on the nodes (default host directory : /var/openebs). There are efforts underway to provide administrator with additional options of consuming the storage (as outlined in "openebs-config.yaml"). These are slated to work hand-in-hand with the local storage manager of the kubernetes that is due in Kubernetes 1.7/1.8.
 
-## Step 3 : Running Stateful workloads with OpenEBS Storage. 
+## Step 3 : Running Stateful workloads with OpenEBS Storage
 
 All you need to do, to use OpenEBS as persistent storage for your Stateful workloads, is to set the Storage Class in the PVC to the OpenEBS Storage Class.
 
-Get the list of storage classes using the below command. Choose the storage class that best suits your application. 
+Get the list of storage classes using the below command. Choose the storage class that best suits your application.
 
 ```bash
 kubectl get sc
