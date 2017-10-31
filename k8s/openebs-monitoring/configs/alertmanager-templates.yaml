@@ -1,0 +1,9 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: alertmanager-templates 
+data:
+  slack.tmpl: |-
+    # TODO
+    # Create templates to customize alerts
+    {{ define "slack.alert.text" }}{{ end }}

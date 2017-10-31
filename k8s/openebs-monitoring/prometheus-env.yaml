@@ -1,6 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: prometheus-env
-data:
-  storage-retention: 120h

@@ -26,11 +26,13 @@ data:
     global:
       scrape_interval: 5s
       evaluation_interval: 5s
-    
+    rule_files: 
+    # alert rules passed as argument in prometheus-deployment at given path     
+    - '/etc/prometheus-rules/alert.rules' 
     # scrape config for maya-apiserver pods
     #
-    # The relabeling allows the actual pod scrape endpoint to be configured via the
-    # following annotations:
+    # The relabeling allows the actual pod scrape endpoint to be configured via 
+    # the following annotations:
     #
     # * `prometheus.io/scrape`: Only scrape pods that have a value of `true`
     # * `prometheus.io/path`: If the metrics path is not `/metrics` override this.
