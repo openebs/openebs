@@ -2,17 +2,33 @@
 ---
 ## Problems addressed:
 
-- `openebs-provisioner` should always be available.
-- 2 `openebs-provisioner` pods should always be running in the cluster. 
-- If any node in cluster goes down in that scenario the pod should be assigned to other node in the cluster.
+- `openebs-provisioner` runs within the Kubernetes Cluster and should always be available. If any node, currently running a openebs-provisioner goes down, the pod should be assigned to another available node in the cluster.
+- One node should be running only single `openebs-provsioner` to avoid single-point-of-failure of a node. 
+
 ---
 ## Solutions for above problems: 
 
+### Replica Count
 
-- Increase the `replicas` count to 2 or >2 in `openebs-operator.yaml` for `openebs-provisioner` deployment.
+- For making `openebs-provisioner` highly available, set the `replicas` to at least 2 in `openebs-operator.yaml` for `openebs-provisioner` deployment.
+
+### Pod Anti Affinity
+Pod anti-affinity can prevent the scheduler from placing a new `openebs-provsioner` pod on the node that is already running one instance of `openebs-provisioner`. 
 
 
-Sample Deployment spec for `openebs-provisioner` looks like: 
+You can change affinity selector in the Deployment spec.
+
+
+| AFFINITY SELECTOR | 	REQUIREMENTS MET  |  REQUIREMENTS NOT MET | REQUIREMENTS LOST | 
+|---|---|--- | --- |
+|`requiredDuringSchedulingIgnoredDuringExecution`  | Runs | Fails | Keeps Running |
+|`preferredDuringSchedulingIgnoredDuringExecution` |	Runs |	Runs |	Keeps Running|
+|`requiredDuringSchedulingRequiredDuringExecution` (Not recommanded) |	Runs |	Fails | Fails|
+
+
+
+
+## Sample Deployment spec for `openebs-provisioner`
 
 ```
 apiVersion: apps/v1beta1
@@ -53,24 +69,4 @@ spec:
               fieldPath: spec.nodeName
 
 ```
-
-## Pod Anti Affinity
-Pod anti-affinity can prevent the scheduler from locating a new pod on the same node as pods with the same labels if the label selector on the new pod matches the label on the current pod. 
-
-
-You can change affinity selector in the Deployment spec.
-
-
-| AFFINITY SELECTOR | 	REQUIREMENTS MET  |  REQUIREMENTS NOT MET | REQUIREMENTS LOST | 
-|---|---|--- | --- |
-|`requiredDuringSchedulingIgnoredDuringExecution`  | Runs | Fails | Keeps Running |
-|`preferredDuringSchedulingIgnoredDuringExecution` |	Runs |	Runs |	Keeps Running|
-|`requiredDuringSchedulingRequiredDuringExecution` (Not recommanded) |	Runs |	Fails | Fails|
-
-
----
-
-### How `openebs-provisioner` will be Highly Available?
- 
-	- Kubernetes scheduler will make sure that each node has atleast one pod of `openebs-provisioner` labeled with `name:openebs-provisioner`.
 
