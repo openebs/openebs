@@ -95,7 +95,7 @@ spec:
       serviceAccountName: prometheus
       containers:
         - name: prometheus
-          image: prom/prometheus:latest
+          image: prom/prometheus:v1.7.2
           args:
             - "-config.file=/etc/prometheus/conf/prometheus.yml"
             # Metrics are stored in an emptyDir volume which
