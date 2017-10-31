@@ -3,16 +3,13 @@
 ## Problems addressed:
 
 - `openebs-provisioner` should always be available.
-- `openebs-provisioner` should always be running on the specified/labeled pods. 
+- 2 `openebs-provisioner` pods should always be running in the cluster. 
 - If any node in cluster goes down in that scenario the pod should be assigned to other node in the cluster.
 ---
 ## Solutions for above problems: 
 
 
-- Increase the `replicas` to 2 or >2 in `openebs-operator.yaml` for `openebs-provisioner` deployment. 
-
-
-- Each node should always be running the specified/labeled openebs-provisioner pods on each node provided that replica count is equal to the number of nodes.
+- Increase the `replicas` count to 2 or >2 in `openebs-operator.yaml` for `openebs-provisioner` deployment.
 
 
 Sample Deployment spec for `openebs-provisioner` looks like: 
@@ -57,7 +54,7 @@ spec:
 
 ```
 
-## Pod Anti Affinity 
+## Pod Anti Affinity
 Pod anti-affinity can prevent the scheduler from locating a new pod on the same node as pods with the same labels if the label selector on the new pod matches the label on the current pod. 
 
 
