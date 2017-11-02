@@ -104,7 +104,7 @@ html_static_path = ['_static']
 htmlhelp_basename = 'openebsdoc'
 
 html_logo = '_static/logo-medium-size.png'
-html_favicon = "_static/favicon.png"
+html_favicon = "_static/new-favicon.png"
 
 # Variables to be used by templates
 # html_context = {
