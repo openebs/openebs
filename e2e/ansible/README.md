@@ -71,7 +71,7 @@ ansible
 ## Limitations
 
 Currently, the ansible playbooks are written to work with Ubuntu hosts. Going ahead, they will be enhanced to work on 
-other linux flavours 
+other linux flavours.
 
 ### Contributions
 
