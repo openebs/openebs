@@ -269,7 +269,7 @@ Go to **Google Cloud Platform** -> **Compute Engine** -> **VM instances**. The n
 a. Check that initiator name is configured.
 ::
 
-    sudo cat /etc/iscsi/initiatorname.iscsi
+    ~$sudo cat /etc/iscsi/initiatorname.iscsi
 
     ## DO NOT EDIT OR REMOVE THIS FILE!
     ## If you remove this file, the iSCSI daemon will not start.
@@ -282,7 +282,7 @@ a. Check that initiator name is configured.
 b. Check if iSCSI service is running using the following commands.
 :: 
 
-  sudo service open-iscsi status
+  ~$sudo service open-iscsi status
   open-iscsi.service - Login to default iSCSI targets
   Loaded: loaded (/lib/systemd/system/open-iscsi.service; enabled; vendor preset: enabled)
   Active: active (exited) since Tue 2017-10-24 14:33:57 UTC; 3min 6s ago
@@ -341,7 +341,7 @@ Apply OpenEBS Operator and add related OpenEBS Storage Classes, that can then be
 
 **Note:**
 
-Persistent storage is created from the space available on the nodes (default host directory : */var/openebs*). Development is in progress to provide administrator with additional options of consuming the storage (as outlined in *openebs-config.yaml*). These are scheduled to work hand-in-hand with the local storage manager of Kubernetes that is due in Kubernetes 1.7/1.8.
+Persistent storage is created from the space available on the nodes (default host directory : */var/openebs*). Administrator is provided with additional options of consuming the storage (as outlined in *openebs-config.yaml*). These options will work hand-in-hand with the Kubernetes local storage manager once OpenEBS integrates them in future releases.
 
 3. Running Stateful Workloads with OpenEBS Storage
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -361,8 +361,10 @@ The *kubectl apply -f demo/jupyter/demo-jupyter-openebs.yaml* command creates th
 
 * Launch a Jupyter Server, with the specified notebook file from github (kubectl get deployments)
 * Create an OpenEBS Volume and mounts to the Jupyter Server Pod (/mnt/data) (kubectl get pvc) (kubectl get pv) (kubectl get pods)
+* Expose the Jupyter Server to external world through the URL http://NodeIP:32424 (NodeIP is any of the nodes external IP) (kubectl get pods)
 
 **Note:** To access the Jupyter Server over the internet, set the firewall rules to allow traffic on port 32424 in your GCP / Networking / Firewalls.
+
 
 
 
