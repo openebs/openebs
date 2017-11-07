@@ -1,0 +1,14 @@
+---
+test_name: ha_pod_reschedule
+
+percona_mysql_plugin_link: https://raw.githubusercontent.com/openebs/openebs/master/k8s/demo/percona/demo-percona-mysql-pvc.yaml
+
+pod_yaml_alias: demo-percona-mysql-pvc.yaml
+
+deb_packages:
+  - mysql-client
+
+
+
+
+
