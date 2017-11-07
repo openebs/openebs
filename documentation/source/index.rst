@@ -24,10 +24,15 @@ Contents:
   
     
 .. toctree::
-    :maxdepth: 1
+    :maxdepth: 2
     :caption: Usecases
     
-    Percona DB <install/install_usecases> 
+    Running OpenEBS Operator <Usecases/run_openebs_operator>
+    Crunchy Postgres <Usecases/crunchy_postgres>
+    Jupyter <Usecases/jupyter>
+    MongoDB <Usecases/mongodb>
+    Percona DB <Usecases/percona_db> 
+    
     
 .. toctree::
     :maxdepth: 1
