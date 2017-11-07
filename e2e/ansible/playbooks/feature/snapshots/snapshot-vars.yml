@@ -1,0 +1,13 @@
+---
+test_name: snap_create_revert 
+
+volume_def: test-pvc.yaml
+
+mount_point: /mnt/jiva
+
+# In Gigabytes
+test_data_size: 1
+
+checksum: sha1
+
+snap_name: quicksnap
