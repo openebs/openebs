@@ -242,7 +242,7 @@ Setting up OpenEBS with Kubernetes on Google Container Engine
 This section, provides detailed instructions on how to setup and use OpenEBS in Google Container Engine (GKE). This section uses a three node container cluster.
 
 1. Preparing your Container Cluster
-
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 You can either use an existing container cluster or create a new one. 
 To create a new cluster, go to **Google Cloud Platform** -> **Container Engine** -> **Create Container Cluster**. 
 
@@ -257,33 +257,75 @@ Minimum requirements for container cluster are as follows:
 
 The example commands below were run on a container cluster *demo-openebs03* in zone *us-central1-a* with project unique ID *strong-eon-153112*. When you copy paste the command, ensure that you use the details from your project.
 
-You can either use an existing container cluster or create a new one. To create a new cluster, go to **Google Cloud Platform** -> **Container Engine** -> **Create Container Cluster** for example, *demo-openebs03*. 
+iSCSI Configuration
+^^^^^^^^^^^^^^^^^^^^^
 
-Add iSCSI Support
-------------------
-
-Go to **Google Cloud Platform** -> **Compute Engine** -> **VM instances** to install open-iscsi package. OpenEBS uses iSCSI to connect to the block volumes. The nodes displayed are Compute Engine VMs, and you can see them in the console. The display is similar to the following screen.
+Go to **Google Cloud Platform** -> **Compute Engine** -> **VM instances**. The nodes displayed by default in this console are Compute Engine VMs, and you can see them in the console. The display is similar to the following screen.
  
  .. image:: ../_static/compute_engine_vms.png
 
+**Verify that iSCSI is configured**
 
-Select one of the SSH nodes displayed in the cluster, click **SSH**, and run the following commands.
+a. Check that initiator name is configured.
 ::
 
-    sudo apt-get update
-    sudo apt-get install open-iscsi
-    sudo service open-iscsi restart
+    ~$sudo cat /etc/iscsi/initiatorname.iscsi
 
-Verify that iSCSI is configured
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ## DO NOT EDIT OR REMOVE THIS FILE!
+    ## If you remove this file, the iSCSI daemon will not start.
+    ## If you change the InitiatorName, existing access control lists
+    ## may reject this initiator.  The InitiatorName must be unique
+    ## for each iSCSI initiator.  Do NOT duplicate iSCSI InitiatorNames.
+    InitiatorName=iqn.1993-08.org.debian:01:6277ea61267f
+    
 
-1. Check that initiator name is configured and iSCSI service is running using the following commands.
+b. Check if iSCSI service is running using the following commands.
+:: 
+
+  ~$sudo service open-iscsi status
+  open-iscsi.service - Login to default iSCSI targets
+  Loaded: loaded (/lib/systemd/system/open-iscsi.service; enabled; vendor preset: enabled)
+  Active: active (exited) since Tue 2017-10-24 14:33:57 UTC; 3min 6s ago
+    Docs: man:iscsiadm(8)
+          man:iscsid(8)
+  Main PID: 1644 (code=exited, status=0/SUCCESS)
+           Tasks: 0
+          Memory: 0B
+             CPU: 0
+          CGroup: /system.slice/open-iscsi.service
+  Oct 24 14:33:57 gke-cluster-3-default-pool-8b0f2a27-5nr2 systemd[1]: Starting Login to default iSCSI targets...
+  Oct 24 14:33:57 gke-cluster-3-default-pool-8b0f2a27-5nr2 iscsiadm[1640]: iscsiadm: No records found
+  Oct 24 14:33:57 gke-cluster-3-default-pool-8b0f2a27-5nr2 systemd[1]: Started Login to default iSCSI targets.
+
+c. Repeat steps a and b for the remaining nodes.
+
+2. Run OpenEBS Operator (using Google Cloud Shell)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Before applying OpenEBS Operator, ensure that the administrator context for the cluster is set. The following procedure helps you setup the administrator context.
+
+**Setting up Kubernetes Cluster with Administrator Privileges**
+
+To create or modify service accounts and grant previleges, kubectl must be run with administrator previleges. The following commands help you set up and use the administrator context for Google Container Engine using the Google Cloud Shell.
+
+a. Initialize credentials to allow kubectl to execute commands on the container cluster.
 ::
 
-    sudo cat /etc/iscsi/initiatorname.iscsi
-    sudo service open-iscsi status
+    gcloud container clusters list
+    gcloud container clusters get-credentials demo-openebs03 --zone us-central1-a
 
-2. Run OpenEBS Operator by clicking **Google Cloud Shell** on the top right corner.
+b. Setup the administrator context.
+
+Create an administrator configuration context from the configuration shell using the following commands.
+::
+
+    gcloud container clusters list
+    kubectl config set-context demo-openebs03 --cluster=gke_strong-eon-153112_us-central1-a_demo-openebs03 --user=cluster-admin
+
+The following commands will prompt you for a username and password. Provide username as *admin*. Password for the admin can be obtained from **Google Cloud Platform** -> **Container Engine** -> **(cluster)** -> **Show Credentials**
+::
+
+    kubectl config use-context demo-openebs03
+    kubectl config use-context gke_strong-eon-153112_us-central1-a_demo-openebs03    
 
 Download the latest OpenEBS Operator files using the following commands.
 ::
@@ -291,42 +333,18 @@ Download the latest OpenEBS Operator files using the following commands.
     git clone https://github.com/openebs/openebs.git
     cd openebs/k8s
 
-To create or modify service accounts and grant privileges, kubectl must be run with Administration privileges. The following procedure helps you setup and use the administration context for Google Container Engine through the Google Cloud Shell.
-
-1. Initialize credentials to allow kubectl to execute commands on the container cluster.
+Apply OpenEBS Operator and add related OpenEBS Storage Classes, that can then be used by developers and applications using the following command.
 ::
 
-    gcloud container clusters list
-    gcloud container clusters get-credentials demo-openebs03 --zone us-central1-a
-
-2. Setup the administration context.
-
-* Access the credentails from **Google Cloud Platform** -> **Container Engine** -> **(cluster)** -> **Show Credentials**.
-* Save the *Cluster CA Certificate* to *~/.kube/admin.key*.
-* Create a administration configuration context from the configuration shell using the following commands.
-
-::
-
-    gcloud container clusters list
-    kubectl config set-context demo-openebs03 --cluster=gke_strong-eon-153112_us-central1-a_demo-openebs03 --user=cluster-a
-
-The following commands will prompt you for a username and password. Provide username as *admin*. Password for the admin can be obtained from **Google Cloud Platform** -> **Container Engine** -> **(cluster)** -> **Show Credentials**
-::
-
-    kubectl config use-context demo-openebs03
     kubectl apply -f openebs-operator.yaml
-    kubectl config use-context gke_strong-eon-153112_us-central1-a_demo-openebs03
-
-Add OpenEBS related storage classes, that can then be used by developers and applications using the following command.
-::
-
     kubectl apply -f openebs-storageclasses.yaml
 
 **Note:**
 
-The persistent storage is carved out from the space available on the nodes (default host directory : */var/openebs*). Development is in progress to provide administrator with additional options of consuming the storage (as outlined in *openebs-config.yaml*). These are slated to work hand-in-hand with the local storage manager of Kubernetes that is due in Kubernetes 1.7/1.8.
+Persistent storage is created from the space available on the nodes (default host directory : */var/openebs*). Administrator is provided with additional options of consuming the storage (as outlined in *openebs-config.yaml*). These options will work hand-in-hand with the Kubernetes local storage manager once OpenEBS integrates them in future releases.
 
 3. Running Stateful Workloads with OpenEBS Storage
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 To use OpenEBS as persistent storage for your stateful workloads, set the storage class in the Persistent Volume Claim (PVC) to the OpenEBS storage class.
 
@@ -343,6 +361,10 @@ The *kubectl apply -f demo/jupyter/demo-jupyter-openebs.yaml* command creates th
 
 * Launch a Jupyter Server, with the specified notebook file from github (kubectl get deployments)
 * Create an OpenEBS Volume and mounts to the Jupyter Server Pod (/mnt/data) (kubectl get pvc) (kubectl get pv) (kubectl get pods)
-* Expose the Jupyter Server to external world via the http://NodeIP:32424 (NodeIP is any of the nodes external IP) (kubectl get pods)
+* Expose the Jupyter Server to external world through the URL http://NodeIP:32424 (NodeIP is any of the nodes external IP) (kubectl get pods)
 
 **Note:** To access the Jupyter Server over the internet, set the firewall rules to allow traffic on port 32424 in your GCP / Networking / Firewalls.
+
+
+
+

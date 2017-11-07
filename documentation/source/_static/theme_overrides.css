@@ -1,4 +1,6 @@
 /* override logo styling */
+
+
 /*.logo {
   display: block;
   width: 150px !important;
@@ -9,5 +11,13 @@
 }*/
 
 .wy-side-nav-search {
-  background-color: #ee5a2b;
+    background-color: #ee5a2b;
+}
+
+.wy-nav-top {
+    background-color: #ee5a2b;
+}
+
+.wy-nav-content {
+    text-align: justify;
 }
