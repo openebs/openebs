@@ -321,23 +321,21 @@ Create an administrator configuration context from the configuration shell using
     gcloud container clusters list
     kubectl config set-context demo-openebs03 --cluster=gke_strong-eon-153112_us-central1-a_demo-openebs03 --user=cluster-admin
 
-The following commands will prompt you for a username and password. Provide username as *admin*. Password for the admin can be obtained from **Google Cloud Platform** -> **Container Engine** -> **(cluster)** -> **Show Credentials**
-::
-
-    kubectl config use-context demo-openebs03
-    kubectl config use-context gke_strong-eon-153112_us-central1-a_demo-openebs03    
-
-Download the latest OpenEBS Operator files using the following commands.
+Download the latest OpenEBS files using the following commands.
 ::
 
     git clone https://github.com/openebs/openebs.git
     cd openebs/k8s
 
-Apply OpenEBS Operator and add related OpenEBS Storage Classes, that can then be used by developers and applications using the following command.
+The following commands will prompt you for a username and password. Provide username as *admin*. Password for the admin can be obtained from **Google Cloud Platform** -> **Container Engine** -> **(cluster)** -> **Show Credentials**
+
+Apply OpenEBS Operator and add related OpenEBS Storage Classes, that can be used by developers and applications using the following commands.
 ::
 
+    kubectl config use-context demo-openebs03
     kubectl apply -f openebs-operator.yaml
     kubectl apply -f openebs-storageclasses.yaml
+    kubectl config use-context gke_strong-eon-153112_us-central1-a_demo-openebs03    
 
 **Note:**
 
