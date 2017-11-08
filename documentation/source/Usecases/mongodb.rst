@@ -41,7 +41,7 @@ OpenEBS recommends using a 3-node cluster, with one master and two nodes, as thi
     sudo cat /etc/iscsi/initiatorname.iscsi
     sudo service open-iscsi status
 
-* Install the following dependent packages to run mongodb-integrated sysbench input/output tool on any one of the Kubernetes nodes.
+* Install the following dependent packages to run mongodb-integrated Sysbench input/output tool on any one of the Kubernetes nodes.
   ::
 
     sudo apt-get install <packagename>:
@@ -51,6 +51,9 @@ OpenEBS recommends using a 3-node cluster, with one master and two nodes, as thi
     libssl-dev
     libmongoc-dev
     libbson-dev
+    automake
+    libmysqlclient-dev
+    libtool
 
 1. Run OpenEBS Operator
 -------------------------
@@ -103,7 +106,7 @@ Check whether the storage classes are applied successfully.
 
 Use OpenEBS as persistent storage for the MongoDB statefulset by selecting an OpenEBS storage class in the persistent volume claim. A sample MongoDB statefulset yaml (with container attributes and pvc details) is available in the OpenEBS git repository.
 
-The number of replicas in the statefulset can be modified as required. The following example uses two replicas. The replica count can be edited in the statefulset specification.
+The number of replicas in the statefulset can be modified as required. The following example uses three replicas. The replica count can be edited in the statefulset specification.
 ::
   
   ---
@@ -113,7 +116,7 @@ The number of replicas in the statefulset can be modified as required. The follo
    name: mongo
   spec:
    serviceName: "mongo"
-   replicas: 2
+   replicas: 3
    template:
      metadata:
        labels:
@@ -170,7 +173,7 @@ Installing Sysbench
 ^^^^^^^^^^^^^^^^^^^^
 The following procedure helps you install Sysbench.
 
-* Download the appropriate branch of Percona-Lab's sysbench fork with support for MongoDB integration on Kubernetes nodes. The sysbench dependencies are installed in these Kubernetes nodes. (see, `Prerequisites`_)
+* Download the appropriate branch of Percona-Lab's Sysbench fork with support for MongoDB integration on Kubernetes nodes. The Sysbench dependencies are installed in these Kubernetes nodes. (see, `Prerequisites`_)
 ::
    
     git clone -b dev-mongodb-support-1.0 https://github.com/Percona-Lab/sysbench.git
@@ -264,10 +267,13 @@ Take an interactive bash session into the maya-apiserver pod container.
 Obtain the list of OpenEBS persistent volumes created by the MongoDB statefulset application YAML.
 ::
 
+    ```
     root@maya-apiserver-1089964587-x5q15:/# maya volume list
     Name                                      Status
     pvc-0d39583c-bad7-11e7-869d-000c298ff5fc  Running
     pvc-21da76b6-bad7-11e7-869d-000c298ff5fc  Running
+     :
+     ```
 
 View usage and input/output metrics for the required volume through the stats command.
 ::
@@ -402,11 +408,11 @@ Verify MongoDB Replication
     "ok" : 1
   }
   
-* You could further confirm the presence of the database with the same size on secondary instances (for exmaple, mongo-1).
+* You could further confirm the presence of the database with the same size on secondary instances (for example, mongo-1).
 
 **Note:**
 
-By default, the databases cannot be viewed on the secondary instance through the *show dbs* command, unless we set the slave context.
+By default, the databases cannot be viewed on the secondary instance through the show dbs command, unless we set the slave context.
 ::
 
   rs0:SECONDARY> rs.slaveOk()
