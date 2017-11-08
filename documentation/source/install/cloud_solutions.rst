@@ -296,7 +296,6 @@ b. Check if iSCSI service is running using the following commands.
   Oct 24 14:33:57 gke-cluster-3-default-pool-8b0f2a27-5nr2 systemd[1]: Starting Login to default iSCSI targets...
   Oct 24 14:33:57 gke-cluster-3-default-pool-8b0f2a27-5nr2 iscsiadm[1640]: iscsiadm: No records found
   Oct 24 14:33:57 gke-cluster-3-default-pool-8b0f2a27-5nr2 systemd[1]: Started Login to default iSCSI targets.
-
 c. Repeat steps a and b for the remaining nodes.
 
 2. Run OpenEBS Operator (using Google Cloud Shell)
