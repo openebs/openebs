@@ -258,7 +258,7 @@ The benchmark output displayed is similar to the following:
 
 While the benchmark is in progress, performance and capacity usage statistics on the OpenEBS storage volume can be viewed using the mayactl commands that must be executed on the maya-apiserver pod.
 
-Take an interactive bash session into the maya-apiserver pod container.
+Run an interactive bash session for the maya-apiserver pod container.
 ::
   
     test@Master:~$ kubectl exec -it maya-apiserver-1089964587-x5q15 /bin/bash
