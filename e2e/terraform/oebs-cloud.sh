@@ -11,6 +11,7 @@ run_cluster_func=false
 run_ssh_func=false
 openebs_pod_status=
 public_ip_addr=
+terraform_url=
 
 function show_help() {
     cat << EOF
@@ -80,7 +81,7 @@ function setup_local_env() {
     echo "Installing Prerequisites..."
 
     sudo apt-get update
-    sudo apt-get install -y unzip curl wget
+    sudo apt-get install -y unzip curl wget jq
 
     IS_AWS_CLI_INSTALLED=$(which aws >> /dev/null 2>&1; echo $?)
     if [ $IS_AWS_CLI_INSTALLED -eq 0 ]; then
@@ -99,8 +100,9 @@ function setup_local_env() {
         sleep 2
     else 
         echo "Missing terraform; Downloading and installing..."
-        wget "https://releases.hashicorp.com/terraform/0.10.0/terraform_0.10.0_linux_amd64.zip"
-        unzip terraform_0.10.0_linux_amd64.zip
+        terraform_url=$(curl https://releases.hashicorp.com/index.json | jq '{terraform}' | egrep "linux.*amd64" | sort --version-sort -r | egrep -v 'beta|rc' | head -1 | awk -F[\"] '{print $4}')
+        curl -o terraform.zip $terraform_url
+        unzip terraform.zip
         chmod +x terraform
         sudo mv terraform /usr/local/bin/terraform
     fi
