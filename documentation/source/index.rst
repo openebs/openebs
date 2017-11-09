@@ -33,6 +33,7 @@ Contents:
     Jupyter <Usecases/jupyter>
     MongoDB <Usecases/mongodb>
     Percona DB <Usecases/percona_db> 
+    Percona Galera Cluster <Usecases/percona_galera_cluster>
     
     
 .. toctree::
