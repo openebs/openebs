@@ -100,7 +100,7 @@ function setup_local_env() {
         sleep 2
     else 
         echo "Missing terraform; Downloading and installing..."
-        terraform_url=$(curl https://releases.hashicorp.com/index.json | jq '{terraform}' | egrep "linux.*amd64" | sort --version-sort -r | egrep -v 'beta|rc' | head -1 | awk -F[\"] '{print $4}')
+        terraform_url=$(curl https://releases.hashicorp.com/index.json | jq '{terraform}' | grep -E "linux.*amd64" | sort --version-sort -r | grep -E -v 'beta|rc' | head -1 | awk -F[\"] '{print $4}')
         curl -o terraform.zip $terraform_url
         unzip terraform.zip
         chmod +x terraform
