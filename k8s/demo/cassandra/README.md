@@ -139,7 +139,7 @@ A status of "UN" implies Up and Normal. The "Owns" column suggests the data dist
 content placed into the Cassandra keyspaces.In the current example,we have chosen a replica count of 2 due to 
 which the data is evenly distributed/copies maintained.
 
-### Step-3: Create a test keyspace with test tables 
+### Step-3: Create a test keyspace with tables 
 
 - Identify the IP of any of the Cassandra replicas, for example Cassandra-0. This is available from the 
 output of the nodetool status command executed in the previous step.
@@ -188,6 +188,8 @@ output of the nodetool status command executed in the previous step.
   ```
   test@Master:$ kubectl exec cassandra-0 -- nodetool flush hardware
   ```
+
+### Step-4: Delete the test keyspace
 
 - Verify the masterless nature of Cassandra statefulset by deleting the keyspace from another replica, 
 Cassandra-1 in this example.
