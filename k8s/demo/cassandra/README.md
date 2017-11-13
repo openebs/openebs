@@ -1,6 +1,6 @@
 # Running Cassandra with OpenEBS
 
-This tutorial provides detailed instructions to run a Cassandra statefulset with OpenEBS storage and perform 
+This tutorial provides detailed instructions to run a Cassandra Statefulset with OpenEBS storage and perform 
 some simple database operations to verify successful deployment.
 
 ## Cassandra 
@@ -25,7 +25,7 @@ openebs-provisioner-4230626287-503dv                             1/1       Runni
 
 The statefulset specification YAMLs are available at OpenEBS/k8s/demo/cassandra. 
 
-The number of replicas in the statefulset can be modified as required. This example makes use of 2 replicas.
+The number of replicas in the Statefulset can be modified as required. This example uses 2 replicas.
 
 ```
 apiVersion: apps/v1beta1
@@ -69,7 +69,7 @@ statefulset "cassandra" created
 ```
 
 Verify that all the OpenEBS persistent volumes are created, the Cassandra headless service and replicas 
-are up and running:
+are running:
 
 ```
 test@Master:~/openebs/k8s/demo/cassandra$ kubectl get pods
@@ -93,25 +93,23 @@ cassandra                                           None             <none>     
 kubernetes                                          10.96.0.1        <none>        443/TCP             14d
 maya-apiserver-service                              10.102.92.217    <none>        5656/TCP            14d
 pvc-1c16536c-c6bc-11e7-a0eb-000c298ff5fc-ctrl-svc   10.107.177.156   <none>        3260/TCP,9501/TCP   4h
-pvc-d1fee1af-bf73-11e7-9be8-000c298ff5fc-ctrl-svc   10.98.87.196     <none>        3260/TCP,9501/TCP   9d
-pvc-dfe98642-bf73-11e7-9be8-000c298ff5fc-ctrl-svc   10.101.17.255    <none>        3260/TCP,9501/TCP   9d
 pvc-e7d18817-c6bb-11e7-a0eb-000c298ff5fc-ctrl-svc   10.108.47.234    <none>        3260/TCP,9501/TCP   4h
 ```
 
-Note: It may take some time for pods to start as the images need to be pulled and instantiated. This is also
+Note: It may take some time for the pods to start as the images must be pulled and instantiated. This is also
 dependent on the network speed.
 
-## Verify successful Cassandra deployment
+## Verify successful Cassandra Deployment
 
 The verification procedure can be carried out in a series of steps, starting from listing the functional 
-replicas, followed by creation and deletion of test data in the cassandra database.
+replicas to by creating and deleting test data in the Cassandra database.
 
-### Step-1: Install the Cqlsh utility
+### Step-1: Install the Cqlsh Utility
 
-Cqlsh is a Python based utility that enables you to execute CQL. The CQL (Cassandra Query Language) is a 
-declarative language that enables users to query Cassandra using a semantics similar to SQL. 
+Cqlsh is a Python based utility that enables you to execute Cassandra Query Language (CQL). CQL is a 
+declarative language that enables users to query Cassandra using semantics similar to SQL. 
 
-Install the python-minimal and python-pip apt packages (if not available) and perform a pip installtion of 
+Install the python-minimal and python-pip apt packages (if not available) and perform a pip install of 
 Csqlsh.
 
 ```
@@ -119,10 +117,10 @@ sudo apt-get install -y python-minimal python-pip
 pip install cqlsh
 ```
 
-Note: Installation of Csqlsh may take a few minutes (typically, the cassandra-driver package takes time to 
-be downloaded and setup). 
+Note: Installing Csqlsh may take a few minutes (typically, the cassandra-driver package takes time to download 
+and setup). 
 
-### Step-2: Verify replica status on Cassandra
+### Step-2: Verify Replica Status on Cassandra
 
 ```
 test@Master:~$ kubectl exec cassandra-0 -- nodetool status
@@ -136,12 +134,12 @@ UN  10.44.0.3  83.1 KiB    32           100.0%           1d2e3b79-4b0b-4bf9-b435
 ```
 
 A status of "UN" implies Up and Normal. The "Owns" column suggests the data distribution percentage for the
-content placed into the Cassandra keyspaces.In the current example,we have chosen a replica count of 2 due to 
-which the data is evenly distributed/copies maintained.
+content placed into the Cassandra keyspaces. In the current example, we have chosen a replica count of 2 due to 
+which the data is evenly distributed and copies maintained.
 
-### Step-3: Create a test keyspace with tables 
+### Step-3: Create a Test Keyspace with Tables 
 
-- Identify the IP of any of the Cassandra replicas, for example Cassandra-0. This is available from the 
+- Identify the IP address of any of the Cassandra replicas, for example, Cassandra-0. This is available from the 
 output of the nodetool status command executed in the previous step.
 
 - Login to the CQL shell using the Cqlsh utility.
@@ -191,8 +189,8 @@ output of the nodetool status command executed in the previous step.
 
 ### Step-4: Delete the test keyspace
 
-- Verify the masterless nature of Cassandra statefulset by deleting the keyspace from another replica, 
-Cassandra-1 in this example.
+- Verify the masterless nature of Cassandra Statefulset by deleting the keyspace from another replica, 
+in this example, Cassandra-1.
 
   ```
   test@Master:~$ cqlsh 10.36.0.6 9042 --cqlversion="3.4.2"
