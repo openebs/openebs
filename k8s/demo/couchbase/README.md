@@ -1,15 +1,15 @@
 # Couchbase
 
-This document demonstrates the deployment of Counchbase as a StatefulSet in a Kubernetes Cluster. The user can spawn a Couchbase StatefulSet that will use OpenEBS as its persistent storage.
+This document demonstrates the deployment of Couchbase as a StatefulSet in a Kubernetes cluster. The user can spawn a Couchbase StatefulSet that will use OpenEBS as its persistent storage.
 
 ## Deploy as a StatefulSet
 
 Deploying Couchbase as a StatefulSet provides the following benefits:
 
-- Stable, unique network identifiers.
+- Stable unique network identifiers.
 - Stable persistent storage.
-- Ordered, graceful deployment and scaling.
-- Ordered, graceful deletion and termination.
+- Ordered graceful deployment and scaling.
+- Ordered graceful deletion and termination.
 
 ## Deploy Couchbase with Persistent Storage
 
@@ -24,7 +24,7 @@ kubeminion-02   Ready     3d        v1.8.2
 
 ```
 
-Download and apply the Couchbase YAML from OpenEBS repo:
+Download and apply the Couchbase YAML from OpenEBS repository:
 
 ```bash
 ubuntu@kubemaster:~wget https://raw.githubusercontent.com/openebs/openebs/master/k8s/demo/couchbase/couchbase-statefulset.yml
@@ -95,11 +95,11 @@ maya-apiserver-service                              ClusterIP   10.111.26.252   
 
 ```
 
-## Launch Couchbase Server
+## Launch Couchbase as Server
 
-The Couchbase service YAML, creates a service of type NodePort to make the Couchbase Server available outside the cluster.
+The Couchbase service YAML, creates a NodePort service type for making the Couchbase server available outside the cluster.
 
-Get the IP Address of the node running the Couchbase Server:
+Get the node's IP Address which is running the Couchbase server:
 
 ```bash
 ubuntu@kubemaster:~kubectl describe pod couchbase-0 | grep Node:
@@ -114,7 +114,7 @@ NodePort:		couchbase  30438/TCP
 
 ```
 
-Open the below URL in the browser:
+Open the following URL in the browser:
 
 ```bash
 https://20.10.29.203:30438
@@ -131,11 +131,11 @@ The default Username is Administrator and Password is password. Enter the creden
 
 ![Couchbase Cluster]
 
-__Click on Server Nodes to see how many Couchbase nodes are part of the cluster. As expected, it shows only one node__
+__Click Server Nodes to see how many Couchbase nodes are part of the cluster. As expected, it shows only one node__
 
 ![Couchbase Server]
 
-__Click on Data Buckets to see a sample bucket that was created as part of the image__
+__Click Data Buckets to see a sample bucket that was created as part of the image__
 
 ![Couchbase Databuckets]
 
