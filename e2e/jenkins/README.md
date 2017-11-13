@@ -97,8 +97,12 @@ Jenkins application for Slack must be installed and configured.
 ### How-to - Fill the SCM Category
 
 - Select _Git_ as the repository.
-- Provide Repository URL
+- Provide Repository URL.
 - Set the Refspec for the repository.
+- For _Additional Behaviors_ add _Polling ignores commits in certain paths_.
+- In the _Excluded Regions_ sections add the files extensions.
+  - /*\.md
+  - /*\.rst
 - Click _Apply_. (Do this periodically to save your changes before the session times out)
 
 ### How-to - Fill the Build Triggers Category
