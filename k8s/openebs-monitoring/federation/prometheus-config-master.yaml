@@ -25,7 +25,7 @@ data:
   prometheus.yml: |-
     global:
       external_labels:
-        slave: slave1
+        master: global
       scrape_interval: 5s
       evaluation_interval: 5s
     rule_files:
@@ -41,12 +41,33 @@ data:
     # * `prometheus.io/port`: Scrape the pod on the indicated port instead of the
     # pod's declared ports (default is a port-free target if none are declared).
     scrape_configs:
+    - job_name: 'master-federation'
+      honor_labels: true
+      metrics_path: /federate
+      params:
+        match[]:
+          # specify the jobs to scrap from the follower(slave) prometheus.
+          - '{job="prometheus"}'
+          - '{job="kubelets"}'
+          - '{job="kubernetes_apiservers"}'
+          - '{job="kubernetes_cadvisor"}'
+          - '{job="kubernetes_node_exporter"}'
+          - '{job="maya-agent"}'
+          - '{job="maya-apiserver"}'
+          - '{job="openebs-jiva-controller"}'
+          - '{job="openebs-jiva-replica"}'
+          - '{__name__=~"^slave:.*"}'
+      static_configs:
+        # replace the ip given below with the prometheus slave's IP and you can add
+        # others slave's IP also.
+        - targets:
+          - 100.100.100.100
     - job_name: 'prometheus'
       static_configs:
       # Please change this IP to the IP of your node (VM)
       # Because prometheus-service is running as Type NodePort
       # So it's accessible outside the cluster.
-        - targets: ['localhost:9090']
+      - targets: ['localhost:9090']
     - job_name: 'maya-apiserver'
       scheme: http
       tls_config:
