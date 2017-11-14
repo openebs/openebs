@@ -33,27 +33,29 @@
 # Notes on Implementation
 # =============================
 # The configuration is specified as Custom Resources called 
-# - StorageBackendAdaptors and StorageBackends
-# - RawStorageAdaptors and RawStorages
+# - StoragePoolClaims and StoragePools
+# - StorageBackendClaims and StorageBackends
 #
-# RawStorageAdaptor : Provide information about types of 
-#  raw storage to be consumed by openebs like - local directory, 
-#  amazon ebs, google gpd, etc.,
+# StoragePoolClaim (SPC) : Provide information about how to 
+#  create a storage pool by consuming local or remote disks. 
+#  SPC will contain details like, the block devices or host 
+#  directory to use for creating a StoragePool. An SPC can 
+#  result on one or more StoragePools to be created on the 
+#  same node or across nodes. 
 #
-# RawStorage : Is a single block of storage - like a directory, 
-#  local disk, ebs disk, gpd disk, etc., 
+# StoragePool : Is an instance of storage pool - like 
+#  - a directory on host-os, 
+#  - a directory on mounted-disk, 
 #
-# StorageBackendAdaptor : Provides information about types of storage
-#  pools that can be created using the raw storage and provided as 
+# StorageBackendClaim : Provides information about types of storage
+#  pools that can be created using the storage pool and provided as 
 #  persistent storage backends to openebs volumes. The storage pool types
-#  can be as simple as a directory, whole-disk, partition or can be
-#  based on lvm, ext4 etc.,  
+#  can be as simple as a directory, whole-disk, partition, etc., 
 #
-# StorageBackend : Is a single volume mount provided to the openebs
-#  volume containers. A backend can be 
-#  - sub/full directory created from RawStorage(directory), 
-#  - partition/full disk from a RawStorage(disk) 
-#  - lvm created using multiple RawStorage(disk)s.
+# StorageBackend : Is an instance of SBC or it is the volume mount 
+# provided to the openebs volume containers. A backend can be 
+#  - sub/full directory created from StoragePool(directory), 
+#  - partition/full disk from a StoragePool(disk) 
 #
 # Custom Resource Definitions
 # =============================
@@ -61,7 +63,7 @@ apiVersion: apiextensions.k8s.io/v1beta1
 kind: CustomResourceDefinition
 metadata:
   # name must match the spec fields below, and be in the form: <plural>.<group>
-  name: rawstorageadaptors.openebs.io
+  name: storagepoolclaims.openebs.io
 spec:
   # group name to use for REST API: /apis/<group>/<version>
   group: openebs.io
@@ -71,20 +73,20 @@ spec:
   scope: Cluster
   names:
     # plural name to be used in the URL: /apis/<group>/<version>/<plural>
-    plural: rawstorageadaptors
+    plural: storagepoolclaims
     # singular name to be used as an alias on the CLI and for display
-    singular: rawstorageadaptor
+    singular: storagepoolclaim
     # kind is normally the CamelCased singular type. Your resource manifests use this.
-    kind: RawStorageAdaptor
+    kind: StoragePoolClaim
     # shortNames allow shorter string to match your resource on the CLI
     shortNames:
-    - rsa
+    - spc
 ---
 apiVersion: apiextensions.k8s.io/v1beta1
 kind: CustomResourceDefinition
 metadata:
   # name must match the spec fields below, and be in the form: <plural>.<group>
-  name: rawstorages.openebs.io
+  name: storagepools.openebs.io
 spec:
   # group name to use for REST API: /apis/<group>/<version>
   group: openebs.io
@@ -94,20 +96,20 @@ spec:
   scope: Cluster
   names:
     # plural name to be used in the URL: /apis/<group>/<version>/<plural>
-    plural: rawstorages
+    plural: storagepools
     # singular name to be used as an alias on the CLI and for display
-    singular: rawstorage
+    singular: storagepool
     # kind is normally the CamelCased singular type. Your resource manifests use this.
-    kind: RawStorage
+    kind: StoragePool
     # shortNames allow shorter string to match your resource on the CLI
     shortNames:
-    - rs
+    - sp
 ---
 apiVersion: apiextensions.k8s.io/v1beta1
 kind: CustomResourceDefinition
 metadata:
   # name must match the spec fields below, and be in the form: <plural>.<group>
-  name: storagebackendadaptors.openebs.io
+  name: storagebackendclaims.openebs.io
 spec:
   # group name to use for REST API: /apis/<group>/<version>
   group: openebs.io
@@ -117,14 +119,14 @@ spec:
   scope: Cluster
   names:
     # plural name to be used in the URL: /apis/<group>/<version>/<plural>
-    plural: storagebackendadaptors
+    plural: storagebackendclaims
     # singular name to be used as an alias on the CLI and for display
-    singular: storagebackendadaptor
+    singular: storagebackendclaim
     # kind is normally the CamelCased singular type. Your resource manifests use this.
-    kind: StorageBackendAdaptor
+    kind: StorageBackendClaim
     # shortNames allow shorter string to match your resource on the CLI
     shortNames:
-    - sba
+    - sbc
 ---
 apiVersion: apiextensions.k8s.io/v1beta1
 kind: CustomResourceDefinition
@@ -153,9 +155,9 @@ spec:
 #  local directory or mounted directory from the minion nodes
 #  
 apiVersion: openebs.io/v1alpha1
-kind: StorageBackendAdaptor
+kind: StoragePool
 metadata:
-  name: sba-hostdir
+  name: sp-hostdir
   type: hostdir
 spec:
   path: "/var/openebs" 
