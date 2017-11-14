@@ -5,7 +5,7 @@ Running Percona Pod on OpenEBS
 ---------------------------------
 This section provides detailed instructions on how to run a *percona-mysql* application pod on OpenEBS storage in a Kubernetes cluster and uses a *mysql-client* container to generate load (in the form of insert and select DB queries) in order to illustrate input/output traffic on the storage.
     
-Run percona-mysql Pod with OpenEBS Storage
+Running percona-mysql Pod with OpenEBS Storage
 --------------------------------------------
 Use OpenEBS as persistent storage for the percona pod by selecting an OpenEBS storage class in the persistent volume claim. A sample percona pod yaml (with container attributes and pvc details) is available in the OpenEBS git repository (which was cloned in the previous steps).
 
@@ -33,7 +33,7 @@ Verify that the OpenEBS storage pods, that is, the jiva controller and jiva repl
 
 It may take some time for the pods to start as the images must be pulled and instantiated. This is also dependent on the network speed.
 
-Run a Database Client Container to Generate SQL Load
+Running a Database Client Container to Generate SQL Load
 ------------------------------------------------------
 
 To test the pod, you can run a Kubernetes job, in which a mysql client container runs a load generation script (which in turn performs simple sql queries) to simulate storage traffic. Run the following procedure on any node in the Kubernetes cluster.
@@ -58,7 +58,7 @@ Run the load generation job using the following command.
     kubectl apply -f sql-loadgen.yaml
 
 
-View Performance and Storage Consumption Statistics Using mayactl
+Viewing Performance and Storage Consumption Statistics Using mayactl
 --------------------------------------------------------------------
 
 Performance and capacity usage statistics on the OpenEBS storage volume can be viewed by executing the following *mayactl* command inside the maya-apiserver pod. 
