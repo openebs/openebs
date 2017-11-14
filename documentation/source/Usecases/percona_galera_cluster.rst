@@ -6,6 +6,7 @@ Running Percona Galera Cluster with OpenEBS
 --------------------------------------------
 
 This section provides detailed instructions on how to perform the following tasks.
+
 * Run a 3-node Percona Galera cluster with OpenEBS storage in a Kubernetes environment
 * Test data replication across the Percona Xtradb mysql instances.
 
@@ -25,11 +26,9 @@ The image used in these pods is *capttofu/percona_xtradb_cluster_5_6:beta*. When
   * Sets up users
   * Builds a list of servers that is used with the galera parameter *wsrep_cluster_address*. This is a list of running nodes that Galera uses for electing a node to obtain Single State Transfer (SST).
 
-Prerequisite
--------------
-A fully configured multi-node Kubernetes cluster configured with the OpenEBS operator and OpenEBS storage classes. For instructions on applying the OpenEBS operator and recommended system configuration, see prerequisites, step 1 and step 2 in  the `MongoDB section`_.
-  
-  .. _MongoDB section: http://openebs.readthedocs.io/en/latest/Usecases/mongodb.html 
+For the prerequisites and running OpenEBS Operator, see `Running OpenEBS Operator`_.
+
+ .. _Running OpenEBS Operator: http://openebs.readthedocs.io/en/latest/Usecases/run_openebs_operator.html
 
 Deploying the Percona Galera Cluster with OpenEBS Storage
 -----------------------------------------------------------
@@ -194,7 +193,7 @@ Test Replication in the Galera Cluster
     mysql> exit
     Bye
 
-* Verify the multi-master capability of the cluster, by writing additional tables into the db using the following command. Use a node other than node1, for example node3.
+* Verify the multi-master capability of the cluster, by writing additional tables into the database using the following command. Use a node other than node1, for example node3.
 ::
 
     test@Master:~/galera-deployment$ kubectl exec -it pxc-node3-82203929-mh5p9 /bin/bash
