@@ -1,0 +1,246 @@
+# Define the Service Account
+# Define the RBAC rules for the Service Account
+# Launch the Prometheus ( deployment )
+# Launch the node-exporter ( deameon set )
+#
+# A service account provides an identity for processes that run in a Pod.
+# Processes in containers inside pods contact the apiserver. When they
+# do, they are authenticated as a particular Service Account.
+#
+# Create prometheus service account
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: prometheus
+  namespace: default
+---
+# RBAC, Role-based access control, is an an authorization mechanism for managing
+# permissions around Kubernetes resources. RBAC allows configuration of flexible
+# authorization policies that can be updated without cluster restarts.
+# RBAC is a way of granting users granular access to Kubernetes API resources.
+#
+# A Role is a collection of permissions. For example, a role could be defined to
+# include read permission on pods and list permission for pods. A ClusterRole is
+# just like a Role, but can be used anywhere in the cluster.
+#
+# TODO : change to new namespace, for isolated data network
+# TODO : the rules should be updated with required group/resources/verb
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRole
+metadata:
+  name: prometheus
+# These are the rules to determine whether a request is allowed or denied
+rules:
+  # You can use the Kubernetes API to read and write Kubernetes resource objects
+  # via a Kubernetes API endpoint. The API group being accessed (for resource 
+  # requests only). An empty string designates the core API group.
+- apiGroups: [""]
+  # The ID or name of the resource that is being accessed (for resource requests
+  # only) –* For resource requests using get, update, patch, and delete verbs, 
+  # you must provide the resource name.
+  resources:
+    # A Node may be a VM or physical machine
+  - nodes
+    # nodes/proxy connect POST requests to proxy of a Node for the given HTTP req
+    # POST /api/v1/nodes/{name}/proxy
+  - nodes/proxy
+    # Services are to load balance traffic across all Pods.and it Exposes an 
+    # externally accessible endpoint. In simple words they are the medium through
+    # which pods communicate.
+  - services
+    # An endpoint is a URL pattern used to communicate with an API. For exp:
+    # <ip>:<port>/metrics
+  - endpoints
+    # A pod is a group of one or more containers (Exp: Docker containers),with 
+    # shared storage/network, and a specification for how to run the containers.
+  - pods
+  verbs: ["get", "list", "watch"]
+  # nonResourceURLs are endpoints that don’t map to a traditional resource. 
+  # Things like /ui/ or /apis or /swagger.json that are used for redirects
+  # Prometheus by default look for /metrics endpoint for the differnet IP's.
+- nonResourceURLs: ["/metrics"]
+  verbs: ["get"]
+---
+# A RoleBinding maps a Role to a user or set of users, granting that Role's 
+# permissions to those users for resources in that namespace. A ClusterRole-
+# Binding allows users to be granted a ClusterRole for authorization across the 
+# entire cluster.
+#
+# TODO: Check if default account also needs to be there
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRoleBinding
+metadata:
+  name: prometheus
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: prometheus
+subjects:
+- kind: ServiceAccount
+  name: prometheus
+  namespace: default
+---
+# prometheus-deployment
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: prometheus-deployment
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        name: prometheus-server
+    spec:
+      serviceAccountName: prometheus
+      containers:
+        - name: prometheus
+          image: prom/prometheus:v1.7.2
+          args:
+            - "-config.file=/etc/prometheus/conf/prometheus.yml"
+            # Metrics are stored in an emptyDir volume which
+            # exists as long as the Pod is running on that Node.
+            # The data in an emptyDir volume is safe across container crashes.
+            - "-storage.local.path=/prometheus"
+            # How long to retain samples in the local storage. 
+            - "-storage.local.retention=$(STORAGE_RETENTION)"
+            #- "-alertmanager.url=http://alertmanager:9093" 
+          ports:
+            - containerPort: 9090
+          env:
+            # environment vars are stored in prometheus-env configmap. 
+            - name: STORAGE_RETENTION
+              valueFrom:
+                configMapKeyRef:
+                  name: prometheus-env
+                  key: storage-retention
+          resources:
+            requests:
+              # A memory request of 250M means it will try to ensure minimum
+              # 250MB RAM .
+              memory: "128M"
+              # A cpu request of 128m means it will try to ensure minimum
+              # .125 CPU; where 1 CPU means :
+              # 1 *Hyperthread* on a bare-metal Intel processor with Hyperthreading
+              cpu: "128m"
+            limits:
+              memory: "700M"
+              cpu: "500m"
+          
+          volumeMounts:
+            # prometheus config file stored in the given mountpath
+            - name: prometheus-server-volume
+              mountPath: /etc/prometheus/conf
+            # metrics collected by prometheus will be stored at the given mountpath.
+            - name: prometheus-storage-volume
+              mountPath: /prometheus
+            # alerting rules defined will be stored at given mountpath
+            #- name: rules-volume
+            # mountPath: /etc/prometheus-rules
+      volumes:
+        # Prometheus Config file will be stored in this volume 
+        - name: prometheus-server-volume
+          configMap:
+            name: prometheus-config
+        # All the time series stored in this volume in form of .db file.
+        - name: prometheus-storage-volume
+          # containers in the Pod can all read and write the same files here.
+          emptyDir: {} 
+        # Rules defined in configmap will be stored in this volume
+        #- name: rules-volume
+        # configMap:
+        #    name: prometheus-alert-rules
+
+---
+# prometheus-service
+apiVersion: v1
+kind: Service
+metadata:
+  name: prometheus-service
+spec:
+  selector: # exposes any pods with the following labels as a service
+    name: prometheus-server
+  # NodePort allows you to access the Prometheus exression browser from outside cluster.
+  # Basically you are exposing your NodeIP and NodePort to outside cluster.
+  type: LoadBalancer
+  ports:
+    - port: 80 # this Service's port (cluster-internal IP clusterIP)
+      targetPort: 9090 # pods expose this port
+---
+# node-exporter will be launch as daemonset.
+apiVersion: extensions/v1beta1
+kind: DaemonSet
+metadata:
+  name: node-exporter
+spec:
+  template:
+    metadata:
+      labels:
+        app: node-exporter
+      name: node-exporter
+    spec:
+      containers:
+      - image: prom/node-exporter:latest
+        name: node-exporter
+        ports:
+        - containerPort: 9100
+          hostPort: 9100
+          name: scrape
+        resources:
+            requests:
+              # A memory request of 250M means it will try to ensure minimum
+              # 250MB RAM .
+              memory: "128M"
+              # A cpu request of 128m means it will try to ensure minimum
+              # .125 CPU; where 1 CPU means :
+              # 1 *Hyperthread* on a bare-metal Intel processor with Hyperthreading
+              cpu: "128m"
+            limits:
+              memory: "700M"
+              cpu: "500m"
+        volumeMounts:
+        # All the application data stored in data-disk
+        - name: data-disk
+          mountPath: /data-disk
+          readOnly: true
+        # Root disk is where OS(Node) is installed
+        - name: root-disk
+          mountPath: /root-disk
+          readOnly: true
+      # The Kubernetes scheduler’s default behavior works well for most cases
+      # -- for example, it ensures that pods are only placed on nodes that have 
+      # sufficient free resources, it ties to spread pods from the same set 
+      # (ReplicaSet, StatefulSet, etc.) across nodes, it tries to balance out 
+      # the resource utilization of nodes, etc.
+      #
+      # But sometimes you want to control how your pods are scheduled. For example,
+      # perhaps you want to ensure that certain pods only schedule on nodes with 
+      # specialized hardware, or you want to co-locate services that communicate 
+      # frequently, or you want to dedicate a set of nodes to a particular set of 
+      # users. Ultimately, you know much more about how your applications should be
+      # scheduled and deployed than Kubernetes ever will.
+      #
+      # “taints and tolerations,” allows you to mark (“taint”) a node so that no 
+      # pods can schedule onto it unless a pod explicitly “tolerates” the taint.
+      # toleration  is particularly useful for situations where most pods in 
+      # the cluster should avoid scheduling onto the node. In our case we want
+      # node-exporter to run on master node also i.e, we want to collect metrics 
+      # from master node. That's why tolerations added.
+      # if removed master's node metrics can't be scrapped by prometheus.
+      tolerations:
+      - effect: NoSchedule
+        operator: Exists
+      volumes:
+        # A hostPath volume mounts a file or directory from the host node’s 
+        # filesystem.For example, some uses for a hostPath are:
+        # running a container that needs access to Docker internals; use a hostPath 
+        # of /var/lib/docker
+        # running cAdvisor in a container; use a hostPath of /dev/cgroups
+        - name: data-disk
+          hostPath:
+            path: /localdata
+        - name: root-disk
+          hostPath:
+            path: /
+      hostNetwork: true
+      hostPID: true
