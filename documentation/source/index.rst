@@ -27,13 +27,14 @@ Contents:
     :maxdepth: 2
     :caption: Usecases
     
-    Running OpenEBS Operator <Usecases/run_openebs_operator>
+    Cassandra <Usecases/cassandra>
     Crunchy Postgres <Usecases/crunchy_postgres>
     Jenkins <Usecases/jenkins>
     Jupyter <Usecases/jupyter>
     MongoDB <Usecases/mongodb>
     Percona DB <Usecases/percona_db> 
     Percona Galera Cluster <Usecases/percona_galera_cluster>
+    Running OpenEBS Operator <Usecases/run_openebs_operator>
     
     
 .. toctree::
