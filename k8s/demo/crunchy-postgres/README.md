@@ -1,12 +1,12 @@
 # Running Crunchy-Postgres with OpenEBS
 
-This tutorial provides detailed instructions to run a PostgreSQL Statefulset with OpenEBS storage and perform 
+This tutorial provides detailed instructions to run a PostgreSQL StatefulSet with OpenEBS storage and perform 
 simple database operations to verify successful deployment. 
 
 ## Crunchy-Postgres 
 
-The postgres container used in the Statefulset is sourced from (CrunchyData)[https://github.com/CrunchyData/crunchy-containers]. CrunchyData provides cloud agnostic PostgreSQL container technology that is designed for production 
-workloads with cloud native HA, DR, and monitoring.  
+The postgres container used in the StatefulSet is sourced from (CrunchyData)[https://github.com/CrunchyData/crunchy-containers]. CrunchyData provides cloud agnostic PostgreSQL container technology that is designed for production 
+workloads with cloud native High Availability, Disaster Recovery, and monitoring.  
 
 ## Prerequisite
 
@@ -20,11 +20,11 @@ maya-apiserver-2245240594-ktfs2                                  1/1       Runni
 openebs-provisioner-4230626287-t8pn9                             1/1       Running   0          3h
 ```
 
-## Deploy the Crunchy-Postgres Statefulset with OpenEBS storage
+## Deploy the Crunchy-Postgres StatefulSet with OpenEBS Storage
 
-The Statefulset specification JSONs are available at OpenEBS/k8s/demo/crunchy-postgres. 
+The StatefulSet specification JSONs are available at OpenEBS/k8s/demo/crunchy-postgres. 
 
-The number of replicas in the Statefulset can be modified in the *set.json* file. This example uses 2 replicas, 
+The number of replicas in the StatefulSet can be modified in the *set.json* file. This example uses 2 replicas, 
 which includes one master and one slave. The Postgres pods are configured as primary/master or as replica/slave by 
 a startup script which decides the role based on ordinality assigned to the pod.
 
@@ -84,7 +84,7 @@ service "pgset-replica" created
 statefulset "pgset" created
 ```
 
-Verify that all the OpenEBS persistent volumes are created, the Crunchy-Postgres services and pods are running. 
+Verify that all the OpenEBS persistent volumes are created and the Crunchy-Postgres services and pods are running. 
 
 ```
 test@Master:~/crunchy-postgres$ kubectl get statefulsets
@@ -130,9 +130,9 @@ dependent on the network speed.
 The verification procedure can be carried out using the following steps: 
 
 - Check cluster replication status between the Postgres primary and replica
-- Create a table in the default database as a Postgres user on the primary
-- Check data synchronization on the replica for created table
-- Verify table creation is restricted on the replica
+- Create a table in the default database as Postgres user "testuser" on the primary
+- Check data synchronization on the replica for table you have created
+- Verify that table is not created on the replica
 
 ### Step-1: Install the PostgreSQL-Client
 
@@ -176,8 +176,8 @@ INSERT 0 1
 
 ### Step-4: Verify Data Synchronization on Replica
 
-Identify the IP address of the replica (pgset-1) pod or the service (pgset-replica) and execute the following
-query: 
+Identify the IP Address of the replica (pgset-1) pod or the service (pgset-replica) and execute the following
+command: 
 
 ```
 test@Master:~$ psql -h 10.44.0.6 -U testuser postgres -c 'table foo'
@@ -188,11 +188,11 @@ Password for user testuser:
 (1 row)
 ```
 
-Verify that the table content is replicated successfully
+Verify that the table content is replicated successfully.
 
 ### Step-5: Verify Database Write Restricted on Replica
 
-Attempt creation of a new table on the replica and verify the operation is unsuccessful.
+Attempt to create a new table on the replica, and verify that the creation is unsuccessful.
 
 ```
 test@Master:~$ psql -h 10.44.0.6 -U testuser postgres -c 'create table bar(id int)'
