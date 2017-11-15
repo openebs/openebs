@@ -14,6 +14,7 @@
 
 kubectl delete statefulset pgset
 kubectl delete sa pgset-sa
-kubectl delete service pgset pgset-master pgset-replica
+kubectl delete service pgset pgset-primary pgset-replica
 kubectl delete pod pgset-0 pgset-1
 kubectl delete pvc pgdata-pgset-0 pgdata-pgset-1
+kubectl delete clusterrolebinding permissive-binding
