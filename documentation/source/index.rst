@@ -28,6 +28,7 @@ Contents:
     :caption: Usecases
     
     Cassandra <Usecases/cassandra>
+    Couchbase <Usecases/couchbase>
     Crunchy Postgres <Usecases/crunchy_postgres>
     Jenkins <Usecases/jenkins>
     Jupyter <Usecases/jupyter>
