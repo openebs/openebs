@@ -131,13 +131,13 @@ The verification procedure can be carried out using the following steps:
 
 - Check cluster replication status between the Postgres primary and replica
 - Create a table in the default database as Postgres user "testuser" on the primary
-- Check data synchronization on the replica for table you have created
+- Check data synchronization on the replica for the table you have created
 - Verify that table is not created on the replica
 
 ### Step-1: Install the PostgreSQL-Client
 
 Install the PostgreSQL CLient Utility (psql) on any of the Kubernetes machines to perform database operations 
-from command line. 
+from the command line. 
 
 ```
 sudo apt-get install postgresql-client
@@ -145,7 +145,7 @@ sudo apt-get install postgresql-client
 
 ### Step-2: Verify Cluster Replication Status on Crunchy-Postgres Cluster
 
-Identify the IP address of the primary (pgset-0) pod or the service (pgset-primary) and execute the following
+Identify the IP Address of the primary (pgset-0) pod or the service (pgset-primary) and execute the following
 query:
 
 ```

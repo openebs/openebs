@@ -24,8 +24,8 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 kubectl create -f $DIR/set-sa.json
 
 # For version Kube 1.6, we must allow the service account to perform
-# a label command. For this example, OpenEBS open up wide permissions
-# for all service accounts, this is NOT for production!
+# a label command. For this example, OpenEBS opens up wide permissions
+# for all service accounts. This is NOT for production!
 kubectl create clusterrolebinding permissive-binding \
   --clusterrole=cluster-admin \
   --user=admin \
