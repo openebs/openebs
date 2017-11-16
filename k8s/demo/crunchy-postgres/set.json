@@ -14,10 +14,14 @@
         }
       },
       "spec": {
+        "securityContext": 
+          {
+            "fsGroup": 26
+          },
         "containers": [
           {
             "name": "pgset",
-            "image": "crunchydata/crunchy-postgres:centos7-9.6-1.4.0",
+            "image": "crunchydata/crunchy-postgres:centos7-10.0-1.6.0",
             "ports": [
               {
                 "containerPort": 5432,
@@ -25,16 +29,16 @@
               }
             ],
             "env": [{
-                "name": "PG_MASTER_USER",
-                "value": "master"
+                "name": "PG_PRIMARY_USER",
+                "value": "primaryuser"
             }, {
                 "name": "PGHOST",
                 "value": "/tmp"
             }, {
                 "name": "PG_MODE",
-                "value": "master"
+                "value": "set"
             }, {
-                "name": "PG_MASTER_PASSWORD",
+                "name": "PG_PRIMARY_PASSWORD",
                 "value": "password"
             }, {
                 "name": "PG_USER",
@@ -48,6 +52,12 @@
             }, {
                 "name": "PG_ROOT_PASSWORD",
                 "value": "password"
+            }, {
+                "name": "PG_PRIMARY_PORT",
+                "value": "5432"
+            }, {
+                "name": "PG_PRIMARY_HOST",
+                "value": "pgset-primary"
             }],
             "volumeMounts": [
               {

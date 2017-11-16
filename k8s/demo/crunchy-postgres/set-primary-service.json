@@ -2,9 +2,9 @@
         "kind": "Service",
         "apiVersion": "v1",
         "metadata": {
-            "name": "pgset-master",
+            "name": "pgset-primary",
             "labels": {
-                "name": "pgset-master"
+                "name": "pgset-primary"
             }
         },
         "spec": {
@@ -15,7 +15,7 @@
                 "nodePort": 0
             }],
             "selector": {
-                "name": "pgset-master"
+                "name": "pgset-primary"
             },
             "type": "ClusterIP",
             "sessionAffinity": "None"
