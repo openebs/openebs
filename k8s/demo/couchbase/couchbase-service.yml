@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: couchbase
+  labels:
+    app: couchbase
+spec:
+  ports:
+  - port: 8091
+    name: couchbase
+  # *.couchbase.default.svc.cluster.local
+  clusterIP: None
+  selector:
+    app: couchbase
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: couchbase-ui
+  labels:
+    app: couchbase-ui
+spec:
+  ports:
+  - port: 8091
+    name: couchbase
+  selector:
+    app: couchbase
+  sessionAffinity: ClientIP
+  type: NodePort
