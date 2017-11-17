@@ -17,7 +17,7 @@ When Raising issues, please specify the following:
 - Setup details (like hyperconverged/dedicated), orchestration engine - kubernetes, docker swarm etc,. 
 - Scenario where the issue was seen to occur
 - If the issue is with storage, include maya version, maya osh-status and maya omm-status.
-- Errors and log messages that are thrown by the sofware
+- Errors and log messages that are thrown by the software
 
 
 ## Submit Change to Improve Documentation
