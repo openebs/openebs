@@ -7,4 +7,6 @@ openebs_storageclasses_link: https://raw.githubusercontent.com/openebs/openebs/m
 
 openebs_storageclasses_alias: openebs-storageclasses.yaml
 
-test_tag: ci
+# Image tag for openebs containers
+# Accepted entries (ci, latest): Default: latest
+test_tag: latest
