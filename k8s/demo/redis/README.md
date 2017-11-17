@@ -74,7 +74,7 @@ rd        3         3         19h
 
 ```
 
-Get the status of underlying persistent volume being used by Redis StatefulSet:
+Get the status of underlying persistent volumes used by Redis StatefulSet:
 
 ```bash
 ubuntu@kubemaster:~$ kubectl get pvc
@@ -99,9 +99,9 @@ redis                                               ClusterIP   None            
 
 ```
 
-## Check Redis replication
+## Check Redis Replication
 
-Set a key:value pair in the redis master.
+Set a key:value pair in the Redis master.
 
 ```bash
 ubuntu@kubemaster:~kubectl exec rd-0 -- /opt/redis/redis-cli -h rd-0.redis SET replicated:test true
@@ -109,7 +109,7 @@ OK
 
 ```
 
-Retrieve the value of the key from a redis slave.
+Retrieve the value of the key from a Redis slave.
 
 ```bash
 ubuntu@kubemaster:~kubectl exec rd-2 -- /opt/redis/redis-cli -h rd-0.redis GET replicated:test
