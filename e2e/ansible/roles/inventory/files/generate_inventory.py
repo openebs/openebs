@@ -34,7 +34,6 @@ import logging
 import argparse
 import configparser
 import warnings
-import re
 import socket
 
 
