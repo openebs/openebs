@@ -79,9 +79,10 @@ def generateInventory(config, boxlist, path, codes, pwdless):
                 if c == 1:
                     hostaliasname = '%s0%s ansible_ssh_host' % (i[0], c)
                     config[hostgroupname] = {hostaliasname: i[1]}
-                    f = open(path, 'w')
-                    config.write(f)
-                    f.close()
+
+                    with open(path,'w') as f:
+                        config.write(f)
+
                     c = c + 1
 
                     varsgroupname = '%s:vars' % (hostgroupname)
@@ -94,17 +95,17 @@ def generateInventory(config, boxlist, path, codes, pwdless):
 
                     extraargs = "'-o StrictHostKeyChecking=no'"
                     config[varsgroupname]['ansible_ssh_extra_args'] = extraargs
-
-                    f = open(path, 'w')
-                    config.write(f)
-                    f.close()
+                    
+                    with open(path,'w') as f:
+                        config.write(f)
 
                 elif c > 1:
                     hostaliasname = '%s0%s ansible_ssh_host' % (i[0], c)
                     config[hostgroupname][hostaliasname] = i[1]
-                    f = open(path, 'w')
-                    config.write(f)
-                    f.close()
+
+                    with open(path,'w') as f:
+                        config.write(f)
+                    
                     c = c + 1
 
             except KeyError as e:
@@ -115,14 +116,12 @@ def generateInventory(config, boxlist, path, codes, pwdless):
 def replace(file, pattern, subst):
     """ Replace extra spaces around assignment operator in inventory """
 
-    file_handle = open(file, 'rb')
-    file_string = file_handle.read()
-    file_handle.close()
-    file_string = (re.sub(pattern, subst, file_string))
-    file_handle = open(file, 'wb')
-    file_handle.write(file_string)
-    file_handle.close()
-
+    with open(file,'rb') as file_handle:
+        s = file_handle.read()
+     
+    with open(file,'wb') as file_handle:
+        s = s.replace(pattern, subst)
+        file_handle.write(s)
 
 def main():
 
@@ -238,9 +237,6 @@ def main():
         generateInventory(config, codeSubList,
                           inventory_path, SupportedHostCodes, passwdless)
 
-    print "Inventory config generated successfully"
-    logging.info("Inventory config generated successfully")
-
     # Insert localhost line into beginning of inventory file
     if local_password:
         lpasswd = "\"{{ lookup('env','%s') }}\"" % (local_password)
@@ -256,6 +252,8 @@ def main():
     # Sanitize the Ansible inventory file
     replace(inventory_path, " = ", "=")
 
+    print "Inventory config generated successfully"
+    logging.info("Inventory config generated successfully")
 
 if __name__ == "__main__":
     main()
