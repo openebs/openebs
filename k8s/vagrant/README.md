@@ -2,9 +2,9 @@
 
 OpenEBS provides vagrant boxes with prepackaged Kuberentes images. There are different vagrant boxes created depending on the Kubernetes release. The Vagrantfiles are organized here based on the Kubernetes version used by the box. 
 
-This Vagrantfile can be used on any machine with Virtualization *Enabled*, like laptop or baremetal server. 
+This Vagrantfile can be used on any machine with Virtualization *Enabled*, like a laptop or bare metal server. 
 
-Procedures listed in this section helps you -
+Procedures listed in this section will help you -
 - Verify prerequisites
 - Download Vagrantfile
 - Setup Kubernetes Cluster
@@ -41,9 +41,9 @@ You should see output similar to this:
 ubuntu-host:~/k8s-demo$ vagrant status
 Current machine states:
 
-kubemaster-01             not created (virtualbox)
-kubeminion-01             not created (virtualbox)
-kubeminion-02             not created (virtualbox)
+kubemaster-01             not created (VirtualBox)
+kubeminion-01             not created (VirtualBox)
+kubeminion-02             not created (VirtualBox)
 
 This environment represents multiple VMs. The VMs are all listed
 above with their current state. For more information about a specific
@@ -65,9 +65,9 @@ The output displayed will be similar to the following:
 kiran@kmaya:~/k8s-demo$ vagrant status
 Current machine states:
 
-kubemaster-01             running (virtualbox)
-kubeminion-01             running (virtualbox)
-kubeminion-02             running (virtualbox)
+kubemaster-01             running (VirtualBox)
+kubeminion-01             running (VirtualBox)
+kubeminion-02             running (VirtualBox)
 
 This environment represents multiple VMs. The VMs are all listed
 above with their current state. For more information about a specific
@@ -124,7 +124,7 @@ Starting to serve on 127.0.0.1:8001
 
 Launch the URL http://127.0.0.1:8001/ui
 
-**Your local Kubernetes cluster with dashboard is ready. The below steps are required only if you would like to run stateful applications with OpenEBS**
+**Your local Kubernetes cluster with the dashboard is ready. The below steps are required only if you would like to run stateful applications with OpenEBS**
 
 ## Setup OpenEBS
 
