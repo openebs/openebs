@@ -38,7 +38,8 @@ def getLocalKey(cmd, path):
 
 def getRemoteKey(cmd, path, ip, user, passwd):
     """Uses ssh-keygen command over SSH to generate id_rsa.pub on remotehost"""
-
+ 
+    sshToOtherClient(ip, user, passwd, cmd)
     showKeyCmd = 'cat %s' % (path)
     remote_key = sshToOtherClient(ip, user, passwd, showKeyCmd)
     logging.debug("Remote key for %s has been generated successfully : %s",
