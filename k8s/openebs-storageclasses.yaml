@@ -6,7 +6,7 @@ metadata:
 provisioner: openebs.io/provisioner-iscsi
 parameters:
   pool: hostdir-var
-  replica: "1"
+  openebs.io/jiva-replica-count: "1"
   size: 5G
 ---
 apiVersion: storage.k8s.io/v1
@@ -16,7 +16,7 @@ metadata:
 provisioner: openebs.io/provisioner-iscsi
 parameters:
   pool: hostdir-var
-  replica: "2"
+  openebs.io/jiva-replica-count: "2"
   size: 5G
 ---
 apiVersion: storage.k8s.io/v1
@@ -26,7 +26,7 @@ metadata:
 provisioner: openebs.io/provisioner-iscsi
 parameters:
   pool: hostdir-var
-  replica: "2"
+  openebs.io/jiva-replica-count: "2"
   size: 5G
 ---
 apiVersion: storage.k8s.io/v1
@@ -36,7 +36,7 @@ metadata:
 provisioner: openebs.io/provisioner-iscsi
 parameters:
   pool: hostdir-var
-  replica: "2"
+  openebs.io/jiva-replica-count: "2"
   size: 5G
 ---
 apiVersion: storage.k8s.io/v1
@@ -46,7 +46,7 @@ metadata:
 provisioner: openebs.io/provisioner-iscsi
 parameters:
   pool: hostdir-var
-  replica: "2"
+  openebs.io/jiva-replica-count: "2"
   size: 5G
 ---
 apiVersion: storage.k8s.io/v1
@@ -56,7 +56,7 @@ metadata:
 provisioner: openebs.io/provisioner-iscsi
 parameters:
   pool: hostdir-var
-  replica: "2"
+  openebs.io/jiva-replica-count: "2"
   size: 5G
 ---
 apiVersion: storage.k8s.io/v1
@@ -66,7 +66,7 @@ metadata:
 provisioner: openebs.io/provisioner-iscsi
 parameters:
   pool: hostdir-var
-  replica: "2"
+  openebs.io/jiva-replica-count: "2"
   size: 5G
 ---
 apiVersion: storage.k8s.io/v1
@@ -76,7 +76,7 @@ metadata:
 provisioner: openebs.io/provisioner-iscsi
 parameters:
   pool: hostdir-var
-  replica: "2"
+  openebs.io/jiva-replica-count: "2"
   size: 10G
 ---
 apiVersion: storage.k8s.io/v1
@@ -86,7 +86,7 @@ metadata:
 provisioner: openebs.io/provisioner-iscsi
 parameters:
   pool: hostdir-var
-  replica: "2"
+  openebs.io/jiva-replica-count: "2"
   size: 5G
 ---
 apiVersion: storage.k8s.io/v1
@@ -96,6 +96,6 @@ metadata:
 provisioner: openebs.io/provisioner-iscsi
 parameters:
   pool: hostdir-var
-  replica: "2"
+  openebs.io/jiva-replica-count: "2"
   size: 5G
 ---
