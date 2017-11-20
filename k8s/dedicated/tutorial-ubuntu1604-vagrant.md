@@ -148,7 +148,7 @@ Check the status of the system pods.
 ```
 ubuntu@kubemaster-01:~$ kubectl get pods --all-namespaces
 ```
-The above command will ouput the status of the pods created:
+The above command will output the status of the pods created:
 ```
 NAMESPACE     NAME                                    READY     STATUS    RESTARTS   AGE
 kube-system   dummy-2088944543-1t7hc                  1/1       Running   0          22m

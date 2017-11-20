@@ -425,7 +425,7 @@ which the sysbench dependencies are installed (refer the prerequisites)
       "ok" : 1
     }
     ```
-  - You could further confirm the presence of the DB with the same size on the secondary instances (for exmaple, mongo-1).
+  - You could further confirm the presence of the DB with the same size on the secondary instances (for example, mongo-1).
   
     Note : By default, the dbs cannot be viewed on the secondary instance via the show dbs command, unless we set the slave context.
     

@@ -1,7 +1,7 @@
 #######################################################################
 # This utils file can be used to setup passwordless SSH between the
 # machine on which it is executed and other target hosts. The method
-# to invoke the function and arguments required are expalined below :
+# to invoke the function and arguments required are explained below :
 #
 # setupSSH(key_rsa_path, key_append_path, key_gen_cmd, HostList), where
 #

@@ -73,7 +73,7 @@ The test playbooks can be placed in e2e/ansible/playbooks/<test-category>.Here a
 
  You can view a sample test playbook [here](https://github.com/openebs/openebs/tree/master/e2e/ansible/playbooks/hyperconverged/test-k8s-percona-mysql-pod)
 
-- Test playbooks that deploy applications are recommended to include steps to generate application-specfic workloads that
+- Test playbooks that deploy applications are recommended to include steps to generate application-specific workloads that
   will exercise the OpenEBS storage volume. 
   
 - Here are some ansible best practices while constructing playbooks : 

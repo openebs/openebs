@@ -70,7 +70,7 @@ Before applying the OpenEBS Operator, the admin context has be set for the clust
 
 To create/modify service accounts and grant previleges, kubectl needs to be run with admin previleges. The following commands help to setup and use the admin context for Google Container Engine via the Google Cloud Shell.
 
-#### Step 1: Initialize credentails to allow kubectl to execute commands on the container cluster
+#### Step 1: Initialize credentials to allow kubectl to execute commands on the container cluster
 
 ```bash
 gcloud container clusters list
