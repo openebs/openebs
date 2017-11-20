@@ -80,7 +80,7 @@ Get the status of the services using the following command.
 ::
 
     ubuntu@kubemaster:~kubectl get svc
-    ME                                                TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)             AGE
+    NAME                                                TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)             AGE
     couchbase                                           ClusterIP   None             <none>        8091/TCP            11h
     couchbase-ui                                        NodePort    10.103.161.153   <none>        8091:30438/TCP      11h
     kubernetes                                          ClusterIP   10.96.0.1        <none>        443/TCP             3d
