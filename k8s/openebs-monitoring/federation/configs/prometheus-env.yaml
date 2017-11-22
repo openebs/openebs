@@ -1,0 +1,11 @@
+# All the run time arguments required in prometheus should
+# be defined in this configmap
+# TODO:
+# Add arg to limit heap usage to overcome high RAM usage
+# Add remote storage address
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-env
+data:
+  storage-retention: 120h
