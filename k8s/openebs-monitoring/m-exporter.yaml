@@ -1,0 +1,24 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: maya-volume-exporter
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        name: maya-volume-exporter
+    spec:
+      # serviceAccountName: prometheus
+      containers:
+        - name: maya-volume-exporter
+          image: openebs/m-exporter:ci
+          command: ["maya-volume-exporter"]
+          args:
+            # This is the flag provided to exporter at run time
+            # replace it with your controller's service IP
+            # For exp : Do kubectl get svc | grep volname-ctrl-svc
+            # to get the IP.
+            - "-c=volname-ctrl-svc:9501"
+          ports:
+          - containerPort: 9500

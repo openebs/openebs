@@ -7,9 +7,20 @@
 │   ├── configs
 │   │   ├── alertmanager-config.yaml
 │   │   ├── alertmanager-templates.yaml
+│   │   ├── openebs-dashboard.json
 │   │   ├── prometheus-alert-rules.yaml
 │   │   ├── prometheus-config.yaml
 │   │   └── prometheus-env.yaml
+│   ├── federation
+│   │   ├── configs
+│   │   │   ├── alertmanager-config.yaml
+│   │   │   ├── alertmanager-templates.yaml
+│   │   │   ├── openebs-dashboard.json
+│   │   │   ├── prometheus-alert-rules.yaml
+│   │   │   ├── prometheus-config-master.yaml
+│   │   │   └── prometheus-env.yaml
+│   │   ├── grafana-operator.yaml
+│   │   └── prometheus-operator-master.yaml
 │   ├── grafana-operator.yaml
 │   ├── prometheus-operator.yaml
 │   └── README.md
@@ -60,6 +71,11 @@ kubectl create -f prometheus-operator.yaml
 kubectl create -f alertmanager.yaml
 kubectl create -f grafana-operator.yaml
 ```
+
+- **Note** : For setting up the cluster on gcloud change the type of service
+    from NodePort to LoadBalancer, ClusterIP based on your requirement. Choosing
+    NodePort over LoadBalancer and ClusterIP doesn't gives you external IP
+    rather exposed srvices can be accesible on the NodeIP:NodePort.
 ## Verify
 After successfully running the above commands, the output displayed is similar to the following :
 ```
@@ -90,3 +106,10 @@ deployment "grafana" created
 * To launch Grafana open NodeIP:NodePort  (NodePort of grafana service) in your browser.
 ## Launch Alertmanager UI
 * To launch alertmanager open NodeIP:NodePort (NodePort of alertmanager service)
+
+## Federation
+Federation is used for scaling prometheus and ensuring its reliability. In this configuration there are two or more than two Prometheus running instances one is known as global which is used for collecting the metrics from others, known as slaves.
+## Setup Federation
+* All the setups and steps are very similar to previous one, one and only change is to be made in prometheus-master-config.yaml.
+* Just replace the IP given in targets field of job `master-federation` with your slave prometheus and also add the job name which you want to collect in the match field.
+* After configuring your global prometheus just repeat the steps given above in setup prometheus.
