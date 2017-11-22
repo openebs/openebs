@@ -237,16 +237,16 @@ OpenEBS is deployed by the time you log in to Amazon Web Services (AWS).
 
 Google Cloud
 =============
-Setting up OpenEBS with Kubernetes on Google Container Engine
+Setting up OpenEBS with Kubernetes on Google Kubernetes Engine
 --------------------------------------------------------------
-This section, provides detailed instructions on how to setup and use OpenEBS in Google Container Engine (GKE). This section uses a three node container cluster.
+This section, provides detailed instructions on how to setup and use OpenEBS in Google Kubernetes Engine (GKE). This section uses a three node Kubernetes cluster.
 
-1. Preparing your Container Cluster
+1. Preparing your Kubernetes Cluster
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-You can either use an existing container cluster or create a new one. 
-To create a new cluster, go to **Google Cloud Platform** -> **Container Engine** -> **Create Container Cluster**. 
+You can either use an existing Kubernetes cluster or create a new one. 
+To create a new cluster, go to **Google Cloud Platform** -> **Kubernetes Engine** -> **Create Kubernetes Cluster**. 
 
-Minimum requirements for container cluster are as follows:
+Minimum requirements for Kubernetes cluster are as follows:
 
 * Machine Type - (Minimum 2 vCPUs)
 * Node Image - (Ubuntu)
@@ -255,7 +255,7 @@ Minimum requirements for container cluster are as follows:
 
 **Note:**
 
-The example commands below were run on a container cluster *demo-openebs03* in zone *us-central1-a* with project unique ID *strong-eon-153112*. When you copy paste the command, ensure that you use the details from your project.
+The example commands below were run on a Kubernetes cluster *demo-openebs03* in zone *us-central1-a* with project unique ID *strong-eon-153112*. When you copy paste the command, ensure that you use the details from your project.
 
 iSCSI Configuration
 ^^^^^^^^^^^^^^^^^^^^^
@@ -304,9 +304,9 @@ Before applying OpenEBS Operator, ensure that the administrator context for the 
 
 **Setting up Kubernetes Cluster with Administrator Privileges**
 
-To create or modify service accounts and grant previleges, kubectl must be run with administrator previleges. The following commands help you set up and use the administrator context for Google Container Engine using the Google Cloud Shell.
+To create or modify service accounts and grant previleges, kubectl must be run with administrator previleges. The following commands help you set up and use the administrator context for Google Kubernetes Engine using the Google Cloud Shell.
 
-a. Initialize credentials to allow kubectl to execute commands on the container cluster.
+a. Initialize credentials to allow kubectl to execute commands on the Kubernetes cluster.
 ::
 
     gcloud container clusters list
@@ -326,7 +326,7 @@ Download the latest OpenEBS files using the following commands.
     git clone https://github.com/openebs/openebs.git
     cd openebs/k8s
 
-The following commands will prompt you for a username and password. Provide username as *admin*. Password for the admin can be obtained from **Google Cloud Platform** -> **Container Engine** -> **(cluster)** -> **Show Credentials**
+The following commands will prompt you for a username and password. Provide username as *admin*. Password for the admin can be obtained from **Google Cloud Platform** -> **Kubernetes Engine** -> **(cluster)** -> **Show Credentials**
 
 Apply OpenEBS Operator and add related OpenEBS Storage Classes, that can be used by developers and applications using the following commands.
 ::
