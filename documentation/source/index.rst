@@ -35,6 +35,7 @@ Contents:
     MongoDB <Usecases/mongodb>
     Percona DB <Usecases/percona_db> 
     Percona Galera Cluster <Usecases/percona_galera_cluster>
+    Redis StatefulSet <Usecases/redis>
     Running OpenEBS Operator <Usecases/run_openebs_operator>
     
     
