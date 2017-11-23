@@ -21,7 +21,10 @@ metadata:
   name: openebs-maya-operator
 rules:
 - apiGroups: ["*"]
-  resources: ["services","pods","deployments", "events"]
+  resources: ["nodes","nodes/proxy"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["*"]
+  resources: ["services","pods","deployments", "events", "endpoints"]
   verbs: ["*"]
 - apiGroups: ["*"]
   resources: ["persistentvolumes","persistentvolumeclaims"]
@@ -29,6 +32,8 @@ rules:
 - apiGroups: ["storage.k8s.io"]
   resources: ["storageclasses"]
   verbs: ["*"]
+- nonResourceURLs: ["/metrics"]
+  verbs: ["get"]
 ---
 # Bind the Service Account with the Role Privileges.
 # TODO: Check if default account also needs to be there
@@ -65,15 +70,15 @@ spec:
       containers:
       - name: maya-apiserver
         imagePullPolicy: Always
-        image: openebs/m-apiserver:0.4.0
+        image: openebs/m-apiserver:ci
         ports:
         - containerPort: 5656
         env:
-        - name: DEFAULT_CONTROLLER_IMAGE
-          value: "openebs/jiva:0.4.0"
-        - name: DEFAULT_REPLICA_IMAGE
-          value: "openebs/jiva:0.4.0"
-        - name: DEFAULT_REPLICA_COUNT
+        - name: OPENEBS_IO_JIVA_CONTROLLER_IMAGE
+          value: "openebs/jiva:latest"
+        - name: OPENEBS_IO_JIVA_REPLICA_IMAGE
+          value: "openebs/jiva:latest"
+        - name: OPENEBS_IO_JIVA_REPLICA_COUNT
           value: "2"
 ---
 apiVersion: v1
@@ -106,11 +111,55 @@ spec:
       containers:
       - name: openebs-provisioner
         imagePullPolicy: Always
-        image: openebs/openebs-k8s-provisioner:0.4.0
+        image: openebs/openebs-k8s-provisioner:latest
         env:
         - name: NODE_NAME
           valueFrom:
             fieldRef:
               fieldPath: spec.nodeName
-
-
+---
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  # name must match the spec fields below, and be in the form: <plural>.<group>
+  name: storagepoolclaims.openebs.io
+spec:
+  # group name to use for REST API: /apis/<group>/<version>
+  group: openebs.io
+  # version name to use for REST API: /apis/<group>/<version>
+  version: v1alpha1
+  # either Namespaced or Cluster
+  scope: Cluster
+  names:
+    # plural name to be used in the URL: /apis/<group>/<version>/<plural>
+    plural: storagepoolclaims
+    # singular name to be used as an alias on the CLI and for display
+    singular: storagepoolclaim
+    # kind is normally the CamelCased singular type. Your resource manifests use this.
+    kind: StoragePoolClaim
+    # shortNames allow shorter string to match your resource on the CLI
+    shortNames:
+    - spc
+---
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  # name must match the spec fields below, and be in the form: <plural>.<group>
+  name: storagepools.openebs.io
+spec:
+  # group name to use for REST API: /apis/<group>/<version>
+  group: openebs.io
+  # version name to use for REST API: /apis/<group>/<version>
+  version: v1alpha1
+  # either Namespaced or Cluster
+  scope: Cluster
+  names:
+    # plural name to be used in the URL: /apis/<group>/<version>/<plural>
+    plural: storagepools
+    # singular name to be used as an alias on the CLI and for display
+    singular: storagepool
+    # kind is normally the CamelCased singular type. Your resource manifests use this.
+    kind: StoragePool
+    # shortNames allow shorter string to match your resource on the CLI
+    shortNames:
+    - sp
