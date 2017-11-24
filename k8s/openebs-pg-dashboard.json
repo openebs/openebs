@@ -650,8 +650,8 @@
     ]
   },
   "time": {
-    "from": "2017-11-24T03:59:09.463Z",
-    "to": "2017-11-24T04:28:03.958Z"
+    "from": "now-6h",
+    "to": "now"
   },
   "timepicker": {
     "refresh_intervals": [
