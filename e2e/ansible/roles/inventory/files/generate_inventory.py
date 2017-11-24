@@ -34,93 +34,10 @@ import logging
 import argparse
 import configparser
 import warnings
-import socket
+from validator import Validator
+from inventory import Inventory
+from utils import replace
 
-
-def IPvalidator(ip):
-    try:
-        socket.inet_aton(ip)
-        return True
-    except socket.error:
-        return False
-
-
-def validateInput(i_line, codes):
-    """ Validates the host codes against a supported list """
-
-    codelist = list(codes)
-    if len(i_line) != 4:
-        print "Invalid row length in line: %s" % (','.join(i_line))
-        exit()
-    if IPvalidator(i_line[1]) is False:
-        print "IP is invalid in line: %s" % (','.join(i_line))
-        exit()
-    for j in i_line[2], i_line[3].rstrip('\n'):
-        if j not in os.environ:
-            print "Variable not in env, from line: %s" % (','.join(i_line))
-            exit()
-    if i_line[0].lower() not in codelist:
-        print "Invalid host code in line: %s" % (','.join(i_line))
-        exit()
-
-
-def generateInventory(config, boxlist, path, codes, pwdless):
-    """ Generates inventory.cfg file using configparser module  """
-
-    c = 1
-    for i in boxlist:
-        if i[0] != 'localhost':
-            hostgroupname = codes[i[0]]
-            user = "\"{{ lookup('env','%s') }}\"" % (i[2])
-            passwd = "\"{{ lookup('env','%s') }}\"" % (i[3])
-
-            try:
-                if c == 1:
-                    hostaliasname = '%s0%s ansible_ssh_host' % (i[0], c)
-                    config[hostgroupname] = {hostaliasname: i[1]}
-
-                    with open(path,'w') as f:
-                        config.write(f)
-
-                    c = c + 1
-
-                    varsgroupname = '%s:vars' % (hostgroupname)
-                    config[varsgroupname] = {'ansible_ssh_user': user}
-
-                    if not pwdless:
-                        config[varsgroupname]['ansible_ssh_pass'] = passwd
-
-                    config[varsgroupname]['ansible_become_pass'] = passwd
-
-                    extraargs = "'-o StrictHostKeyChecking=no'"
-                    config[varsgroupname]['ansible_ssh_extra_args'] = extraargs
-                    
-                    with open(path,'w') as f:
-                        config.write(f)
-
-                elif c > 1:
-                    hostaliasname = '%s0%s ansible_ssh_host' % (i[0], c)
-                    config[hostgroupname][hostaliasname] = i[1]
-
-                    with open(path,'w') as f:
-                        config.write(f)
-                    
-                    c = c + 1
-
-            except KeyError as e:
-                err_text = "Unable to construct hosts file, received error:"
-                logging.info(err_text, e)
-
-
-def replace(file, pattern, subst):
-    """ Replace extra spaces around assignment operator in inventory """
-
-    with open(file,'rb') as file_handle:
-        s = file_handle.read()
-     
-    with open(file,'wb') as file_handle:
-        s = s.replace(pattern, subst)
-        file_handle.write(s)
 
 def main():
 
@@ -202,12 +119,15 @@ def main():
     localhost password"""
     HostList = []
     local_password = None
+    v = Validator()
     with open(Hosts, "rb") as fp:
         for i in fp.readlines():
             tmp = i.split(",")
             if tmp[0] != '\n' and "#" not in tmp[0]:
-
-                validateInput(tmp, SupportedHostCodes)
+                ret, msg = v.validateInput(tmp, SupportedHostCodes)
+                if not ret:
+                    print msg
+                    exit()
 
                 if tmp[0] == "localhost":
                     local_password = tmp[3].rstrip('\n')
@@ -228,13 +148,22 @@ def main():
 
     # Generate Ansible hosts file from 'machines.in'
     codes = list(SupportedHostCodes)
+    inventory = Inventory()
     for i in codes:
         codeSubList = []
         for j in HostList:
             if i in j:
                 codeSubList.append(j)
-        generateInventory(config, codeSubList,
-                          inventory_path, SupportedHostCodes, passwdless)
+        ret, msg = inventory.generateInventory(config, codeSubList,
+                                               inventory_path,
+                                               SupportedHostCodes,
+                                               passwdless)
+        if not ret:
+            print msg
+            exit()
+
+    print "Inventory config generated successfully"
+    logging.info("Inventory config generated successfully")
 
     # Insert localhost line into beginning of inventory file
     if local_password:
@@ -251,8 +180,6 @@ def main():
     # Sanitize the Ansible inventory file
     replace(inventory_path, " = ", "=")
 
-    print "Inventory config generated successfully"
-    logging.info("Inventory config generated successfully")
 
 if __name__ == "__main__":
     main()

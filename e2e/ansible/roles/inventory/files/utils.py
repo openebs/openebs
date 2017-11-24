@@ -1,5 +1,6 @@
 import subprocess
 import paramiko
+import re
 
 
 def executeCmd(command):
@@ -26,3 +27,15 @@ def sshToOtherClient(ip, usrname, pwd, cmd):
         return output
     else:
         return error
+
+
+def replace(file, pattern, subst):
+    """ Replace extra spaces around assignment operator in inventory """
+
+    file_handle = open(file, 'rb')
+    file_string = file_handle.read()
+    file_handle.close()
+    file_string = (re.sub(pattern, subst, file_string))
+    file_handle = open(file, 'wb')
+    file_handle.write(file_string)
+    file_handle.close()
