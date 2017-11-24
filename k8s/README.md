@@ -20,6 +20,16 @@ kubectl apply -f openebs-config.yaml
 kubectl apply -f openebs-storageclasses.yaml
 ```
 
+### (Optional) Run customized kubernetes dashboard
+
+This step is required till a newer version of kubernetes dashboard is released, that contains fixes from openebs team to PV/PVC links. 
+
+Delete the older version of the kubernetes dashboard. If you are running in minikube, you can say - minikube addons disable dashboard. 
+
+```
+kubectl apply -f openebs-kubernetes-dashboard.yaml
+```
+
 ### (Optional) Enable monitoring using prometheus and grafana
 
 Use this step if you don't already have monitoring services installed
