@@ -24,11 +24,12 @@ kubectl apply -f openebs-storageclasses.yaml
 
 This step is required till a newer version of kubernetes dashboard is released, that contains fixes from openebs team to PV/PVC links. 
 
-Delete the older version of the kubernetes dashboard. If you are running in minikube, you can say - minikube addons disable dashboard. 
-
 ```
 kubectl apply -f openebs-kubernetes-dashboard.yaml
 ```
+
+If you running in minikube, you can access the openebs-dashboard via the proxy url:
+http://127.0.0.1:8001/api/v1/namespaces/kube-system/services/https:openebs-kubernetes-dashboard:/proxy/#!/persistentvolume?namespace=default
 
 ### (Optional) Enable monitoring using prometheus and grafana
 
