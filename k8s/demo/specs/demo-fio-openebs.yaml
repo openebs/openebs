@@ -28,10 +28,10 @@ apiVersion: v1
 metadata:
   name: demo-vol1-claim
 spec:
-  storageClassName: openebs-standard
+  storageClassName: openebs-standalone
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
-      storage: "5G"
+      storage: "2G"
  
