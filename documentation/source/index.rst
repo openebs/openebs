@@ -38,6 +38,13 @@ Contents:
     Percona Galera Cluster <Usecases/percona_galera_cluster>
     Redis StatefulSet <Usecases/redis>
     Running OpenEBS Operator <Usecases/run_openebs_operator>
+
+.. toctree::
+    :maxdepth: 2
+    :caption: Policies
+    
+    Storage Policies <Policies/storage_policy>
+
     
     
 .. toctree::
