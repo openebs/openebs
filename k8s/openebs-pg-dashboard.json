@@ -123,7 +123,7 @@
           "tableColumn": "",
           "targets": [
             {
-              "expr": "OpenEBS_volume_uptime{job=\"openebs-volumes\", instance=~\"$OpenEBS\"}/60",
+              "expr": "OpenEBS_volume_uptime{job=\"openebs-volumes\", kubernetes_pod_name=~\"$OpenEBS\"}/60",
               "format": "time_series",
               "hide": false,
               "intervalFactor": 2,
@@ -201,7 +201,7 @@
           "tableColumn": "__name__",
           "targets": [
             {
-              "expr": "OpenEBS_actual_used{instance=~\"$OpenEBS\"}",
+              "expr": "OpenEBS_actual_used{kubernetes_pod_name=~\"$OpenEBS\"}",
               "format": "time_series",
               "hide": false,
               "intervalFactor": 2,
@@ -279,7 +279,7 @@
           "tableColumn": "",
           "targets": [
             {
-              "expr": "OpenEBS_actual_used{instance=~\"$OpenEBS\"}",
+              "expr": "OpenEBS_actual_used{kubernetes_pod_name=~\"$OpenEBS\"}",
               "format": "time_series",
               "intervalFactor": 1,
               "refId": "A",
@@ -291,6 +291,7 @@
           "timeShift": null,
           "title": "Storage Usage",
           "type": "singlestat",
+	  "hideTimeOverride": true,
           "valueFontSize": "80%",
           "valueMaps": [
             {
@@ -360,7 +361,7 @@
           "steppedLine": false,
           "targets": [
             {
-              "expr": "OpenEBS_read_iops{job=\"openebs-volumes\", instance=~\"$OpenEBS\"}",
+              "expr": "OpenEBS_read_iops{job=\"openebs-volumes\", kubernetes_pod_name=~\"$OpenEBS\"}",
               "format": "time_series",
               "hide": false,
               "intervalFactor": 2,
@@ -369,7 +370,7 @@
               "step": 2
             },
             {
-              "expr": "OpenEBS_write_iops{job=\"openebs-volumes\", instance=~\"$OpenEBS\"}",
+              "expr": "OpenEBS_write_iops{job=\"openebs-volumes\", kubernetes_pod_name=~\"$OpenEBS\"}",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{Write IOPS}}",
@@ -459,7 +460,7 @@
           "steppedLine": false,
           "targets": [
             {
-              "expr": "OpenEBS_read_block_count_per_second{job=\"openebs-volumes\", instance=~\"$OpenEBS\"}/(1024*1024)",
+              "expr": "OpenEBS_read_block_count_per_second{job=\"openebs-volumes\", kubernetes_pod_name=~\"$OpenEBS\"}/(1024*1024)",
               "format": "time_series",
               "hide": false,
               "intervalFactor": 2,
@@ -468,7 +469,7 @@
               "step": 2
             },
             {
-              "expr": "OpenEBS_write_block_count_per_second{job=\"openebs-volumes\", instance=~\"$OpenEBS\"}/(1024*1024)",
+              "expr": "OpenEBS_write_block_count_per_second{job=\"openebs-volumes\", kubernetes_pod_name=~\"$OpenEBS\"}/(1024*1024)",
               "format": "time_series",
               "hide": false,
               "intervalFactor": 2,
@@ -559,7 +560,7 @@
           "steppedLine": false,
           "targets": [
             {
-              "expr": "OpenEBS_read_latency{job=\"openebs-volumes\", instance=~\"$OpenEBS\"}",
+              "expr": "OpenEBS_read_latency{job=\"openebs-volumes\", kubernetes_pod_name=~\"$OpenEBS\"}",
               "format": "time_series",
               "hide": false,
               "intervalFactor": 2,
@@ -568,7 +569,7 @@
               "step": 2
             },
             {
-              "expr": "OpenEBS_write_latency{job=\"openebs-volumes\", instance=~\"$OpenEBS\"}",
+              "expr": "OpenEBS_write_latency{job=\"openebs-volumes\", kubernetes_pod_name=~\"$OpenEBS\"}",
               "format": "time_series",
               "hide": false,
               "intervalFactor": 2,
@@ -637,7 +638,7 @@
         "multi": false,
         "name": "OpenEBS",
         "options": [],
-        "query": "label_values(OpenEBS_size_of_volume, instance)",
+        "query": "label_values(OpenEBS_size_of_volume, kubernetes_pod_name)",
         "refresh": 1,
         "regex": "",
         "sort": 0,
