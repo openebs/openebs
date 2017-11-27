@@ -10,6 +10,7 @@ Contents:
     :caption: Getting Started
 
     OpenEBS Introduction <getting_started/overview>
+    OpenEBS Features <getting_started/features>
     Quick Install <getting_started/quick_install>
     How does Storage High Availablility Work? <getting_started/ha_storage>
     
