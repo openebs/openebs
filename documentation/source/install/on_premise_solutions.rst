@@ -45,7 +45,7 @@ Installing a Vagrant Box by Downloading the Vagrantfile
    ::
       ubuntu@ubuntu:~/k8s-demo$ vagrant up
 
-It will bring up a three node Kubernetes cluster with one master and two nodes. 
+   It will bring up a three node Kubernetes cluster with one master and two nodes. 
 
 4. SSH to kubemaster using the following command.
    ::
