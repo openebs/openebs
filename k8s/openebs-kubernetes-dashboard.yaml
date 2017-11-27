@@ -121,7 +121,7 @@ spec:
           mountPath: /certs
       containers:
       - name: openebs-kubernetes-dashboard
-        image: openebs/kubernetes-dashboard-amd64:latest
+        image: openebs/kubernetes-dashboard-amd64:v0.5.0-2017110901
         ports:
         - containerPort: 8443
           protocol: TCP
