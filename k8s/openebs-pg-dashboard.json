@@ -337,6 +337,7 @@
             "alignAsTable": true,
             "avg": true,
             "current": false,
+            "rightSide": false,
             "max": false,
             "min": false,
             "show": true,
