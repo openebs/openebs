@@ -337,11 +337,8 @@
             "alignAsTable": true,
             "avg": true,
             "current": false,
-            "hideEmpty": false,
-            "hideZero": false,
             "max": false,
             "min": false,
-            "rightSide": false,
             "show": true,
             "total": false,
             "values": true
