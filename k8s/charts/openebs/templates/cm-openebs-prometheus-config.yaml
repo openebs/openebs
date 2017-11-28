@@ -40,6 +40,9 @@ data:
       - source_labels: [__meta_kubernetes_pod_name]
         action: replace
         target_label: kubernetes_pod_name
+      - source_labels: [__meta_kubernetes_pod_label_vsm]
+        action: replace
+        target_label: openebs_pv
       - source_labels: [__meta_kubernetes_pod_container_port_number]
         action: drop
         regex: '(.*)9501'
