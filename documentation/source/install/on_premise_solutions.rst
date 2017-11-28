@@ -37,19 +37,19 @@ Installing a Vagrant Box by Downloading the Vagrantfile
       mkdir k8s-demo
 
 2. Download OpenEBS Vagrant file using the following command.
-::
-    cd k8s-demo
-    $ wget https://raw.githubusercontent.com/openebs/openebs/master/k8s/vagrant/1.7.5/Vagrantfile
+   ::
+       cd k8s-demo
+       $ wget https://raw.githubusercontent.com/openebs/openebs/master/k8s/vagrant/1.7.5/Vagrantfile
 
 3. Bring up k8s Cluster.
-::
-   ubuntu@ubuntu:~/k8s-demo$ vagrant up
+   ::
+      ubuntu@ubuntu:~/k8s-demo$ vagrant up
 
-It will bring up a three node Kubernetes cluster with one master and two nodes. 
+   It will bring up a three node Kubernetes cluster with one master and two nodes. 
 
 4. SSH to kubemaster using the following command.
-::
-   ubuntu@ubuntu:~/k8s-demo$ vagrant ssh kubemaster-01
+   ::
+      ubuntu@ubuntu:~/k8s-demo$ vagrant ssh kubemaster-01
 
 5. Run OpenEBS Operator.
    
@@ -248,13 +248,13 @@ OpenEBS Installation - Hyperconverged Mode
 
 * Setup the Kubernetes cluster using the setup-kubernetes playbook, followed by the setup-openebs playbook to deploy the OpenEBS pods. Internally, this runs the hyperconverged ansible role which executes the openebs-operator and integrates openebs-storage classes into the Kubernetes cluster.
 
-  * Execute the setup-kubernetes ansible playbook to create the Kubernetes cluster followed by the    setup-openebs playbook. These playbooks install the requisite dependencies on the machines, update the configuration files on the boxes and sets up Kubernetes cluster.
+* Execute the setup-kubernetes ansible playbook to create the Kubernetes cluster followed by the    setup-openebs playbook. These playbooks install the requisite dependencies on the machines, update the configuration files on the boxes and sets up Kubernetes cluster.
     ::
 
         testuser@OpenEBSClient:~/openebs/e2e/ansible$ ansible-playbook setup-kubernetes.yml
         testuser@OpenEBSClient:~/openebs/e2e/ansible$ ansible-playbook setup-openebs.yml
 
-  * Check status of the Kubernetes cluster
+* Check status of the Kubernetes cluster
     ::
 
         name@KubeMaster:~$ kubectl get nodes
