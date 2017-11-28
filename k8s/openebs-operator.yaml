@@ -70,7 +70,7 @@ spec:
       containers:
       - name: maya-apiserver
         imagePullPolicy: Always
-        image: openebs/m-apiserver:0.5.0-RC1
+        image: openebs/m-apiserver:0.5.0-RC2
         ports:
         - containerPort: 5656
         env:
@@ -78,6 +78,8 @@ spec:
           value: "openebs/jiva:0.5.0-RC1"
         - name: OPENEBS_IO_JIVA_REPLICA_IMAGE
           value: "openebs/jiva:0.5.0-RC1"
+        - name: OPENEBS_IO_VOLUME_MONITOR_IMAGE
+          value: "openebs/m-exporter:0.5.0-RC1"
         - name: OPENEBS_IO_JIVA_REPLICA_COUNT
           value: "2"
 ---
@@ -111,7 +113,7 @@ spec:
       containers:
       - name: openebs-provisioner
         imagePullPolicy: Always
-        image: openebs/openebs-k8s-provisioner:0.5.0-RC1
+        image: openebs/openebs-k8s-provisioner:0.5.0-RC2
         env:
         - name: NODE_NAME
           valueFrom:
@@ -119,6 +121,8 @@ spec:
               fieldPath: spec.nodeName
         - name: OPENEBS_MONITOR_URL
           value: "http://127.0.0.1:32515/dashboard/db/openebs-volume-stats?orgId=1"
+        - name: OPENEBS_MONITOR_VOLKEY
+          value: "&var-OpenEBS"
         - name: MAYA_PORTAL_URL
           value: "https://mayaonline.io/"
 ---
@@ -167,3 +171,14 @@ spec:
     # shortNames allow shorter string to match your resource on the CLI
     shortNames:
     - sp
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+   name: openebs-standard
+provisioner: openebs.io/provisioner-iscsi
+parameters:
+  openebs.io/storage-pool: "default"
+  openebs.io/jiva-replica-count: "2"
+  openebs.io/volume-monitor: "true"
+  openebs.io/capacity: 5G
