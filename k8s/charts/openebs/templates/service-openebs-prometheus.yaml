@@ -1,0 +1,17 @@
+{{- if .Values.policies.monitoring.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: openebs-prometheus-service
+  labels:
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+spec:
+  selector: 
+    name: openebs-prometheus-server
+  type: NodePort
+  ports:
+    - port: 80 # this Service's port (cluster-internal IP clusterIP)
+      targetPort: 9090 # pods expose this port
+      nodePort: 32514
+      # Note that this Service will be visible as both NodeIP:nodePort and clusterIp:Port
+{{- end }}

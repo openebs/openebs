@@ -23,3 +23,7 @@ spec:
           valueFrom: 
             fieldRef:
               fieldPath: spec.nodeName
+        - name: OPENEBS_MONITOR_URL
+          value: "{{ .Values.provisioner.monitorurl }}"
+        - name: MAYA_PORTAL_URL
+          value: "{{ .Values.provisioner.mayaportalurl }}"
