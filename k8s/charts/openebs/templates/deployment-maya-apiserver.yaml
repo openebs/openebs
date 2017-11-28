@@ -25,5 +25,7 @@ spec:
           value: {{ .Values.jiva.image }}
         - name: OPENEBS_IO_JIVA_REPLICA_IMAGE
           value: {{ .Values.jiva.image }}
+        - name: OPENEBS_IO_VOLUME_MONITOR_IMAGE
+          value: "{{ .Values.policies.monitoring.image }}"
         - name: OPENEBS_IO_JIVA_REPLICA_COUNT
           value: "{{ .Values.jiva.replicas }}"

@@ -24,3 +24,4 @@ jiva:
 policies:
   monitoring:
     enabled: true
+    image: "openebs/m-exporter:0.5.0-RC1"
