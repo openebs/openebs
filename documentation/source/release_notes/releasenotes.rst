@@ -4,12 +4,43 @@
 Changelog
 *******************
 
+OpenEBS Release Version 0.5.0
+================================
+
+Downloads for v0.5.0
+------------------------
+The following v0.5.0 containers are available at the  
+
+<TBD>
+
+New v0.5.0 Features
+--------------------------
+
+* OpenEBS can now be deployed with Cassandra, Couchbase, Jenkins, MongoDB, Percona Galera Cluster, and Redis StatefulSet.
+* Storage Policies
+
+<TBD>
+
+Issues Fixed in v0.5.0
+------------------------
+
+<TBD>
+
+Known Issues in v0.5.0
+------------------------
+
+<TBD>
+
+
+OpenEBS Release Version 0.4.0
+================================
+
 You can try out OpenEBS v0.4.0 on your Kubernetes Cluster using the `quick start guide`_. 
  
 .. _quick start guide: http://openebs.readthedocs.io/en/latest/getting_started/quick_install.html
 
 Downloads for v0.4.0
-=====================
+---------------------------
 The following OpenEBS v0.4.0 containers are available at the `Docker Hub`_.
 
 .. _Docker Hub: https://hub.docker.com/r/openebs/
@@ -18,7 +49,7 @@ The following OpenEBS v0.4.0 containers are available at the `Docker Hub`_.
 * openebs/openebs-k8s-provisioner:0.4.0 : Dynamic OpenEBS Volume Provisioner for Kubernetes.
 
 New v0.4.0 Features
-=====================
+-------------------------
 * Maya CLI Support for managing snapshots for OpenEBS Volumes
 * Maya CLI Support for obtaining the capacity usage statistics from OpenEBS Volumes
 * OpenEBS Volume - Dynamic Provisioner is merged into kubernetes-incubator/external-storage project
@@ -30,12 +61,12 @@ New v0.4.0 Features
 * OpenEBS can now be deployed within a minikube setup
 
 Issues Fixed in v0.4.0
-==============================
+---------------------------
 * #166 (https://github.com/edorid): openebs-k8s-provisioner goes into crashloopbackoff, during the first volume creation
 * #176 (https://github.com/maikotz): OpenEBS PV is unreachable after one of the replica becomes unreachable.
 
 Known Issues in v0.4.0
-==============================
+-------------------------
 * #633 (https://github.com/openebs/openebs/issues/633): 
 
 **Issue:**
@@ -59,18 +90,18 @@ Setting up OpenEBS with Kubernetes using Minikube on the Ubuntu host displayed t
       sudo mv ./kubectl /usr/local/bin/kubectl
 
 CI Updates with v0.4.0
-=========================
+---------------------------
 * Support for on-premise Jenkins CI for performing e2e tests
 * iSCSI compliance tests are run as part of the CI
 * CI can now be extended using a framework developer for running storage benchmark tests with vdbench or fio.
 * CI has been extended to run Percona Benchmarking tests on Kubernetes.
 
 Deprecated with v0.4.0
-=========================
+----------------------------
 The maya cli options (setup-omm, setup-osh, omm-status, osh-status) to setup and manage dedicated OpenEBS setup is removed. Starting with v0.4.0, only hyperconvergence with Kubernetes is supported.
 
 Notes for Contributors
-=========================
+---------------------------
 * OpenEBS user documentation is currently being moved into *openebs/openebs/documentation*
 * OpenEBS developer documentation is currently being added to *openebs/openebs/contribute*
 * The deployment and e2e functionality will continue to be located in *openebs/k8s* and *openebs/e2e* respectively.
