@@ -25,5 +25,7 @@ spec:
               fieldPath: spec.nodeName
         - name: OPENEBS_MONITOR_URL
           value: "{{ .Values.provisioner.monitorurl }}"
+        - name: OPENEBS_MONITOR_VOLKEY
+          value: "{{ .Values.provisioner.monitorvolkey }}"
         - name: MAYA_PORTAL_URL
           value: "{{ .Values.provisioner.mayaportalurl }}"

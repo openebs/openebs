@@ -75,9 +75,9 @@ spec:
         - containerPort: 5656
         env:
         - name: OPENEBS_IO_JIVA_CONTROLLER_IMAGE
-          value: "openebs/jiva:0.5.0-RC1"
+          value: "openebs/jiva:0.5.0-RC2"
         - name: OPENEBS_IO_JIVA_REPLICA_IMAGE
-          value: "openebs/jiva:0.5.0-RC1"
+          value: "openebs/jiva:0.5.0-RC2"
         - name: OPENEBS_IO_VOLUME_MONITOR_IMAGE
           value: "openebs/m-exporter:0.5.0-RC1"
         - name: OPENEBS_IO_JIVA_REPLICA_COUNT
