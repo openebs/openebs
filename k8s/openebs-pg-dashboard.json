@@ -76,7 +76,7 @@
             "rgba(50, 172, 45, 0.97)"
           ],
           "datasource": "${DS_OPENEBS_PROMETHEUS}",
-          "description": "Time Since volume registered",
+          "description": "Elapsed time since Volume was provisioned",
           "format": "m",
           "gauge": {
             "maxValue": 100,
@@ -154,7 +154,7 @@
             "rgba(245, 54, 54, 0.9)"
           ],
           "datasource": "${DS_OPENEBS_PROMETHEUS}",
-          "description": "This shows the total size of the volume used.",
+          "description": "Capacity Used by the Volume",
           "format": "decgbytes",
           "gauge": {
             "maxValue": 5,
@@ -322,7 +322,7 @@
     },
     {
       "collapse": false,
-      "height": 298,
+      "height": 275,
       "panels": [
         {
           "aliasColors": {},
@@ -330,7 +330,7 @@
           "dashLength": 10,
           "dashes": false,
           "datasource": "${DS_OPENEBS_PROMETHEUS}",
-          "description": "Read IOPS of volume",
+          "description": "IOPS",
           "fill": 1,
           "id": 3,
           "legend": {
@@ -362,7 +362,7 @@
               "format": "time_series",
               "hide": false,
               "intervalFactor": 2,
-              "legendFormat": "{{Read IOPS}}",
+              "legendFormat": "{{Reads}}",
               "refId": "A",
               "step": 2
             },
@@ -370,7 +370,7 @@
               "expr": "OpenEBS_write_iops{job=\"openebs-volumes\", kubernetes_pod_name=~\"$OpenEBS\"}",
               "format": "time_series",
               "intervalFactor": 2,
-              "legendFormat": "{{Write IOPS}}",
+              "legendFormat": "{{Writes}}",
               "refId": "B",
               "step": 2
             }
@@ -378,7 +378,7 @@
           "thresholds": [],
           "timeFrom": null,
           "timeShift": null,
-          "title": "Read/Write IOPS",
+          "title": "IOPS",
           "tooltip": {
             "shared": true,
             "sort": 0,
@@ -416,12 +416,12 @@
       "repeatIteration": null,
       "repeatRowId": null,
       "showTitle": false,
-      "title": "Dashboard Row",
+      "title": "IOPS Graph",
       "titleSize": "h6"
     },
     {
       "collapse": false,
-      "height": 285,
+      "height": 275,
       "panels": [
         {
           "aliasColors": {},
@@ -429,7 +429,7 @@
           "dashLength": 10,
           "dashes": false,
           "datasource": "${DS_OPENEBS_PROMETHEUS}",
-          "description": "Bandwidth of volume",
+          "description": "Throughput",
           "fill": 1,
           "id": 9,
           "legend": {
@@ -478,7 +478,7 @@
           "thresholds": [],
           "timeFrom": null,
           "timeShift": null,
-          "title": "Read/Write Throughput",
+          "title": "Throughput",
           "tooltip": {
             "shared": true,
             "sort": 0,
@@ -516,12 +516,12 @@
       "repeatIteration": null,
       "repeatRowId": null,
       "showTitle": false,
-      "title": "Dashboard Row",
+      "title": "Throughput Graph",
       "titleSize": "h6"
     },
     {
       "collapse": false,
-      "height": 250,
+      "height": 275,
       "panels": [
         {
           "aliasColors": {},
@@ -529,7 +529,7 @@
           "dashLength": 10,
           "dashes": false,
           "datasource": "${DS_OPENEBS_PROMETHEUS}",
-          "description": "Read/Write latency of volume",
+          "description": "Latency",
           "fill": 1,
           "id": 5,
           "legend": {
@@ -561,7 +561,7 @@
               "format": "time_series",
               "hide": false,
               "intervalFactor": 2,
-              "legendFormat": "{{Read latency}}",
+              "legendFormat": "{{Read Latency}}",
               "refId": "A",
               "step": 2
             },
@@ -570,7 +570,7 @@
               "format": "time_series",
               "hide": false,
               "intervalFactor": 2,
-              "legendFormat": "{{Write latency}}",
+              "legendFormat": "{{Write Latency}}",
               "refId": "B",
               "step": 2
             }
@@ -578,7 +578,7 @@
           "thresholds": [],
           "timeFrom": null,
           "timeShift": null,
-          "title": "Read/Write Latency",
+          "title": "Latency",
           "tooltip": {
             "shared": true,
             "sort": 0,
@@ -616,7 +616,7 @@
       "repeatIteration": null,
       "repeatRowId": null,
       "showTitle": false,
-      "title": "Dashboard Row",
+      "title": "Latency Graph",
       "titleSize": "h6"
     }
   ],
