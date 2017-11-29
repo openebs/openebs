@@ -60,8 +60,9 @@ The list of operations performed by the *oebs-cloud.sh* script are as follows:
     $ ./oebs-cloud.sh
     Usage : 
        oebs-cloud.sh --setup-local-env
-       oebs-cloud.sh --create-cluster-config
-       oebs-cloud.sh --ssh-aws-ec2
+       oebs-cloud.sh --create-cluster-config [--ami-vm-os=[ubuntu|coreos]]
+       oebs-cloud.sh --list-aws-instances
+       oebs-cloud.sh --ssh-aws-ec2  [  ipaddress |=ipaddress]
        oebs-cloud.sh --help
 
     Sets Up OpenEBS On AWS
@@ -192,7 +193,9 @@ From your workstation, run the following commands to connect to the EC2 instance
 
 Running *--ssh-aws-ec2* command without any arguments, by default, connects you to the Kubernetes Master. 
 
-You can also run *--ssh-aws-ec2* command as *--ssh-aws-ec2=ipaddress*, where *ipaddress* is the Public IP Address of the AWS EC2 instance.
+You can also run *--ssh-aws-ec2* command as *--ssh-aws-ec2=ipaddress*, where *ipaddress* is the public IP Address of the AWS EC2 instance.
+
+If you want to connect with the Kubernetes minion, run *--ssh-aws-ec2=ipaddress*, where *ipaddress* is the public IP Address of the AWS EC2 instance.
 
 You should now be running inside the AWS EC2 instance.
 
