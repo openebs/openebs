@@ -3,16 +3,16 @@ apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   labels:
-    app: openbs-grafana
+    app: openebs-grafana
     chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
-  name: openbs-grafana
+  name: openebs-grafana
 spec:
   replicas: 1
   revisionHistoryLimit: 2
   template:
     metadata:
       labels:
-        app: openbs-grafana
+        app: openebs-grafana
     spec:
       containers:
       - image: grafana/grafana:4.5.2

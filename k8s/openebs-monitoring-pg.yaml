@@ -141,7 +141,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: openbs-grafana
+  name: openebs-grafana
 spec:
   type: NodePort
   ports:
@@ -149,21 +149,21 @@ spec:
     targetPort: 3000
     nodePort: 32515
   selector:
-    app: openbs-grafana
+    app: openebs-grafana
 ---
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   labels:
-    app: openbs-grafana
-  name: openbs-grafana
+    app: openebs-grafana
+  name: openebs-grafana
 spec:
   replicas: 1
   revisionHistoryLimit: 2
   template:
     metadata:
       labels:
-        app: openbs-grafana
+        app: openebs-grafana
     spec:
       containers:
       - image: grafana/grafana:4.5.2
