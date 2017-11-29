@@ -57,6 +57,11 @@ working_dir=$GOPATH/src/github.com/openebs
 mkdir -p $working_dir
 cd $working_dir
 ```
+Set `user` to match your github profile name:
+
+```
+user={your github profile name}
+```
 
 ## The steps mentioned here are w.r.t contribution towards openebs/openebs project
 ```
