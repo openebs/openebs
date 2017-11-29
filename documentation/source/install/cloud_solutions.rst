@@ -267,6 +267,8 @@ Go to **Google Cloud Platform** -> **Compute Engine** -> **VM instances**. The n
  
  .. image:: ../_static/compute_engine_vms.png
 
+Select the nodes and click SSH to see the iSCSI configuration.
+
 **Verify that iSCSI is configured**
 
 a. Check that initiator name is configured.
@@ -323,15 +325,17 @@ Create an administrator configuration context from the configuration shell using
     gcloud container clusters list
     kubectl config set-context demo-openebs03 --cluster=gke_strong-eon-153112_us-central1-a_demo-openebs03 --user=cluster-admin
 
-Download the latest OpenEBS files using the following commands.
+c. Download the latest OpenEBS files using the following commands.
 ::
 
     git clone https://github.com/openebs/openebs.git
     cd openebs/k8s
 
-The following commands will prompt you for a username and password. Provide username as *admin*. Password for the admin can be obtained from **Google Cloud Platform** -> **Kubernetes Engine** -> **(cluster)** -> **Show Credentials**
+The following commands will prompt you for a username and password. Provide username as *admin*. Password for the admin can be obtained from **Google Cloud Platform** -> **Kubernetes Engine**.
 
-Apply OpenEBS Operator and add related OpenEBS Storage Classes, that can be used by developers and applications using the following commands.
+Click the cluster you have created and select **Show Credentials**.
+
+d. Apply OpenEBS Operator and add related OpenEBS Storage Classes, that can be used by developers and applications using the following commands.
 ::
 
     kubectl config use-context demo-openebs03
