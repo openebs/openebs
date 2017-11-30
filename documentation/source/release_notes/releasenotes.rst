@@ -7,12 +7,6 @@ Changelog
 OpenEBS Release Version 0.5.0
 ================================
 
-Downloads for v0.5.0
-------------------------
-The following v0.5.0 containers are available at the  
-
-<TBD>
-
 New v0.5.0 Features
 --------------------------
 
@@ -75,7 +69,9 @@ Issues Fixed in v0.5.0
 Known Issues in v0.5.0
 ------------------------
 
-For a list of v0.5.0 known issues, go to https://github.com/openebs/openebs/labels/documentation%2Frelease-note-open.
+For a list of known issues, go to `v0.5.0 known issues`_.
+
+.. _v0.5.0 known issues: https://github.com/openebs/openebs/labels/documentation/release-note-open
 
 Kubernetes Dashboard/UI Updates
 ---------------------------------
