@@ -6,8 +6,8 @@ You can now define policies based on the type of application at the storage-clas
 * openebs.io/jiva-replica-count
 * openebs.io/jiva-replica-image
 * openebs.io/jiva-controller-image
-* storage pool
-* volume monitoring 
+* openebs.io/storage-pool
+* openebs.io/volume-monitor 
 
 Replica Count Policy
 ----------------------
