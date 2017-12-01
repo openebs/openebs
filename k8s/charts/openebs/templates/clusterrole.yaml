@@ -8,7 +8,10 @@ metadata:
     chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
 rules:
 - apiGroups: ["*"]
-  resources: ["services","pods","deployments", "events"]
+  resources: ["nodes","nodes/proxy"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["*"]
+  resources: ["services","pods","deployments", "events", "endpoints"]
   verbs: ["*"]
 - apiGroups: ["*"]
   resources: ["persistentvolumes","persistentvolumeclaims"]
@@ -16,4 +19,6 @@ rules:
 - apiGroups: ["storage.k8s.io"]
   resources: ["storageclasses"]
   verbs: ["*"]
+- nonResourceURLs: ["/metrics"]
+  verbs: ["get"]
 {{- end }}

@@ -7,30 +7,110 @@ Changelog
 OpenEBS Release Version 0.5.0
 ================================
 
-Downloads for v0.5.0
-------------------------
-The following v0.5.0 containers are available at the  
-
-<TBD>
-
 New v0.5.0 Features
 --------------------------
 
-* OpenEBS can now be deployed with Cassandra, Couchbase, Jenkins, MongoDB, Percona Galera Cluster, and Redis StatefulSet.
-* Storage Policies
+* Storage Policy Enforcement Framework that allows DevOps teams to deploy a customized storage. Some of the storage policies supported are for -
+  
+  - using a custom Storage Engine like Jiva
+  - exposing volume metrics in Prometheus format using a side-car to volume controller
+  - defining capacity
+  - defining the persistent storage location like */var/openebs* (default) or a directory mounted on EBS or GPD and so on
+* Extend OpenEBS API Server to expose volume snapshot api
+* Support for deploying OpenEBS using helm charts
+* Sample Prometheus configuration for collecting OpenEBS Volume Metrics
+* Sample Grafana OpenEBS Volume Dashboard using the prometheus Metrics
+* Sample Deployment YAMLs and corresponding storage classes for different types of applications. For a more detailed list, see `Deployment Examples of YAMLs using OpenEBS`_
+* Sample Deployment YAMLs for launching the Kubernetes Dashboard for a preview of the changes made by the OpenEBS Team to the Kubernetes Dashboard. See, `Kubernetes Dashboard/UI Updates`_ for the PRs raised and merged.
+* Sample Deployment YAMLs for Prometheus and Grafana if they are not already a part of your deployment
+* Several documentation and code re-factoring changes for improving code quality
 
-<TBD>
+Enhancements for v0.5.0
+-------------------------
+
+* Support for defining storage policies as parameters on a StorageClass (openebs/maya #136 #180 openebs/external-storage #6)
+* OpenEBS Volume Exporter (m-exporter) container is introduced which can be launched as a sidecar to the OpenEBS Volume Controller. (openebs/maya #186 #200)
+* Support for Storage Pool policy, to allow users to specify the location (directory) to store the data (openebs/maya #192)
+* Include additional metrics along with IOPS, Throughput, Latency, Block Size:
+  
+  - VolName, Uptime (openebs/jiva #30)
+  - Total Capacity, Used Capacity (openebs/jiva #29)
+* Added /metrics endpoint to OpenEBS Volume - controller and replica volumes, to gather volume control api statistics (openebs/jiva #17)
+* Extend OpenEBS apiserver api to manage snapshots (openebs/maya #164)
+* openebs-provisioner to connect with m-apiserver through non-default namespace (openebs/external-storage #12)
+* Optimize the container images for size (openebs/jiva #24, openebs/maya #119)
+* Improve the logging mechanism for openebs-provisioner (openebs/external-storage #10)
+* OpenEBS Volume Controller and Replicas can be scheduled on specific nodes using taints (openebs/maya #106)
+
+Deployment Examples of YAMLs using OpenEBS
+--------------------------------------------
+Following are some of the deployment examples that are supported in this release.
+
+* MongoDB (openebs/openebs #488)
+* Cassandra (openebs/openebs #504)
+* MySQL Replication Cluster (openebs/openebs #543)
+* Redis (openebs/openebs #561)
+* Kafka (openebs/openebs #610)
+* RabbitMQ (openebs/openebs #662)
+* EFK (openebs/openebs #682)
+* CockroachDB (openebs/openebs #682)
+* Jenkins (openebs/openebs #741)
+* MySQL Syncrhonous Replication Cluster using Galera (openebs/openebs #803)
+* Crunchy Postgress (openebs/openebs #895)
+* Couchbase (openebs/openebs #901)
 
 Issues Fixed in v0.5.0
 ------------------------
 
-<TBD>
+* OpenEBS volume fails to attach when the capacity is provided as Gi (openebs/jiva #32)
+* Jiva iSCSI target returns a negative "target portal group tag" on discovery (openebs/jiva #28)
+* Add resiliency to openebs-provisioner to handle intermittent issues with apiserver (openebs/external-storage #7)
 
 Known Issues in v0.5.0
 ------------------------
 
-<TBD>
+For a list of known issues, go to `v0.5.0 known issues`_.
 
+.. _v0.5.0 known issues: https://github.com/openebs/openebs/labels/documentation/release-note-open
+
+Kubernetes Dashboard/UI Updates
+---------------------------------
+
+* Show PersistentVolumes created for a given StorageClass (kubernetes/dashboard #2495)
+* Show PersistentVolumeClaims used by a Pod (kubernetes/dashboard #2515)
+* Make the PVC, PV, StorageClass clickable from PVC and PV pages ( kubernetes/dashboard #2520 #2560)
+
+CI Updates
+-------------
+
+* Include feature test to verify 
+  
+  - snapshot create-revert workflow (openebs/openebs #859)
+  - basic high-availability workflow (openebs/openebs #868)
+  - snapshot workflow for percona-mysql application (openebs/openebs #885)
+* Run volume provisioning tests using minikube on openebs/maya code commits (openebs/maya #142)
+* MySQL Test Containers with automated replication cluster setup (openebs/test-storage #21 #22 openebs/openebs #543)
+* Sysbench Test Container (openebs/test-storage #25)
+* Mechanism to avoid running deployment CI when commits are made to documentation (openebs/openebs #889)
+* Improve the slack notifications based on Jenkins CI status (openebs/openebs #603)
+* Improvise on the CI run time (openebs/openebs #626 #779)
+* Make the contain tag (on which CI should be run) configurable for Ansible playbook (openebs/openebs #739 #905)
+* Few other incremental enhancements/bugfixes (openebs/openebs #481 #598 #522 #623 #627 #629 #912)
+
+Notes for Contributors
+---------------------------
+
+* openebs/mayaserver has been deprecated and code migrated to openebs/maya (openebs/maya #95)
+* openebs/maya repository now hosts all the OpenEBS native control plane components like m-apiserver, mayactl, m-exporter. The build and directory structures are accordingly modified. Please see openebs/maya/cmd/<component-name> for a starting point.
+* openebs/maya now uses GO as a build tool and dep for dependency management (openebs/maya #96 )
+* CLI is moving toward COBRA. All the new components use COBRA, mayactl except for the volume stats command, while others now support COBRA CLI. In the next release, we look forward to move the remaining commands to COBRA CLI and converge on a single CLI framework. (openebs/maya #388)
+* The OpenEBS control plane components are designed to be plugged into different COs. The components/framework is being refactored to make it easy to support additional COs in the future release. Some of these framework changes are warranting to remove the code dependent on the deprecated usage (primarily used by nomad) is being removed.
+* openebs/maya/cmd/maya-agent was introduced to manage and automate the local storage functionality. This component is being renamed to openebs/maya/cmd/maya-nodebot and is primarily intended to augment the functionality already provided by k8s local storage manager and node-exporter (openebs/openebs #194)
+
+Limitations
+-------------
+
+* Running in Azure K8s Clusters (not verified)
 
 OpenEBS Release Version 0.4.0
 ================================

@@ -37,19 +37,19 @@ Installing a Vagrant Box by Downloading the Vagrantfile
       mkdir k8s-demo
 
 2. Download OpenEBS Vagrant file using the following command.
-::
-    cd k8s-demo
-    $ wget https://raw.githubusercontent.com/openebs/openebs/master/k8s/vagrant/1.7.5/Vagrantfile
+   ::
+       cd k8s-demo
+       $ wget https://raw.githubusercontent.com/openebs/openebs/master/k8s/vagrant/1.7.5/Vagrantfile
 
 3. Bring up k8s Cluster.
-::
-   ubuntu@ubuntu:~/k8s-demo$ vagrant up
+   ::
+      ubuntu@ubuntu:~/k8s-demo$ vagrant up
 
-It will bring up a three node Kubernetes cluster with one master and two nodes. 
+   It will bring up a three node Kubernetes cluster with one master and two nodes. 
 
 4. SSH to kubemaster using the following command.
-::
-   ubuntu@ubuntu:~/k8s-demo$ vagrant ssh kubemaster-01
+   ::
+      ubuntu@ubuntu:~/k8s-demo$ vagrant ssh kubemaster-01
 
 5. Run OpenEBS Operator.
    
@@ -252,7 +252,9 @@ OpenEBS Installation - Hyperconverged Mode
     ::
 
         testuser@OpenEBSClient:~/openebs/e2e/ansible$ ansible-playbook setup-kubernetes.yml
+
         testuser@OpenEBSClient:~/openebs/e2e/ansible$ ansible-playbook setup-openebs.yml
+
 
   * Check status of the Kubernetes cluster
     ::
