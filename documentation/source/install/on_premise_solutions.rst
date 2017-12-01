@@ -13,7 +13,7 @@ Prerequisites:
 ----------------
 
 * Vagrant (>=1.9.1)
-* VirtualBox 5.1
+* VirtualBox (>=5.1)
 * curl / wget / git and so on, to download the Vagrant file
 * Ensure virtualization is enabled at the BIOS level
 
@@ -96,8 +96,14 @@ The *ubuntu@kubemaster-01:~$ kubectl apply -f demo/jupyter/demo-jupyter-openebs.
 * Create an OpenEBS Volume and mount to the Jupyter Server Pod (/mnt/data) (kubectl get pvc) (kubectl get pv) (kubectl get pods)
 * Expose the Jupyter Server to external world through http://NodeIP:8888 (NodeIP is any of the nodes' external IP) (kubectl get pods)
 
+Troubleshooting
+-----------------
+**Issue:** Error while vagrant up.
+
+**Workaround:** Update your virtualbox and vagrant to the latest version.
+
 Using Ansible
-=============
+===============
 
 Setting Up OpenEBS on Ubuntu Hosts or Virtual Machines
 ------------------------------------------------------
@@ -163,11 +169,12 @@ Setup the local working directory where the ansible code will be downloaded. Per
 
 Setup Environment for OpenEBS Installation
 ------------------------------------------
-* Setup environment variables for the usernames and passwords of all the machines which have been brought up in the previous steps on the test-harness (this machine will be interchangeably used with the term 'localhost'). Ensure that these are setup in the .profile of the localhost user which will be running the ansible code or playbooks, that is the ansible_user.
+* Setup environment variables for the usernames and passwords of all the machines which have been brought up in the previous steps on the test-harness (this machine will be interchangeably used with the term 'localhost'). Ensure that these are setup in the **.profile** file of the localhost user which will be running the ansible code or playbooks, that is the ansible_user.
 
-* Ensure that the env variables setup in the previous step are available in the current user session. Perform source ~/.profile to achieve the same and verify through echo $VARIABLE.
+* Ensure that the env variables setup in the previous step are available in the current user session. Perform *source ~/.profile* to achieve the same and verify through echo $VARIABLE.
 
-* Edit the *inventory/machines.in* file to place the latest HostCode, IP, username variable, password variable for all the machines setup. For more details on editing *machines.in*, see the Inventory README.
+* Edit the *inventory/machines.in* file to place the latest HostCode, IP, username variable, password variable for all the machines setup. For more details on editing *machines.in*, see the `Inventory README`_.
+.. _Inventory README: https://github.com/openebs/openebs/blob/master/e2e/ansible/inventory/README.md
 
 * Edit the global variables file *inventory/group_vars/all.yml* to reflect the desired storage volume properties and network CIDR that will be used by the maya api server to allot the IP for the volume containers. Also update the ansible run-time properties to reflect the machine type (is_vagrant), whether the playbook execution needs to be recorded using the Ansible Run Analysis framework (setup_ara), whether slack notifications are needed (in case they are required, a $SLACK_TOKEN env variable needs to be setup. The token is usually the last part of the slack webhook URL which is user generated) and so on.
 
@@ -245,6 +252,9 @@ OpenEBS Installation - Hyperconverged Mode
     ::
 
         testuser@OpenEBSClient:~/openebs/e2e/ansible$ ansible-playbook setup-kubernetes.yml
+
+        testuser@OpenEBSClient:~/openebs/e2e/ansible$ ansible-playbook setup-openebs.yml
+
 
   * Check status of the Kubernetes cluster
     ::
