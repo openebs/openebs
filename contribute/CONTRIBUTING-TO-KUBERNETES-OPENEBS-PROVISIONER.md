@@ -44,6 +44,12 @@ cd $working_dir
 
 ```
 
+Set `user` to match your github profile name:
+
+```
+user={your github profile name}
+```
+
 ### Clone your repo 
  
 Clone your fork inside `$working_dir`
