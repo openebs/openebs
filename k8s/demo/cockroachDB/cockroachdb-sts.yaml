@@ -109,9 +109,8 @@ spec:
   volumeClaimTemplates:
   - metadata:
       name: datadir
-      annotations:
-        volume.alpha.kubernetes.io/storage-class: openebs-cockroachdb-sc
     spec:
+      storageClassName: openebs-cockroachdb
       accessModes:
         - "ReadWriteOnce"
       resources:

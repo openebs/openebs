@@ -1,0 +1,12 @@
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+   name: openebs-cockroachdb
+provisioner: openebs.io/provisioner-iscsi
+parameters:
+  openebs.io/storage-pool: "default"
+  openebs.io/jiva-replica-count: "2"
+  openebs.io/volume-monitor: "true"
+  openebs.io/capacity: 5G
+---
