@@ -11,9 +11,9 @@ Deploying CockroachDB as a StatefulSet provides the following benefits:
 - Ordered graceful deployment and scaling.
 - Ordered graceful deletion and termination.
 
-## Deploy CockroachDB with Persistent Storage
+## Deploying CockroachDB with Persistent Storage
 
-Before getting started check the status of the cluster:
+Before starting check the status of the cluster:
 
 ```bash
 ubuntu@kubemaster:~kubectl get nodes
@@ -24,7 +24,7 @@ kubeminion-02   Ready     3d        v1.8.2
 
 ```
 
-Download and Apply the CockroachDB YAMLs from OpenEBS repository:
+Download and apply the CockroachDB YAMLs from the OpenEBS repository:
 
 ```bash
 
@@ -68,7 +68,7 @@ cockroachdb   3         3         22h
 
 ```
 
-Get the status of underlying persistent volume being used by CockroachDB StatefulSet:
+Get the status of underlying persistent volume used by CockroachDB StatefulSet:
 
 ```bash
 ubuntu@kubemaster:~$ kubectl get pvc
@@ -94,9 +94,9 @@ pvc-ef78ba18-d4d6-11e7-8d7b-000c29119159-ctrl-svc   ClusterIP   10.110.107.240  
 
 ```
 
-## Test your Database
+## Testing your Database
 
-### Use the built-in SQL Client
+### Using the built-in SQL Client
 
 1. Launch a temporary interactive pod and start the built-in SQL client inside it:
 
@@ -130,9 +130,9 @@ ubuntu@kubemaster:~kubectl run cockroachdb -it --image=cockroachdb/cockroach --r
 >\q
 ```
 
-### Use a Load Generator
+### Using a Load Generator
 
-1. Download and Apply the CockroachDB load generator from OpenEBS repository:
+1. Download and apply the CockroachDB load generator from the OpenEBS repository:
 
 ```bash
 
