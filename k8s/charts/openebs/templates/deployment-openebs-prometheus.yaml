@@ -1,0 +1,65 @@
+{{- if .Values.policies.monitoring.enabled }}
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: openebs-prometheus
+  labels:
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        name: openebs-prometheus-server
+    spec:
+      serviceAccountName: openebs-maya-operator
+      containers:
+        - name: prometheus
+          image: prom/prometheus:v1.7.2
+          args:
+            - "-config.file=/etc/prometheus/conf/prometheus.yml"
+            # Metrics are stored in an emptyDir volume which
+            # exists as long as the Pod is running on that Node.
+            # The data in an emptyDir volume is safe across container crashes.
+            - "-storage.local.path=/prometheus"
+            # How long to retain samples in the local storage. 
+            - "-storage.local.retention=$(STORAGE_RETENTION)"
+          ports:
+            - containerPort: 9090
+          env:
+            # environment vars are stored in prometheus-env configmap. 
+            - name: STORAGE_RETENTION
+              valueFrom:
+                configMapKeyRef:
+                  name: openebs-prometheus-tunables
+                  key: storage-retention
+          resources:
+            requests:
+              # A memory request of 250M means it will try to ensure minimum
+              # 250MB RAM .
+              memory: "128M"
+              # A cpu request of 128m means it will try to ensure minimum
+              # .125 CPU; where 1 CPU means :
+              # 1 *Hyperthread* on a bare-metal Intel processor with Hyperthreading
+              cpu: "128m"
+            limits:
+              memory: "700M"
+              cpu: "500m"
+          
+          volumeMounts:
+            # prometheus config file stored in the given mountpath
+            - name: prometheus-server-volume
+              mountPath: /etc/prometheus/conf
+            # metrics collected by prometheus will be stored at the given mountpath.
+            - name: prometheus-storage-volume
+              mountPath: /prometheus
+      volumes:
+        # Prometheus Config file will be stored in this volume 
+        - name: prometheus-server-volume
+          configMap:
+            name: openebs-prometheus-config
+        # All the time series stored in this volume in form of .db file.
+        - name: prometheus-storage-volume
+          # containers in the Pod can all read and write the same files here.
+          emptyDir: {} 
+{{- end }}

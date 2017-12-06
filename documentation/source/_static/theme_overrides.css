@@ -24,11 +24,15 @@ html {
 
 .wy-nav-content {
     text-align: justify;
+    max-width: 100%;
 }
 
 @media screen and (min-width:1100px) {
     .wy-side-scroll {
         width: 350px;
+    }
+    .wy-nav-content-wrap{
+        margin-left: 340px;
     }
     .wy-side-nav-search {
         width: 340px;

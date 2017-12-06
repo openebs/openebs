@@ -1,0 +1,183 @@
+# The following file is intended for deployments that are not already
+# configured with prometheus. This is a minified version of the config
+# from the files present under ./openebs-monitoring/
+# 
+# Prometheus tunables
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: openebs-prometheus-tunables
+data:
+  storage-retention: 24h
+---
+# Define the openebs prometheus jobs
+kind: ConfigMap
+metadata:
+  name: openebs-prometheus-config
+apiVersion: v1
+data:
+  prometheus.yml: |-
+    global:
+      external_labels:
+        slave: slave1
+      scrape_interval: 5s
+      evaluation_interval: 5s
+    scrape_configs:
+    #- job_name: 'prometheus'
+      #static_configs:
+      # Added this to allow for federation collection
+      # Replace localhost with the nodeIP
+      #  - targets: ['localhost:32514']
+    - job_name: 'openebs-prometheus-server'
+      scheme: http
+      kubernetes_sd_configs:
+      - role: pod
+      relabel_configs:
+      - source_labels: [__meta_kubernetes_pod_label_name]
+        regex: openebs-prometheus-server
+        action: keep
+      - source_labels: [__meta_kubernetes_pod_name]
+        action: replace
+        target_label: kubernetes_pod_name
+    - job_name: 'openebs-volumes'
+      scheme: http
+      kubernetes_sd_configs:
+      - role: pod
+      relabel_configs:
+      - source_labels: [__meta_kubernetes_pod_label_monitoring]
+        regex: volume_exporter_prometheus
+        action: keep
+      - source_labels: [__meta_kubernetes_pod_name]
+        action: replace
+        target_label: kubernetes_pod_name
+      - source_labels: [__meta_kubernetes_pod_label_vsm]
+        action: replace
+        target_label: openebs_pv
+      - source_labels: [__meta_kubernetes_pod_container_port_number]
+        action: drop
+        regex: '(.*)9501'
+      - source_labels: [__meta_kubernetes_pod_container_port_number]
+        action: drop
+        regex: '(.*)3260'
+---
+# prometheus-deployment
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: openebs-prometheus
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        name: openebs-prometheus-server
+    spec:
+      serviceAccountName: openebs-maya-operator
+      containers:
+        - name: prometheus
+          image: prom/prometheus:v1.7.2
+          args:
+            - "-config.file=/etc/prometheus/conf/prometheus.yml"
+            # Metrics are stored in an emptyDir volume which
+            # exists as long as the Pod is running on that Node.
+            # The data in an emptyDir volume is safe across container crashes.
+            - "-storage.local.path=/prometheus"
+            # How long to retain samples in the local storage. 
+            - "-storage.local.retention=$(STORAGE_RETENTION)"
+          ports:
+            - containerPort: 9090
+          env:
+            # environment vars are stored in prometheus-env configmap. 
+            - name: STORAGE_RETENTION
+              valueFrom:
+                configMapKeyRef:
+                  name: openebs-prometheus-tunables
+                  key: storage-retention
+          resources:
+            requests:
+              # A memory request of 250M means it will try to ensure minimum
+              # 250MB RAM .
+              memory: "128M"
+              # A cpu request of 128m means it will try to ensure minimum
+              # .125 CPU; where 1 CPU means :
+              # 1 *Hyperthread* on a bare-metal Intel processor with Hyperthreading
+              cpu: "128m"
+            limits:
+              memory: "700M"
+              cpu: "500m"
+          
+          volumeMounts:
+            # prometheus config file stored in the given mountpath
+            - name: prometheus-server-volume
+              mountPath: /etc/prometheus/conf
+            # metrics collected by prometheus will be stored at the given mountpath.
+            - name: prometheus-storage-volume
+              mountPath: /prometheus
+      volumes:
+        # Prometheus Config file will be stored in this volume 
+        - name: prometheus-server-volume
+          configMap:
+            name: openebs-prometheus-config
+        # All the time series stored in this volume in form of .db file.
+        - name: prometheus-storage-volume
+          # containers in the Pod can all read and write the same files here.
+          emptyDir: {} 
+---
+# prometheus-service
+apiVersion: v1
+kind: Service
+metadata:
+  name: openebs-prometheus-service
+spec:
+  selector: 
+    name: openebs-prometheus-server
+  type: NodePort
+  ports:
+    - port: 80 # this Service's port (cluster-internal IP clusterIP)
+      targetPort: 9090 # pods expose this port
+      nodePort: 32514
+      # Note that this Service will be visible as both NodeIP:nodePort and clusterIp:Port
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: openebs-grafana
+spec:
+  type: NodePort
+  ports:
+  - port: 3000
+    targetPort: 3000
+    nodePort: 32515
+  selector:
+    app: openebs-grafana
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    app: openebs-grafana
+  name: openebs-grafana
+spec:
+  replicas: 1
+  revisionHistoryLimit: 2
+  template:
+    metadata:
+      labels:
+        app: openebs-grafana
+    spec:
+      containers:
+      - image: grafana/grafana:4.5.2
+        name: grafana
+        ports:
+        - containerPort: 3000
+        env:
+          - name: GF_AUTH_BASIC_ENABLED
+            value: "true"
+          - name: GF_AUTH_ANONYMOUS_ENABLED
+            value: "false"
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 3000
+          initialDelaySeconds: 30
+          timeoutSeconds: 1

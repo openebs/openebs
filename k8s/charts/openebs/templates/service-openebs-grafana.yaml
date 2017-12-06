@@ -1,0 +1,16 @@
+{{- if .Values.policies.monitoring.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: openebs-grafana
+  labels:
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+spec:
+  type: NodePort
+  ports:
+  - port: 3000
+    targetPort: 3000
+    nodePort: 32515
+  selector:
+    app: openebs-grafana
+{{- end }}

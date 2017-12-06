@@ -1,32 +1,60 @@
 
 Storage Policies
 ==================
-You can now define policies based on the type of application at the storage-class level. Following are some of the properties that can be customized at the default level in the openebs-storageclasses.yaml file.
+Overview
+-----------
 
-* jiva-replica-count
-* jiva-replica-image
-* jiva-controller-image
-* volume capacity and monitoring 
+This section explains storage policies, that every DevOps team can create and apply to their own storage systems. You can now define policies based on the type of application at the StorageClass (a Kubernetes Kind) level. This page explains when to add a storage policy to your OpenEBS cluster and how to use the same.
+
+A storage policy states the desired behavior of an OpenEBS volume. For example, a set of storage policies can be set in a StorageClass that in turn will be referred to during OpenEBS volume provisioning.
+
+Storage policies can be created, updated, and deleted in a running OpenEBS cluster through corresponding operations on StorageClass. Cluster administrators can update storage policies independent of the cluster. Once a storage policy is installed, users can create and access it's objects with kubectl commands on StorageClass.
+
+OpenEBS Components
+--------------------
+
+On their own, StorageClass lets you store and retrieve storage policies. It is only when combined with OpenEBS components namely openebs provisioner and maya api service that storage policies are applied against a PersistentVolume (a Kubernetes kind). The OpenEBS volume controller interprets the StorageClass' structured data as a record of the user’s desired state, and continually takes action to achieve and maintain that state.
+
+Users can deploy and update OpenEBS volume controller (otherwise known as Maya api service) on a running OpenEBS cluster, independently of the cluster’s own lifecycle. OpenEBS volume controller hooks up to the lifecycle of PersistentVolume (that is marked for OpenEBS via OpenEBS provisioner) to apply these storage policies.
+
+Should I Add a Custom Storage Policy to my OpenEBS Cluster?
+-----------------------------------------------------------------
+
+Storage policies are meant to be created per team, per workload, per storage controller, and so on. that fits your requirement. Since OpenEBS storage controllers (i.e. jiva or cStor) run from within a container, a custom storage policy can be created and set against a particular storage controller instance that meets the demands of the application (which consumes the storage exposed from the storage controller instance). You can now define policies based on the type of application at the storage-class level. Following are some of the properties that can be customized at the default level in the *openebs-storageclasses.yaml* file.
+
+Types of Storage Policies
+---------------------------
+
+OpenEBS supports several types of Storage Policies as follows:
+
+* openebs.io/jiva-replica-count
+* openebs.io/jiva-replica-image
+* openebs.io/jiva-controller-image
+* openebs.io/storage-pool
+* openebs.io/volume-monitor 
 
 Replica Count Policy
 ----------------------
-You can specify the number of jiva replicas you want to create. In the following example, the jiva-replica-count is specified as 1. Hence, a single replica is created.  
+You can specify the jiva replica count using the *openebs.io/jiva-replica-count* property. In the following example, the jiva-replica-count is specified as 1. Hence, a single replica is created.  
 ::
 
-    # Define a storage classes supported by OpenEBS
     apiVersion: storage.k8s.io/v1
     kind: StorageClass
     metadata:
         name: openebs-standalone
     provisioner: openebs.io/provisioner-iscsi
     parameters:
-        pool: hostdir-var
         openebs.io/jiva-replica-count: "1"
-    size: 5G
-
+    
 Replica Image Policy
 ----------------------
-You can add a replica image using the jiva-replica-image property. Specify the value in the "repo-hub-name/project-name:tag-name" format. In the following example, openebs is the repository name and jiva:0.4.0 is the project and tag name.
+You can specify the jiva replica image using the *openebs.io/jiva-replica-image* property.
+
+**Note:**
+
+Jiva replica image is a docker image.
+
+Following is a sample intent that makes use of replica image policy:
 ::
 
     apiVersion: storage.k8s.io/v1
@@ -41,10 +69,15 @@ You can add a replica image using the jiva-replica-image property. Specify the v
   
 Controller Image Policy
 ---------------------------
-You can add a jiva controller image using the jiva-controller-image property. Specify the value in the ""repo-hub-name/project-name:tag-name" " format. In the following example, openebs is the repository name and jiva:0.4.0 is the project and tag name.
+You can specify the jiva controller image using the *openebs.io/jiva-controller-image* property.
+
+**Note:**
+
+Jiva controller image is a docker image.
+
+Following is a sample setting.
 ::
 
-    apiVersion: storage.k8s.io/v1
     kind: StorageClass
     metadata:
         name: mysql
@@ -56,18 +89,19 @@ You can add a jiva controller image using the jiva-controller-image property. Sp
 
 Storage Pool Policy
 --------------------
-A storage pool provides a persistent path for an OpenEBS volume. It can be a directory on a
+A storage pool provides a persistent path for an OpenEBS volume. It can be a directory on a:
 
 * host-os or 
 * mounted disk
 
-You can specify key value pair in the openebs-config.yaml file. For example, key=openebs.io which is a storage-pool name and value=<*Name of storage pool CRD object*>
+**Note:**
+
+You must define the storage pool as a Kubernetes Custom Resource (CR) before using it as a Storage Pool policy.
+
+Following is a sample Kubernetes custom resource definition for a storage pool.
 
 ::
 
-    # Define a storage pool for launching the replicas using
-    #  local directory or mounted directory from the minion nodes
-    #  
     apiVersion: openebs.io/v1alpha1
     kind: StoragePool
     metadata:
@@ -76,52 +110,33 @@ You can specify key value pair in the openebs-config.yaml file. For example, key
     spec:
         path: "/var/openebs" 
 
-Volume Capacity and Monitoring Policy
--------------------------------------------
-OpenEBS volumes are each deployed in their own set of containers, which allows flexibility to enable, disable, or customize the features. 
-
-You can set the volume monitor to true or set it by specifying a value which is of string type. 
-
-
-In the following example, a default volume is added with minimum properties.
+This storage pool custom resource can now be used as follows:
 ::
 
-    $ cat default-vol.yaml  
-    kind: Volume
-    apiVersion: v1
+    apiVersion: storage.k8s.io/v1
+    kind: StorageClass
     metadata:
-        name: def-vol
-    # add command using curl
-    curl -k -H "Content-Type: application/yaml" \
-        -XPOST -d"$(cat default-vol.yaml)" \
-        http://10.0.0.85:5656/latest/volumes/
+        name: openebs-percona
+    provisioner: openebs.io/provisioner-iscsi
+    parameters:
+        pool: hostdir-var
+        openebs.io/jiva-replica-count: "1"
+        openebs.io/capacity: "2G"
+        openebs.io/jiva-replica-image: "openebs/jiva:0.4.0"
+        openebs.io/storage-pool: "sp-hostdir"
 
-You can set the volume capacity in a storage class. The following example creates a cap-new.yaml file with 1G as the volume capacity.
+Volume Monitoring Policy
+-----------------------------
+You can specify the monitoring policy for a particular volume using *openebs.io/volume-monitor* property.
+
+The following Kubernetes storage class sample uses the Volume Monitoring policy.
 ::
 
-    $ cat cap-new.yaml  
-    kind: Volume
-    apiVersion: v1
+    apiVersion: storage.k8s.io/v1
+    kind: StorageClass
     metadata:
-        name: cap-new
-    capacity: 1G
-    # add command using curl
-    curl -k -H "Content-Type: application/yaml" \
-        -XPOST -d"$(cat cap-new.yaml)" \
-        http://10.0.0.85:5656/latest/volumes/
-
-You can add a volume with single replica. The following example creates a 1-rep-new.yaml file with replica set to 1.
-::
-
-    $ cat 1-rep-new.yaml 
-    kind: Volume
-    apiVersion: v1
-    metadata:
-        name: one-rep-new
-    specs:
-        - context: replica
-            replicas: 1
-    # add command using curl
-    curl -k -H "Content-Type: application/yaml" \
-        -XPOST -d"$(cat 1-rep-new.yaml)" \
-        http://10.0.0.85:5656/latest/volumes/
+        name: sc-percona-monitor
+    provisioner: openebs.io/provisioner-iscsi
+    parameters:
+        openebs.io/jiva-replica-image: "openebs/jiva:0.4.0"
+        openebs.io/volume-monitor: "true" 
