@@ -11,6 +11,8 @@ BOX_MODE_KUBERNETES = 2
 
 box_Mode=ENV['OPENEBS_BUILD_BOX'] || 2
 
+kube_version=ENV['KUBE_VERSION'] || "1.7.5"
+
 Vagrant.configure("2") do |config|
   # The most common configuration options are documented and commented below.
   # For a complete reference, please see the online documentation at
@@ -108,6 +110,7 @@ Vagrant.configure("2") do |config|
 
     config.vm.provision :shell, 
     path: "boxes/k8s/fetch_k8scontainers.sh",
+    :args => "#{kube_version}",
     privileged: true
 
     config.vm.provision :shell, 
@@ -124,6 +127,7 @@ Vagrant.configure("2") do |config|
 
     config.vm.provision :shell,
     path: "boxes/k8s/cleanup_k8s.sh",
+    :args => "#{kube_version}",
     privileged: true
 
   elsif box_Mode.to_i == BOX_MODE_OPENEBS.to_i
