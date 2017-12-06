@@ -29,7 +29,7 @@ Contents:
     :caption: Usecases
     
     Cassandra <Usecases/cassandra>
-    CockroachDB <Usecases/cockroach>
+    CockroachDB <Usecases/cockroachdb>
     Couchbase <Usecases/couchbase>
     Crunchy Postgres <Usecases/crunchy_postgres>
     Jenkins <Usecases/jenkins>
