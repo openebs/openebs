@@ -1,9 +1,9 @@
-********************
+**********************
 On-Premise Solutions
-********************
+**********************
 
 Using Vagrant
-=============
+================
 
 Setting Up OpenEBS with Kubernetes on a Local Machine
 -------------------------------------------------------
@@ -106,7 +106,7 @@ Using Ansible
 ===============
 
 Setting Up OpenEBS on Ubuntu Hosts or Virtual Machines
-------------------------------------------------------
+---------------------------------------------------------
 This section provides detailed instructions on how to perform the OpenEBS on-premise deployment. The objective of this procedure is to have the following functional.
 
 * Kubernetes cluster (K8s master & K8s nodes/host) configured with the OpenEBS iSCSI flexvol driver,
@@ -118,7 +118,7 @@ Depending on your need, you can either setup only the Kubernetes cluster or the 
 The Kubernetes cluster is setup, in this framework using *kubeadm*.
 
 Running the Setup on Ubuntu 16.04
----------------------------------
+------------------------------------
 The following instructions have been verified on -
 
 * Baremetal and VMware virtual machines installed with Ubuntu 16.04 64 bit
@@ -143,8 +143,18 @@ Prerequisites:
 
 * Deployment can be performed by both root as well as non-root users. In case of the latter, ensure that the users are part of the sudo group. This is required to run certain operations which require root privileges.
 
+**Minimum System Requirements**
+
+The Vagrant VMs (ubuntu-xenial) that are used in the on-premise installation requires a mininum of 10GB hard-disk space each (3 VMs are recommended for a hyperconverged deployment) and 1GB operating memory.
+
+The recommended configuration for the VM host is as follows:
+
+* 40GB Hard Disk
+* 4GB RAM
+* Minimum of 2 CPU cores / vCPUs (if host is a VMware/other guest box)
+
 Download
---------
+----------
 Setup the local working directory where the ansible code will be downloaded. Perform a git clone of the OpenEBS repository, and navigate to e2e/ansible.
 ::
 
@@ -168,7 +178,8 @@ Setup the local working directory where the ansible code will be downloaded. Per
     -rw-rw-r--  1 testuser testuser  4221 Jun  5 09:29 Vagrantfile
 
 Setup Environment for OpenEBS Installation
-------------------------------------------
+--------------------------------------------
+
 * Setup environment variables for the usernames and passwords of all the machines which have been brought up in the previous steps on the test-harness (this machine will be interchangeably used with the term 'localhost'). Ensure that these are setup in the **.profile** file of the localhost user which will be running the ansible code or playbooks, that is the ansible_user.
 
 * Ensure that the env variables setup in the previous step are available in the current user session. Perform *source ~/.profile* to achieve the same and verify through echo $VARIABLE.
@@ -238,7 +249,7 @@ The subsequent section explains the installation procedure for hyperconverged mo
         564dd2e3  dc1  MayaHost02  <none>  false  ready
 
 OpenEBS Installation - Hyperconverged Mode
-------------------------------------------
+---------------------------------------------
 
 * Update the *inventory/group_vars/all.yml* with the appropriate value *hyperconverged* for the key *deployment_mode*.
 
@@ -289,7 +300,7 @@ OpenEBS Installation - Hyperconverged Mode
       openebs-percona   openebs.io/provisioner-iscsi
 
 Run Sample Applications on the OpenEBS Setup
---------------------------------------------
+-----------------------------------------------
 * Test the OpenEBS setup installed using the above procedure by deploying a sample application pod.
 
 * *run-hyperconverged-tests.yml* can be used to run tests on the hyperconverged installation.
@@ -346,7 +357,7 @@ Run Sample Applications on the OpenEBS Setup
 .. In case of dedicated installations, the `maya volume list` and `maya volume stats` commands can be executed directly on the maya server host console.
 
 Tips and Gotchas
-----------------
+------------------
 * Use the -v flag while running the playbooks to enable verbose output and logging. Increase the number of 'v's to increase the verbosity.
 
 * Sometimes, the nodes take time to join the Kubernetes master. This could be caused due to slow internet or less resources on the box. The time could range between a few seconds to a few minutes.
