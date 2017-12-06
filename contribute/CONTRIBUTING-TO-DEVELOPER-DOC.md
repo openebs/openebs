@@ -114,3 +114,7 @@ git push origin --delete <branch_name>
 git branch -d <branch_name>
 ```
 
+## Writing a Unit Test
+Though it is important to write unit tests, do not try to achive 100% code coverage if it complicates writing these tests.If a unit test is simple to write & understand, most probably it will be extended when new code gets added. However, reverse willlead to its removal on the whole. In other words, complicatedunit tests will lead to decrease in the overall coverage in the long run.
+
+OpenEBS being an OpenSource project will always try to experiment new ideas and concepts. Hence, writing unit tests will provide the necessary checklist that reduces the scope for errors.
