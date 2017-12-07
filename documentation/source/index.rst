@@ -11,13 +11,13 @@ Contents:
 
     OpenEBS Introduction <getting_started/overview>
     OpenEBS Features <getting_started/features>
-    Quick Install <getting_started/quick_install>
     How does Storage High Availablility Work? <getting_started/ha_storage>
     
 .. toctree::
     :maxdepth: 2
     :caption: Setup
     
+    Quick Install <getting_started/quick_install>
     Overview <install/install_overview>
     Cloud Solutions <install/cloud_solutions>
     On-Premise Solutions <install/on_premise_solutions>
