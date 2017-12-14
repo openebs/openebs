@@ -16,6 +16,9 @@ The following example allows you set up Open-iSCSI on **Ubuntu**. Use the follow
 
   * sudo apt-get update 
   * sudo apt-get install open-iscsi
+ 
+ 
+**NOTE**: If running inside Rancher, the above commands have to be executed inside the kubelet container. Although open-iscsi will run in a container, the data in /var/openebs will be stored on the hosts.
 
 Setting up OpenEBS 
 ==================
