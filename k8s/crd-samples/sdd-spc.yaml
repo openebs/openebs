@@ -1,5 +1,5 @@
-apiVersion: openebs.io/v1
-kind: Storagepoolclaim
+apiVersion: openebs.io/v1alpha1
+kind: StoragePoolClaim
 metadata:
   name: sdd
 spec:
