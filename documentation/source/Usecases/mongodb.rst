@@ -40,10 +40,10 @@ The number of replicas in the StatefulSet can be modified as required. The follo
     .
     .
 
-Apply the mongo-S yaml using the following commands.
+Apply the mongo-statefulset.yml using the following commands.
 ::
 
-    test@Master:~$ kubectl apply -f mongo-S.yml
+    test@Master:~$ kubectl apply -f mongo-statefulset.yml
     service "mongo" created
     S "mongo" created
 
