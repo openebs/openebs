@@ -2,7 +2,7 @@
 
 **It is based on Helm community chart [openebs](https://github.com/openebs/openebs/tree/master/k8s/charts/openebs)**
 
-[OpenEBS](http://openebs.io/) is a cloud-native storage solution built with the goal of providing containerized storage for containers. Using OpenEBS, a developer can seamlessly get the persistent storage for stateful applications on Kubernetes with ease.
+[OpenEBS](http://openebs.io/) is a cloud-native storage solution built with the goal of providing containerized storage for containers. Using OpenEBS, a developer can seamlessly get persistent storage for stateful applications on Kubernetes with ease.
 
 ## Introduction
 
