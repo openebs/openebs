@@ -24,6 +24,8 @@ $ helm install tc/openebs --name openebs --namespace=openebs
 List 
 ```
 helm ls --all
+```
+
 # Note the `openebs` from above command
 To uninstall/delete the `openebs` deployment:
 ```bash
