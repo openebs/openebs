@@ -2,7 +2,7 @@
 
 OpenEBS Introduction
 ====================
-OpenEBS is a cloud native storage solution built with the goal of providing containerized storage for containers. Using OpenEBS, a developer can seamlessly get the persistent storage for stateful applications with ease, much of which is automated, while using the popular orchestration platforms such as Kubernetes.
+OpenEBS is a cloud native storage solution built. this is a test doc. with the goal of providing containerized storage for containers. Using OpenEBS, a developer can seamlessly get the persistent storage for stateful applications with ease, much of which is automated, while using the popular orchestration platforms such as Kubernetes.
 
 Persistent storage presents significant challenges to the developer interfacing with stateful applications such as databases. While a developer can get the initial needs of persistent storage using Docker volume plug-in, Kubernetes stateful sets and so on, there is lots more to the storage needs of an application than just the connectivity. 
 

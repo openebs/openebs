@@ -17,8 +17,8 @@ Contents:
     :maxdepth: 2
     :caption: Setup
     
-    Quick Install <getting_started/quick_install>
     Overview <install/install_overview>
+    Quick Install <getting_started/quick_install>
     Cloud Solutions <install/cloud_solutions>
     On-Premise Solutions <install/on_premise_solutions>
     Developer Solutions <install/dev_solutions>
