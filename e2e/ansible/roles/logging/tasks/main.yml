@@ -1,0 +1,38 @@
+---
+- name: Generate a unique name for the folder
+  shell: echo "$(date +%Y%m%d_%H%M%S)"
+  register: log_folder
+
+- name: Create a unique folder to copy logs
+  file:
+    path: "{{ playbook_dir }}/roles/logging/{{log_folder.stdout}}"
+    state: directory
+    mode: 0755
+
+- name: Get $HOME of K8s master for kubernetes user
+  shell: source ~/.profile; echo $HOME
+  args:
+    executable: /bin/bash
+  register: result_kube_home
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+- name: use find to get the files list which you want to copy/fetch
+  find: 
+    paths: "{{ result_kube_home.stdout }}/setup/logs"
+  register: file_2_fetch
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+- name: use fetch to get the files
+  fetch:
+    src: "{{ item.path }}"
+    dest: "{{ playbook_dir }}/roles/logging/{{log_folder.stdout}}"
+    flat: yes
+  with_items: "{{ file_2_fetch.files }}"  
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+- name: Cleanup the logs directory
+  file:
+    path: "{{ item.path }}"
+    state: absent
+  with_items: "{{ file_2_fetch.files }}"
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
