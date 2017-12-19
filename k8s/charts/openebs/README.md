@@ -26,7 +26,7 @@ List
 helm ls --all
 ```
 
-# Note the `openebs` from above command
+Note the `openebs` from above command
 To uninstall/delete the `openebs` deployment:
 ```bash
 $ helm delete openebs
