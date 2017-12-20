@@ -2,7 +2,6 @@ apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
   name: openebs-provisioner
-  namespace: default
   labels:
     chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
 spec:
