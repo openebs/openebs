@@ -241,24 +241,47 @@ OpenEBS is deployed by the time you log in to Amazon Web Services (AWS).
 Google Cloud
 =============
 Setting up OpenEBS with Kubernetes on Google Kubernetes Engine
---------------------------------------------------------------
+-----------------------------------------------------------------
 This section, provides detailed instructions on how to setup and use OpenEBS in Google Kubernetes Engine (GKE). This section uses a three node Kubernetes cluster.
 
-1. Preparing your Kubernetes Cluster
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-You can either use an existing Kubernetes cluster or create a new one. 
-To create a new cluster, go to **Google Cloud Platform** -> **Kubernetes Engine** -> **Create Kubernetes Cluster**. 
+Prerequisite:
+^^^^^^^^^^^^^^^^
+A GKE account
 
-Minimum requirements for Kubernetes cluster are as follows:
+1. Preparing your Kubernetes Cluster
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+You can either use an existing Kubernetes cluster or create a new one. 
+To create a new cluster, perform the following procedure. 
+
+1. Go to the Google Cloud URL at https://console.cloud.google.com/.
+2. In the  *Google Cloud Platform* screen, select **Kubernetes Engine** on the left pane. 
+3. Click **Create Cluster**. 
+4. In the *Create Kubernetes Cluster* screen, key in or select the required information.  The minimum requirements for Kubernetes cluster are as follows:
 
 * Machine Type - (Minimum 2 vCPUs)
 * Node Image - (Ubuntu)
 * Size - (Minimum 3)
 * Cluster Version - (1.6.4+)
 
+5. Click **Create** and **Connect** on the top pane.
+
 **Note:**
 
-The example commands below were run on a Kubernetes cluster *demo-openebs03* in zone *us-central1-a* with project unique ID *strong-eon-153112*. When you copy paste the command, ensure that you use the details from your project.
+You can also click on the Edit icon, edit the fields, click **Save** and **Connect**. Select *Connect using Cloud Shell*. You will get a welcome message.
+   
+Enter the following command at the prompt
+::
+   kubectl config current-context
+
+
+The following, for example, is displayed which is the current context. 
+
+gke_maya-chatops_us-central1-a_doc-test where *maya-chatops* is the project name and *doc-test* is the cluster name.
+
+
+**Note:**
+
+The example commands below were run on a Kubernetes cluster *doc-test* in zone *us-central1-a* with project unique ID *maya-chatops*. When you copy paste the command, ensure that you use the details from your project.
 
 iSCSI Configuration
 ^^^^^^^^^^^^^^^^^^^^^
@@ -315,7 +338,7 @@ a. Initialize credentials to allow kubectl to execute commands on the Kubernetes
 ::
 
     gcloud container clusters list
-    gcloud container clusters get-credentials demo-openebs03 --zone us-central1-a
+    gcloud container clusters get-credentials doc-test --zone us-central1-a
 
 b. Setup the administrator context.
 
@@ -323,7 +346,7 @@ Create an administrator configuration context from the configuration shell using
 ::
 
     gcloud container clusters list
-    kubectl config set-context demo-openebs03 --cluster=gke_strong-eon-153112_us-central1-a_demo-openebs03 --user=cluster-admin
+    kubectl config set-context doc-test --cluster=gke_maya-chatops_us-central1-a_maya-chatops --user=cluster-admin
 
 c. Download the latest OpenEBS files using the following commands.
 ::
@@ -357,17 +380,23 @@ Get the list of storage classes using the following command. Choose the storage 
 
     kubectl get sc
 
+    NAME                 TYPE
+    openebs-cassandra    openebs.io/provisioner-iscsi
+    openebs-es-data-sc   openebs.io/provisioner-iscsi
+    openebs-jupyter      openebs.io/provisioner-iscsi
+    openebs-kafka        openebs.io/provisioner-iscsi
+    openebs-mongodb      openebs.io/provisioner-iscsi
+    openebs-percona      openebs.io/provisioner-iscsi
+    openebs-redis        openebs.io/provisioner-iscsi
+    openebs-standalone   openebs.io/provisioner-iscsi
+    openebs-standard     openebs.io/provisioner-iscsi
+    openebs-zk           openebs.io/provisioner-iscsi
+
 Some sample YAML files for stateful workloads using OpenEBS are provided in the `openebs/k8s/demo`_
         
   .. _openebs/k8s/demo: https://github.com/openebs/openebs/tree/master/k8s/demo
 
-The *kubectl apply -f demo/jupyter/demo-jupyter-openebs.yaml* command creates the following, which can be verified using the corresponding kubectl commands.
 
-* Launch a Jupyter Server, with the specified notebook file from github (kubectl get deployments)
-* Create an OpenEBS Volume and mounts to the Jupyter Server Pod (/mnt/data) (kubectl get pvc) (kubectl get pv) (kubectl get pods)
-* Expose the Jupyter Server to external world through the URL http://NodeIP:32424 (NodeIP is any of the nodes external IP) (kubectl get pods)
-
-**Note:** To access the Jupyter Server over the internet, set the firewall rules to allow traffic on port 32424 in your GCP / Networking / Firewalls.
 
 
 
