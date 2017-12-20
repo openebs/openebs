@@ -103,6 +103,16 @@
 
 ## K8S-MASTER ROLE PREPARATION
 
+- name: Get Log Aggregator
+  get_url:
+    url: "{{k8s_log_aggregator_url}}"
+    dest: "{{ playbook_dir }}/roles/k8s-master/files/{{k8s_log_aggregator}}"
+    force: yes
+  register: result
+  until: "'OK' in result.msg"
+  delay: 5
+  retries: 3
+
 - name: Fetch configure_K8s scripts into k8s-master role
   get_url: 
     url: "{{ item }}"

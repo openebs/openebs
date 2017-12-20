@@ -44,6 +44,11 @@
   meta: end_play
   when: result.stdout != "Ready"
 
+- name: Start the log aggregator to capture operator logs
+  shell: source ~/.profile; nohup stern "maya*|openebs*" --since 1m >"{{ ansible_env.HOME }}/setup/logs/operator.txt" &
+  args:
+    executable: /bin/bash
+
 - name: Deploy the openebs operator yml
   shell: >
     source ~/.profile; 
@@ -105,6 +110,7 @@
   delay: 10
   retries: 6
 
-
-
-
+- name: Terminate the log aggregator
+  shell: source ~/.profile; killall stern
+  args:
+    executable: /bin/bash

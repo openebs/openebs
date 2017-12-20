@@ -16,6 +16,9 @@ weave_images_path: "{{ ansible_env.HOME}}/setup/weave"
 
 k8s_images_path: "{{ ansible_env.HOME}}/setup/k8s"
 
+k8s_logs_path: "{{ ansible_env.HOME}}/setup/logs"
+
+k8s_log_aggregator: stern
 # Do not change the order of the packages
 # They have to be installed in the order defined below.
 
