@@ -20,9 +20,7 @@ The following example allows you set up Open-iSCSI on **Ubuntu**. Use the follow
  
 **NOTE**: If running inside Rancher, the above commands have to be executed inside the kubelet container. Although open-iscsi will run in a container, the data in /var/openebs will be stored on the hosts.
 
-Setting up OpenEBS 
-==================
-Perform this procedure to run OpenEBS operator. Use the following commands at the command prompt:
+Run the following commands at the command prompt to run OpenEBS operator.
 
    1.  kubectl create/apply -f openebs-operator.yaml
    2.  kubectl create/apply -f openebs-storageclasses.yaml
@@ -30,4 +28,7 @@ Perform this procedure to run OpenEBS operator. Use the following commands at th
 **See Also:**
 
     `Amazon Cloud`_
-          .. _Amazon Cloud: http://openebs.readthedocs.io/en/latest/install/deploy_terraform_kops.html
+          .. _Amazon Cloud: http://openebs.readthedocs.io/en/latest/install/cloud_solutions.html#amazon-cloud
+
+    `Google Cloud`_
+          .. _Google Cloud: http://openebs.readthedocs.io/en/latest/install/cloud_solutions.html#google-cloud      
