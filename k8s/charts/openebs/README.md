@@ -11,11 +11,10 @@ helm install openebs-charts/openebs
 ```
 
 ## Installing OpenEBS from Chart codebase
-The command deploys OpenEBS on the Kubernetes cluster with the release name `openebs` and the default configuration. 
 ```
 git clone https://github.com/openebs/openebs.git
 cd openebs/k8s/charts/openebs/
-helm install --name openebs --namespace=openebs
+helm install --name openebs .
 ```
 
 ## Unistalling OpenEBS from Chart codebase
