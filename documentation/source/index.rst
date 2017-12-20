@@ -17,8 +17,8 @@ Contents:
     :maxdepth: 2
     :caption: Setup
     
-    Quick Install <getting_started/quick_install>
     Overview <install/install_overview>
+    Quick Install <getting_started/quick_install>
     Cloud Solutions <install/cloud_solutions>
     On-Premise Solutions <install/on_premise_solutions>
     Developer Solutions <install/dev_solutions>
@@ -28,6 +28,7 @@ Contents:
     :maxdepth: 2
     :caption: Usecases
     
+    Running OpenEBS Operator <Usecases/run_openebs_operator>
     Cassandra <Usecases/cassandra>
     CockroachDB <Usecases/cockroachdb>
     Couchbase <Usecases/couchbase>
@@ -38,7 +39,7 @@ Contents:
     Percona DB <Usecases/percona_db> 
     Percona Galera Cluster <Usecases/percona_galera_cluster>
     Redis StatefulSet <Usecases/redis>
-    Running OpenEBS Operator <Usecases/run_openebs_operator>
+    
 
 .. toctree::
     :maxdepth: 2

@@ -7,10 +7,9 @@ Prerequisites include the following:
     
 * A fully configured Kubernetes cluster (versions 1.6.3/4/6 and 1.7.0, and 1.7.5 have been tested) with Kubernetes master and at least one Kubernetes node. This can be created on cloud platforms like Google Cloud Engine, on-premise virtual machines (vagrant/VMware/Hyper-V) or Baremetal boxes.
 
-**Note:**
+  **Note:**
 
-    * OpenEBS recommends using a 3-node cluster, with one master and two nodes. This aids in creating storage replicas on separate nodes and is helpful in maintaining redundancy and data availability.
-
+    - OpenEBS recommends using a 3-node cluster, with one master and two nodes. This aids in creating storage replicas on separate nodes and is helpful in maintaining redundancy and data availability.
     ::
     
         test@Master:~$ kubectl get nodes
@@ -19,10 +18,9 @@ Prerequisites include the following:
           host02   Ready     18h       v1.6.3
           master   Ready     18h       v1.6.3
 
-    * If you are using gcp, view the appendix in this section for additional steps to set up cluster administration context and use it.
+    - If you are using gcp, view the appendix in this section for additional steps to set up cluster administration context and use it.
 
 Verify that the Kubernetes cluster is in optimal state by using the following commands.
-
 :: 
   
    name@Master:~$ kubectl get nodes
