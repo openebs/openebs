@@ -11,10 +11,11 @@ helm install openebs-charts/openebs
 ```
 
 ## Installing OpenEBS from Chart codebase
+The command deploys OpenEBS on the Kubernetes cluster with the release name `openebs` and the default configuration. 
 ```
 git clone https://github.com/openebs/openebs.git
 cd openebs/k8s/charts/openebs/
-helm install --name openebs .
+helm install --name openebs --namespace=openebs
 ```
 
 ## Unistalling OpenEBS from Chart codebase
@@ -33,10 +34,10 @@ The following tables lists the configurable parameters of the OpenEBS chart and 
 | `rbacEnable`            | Enable RBAC Resources              | `true`                                                     |
 | `image.pullPolicy`      | Container pull policy              | `IfNotPresent`                                             |
 | `apiserver.image`       | Docker Image for API Server        | `openebs/m-apiserver`                                      |
-| `apiserver.tag`         | Docker Image Tag for API Server    | `0.4.0`                                                    |
+| `apiserver.tag`         | Docker Image Tag for API Server    | `0.5.0`                                                    |
 | `provisioner.image`     | Docker Image for Provisioner       | `openebs/openebs-k8s-provisioner`                          |
-| `provisioner.tag`       | Docker Image Tag for Provisioner   | `0.4.0`                                                    |
-| `jiva.image`            | Docker Image for Jiva              | `openebs/jiva:0.4.0`                                       |
+| `provisioner.tag`       | Docker Image Tag for Provisioner   | `0.5.0`                                                    |
+| `jiva.image`            | Docker Image for Jiva              | `openebs/jiva:0.5.0`                                       |
 | `jiva.tag`              | Number of Jiva Replicas            | `2`                                                        |
 
 Specify each parameter using the `--set key=value[,key=value]` argument to `helm install`.
