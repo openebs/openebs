@@ -54,8 +54,8 @@ test@Master:~$ cd openebs/k8s/demo/cassandra
 
 test@Master:~/openebs/k8s/demo/cassandra$ ls -ltr
 total 8
--rw-rw-r-- 1 karthik karthik  165 Oct 30 12:19 cassandra-service.yaml
--rw-rw-r-- 1 karthik karthik 2382 Nov 11 14:09 cassandra-statefulset.yaml
+-rw-rw-r-- 1 test test  165 Oct 30 12:19 cassandra-service.yaml
+-rw-rw-r-- 1 test test 2382 Nov 11 14:09 cassandra-statefulset.yaml
 ```
 
 ```
@@ -320,7 +320,7 @@ pvc-f84a8133-e647-11e7-bc35-000c298ff5fc-rep-3359561965-b2ctt    1/1       Runni
 - Verify that the stress tool has started running I/O using *kubectl logs* command.
 
 ```
-karthik@MayaMaster:~/openebs/k8s/demo/cassandra$ kubectl logs -f cassandra-loadgen-mhwnt
+test@Master:~/openebs/k8s/demo/cassandra$ kubectl logs -f cassandra-loadgen-mhwnt
 ******************** Stress Settings ********************
 Command:
   Type: write
