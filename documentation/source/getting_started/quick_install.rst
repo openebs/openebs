@@ -22,8 +22,8 @@ The following example allows you set up Open-iSCSI on **Ubuntu**. Use the follow
 
 Run the following commands at the command prompt to run OpenEBS operator.
 
-   1.  kubectl create/apply -f openebs-operator.yaml
-   2.  kubectl create/apply -f openebs-storageclasses.yaml
+   1.  kubectl apply -f openebs-operator.yaml
+   2.  kubectl apply -f openebs-storageclasses.yaml
 
 **See Also:**
 
