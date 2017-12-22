@@ -65,7 +65,7 @@ Following is a sample intent that makes use of replica image policy:
     parameters:
         openebs.io/jiva-replica-count: "1"
         openebs.io/capacity: "1G"
-        openebs.io/jiva-replica-image: "openebs/jiva:0.4.0"
+        openebs.io/jiva-replica-image: "openebs/jiva:0.5.0"
   
 Controller Image Policy
 ---------------------------
@@ -85,7 +85,7 @@ Following is a sample setting.
     parameters:
         openebs.io/jiva-replica-count: "1"
         openebs.io/capacity: "1G"
-        openebs.io/jiva-controller-image: "openebs/jiva:0.4.0"
+        openebs.io/jiva-controller-image: "openebs/jiva:0.5.0"
 
 Storage Pool Policy
 --------------------
@@ -105,10 +105,10 @@ Following is a sample Kubernetes custom resource definition for a storage pool.
     apiVersion: openebs.io/v1alpha1
     kind: StoragePool
     metadata:
-        name: sp-hostdir
+        name: sp-mntdir
         type: hostdir
     spec:
-        path: "/var/openebs" 
+        path: "/mnt/openebs" 
 
 This storage pool custom resource can now be used as follows:
 ::
@@ -119,11 +119,10 @@ This storage pool custom resource can now be used as follows:
         name: openebs-percona
     provisioner: openebs.io/provisioner-iscsi
     parameters:
-        pool: hostdir-var
-        openebs.io/jiva-replica-count: "1"
+        openebs.io/jiva-replica-count: "2"
         openebs.io/capacity: "2G"
-        openebs.io/jiva-replica-image: "openebs/jiva:0.4.0"
-        openebs.io/storage-pool: "sp-hostdir"
+        openebs.io/jiva-replica-image: "openebs/jiva:0.5.0"
+        openebs.io/storage-pool: "sp-mntdir"
 
 Volume Monitoring Policy
 -----------------------------
@@ -138,5 +137,5 @@ The following Kubernetes storage class sample uses the Volume Monitoring policy.
         name: sc-percona-monitor
     provisioner: openebs.io/provisioner-iscsi
     parameters:
-        openebs.io/jiva-replica-image: "openebs/jiva:0.4.0"
+        openebs.io/jiva-replica-image: "openebs/jiva:0.5.0"
         openebs.io/volume-monitor: "true" 
