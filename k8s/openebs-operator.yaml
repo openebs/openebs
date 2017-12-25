@@ -70,7 +70,7 @@ spec:
       containers:
       - name: maya-apiserver
         imagePullPolicy: Always
-        image: openebs/m-apiserver:0.5.0
+        image: openebs/m-apiserver:0.5.1-RC1
         ports:
         - containerPort: 5656
         env:
@@ -113,7 +113,7 @@ spec:
       containers:
       - name: openebs-provisioner
         imagePullPolicy: Always
-        image: openebs/openebs-k8s-provisioner:0.5.0
+        image: openebs/openebs-k8s-provisioner:0.5.1-RC1
         env:
         - name: NODE_NAME
           valueFrom:
