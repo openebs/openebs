@@ -55,7 +55,7 @@ Vagrant.configure("2") do |config|
     config.vm.provider "virtualbox" do |vb|
       vb.customize ["modifyvm", :id, "--uartmode1", "file", File.join(Dir.pwd, "k8s-console.log")]
     end
-    config.vm.box = "openebs/k8s-1.7"
+    config.vm.box = "openebs/k8s-1.8"
 
   elsif box_Mode.to_i == BOX_MODE_OPENEBS.to_i
     config.vm.provider "virtualbox" do |vb|

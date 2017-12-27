@@ -1,0 +1,35 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: openebs-exporter
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        name: openebs-exporter
+    spec:
+      serviceAccountName: prometheus
+      containers:
+        - name: openebs-exporter
+          image: utkarshmani1997/openebs-exporter:test-11
+          args:
+            # This is the flag provided to exporter at run time
+            # replace it with your controller's service IP
+            # For exp : Do kubectl get svc | grep volname-ctrl-svc
+            # to get the IP.
+            - --controller.addr=http://10.101.141.121:9501
+          ports:
+            - containerPort: 9500
+---
+# openebs-exporter-service
+apiVersion: v1
+kind: Service
+metadata:
+  name: openebs-exporter-service
+spec:
+  selector: # exposes any pods with the following labels as a service
+    name: openebs-exporter
+  ports:
+    - port: 80 # this Service's port (cluster-internal IP clusterIP)
+      targetPort: 9500 # pods expose this port
