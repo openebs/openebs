@@ -54,8 +54,8 @@ test@Master:~$ cd openebs/k8s/demo/cassandra
 
 test@Master:~/openebs/k8s/demo/cassandra$ ls -ltr
 total 8
--rw-rw-r-- 1 karthik karthik  165 Oct 30 12:19 cassandra-service.yaml
--rw-rw-r-- 1 karthik karthik 2382 Nov 11 14:09 cassandra-statefulset.yaml
+-rw-rw-r-- 1 test test  165 Oct 30 12:19 cassandra-service.yaml
+-rw-rw-r-- 1 test test 2382 Nov 11 14:09 cassandra-statefulset.yaml
 ```
 
 ```
@@ -215,7 +215,215 @@ in this example, Cassandra-1.
   system_traces  system_schema  system_auth  system  system_distributed
   ```
 
+## Scale the Cassandra Statefulset
 
+The Cassandra Statefulset can be scaled depending on resource availability using the *kubectl scale statefulset* command.
 
+```
+test@Master:~$ kubectl get pods
+NAME                                                             READY     STATUS    RESTARTS   AGE
+cassandra-0                                                      1/1       Running   1          1d
+maya-apiserver-3416621614-8q6k9                                  1/1       Running   1          1d
+openebs-provisioner-4230626287-p8g1n                             1/1       Running   1          1d
+pvc-8910e033-e56b-11e7-8f29-000c298ff5fc-ctrl-1165089859-rpd6p   1/1       Running   1          1d
+pvc-8910e033-e56b-11e7-8f29-000c298ff5fc-rep-3111921848-cqzw4    1/1       Running   1          1d
+pvc-8910e033-e56b-11e7-8f29-000c298ff5fc-rep-3111921848-p1f2b    1/1       Running   1          1d
 
+test@Master:~$ kubectl get statefulset
+NAME        DESIRED   CURRENT   AGE
+cassandra   1         1         1d
+
+test@Master:~$ kubectl scale statefulset cassandra --replicas=2
+statefulset "cassandra" scaled
+
+test@Master:~$ kubectl get pods
+NAME                                                             READY     STATUS              RESTARTS   AGE
+cassandra-0                                                      1/1       Running             1          1d
+cassandra-1                                                      0/1       ContainerCreating   0          4s
+maya-apiserver-3416621614-8q6k9                                  1/1       Running             1          1d
+openebs-provisioner-4230626287-p8g1n                             1/1       Running             1          1d
+pvc-8910e033-e56b-11e7-8f29-000c298ff5fc-ctrl-1165089859-rpd6p   1/1       Running             1          1d
+pvc-8910e033-e56b-11e7-8f29-000c298ff5fc-rep-3111921848-cqzw4    1/1       Running             1          1d
+pvc-8910e033-e56b-11e7-8f29-000c298ff5fc-rep-3111921848-p1f2b    1/1       Running             1          1d
+pvc-f84a8133-e647-11e7-bc35-000c298ff5fc-ctrl-2160660239-l9bkk   1/1       Running             0          4s
+pvc-f84a8133-e647-11e7-bc35-000c298ff5fc-rep-3359561965-6bcr1    1/1       Running             0          4s
+pvc-f84a8133-e647-11e7-bc35-000c298ff5fc-rep-3359561965-b2ctt    1/1       Running             0          4s
+```
+
+Verify that a new OpeneBS persistent volume (PV), i.e., ctrl/replica pods are automatically created upon scaling the 
+application replicas.
+
+```
+test@Master:~$ kubectl get pvc
+NAME                         STATUS    VOLUME                                     CAPACITY   ACCESSMODES   STORAGECLASS        AGE
+cassandra-data-cassandra-0   Bound     pvc-8910e033-e56b-11e7-8f29-000c298ff5fc   5G         RWO           openebs-cassandra   1d
+cassandra-data-cassandra-1   Bound     pvc-f84a8133-e647-11e7-bc35-000c298ff5fc   5G         RWO           openebs-cassandra   3m
+```
+
+## Testing Cassandra Performance on OpenEBS
+
+Performance tests on OpenEBS can be run using the Cassandra-loadgen Kubernetes job (cassandra-loadgen.yaml). Follow the steps 
+shown below.
+
+- Get the IP address of any one of the Cassandra replicas using the command kubectl get pod <podname> -o wide.
+
+```
+test@Master:~/openebs/k8s/demo/cassandra$ kubectl get pods cassandra-0 -o wide
+NAME          READY     STATUS    RESTARTS   AGE       IP          NODE
+cassandra-0   1/1       Running   1          1d        10.47.0.4   host01
+```
+- In the loadgen job specification yaml, replace the following. 
+
+  - IP address in the pod spec
+  - Workload details (for details on supported workloads, refer https://docs.datastax.com/en/cassandra/2.1/cassandra/tools/toolsCStress_t.html) 
   
+```
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: cassandra-loadgen
+spec:
+  template:
+    metadata:
+      name: cassandra-loadgen
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: cassandra-loadgen
+        image: cassandra
+        command: ["/bin/bash"]
+        args: ["-c", "cassandra-stress write duration=5m no-warmup -node 10.47.0.4"]
+        tty: true
+  ```
+
+- Run the Cassandra loadgen Kubernetes job using *kubectl apply* command.
+
+```
+test@Master:~/openebs/k8s/demo/cassandra$ kubectl apply -f cassandra-loadgen.yaml
+job "cassandra-loadgen" created
+  
+test@Master:~/openebs/k8s/demo/cassandra$ kubectl get pods
+NAME                                                             READY     STATUS              RESTARTS   AGE
+cassandra-0                                                      1/1       Running             1          1d
+cassandra-1                                                      1/1       Running             0          23m
+cassandra-loadgen-mhwnt                                          0/1       ContainerCreating   0          5s
+maya-apiserver-3416621614-8q6k9                                  1/1       Running             1          1d
+openebs-provisioner-4230626287-p8g1n                             1/1       Running             1          1d
+pvc-8910e033-e56b-11e7-8f29-000c298ff5fc-ctrl-1165089859-rpd6p   1/1       Running             1          1d
+pvc-8910e033-e56b-11e7-8f29-000c298ff5fc-rep-3111921848-cqzw4    1/1       Running             1          1d
+pvc-8910e033-e56b-11e7-8f29-000c298ff5fc-rep-3111921848-p1f2b    1/1       Running             1          1d
+pvc-f84a8133-e647-11e7-bc35-000c298ff5fc-ctrl-2160660239-l9bkk   1/1       Running             0          23m
+pvc-f84a8133-e647-11e7-bc35-000c298ff5fc-rep-3359561965-6bcr1    1/1       Running             0          23m
+pvc-f84a8133-e647-11e7-bc35-000c298ff5fc-rep-3359561965-b2ctt    1/1       Running             0          23m
+```
+- Verify that the stress tool has started running I/O using *kubectl logs* command.
+
+```
+test@Master:~/openebs/k8s/demo/cassandra$ kubectl logs -f cassandra-loadgen-mhwnt
+******************** Stress Settings ********************
+Command:
+  Type: write
+  Count: -1
+  Duration: 5 MINUTES
+  No Warmup: true
+  Consistency Level: LOCAL_ONE
+  Target Uncertainty: not applicable
+  Key Size (bytes): 10
+  Counter Increment Distibution: add=fixed(1)
+Rate:
+  Auto: true
+  Min Threads: 4
+  Max Threads: 1000
+Population:
+  Sequence: 1..1000000
+  Order: ARBITRARY
+  Wrap: true
+Insert:
+  Revisits: Uniform:  min=1,max=1000000
+  Visits: Fixed:  key=1
+  Row Population Ratio: Ratio: divisor=1.000000;delegate=Fixed:  key=1
+  Batch Type: not batching
+Columns:
+  Max Columns Per Key: 5
+  Column Names: [C0, C1, C2, C3, C4]
+  Comparator: AsciiType
+  Timestamp: null
+  Variable Column Count: false
+  Slice: false
+  Size Distribution: Fixed:  key=34
+  Count Distribution: Fixed:  key=5
+Errors:
+  Ignore: false
+  Tries: 10
+Log:
+  No Summary: false
+  No Settings: false
+  File: null
+  Interval Millis: 1000
+  Level: NORMAL
+Mode:
+  API: JAVA_DRIVER_NATIVE
+  Connection Style: CQL_PREPARED
+  CQL Version: CQL3
+  Protocol Version: V4
+  Username: null
+  Password: null
+  Auth Provide Class: null
+  Max Pending Per Connection: 128
+  Connections Per Host: 8
+  Compression: NONE
+Node:
+  Nodes: [10.47.0.4]
+  Is White List: false
+  Datacenter: null
+Schema:
+  Keyspace: keyspace1
+  Replication Strategy: org.apache.cassandra.locator.SimpleStrategy
+  Replication Strategy Pptions: {replication_factor=1}
+  Table Compression: null
+  Table Compaction Strategy: null
+  Table Compaction Strategy Options: {}
+Transport:
+  factory=org.apache.cassandra.thrift.TFramedTransportFactory; truststore=null; truststore-password=null; keystore=null; keystore-password=null; ssl-protocol=TLS; ssl-alg=SunX509; store-type=JKS; ssl-ciphers=TLS_RSA_WITH_AES_128_CBC_SHA,TLS_RSA_WITH_AES_256_CBC_SHA;
+Port:
+  Native Port: 9042
+  Thrift Port: 9160
+  JMX Port: 7199
+Send To Daemon:
+  *not set*
+Graph:
+  File: null
+  Revision: unknown
+  Title: null
+  Operation: WRITE
+TokenRange:
+  Wrap: false
+  Split Factor: 1
+
+Connected to cluster: K8Demo, max pending requests per connection 128, max connections per host 8
+Datatacenter: DC1-K8Demo; Host: /10.44.0.9; Rack: Rack1-K8Demo
+Datatacenter: DC1-K8Demo; Host: /10.47.0.4; Rack: Rack1-K8Demo
+Created keyspaces. Sleeping 1s for propagation.
+Sleeping 2s...
+Thread count was not specified
+
+Running with 4 threadCount
+Running WRITE with 4 threads 5 minutes
+Failed to connect over JMX; not collecting these stats
+type       total ops,    op/s,    pk/s,   row/s,    mean,     med,     .95,     .99,    .999,     max,   time,   stderr, errors,  gc: #,  max ms,  sum ms,  sdv ms,      mb
+total,            30,      30,      30,      30,    73.3,    33.3,   266.3,   273.2,   273.2,   273.2,    1.0,  0.00000,      0,      0,       0,       0,       0,       0
+total,           164,     134,     134,     134,    31.1,    14.7,    91.9,   177.6,   197.7,   197.7,    2.0,  0.42686,      0,      0,       0,       0,       0,       0
+total,           379,     215,     215,     215,    18.3,    10.9,    55.1,    64.5,    72.9,    72.9,    3.0,  0.31137,      0,      0,       0,       0,       0,       0
+total,           558,     179,     179,     179,    22.4,    11.6,    67.3,    95.9,   104.0,   104.0,    4.0,  0.22588,      0,      0,       0,       0,       0,       0
+total,           762,     204,     204,     204,    19.1,     7.8,    73.1,   112.1,   114.0,   114.0,    5.0,  0.18113,      0,      0,       0,       0,       0,       0
+total,           835,      73,      73,      73,    54.5,    68.4,   113.1,   126.7,   133.6,   133.6,    6.0,  0.18614,      0,      0,       0,       0,       0,       0
+total,           907,      72,      72,      72,    55.3,    10.6,   115.5,   194.1,   200.5,   200.5,    7.0,  0.18075,      0,      0,       0,       0,       0,       0
+total,           996,      89,      89,      89,    44.8,    11.3,   101.8,   108.8,   109.3,   109.3,    8.0,  0.16982,      0,      0,       0,       0,       0,       0
+total,          1066,      70,      70,      70,    57.3,    89.3,   109.6,   114.2,   115.3,   115.3,    9.0,  0.16630,      0,      0,       0,       0,       0,       0
+total,          1130,      64,      64,      64,    62.0,    88.8,   110.6,   111.4,   111.9,   111.9,   10.0,  0.16387,      0,      0,       0,       0,       0,       0
+total,          1195,      65,      65,      65,    63.3,    91.2,   120.9,   132.8,   133.6,   133.6,   11.0,  0.15948,      0,      0,       0,       0,       0,       0
+total,          1273,      78,      78,      78,    49.8,    72.4,   103.7,   115.9,   116.1,   116.1,   12.0,  0.15172,      0,      0,       0,       0,       0,       0
+total,          1354,      81,      81,      81,    49.6,     8.3,   101.8,   102.6,   102.9,   102.9,   13.0,  0.14419,      0,      0,       0,       0,       0,       0
+total,          1426,      72,      72,      72,    55.2,    88.1,   103.6,   109.2,   110.1,   110.1,   14.0,  0.13889,      0,      0,       0,       0,       0,       0
+```
