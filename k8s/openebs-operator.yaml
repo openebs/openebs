@@ -131,13 +131,14 @@ kind: CustomResourceDefinition
 metadata:
   # name must match the spec fields below, and be in the form: <plural>.<group>
   name: storagepoolclaims.openebs.io
+  namespace: default
 spec:
   # group name to use for REST API: /apis/<group>/<version>
   group: openebs.io
   # version name to use for REST API: /apis/<group>/<version>
   version: v1alpha1
   # either Namespaced or Cluster
-  scope: Cluster
+  scope: Namespaced
   names:
     # plural name to be used in the URL: /apis/<group>/<version>/<plural>
     plural: storagepoolclaims
@@ -154,13 +155,14 @@ kind: CustomResourceDefinition
 metadata:
   # name must match the spec fields below, and be in the form: <plural>.<group>
   name: storagepools.openebs.io
+  namespace: default
 spec:
   # group name to use for REST API: /apis/<group>/<version>
   group: openebs.io
   # version name to use for REST API: /apis/<group>/<version>
   version: v1alpha1
   # either Namespaced or Cluster
-  scope: Cluster
+  scope: Namespaced
   names:
     # plural name to be used in the URL: /apis/<group>/<version>/<plural>
     plural: storagepools
@@ -182,3 +184,4 @@ parameters:
   openebs.io/jiva-replica-count: "2"
   openebs.io/volume-monitor: "true"
   openebs.io/capacity: 5G
+
