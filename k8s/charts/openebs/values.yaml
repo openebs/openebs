@@ -9,20 +9,20 @@ image:
 
 apiserver:
   image: "openebs/m-apiserver"
-  tag: "0.5.0"
+  tag: "0.5.1"
 
 provisioner:
   image: "openebs/openebs-k8s-provisioner"
-  tag: "0.5.0"
+  tag: "0.5.1"
   mayaportalurl: "https://mayaonline.io/"
   monitorurl: "http://127.0.0.1:32515/dashboard/db/openebs-volume-stats?orgId=1"
   monitorvolkey: "&var-OpenEBS"
 
 jiva:
-  image: "openebs/jiva:0.5.0"
+  image: "openebs/jiva:0.5.1"
   replicas: 2
 
 policies:
   monitoring:
     enabled: true
-    image: "openebs/m-exporter:0.5.0"
+    image: "openebs/m-exporter:0.5.1"
