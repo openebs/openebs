@@ -99,7 +99,7 @@
        - name: Run the libiscsi test suites
          shell: >
            iscsi-test-cu --test={{ item }} 
-           iscsi://{{ ctrl_ip }}/{{ iqn }}/1 
+           iscsi://{{ ctrl_ip }}/{{ iqn }}/0 
            --dataloss --allow-sanitize 
            > {{ result_kube_home.stdout }}/libiscsi_suite_logs/{{ item }}.log 
            2>&1
