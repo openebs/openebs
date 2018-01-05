@@ -79,7 +79,7 @@ Installing a Vagrant Box by Cloning the Repository
 
 1. Clone the OpenEBS repository using the following command.
    ::
-      git clone http://github.com/openebs.git
+      git clone http://github.com/openebs/openebs.git
 
 2. Bring up k8s Cluster.
    ::
