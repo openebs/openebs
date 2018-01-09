@@ -10,13 +10,6 @@ A storage policy states the desired behavior of an OpenEBS volume. For example, 
 
 Storage policies can be created, updated, and deleted in a running OpenEBS cluster through corresponding operations on StorageClass. Cluster administrators can update storage policies independent of the cluster. Once a storage policy is installed, users can create and access it's objects with kubectl commands on StorageClass.
 
-OpenEBS Components
---------------------
-
-On their own, StorageClass lets you store and retrieve storage policies. It is only when combined with OpenEBS components namely openebs provisioner and maya api service that storage policies are applied against a PersistentVolume (a Kubernetes kind). The OpenEBS volume controller interprets the StorageClass' structured data as a record of the user’s desired state, and continually takes action to achieve and maintain that state.
-
-Users can deploy and update OpenEBS volume controller (otherwise known as Maya api service) on a running OpenEBS cluster, independently of the cluster’s own lifecycle. OpenEBS volume controller hooks up to the lifecycle of PersistentVolume (that is marked for OpenEBS via OpenEBS provisioner) to apply these storage policies.
-
 Should I Add a Custom Storage Policy to my OpenEBS Cluster?
 -----------------------------------------------------------------
 
