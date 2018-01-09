@@ -2,7 +2,7 @@
 Storage Policies
 ==================
 Overview
------------
+-------------
 
 This section explains storage policies, that every DevOps team can create and apply to their own storage systems. You can now define policies based on the type of application at the StorageClass (a Kubernetes Kind) level. This page explains when to add a storage policy to your OpenEBS cluster and how to use the same.
 
