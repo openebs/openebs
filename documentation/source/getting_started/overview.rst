@@ -39,6 +39,13 @@ Jiva is the docker container image for storage volume containers. In OpenEBS, th
 * Block replication controller (if the container is a controller)
 * Block storage handler (if the container is a replica)
 
+Storage Policies
+------------------
+
+On their own, StorageClass lets you store and retrieve storage policies. It is only when combined with OpenEBS components namely openebs provisioner and maya api service that storage policies are applied against a PersistentVolume (a Kubernetes kind). The OpenEBS volume controller interprets the StorageClass' structured data as a record of the user’s desired state, and continually takes action to achieve and maintain that state.
+
+Users can deploy and update OpenEBS volume controller (otherwise known as Maya api service) on a running OpenEBS cluster, independently of the cluster’s own lifecycle. OpenEBS volume controller hooks up to the lifecycle of PersistentVolume (that is marked for OpenEBS via OpenEBS provisioner) to apply these storage policies.
+
 **See Also:**
 
 Changelog_
