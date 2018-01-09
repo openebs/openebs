@@ -19,16 +19,17 @@ Contents:
     
     Overview <install/install_overview>
     Quick Install <getting_started/quick_install>
+    Running OpenEBS on CentOS 7 OpenShift Cluster <install/openshift>
     Cloud Solutions <install/cloud_solutions>
     On-Premise Solutions <install/on_premise_solutions>
     Developer Solutions <install/dev_solutions>
+    Running OpenEBS Operator <Usecases/run_openebs_operator>
   
     
 .. toctree::
     :maxdepth: 2
     :caption: Usecases
     
-    Running OpenEBS Operator <Usecases/run_openebs_operator>
     Cassandra <Usecases/cassandra>
     CockroachDB <Usecases/cockroachdb>
     Couchbase <Usecases/couchbase>
