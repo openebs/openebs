@@ -10,7 +10,7 @@ Setting Up OpenEBS with Kubernetes on a Local Machine
 The following procedure helps you setup and use OpenEBS on a local machine:
 
 Prerequisites:
-----------------
+^^^^^^^^^^^^^^^^^^^
 
 * Vagrant (>=1.9.1)
 * VirtualBox (>=5.1)
@@ -95,6 +95,301 @@ The *ubuntu@kubemaster-01:~$ kubectl apply -f demo/jupyter/demo-jupyter-openebs.
 * Launch a Jupyter Server, with the specified notebook file from github (kubectl get deployments)
 * Create an OpenEBS Volume and mount to the Jupyter Server Pod (/mnt/data) (kubectl get pvc) (kubectl get pv) (kubectl get pods)
 * Expose the Jupyter Server to external world through http://NodeIP:8888 (NodeIP is any of the nodes' external IP) (kubectl get pods)
+
+Installing Kubernetes on CentOS in Vagrant VMs
+----------------------------------------------------
+The following procedure helps you install Kubernetes on CentOS version 7.4 and use OpenEBS on that cluster. You will be setting up a 3 node cluster comprising of 1 Master and 2 Worker Nodes running Kubernetes 1.8.5.
+
+Prerequisites:
+^^^^^^^^^^^^^^^^
+Verify that you have the following software installed on your machine.
+
+- Vagrant (>=1.9.1)
+- VirtualBox 5.1
+
+Creating and Editing a Vagrantfile for CentOS
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Run the following commands to create a Vagrantfile for CentOS.
+::
+    host-machine:~/mkdir k8s-demo
+    host-machine:~/cd k8s-demo
+    host-machine:~/k8s-demo$ vagrant init centos/7
+    A `Vagrantfile` has been placed in this directory. You are now
+    ready to `vagrant up` your first virtual environment! Please read
+    the comments in the Vagrantfile as well as documentation on
+    `vagrantup.com` for more information on using Vagrant.    
+
+Edit the generated Vagrantfile similar to the following:
+::
+    # -*- mode: ruby -*-
+    # vi: set ft=ruby :
+
+    # All Vagrant configuration is done below. The "2" in Vagrant.configure
+    # configures the configuration version (we support older styles for
+    # backwards compatibility). Please don't change it unless you know what
+    # you're doing.
+    Vagrant.configure("2") do |config|
+      # The most common configuration options are documented and commented below.
+      # For a complete reference, please see the online documentation at
+      # https://docs.vagrantup.com.
+
+        config.vm.box = "centos/7"
+
+        config.vm.provider "virtualbox" do |vb|
+          vb.cpus = 2
+          vb.memory = "2048"
+        end
+
+        config.vm.define "master" do |vmCfg|
+          vmCfg.vm.hostname = "master"
+          vmCfg.vm.network "private_network", ip: "172.28.128.31"
+        end
+
+        config.vm.define "worker-01" do |vmCfg|
+          vmCfg.vm.hostname = "worker-01"
+          vmCfg.vm.network "private_network", ip: "172.28.128.32"
+        end
+
+        config.vm.define "worker-02" do |vmCfg|
+          vmCfg.vm.hostname = "worker-02"
+          vmCfg.vm.network "private_network", ip: "172.28.128.33"
+        end
+    end
+
+Verifying the Vagrant VMs State
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Verify the state of Vagrant VMs. The output displayed is similar to the following:
+::
+    host-machine:~/k8s-demo$ vagrant status
+    Current machine states:
+
+    master                not created (VirtualBox)
+    worker-01             not created (VirtualBox)
+    worker-02             not created (VirtualBox)
+
+    This environment represents multiple VMs. The VMs are all listed
+    above with their current state. For more information about a specific
+    VM, run `vagrant status NAME`.
+
+Bringing up Vagrant VMs
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Use *vagrant up* command to bring up the VMs.
+::
+    host-machine:~/k8s-demo$ vagrant up
+
+Verify the state of Vagrant VMs using the following command. The output displayed is similar to the following:
+::
+    host-machine:~/k8s-demo$ vagrant status
+    Current machine states:
+
+    master                running (VirtualBox)
+    worker-01             running (VirtualBox)
+    worker-02             running (VirtualBox)
+
+    This environment represents multiple VMs. The VMs are all listed
+    above with their current state. For more information about a specific
+    VM, run `vagrant status NAME`.    
+
+Before you Begin
+^^^^^^^^^^^^^^^^^^
+
+* SSH into each Vagrant VM and perform the following steps:
+
+  - Update the /etc/hosts file. Your hosts file will be similar to the following:
+    ::
+      For Master /etc/hosts:
+      -----------------------
+      172.28.128.31   master       master
+      127.0.0.1   localhost
+
+      For Worker-01 /etc/hosts:
+      --------------------------
+      172.28.128.32   worker-01       worker-01
+      127.0.0.1   localhost
+
+      For Worker-02 /etc/hosts:
+      --------------------------
+      172.28.128.33   worker-02       worker-02
+      127.0.0.1   localhost
+      
+  - Update the /etc/resolv.conf file. Your resolv.conf file will look similar to the following:
+    ::
+        # Generated by NetworkManager
+        search domain.name
+        nameserver 8.8.8.8
+        
+  - Disable Swap - you must disable swap for kubelet to work properly (for Kubernetes 1.8 and above).
+    ::
+        [vagrant@master ~]$ sudo swapoff -a
+
+  - Comment out lines containing "swap" in /etc/fstab with swap disabled.
+    ::
+        [vagrant@master ~]$ sudo vi /etc/fstab
+        #
+        # /etc/fstab
+        # Created by anaconda on Sat Oct 28 11:03:00 2017
+        #
+        # Accessible filesystems, by reference, are maintained under '/dev/disk'
+        # See man pages fstab(5), findfs(8), mount(8) and/or blkid(8) for more info
+        #
+        /dev/mapper/VolGroup00-LogVol00 /                       xfs     defaults        0 0
+        UUID=8ffa0ee9-e1a8-4c03-acce-b65b342c6935 /boot                   xfs     defaults        0 0
+
+        #Below line was commented as it contained swap.
+        #/dev/mapper/VolGroup00-LogVol01 swap                    swap    defaults        0 0
+
+  - On each of your vagrant machines, install Docker. Refer to the official Docker installation guides.
+
+  - Once the docker installation is complete, execute the below command to enable and start the docker service.
+    ::
+        sudo systemctl enable docker && sudo systemctl start docker
+
+  - Setup Kubernetes repo details for installing Kubernetes binaries.
+    ::
+        sudo tee -a /etc/yum.repos.d/kubernetes.repo <<EOF >/dev/null
+        [kubernetes]
+        name=Kubernetes
+        baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64
+        enabled=1
+        gpgcheck=1
+        repo_gpgcheck=1
+        gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+        EOF
+        
+  - Disable SELinux - you have to do this until SELinux support is improved in the kubelet.
+    ::
+        # Disable SELinux by running setenforce 0
+        # This is required to allow containers to access the host filesystem required by the pod networks.
+        sudo setenforce 0
+
+  - Ensure the iptables flag in sysctl configuration is set to 1.
+    ::
+        sudo tee -a /etc/sysctl.d/k8s.conf <<EOF >/dev/null
+        net.bridge.bridge-nf-call-ip6tables = 1
+        net.bridge.bridge-nf-call-iptables = 1
+        EOF
+
+  - Reload the system configuration.
+    ::
+        sudo sysctl --system
+  
+  - Install kubeadm, kubelet, and kubectl.
+    ::
+        sudo yum install -y kubelet-1.8.5-0 kubeadm-1.8.5-0 kubectl-1.8.5-0
+
+  - Ensure the --cgroup-driver kubelet flag is set to the same value as Docker.
+    ::
+        sudo sed -i -E 's/--cgroup-driver=systemd/--cgroup-driver=cgroupfs/' /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
+
+  - Execute the below step to enable and start the kubelet service.
+    ::
+        sudo systemctl enable kubelet && sudo systemctl start kubelet    
+
+Create Cluster using kubeadm
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+* Perform the following operations on the **Master Node**.
+
+  - Install wget.
+    ::
+      sudo yum install -y wget
+  
+  - Download and configure the JSON parser jq.
+    ::
+      wget -O jq https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64
+      chmod +x ./jq
+      sudo mv jq /usr/bin
+
+  - Initialize your master.
+    ::
+      sudo kubeadm init --apiserver-advertise-address=<vagrant_vm_ipaddress>
+  
+  - Configure the Kubernetes configuration.
+    ::
+      mkdir -p $HOME/.kube
+      sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+      sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
+  - Patch kube-proxy for CNI Networks.
+    ::
+      kubectl -n kube-system get ds -l 'k8s-app=kube-proxy' -o json \
+      | jq '.items[0].spec.template.spec.containers[0].command |= .+ ["--proxy-mode=userspace"]' \
+      | kubectl apply -f - \
+      && kubectl -n kube-system delete pods -l 'k8s-app=kube-proxy'
+
+  - Install Pod Network - Weave
+    ::
+      export kubever=$(kubectl version | base64 | tr -d '\n')
+      kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$kubever"   
+
+* Perform the following operations on the **Worker Nodes**.
+
+  - Join the cluster
+    ::
+      sudo kubeadm join --token <token> <master-ip>:<master-port> --discovery-token-ca-cert-hash sha256:<hash>
+    
+  - Install ISCSI.
+    ::
+      sudo yum install -y iscsi-initiator-utils
+  
+  - Execute the below command to enable and start the iscsid service.
+    ::
+      sudo systemctl enable iscsid && sudo systemctl start iscsid
+
+**Note:**
+OpenEBS uses iSCSI to connect to the block volumes. Steps 2 and 3 are required to configure an initiator on the worker nodes.
+
+Setting Up OpenEBS Volume Provisioner
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+* Download the *openebs-operator.yaml* and *openebs-storageclasses.yaml* on the Kubernetes Master.
+  ::
+    wget https://raw.githubusercontent.com/openebs/openebs/master/k8s/openebs-operator.yaml
+    wget https://raw.githubusercontent.com/openebs/openebs/master/k8s/openebs-storageclasses.yaml
+
+* Apply the *openebs-operator.yaml* file on the Kubernetes cluster. This creates the maya api-server and OpenEBS provisioner deployments.
+  ::
+    kubectl apply -f openebs-operator.yaml
+
+* Add the OpenEBS storage classes using the following command. This can be used by users to map a suitable storage profile for their applications in their respective persistent volume claims.
+  ::
+      kubectl apply -f openebs-storageclasses.yaml
+
+* Check whether the deployments are running successfully using the following commands.
+  ::
+    vagrant@master:~$ kubectl get deployments
+    NAME                                            DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE
+    maya-apiserver                                  1         1         1            1           2m
+    openebs-provisioner                             1         1         1            1           2m
+
+* Check whether the pods are running successfully using the following commands.
+  ::
+    vagrant@master:~$ kubectl get pods
+    NAME                                   READY     STATUS    RESTARTS   AGE
+    maya-apiserver-1633167387-5ss2w        1/1       Running   0          24s
+    openebs-provisioner-1174174075-f2ss6   1/1       Running   0          23s
+
+* Check whether the storage classes are applied successfully using the following commands.
+  ::
+    vagrant@master:~$ kubectl get sc
+    NAME                 TYPE
+    openebs-cassandra    openebs.io/provisioner-iscsi
+    openebs-es-data-sc   openebs.io/provisioner-iscsi
+    openebs-jupyter      openebs.io/provisioner-iscsi
+    openebs-kafka        openebs.io/provisioner-iscsi
+    openebs-mongodb      openebs.io/provisioner-iscsi
+    openebs-percona      openebs.io/provisioner-iscsi
+    openebs-redis        openebs.io/provisioner-iscsi
+    openebs-standalone   openebs.io/provisioner-iscsi
+    openebs-standard     openebs.io/provisioner-iscsi
+    openebs-zk           openebs.io/provisioner-iscsi
+
+Running Stateful Workloads using OpenEBS
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+* Some sample YAML files for stateful workloads using OpenEBS are provided here_.
+.. _here: https://github.com/openebs/openebs/tree/master/k8s/demo
+* For more information visit http://openebs.readthedocs.io/en/latest/
+
 
 Troubleshooting
 -----------------
