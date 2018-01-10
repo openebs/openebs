@@ -98,7 +98,7 @@ The *ubuntu@kubemaster-01:~$ kubectl apply -f demo/jupyter/demo-jupyter-openebs.
 
 Installing Kubernetes on CentOS in Vagrant VMs
 ----------------------------------------------------
-The following procedure helps you install Kubernetes on CentOS version 7.4 and use OpenEBS on a local machine. You will be setting up a 3 node cluster comprising of 1 Master and 2 Worker Nodes running Kubernetes 1.8.5.
+The following procedure helps you install Kubernetes on CentOS version 7.4 and use OpenEBS on that cluster. You will be setting up a 3 node cluster comprising of 1 Master and 2 Worker Nodes running Kubernetes 1.8.5.
 
 Prerequisites:
 ^^^^^^^^^^^^^^^^
@@ -157,7 +157,7 @@ Edit the generated Vagrantfile similar to the following:
         end
     end
 
-Verifying the Vagramt VMs State
+Verifying the Vagrant VMs State
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Verify the state of Vagrant VMs. The output displayed is similar to the following:
 ::
