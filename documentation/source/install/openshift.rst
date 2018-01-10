@@ -10,9 +10,9 @@ Pre-requisites:
 * At least 2 or more CentOS 7 hosts (virtual-machines/baremetal/cloud instances) with 2 vCPUs, 4G RAM and 16GB hard disk.
 
 * Ensure that the following package dependencies are installed on the hosts using yum install. 
-  **Note:** yum update may be needed prior to this step.
+  **Note:** You may need to update yum prior to this step.
 
-  -   python, wget, git, net-tools, bind-utils, iptables-services, bridge-utils, bash-completion, kexec-tools, sos, psacct, docker-1.12.6
+  -   python, wget, git, net-tools, bind-utils, iptables-services, bridge-utils, bash-completion, kexec-tools, sos, psacct, docker-1.12.6, iscsi-initiator-utils
 
 * Ensure that the following python packages are installed on hosts using pip install. 
   **Note:** Python-pip can be installed using easy_install pip if not present already.
@@ -267,7 +267,7 @@ While the above procedures may be sufficient to enable host access to the contai
 
 Login to the OpenShift management console at https://:8443 as "admin" user. Navigate on the left pane to view different consoles and manage the cluster resources.
 
-  .. figure:: /_static/openshift.png
+  .. image:: ../_static/openshift.png
     :align: center
 
 
