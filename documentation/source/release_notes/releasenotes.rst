@@ -4,6 +4,83 @@
 Changelog
 *******************
 
+OpenEBS Release Version 0.5.1
+================================
+
+Issues Fixed in v0.5.1
+-------------------------
+* Fixed the inter-operability issues of connecting to OpenEBS Volume from CentOS iscsi Initiator (1087_).
+.. _1087: (https://github.com/openebs/openebs/issues/1087)
+* Fixed openebs-k8s-provisioner that must be launched in non-default namespace (1055_).
+.. _1055: (https://github.com/openebs/openebs/issues/#1055)
+* Update the documentation with steps to use OpenEBS on OpenShift Kubernetes Cluster (1102_) and Kubernetes on CentOS (1104_).
+  
+  .. _1102: (https://github.com/openebs/openebs/issues/#1102)
+
+  .. _1104: (https://github.com/openebs/openebs/issues/#1104)
+* Update helm charts to use OpenEBS 0.5.1 (1100_).
+.. _1100: (https://github.com/openebs/openebs/issues/#1100)
+
+Known Limitations
+---------------------
+* Requires Kubernetes 1.7.5+
+* Requires iscsi initiator that must be installed in the Kubernetes nodes or kubelet container
+* Not recommended for mission critical workloads
+* Not recommended for performance sensitive workloads. Efforts are ongoing to improve performance.
+
+Installation
+---------------
+Execute the following command to install OpenEBS using kubectl.
+::
+  kubectl apply -f https://raw.githubusercontent.com/openebs/openebs/v0.5.1/k8s/openebs-operator.yaml
+
+Execute the following command to install OpenEBS using helm.
+::
+  helm repo add openebs-charts https://openebs.github.io/charts/
+  helm repo update
+  helm install openebs-charts/openebs
+
+Images
+----------
+* *openebs/jiva:0.5.1* : Containerized Storage Controller
+* *openebs/m-apiserver:0.5.1* : OpenEBS Maya API Server along with the latest maya cli.
+* *openebs/openebs-k8s-provisioner:0.5.1* : Dynamic OpenEBS Volume Provisioner for Kubernetes.
+* *openebs/m-exporter:0.5.1* : OpenEBS Volume metrics exporter.
+
+Setup OpenEBS Volume Monitoring
+---------------------------------
+If you are running your own Prometheus, please update it with the following job configuration:
+::
+    - job_name: 'openebs-volumes'
+      scheme: http
+      kubernetes_sd_configs:
+      - role: pod
+      relabel_configs:
+      - source_labels: [__meta_kubernetes_pod_label_monitoring]
+        regex: volume_exporter_prometheus
+        action: keep
+      - source_labels: [__meta_kubernetes_pod_name]
+        action: replace
+        target_label: kubernetes_pod_name
+      - source_labels: [__meta_kubernetes_pod_label_vsm]
+        action: replace
+        target_label: openebs_pv
+      - source_labels: [__meta_kubernetes_pod_container_port_number]
+        action: drop
+        regex: '(.*)9501'
+      - source_labels: [__meta_kubernetes_pod_container_port_number]
+        action: drop
+        regex: '(.*)3260
+
+If you do not have Prometheus running, you can use the following yaml file to run Prometheus and Grafana.
+::
+    kubectl apply -f  https://raw.githubusercontent.com/openebs/openebs/v0.5.0/k8s/openebs-monitoring-pg.yaml
+
+You can import the following grafana-dashboard file to view the OpenEBS Volume metrics.
+
+https://raw.githubusercontent.com/openebs/openebs/v0.5.0/k8s/openebs-pg-dashboard.json
+
+
 OpenEBS Release Version 0.5.0
 ================================
 
