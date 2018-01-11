@@ -9,10 +9,17 @@ OpenEBS Release Version 0.5.1
 
 Issues Fixed in v0.5.1
 -------------------------
-* Fixed the inter-operability issues of connecting to OpenEBS Volume from CentOS iscsi Initiator (#1087)
-* Fixed openebs-k8s-provisioner that must be launched in non-default namespace (#1055)
-* Update the documentation with steps to use OpenEBS on OpenShift Kubernetes Cluster (#1102) and Kubernetes on CentOS (#1104)
-* Update helm charts to use OpenEBS 0.5.1 (#1100)
+* Fixed the inter-operability issues of connecting to OpenEBS Volume from CentOS iscsi Initiator (1087_).
+.. _1087: (https://github.com/openebs/openebs/issues/1087)
+* Fixed openebs-k8s-provisioner that must be launched in non-default namespace (1055_).
+.. _1055: (https://github.com/openebs/openebs/issues/#1055)
+* Update the documentation with steps to use OpenEBS on OpenShift Kubernetes Cluster (1102_) and Kubernetes on CentOS (1104_).
+  
+  .. _1102: (https://github.com/openebs/openebs/issues/#1102)
+
+  .. _1104: (https://github.com/openebs/openebs/issues/#1104)
+* Update helm charts to use OpenEBS 0.5.1 (1100_).
+.. _1100: (https://github.com/openebs/openebs/issues/#1100)
 
 Known Limitations
 ---------------------
