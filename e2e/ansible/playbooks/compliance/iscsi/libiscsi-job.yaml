@@ -1,0 +1,26 @@
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: libiscsi
+spec:
+  template:
+    metadata:
+      name: libiscsi
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: libiscsi
+        image: openebs/tests-libiscsi
+        command: ["/bin/bash"]
+        # Use the appropriate iSCSI target portal IP address in args
+        # For OpenEBS obtain this via:  
+        # kubectl get svc 
+        args: ["-c", "./testiscsi.sh --ctrl-svc-ip 10.107.125.0"]
+        volumeMounts:
+        - name: logpath
+          mountPath: /mnt/logs
+      volumes: 
+        - name: logpath
+          hostPath: 
+            path: /logdir
