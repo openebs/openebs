@@ -153,7 +153,7 @@ Download the latest OpenEBS Operator files using the following commands.
    kubectl apply -f openebs-operator.yaml
 
 **Note** 
-By default, OpenEBS launches OpenEBS Volumes with two replicas. To set one replica, as is the case with single-node Kubernetes cluster, specify the environment variable *OPENEBS_IO_JIVA_REPLICA_COUNT=1*.
+By default, OpenEBS launches OpenEBS Volumes with two replicas. To set one replica, as is the case with single-node Kubernetes cluster, specify the environment variable *OPENEBS_IO_JIVA_REPLICA_COUNT=1*. If your OpenEBS version is < 0.5.0 you should use `DEFAULT_REPLICA_COUNT` environment variable instead of `OPENEBS_IO_JIVA_REPLICA_COUNT`.
 
 The following snippet of the openebs-operator.yaml -> maya-apiserver section shows that how you should update it:
 ::
