@@ -4,25 +4,60 @@
 ##
 rbacEnable: true
 
+serviceAccountName: "openebs-maya-operator"
+
 image:
   pullPolicy: IfNotPresent
 
 apiserver:
   image: "openebs/m-apiserver"
-  tag: "0.5.1"
+  imageTag: "0.5.1"
+  replicas: 2
+  ports:
+    externalPort: 5656
+    internalPort: 5656
+  nodeSelector: {}
+  tolerations: {}
+  antiAffinity:
+    enabled: true
+    type: Hard
 
 provisioner:
   image: "openebs/openebs-k8s-provisioner"
-  tag: "0.5.1"
+  imageTag: "0.5.1"
+  replicas: 2
   mayaportalurl: "https://mayaonline.io/"
   monitorurl: "http://127.0.0.1:32515/dashboard/db/openebs-volume-stats?orgId=1"
   monitorvolkey: "&var-OpenEBS"
+  nodeSelector: {}
+  tolerations: {}
+  antiAffinity:
+    enabled: true
+    type: Hard
+
+grafana:
+  image: "grafana/grafana"
+  imageTag: "4.5.2"
+  ports:
+    externalPort: 3000
+    internalPort: 3000
+    nodePort: 32515
+
+prometheus:
+  image: "prom/prometheus"
+  imageTag: "v1.7.2"
+  ports:
+    externalPort: 80
+    internalPort: 9090
+    nodePort: 32514
 
 jiva:
-  image: "openebs/jiva:0.5.1"
+  image: "openebs/jiva"
+  imageTag: "0.5.1"
   replicas: 2
 
 policies:
   monitoring:
     enabled: true
-    image: "openebs/m-exporter:0.5.1"
+    image: "openebs/m-exporter"
+    imageTag: "0.5.1"

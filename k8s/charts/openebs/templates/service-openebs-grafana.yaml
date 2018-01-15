@@ -2,15 +2,22 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: openebs-grafana
+  name: {{ template "openebs.fullname" . }}-grafana
   labels:
-    chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+    app: {{ template "openebs.name" . }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+    role: grafana
 spec:
   type: NodePort
   ports:
-  - port: 3000
-    targetPort: 3000
-    nodePort: 32515
+  - port: {{ .Values.grafana.ports.externalPort }}
+    targetPort: {{ .Values.grafana.ports.internalPort }}
+    nodePort: {{ .Values.grafana.ports.nodePort }}
   selector:
-    app: openebs-grafana
+    app: {{ template "openebs.name" . }}-grafana
+    release: {{ .Release.Name }}
+    component: {{ template "openebs.fullname" . }}
+    role: grafana
 {{- end }}

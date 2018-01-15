@@ -1,25 +1,32 @@
 apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
-  name: openebs-provisioner
+  name: {{ template "openebs.fullname" . }}-provisioner
   labels:
-    chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+    app: {{ template "openebs.name" . }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+    component: {{ template "openebs.fullname" . }}
+    role: provisioner
 spec:
-  replicas: 1
+  replicas: {{ .Values.provisioner.replicas }}
   template:
     metadata:
       labels:
-        name: openebs-provisioner
-        chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+        app: {{ template "openebs.name" . }}
+        release: {{ .Release.Name }}
+        component: {{ template "openebs.fullname" . }}
+        role: provisioner
     spec:
-      serviceAccountName: openebs-maya-operator
+      serviceAccountName: {{ .Values.serviceAccountName }}
       containers:
-      - name: openebs-provisioner
-        image: "{{ .Values.provisioner.image }}:{{ .Values.provisioner.tag }}"
+      - name: {{ template "openebs.name" . }}-provisioner
+        image: "{{ .Values.provisioner.image }}:{{ .Values.provisioner.imageTag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         env:
         - name: NODE_NAME
-          valueFrom: 
+          valueFrom:
             fieldRef:
               fieldPath: spec.nodeName
         - name: OPENEBS_MONITOR_URL
@@ -28,3 +35,34 @@ spec:
           value: "{{ .Values.provisioner.monitorvolkey }}"
         - name: MAYA_PORTAL_URL
           value: "{{ .Values.provisioner.mayaportalurl }}"
+
+{{- if .Values.provisioner.nodeSelector }}
+      nodeSelector:
+{{ toYaml .Values.provisioner.nodeSelector | indent 8 }}
+{{- end }}
+
+{{- if .Values.provisioner.tolerations }}
+      tolerations:
+{{ toYaml .Values.provisioner.tolerations | indent 8 }}
+{{- end }}
+
+{{- if .Values.provisioner.antiAffinity.enabled }}
+      affinity:
+        podAntiAffinity:
+  {{- $antiAffinityType := .Values.provisioner.antiAffinity.type | lower -}}
+  {{- if eq $antiAffinityType "hard" }}
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - topologyKey: "kubernetes.io/hostname"
+              labelSelector:
+                matchLabels:
+                  name: {{ template "openebs.fullname" . }}-provisioner
+  {{- else if eq $antiAffinityType "soft" }}
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 1
+              podAffinityTerm:
+                topologyKey: "kubernetes.io/hostname"
+                labelSelector:
+                  matchLabels:
+                    name: {{ template "openebs.fullname" . }}-provisioner
+  {{- end }}
+{{- end }}

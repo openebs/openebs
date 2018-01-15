@@ -1,30 +1,68 @@
 apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
-  name: maya-apiserver
+  name: {{ template "openebs.fullname" . }}-maya-apiserver
   labels:
-    chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+    app: {{ template "openebs.name" . }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+    component: {{ template "openebs.fullname" . }}
+    role: apiserver
 spec:
-  replicas: 1
+  replicas: {{ .Values.apiserver.replicas }}
   template:
     metadata:
       labels:
-        name: maya-apiserver
-        chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+        app: {{ template "openebs.name" . }}
+        release: {{ .Release.Name }}
+        component: {{ template "openebs.fullname" . }}
+        role: apiserver
     spec:
-      serviceAccountName: openebs-maya-operator
+      serviceAccountName: {{ .Values.serviceAccountName }}
       containers:
-      - name: maya-apiserver
-        image: "{{ .Values.apiserver.image }}:{{ .Values.apiserver.tag }}"
+      - name: {{ template "openebs.name" . }}-maya-apiserver
+        image: "{{ .Values.apiserver.image }}:{{ .Values.apiserver.imageTag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
-        ports: 
-        - containerPort: 5656
+        ports:
+        - containerPort: {{ .Values.apiserver.ports.internalPort }}
         env:
         - name: OPENEBS_IO_JIVA_CONTROLLER_IMAGE
-          value: {{ .Values.jiva.image }}
+          value: "{{ .Values.jiva.image }}:{{ .Values.jiva.imageTag }}"
         - name: OPENEBS_IO_JIVA_REPLICA_IMAGE
-          value: {{ .Values.jiva.image }}
+          value: "{{ .Values.jiva.image }}:{{ .Values.jiva.imageTag }}"
         - name: OPENEBS_IO_VOLUME_MONITOR_IMAGE
-          value: "{{ .Values.policies.monitoring.image }}"
+          value: "{{ .Values.policies.monitoring.image }}:{{ .Values.policies.monitoring.imageTag }}"
         - name: OPENEBS_IO_JIVA_REPLICA_COUNT
           value: "{{ .Values.jiva.replicas }}"
+
+{{- if .Values.apiserver.nodeSelector }}
+      nodeSelector:
+{{ toYaml .Values.apiserver.nodeSelector | indent 8 }}
+{{- end }}
+
+{{- if .Values.apiserver.tolerations }}
+      tolerations:
+{{ toYaml .Values.apiserver.tolerations | indent 8 }}
+{{- end }}
+
+{{- if .Values.apiserver.antiAffinity.enabled }}
+      affinity:
+        podAntiAffinity:
+  {{- $antiAffinityType := .Values.apiserver.antiAffinity.type | lower -}}
+  {{- if eq $antiAffinityType "hard" }}
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - topologyKey: "kubernetes.io/hostname"
+              labelSelector:
+                matchLabels:
+                  name: {{ template "openebs.fullname" . }}-maya-apiserver
+  {{- else if eq $antiAffinityType "soft" }}
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 1
+              podAffinityTerm:
+                topologyKey: "kubernetes.io/hostname"
+                labelSelector:
+                  matchLabels:
+                    name: {{ template "openebs.fullname" . }}-maya-apiserver
+  {{- end }}
+{{- end }}

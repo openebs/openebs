@@ -3,13 +3,20 @@ kind: Service
 metadata:
   name: maya-apiserver-service
   labels:
-    chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+    app: {{ template "openebs.name" . }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+    role: apiserver
 spec:
   ports:
   - name: api
-    port: 5656
+    port: {{ .Values.apiserver.ports.externalPort }}
+    targetPort: {{ .Values.apiserver.ports.internalPort }}
     protocol: TCP
-    targetPort: 5656
   selector:
-    name: maya-apiserver
+    app: {{ template "openebs.name" . }}-maya-apiserver
+    release: {{ .Release.Name }}
+    component: {{ template "openebs.fullname" . }}
+    role: apiserver
   sessionAffinity: None

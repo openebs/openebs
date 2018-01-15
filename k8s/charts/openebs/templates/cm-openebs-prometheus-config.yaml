@@ -1,10 +1,15 @@
 {{- if .Values.policies.monitoring.enabled }}
+apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: openebs-prometheus-config
+  name: {{ template "openebs.fullname" . }}-prometheus-config
   labels:
-    chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
-apiVersion: v1
+    app: {{ template "openebs.name" . }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+    component: {{ template "openebs.fullname" . }}
+    role: prometheus-config
 data:
   prometheus.yml: |-
     global:
