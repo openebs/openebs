@@ -117,4 +117,4 @@ Federation is used for scaling prometheus and ensuring its reliability. In this 
 * After configuring your global prometheus just repeat the steps given above in setup prometheus.
 
 ### Note : 
-**if you are using openebs version > 0.5 then m-exporter runs as sidecar in jiva in the subsequent versions, so you need not create a separate deployment for that.**
+**if you are using openebs version > 0.5 then m-exporter runs as sidecar in jiva in the subsequent versions, so you need not to create a separate deployment for that.**
