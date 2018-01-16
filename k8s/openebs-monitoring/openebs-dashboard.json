@@ -1,40 +1,4 @@
 {
-  "__inputs": [
-    {
-      "name": "DS_PROMETHEUS-DEMO",
-      "label": "Prometheus-demo",
-      "description": "",
-      "type": "datasource",
-      "pluginId": "prometheus",
-      "pluginName": "Prometheus"
-    }
-  ],
-  "__requires": [
-    {
-      "type": "grafana",
-      "id": "grafana",
-      "name": "Grafana",
-      "version": "4.5.2"
-    },
-    {
-      "type": "panel",
-      "id": "graph",
-      "name": "Graph",
-      "version": ""
-    },
-    {
-      "type": "datasource",
-      "id": "prometheus",
-      "name": "Prometheus",
-      "version": "1.0.0"
-    },
-    {
-      "type": "panel",
-      "id": "singlestat",
-      "name": "Singlestat",
-      "version": ""
-    }
-  ],
   "annotations": {
     "list": []
   },
@@ -42,92 +6,24 @@
   "gnetId": null,
   "graphTooltip": 0,
   "hideControls": false,
-  "id": null,
-  "links": [],
+  "id": 4,
+  "links": [
+    {
+      "icon": "info",
+      "tags": [],
+      "targetBlank": true,
+      "title": "OpenEBS Docs",
+      "tooltip": "OpenEBS Documentation",
+      "type": "link",
+      "url": "http://openebs.readthedocs.io/en/latest/"
+    }
+  ],
+  "refresh": false,
   "rows": [
     {
       "collapse": false,
-      "height": 298,
+      "height": 328,
       "panels": [
-        {
-          "cacheTimeout": null,
-          "colorBackground": false,
-          "colorValue": false,
-          "colors": [
-            "rgba(50, 172, 45, 0.97)",
-            "rgba(237, 81, 40, 0.89)",
-            "rgba(245, 54, 54, 0.9)"
-          ],
-          "datasource": "${DS_PROMETHEUS-DEMO}",
-          "description": "This shows the total size of the volume used.",
-          "format": "decgbytes",
-          "gauge": {
-            "maxValue": 5,
-            "minValue": 0,
-            "show": false,
-            "thresholdLabels": false,
-            "thresholdMarkers": false
-          },
-          "id": 2,
-          "interval": null,
-          "links": [],
-          "mappingType": 1,
-          "mappingTypes": [
-            {
-              "name": "value to text",
-              "value": 1
-            },
-            {
-              "name": "range to text",
-              "value": 2
-            }
-          ],
-          "maxDataPoints": 100,
-          "nullPointMode": "connected",
-          "nullText": null,
-          "postfix": "",
-          "postfixFontSize": "50%",
-          "prefix": "",
-          "prefixFontSize": "50%",
-          "rangeMaps": [
-            {
-              "from": "null",
-              "text": "N/A",
-              "to": "null"
-            }
-          ],
-          "span": 3,
-          "sparkline": {
-            "fillColor": "rgba(31, 118, 189, 0.18)",
-            "full": false,
-            "lineColor": "rgb(31, 120, 193)",
-            "show": false
-          },
-          "tableColumn": "",
-          "targets": [
-            {
-              "expr": "OpenEBS_actual_used{instance=~\"$OpenEBS\"}",
-              "format": "time_series",
-              "hide": false,
-              "intervalFactor": 2,
-              "legendFormat": "",
-              "refId": "A",
-              "step": 600
-            }
-          ],
-          "thresholds": "4,5",
-          "title": "Volume Used",
-          "type": "singlestat",
-          "valueFontSize": "80%",
-          "valueMaps": [
-            {
-              "op": "=",
-              "text": "N/A",
-              "value": "null"
-            }
-          ],
-          "valueName": "current"
-        },
         {
           "cacheTimeout": null,
           "colorBackground": false,
@@ -137,8 +33,8 @@
             "rgba(237, 129, 40, 0.89)",
             "rgba(50, 172, 45, 0.97)"
           ],
-          "datasource": "${DS_PROMETHEUS-DEMO}",
-          "description": "Time Since volume registered",
+          "datasource": "prometheus",
+          "description": "Elapsed time since Volume was provisioned",
           "format": "m",
           "gauge": {
             "maxValue": 100,
@@ -185,7 +81,7 @@
           "tableColumn": "",
           "targets": [
             {
-              "expr": "OpenEBS_volume_uptime{job=\"maya-agent\", instance=~\"$OpenEBS\"}/60",
+              "expr": "OpenEBS_volume_uptime{job=\"maya-volume-exporter\", instance=~\"$OpenEBS\"}/60",
               "format": "time_series",
               "hide": false,
               "intervalFactor": 2,
@@ -207,24 +103,203 @@
           "valueName": "current"
         },
         {
+          "cacheTimeout": null,
+          "colorBackground": false,
+          "colorValue": false,
+          "colors": [
+            "rgba(50, 172, 45, 0.97)",
+            "rgba(237, 81, 40, 0.89)",
+            "rgba(245, 54, 54, 0.9)"
+          ],
+          "datasource": "prometheus",
+          "description": "Capacity Used by the Volume",
+          "format": "decgbytes",
+          "gauge": {
+            "maxValue": 5,
+            "minValue": 0,
+            "show": true,
+            "thresholdLabels": false,
+            "thresholdMarkers": false
+          },
+          "id": 2,
+          "interval": null,
+          "links": [],
+          "mappingType": 1,
+          "mappingTypes": [
+            {
+              "name": "value to text",
+              "value": 1
+            },
+            {
+              "name": "range to text",
+              "value": 2
+            }
+          ],
+          "maxDataPoints": 100,
+          "nullPointMode": "connected",
+          "nullText": null,
+          "postfix": "",
+          "postfixFontSize": "50%",
+          "prefix": "",
+          "prefixFontSize": "50%",
+          "rangeMaps": [
+            {
+              "from": "null",
+              "text": "N/A",
+              "to": "null"
+            }
+          ],
+          "span": 3,
+          "sparkline": {
+            "fillColor": "rgba(31, 118, 189, 0.18)",
+            "full": true,
+            "lineColor": "rgb(31, 120, 193)",
+            "show": false
+          },
+          "tableColumn": "__name__",
+          "targets": [
+            {
+              "expr": "OpenEBS_actual_used{job=\"maya-volume-exporter\", instance=~\"$OpenEBS\"}",
+              "format": "time_series",
+              "hide": false,
+              "intervalFactor": 2,
+              "legendFormat": "",
+              "refId": "A",
+              "step": 600
+            }
+          ],
+          "thresholds": "4,5",
+          "title": "Capacity",
+          "type": "singlestat",
+          "valueFontSize": "80%",
+          "valueMaps": [
+            {
+              "op": "=",
+              "text": "N/A",
+              "value": "null"
+            }
+          ],
+          "valueName": "current"
+        },
+        {
+          "cacheTimeout": null,
+          "colorBackground": false,
+          "colorValue": false,
+          "colors": [
+            "rgba(245, 54, 54, 0.9)",
+            "rgba(237, 129, 40, 0.89)",
+            "rgba(50, 172, 45, 0.97)"
+          ],
+          "datasource": "prometheus",
+          "format": "none",
+          "gauge": {
+            "maxValue": 100,
+            "minValue": 0,
+            "show": false,
+            "thresholdLabels": false,
+            "thresholdMarkers": true
+          },
+          "hideTimeOverride": true,
+          "id": 12,
+          "interval": null,
+          "links": [],
+          "mappingType": 1,
+          "mappingTypes": [
+            {
+              "name": "value to text",
+              "value": 1
+            },
+            {
+              "name": "range to text",
+              "value": 2
+            }
+          ],
+          "maxDataPoints": 100,
+          "nullPointMode": "connected",
+          "nullText": null,
+          "postfix": "",
+          "postfixFontSize": "50%",
+          "prefix": "",
+          "prefixFontSize": "50%",
+          "rangeMaps": [
+            {
+              "from": "null",
+              "text": "N/A",
+              "to": "null"
+            }
+          ],
+          "span": 3,
+          "sparkline": {
+            "fillColor": "rgba(31, 118, 189, 0.18)",
+            "full": false,
+            "lineColor": "rgb(31, 120, 193)",
+            "show": true
+          },
+          "tableColumn": "",
+          "targets": [
+            {
+              "expr": "OpenEBS_actual_used{job=\"maya-volume-exporter\", instance=~\"$OpenEBS\"}",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "refId": "A",
+              "step": 60
+            }
+          ],
+          "thresholds": "",
+          "timeFrom": "2h",
+          "timeShift": null,
+          "title": "Storage Usage",
+          "type": "singlestat",
+          "valueFontSize": "80%",
+          "valueMaps": [
+            {
+              "op": "=",
+              "text": "N/A",
+              "value": "null"
+            }
+          ],
+          "valueName": "avg"
+        },
+        {
+          "content": "<img src=\"https://raw.githubusercontent.com/openebs/chitrakala/master/OpenEBS%20logo/openebs%20logos-03.png\" alt=\"OpenEBS logo\" style=\"height: 40px;\">\n<span style=\"font-family: 'Open Sans', 'Helvetica Neue', Helvetica; font-size: 25px;vertical-align: text-top;color: #bbbfc2;margin-left: 10px;\">OpenEBS</span>\n\n<p style=\"margin-top: 10px;\">You're monitoring OpenEBS Volumes using Prometheus. For more information, check out the <a href=\"http://openebs.io/\">OpenEBS</a> and <a href=\"http://prometheus.io/\">Prometheus</a> projects. If you would like to retain this volume monitoring data and much more, sign-up for <a href=\"http://mayaonline.io/\">MayaOnline</a> </p>",
+          "id": 11,
+          "links": [],
+          "mode": "html",
+          "span": 3,
+          "title": "",
+          "transparent": true,
+          "type": "text"
+        }
+      ],
+      "repeat": null,
+      "repeatIteration": null,
+      "repeatRowId": null,
+      "showTitle": false,
+      "title": "Dashboard Row",
+      "titleSize": "h6"
+    },
+    {
+      "collapse": false,
+      "height": 275,
+      "panels": [
+        {
           "aliasColors": {},
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "${DS_PROMETHEUS-DEMO}",
-          "description": "Read IOPS of volume",
+          "datasource": "prometheus",
+          "description": "IOPS",
           "fill": 1,
           "id": 3,
           "legend": {
             "alignAsTable": true,
             "avg": true,
             "current": false,
-            "hideEmpty": false,
-            "hideZero": false,
-            "max": false,
-            "min": false,
-            "rightSide": false,
+            "max": true,
+            "min": true,
+            "rightSide": true,
             "show": true,
+            "sideWidth": 350,
             "total": false,
             "values": true
           },
@@ -238,32 +313,33 @@
           "renderer": "flot",
           "seriesOverrides": [],
           "spaceLength": 10,
-          "span": 6,
+          "span": 12,
           "stack": true,
           "steppedLine": false,
           "targets": [
             {
-              "expr": "OpenEBS_read_iops{job=\"maya-agent\", instance=~\"$OpenEBS\"}",
+              "expr": "OpenEBS_read_iops{job=\"maya-volume-exporter\", instance=~\"$OpenEBS\"}",
               "format": "time_series",
               "hide": false,
               "intervalFactor": 2,
-              "legendFormat": "{{Read IOPS}}",
+              "legendFormat": "{{Reads}}",
               "refId": "A",
-              "step": 60
+              "step": 30
             },
             {
-              "expr": "OpenEBS_write_iops{job=\"maya-agent\", instance=~\"$OpenEBS\"}",
+              "expr": "OpenEBS_write_iops{job=\"maya-volume-exporter\", instance=~\"$OpenEBS\"}",
               "format": "time_series",
+              "hide": false,
               "intervalFactor": 2,
-              "legendFormat": "{{Write IOPS}}",
+              "legendFormat": "{{Writes}}",
               "refId": "B",
-              "step": 60
+              "step": 30
             }
           ],
           "thresholds": [],
           "timeFrom": null,
           "timeShift": null,
-          "title": "Read/Write IOPS",
+          "title": "IOPS",
           "tooltip": {
             "shared": true,
             "sort": 0,
@@ -301,117 +377,31 @@
       "repeatIteration": null,
       "repeatRowId": null,
       "showTitle": false,
-      "title": "Dashboard Row",
+      "title": "IOPS Graph",
       "titleSize": "h6"
     },
     {
       "collapse": false,
-      "height": 264,
+      "height": 275,
       "panels": [
         {
           "aliasColors": {},
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "${DS_PROMETHEUS-DEMO}",
-          "description": "Read/Write latency of volume",
-          "fill": 1,
-          "id": 5,
-          "legend": {
-            "alignAsTable": true,
-            "avg": true,
-            "current": false,
-            "max": false,
-            "min": false,
-            "show": true,
-            "total": false,
-            "values": true
-          },
-          "lines": true,
-          "linewidth": 1,
-          "links": [],
-          "nullPointMode": "null",
-          "percentage": false,
-          "pointradius": 5,
-          "points": false,
-          "renderer": "flot",
-          "seriesOverrides": [],
-          "spaceLength": 10,
-          "span": 6,
-          "stack": true,
-          "steppedLine": false,
-          "targets": [
-            {
-              "expr": "OpenEBS_read_latency{job=\"maya-agent\", instance=~\"$OpenEBS\"}",
-              "format": "time_series",
-              "hide": false,
-              "intervalFactor": 2,
-              "legendFormat": "{{Read latency}}",
-              "refId": "A",
-              "step": 60
-            },
-            {
-              "expr": "OpenEBS_write_latency{job=\"maya-agent\", instance=~\"$OpenEBS\"}",
-              "format": "time_series",
-              "hide": false,
-              "intervalFactor": 2,
-              "legendFormat": "{{Write latency}}",
-              "refId": "B",
-              "step": 60
-            }
-          ],
-          "thresholds": [],
-          "timeFrom": null,
-          "timeShift": null,
-          "title": "Read/Write Latency",
-          "tooltip": {
-            "shared": true,
-            "sort": 0,
-            "value_type": "individual"
-          },
-          "type": "graph",
-          "xaxis": {
-            "buckets": null,
-            "mode": "time",
-            "name": null,
-            "show": true,
-            "values": []
-          },
-          "yaxes": [
-            {
-              "format": "s",
-              "label": null,
-              "logBase": 1,
-              "max": null,
-              "min": "0",
-              "show": true
-            },
-            {
-              "format": "short",
-              "label": null,
-              "logBase": 1,
-              "max": null,
-              "min": null,
-              "show": false
-            }
-          ]
-        },
-        {
-          "aliasColors": {},
-          "bars": false,
-          "dashLength": 10,
-          "dashes": false,
-          "datasource": "${DS_PROMETHEUS-DEMO}",
-          "description": "Bandwidth of volume",
+          "datasource": "prometheus",
+          "description": "Throughput",
           "fill": 1,
           "id": 9,
           "legend": {
             "alignAsTable": true,
             "avg": true,
             "current": false,
-            "max": false,
-            "min": false,
+            "max": true,
+            "min": true,
+            "rightSide": true,
             "show": true,
+            "sideWidth": 350,
             "total": false,
             "values": true
           },
@@ -425,33 +415,33 @@
           "renderer": "flot",
           "seriesOverrides": [],
           "spaceLength": 10,
-          "span": 6,
+          "span": 12,
           "stack": true,
           "steppedLine": false,
           "targets": [
             {
-              "expr": "OpenEBS_read_block_count_per_second{job=\"maya-agent\", instance=~\"$OpenEBS\"}/(1024*1024)",
+              "expr": "OpenEBS_read_block_count_per_second{job=\"maya-volume-exporter\", instance=~\"$OpenEBS\"}/(1024*1024)",
               "format": "time_series",
               "hide": false,
               "intervalFactor": 2,
               "legendFormat": "{{Read Throughput}}",
               "refId": "A",
-              "step": 60
+              "step": 30
             },
             {
-              "expr": "OpenEBS_write_block_count_per_second{job=\"maya-agent\", instance=~\"$OpenEBS\"}/(1024*1024)",
+              "expr": "OpenEBS_write_block_count_per_second{job=\"maya-volume-exporter\", instance=~\"$OpenEBS\"}/(1024*1024)",
               "format": "time_series",
               "hide": false,
               "intervalFactor": 2,
               "legendFormat": "{{Write Throughput}}",
               "refId": "B",
-              "step": 60
+              "step": 30
             }
           ],
           "thresholds": [],
           "timeFrom": null,
           "timeShift": null,
-          "title": "Read/Write Throughput",
+          "title": "Throughput",
           "tooltip": {
             "shared": true,
             "sort": 0,
@@ -489,7 +479,109 @@
       "repeatIteration": null,
       "repeatRowId": null,
       "showTitle": false,
-      "title": "Dashboard Row",
+      "title": "Throughput Graph",
+      "titleSize": "h6"
+    },
+    {
+      "collapse": false,
+      "height": 275,
+      "panels": [
+        {
+          "aliasColors": {},
+          "bars": false,
+          "dashLength": 10,
+          "dashes": false,
+          "datasource": "prometheus",
+          "description": "Latency",
+          "fill": 1,
+          "id": 5,
+          "legend": {
+            "alignAsTable": true,
+            "avg": true,
+            "current": false,
+            "max": true,
+            "min": true,
+            "rightSide": true,
+            "show": true,
+            "sideWidth": 350,
+            "total": false,
+            "values": true
+          },
+          "lines": true,
+          "linewidth": 1,
+          "links": [],
+          "nullPointMode": "null",
+          "percentage": false,
+          "pointradius": 5,
+          "points": false,
+          "renderer": "flot",
+          "seriesOverrides": [],
+          "spaceLength": 10,
+          "span": 12,
+          "stack": true,
+          "steppedLine": false,
+          "targets": [
+            {
+              "expr": "OpenEBS_read_latency{job=\"maya-volume-exporter\", instance=~\"$OpenEBS\"}",
+              "format": "time_series",
+              "hide": false,
+              "intervalFactor": 2,
+              "legendFormat": "{{Read Latency}}",
+              "refId": "A",
+              "step": 30
+            },
+            {
+              "expr": "OpenEBS_write_latency{job=\"maya-volume-exporter\", instance=~\"$OpenEBS\"}",
+              "format": "time_series",
+              "hide": false,
+              "intervalFactor": 2,
+              "legendFormat": "{{Write Latency}}",
+              "refId": "B",
+              "step": 30
+            }
+          ],
+          "thresholds": [],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "Latency",
+          "tooltip": {
+            "shared": true,
+            "sort": 0,
+            "value_type": "individual"
+          },
+          "type": "graph",
+          "xaxis": {
+            "buckets": null,
+            "mode": "time",
+            "name": null,
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "format": "s",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": "0",
+              "show": true
+            },
+            {
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": false
+            }
+          ]
+        }
+      ],
+      "repeat": null,
+      "repeatIteration": null,
+      "repeatRowId": null,
+      "showTitle": false,
+      "title": "Latency Graph",
       "titleSize": "h6"
     }
   ],
@@ -500,8 +592,11 @@
     "list": [
       {
         "allValue": null,
-        "current": {},
-        "datasource": "${DS_PROMETHEUS-DEMO}",
+        "current": {
+          "text": "10.44.0.5:9500",
+          "value": "10.44.0.5:9500"
+        },
+        "datasource": "prometheus",
         "hide": 0,
         "includeAll": false,
         "label": "OpenEBS Volume",
@@ -550,6 +645,6 @@
     ]
   },
   "timezone": "",
-  "title": "OpenEBS",
+  "title": "OpenEBS Volume",
   "version": 2
 }

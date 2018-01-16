@@ -104,6 +104,8 @@ deployment "grafana" created
 ## Launch Grafana UI
 * Run `kubectl get svc` and note down the NodePort, used to launch Grafana User Interface and Alertmanager.
 * To launch Grafana open NodeIP:NodePort  (NodePort of grafana service) in your browser.
+* After login add your data source by putting IP address of Prometheus to import the dashboard
+* These are the graphs related to prometheus. You can create a new dashboard by importing `openebs-dashboard.json`
 ## Launch Alertmanager UI
 * To launch alertmanager open NodeIP:NodePort (NodePort of alertmanager service)
 
@@ -113,3 +115,6 @@ Federation is used for scaling prometheus and ensuring its reliability. In this 
 * All the setups and steps are very similar to previous one, one and only change is to be made in prometheus-master-config.yaml.
 * Just replace the IP given in targets field of job `master-federation` with your slave prometheus and also add the job name which you want to collect in the match field.
 * After configuring your global prometheus just repeat the steps given above in setup prometheus.
+
+### Note : 
+**if you are using openebs version > 0.5 then m-exporter runs as sidecar in jiva in the subsequent versions, so you need not to create a separate deployment for that.**
