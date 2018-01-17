@@ -2,36 +2,45 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: openebs-prometheus
+  name: {{ template "openebs.fullname" . }}-prometheus
   labels:
-    chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+    app: {{ template "openebs.name" . }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+    component: {{ template "openebs.fullname" . }}
+    role: prometheus
 spec:
   replicas: 1
   template:
     metadata:
       labels:
-        name: openebs-prometheus-server
+        app: {{ template "openebs.name" . }}
+        release: {{ .Release.Name }}
+        component: {{ template "openebs.fullname" . }}
+        role: prometheus
     spec:
-      serviceAccountName: openebs-maya-operator
+      serviceAccountName: {{ .Values.serviceAccountName }}
       containers:
-        - name: prometheus
-          image: prom/prometheus:v1.7.2
+        - name: {{ template "openebs.name" . }}-prometheus
+          image: "{{ .Values.prometheus.image }}:{{ .Values.prometheus.imageTag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
           args:
             - "-config.file=/etc/prometheus/conf/prometheus.yml"
             # Metrics are stored in an emptyDir volume which
             # exists as long as the Pod is running on that Node.
             # The data in an emptyDir volume is safe across container crashes.
             - "-storage.local.path=/prometheus"
-            # How long to retain samples in the local storage. 
+            # How long to retain samples in the local storage.
             - "-storage.local.retention=$(STORAGE_RETENTION)"
           ports:
-            - containerPort: 9090
+            - containerPort: {{ .Values.prometheus.ports.internalPort }}
           env:
-            # environment vars are stored in prometheus-env configmap. 
+            # environment vars are stored in prometheus-env configmap.
             - name: STORAGE_RETENTION
               valueFrom:
                 configMapKeyRef:
-                  name: openebs-prometheus-tunables
+                  name: {{ template "openebs.fullname" . }}-prometheus-tunables
                   key: storage-retention
           resources:
             requests:
@@ -57,9 +66,9 @@ spec:
         # Prometheus Config file will be stored in this volume 
         - name: prometheus-server-volume
           configMap:
-            name: openebs-prometheus-config
+            name: {{ template "openebs.fullname" . }}-prometheus-config
         # All the time series stored in this volume in form of .db file.
         - name: prometheus-storage-volume
           # containers in the Pod can all read and write the same files here.
-          emptyDir: {} 
+          emptyDir: {}
 {{- end }}
