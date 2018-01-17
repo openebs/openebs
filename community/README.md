@@ -22,10 +22,18 @@ There's a curated list of issues, [Good First Issue](https://github.com/openebs/
 
 To dig deeper, please start by having a look at [OpenEBS Architecture](../contribute/design/README.md).
 
-There's always code that can be clarified and variables or functions that can be renamed or commented.
+There's always code that can be clarified and variables or functions that can be renamed or commented and need for more test coverage.
 
-There's always a need for more test coverage that by contributed through [OpenEBS E2E](../contribute/CONTRIBUTING-TO-CI-AND-E2E.md
-).
+
+## Getting Started
+
+Links in [openebs/contribute](../contribute) will help you get started with:
+
+- [OpenEBS Development](../contribute/CONTRIBUTING-TO-DEVELOPER-DOC.md).
+
+- [OpenEBS E2E](../contribute/CONTRIBUTING-TO-CI-AND-E2E.md).
+
+- [Demo Applications](../contribute/CONTRIBUTING-TO-K8S-DEMO.md)
 
 ## Issues
 
@@ -37,6 +45,8 @@ please [file an issue](https://github.com/openebs/openebs/issues).
 
 ## Weekly Meeting
 
-We have PUBLIC [weekly meeting](https://zoom.us/j/438333946) every Friday at 10am Indian Standard Time over Zoom.
+We have weekly contributor meeting every Friday at 10am Indian Standard Time over [Zoom](https://zoom.us/j/438333946).
+
+To add this event to your calendar, please send a mail to nisanta.sahoo@openebs.io or use the following [public event link](https://calendar.google.com/calendar/embed?src=openebs%40gmail.com&ctz=Asia%2FCalcutta).
 
 Map that to your local time with this [timezone table](https://www.google.com/search?q=1000+am+in+ist).
