@@ -50,3 +50,9 @@ We have weekly contributor meeting every Friday at 10am Indian Standard Time ove
 To add this event to your calendar, please send a mail to nisanta.sahoo@openebs.io or use the following [public event link](https://calendar.google.com/calendar/embed?src=openebs%40gmail.com&ctz=Asia%2FCalcutta).
 
 Map that to your local time with this [timezone table](https://www.google.com/search?q=1000+am+in+ist).
+
+### Meetings
+
+- Agenda and any notes from each meeting are captured in this [document](https://docs.google.com/document/d/1mHL1ypds4Hf6OnOGz2dOufamu4LiSt4Sgnl9QFrxDls).
+
+- Feature requests and current sprint tasks are captured in this [planning sheet](https://docs.google.com/spreadsheets/d/1bbphUqbxShBhgr1VHaEQUzIGMaJJacPNKc1ckNXU1QE).
