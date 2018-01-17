@@ -51,8 +51,8 @@ To add this event to your calendar, please send a mail to nisanta.sahoo@openebs.
 
 Map that to your local time with this [timezone table](https://www.google.com/search?q=1000+am+in+ist).
 
-### Meetings
+### Meeting resources
 
 - Agenda and any notes from each meeting are captured in this [document](https://docs.google.com/document/d/1mHL1ypds4Hf6OnOGz2dOufamu4LiSt4Sgnl9QFrxDls).
 
-- Feature requests and current sprint tasks are captured in this [planning sheet](https://docs.google.com/spreadsheets/d/1bbphUqbxShBhgr1VHaEQUzIGMaJJacPNKc1ckNXU1QE).
+- Feature requests and current release tasks are captured in this [planning sheet](https://docs.google.com/spreadsheets/d/1bbphUqbxShBhgr1VHaEQUzIGMaJJacPNKc1ckNXU1QE).
