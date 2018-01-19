@@ -3,7 +3,7 @@
 # Launch the maya-apiserver ( deployment )
 # Launch the maya-storagemanager ( deameon set )
 
-# Create Maya Service Account 
+# Create Maya Service Account
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -51,7 +51,7 @@ subjects:
   apiGroup: rbac.authorization.k8s.io
 roleRef:
   kind: ClusterRole
-  name: openebs-maya-operator
+  name: cluster-admin
   apiGroup: rbac.authorization.k8s.io
 ---
 apiVersion: apps/v1beta1
