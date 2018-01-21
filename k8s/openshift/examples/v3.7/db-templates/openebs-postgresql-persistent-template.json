@@ -276,6 +276,7 @@
       "value": "openebs-standard",
       "required": true
     },
+    {
       "name": "POSTGRESQL_VERSION",
       "displayName": "Version of PostgreSQL Image",
       "description": "Version of PostgreSQL image to be used (9.2, 9.4, 9.5 or latest).",

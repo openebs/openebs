@@ -295,6 +295,7 @@
       "value": "openebs-standard",
       "required": true
     },
+    {
       "name": "MONGODB_VERSION",
       "displayName": "Version of MongoDB Image",
       "description": "Version of MongoDB image to be used (2.4, 2.6, 3.2 or latest).",

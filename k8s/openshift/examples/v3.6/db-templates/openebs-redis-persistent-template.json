@@ -239,6 +239,7 @@
       "value": "openebs-standard",
       "required": true
     },
+    {
       "name": "REDIS_VERSION",
       "displayName": "Version of Redis Image",
       "description": "Version of Redis image to be used (3.2 or latest).",

@@ -56,7 +56,12 @@
         ],
         "selector": {
           "name": "${DATABASE_SERVICE_NAME}"
-        }
+        },
+        "type": "ClusterIP",
+        "sessionAffinity": "None"
+      },
+      "status": {
+        "loadBalancer": {}
       }
     },
     {
@@ -104,7 +109,8 @@
                 "kind": "ImageStreamTag",
                 "name": "mysql:${MYSQL_VERSION}",
                 "namespace": "${NAMESPACE}"
-              }
+              },
+              "lastTriggeredImage": ""
             }
           },
           {
@@ -195,7 +201,13 @@
                     "mountPath": "/var/lib/mysql/data"
                   }
                 ],
-                "imagePullPolicy": "IfNotPresent"
+                "terminationMessagePath": "/dev/termination-log",
+                "imagePullPolicy": "IfNotPresent",
+                "capabilities": {},
+                "securityContext": {
+                  "capabilities": {},
+                  "privileged": false
+                }
               }
             ],
             "volumes": [
@@ -205,10 +217,13 @@
                   "claimName": "${DATABASE_SERVICE_NAME}"
                 }
               }
-            ]
+            ],
+            "restartPolicy": "Always",
+            "dnsPolicy": "ClusterFirst"
           }
         }
-      }
+      },
+      "status": {}
     }
   ],
   "parameters": [
