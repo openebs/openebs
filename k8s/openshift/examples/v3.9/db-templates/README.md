@@ -28,11 +28,26 @@ the command line with the `-p` option:
 
     $ oc new-app examples/db-templates/openebs-mongodb-persistent-template.json -p DATABASE_SERVICE_NAME=mydb -p MONGODB_USER=default -p STORAGE_CLASS_NAME=openebs-default
 
+### Deleting a new database service
+
+Use these instructions when you need to completely delete the app and persistent 
+volumes in your current project. Seperately delete your database service and 
+persistentvolumeclaim using the commands below:
+
+    $ oc delete all -l app=openebs-mongodb-persistent
+
+Use "oc get pvc" command to find your persistentvolumeclaim name:
+
+    $ oc get pvc
+
+Delete the pvc using the correct name from the output of above command:
+ 
+    $ oc delete pvc mongodb
+    $ oc delete secret mongodb 
+
 ## More information
 
 The usage of each supported database image is further documented in the links
 below:
 
-- [MySQL](https://docs.openshift.org/latest/using_images/db_images/mysql.html)
-- [PostgreSQL](https://docs.openshift.org/latest/using_images/db_images/postgresql.html)
 - [MongoDB](https://docs.openshift.org/latest/using_images/db_images/mongodb.html)
