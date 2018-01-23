@@ -1,6 +1,10 @@
 ---
 test_name: hyperconverged_postgres_statefulset_on_k8s
 
+test_log_path: setup/logs/hyperconverged_postgres_statefulset_on_k8s.log
+
+test_pod_regex: maya*|openebs*|pvc*|pgset*
+
 crunchy_pg_git_dir: https://github.com/openebs/openebs/tree/master/k8s/demo/crunchy-postgres
 
 postgres_vol_size: 5G

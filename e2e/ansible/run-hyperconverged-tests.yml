@@ -57,7 +57,10 @@
 # TC NOTES:           
 #    
 - include: playbooks/feature/ha/ha.yml 
-#
+##########################################################################################
+- hosts: localhost
+  roles:
+    - {role: logging, when: logging | bool and deployment_mode == "hyperconverged"}
 ###########################################################################################
 - hosts: localhost
   tasks:
