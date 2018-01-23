@@ -1,6 +1,10 @@
 ---
 test_name: snap_create_revert 
 
+test_log_path: setup/logs/snap_create_revert.log
+
+test_pod_regex: maya*|openebs*|pvc*
+
 volume_def: test-pvc.yaml
 
 mount_point: /mnt/jiva

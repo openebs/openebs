@@ -21,7 +21,15 @@
            src: "{{ volume_def }}"
            dest: "{{ result_kube_home.stdout }}"
          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
-        
+       
+       - name: Start the log aggregator to capture test pod logs
+         shell: >
+           source ~/.profile;
+           nohup stern "{{test_pod_regex}}" --since 1m > "{{result_kube_home.stdout}}/{{test_log_path}}" &
+         args:
+           executable: /bin/bash
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}" 
+ 
        - name: Create a storage volume via a pvc 
          shell: source ~/.profile; kubectl apply -f "{{ volume_def }}"
          args:
@@ -119,6 +127,12 @@
            msg: "{{ summary.stdout }}"
 
        - include: libiscsi-cleanup.yml
+
+       - name: Terminate the log aggregator
+         shell: source ~/.profile; killall stern
+         args:
+           executable: /bin/bash
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
        - set_fact:
            flag: "Pass"

@@ -13,7 +13,3 @@
   roles: 
     - {role: k8s-openebs-operator, when: deployment_mode == "hyperconverged"}
 
-- hosts: localhost
-  roles:
-    - {role: logging, when: logging | bool and deployment_mode == "hyperconverged"}
-

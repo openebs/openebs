@@ -43,6 +43,14 @@
            line: "      storage: \"{{percona_mysql_vol_size}}\""
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
+       - name: Start the log aggregator to capture test pod logs
+         shell: >
+           source ~/.profile; 
+           nohup stern "{{test_pod_regex}}" --since 1m > "{{result_kube_home.stdout}}/{{test_log_path}}" & 
+         args:
+           executable: /bin/bash
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
        - name: Deploy percona mysql pod
          shell: source ~/.profile; kubectl create -f {{ pod_yaml_alias }} 
          args: 
@@ -105,6 +113,12 @@
        - include: k8s-percona-pod-cleanup.yml
          when: clean | bool 
 
+       - name: Terminate the log aggregator
+         shell: source ~/.profile; killall stern
+         args:
+           executable: /bin/bash 
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}" 
+
        - set_fact:
            flag: "Pass"
 
@@ -118,4 +132,3 @@
            token: "{{ lookup('env','SLACK_TOKEN') }}"
            msg: '{{ ansible_date_time.time }} TEST: {{test_name}}, RESULT: {{ flag }}'
          when: slack_notify | bool and lookup('env','SLACK_TOKEN')
-

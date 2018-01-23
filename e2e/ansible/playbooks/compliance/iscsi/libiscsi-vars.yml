@@ -1,6 +1,10 @@
 ---
 test_name: libiscsi_test_suite 
 
+test_log_path: setup/logs/libiscsi_test_suite.log
+
+test_pod_regex: maya*|openebs*|pvc*
+
 volume_def: test-pvc.yaml
 
 test_list: run-tests.out 

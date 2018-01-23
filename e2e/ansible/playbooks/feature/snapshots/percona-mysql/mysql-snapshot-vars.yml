@@ -1,6 +1,10 @@
 ---
 test_name: mysql_snap_create_revert 
 
+test_log_path: setup/logs/mysql_snap_create_revert.log
+
+test_pod_regex: maya*|openebs*|pvc*|percona*
+
 volume_def: percona-openebs-pvc.yaml
 
 snap_name: quicksnap

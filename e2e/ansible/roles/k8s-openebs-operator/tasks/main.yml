@@ -45,7 +45,7 @@
   when: result.stdout != "Ready"
 
 - name: Start the log aggregator to capture operator logs
-  shell: source ~/.profile; nohup stern "maya*|openebs*" --since 1m >"{{ ansible_env.HOME }}/setup/logs/operator.txt" &
+  shell: source ~/.profile; nohup stern "maya*|openebs*" --since 1m >"{{ ansible_env.HOME }}/setup/logs/operator.log" &
   args:
     executable: /bin/bash
 

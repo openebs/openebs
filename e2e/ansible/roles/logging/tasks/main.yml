@@ -30,7 +30,17 @@
   with_items: "{{ file_2_fetch.files }}"  
   delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
-- name: Cleanup the logs directory
+- name: tar the logdir to generate a support bundle 
+  archive: 
+    path: "{{ playbook_dir }}/roles/logging/{{log_folder.stdout}}"
+    dest: "{{ playbook_dir }}/roles/logging/{{log_folder.stdout}}.tgz"
+
+- name: remove the source logdir post archival
+  file:  
+    path: "{{ playbook_dir }}/roles/logging/{{log_folder.stdout}}"
+    state: absent 
+
+- name: Cleanup the logs directory on kube-master 
   file:
     path: "{{ item.path }}"
     state: absent
