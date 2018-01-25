@@ -106,9 +106,10 @@ Go to the https://20.10.29.203:30438 URL from your browser and perform the follo
 
 **Note:**
 
-The NodePort is dynamically allocated and may vary in a different deployment. 
+* For Google Cloud Users, create Firewall Rules to perform tasks using Couchbase UI.
+* The NodePort is dynamically allocated and may vary in a different deployment. 
 
-1. In the Couchbase Console, enter your credentials in the **Username** and **Password** fields and click **Sign In**. You can now see the console.
+1. In the Couchbase Console, enter your credentials in the **Username** and **Password** fields and click **Sign In**. You can now see the console.[The default Username is Administrator and Password is password. Enter the credentials to see the console.]
 2. Click **Server Nodes** to see the number of Couchbase nodes that are part of the cluster. As expected, it displays only one node.
 3. Click **Data Buckets** to see a sample bucket that was created as part of the image.
 
