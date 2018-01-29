@@ -1,4 +1,8 @@
 ---
+#####################################
+#    ARA COMMON PRE-REQUISITES      #
+#####################################
+
 ara_apt_packages: 
   - gcc 
   - python-dev
@@ -7,9 +11,13 @@ ara_apt_packages:
   - python-pip
   - libxml2-dev
   - libxslt1-dev
+  - python-setuptools 
 
 ara_pip_packages:
   - tox
   - ara 
 
 ara_webserver_port: 9191
+
+ara_webserver: embedded
+

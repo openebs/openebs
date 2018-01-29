@@ -1,0 +1,14 @@
+[Unit]
+Description=ARA
+After=network.target
+
+[Service]
+Type=simple
+TimeoutStartSec=0
+Restart=on-failure
+RestartSec=10
+RemainAfterExit=yes
+ExecStart={{ ara_manage_binary.stdout }} runserver -h {{ ansible_default_ipv4.address }} -p {{ ara_webserver_port }}
+
+[Install]
+WantedBy=multi-user.target
