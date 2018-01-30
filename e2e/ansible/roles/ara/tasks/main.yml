@@ -1,3 +1,4 @@
+---
 - name: Install ara apt packages
   apt:
     name: "{{ item }}"
@@ -68,33 +69,34 @@
     option: notification_callback 
     value: "ara"
 
-- name: Get ara-manage binary location
-  command: which ara-manage
-  register: ara_manage_binary
+- block:
+    - name: Get ara-manage binary location
+      command: which ara-manage
+      register: ara_manage_binary
 
-- name: Start ara webserver on localhost
-  shell: >
-    nohup {{ ara_manage_binary.stdout }} 
-    runserver
-    -h {{ ansible_default_ipv4.address }} 
-    -p {{ ara_webserver_port }} 
-    > {{ ansible_env.HOME }}/ara-manage.log
-    2>&1
-    &
-  args:
-    executable: /bin/bash
+    - name: Copy systemd service template
+      template:
+        src: templates/ara-service.conf.j2
+        dest: /etc/systemd/system/ara.service
+        owner: root
+        group: root
+        mode: 0644
+      become: true 
+      notify: 
+        - Reload systemctl
+
+    - name: Flush handlers
+      meta: flush_handlers
+
+    - name: Start and enable the embedded server service
+      service:
+        name: ara
+        state: started
+        enabled: yes
+      become: true 
+  when: ara_webserver == "embedded"
 
 - name: Display ara UI URL  
   debug: 
     msg: "Access playbook records at http://{{ ansible_default_ipv4.address }}:{{ ara_webserver_port }}"
-
-
-
-  
-
-
-  
-
-
-
 
