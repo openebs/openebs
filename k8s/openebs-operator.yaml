@@ -3,7 +3,7 @@
 # Launch the maya-apiserver ( deployment )
 # Launch the maya-storagemanager ( deameon set )
 
-# Create Maya Service Account 
+# Create Maya Service Account
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -22,16 +22,19 @@ metadata:
 rules:
 - apiGroups: ["*"]
   resources: ["nodes","nodes/proxy"]
-  verbs: ["get", "list", "watch"]
+  verbs: ["get","list","watch","create","update"]
 - apiGroups: ["*"]
-  resources: ["services","pods","deployments", "events", "endpoints"]
+  resources: ["namespaces","services","pods","deployments", "events", "endpoints"]
   verbs: ["*"]
 - apiGroups: ["*"]
   resources: ["persistentvolumes","persistentvolumeclaims"]
   verbs: ["*"]
 - apiGroups: ["storage.k8s.io"]
   resources: ["storageclasses"]
-  verbs: ["*"]
+  verbs: [ "get", "list" ]
+- apiGroups: ["apiextensions.k8s.io"]
+  resources: ["customresourcedefinitions"]
+  verbs: [ "get", "list", "create" ]
 - nonResourceURLs: ["/metrics"]
   verbs: ["get"]
 ---
