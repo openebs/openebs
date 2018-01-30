@@ -52,7 +52,7 @@ Verify that iSCSI is configured using the following commands.
     sudo apt-get install <packagename>:
 
     make
-    libsas12-dev
+    libsasl2-dev
     libssl-dev
     libmongoc-dev
     libbson-dev
