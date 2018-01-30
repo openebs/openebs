@@ -318,7 +318,7 @@ function delete_cluster()
                   aws s3api delete-bucket --bucket=`echo $clusterstate | sed 's|s3://||g'` 
 
                   # Perform cleanup on localhost by removing terraform files and cluster scripts 
-                  rm -rf kubernetes.tf terraform.tfstate data  
+                  rm -rf kubernetes.tf terraform.tfstate terraform.tfstate.backup data
                   
                   exit;;
             
