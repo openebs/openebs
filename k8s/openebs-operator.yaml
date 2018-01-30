@@ -22,9 +22,9 @@ metadata:
 rules:
 - apiGroups: ["*"]
   resources: ["nodes","nodes/proxy"]
-  verbs: ["get", "list", "watch"]
+  verbs: ["get","list","watch","create","update"]
 - apiGroups: ["*"]
-  resources: ["services","pods","deployments", "events", "endpoints"]
+  resources: ["namespaces","services","pods","deployments", "events", "endpoints"]
   verbs: ["*"]
 - apiGroups: ["*"]
   resources: ["persistentvolumes","persistentvolumeclaims"]
@@ -32,6 +32,9 @@ rules:
 - apiGroups: ["storage.k8s.io"]
   resources: ["storageclasses"]
   verbs: ["*"]
+- apiGroups: ["apiextensions.k8s.io"]
+  resources: ["customresourcedefinitions"]
+  verbs: [ "get", "list", "create" ]
 - nonResourceURLs: ["/metrics"]
   verbs: ["get"]
 ---
@@ -51,7 +54,7 @@ subjects:
   apiGroup: rbac.authorization.k8s.io
 roleRef:
   kind: ClusterRole
-  name: cluster-admin
+  name: openebs-maya-operator
   apiGroup: rbac.authorization.k8s.io
 ---
 apiVersion: apps/v1beta1
