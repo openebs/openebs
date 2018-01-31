@@ -6,7 +6,7 @@ OpenEBS is a cloud native storage solution built with the goal of providing cont
 
 You can think of OpenEBS as Container Attached Storage(CAS) - which combines the best of DAS and NAS Storage Solutions. 
 
-.. image:: /_static/das-nas-cas.png
+.. image:: ../_static/das-nas-cas.png
     :align: center
 
 OpenEBS runs within a Kubernetes Cluster as Pods and provides Persistent Volumes to Stateful applications, by making use of storage attached to the Kubernetes Nodes.
