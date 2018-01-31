@@ -7,18 +7,18 @@ Contents:
 
 .. toctree::
     :maxdepth: 2
-    :caption: Getting Started
+    :caption: Introduction
 
-    OpenEBS Introduction <getting_started/overview>
-    OpenEBS Features <getting_started/features>
-    How does Storage High Availablility Work? <getting_started/ha_storage>
+    Overview <intro/overview>
+    OpenEBS Features <intro/features>
+    How does Storage High Availablility Work? <intro/ha_storage>
     
 .. toctree::
     :maxdepth: 2
     :caption: Setup
     
     Overview <install/install_overview>
-    Quick Install <getting_started/quick_install>
+    Quick Install <intro/quick_install>
     Running OpenEBS on CentOS 7 OpenShift Cluster <install/openshift>
     Cloud Solutions <install/cloud_solutions>
     On-Premise Solutions <install/on_premise_solutions>
