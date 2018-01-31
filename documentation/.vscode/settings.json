@@ -1,6 +1,0 @@
-{
-    "restructuredtext.builtDocumentationPath" : "${workspaceRoot}/build/html",
-    "restructuredtext.confPath"               : "${workspaceRoot}/source",
-    "restructuredtext.updateOnTextChanged"    : "true",
-    "restructuredtext.sphinxBuildPath"        : "C:\\Users\\CB\\AppData\\Local\\Programs\\Python\\Python36\\Scripts\\sphinx-autobuild.exe"
-}
