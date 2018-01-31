@@ -24,10 +24,10 @@ html {
 
 .wy-nav-content {
     text-align: justify;
-    max-width: 100%;
+    max-width: 99%;
 }
 
-.caption-text{
+.wy-nav-content .caption-text{
     color: #fff;
 }
 
