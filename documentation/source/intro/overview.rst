@@ -4,48 +4,70 @@ OpenEBS Introduction
 ====================
 OpenEBS is a cloud native storage solution built with the goal of providing containerized storage for containers. Using OpenEBS, a developer can seamlessly get the persistent storage for stateful applications with ease, much of which is automated, while using the popular orchestration platforms such as Kubernetes.
 
-You can think of OpenEBS as Container Attached Storage(CAS) - which combines the best of DAS and NAS Storage Solutions. 
+OpenEBS is Container Attached Storage(CAS) - which combines the best of DAS and NAS Storage Solutions. OpenEBS runs within a Kubernetes Cluster as Pods and provides Persistent Volumes to Stateful applications, by making use of storage attached to the Kubernetes Nodes.
 
 .. image:: ../_static/das-nas-cas.png
     :align: center
 
-OpenEBS runs within a Kubernetes Cluster as Pods and provides Persistent Volumes to Stateful applications, by making use of storage attached to the Kubernetes Nodes.
+You can try out OpenEBS on your Kubernetes Cluster using the `quick start guide`_. 
+ 
+.. _quick start guide: http://openebs.readthedocs.io/en/latest/getting_started/quick_install.html
 
-A DevOps developer gets the following from the OpenEBS solution.
+When you install OpenEBS, you get the following:
+- Dynamic Volume Provisioner
+- Storage Classes
+- OpenEBS Operators and Custom Resources for Managing Storage
 
-- OpenEBS operator yaml file that installs the OpenEBS components onto a k8s cluster
-- A set of yaml files containing configuration examples of how to use OpenEBS storage classes 
-- A CLI for monitoring the persistent volume and its replicas
+If you are new to Kubernetes, here are some guides that can help you setup Kubernetes and install OpenEBS:
+    `Amazon EC2`_
+          .. _Amazon EC2: http://openebs.readthedocs.io/en/latest/install/cloud_solutions.html#amazon-cloud
+    `GKE`_
+          .. _GKE: http://openebs.readthedocs.io/en/latest/install/cloud_solutions.html#google-cloud      
+    `OpenShift`_
+          .. _OpenShift: http://openebs.readthedocs.io/en/latest/install/openshift.html      
+    `Minikube`_
+          .. _Minikube: http://openebs.readthedocs.io/en/latest/install/dev_solutions.html#minikube
+    `Baremetal`_
+          .. _Baremetal: http://openebs.readthedocs.io/en/latest/install/on_premise_solutions.html#running-the-setup-on-ubuntu-16-04
 
-Using the above tools, a developer can easily provision the persistent storage from the hostdir of the minion node. Much of the tasks for the developer are automated by the OpenEBS storage class, including, scheduling the volume and replicas on k8s minions, connectivity to the container via a mount point.
+Once OpenEBS is installed on your Kubernetes Cluster, you can start using it by specifying OpenEBS Storage Classes in your PVCs. Example:
+::
+   ..
+   kind: PersistentVolumeClaim
+   apiVersion: v1
+   metadata:
+     name: stateful-app-vol-claim
+   spec:
+     storageClassName: openebs-standard
+     accessModes:
+       - ReadWriteOnce
+     resources:
+       requests:
+         storage: 50G
+    ..
 
-Components 
--------------
-This section includes OpenEBS components.
+By default, the volume data will be saved under `/var/openebs`. OpenEBS provides the flexibility to change this default location as well as provide options to organize your deployment to use different locations depending the application/namespace. This flexibilty is provided via Custom Resources called - Storage Pools and Volume Policies that tie into Kubernetes Storage Class. 
 
-OpenEBS platform contains the following main components:
+A typical stateful application using OpenEBS is as follows:
 
-  * Maya - The helper storage orchestration engine that aids the kubernetes orchestration of storage volumes
-  * Jiva - A docker image that is used to spin the storage volume containers on Kubernetes nodes
+.. image:: ../_static/openebs-pv-2replica.png
+    :align: center
 
-Maya
-^^^^^
-OpenEBS orchestration does not pre-empt or overwrite the Kubernetes orchestration system. It rather fills the storage orchestration gaps left behind by Kubernetes. For example, in OpenEBS, storage volume provisioning workflow is handled by Kubernetes. Just like other Kubernetes storage incubators, OpenEBS provides a new storage incubator called "OpenEBS". This incubator will have a storage class called "OpenEBS-storageclass". Internally, openebs-storageclass interacts with Maya to decide on which node a given volume must be provisioned, when it must be augmented automatically in capacity and so on. Maya also helps in data protection operations such as taking snapshots, restoring from snapshots and so on.
+OpenEBS Volume comprises of Pods that are managed by Kubernetes itself, and each application gets its own storage controller which provides you with benefits like:
+- managing the storage with the same tools that you use to manage kuberentes objects (like kubectl)
+- scaling up/down replica's as they are deployments with node/pod affinity constraints
+- extending the manageability via namespaces/RBAC to storage
 
-Jiva
-^^^^^
-Jiva is the docker container image for storage volume containers. In OpenEBS, the storage volumes are containerized. Each volume will have atleast one storage controller and a storage replica, each of which will be a Jiva container. The functionality embedded into the Jiva image includes the following:
+Ready to try some stateful application with OpenEBS, try:
+    `MySQL`_
+          .. _MySQL: http://openebs.readthedocs.io/en/latest/Usecases/percona_db.html#percona-db
+    `Jenkins`_
+          .. _Jenkins: http://openebs.readthedocs.io/en/latest/Usecases/jenkins.html#jenkins
 
-* iSCSI target
-* Block replication controller (if the container is a controller)
-* Block storage handler (if the container is a replica)
+Learn more by joining us on Slack http://slack.openebs.io/. Feel free to come and ask any questions. Go to `Slack OpenEBS Community`_. 
+                   
+                    .. _Slack OpenEBS Community: https://openebs-community.slack.com/messages/C3NPGQ6G3/.
 
-Storage Policies
-------------------
-
-On their own, StorageClass lets you store and retrieve storage policies. It is only when combined with OpenEBS components namely openebs provisioner and maya api service that storage policies are applied against a PersistentVolume (a Kubernetes kind). The OpenEBS volume controller interprets the StorageClass' structured data as a record of the user’s desired state, and continually takes action to achieve and maintain that state.
-
-Users can deploy and update OpenEBS volume controller (otherwise known as Maya api service) on a running OpenEBS cluster, independently of the cluster’s own lifecycle. OpenEBS volume controller hooks up to the lifecycle of PersistentVolume (that is marked for OpenEBS via OpenEBS provisioner) to apply these storage policies.
 
 **See Also:**
 
