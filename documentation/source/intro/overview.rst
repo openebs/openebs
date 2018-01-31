@@ -9,14 +9,15 @@ OpenEBS is Container Attached Storage(CAS) - which combines the best of DAS and 
 .. image:: ../_static/das-nas-cas.png
     :align: center
 
-You can try out OpenEBS on your Kubernetes Cluster using the `quick start guide`_. 
+You can try out OpenEBS on your Kubernetes Cluster using the `Quick Start Guide`_. 
  
-.. _quick start guide: http://openebs.readthedocs.io/en/latest/getting_started/quick_install.html
+.. _Quick Start Guide: http://openebs.readthedocs.io/en/latest/getting_started/quick_install.html
 
 When you install OpenEBS, you get the following:
-- Dynamic Volume Provisioner
-- Storage Classes
-- OpenEBS Operators and Custom Resources for Managing Storage
+
+* Dynamic Volume Provisioner
+* Storage Classes
+* OpenEBS Operators and Custom Resources for Managing Storage
 
 If you are new to Kubernetes, here are some guides that can help you setup Kubernetes and install OpenEBS:
     `Amazon EC2`_
@@ -54,9 +55,10 @@ A typical stateful application using OpenEBS is as follows:
     :align: center
 
 OpenEBS Volume comprises of Pods that are managed by Kubernetes itself, and each application gets its own storage controller which provides you with benefits like:
-- managing the storage with the same tools that you use to manage kuberentes objects (like kubectl)
-- scaling up/down replica's as they are deployments with node/pod affinity constraints
-- extending the manageability via namespaces/RBAC to storage
+
+* managing the storage with the same tools that you use to manage kuberentes objects (like kubectl)
+* scaling up/down replica's as they are deployments with node/pod affinity constraints
+* extending the manageability via namespaces/RBAC to storage
 
 Ready to try some stateful application with OpenEBS, try:
     `MySQL`_
