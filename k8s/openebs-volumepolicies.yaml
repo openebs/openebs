@@ -1,0 +1,256 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: volume-service-0.6.0
+  annotations:
+    openebs.io/policy: VolumePolicy
+    policy.openebs.io/version: 0.6.0
+data:
+  meta: |
+    runNamespace: {{ .Volume.runNamespace }}
+    apiVersion: v1
+    kind: Service
+    action: put
+  task: |
+    apiVersion: v1
+    Kind: Service
+    metadata:
+      labels:
+        openebs/controller-service: jiva-controller-service
+        openebs.io/controller-service: jiva-controller-svc
+        openebs.io/storage-engine-type: jiva
+        openebs/volume-provisioner: jiva
+        vsm: {{ .Volume.owner }}
+        openebs.io/pv: {{ .Volume.owner }}
+      name: {{ .Volume.owner }}-ctrl-svc
+    spec:
+      ports:
+      - name: iscsi
+        port: 3260
+        protocol: TCP
+        targetPort: 3260
+      - name: api
+        port: 9501
+        protocol: TCP
+        targetPort: 9501
+      selector:
+        openebs/controller: jiva-controller
+        vsm: {{ .Volume.owner }}
+        openebs.io/controller: jiva-controller
+        openebs.io/pv: {{ .Volume.owner }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: volume-path-0.6.0
+  annotations:
+    openebs.io/policy: VolumePolicy
+    policy.openebs.io/version: 0.6.0
+data:
+  meta: |
+    runNamespace: {{ .Volume.runNamespace }}
+    apiVersion: openebs.io/v1alpha1
+    kind: StoragePool
+    objectName: {{ .Policy.StoragePool.value }}
+    action: get
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: volume-controller-0.6.0
+  annotations:
+    openebs.io/policy: VolumePolicy
+    policy.openebs.io/version: 0.6.0
+data:
+  meta: |
+    runNamespace: {{ .Volume.runNamespace }}
+    apiVersion: extensions/v1beta1
+    kind: Deployment
+    action: put
+  task: |
+    apiVersion: extensions/v1beta1
+    Kind: Deployment
+    metadata:
+      labels:
+        openebs.io/storage-engine-type: jiva
+        openebs/volume-provisioner: jiva
+        openebs/controller: jiva-controller
+        openebs.io/controller: jiva-controller
+        vsm: {{ .Volume.owner }}
+        openebs.io/pv: {{ .Volume.owner }}
+      annotations:
+        openebs.io/volume-monitor: "true"
+        openebs.io/volume-type: jiva
+      name: {{ .Volume.owner }}-ctrl
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          monitoring: volume_exporter_prometheus
+          openebs.io/controller: jiva-controller
+          openebs/controller: jiva-controller
+          openebs.io/pv: {{ .Volume.owner }}
+          vsm: {{ .Volume.owner }}
+      template:
+        metadata:
+          labels:
+            monitoring: volume_exporter_prometheus
+            openebs.io/controller: jiva-controller
+            openebs/controller: jiva-controller
+            openebs.io/pv: {{ .Volume.owner }}
+            vsm: {{ .Volume.owner }}
+        spec:
+          containers:
+          - args:
+            - controller
+            - --frontend
+            - gotgt
+            - --clusterIP
+            - {{ .TaskResult.key0.serviceIP }}
+            - {{ .Volume.owner }}
+            command:
+            - launch
+            image: {{ .Policy.ControllerImage.value }}
+            name: {{ .Volume.owner }}-ctrl-con
+            ports:
+            - containerPort: 3260
+              protocol: TCP
+            - containerPort: 9501
+              protocol: TCP
+          - args:
+            - -c=http://127.0.0.1:9501
+            command:
+            - maya-volume-exporter
+            image: {{ .Policy.VolumeMonitor.value }}
+            name: maya-volume-exporter
+            ports:
+            - containerPort: 9500
+              protocol: TCP
+          tolerations:
+          - effect: NoExecute
+            key: node.alpha.kubernetes.io/notReady
+            operator: Exists
+            tolerationSeconds: 0
+          - effect: NoExecute
+            key: node.alpha.kubernetes.io/unreachable
+            operator: Exists
+            tolerationSeconds: 0                  
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: volume-replica-0.6.0
+  annotations:
+    openebs.io/policy: VolumePolicy
+    policy.openebs.io/version: 0.6.0
+data:
+  meta: |
+    runNamespace: {{ .Volume.runNamespace }}
+    apiVersion: extensions/v1beta1
+    kind: Deployment
+    action: put
+  task: |
+    apiVersion: extensions/v1beta1
+    kind: Deployment
+    metadata:
+      labels:
+        openebs.io/storage-engine-type: jiva
+        openebs/volume-provisioner: jiva
+        openebs/replica: jiva-replica
+        openebs.io/replica: jiva-replica
+        vsm: {{ .Volume.owner }}
+        openebs.io/pv: {{ .Volume.owner }}
+      name: {{ .Volume.owner }}-rep
+    spec:
+      replicas: {{ .Policy.ReplicaCount.value }}
+      selector:
+        matchLabels:
+          openebs/replica: jiva-replica
+          openebs.io/replica: jiva-replica
+          vsm: {{ .Volume.owner }}
+          openebs.io/pv: {{ .Volume.owner }}
+      template:
+        metadata:
+          labels:
+            openebs/replica: jiva-replica
+            openebs.io/replica: jiva-replica
+            vsm: {{ .Volume.owner }}
+            openebs.io/pv: {{ .Volume.owner }}
+        spec:
+          affinity:
+            podAntiAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+              - labelSelector:
+                  matchLabels:
+                    openebs/replica: jiva-replica
+                    openebs.io/replica: jiva-replica
+                    vsm: {{ .Volume.owner }}
+                    openebs.io/pv: {{ .Volume.owner }}
+                topologyKey: kubernetes.io/hostname
+          containers:
+          - args:
+            - replica
+            - --frontendIP
+            - {{ .TaskResult.key0.serviceIP }}
+            - --size
+            - {{ .Volume.capacity }}
+            - /openebs
+            command:
+            - launch
+            image: {{ .Policy.ReplicaImage.value }}
+            name: {{ .Volume.owner }}-rep-con
+            ports:
+            - containerPort: 9502
+              protocol: TCP
+            - containerPort: 9503
+              protocol: TCP
+            - containerPort: 9504
+              protocol: TCP
+            volumeMounts:
+            - name: openebs
+              mountPath: /openebs
+          tolerations:
+          - effect: NoExecute
+            key: node.alpha.kubernetes.io/notReady
+            operator: Exists
+          - effect: NoExecute
+            key: node.alpha.kubernetes.io/unreachable
+            operator: Exists
+          volumes:
+          - name: openebs
+            hostPath:
+              path: {{ .TaskResult.key1.storagePoolPath }}/{{ .Volume.owner }}                  
+---
+apiVersion: openebs.io/v1alpha1
+kind: VolumePolicy
+metadata:
+  name: openebs-policy-0.6.0
+spec:
+  policies:
+  - name: VolumeMonitor
+    value: openebs/m-exporter:0.5.0
+  - name: ControllerImage
+    value: openebs/jiva:0.5.0
+  - name: ReplicaImage
+    value: openebs/jiva:0.5.0
+  - name: ReplicaCount
+    value: "2"
+  - name: StoragePool
+    value: ssd
+  run:
+    searchNamespace: default
+    tasks:
+    - template: volume-service-0.6.0
+    - template: volume-path-0.6.0
+    - template: volume-controller-0.6.0
+    - template: volume-replica-0.6.0
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: openebs-standard-0.6.0
+  annotations:
+    provisioner.openebs.io/version: 0.6.0
+provisioner: openebs.io/provisioner-iscsi
+parameters:
+  openebs.io/volume-policy: openebs-policy-0.6.0
