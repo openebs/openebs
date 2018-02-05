@@ -3,6 +3,7 @@
 - *OpenEBS Operator : Refers to maya-apiserver & openebs-provisioner along w/ respective services, service a/c, roles, rolebindings*
 - *OpenEBS Volume: The Jiva controller & replica pods*
 - *All steps described in this document need to be performed on the Kubernetes master*
+- *The same steps can be used to upgrade OpenEBS from 0.4.0 to 0.5.1* 
 
 ### STEP-1 : CORDON ALL NODES WHICH DO NOT HOST OPENEBS VOLUME REPLICAS 
 
