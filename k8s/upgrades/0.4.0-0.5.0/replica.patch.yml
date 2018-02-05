@@ -4,7 +4,7 @@
         "spec": {
            "containers":[
               {
-                "name": "pvc-a47d57e1-0a1b-11e8-be1c-000c298ff5fc-rep-con",
+                  "name": "pvc-<deploy-hash>-rep-con",
                 "image": "openebs/jiva:0.5.0"
               }
            ]
