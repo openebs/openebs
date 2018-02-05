@@ -1,0 +1,14 @@
+{
+  "spec": {
+     "template": {
+        "spec": {
+           "containers":[
+              {
+                "name": "pvc-8d832b0e-0a2e-11e8-be1c-000c298ff5fc-ctrl-con",
+                "image": "openebs/jiva:0.5.1"
+              }
+           ]
+        }
+     }
+  }
+} 
