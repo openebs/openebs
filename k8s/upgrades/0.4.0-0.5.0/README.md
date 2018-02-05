@@ -32,7 +32,7 @@ customresourcedefinition "storagepools.openebs.io" created
 storageclass "openebs-standard" created
 ```
 
-**Notes** : This step will upgrade the operator deployments with the latest images, and also :
+**Notes** : This step will upgrade the operator deployments with the 0.5.0 images, and also :
 
 - Sets up the pre-requisites for volume monitoring
 - Creates a new OpenEBS storage-class called openebs-standard with : vol-size=5G, storage-replica-count=2, storagepool=default, monitoring=True
@@ -41,7 +41,11 @@ The above storage-class template can be used to create new ones with desired pro
 
 ### STEP-4: CREATE THE OPENEBS MONITORING DEPLOYMENTS (Prometheus & Grafana)
 
-karthik@MayaMaster:~/steps$ kubectl apply -f k8s/openebs-monitoring-pg.yaml
+While this is an optional step, it is recommended to use the monitoring framework to track storage metrics on the OpenEBS 
+volume.
+
+```
+testk@Master:~/steps$ kubectl apply -f k8s/openebs-monitoring-pg.yaml
 configmap "openebs-prometheus-tunables" created
 configmap "openebs-prometheus-config" created
 deployment "openebs-prometheus" created
@@ -52,7 +56,7 @@ deployment "openebs-grafana" created
 Verify that the monitoring pods are created & the operator pods are in running state. Together these constitute
 the OpenEBS control plane in 0.5.0
 
-karthik@MayaMaster:~/openebs/k8s/demo/percona$ kubectl get pods
+test@Master:~/openebs/k8s/demo/percona$ kubectl get pods
 NAME                                                             READY     STATUS    RESTARTS   AGE
 maya-apiserver-2288016177-lzctj                                  1/1       Running   0          1m
 openebs-grafana-2789105701-0rw6v                                 1/1       Running   0          14s
@@ -63,7 +67,7 @@ pvc-8cc9c06c-ea22-11e7-9112-000c298ff5fc-ctrl-3477661062-t0pg9   1/1       Runni
 pvc-8cc9c06c-ea22-11e7-9112-000c298ff5fc-rep-3163680705-4d7x2    1/1       Running   0          7m
 pvc-8cc9c06c-ea22-11e7-9112-000c298ff5fc-rep-3163680705-lbgpc    1/1       Running   0          7m
 
-karthik@MayaMaster:~/openebs/k8s/demo/percona$ kubectl get svc
+test@Master:~/openebs/k8s/demo/percona$ kubectl get svc
 NAME                                                CLUSTER-IP       EXTERNAL-IP   PORT(S)             AGE
 kubernetes                                          10.96.0.1        <none>        443/TCP             24h
 maya-apiserver-service                              10.102.159.226   <none>        5656/TCP            9m
@@ -75,13 +79,13 @@ pvc-8cc9c06c-ea22-11e7-9112-000c298ff5fc-ctrl-svc   10.111.2.96      <none>     
 **Notes** : This also creates a default prometheus configmap which can be upgraded if needed. The prometheus 
 and grafana services are available on the node ports at ports 32514 & 32515 respectively
 
-
+```
 ### STEP-5: UPDATE OPENEBS VOLUME (CONTROLLER AND REPLICA) DEPLOYMENTS 
 
 Obtain the name of the OpenEBS PersistentVolume (PV) that has to be updated
 
 ```
-karthik@MayaMaster:~$ kubectl get pv
+test@Master:~$ kubectl get pv
 NAME                                       CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS    CLAIM                     STORAGECLASS       REASON    AGE
 pvc-8cc9c06c-ea22-11e7-9112-000c298ff5fc   5G         RWO            Delete           Bound     default/demo-vol1-claim   openebs-basic    
 ```
@@ -89,15 +93,15 @@ pvc-8cc9c06c-ea22-11e7-9112-000c298ff5fc   5G         RWO            Delete     
 Run the script oebs_update.sh by passing the PV as argument
 
 ```
-karthik@MayaMaster:~/0.4-0.5.0$ ./oebs_update pvc-01174ced-0a40-11e8-be1c-000c298ff5fc
+test@Master:~/0.4-0.5.0$ ./oebs_update pvc-01174ced-0a40-11e8-be1c-000c298ff5fc
 deployment "pvc-8cc9c06c-ea22-11e7-9112-000c298ff5fc-rep" patched
 deployment "pvc-8cc9c06c-ea22-11e7-9112-000c298ff5fc-ctrl" patched
 replicaset "pvc-8cc9c06c-ea22-11e7-9112-000c298ff5fc-ctrl-59df76689f" deleted
 ```
 **Notes** : This script replaces the replica and controller patch files with the appropriate container names derived from the 
-PV and patches the replica deployment followed by the controller deployment using the ```kubectl patch deployment``` command. 
+PV and patches the volume deployments using the ```kubectl patch deployment``` command. 
 In each case, it verifies whether the new images have been rolled out successfully, using ```kubectl rollout status deployment```
-before resuming to the next step. Post patching, it also deletes the orphaned replicaset of the controller deployment as a 
+before proceeding to the next step. Post patching, it also deletes the orphaned replicaset of the controller deployment as a 
 woraround for this issue : https://github.com/openebs/openebs/issues/1201
 
 ### STEP-6: VERIFY THAT ALL THE REPLICAS ARE REGISTERED AND ARE IN RW MODE
@@ -110,7 +114,7 @@ Execute the following REST query by providing the controller pod IP or service I
 - Install jq package on the kubernetes node/master where the following command is executed
 
 ```
-karthik@MayaMaster:~$ curl GET http://10.47.0.5:9501/v1/replicas | grep createTypes | jq
+test@Master:~$ curl GET http://10.47.0.5:9501/v1/replicas | grep createTypes | jq
   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
                                  Dload  Upload   Total   Spent    Left  Speed
 100   162  100   162    0     0     27      0  0:00:06  0:00:05  0:00:01    37
@@ -157,9 +161,12 @@ karthik@MayaMaster:~$ curl GET http://10.47.0.5:9501/v1/replicas | grep createTy
 
 ### STEP-7: CONFIGURE GRAFANA TO MONITOR VOLUME METRICS
 
-- Access the grafana dashboard at http://<NodeIP>:32515
-- Add the prometheus data source by giving URL as http://<NodeIP>:32514 
-- Once data source is validated, import the dashboard JSON from https://raw.githubusercontent.com/openebs/openebs/master/k8s/openebs-pg-dashboard.json
+Perform the following actions if Step-4 was executed. 
+
+- Access the grafana dashboard at http://*NodeIP*:32515
+- Add the prometheus data source by giving URL as http://*NodeIP*:32514 
+- Once data source is validated, import the dashboard JSON from : 
+  https://raw.githubusercontent.com/openebs/openebs/master/k8s/openebs-pg-dashboard.json
 - Access the volume stats by selecting the volume name (pvc-*) in the OpenEBS Volume dashboard
 
 **Note** : For new applications select a newly created storage-class that has monitoring enabled to automatically start viewing metrics
