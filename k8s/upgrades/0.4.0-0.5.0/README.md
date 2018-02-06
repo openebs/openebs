@@ -46,7 +46,7 @@ While this is an optional step, it is recommended to use the monitoring framewor
 volume.
 
 ```
-testk@Master:~/steps$ kubectl apply -f k8s/openebs-monitoring-pg.yaml
+testk@Master:~$ kubectl apply -f k8s/openebs-monitoring-pg.yaml
 configmap "openebs-prometheus-tunables" created
 configmap "openebs-prometheus-config" created
 deployment "openebs-prometheus" created
@@ -57,7 +57,7 @@ deployment "openebs-grafana" created
 Verify that the monitoring pods are created & the operator pods are in running state. Together these constitute
 the OpenEBS control plane in 0.5.0
 
-test@Master:~/openebs/k8s/demo/percona$ kubectl get pods
+test@Master:~$ kubectl get pods
 NAME                                                             READY     STATUS    RESTARTS   AGE
 maya-apiserver-2288016177-lzctj                                  1/1       Running   0          1m
 openebs-grafana-2789105701-0rw6v                                 1/1       Running   0          14s
@@ -68,7 +68,7 @@ pvc-8cc9c06c-ea22-11e7-9112-000c298ff5fc-ctrl-3477661062-t0pg9   1/1       Runni
 pvc-8cc9c06c-ea22-11e7-9112-000c298ff5fc-rep-3163680705-4d7x2    1/1       Running   0          7m
 pvc-8cc9c06c-ea22-11e7-9112-000c298ff5fc-rep-3163680705-lbgpc    1/1       Running   0          7m
 
-test@Master:~/openebs/k8s/demo/percona$ kubectl get svc
+test@Master:~$ kubectl get svc
 NAME                                                CLUSTER-IP       EXTERNAL-IP   PORT(S)             AGE
 kubernetes                                          10.96.0.1        <none>        443/TCP             24h
 maya-apiserver-service                              10.102.159.226   <none>        5656/TCP            9m
@@ -94,7 +94,7 @@ pvc-8cc9c06c-ea22-11e7-9112-000c298ff5fc   5G         RWO            Delete     
 Run the script oebs_update.sh by passing the PV as argument
 
 ```
-test@Master:~/0.4-0.5.0$ ./oebs_update pvc-01174ced-0a40-11e8-be1c-000c298ff5fc
+test@Master:~$ ./oebs_update pvc-01174ced-0a40-11e8-be1c-000c298ff5fc
 deployment "pvc-8cc9c06c-ea22-11e7-9112-000c298ff5fc-rep" patched
 deployment "pvc-8cc9c06c-ea22-11e7-9112-000c298ff5fc-ctrl" patched
 replicaset "pvc-8cc9c06c-ea22-11e7-9112-000c298ff5fc-ctrl-59df76689f" deleted
@@ -104,6 +104,22 @@ PV and patches the volume deployments using the ```kubectl patch deployment``` c
 In each case, it verifies whether the new images have been rolled out successfully, using ```kubectl rollout status deployment```
 before proceeding to the next step. Post patching, it also deletes the orphaned replicaset of the controller deployment as a 
 woraround for this issue : https://github.com/openebs/openebs/issues/1201
+
+
+Verify that the volume controller and replica pods are running post upgrade 
+
+```
+test@Master:~$ kubectl get pods
+NAME                                                             READY     STATUS    RESTARTS   AGE
+maya-apiserver-2288016177-lzctj                                  1/1       Running   0          3m
+openebs-grafana-2789105701-0rw6v                                 1/1       Running   0          2m
+openebs-prometheus-4109589487-4bngb                              1/1       Running   0          2m
+openebs-provisioner-2835097941-5fcxh                             1/1       Running   0          3m
+percona-2503451898-5k9xw                                         1/1       Running   0          9m
+pvc-8cc9c06c-ea22-11e7-9112-000c298ff5fc-ctrl-6489864889-ml2zw   2/2       Running   0          10s
+pvc-8cc9c06c-ea22-11e7-9112-000c298ff5fc-rep-6b9f46bc6b-4vjkf    1/1       Running   0          20s
+pvc-8cc9c06c-ea22-11e7-9112-000c298ff5fc-rep-6b9f46bc6b-hvc8b    1/1       Running   0          20s
+```
 
 ### STEP-6: VERIFY THAT ALL THE REPLICAS ARE REGISTERED AND ARE IN RW MODE
 
