@@ -49,7 +49,7 @@ In ubuntu, the iSCSI initiator can be installed using the following procedure :
   sudo apt-get install <packagename>:
 
   make
-  libsas12-dev
+  libsasl2-dev
   libssl-dev
   libmongoc-dev
   libbson-dev
