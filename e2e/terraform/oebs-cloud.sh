@@ -318,7 +318,7 @@ function delete_cluster()
                   elif [ -d "data" ]; then
                       res=`grep -r ConfigBase data` 
                       if [ $? -ne 0 ]; then  
-                          echo "Cluster state is invalid, please check aws console"
+                          printf "\nCluster state is invalid, please check aws console\n"
                           exit;
                       else
                           clusterstate=`grep -r ConfigBase data | head -1 | awk '{print $2}' | sed 's|/openebs.k8s.local||g'`
@@ -334,9 +334,24 @@ function delete_cluster()
                   echo "Deleting the cluster.."
                   kops delete cluster --name=openebs.k8s.local --state=$clusterstate --yes 
                   
-                  if [ $? -ne 0 ]; then 
-                      echo "Kops delete cluster failed with errors, please check logs" 
-                      exit; 
+                  if [ $? -ne 0 ]; then
+                      #echo "Kops delete cluster failed with errors, please check logs.."
+                      printf "\nKops delete cluster failed with errors, please check logs..\n"
+                      while true; do 
+                          read -p "Do you wish to attempt s3 bucket deletion (y/n)?" yn
+                          case $yn in 
+                              [Yy]* )
+                                    echo "Deleting s3 bucket .."
+                                    break
+                                    ;;
+
+                              [Nn]* )
+                                    echo "Aborting delete.."
+                                    exit;;
+                              * )
+                                echo "Please answer yes(Y|y) or no(N|n)"
+                          esac
+                      done
                   fi	
    
                   # Remove the S3 bucket
