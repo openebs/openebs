@@ -1,0 +1,44 @@
+{
+  "spec": {
+     "selector": {
+        "matchLabels": {
+           "monitoring": "volume_exporter_prometheus"
+        }
+     },
+     "template": {
+        "metadata": {
+           "labels": {
+              "monitoring": "volume_exporter_prometheus"
+           }
+        },
+        "spec": {
+           "containers":[
+              {
+                  "name": "pvc-<deploy-hash>-ctrl-con", 
+                "image": "openebs/jiva:0.5.0"          
+              },
+              {
+                "args": [
+                   "-c=http://127.0.0.1:9501"
+                ],
+                "command": [
+                   "maya-volume-exporter"
+                ],
+                "image": "openebs/m-exporter:0.5.0",
+                "imagePullPolicy": "IfNotPresent",
+                "name": "maya-volume-exporter",
+                "ports": [
+                   {
+                      "containerPort": 9500,
+                      "protocol": "TCP"
+                   }
+                ],
+                "resources": {},
+                "terminationMessagePath": "/dev/termination-log",
+                "terminationMessagePolicy": "File"
+              }
+           ] 
+        }
+     }
+  }
+} 

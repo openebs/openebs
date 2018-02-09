@@ -1,0 +1,14 @@
+{
+  "spec": {
+     "template": {
+        "spec": {
+           "containers":[
+              {
+                  "name": "pvc-<deploy-hash>-ctrl-con",
+                "image": "openebs/jiva:0.5.1"
+              }
+           ]
+        }
+     }
+  }
+} 
