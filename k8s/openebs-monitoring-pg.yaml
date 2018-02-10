@@ -75,15 +75,15 @@ spec:
       serviceAccountName: openebs-maya-operator
       containers:
         - name: prometheus
-          image: prom/prometheus:v1.7.2
+          image: prom/prometheus:v2.1.0
           args:
-            - "-config.file=/etc/prometheus/conf/prometheus.yml"
+            - "--config.file=/etc/prometheus/conf/prometheus.yml"
             # Metrics are stored in an emptyDir volume which
             # exists as long as the Pod is running on that Node.
             # The data in an emptyDir volume is safe across container crashes.
-            - "-storage.local.path=/prometheus"
-            # How long to retain samples in the local storage. 
-            - "-storage.local.retention=$(STORAGE_RETENTION)"
+            - "--storage.tsdb.path=/prometheus"
+            # How long to retain samples in the local storage.
+            - "--storage.tsdb.retention=$(STORAGE_RETENTION)"
           ports:
             - containerPort: 9090
           env:
@@ -166,7 +166,7 @@ spec:
         app: openebs-grafana
     spec:
       containers:
-      - image: grafana/grafana:4.5.2
+      - image: grafana/grafana:4.6.3
         name: grafana
         ports:
         - containerPort: 3000
