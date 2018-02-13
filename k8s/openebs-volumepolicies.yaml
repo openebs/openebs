@@ -106,7 +106,7 @@ data:
             - --frontend
             - gotgt
             - --clusterIP
-            - {{ .TaskResult.key0.serviceIP }}
+            - {{ .TaskResult.vsvc.serviceIP }}
             - {{ .Volume.owner }}
             command:
             - launch
@@ -191,7 +191,7 @@ data:
           - args:
             - replica
             - --frontendIP
-            - {{ .TaskResult.key0.serviceIP }}
+            - {{ .TaskResult.vsvc.serviceIP }}
             - --size
             - {{ .Volume.capacity }}
             - /openebs
@@ -219,7 +219,7 @@ data:
           volumes:
           - name: openebs
             hostPath:
-              path: {{ .TaskResult.key1.storagePoolPath }}/{{ .Volume.owner }}                  
+              path: {{ .TaskResult.vpath.storagePoolPath }}/{{ .Volume.owner }}
 ---
 apiVersion: openebs.io/v1alpha1
 kind: VolumePolicy
@@ -241,9 +241,13 @@ spec:
     searchNamespace: default
     tasks:
     - template: volume-service-0.6.0
+      identity: vsvc
     - template: volume-path-0.6.0
+      identity: vpath
     - template: volume-controller-0.6.0
+      identity: vctrl
     - template: volume-replica-0.6.0
+      identity: vrep
 ---
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
