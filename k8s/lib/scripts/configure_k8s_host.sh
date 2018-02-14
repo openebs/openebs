@@ -7,7 +7,7 @@ masterip=
 clusterip=
 token=
 hostname=`hostname`
-kubeverion=`sudo kubeadm version -o short`
+kubeversion=`sudo kubeadm version -o short`
 kuberegex='^v1.[0-7].[0-9][0-9]?$'
 
 function get_machine_ip(){
