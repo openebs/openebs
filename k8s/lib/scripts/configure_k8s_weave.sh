@@ -8,7 +8,8 @@ function patch_kube_proxy(){
 }
 
 function setup_k8s_weave() {
-    kubectl apply -f $HOME/setup/weave/weave-daemonset-k8s-1.6.yaml
+    export kubever=$(kubectl version | base64 | tr -d '\n')
+    kubectl apply -f https://cloud.weave.works/k8s/net?k8s-version=$kubever
 }
 
 

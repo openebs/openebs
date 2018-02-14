@@ -13,10 +13,29 @@ box_Mode=ENV['OPENEBS_BUILD_BOX'] || 2
 
 kube_version=ENV['KUBE_VERSION'] || "1.7.5"
 
+distro=ENV['DISTRIBUTION'] || "ubuntu"
+
+docker=ENV['DOCKER'] || "docker-cs"
+
+required_plugins = %w(vagrant-vbguest)
+
+required_plugins.each do |plugin|
+  need_restart = false
+  unless Vagrant.has_plugin? plugin
+    system "vagrant plugin install #{plugin}"
+    need_restart = true
+  end
+  exec "vagrant #{ARGV.join(' ')}" if need_restart
+end
+
 Vagrant.configure("2") do |config|
   # The most common configuration options are documented and commented below.
   # For a complete reference, please see the online documentation at
   # https://docs.vagrantup.com.
+
+  if Vagrant.has_plugin?("vagrant-vbguest") then
+    config.vbguest.auto_update = true
+  end
 
   if ((box_Mode.to_i < BOX_MODE_OPENEBS.to_i) || \
       (box_Mode.to_i > BOX_MODE_KUBERNETES.to_i))
@@ -42,13 +61,15 @@ Vagrant.configure("2") do |config|
 
   # Every Vagrant development environment requires a box. You can search for
   # boxes at https://atlas.hashicorp.com/search.
-  config.vm.box = "ubuntu/xenial64"
-
+  if(distro == "ubuntu")
+    config.vm.box = "ubuntu/xenial64"
+  else
+    config.vm.box = "centos/7"
+  end
   # Disable automatic box update checking. If you disable this, then
   # boxes will only be checked for updates when the user runs
   # `vagrant box outdated`. This is not recommended.
   config.vm.box_check_update = false
-
   # Create a forwarded port mapping which allows access to a specific port
   # within the machine from a port on the host machine. In the example below,
   # accessing "localhost:8080" will access port 80 on the guest machine.
@@ -102,11 +123,12 @@ Vagrant.configure("2") do |config|
     
     config.vm.provision :shell, 
     path: "boxes/k8s/prepare_k8s.sh",
+    :args => "#{distro}",
     privileged: true
 
     config.vm.provision :shell, 
     path: "boxes/k8s/fetch_kubeadm.sh",
-    :args => "#{kube_version}",
+    :args => "#{kube_version} #{distro} #{docker}",
     privileged: true
 
     config.vm.provision :shell, 
@@ -116,10 +138,11 @@ Vagrant.configure("2") do |config|
 
     config.vm.provision :shell, 
     path: "boxes/k8s-dashboard/fetch_dashboard.sh",
+    :args => "#{distro}",
     privileged: true
 
     config.vm.provision :shell, 
-    path: "boxes/k8s-weave/fetch_weave.sh",
+    path: "boxes/k8s-weave/fetch_weave.sh",    
     privileged: true
 
     config.vm.provision :shell, 
@@ -128,7 +151,7 @@ Vagrant.configure("2") do |config|
 
     config.vm.provision :shell,
     path: "boxes/k8s/cleanup_k8s.sh",
-    :args => "#{kube_version}",
+    :args => "#{kube_version} #{distro}",
     privileged: true
 
   elsif box_Mode.to_i == BOX_MODE_OPENEBS.to_i

@@ -7,10 +7,12 @@ masterip=
 clusterip=
 token=
 hostname=`hostname`
+kubeverion=`sudo kubeadm version -o short`
+kuberegex='^v1.[0-7].[0-9][0-9]?$'
 
 function get_machine_ip(){
-    ifconfig \
-    | grep -oP "inet addr:\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}" \
+    ip addr show \
+    | grep -oP "inet \\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}" \
     | grep -oP "\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}" | sort \
     | tail -n 1 | head -n 1
 }
@@ -23,8 +25,17 @@ function setup_k8s_minion(){
     sudo kubeadm join --token=$token ${masterip}:6443
 }
 
-function join_cni_network(){
-    sudo route add $clusterip gw $masterip
+function disable_swap()
+{    
+    sudo swapoff -a
+
+    sudo sed -i.bak '/ swap / s/^\(.*\)$/#\1/g' /etc/fstab
+    
+    cat <<EOF | sudo tee -a /etc/systemd/system/kubelet.service.d/90-local-extras.conf > /dev/null
+    Environment="KUBELET_EXTRA_ARGS=--fail-swap-on=false"
+EOF
+    sudo systemctl daemon-reload
+    sudo systemctl restart kubelet
 }
 
 function show_help() {
@@ -166,11 +177,15 @@ machineip=`get_machine_ip`
 echo Updating the host files...
 update_hosts
 
+[[ $kubeversion =~ $kuberegex ]]
+# For versions 1.8 and above, swap needs to be disabled
+if [[ $? -eq 1 ]]; then
+    #Disable swap for Kubernetes 1.8 and above
+    echo Disable swap
+    disable_swap
+fi
+
 #Join the cluster
 echo Setting up the Minion using IPAddress: $machineip
 echo Setting up the Minion using Token: $token 
 setup_k8s_minion
-
-#Add route to the minion ip to the cluster ip
-echo Joining the CNI Network...
-join_cni_network
