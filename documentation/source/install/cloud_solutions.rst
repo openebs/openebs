@@ -346,7 +346,7 @@ Create an administrator configuration context from the configuration shell using
 ::
 
     gcloud container clusters list
-    kubectl config set-context doc-test --cluster=gke_maya-chatops_us-central1-a_maya-chatops --user=cluster-admin
+    kubectl config set-context doc-test --cluster=gke_maya-chatops_us-central1-a_doc-test --user=cluster-admin
 
 c. Download the latest OpenEBS files using the following commands.
 ::
@@ -361,10 +361,10 @@ Click the cluster you have created and select **Show Credentials**.
 d. Apply OpenEBS Operator and add related OpenEBS Storage Classes, that can be used by developers and applications using the following commands.
 ::
 
-    kubectl config use-context demo-openebs03
+    kubectl config use-context doc-test
     kubectl apply -f openebs-operator.yaml
     kubectl apply -f openebs-storageclasses.yaml
-    kubectl config use-context gke_strong-eon-153112_us-central1-a_demo-openebs03    
+    kubectl config use-context gke_maya-chatops_us-central1-a_doc-test   
 
 **Note:**
 
