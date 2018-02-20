@@ -95,16 +95,15 @@ spec:
       serviceAccountName: prometheus
       containers:
         - name: prometheus
-          image: prom/prometheus:v1.7.2
+          image: prom/prometheus:v2.0.0
           args:
-            - "-config.file=/etc/prometheus/conf/prometheus.yml"
+            - "--config.file=/etc/prometheus/conf/prometheus.yml"
             # Metrics are stored in an emptyDir volume which
             # exists as long as the Pod is running on that Node.
             # The data in an emptyDir volume is safe across container crashes.
-            - "-storage.local.path=/prometheus"
+            - "--storage.tsdb.path=/prometheus"
             # How long to retain samples in the local storage. 
-            - "-storage.local.retention=$(STORAGE_RETENTION)"
-            - "-alertmanager.url=http://alertmanager:9093" 
+            - "--storage.tsdb.retention=$(STORAGE_RETENTION)"
           ports:
             - containerPort: 9090
           env:
@@ -185,7 +184,7 @@ spec:
       name: node-exporter
     spec:
       containers:
-      - image: prom/node-exporter:latest
+      - image: prom/node-exporter:v0.15.2
         name: node-exporter
         ports:
         - containerPort: 9100
