@@ -16,7 +16,7 @@ spec:
     targetPort: {{ .Values.grafana.ports.internalPort }}
     nodePort: {{ .Values.grafana.ports.nodePort }}
   selector:
-    app: {{ template "openebs.name" . }}-grafana
+    app: {{ template "openebs.name" . }}
     release: {{ .Release.Name }}
     component: {{ template "openebs.fullname" . }}
     role: grafana
