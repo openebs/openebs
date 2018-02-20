@@ -10,7 +10,7 @@ data:
       # if it has not been updated.
       resolve_timeout: 5m
       # Replace the given api url by your slack webhook url.        
-      slack_api_url: 'https://hooks.slack.com/services/Token'
+      slack_api_url: 'https://hooks.slack.com/services/T3NU2A2UV/Your_Token'
 
     # The directory from which notification templates are read.
     templates:

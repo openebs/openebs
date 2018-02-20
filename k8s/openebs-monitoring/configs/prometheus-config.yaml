@@ -30,7 +30,7 @@ data:
       evaluation_interval: 5s
     rule_files:
     # alert rules passed as argument in prometheus-deployment at given path
-    - '/etc/prometheus-rules/alert.rules'
+    - '/etc/prometheus-rules/alert.rules.yaml'
     # scrape config for maya-apiserver pods
     #
     # The relabeling allows the actual pod scrape endpoint to be configured via
@@ -40,6 +40,23 @@ data:
     # * `prometheus.io/path`: If the metrics path is not `/metrics` override this.
     # * `prometheus.io/port`: Scrape the pod on the indicated port instead of the
     # pod's declared ports (default is a port-free target if none are declared).
+    alerting:
+      alertmanagers:
+      - kubernetes_sd_configs:
+        - role: pod
+        tls_config:
+          ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+        bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+        relabel_configs:
+        - source_labels: [__meta_kubernetes_pod_label_name]
+          regex: alertmanager
+          action: keep
+        - source_labels: [__meta_kubernetes_namespace]
+          regex: default
+          action: keep
+        - source_labels: [__meta_kubernetes_pod_container_port_number]
+          regex:
+          action: drop
     scrape_configs:
     - job_name: 'prometheus'
       static_configs:
@@ -75,6 +92,9 @@ data:
       - source_labels: [__meta_kubernetes_pod_container_port_number]
         action: drop
         regex: '(.*)3260'
+      - source_labels: [__meta_kubernetes_pod_container_port_number]
+        action: drop
+        regex: '(.*)9500'
       - source_labels: [__meta_kubernetes_pod_name]
         action: replace
         target_label: kubernetes_pod_name
