@@ -11,7 +11,7 @@ image:
 
 apiserver:
   image: "openebs/m-apiserver"
-  imageTag: "0.5.1"
+  imageTag: "0.5.2"
   replicas: 2
   ports:
     externalPort: 5656
@@ -24,7 +24,7 @@ apiserver:
 
 provisioner:
   image: "openebs/openebs-k8s-provisioner"
-  imageTag: "0.5.1"
+  imageTag: "0.5.2"
   replicas: 2
   mayaportalurl: "https://mayaonline.io/"
   monitorurl: "http://127.0.0.1:32515/dashboard/db/openebs-volume-stats?orgId=1"
@@ -37,7 +37,7 @@ provisioner:
 
 grafana:
   image: "grafana/grafana"
-  imageTag: "4.5.2"
+  imageTag: "4.6.3"
   ports:
     externalPort: 3000
     internalPort: 3000
@@ -45,7 +45,7 @@ grafana:
 
 prometheus:
   image: "prom/prometheus"
-  imageTag: "v1.7.2"
+  imageTag: "v2.1.0"
   ports:
     externalPort: 80
     internalPort: 9090
@@ -53,11 +53,11 @@ prometheus:
 
 jiva:
   image: "openebs/jiva"
-  imageTag: "0.5.1"
+  imageTag: "0.5.2"
   replicas: 2
 
 policies:
   monitoring:
     enabled: true
     image: "openebs/m-exporter"
-    imageTag: "0.5.1"
+    imageTag: "0.5.2"

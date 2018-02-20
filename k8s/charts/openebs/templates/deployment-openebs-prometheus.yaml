@@ -26,13 +26,13 @@ spec:
           image: "{{ .Values.prometheus.image }}:{{ .Values.prometheus.imageTag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           args:
-            - "-config.file=/etc/prometheus/conf/prometheus.yml"
+            - "--config.file=/etc/prometheus/conf/prometheus.yml"
             # Metrics are stored in an emptyDir volume which
             # exists as long as the Pod is running on that Node.
             # The data in an emptyDir volume is safe across container crashes.
-            - "-storage.local.path=/prometheus"
+            - "--storage.tsdb.path=/prometheus"
             # How long to retain samples in the local storage.
-            - "-storage.local.retention=$(STORAGE_RETENTION)"
+            - "--storage.tsdb.retention=$(STORAGE_RETENTION)"
           ports:
             - containerPort: {{ .Values.prometheus.ports.internalPort }}
           env:
