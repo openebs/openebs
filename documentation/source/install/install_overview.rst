@@ -13,7 +13,7 @@ If you are beginner to Kubernetes and OpenEBS, OpenEBS recommends you to get sta
   
 If you are already an experienced Kubernetes user and if you have Kubernetes installed you can deploy OpenEBS through either of the following:
 
-* kubectl - you can easily setup OpenEBS on your existing Kubernetes cluster with a few simple kubectl commands. See, :ref:`quick-start`.
+* kubectl - you can easily setup OpenEBS on your existing Kubernetes cluster with a few simple kubectl commands. See `quick-start. <http://openebs.readthedocs.io/en/latest/intro/quick_install.html>`_
 * helm
 
 
