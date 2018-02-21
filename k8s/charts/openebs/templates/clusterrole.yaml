@@ -11,7 +11,7 @@ rules:
   resources: ["nodes","nodes/proxy"]
   verbs: ["get", "list", "watch"]
 - apiGroups: ["*"]
-  resources: ["services","pods","deployments", "events", "endpoints"]
+  resources: ["namespaces","services","pods","deployments", "events", "endpoints"]
   verbs: ["*"]
 - apiGroups: ["*"]
   resources: ["persistentvolumes","persistentvolumeclaims"]
