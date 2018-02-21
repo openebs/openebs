@@ -17,7 +17,7 @@ spec:
     nodePort: {{ .Values.prometheus.ports.nodePort }}
     # Note that this Service will be visible as both NodeIP:nodePort and clusterIp:Port
   selector:
-    app: {{ template "openebs.name" . }}-prometheus
+    app: {{ template "openebs.name" . }}
     release: {{ .Release.Name }}
     component: {{ template "openebs.fullname" . }}
     role: prometheus
