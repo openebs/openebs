@@ -8,6 +8,6 @@ metadata:
 provisioner: openebs.io/provisioner-iscsi
 parameters:
   openebs.io/storage-pool: "default"
-  openebs.io/jiva-replica-count: "2"
+  openebs.io/jiva-replica-count: "{{ .Values.jiva.replicas }}"
   openebs.io/volume-monitor: "true"
   openebs.io/capacity: 5G

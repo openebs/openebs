@@ -1,8 +1,11 @@
 {{- if .Values.policies.monitoring.enabled }}
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
   name: openebs-prometheus
+{{- if .Values.rbacEnable }}
+  namespace: {{ .Values.rbac.namespace }}
+{{- end }}
   labels:
     chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
 spec:
@@ -12,7 +15,7 @@ spec:
       labels:
         name: openebs-prometheus-server
     spec:
-      serviceAccountName: openebs-maya-operator
+      serviceAccountName: {{ .Values.operator.name }}
       containers:
         - name: prometheus
           image: prom/prometheus:v1.7.2

@@ -1,11 +1,14 @@
 {{- if .Values.policies.monitoring.enabled }}
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
   labels:
     app: openebs-grafana
     chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
   name: openebs-grafana
+{{- if .Values.rbacEnable }}
+  namespace: {{ .Values.rbac.namespace }}
+{{- end }}
 spec:
   replicas: 1
   revisionHistoryLimit: 2
@@ -14,6 +17,7 @@ spec:
       labels:
         app: openebs-grafana
     spec:
+      serviceAccountName: {{ .Values.operator.name }}
       containers:
       - image: grafana/grafana:4.5.2
         name: grafana
