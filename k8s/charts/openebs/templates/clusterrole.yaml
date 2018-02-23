@@ -2,8 +2,7 @@
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRole
 metadata:
-  namespace: default
-  name: openebs-maya-operator
+  name: {{ .Values.operator.name }}
   labels:
     chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
 rules:
@@ -11,7 +10,7 @@ rules:
   resources: ["nodes","nodes/proxy"]
   verbs: ["get", "list", "watch"]
 - apiGroups: ["*"]
-  resources: ["services","pods","deployments", "events", "endpoints"]
+  resources: ["namespaces", "services", "pods", "deployments", "events", "endpoints"]
   verbs: ["*"]
 - apiGroups: ["*"]
   resources: ["persistentvolumes","persistentvolumeclaims"]
@@ -19,6 +18,9 @@ rules:
 - apiGroups: ["storage.k8s.io"]
   resources: ["storageclasses"]
   verbs: ["*"]
+- apiGroups: ["*"]
+  resources: ["storagepools"]
+  verbs: ["get", "list"]
 - nonResourceURLs: ["/metrics"]
   verbs: ["get"]
 {{- end }}

@@ -2,6 +2,9 @@
 kind: ConfigMap
 metadata:
   name: openebs-prometheus-config
+{{- if .Values.rbacEnable }}
+  namespace: {{ .Values.rbac.namespace }}
+{{- end }}
   labels:
     chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
 apiVersion: v1
