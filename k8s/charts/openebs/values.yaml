@@ -3,8 +3,11 @@
 ## If true, create & use RBAC resources
 ##
 rbacEnable: true
+rbac:
+  namespace: "openebs"
 
-serviceAccountName: "openebs-maya-operator"
+operator:
+  name: "openebs-maya-operator"
 
 image:
   pullPolicy: IfNotPresent
@@ -54,7 +57,7 @@ prometheus:
 jiva:
   image: "openebs/jiva"
   imageTag: "0.5.2"
-  replicas: 2
+  replicas: 3
 
 policies:
   monitoring:
