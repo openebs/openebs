@@ -3,8 +3,11 @@
 ## If true, create & use RBAC resources
 ##
 rbacEnable: true
+rbac:
+  namespace: "openebs"
 
-serviceAccountName: "openebs-maya-operator"
+operator:
+  name: "openebs-maya-operator"
 
 image:
   pullPolicy: IfNotPresent
@@ -24,7 +27,7 @@ apiserver:
 
 provisioner:
   image: "openebs/openebs-k8s-provisioner"
-  imageTag: "0.5.2"
+  imageTag: "0.5.3-RC1"
   replicas: 2
   mayaportalurl: "https://mayaonline.io/"
   monitorurl: "http://127.0.0.1:32515/dashboard/db/openebs-volume-stats?orgId=1"
@@ -54,7 +57,7 @@ prometheus:
 jiva:
   image: "openebs/jiva"
   imageTag: "0.5.2"
-  replicas: 2
+  replicas: 3
 
 policies:
   monitoring:
