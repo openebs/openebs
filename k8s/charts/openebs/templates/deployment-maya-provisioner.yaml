@@ -48,12 +48,20 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: spec.nodeName
-        - name: OPENEBS_MONITOR_URL
-          value: "{{ .Values.provisioner.monitorurl }}"
-        - name: OPENEBS_MONITOR_VOLKEY
-          value: "{{ .Values.provisioner.monitorvolkey }}"
-        - name: MAYA_PORTAL_URL
-          value: "{{ .Values.provisioner.mayaportalurl }}"
+        # OPENEBS_MAYA_SERVICE_NAME provides the maya-apiserver K8s service name,
+        # that provisioner should forward the volume creaet/delete requests.
+        # If not present, "maya-apiserver-service" will be used for lookup.
+        # This is supported for openebs provisioner version 0.5.3-RC1 onwards
+        - name: OPENEBS_MAYA_SERVICE_NAME
+          value: "{{ template "openebs.fullname" . }}-maya-apiservice"
+        # The following values will be set as annotations to the PV object.
+        # Refer : https://github.com/openebs/external-storage/pull/15
+        #- name: OPENEBS_MONITOR_URL
+        #  value: "{{ .Values.provisioner.monitorurl }}"
+        #- name: OPENEBS_MONITOR_VOLKEY
+        #  value: "{{ .Values.provisioner.monitorvolkey }}"
+        #- name: MAYA_PORTAL_URL
+        #  value: "{{ .Values.provisioner.mayaportalurl }}"
 
 {{- if .Values.provisioner.nodeSelector }}
       nodeSelector:

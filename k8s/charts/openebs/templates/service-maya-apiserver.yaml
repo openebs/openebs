@@ -1,9 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  # service name must be `maya-apiserver-service` until a time when the serivce name is not hardcoded in the provisioner.
-  # See https://git.io/vNBGa
-  name: maya-apiserver-service
+  name: {{ template "openebs.fullname" . }}-maya-apiservice
 {{- if .Values.rbacEnable }}
   namespace: {{ .Values.rbac.namespace }}
 {{- end }}
