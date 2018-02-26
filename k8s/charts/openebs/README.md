@@ -44,7 +44,7 @@ The following tables lists the configurable parameters of the OpenEBS chart and 
 | `provisioner.antiAffinity.type`      | Anti-affinity type for Provisioner            | `Hard`                           |
 | `jiva.image`                         | Docker Image for Jiva                         | `openebs/jiva`                    |
 | `jiva.imageTag`                      | Docker Image Tag for Jiva                     | `0.5.2`                           |
-| `jiva.replicas`                      | Number of Jiva Replicas                       | `2`                               |
+| `jiva.replicas`                      | Number of Jiva Replicas                       | `3`                               |
 
 Specify each parameter using the `--set key=value[,key=value]` argument to `helm install`.
 
