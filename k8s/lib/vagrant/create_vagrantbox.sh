@@ -3,7 +3,8 @@
 kubeversion=
 distribution=
 docker_version=
-kuberegex='^[1-9].[0-9][0-9]?.[0-9][0-9]?$'
+kuberegex='^[1-9][.][0-9][0-9]?[.][0-9][0-9]?$'
+kuberegex_cni='^1[.][6-8][.][0-9][0-9]?$'
 
 debpackageurl="https://packages.cloud.google.com/apt/dists/kubernetes-xenial/main/binary-amd64/Packages"
 rpmpackageurl="https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64/repodata/primary.xml"
@@ -132,10 +133,12 @@ function fetch_k8s_scripts(){
     sed -i "s/.*kubeversion=.*/kubeversion=v${kubeversion}/g" workdir/scripts/k8s/configure_k8s_master.sh
 
 
-    cp ../scripts/configure_k8s_host.sh workdir/scripts/k8s/
-    cp ../scripts/configure_k8s_weave.sh workdir/scripts/k8s/
+    cp boxes/ubuntu-xenial/prepare_network.sh workdir/scripts/k8s
+    cp ../scripts/configure_k8s_host.sh workdir/scripts/k8s/    
     cp ../scripts/configure_k8s_cred.sh workdir/scripts/k8s/
     cp ../scripts/configure_k8s_dashboard.sh workdir/scripts/k8s/
+    cp ../scripts/configure_k8s_cni.sh workdir/scripts/k8s/
+       
 }
 
 function fetch_specs(){
@@ -152,29 +155,62 @@ function fetch_k8s_debpkgs(){
     | cut -d '/' -f2)
 
     length=${#packagedownloadurls[@]}
+
+    if [ "$length" -eq 0 ]; then
+       echo "Unable to download packages for the specified Version."
+       echo "Run the script again. If the problem persists try with a different Version."
+       cleanup
+       exit 
+    fi
+    
     for ((i = 0; i != length; i++)); do    
         wget "https://packages.cloud.google.com/apt/pool/${packagedownloadurls[i]}" -P workdir/debpkgs    
     done
 
-    wget https://packages.cloud.google.com/apt/pool/kubernetes-cni_0.5.1-00_amd64_08cbe5c42366ec3184cc91a4353f6e066f2d7325b4db1cb4f87c7dcc8c0eb620.deb \
+    [[ $kubeversion =~ $kuberegex_cni ]]
+
+    if [[ $? -eq 1 ]]; then
+        wget https://packages.cloud.google.com/apt/pool/kubernetes-cni_0.6.0-00_amd64_43460dd3c97073851f84b32f5e8eebdc84fadedb5d5a00d1fc6872f30a4dd42c.deb \
     -P workdir/debpkgs
+    else
+        wget https://packages.cloud.google.com/apt/pool/kubernetes-cni_0.5.1-00_amd64_08cbe5c42366ec3184cc91a4353f6e066f2d7325b4db1cb4f87c7dcc8c0eb620.deb \
+    -P workdir/debpkgs
+    fi
 }
 
 function fetch_k8s_rpmpkgs(){
     mkdir -p workdir/rpmpkgs
 
     mapfile -t packagedownloadurls < <(curl -sS  $rpmpackageurl \
-    | grep $kubeversion | grep "location href" \
+    | grep -- -$kubeversion | grep "location href" \
     | awk '{print $2}' | cut -d '/' -f4 | cut -d '"' -f1)
 
     
     length=${#packagedownloadurls[@]}
+
+    if [ "$length" -eq 0 ]; then
+       echo "Unable to download packages for the specified Version."
+       echo "Run the script again. If the problem persists try with a different Version."
+       cleanup
+       exit 
+    fi
+    
     for ((i = 0; i != length; i++)); do    
         wget "https://packages.cloud.google.com/yum/pool/${packagedownloadurls[i]}" -P workdir/rpmpkgs    
     done
 
-    wget https://packages.cloud.google.com/yum/pool/fe33057ffe95bfae65e2f269e1b05e99308853176e24a4d027bc082b471a07c0-kubernetes-cni-0.6.0-0.x86_64.rpm \
+    [[ $kubeversion =~ $kuberegex_cni ]]
+
+    if [[ $? -eq 1 ]]; then
+
+        wget https://packages.cloud.google.com/yum/pool/fe33057ffe95bfae65e2f269e1b05e99308853176e24a4d027bc082b471a07c0-kubernetes-cni-0.6.0-0.x86_64.rpm \
     -P workdir/rpmpkgs
+    else
+
+        wget https://packages.cloud.google.com/yum/pool/e7a4403227dd24036f3b0615663a371c4e07a95be5fee53505e647fd8ae58aa6-kubernetes-cni-0.5.1-0.x86_64.rpm \
+    -P workdir/rpmpkgs        
+
+    fi
 }
 
 function cleanup(){

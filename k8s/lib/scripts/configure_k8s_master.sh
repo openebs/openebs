@@ -5,6 +5,7 @@ machineip=
 hostname=`hostname`
 kubeversion="v1.7.5"
 kuberegex='^v1.[0-7].[0-9][0-9]?$'
+kubecniregex='^v1[.][0-8][.][0-9][0-9]?$'
 
 function get_machine_ip(){
     ip addr show | \
@@ -14,8 +15,25 @@ function get_machine_ip(){
 }
 
 function setup_k8s_master() {
-    sudo kubeadm init --apiserver-advertise-address=$machineip \
-    --kubernetes-version=$kubeversion
+
+    # HEPTIO Pro Tip
+    # Flush iptables for any residue left behind by kubeadm reset
+    sudo iptables -F && sudo iptables -t nat -F && sudo iptables -t mangle -F && sudo iptables -X
+
+    # Releases the port 10251, which causes the pre-flight checks to fail.
+    # Kubeadm init, will start the kubelet if it is not running.
+    sudo systemctl stop kubelet
+
+    [[ $kubeversion =~ $kubecniregex ]]
+
+    if [[ $? -eq 1 ]]; then
+        # Use Flannel Pod Network for now for version 1.9.0 and above    
+        sudo kubeadm init --apiserver-advertise-address=$machineip \
+        --kubernetes-version=$kubeversion --pod-network-cidr=10.244.0.0/16
+    else
+        sudo kubeadm init --apiserver-advertise-address=$machineip \
+        --kubernetes-version=$kubeversion
+    fi
 }
 
 function update_hosts(){

@@ -17,9 +17,10 @@ if [ "$distribution" = "ubuntu" ]; then
    mkdir -p /home/ubuntu/setup/k8s
    cd /home/ubuntu/setup/k8s
 
+   cp ${scriptloc}/prepare_network.sh .
    cp ${scriptloc}/configure_k8s_master.sh .
    cp ${scriptloc}/configure_k8s_cred.sh .
-   cp ${scriptloc}/configure_k8s_weave.sh .
+   cp ${scriptloc}/configure_k8s_cni.sh .
    cp ${scriptloc}/configure_k8s_host.sh .
    cp ${scriptloc}/configure_k8s_dashboard.sh .
 
@@ -41,9 +42,10 @@ else
    mkdir -p /home/vagrant/setup/k8s
    cd /home/vagrant/setup/k8s
 
+   cp ${scriptloc}/prepare_network.sh .
    cp ${scriptloc}/configure_k8s_master.sh .
    cp ${scriptloc}/configure_k8s_cred.sh .
-   cp ${scriptloc}/configure_k8s_weave.sh .
+   cp ${scriptloc}/configure_k8s_cni.sh .
    cp ${scriptloc}/configure_k8s_host.sh .
    cp ${scriptloc}/configure_k8s_dashboard.sh .
 

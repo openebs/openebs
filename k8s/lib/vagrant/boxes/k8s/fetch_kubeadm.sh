@@ -5,7 +5,8 @@ docker=${3:-"docker-cs"}
 
 if [ "$distribution" = "ubuntu" ]; then
    #Update the repository index
-   apt-get update && apt-get install -y apt-transport-https ca-certificates software-properties-common
+   apt-get update && apt-get install -y apt-transport-https ca-certificates software-properties-common \
+   socat ebtables
 
    curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
 
@@ -20,11 +21,11 @@ if [ "$distribution" = "ubuntu" ]; then
       stable"
                 
       apt-get update && apt-get install -y docker-ce=$(apt-cache madison docker-ce \
-      | grep 17.03 | head -1 | awk '{print $3}') socat ebtables     
+      | grep 17.03 | head -1 | awk '{print $3}')      
    else
       apt-get update
       # Install docker if you don't have it already.
-      apt-get install -y docker.io socat ebtables       
+      apt-get install -y docker.io      
    fi
 
 systemctl enable docker && systemctl start docker
@@ -65,11 +66,12 @@ sudo yum-config-manager \
 https://download.docker.com/linux/centos/docker-ce.repo
 
 sudo yum deplist docker-ce-17.03.2.ce-1.el7.centos | awk '/provider:/ {print $2}' \
-| sort -u | xargs yum -y install
+| sort -u | sudo xargs yum -y install
                 
 sudo yum install -y docker-ce-17.03.2.ce-1.el7.centos
 
 sudo systemctl enable docker && sudo systemctl start docker
+
 
 cd /vagrant/workdir/rpmpkgs
 

@@ -139,16 +139,18 @@ Vagrant.configure("2") do |config|
     config.vm.provision :shell, 
     path: "boxes/k8s-dashboard/fetch_dashboard.sh",
     :args => "#{distro}",
-    privileged: true
-
+    privileged: true    
+    
     config.vm.provision :shell, 
-    path: "boxes/k8s-weave/fetch_weave.sh",    
+    path: "boxes/k8s-weave/fetch_weave.sh",
+    :args => "#{distro}",    
     privileged: true
-
+    
     config.vm.provision :shell, 
-    path: "boxes/ubuntu-xenial/prepare_network.sh",
+    path: "boxes/k8s-flannel/fetch_flannel.sh",
+    :args => "#{distro}",
     privileged: true
-
+    
     config.vm.provision :shell,
     path: "boxes/k8s/cleanup_k8s.sh",
     :args => "#{kube_version} #{distro}",
