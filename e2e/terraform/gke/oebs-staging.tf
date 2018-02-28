@@ -1,3 +1,10 @@
+/* THIS IS THE TERRAFORM HCL FILE USED TO CREATE THE CLUSTER 
+   RESOURCES */
+
+#-------PROVIDER DEF-------#
+
+# The Google Cloud provider is used to interact with Google Cloud services
+# It needs to be configured with the proper credentials before it can be used
 
 provider "google" {
   credentials = "${file("${var.credentials}")}"
@@ -5,16 +12,22 @@ provider "google" {
   region      = "${var.region}"
 }
 
+#-------RESOURCE DEF-------#
+
 resource "google_container_cluster" "primary" {
   name = "${var.clustername}"
   zone = "${var.region}"
   initial_node_count = "${var.nodecount}"
 
+  #-------K8s MASTER AUTH DEF-------#
+  
   master_auth {
-    username = "admin"
-    password = "oebsstaging@1234"
+    username = "${var.username}"
+    password = "${var.password}"
   }
 
+  #-------COMPUTE NODE DEF-------#
+  
   node_config {
     oauth_scopes = [
       "https://www.googleapis.com/auth/compute",
