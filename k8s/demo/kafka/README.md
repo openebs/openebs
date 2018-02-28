@@ -1,6 +1,6 @@
-Apply the k8s podspecs mentioned in the folder.
+Apply the k8s podspecs mentioned in the folder as per the numbering prefixed on the YAMLs. 
 
-`kubectl apply -f .`
+`kubectl apply -f <spec>`
 
 This will create a 3 node zookeeper ensemble and a 3 node Kafka cluster which uses OpenEBS volumes.
 
