@@ -35,6 +35,9 @@ rules:
 - apiGroups: ["apiextensions.k8s.io"]
   resources: ["customresourcedefinitions"]
   verbs: [ "get", "list", "create" ]
+- apiGroups: ["*"]
+  resources: ["storagepools"]
+  verbs: ["get", "list"] 
 - nonResourceURLs: ["/metrics"]
   verbs: ["get"]
 ---
