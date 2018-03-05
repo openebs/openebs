@@ -92,6 +92,15 @@ The below command will prompt for username/password. Provide username as "admin"
 kubectl config use-context demo-openebs03
 kubectl config use-context gke_strong-eon-153112_us-central1-a_demo-openebs03
 ```
+***Use These commands to give admin priviledges to your cluster (cluster-admin role)***
+ get current google identity
+`$ gcloud info | grep Account`
+Account: [myname@example.org]
+
+ grant cluster-admin to your current identity
+`$ kubectl create clusterrolebinding myname-cluster-admin-binding --clusterrole=cluster-admin --user=myname@example.org`
+Clusterrolebinding "myname-cluster-admin-binding" created
+
 
 Download the latest OpenEBS Operator Files:
 
