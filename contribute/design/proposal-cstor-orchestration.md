@@ -3,8 +3,9 @@
 This document provides the design details on how the OpenEBS Orchestration Components will create OpenEBS StoragePools and Volumes using OpenEBS cStor storage-engine. 
 
 ## Prerequisites
-- Container Attached Storage - or using containers to server the storage that is in turn used by the stateful workloads. 
-- Knowledge about Kubernetes CRDs 
+- Container Attached Storage or storage for containers in containers. [Introduction to OpenEBS](https://docs.google.com/presentation/d/1XPZZx7DYv2ah0Yy_A_CwTVVhZj3Sc0XkSsdQc7BG72I/edit#slide=id.p)
+- Knowledge about Kubernetes [CRDs](https://kubernetes.io/docs/concepts/api-extension/custom-resources/)
+- Knowledge about Kubernetes [Resource limits and requests for CPU and Memory](https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/#resource-requests-and-limits-of-pod-and-container)
 - Knowledge about Kubernetes concepts like Custom Controllers, initializers and reconcilation loop that wait on objects to move from actual to desired state.
 - Familiar with Kubernetes and OpenEBS Storage Concepts:
   * PersistentVolume(PV) and PersistentVolumeClaim(PVC) are standard kubernetes terms used to associate volumes to a given workload. A PVC will be watched by a dynamic provisioner, which will inturn spin-up OpenEBS Volume Containers and create a PV (iSCSI) to be used by the workload.
@@ -46,8 +47,12 @@ The design is split into two aspects - creation of storage pools using cStor Eng
          #type: "stripe"
          #Use the following to enforce the limits on CPU and RAM to be allocated/used by the cStor Pool containers.
          #resources:
-           #cpu: 
-           #memory: 
+           #limits:
+             #cpu: 1
+             #memory: 512Mi
+           #requests:
+             #cpu: 2
+             #memory: 256Mi
          #Pools can be configured with different features. An example feature could be to enable/disable thin provisioning.
          #thinprovisioning: true
      ```
@@ -65,7 +70,7 @@ The design is split into two aspects - creation of storage pools using cStor Eng
        - unique id
        - name
        - actual disks paths to be used. 
-       - raid type
+       - redundancy type (stripe or mirror)
        
        ```
        apiVersion: openebs.io/v1alpha1
@@ -126,7 +131,7 @@ The design is split into two aspects - creation of storage pools using cStor Eng
                protocol: TCP
              resources: {}      
        ```
-       The resources{} will be filled based on the resource (cpu, mem) limits given in the cStorPool spec. If nothing has been provided, these will be left as default. 
+       The resources{} will be filled based on the resource (cpu, mem) requests and limits given in the cStorPool spec. If nothing has been provided, Kubernetes will assign default values depending on the node resources. Please refer to the [Kubernetes Resource Limits and Request](https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/#resource-requests-and-limits-of-pod-and-container).
        
      * create SP object
        ```
@@ -258,7 +263,7 @@ The design is split into two aspects - creation of storage pools using cStor Eng
                defaultMode: 420
                name: pvc-ee171da3-07d5-11e8-a5be-42010a8001be-cstor-ctrl-config-map  
        ```
-       The resources{} will be filled based on the volume policy rules that determine the resource (cpu, mem) limits to be associated with a given volume.
+       The resources{} will be filled based on the resource (cpu, mem) requests and limits given in the Volume Policies associated with PVC. If nothing has been provided, Kubernetes will assign default values depending on the node resources. Please refer to the [Kubernetes Resource Limits and Request](https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/#resource-requests-and-limits-of-pod-and-container).
 
    * maya-apiserver will create the OV cStorReplicas as follows: 
      * Query for the storage pools matching the given pool name in the PVC and pick up a subset of pools (based on the replica-count of the PVC). 
