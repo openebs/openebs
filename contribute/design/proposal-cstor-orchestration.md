@@ -9,7 +9,7 @@ This document provides the design details on how the OpenEBS Orchestration Compo
 - Knowledge about Kubernetes concepts like Custom Controllers, initializers and reconcilation loop that wait on objects to move from actual to desired state.
 - Familiar with Kubernetes and OpenEBS Storage Concepts:
   * PersistentVolume(PV) and PersistentVolumeClaim(PVC) are standard kubernetes terms used to associate volumes to a given workload. A PVC will be watched by a dynamic provisioner, which will inturn spin-up OpenEBS Volume Containers and create a PV (iSCSI) to be used by the workload.
-  * PersistentDisks(PDs) and PersistentDiskClaims(PDCs) are used to represent and identify the storage (a disk) attached to a Kubernetes Node. PersistentDiskClaims are created by the User and maya-nodebot will use that information to discover disks matching the criteria mentioned in PDC to create the PDs. It is also possible that the User will directly create PD representing a storage attached to a node. Each PD will be represented by a cluster wide unique identifier like -- rs://host:nodea/device:/dev/disk-by-id/avcd-121312-hfjgdf. (TODO - Provide the link to the design documented here)
+  * PersistentDisks(PDs) and PersistentDiskClaims(PDCs) are used to represent and identify the storage (a disk) attached to a Kubernetes Node. PersistentDiskClaims are created by the User and maya-nodebot will use that information to discover disks matching the criteria mentioned in PDC to create the PDs. It is also possible that the User will directly create PD representing a storage attached to a node. Each PD will be represented by a cluster wide unique identifier like -- rs://host:nodea/device:/dev/disk-by-id/avcd-121312-hfjgdf. [OpenEBS Storage Management via Node-bot](https://github.com/openebs/node-bot/pull/1)
   * StoragePool(SP) and StoragePoolClaim(SPC) are used to respresent and identify a pool of storage that is created using one more PDs. Each StoragPool can be used to then serve one or more OpenEBS Volume Replicas. The StoragePools can be of different types depending on how the underlying disks/storage are aggregated and how the pool is exposed. Till 0.6, OpenEBS supported storage pools of type (filesystem), which where basically either a hostDirectory or ext4 mount of a single block disk. From 0.7, OpenEBS will support creation of storage pools that expose blocks. These block type pools are implemented using cStor containers. 
 
 
@@ -18,8 +18,9 @@ This document provides the design details on how the OpenEBS Orchestration Compo
 The design is split into two aspects - creation of storage pools using cStor Engine and creating OpenEBS Volumes using the cStor engine. This implementation makes use of CRDs to storage the disk, pool and volume related information. As part of the openebs installation, the followind CRDs are loaded:
 - PeristentDisk and PersistentDiskClaim
 - StoragePool and StoragePoolClaim
-- cStorPool
-- cStorReplica
+- CStorPool
+- CStorVolume
+- CStorVolumeReplica
 (TODO: @ganesh) Fill in the YAMLs for the above CRDs. 
 
 ### Creating cStor StoragePools:
@@ -30,9 +31,9 @@ The design is split into two aspects - creation of storage pools using cStor Eng
      kind: StoragePoolClaim
      metadata:
        name: pool1
-       type: block
      spec:
        scope: Cluster
+       type: block
        disks:
          #Disks here refer to the PDs or PDCs. With PDC/PDs, the disks could refer to local disks or 
          # disks from external storage providers like EBS, GPD or SAN.
@@ -44,7 +45,7 @@ The design is split into two aspects - creation of storage pools using cStor Eng
        #nodeSelector: [ "host-label1", "host-label2",..]
        #poolspec: 
          #Define the type of pool to be created. Default is stripe. The other supported type is "mirror"
-         #type: "stripe"
+         #pooltype: "stripe"
          #Use the following to enforce the limits on CPU and RAM to be allocated/used by the cStor Pool containers.
          #resources:
            #limits:
@@ -53,8 +54,8 @@ The design is split into two aspects - creation of storage pools using cStor Eng
            #requests:
              #cpu: 2
              #memory: 256Mi
-         #Pools can be configured with different features. An example feature could be to enable/disable thin provisioning.
-         #thinprovisioning: true
+         #Pools can be configured with different features. An example feature could be to enable/disable over provisioning.
+         #overprovisioning: false
      ```
 
    * maya-cstor-operator (could be embedded into maya-apiserver), will be watching for SPCs (type=block).
@@ -66,7 +67,7 @@ The design is split into two aspects - creation of storage pools using cStor Eng
      This step can result in more than one node satisfying the constraints. Only the number of nodes required (as specified using max-pools) will be picked up. 
      
    * For each of the potentional node where the cStor pool can be created, maya-cstor-operator will:
-     * create a cStorPool (CRD), which will include the following information:
+     * create a CStorPool (CR), which will include the following information:
        - unique id
        - name
        - actual disks paths to be used. 
@@ -74,7 +75,7 @@ The design is split into two aspects - creation of storage pools using cStor Eng
        
        ```
        apiVersion: openebs.io/v1alpha1
-       kind: cStorPool
+       kind: CStorPool
        metadata:
          name: pool1
          guid: 7b99e406-1260-11e8-aa43-00505684eb2e
@@ -85,12 +86,12 @@ The design is split into two aspects - creation of storage pools using cStor Eng
            #pd-list: ["pd-name1", "pd-name2",...]
        poolspec: 
          #Defines the type of pool as passed from the SPC. stripe or mirror. 
-         type: "stripe"
+         pooltype: "stripe"
          #Pool features as passed from the SPC.
-         #thinprovisioning: true       
+         #overprovisioning: false       
        ```
        
-     * create a Deployment YAML file that contains the cStor container and its associated sidecars. The cStor-Sidecar is passed the “unique id” of the cStorPool (CRD)
+     * create a Deployment YAML file that contains the cStor container and its associated sidecars. The cStor-Sidecar is passed the “unique id” of the CStorPool (CR)
        ```
        apiVersion: extensions/v1beta1
        kind: Deployment
@@ -118,12 +119,15 @@ The design is split into two aspects - creation of storage pools using cStor Eng
              resources: {}
            - name: spc-7b99e406-1260-11e8-aa43-00505684eb2e-pool-mgmt
              image: openebs/m-cstor-mgmt:0.7.0
-             resources: {}
              args:
              - --cstor-id
              - 7b99e406-1260-11e8-aa43-00505684eb2e
              command:
              - launch
+             ports:
+             - containerPort: 9500
+               protocol: TCP
+             resources: {}
            - name: spc-7b99e406-1260-11e8-aa43-00505684eb2e-pool-exporter
              image: openebs/m-exporter:0.7.0               
              ports:
@@ -131,7 +135,7 @@ The design is split into two aspects - creation of storage pools using cStor Eng
                protocol: TCP
              resources: {}      
        ```
-       The resources{} will be filled based on the resource (cpu, mem) requests and limits given in the cStorPool spec. If nothing has been provided, Kubernetes will assign default values depending on the node resources. Please refer to the [Kubernetes Resource Limits and Request](https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/#resource-requests-and-limits-of-pod-and-container).
+       The resources{} will be filled based on the resource (cpu, mem) requests and limits given in the CStorPool spec. If nothing has been provided, Kubernetes will assign default values depending on the node resources. Please refer to the [Kubernetes Resource Limits and Request](https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/#resource-requests-and-limits-of-pod-and-container).
        
      * create SP object
        ```
@@ -139,10 +143,10 @@ The design is split into two aspects - creation of storage pools using cStor Eng
        kind: StoragePool
        metadata:
          name: spc-7b99e406-1260-11e8-aa43-00505684eb2e
-         type: block
          node: node-host-label
        spec:
          scope: Cluster
+         type: block
          disks:
            #PDCs as mentioned in the SPC. 
            pdc-list: ["pdc-name1", "pdc-name2",...]
@@ -153,14 +157,14 @@ The design is split into two aspects - creation of storage pools using cStor Eng
            #pd-list-spares: ["pd-namex", "pd-namey",...]
          poolspec: 
            #Defines the type of pool as passed from the SPC. stripe or mirror. 
-           type: "stripe"
+           pooltype: "stripe"
            #Save the resources as sent from SPC. If these values are updated, 
-           # the corresponding values on the cStorPool Deployment YAML will have to be updated.
+           # the corresponding values on the CStorPool Deployment YAML will have to be updated.
            #resources:
              #cpu: 
              #memory: 
            #Pool features as passed from the SPC.
-           #thinprovisioning: true       
+           #overprovisioning: false       
        ```
    * Admin associates the SPC with a StorageClass
      ```
@@ -190,7 +194,7 @@ The design is split into two aspects - creation of storage pools using cStor Eng
        storageClassName: openebs-pool1
      ```
 
-   * maya-apiserver will create the OV cStorService (to get the portal ip address) and the OV cStorController. The OV cStorController will be passed a ConfigMap - cStorControllerConfig (that will be mounted into the OV cStorController). 
+   * maya-apiserver will create the OV cStorService (to get the portal ip address) and the OV cStorController Deployment that will contain cstor-ctlr (iscsi target) container and a cstor-ctlr-mgmt side-car. The configuration options for running the cstor-ctlr(iscsi target) will be passed via CStorVolume CR. 
      - The cStorService YAML will have the following details:
        ```
        apiVersion: v1
@@ -211,12 +215,23 @@ The design is split into two aspects - creation of storage pools using cStor Eng
            pv: pvc-ee171da3-07d5-11e8-a5be-42010a8001be
        ```
        
-     - The cStorControllerConfigMap will contain the following details:
-       - portal ip - obtained from the cStorService ClusterIP
-       - volume id - will be pv id (like ee171da3-07d5-11e8-a5be-42010a8001be), used from the pvc name. 
-       - volume name - will also be the pv id. _(TODO Or should this be pvc name like demo-vol. Verify this with @gila)_
-       - config-map name - pvc-ee171da3-07d5-11e8-a5be-42010a8001be-cstor-ctrl-config-map
-       - _(TODO Fill in the exact configmap. @payes)_
+     - The CStorVolume CR will contain the following details:
+       ```
+       apiVersion: openebs.io/v1alpha1
+       kind: CStorVolume
+       metadata:
+         name: pvc-ee171da3-07d5-11e8-a5be-42010a8001be-cstor-volume
+       spec:
+         # The following details are obtained from cStorService
+         cstor-controller-ip: <ip-address>
+         # The following details are obtained from PVC
+         volume-name: demo-vol 
+         volume-id: ee171da3-07d5-11e8-a5be-42010a8001be
+         capacity: 5G
+         # There could be additional details like Unmap etc.
+         #  can be obtained via Volume Policies attached to PVC/StorageClass
+       ```
+       The cstor-ctrl-mgmt will get the details from this CR and create the required istgt.conf
        
      - The cStorController YAML will have the following details:
        ```
@@ -247,65 +262,74 @@ The design is split into two aspects - creation of storage pools using cStor Eng
              ports:
              - containerPort: 3260
                protocol: TCP
-             volumeMounts:
-             - name: cstor-ctrl-istgt-config-map
-               mountPath: /etc/istgt/istgt.conf
              resources: {}
+           - name: pvc-ee171da3-07d5-11e8-a5be-42010a8001be-cstor-ctrl-mgmt
+             image: openebs/m-cstor-mgmt:0.7.0
+             args:
+             - --volume-cr
+             - pvc-ee171da3-07d5-11e8-a5be-42010a8001be-cstor-volume
+             command:
+             - launch
+             ports:
+             - containerPort: 9500
+               protocol: TCP
+             resources: {}
+             resources: {}             
            - name: pvc-ee171da3-07d5-11e8-a5be-42010a8001be-cstor-ctrl-exporter
              image: openebs/m-exporter:0.7.0               
              ports:
              - containerPort: 9500
                protocol: TCP
              resources: {}             
-           volumes:
-           - name: cstor-ctrl-istgt-config-map
-             configMap:
-               defaultMode: 420
-               name: pvc-ee171da3-07d5-11e8-a5be-42010a8001be-cstor-ctrl-config-map  
        ```
        The resources{} will be filled based on the resource (cpu, mem) requests and limits given in the Volume Policies associated with PVC. If nothing has been provided, Kubernetes will assign default values depending on the node resources. Please refer to the [Kubernetes Resource Limits and Request](https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/#resource-requests-and-limits-of-pod-and-container).
 
-   * maya-apiserver will create the OV cStorReplicas as follows: 
+   * maya-apiserver will create the OV CStorVolumeReplicas as follows: 
      * Query for the storage pools matching the given pool name in the PVC and pick up a subset of pools (based on the replica-count of the PVC). 
-     * For each replica, maya-apiserver will create - cStorReplica CRD. This cStorReplica CRD will contain:
-       - cStorPool (unique id like _7b99e406-1260-11e8-aa43-00505684eb2e_)
+     * For each replica, maya-apiserver will create - CStorVolumeReplica CR. This CStorVolumeReplica CR will contain:
+       - CStorPool (unique id like _7b99e406-1260-11e8-aa43-00505684eb2e_)
        - Unique Name ( an hash will be suffixed to the PVC name like - _pvc-ee171da3-07d5-11e8-a5be-42010a8001be-cstor-rep-9440ab_
        - Required capacity (obtained from PVC or StorageClass or default value)
        - OV cStorService IP (obtained from cStorService _(pvc-ee171da3-07d5-11e8-a5be-42010a8001be-cstor-ctrl-service)_ CluserIP )
        
-       The YAML for the cStorReplica is as follows:
+       The YAML for the CStorVolumeReplica is as follows:
        ```
        apiVersion: openebs.io/v1alpha1
-       kind: cStorReplica
+       kind: CStorVolumeReplica
        metadata:
          name: pvc-ee171da3-07d5-11e8-a5be-42010a8001be-cstor-rep-9440ab
          poolguid: 7b99e406-1260-11e8-aa43-00505684eb2e
        spec:
          cstor-controller-ip: <ip-address>
+         vol-name: demo-vol
          capacity: 5G
        ```
        
-    * The cstor-sidecar (spc-7b99e406-1260-11e8-aa43-00505684eb2e-pool-mgmt) running in the cStorPool(7b99e406-1260-11e8-aa43-00505684eb2e), will watch on the cStorReplica CRD for creating the zVol and associating itself with the OV cStorController. The cstor-sidecar will only be allowed to update the cStorReplica CRD, it SHOULD NOT create/delete cStorReplica CRD.
+    * The cstor-sidecar (spc-7b99e406-1260-11e8-aa43-00505684eb2e-pool-mgmt) running in the CStorPool(7b99e406-1260-11e8-aa43-00505684eb2e), will watch on the CStorVolumeReplica CR for creating the zVol and associating itself with the OV cStorController. The cstor-sidecar will only be allowed to update the CStorVolumeReplica CR, it SHOULD NOT create/delete CStorVolumeReplica CR.
 
 
 ### Design Considerations
 The previous two sections have laid out the workflow for a successful pool and volume creation. As part of the workflow, several cases need to be considered like:
-- Node hosting the cStorPool is down or not reachable. 
+- Node hosting the CStorPool is down or not reachable. 
 - Node hosting the cStorContainer is running out of resources and cStorContainer is evicted
-- Node hosting the cStorPool is restarted
-- OpenEBS Volume with replica count = 1 and cStorPool is restarted. 
+- Node hosting the CStorPool is restarted
+- OpenEBS Volume with replica count = 1 and CStorPool is restarted. 
 - OpenEBS Volume with replica count = 3 and case where 1 of the 3 replica nodes, 2 of 3 replica nodes and 3 or 3 replica nodes are down
 - All nodes are down and are restarted one by one
 - OpenEBS Volume (PVC) is accidentally deleted and user wants to get the data stored in the volume back. 
 - OpenEBS Volume data needs to be backed up or restored from a backup. 
-- cStorPool has a capacity of 100G and volumes are created adding up to more than 100G
-- One of the disks of the cStorPool is showing high latency
+- CStorPool has a capacity of 100G and volumes are created adding up to more than 100G
+- One of the disks of the CStorPool is showing high latency
 - 
 
 
 
+## Implementation Plan
+
+### Current
 
 
+### Future
+- User should be able to specify required values for the features available on the CStorPool and CStorVolumeReplica like compression, block size, deduplication, etc. This has to be aligned with the VolumePolicies and VolumeUpdatePolicies being implemented in OpenEBS 0.6 and 0.7 respectively.
 
 
- 
