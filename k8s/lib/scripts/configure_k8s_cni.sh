@@ -15,34 +15,31 @@ function setup_k8s_weave() {
     if [[ $? -ne 0 ]]; then
 
        kubectl delete -f $HOME/setup/cni/weave/weave-daemonset-k8s-1.6.yaml
-       export kubever=$(kubectl version | base64 | tr -d '\n')
-       kubectl apply -f https://cloud.weave.works/k8s/net?k8s-version=$kubever
-
-       if [[ $? -ne 0 ]]; then
-          "Unable to apply the Pod Network. SSH into the master and apply a Pod Network for your Cluster."
-       fi
-
-    fi
-}
-
-function setup_k8s_flannel() {
-
-    cat $HOME/setup/cni/flannel/kube-flannel.yml
-
-    kubectl apply -f $HOME/setup/cni/flannel/kube-flannel.yml
-
-    if [[ $? -ne 0 ]]; then
-
-       kubectl delete -f $HOME/setup/cni/flannel/kube-flannel.yml
-       kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/v0.9.1/Documentation/kube-flannel.yml
        
+       export kubever=$(kubectl version | base64 | tr -d '\n')
+       kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$kubever"
+
        if [[ $? -ne 0 ]]; then
           echo "Unable to apply the Pod Network. SSH into the master and apply a Pod Network for your Cluster."
        fi
 
     fi
-
 }
+
+function setup_k8s_kuberouter(){
+    kubectl apply -f $HOME/setup/cni/kuberouter/kubeadm-kuberouter.yaml
+
+    if [[ $? -ne 0 ]]; then
+
+       kubectl delete -f $HOME/setup/cni/kuberouter/kubeadm-kuberouter.yaml
+       
+       kubectl apply -f https://raw.githubusercontent.com/cloudnativelabs/kube-router/master/daemonset/kubeadm-kuberouter.yaml
+
+       if [[ $? -ne 0 ]]; then
+          echo "Unable to apply the Pod Network. SSH into the master and apply a Pod Network for your Cluster."
+       fi
+    fi
+} 
 
 #Patching kube-proxy to run with --proxy-mode=userspace
 echo Patching the kube-proxy for CNI Networks...
@@ -51,10 +48,9 @@ patch_kube_proxy
 [[ $kubeversion =~ $kuberegex ]]
 
 if [[ $? -eq 1 ]]; then
-    echo Configure Pod Network with flannel
-    setup_k8s_flannel
+    echo Configure Pod Network with Kuberouter
+    setup_k8s_kuberouter
 else
     echo Configure Pod Network with Weave
-    setup_k8s_weave
+   setup_k8s_weave
 fi
-
