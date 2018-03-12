@@ -228,11 +228,11 @@ metadata:
 spec:
   policies:
   - name: VolumeMonitor
-    value: openebs/m-exporter:0.5.0
+    value: openebs/m-exporter:0.5.3
   - name: ControllerImage
-    value: openebs/jiva:0.5.0
+    value: openebs/jiva:0.5.3
   - name: ReplicaImage
-    value: openebs/jiva:0.5.0
+    value: openebs/jiva:0.5.3
   - name: ReplicaCount
     value: "2"
   - name: StoragePool

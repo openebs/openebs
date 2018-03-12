@@ -33,18 +33,18 @@ The following tables lists the configurable parameters of the OpenEBS chart and 
 | `rbacEnable`                         | Enable RBAC Resources                         | `true`                            |
 | `image.pullPolicy`                   | Container pull policy                         | `IfNotPresent`                    |
 | `apiserver.image`                    | Docker Image for API Server                   | `openebs/m-apiserver`             |
-| `apiserver.imageTag`                 | Docker Image Tag for API Server               | `0.5.2`                           |
+| `apiserver.imageTag`                 | Docker Image Tag for API Server               | `0.5.3`                           |
 | `apiserver.replicas`                 | Number of API Server Replicas                 | `2`                               |
 | `apiserver.antiAffinity.enabled`     | Enable anti-affinity for API Server Replicas  | `true`                           |
 | `apiserver.antiAffinity.type`        | Anti-affinity type for API Server             | `Hard`                           |
 | `provisioner.image`                  | Docker Image for Provisioner                  | `openebs/openebs-k8s-provisioner` |
-| `provisioner.imageTag`               | Docker Image Tag for Provisioner              | `0.5.2`                           |
+| `provisioner.imageTag`               | Docker Image Tag for Provisioner              | `0.5.3`                           |
 | `provisioner.replicas`               | Number of Provisioner Replicas                | `2`                               |
 | `provisioner.antiAffinity.enabled`   | Enable anti-affinity for API Server Replicas  | `true`                           |
 | `provisioner.antiAffinity.type`      | Anti-affinity type for Provisioner            | `Hard`                           |
 | `jiva.image`                         | Docker Image for Jiva                         | `openebs/jiva`                    |
-| `jiva.imageTag`                      | Docker Image Tag for Jiva                     | `0.5.2`                           |
-| `jiva.replicas`                      | Number of Jiva Replicas                       | `2`                               |
+| `jiva.imageTag`                      | Docker Image Tag for Jiva                     | `0.5.3`                           |
+| `jiva.replicas`                      | Number of Jiva Replicas                       | `3`                               |
 
 Specify each parameter using the `--set key=value[,key=value]` argument to `helm install`.
 
