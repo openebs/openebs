@@ -27,9 +27,9 @@ function setup_k8s_master() {
     [[ $kubeversion =~ $kubecniregex ]]
 
     if [[ $? -eq 1 ]]; then
-        # Use Flannel Pod Network for now for version 1.9.0 and above    
+        # Use Kuberouter Pod Network for now for version 1.9.0 and above    
         sudo kubeadm init --apiserver-advertise-address=$machineip \
-        --kubernetes-version=$kubeversion --pod-network-cidr=10.244.0.0/16
+        --kubernetes-version=$kubeversion --pod-network-cidr 10.1.0.0/16
     else
         sudo kubeadm init --apiserver-advertise-address=$machineip \
         --kubernetes-version=$kubeversion

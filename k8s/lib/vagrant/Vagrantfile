@@ -147,10 +147,10 @@ Vagrant.configure("2") do |config|
     privileged: true
     
     config.vm.provision :shell, 
-    path: "boxes/k8s-flannel/fetch_flannel.sh",
-    :args => "#{distro}",
+    path: "boxes/k8s-kuberouter/fetch_kuberouter.sh",
+    :args => "#{distro}",    
     privileged: true
-    
+
     config.vm.provision :shell,
     path: "boxes/k8s/cleanup_k8s.sh",
     :args => "#{kube_version} #{distro}",
