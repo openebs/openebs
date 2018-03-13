@@ -262,7 +262,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
                     --clusterip=#{cluster_ip.strip}")
 
                     info"Fetching the latest jiva image"
-		    @machine.communicate.sudo("docker pull openebs/jiva:0.5.0")
+		    @machine.communicate.sudo("docker pull openebs/jiva:0.5.3")
                   else
                     info"Invalid Token. Check your Kubernetes setup."
                   end
