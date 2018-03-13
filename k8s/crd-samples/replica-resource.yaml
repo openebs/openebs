@@ -1,0 +1,9 @@
+apiVersion: openebs.io/v1alpha1
+kind: CstorReplica
+metadata:
+  name: pvc-ee171da3-07d5-11e8-a5be-42010a8001be-cstor-rep-9440ab
+  poolguid: 7b99e406-1260-11e8-aa43-00505684eb2e
+spec:
+  serviceAccountName: openebs-crd-operator
+  volname: vol1
+  capacity: 1G
