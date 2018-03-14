@@ -3,14 +3,14 @@
 This is a design proposal for implementing the workflow (orchestration) of creating snapshots and clones for a given OpenEBS Volume. 
 
 ## Prerequisites:
-- Refer [Kubernetes Usecases for Snapshots](https://github.com/kubernetes-incubator/external-storage/blob/master/snapshot/doc/user-guide.md)
+- Refer [Kubernetes Use-cases for Snapshots](https://github.com/kubernetes-incubator/external-storage/blob/master/snapshot/doc/user-guide.md)
 - Refer [Kubernetes Cron Jobs](https://kubernetes.io/docs/concepts/workloads/controllers/cron-jobs/)
 - Related Issues : #440, #631, #1046, 
 
-## Usecases (Goals)
+## Use-cases (Goals)
 - User wants to protect the data stored on openebs volumes against application errors. 
   Possible solution:
-  * Snapshot the OpenEBS Volumes at specified or regular intervals, by co-ordinating with the application access pattern. 
+  * Snapshot the OpenEBS Volumes at specified or regular intervals, by coordinating with the application access pattern. 
   * In the event of an error/partial-data-loss, mount the snapshot as a read-only volume and recover the required data.
   * In the event of an error/complete-data-loss, mount the snapshot as a read-only volume, verify the snapshot contains the required data and mount the volume as read-write - this new volume created from snapshot replaces the earlier volume. 
 
@@ -27,22 +27,22 @@ This is a design proposal for implementing the workflow (orchestration) of creat
   * Commit the validated schema changes and the upgrade sql (data migration) scripts on to the original database
   * Delete the cloned volume and the snapshot that was used to run the tests.
 
-## Usecases (Non-Goals)
-- User wishes to setup a process to protect the data stored on openebs volumes against system (kubernetes nodes or openebs storage) failures.
+## Use-cases (Non-Goals)
+- User wishes to setup a process to protect the data stored on openebs volumes against system (Kubernetes nodes or openebs storage) failures.
   Possible solution:
-  * Snapshot the OpenEBS Volumes at regular intervals like daily or weekly. Transfer the data from the snapshot to a remote location - external from the current system (kubernetes nodes and storage). The remote locations could be an S3 store or another OpenEBS Volume in a different location.
+  * Snapshot the OpenEBS Volumes at regular intervals like daily or weekly. Transfer the data from the snapshot to a remote location - external from the current system (Kubernetes nodes and storage). The remote locations could be an S3 store or another OpenEBS Volume in a different location.
   * In the event of an system failure, restore the data from the backup location - s3 or remote openebs volume.
 
 Note:
-- User could setup scheduled snasphots for a given volume as follows:
+- User could setup scheduled snapshots for a given volume as follows:
   * The functionality of create/delete snapshot could be provided in a container (say snap-manager).
   * The snap-manager can take as parameters - PV/PVC, Snapshot Name pattern, Retention copies, etc.
-  * The snap-manager will use kubernetes api for creating the snapshot and deleting the older snapshot
+  * The snap-manager will use Kubernetes api for creating the snapshot and deleting the older snapshot
   * A Kubernetes CronJob with desired schedule can be setup with the above container(snap-manager). 
 
-## Desgin
+## High Level Design
 
-The usecases related to protecting data against application failures and recovering data from local snapshots can be achieved if the following primitives(API) are supported by the OpenEBS Volumes:
+The use-cases related to protecting data against application failures and recovering data from local snapshots can be achieved if the following primitives(API) are supported by the OpenEBS Volumes:
 - Create Snapshot
 - Delete Snapshot
 - List Snapshot
@@ -54,67 +54,198 @@ The usecases related to protecting data against application failures and recover
 
 When installing openebs, OpenEBS Snapshot Provisioner will be launched. The OpenEBS Snapshot Provisioner is an extension/plugin of https://github.com/kubernetes-incubator/external-storage/tree/master/snapshot
 
-### Create Snapshot
-* Admin uses the kubectl volume snapshot yaml to create a snapshot on a given PV/PVC. 
-* Kubernetes will forward the snapshot create request to the OpenEBS Snapshot provisioner, which will do the following:
-  - Identify the cStorService or the JivaService associated with the PV
-  - If Jiva, call the REST API of Jiva Controller to create a new snapshot
-  - If cStor: 
-    * cstor-volume-mgmt side-car will be provisioned for cStorController. This will listen for cStorVolumeSnapshot CR events
-    * cStorVolumeSnasphot will contain details like:
-      - Volume Identifier
-      - Snapshot Name
-      - Status Fields for Controller and Replicas will be initialized with "init". Only the Replicas that are online will be included.
-      (TODO: Vitta/Jeffry - If one of the Replica was offline during the snapshot creation, will it be created during rebuild process?)
-    * cstor-volume-mgmt Add Event handler will pause the IOs and update the contoller state to pause. The controller will wait for a max of 2 seconds(?) for the snapshot to be taken on all the replicas. After every 1000ms, this side-car will check to resume IOs, if all the replica status are updated. 
-    * cstor-pool-mgmt side-car will wait for the controller to set its status to pause and they will create Snapshot on the corresponding volume. After taking the snapshot, the status field will be updated. 
-    * OpenEBS Snapshot Provisioner will check on the status of the cStorVolumeSnapshot CR and marks the success/failure.
-* OpenEBS Snapshot provisioner will return the status back to Kubernetes
-* Kubernetes will store the snapshot against the PV. The list of created snapshots can be obtained using kubectl get snapshots.
+cstor-volume-mgmt side-car running along side cStorController will expose API for snapshots and clones that will be used by the OpenEBS Snapshot Provisioner. 
 
-### Delete Snapshot
+### Workflow for Create Snapshot
 * Admin uses the kubectl volume snapshot yaml to create a snapshot on a given PV/PVC. 
-* Kubernetes will delete snapshot from its configuration. Also pass the request to the OpenEBS Snapshot provisioner for cleanup. 
-* If the volume type is cStor:
-  * OpenEBS Snapshot provisioner will update the status on cStorVolumeSnapshot CR to Delete
-  * cstor-pool-mgmt side-car will delete the snapshot on the volume. The cStorVolumeSansphot will be purged only after all the replica's have updated their state to Delete. 
+  ```
+  apiVersion: volumesnapshot.external-storage.k8s.io/v1
+  kind: VolumeSnapshot
+  metadata:
+    name: snap1
+  spec:
+    persistentVolumeClaimName: demo-vol1-claim
+  ```
+
+* Kubernetes will generate an unique id to this snapshot request and attach to the above VolumeSnapshot object, along with a few other house keeping parameters.
+  ```
+  apiVersion: volumesnapshot.external-storage.k8s.io/v1
+  kind: VolumeSnapshot
+  metadata:
+    name: snap1
+  spec:
+    persistentVolumeClaimName: demo-vol1-claim
+    snapshotDataName: k8s-volume-snapshot-680b2b68-e279-44c6-8dee-df7201a6e0f9
+  ```
+
+* Kubernetes will forward the snapshot create request to the OpenEBS Snapshot provisioner. (TODO - Prateek, fill in the specific details here)
+
+* OpenEBS Snapshot provisioner will pass the unique id and the snapshot name to the openebs volume controller (jiva or cstor), depending on the type of the volume. For cstor, the API endpoint is served by the gRPC running in the cstor-volume-mgmt sidecar of the cStorController, while Jiva runs an HTTP endpoint. Let us call this as `CreateSnapshot` API.
+  The CreateSnapshot API is provided with
+  - snapshot name (snap1)
+  - snapshot unique id (680b2b68-e279-44c6-8dee-df7201a6e0f9) 
+  - volume id (ee171da3-07d5-11e8-a5be-42010a8001be) 
+
+  How to use the above Ids are used is up to the API implementation. For instance, the snapshot could be created either with name or unique id. The volume id can be used to identify the volume, if multiple volumes are served by the same controller.
+
+  Also, the implementation details of how the Create Snapshots is implemented within the controller, by quiescing the IOs is not in the scope of this workflow. However the following flow has been suggested:
+  - The controller will pause the IO, issue the snapshot request to all its replicas and wait for a max of 2 seconds(?) for the snapshot to be taken on all the replicas. After every 1000ms, it will check to resume IOs, if all the replica responded for the snapshot request. 
+  - Each of the replica will flush its data and take a snapshot and respond status to the controller. 
+  - The controller will respond back with failure(timeout/error) or success
+
+  Depending on the status from API server, the VolumeSnapshot details are updated.
+
+  In case of success, the details are:
+  ```
+  apiVersion: volumesnapshot.external-storage.k8s.io/v1
+  kind: VolumeSnapshot
+  metadata:
+    creationTimestamp: 2018-03-14T01:02:03Z
+    labels:
+      #Fill the PV name associated with the above demo-vol1-claim
+      SnapshotMetadata-PVName: pvc-ee171da3-07d5-11e8-a5be-42010a8001be
+      #Timestamp returned from the Snapshot API when the snapshot was actually taken. 
+      SnapshotMetadata-Timestamp: "1520989324069268076"
+    name: snap1
+  spec:
+    persistentVolumeClaimName: demo-vol1-claim
+    snapshotDataName: k8s-volume-snapshot-680b2b68-e279-44c6-8dee-df7201a6e0f9
+  status:
+    conditions:
+    - lastTransitionTime: 2018-03-14T01:02:04Z
+      message: Snapshot created successfully
+      reason: ""
+      status: "True"
+      type: Ready
+  ``` 
+
+* OpenEBS Snapshot provisioner will return the status back to Kubernetes
+
+* Kubernetes will store the snapshot against the PV. The list of created snapshots can be obtained using `kubectl get volumesnapshots`.
+
+### Workflow for Delete Snapshot
+* Admin uses the kubectl to delete a previously created snapshot.
+  `kubectl delete volumesnapshot/snap1`
+
+* Kubernetes passes the request to the OpenEBS Snapshot Provisioner.
+
+* OpenEBS Snapshot provisioner will pass the unique id and the snapshot name to the DeleteSnapshot API on openebs volume controller (jiva or cstor), depending on the type of the volume. The API implementation in the controller will take care of clearing the snapshot information by enforcing checks like - there are no cloned volumes created out of the snapshot etc., Depending on the response from the API server, the status of failure/success will be returned to Kubernetes. 
+
+* On success, Kubernetes will delete snapshot from its configuration.
 
 
 ### List Snapshot
-* No code changes required, the kubectl takes care of listing the created snapshots from its configuration.
+* No code changes required, the `kubectl get volumesnapshots` can be used to query for available snapshots. To get snapshots on a specific volume, use `kubectl get volumesnapshots -l SnapshotMetadata-PVName=pvc-ee171da3-07d5-11e8-a5be-42010a8001be `
 
-### Mount Snapshot as Read-only or Read-Write
-* Admin specifies the snapshot that needs to be mounted as read-only or read-write.
-* Kubernetes will forward the request to the OpenEBS Snapshot Provisioner
-* OpenEBS Snapshot Provisioner will check the volume type:
-  - If Jiva
-    * create a new jivaService, jivaController and jivaReplica. For the controller, pass the original volume and snapshot details
-    * create a PV using the new jivaService created above. Set the read-write or read-only based on the snapshot yaml passed by admin
-  - If cStor
-    * create a new cStorSerivce and cStorController and corresponding cStorVolume CR
-    * create new cStorReplica CRs on the cStorPools where the original volume resides. cStorReplica will specify that zVol should be created from a snapshot of original zvol.
-    * create a PV using the new cStorService created above. Set the read-write or read-only based on the snapshot yaml passed by admin
+### Workflow for Mount Snapshot as Read-only or Read-Write
 
-### Delete Clone Volume
-* Admin specifies the PV (snapshot) that needs to be deleted. 
+To mount a snapshot, a new volume is created from the snapshot, as per the design outlined in [Kubernetes Snapshot Design Proposal](://github.com/kubernetes-incubator/external-storage/blob/master/snapshot/doc/volume-snapshotting-proposal.md). In order to support creation of the volumes, jiva controller and replica API are being enhanced to:
+
+* Admin creates a new StorageClass for creating Volumes using a Snapshot or what is called promoting a snapshot into a PV. 
+  ```
+  kind: StorageClass
+  apiVersion: storage.k8s.io/v1
+  metadata:
+    name: snapshot-promoter
+  provisioner: volumesnapshot.external-storage.k8s.io/snapshot-promoter
+  ```
+
+* Admin creates a PVC that specifies the snapshot from which the new Volume needs to be created. The PVC also contains the access mode. 
+  ```
+  apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    name: snapshot-vol-claim
+    annotations:
+      snapshot.alpha.kubernetes.io/snapshot: snap1
+  spec:
+    accessModes:
+      - ReadWriteOnce
+    storageClassName: snapshot-promoter
+  ```
+
 * Kubernetes will forward the request to the OpenEBS Snapshot Provisioner
-* OpenEBS Snapshot Provisioner will check the volume type:
-  - If Jiva - delete the jivaService, jivaController and jivaReplica
-  - If cStor:
-    * delete cStorService and cStoreController and associated cStorVolume CR. 
-    * delete the cStorReplica CR
-    * cstor-pool-mgmt side car will delete the cloned zvol. 
+
+* OpenEBS Snapshot Provisioner will pull in the source volume details and will invoke the maya-apiserver clone volume API with following details: 
+  - source volume name (pvc-ee171da3-07d5-11e8-a5be-42010a8001be)
+  - source snapshot (snap1)
+  - clone volume name (pvc-54ad20e4-0082-46da-8bc7-ead47c9019e7)
+
+  The maya-apiserver clone volume will initiate a new volume creation (which involves creating Kubernetes YAMLs and CRs) by using the same volume policies that were used to create the source volume. Only minor modifications will be done to the Kubernetes YAMLs and CRs depending on the volume type.
+  - If volume type is Jiva, the only change will be in the Jiva Controller Deployment YAML, to include the following additional command-line arguments:
+    ```
+      --sourceIP
+      <source-controller-cluster-ip-address>
+      --sourceSnap
+      <source-snap-name>
+    ```
+    It is outside the scope of this document to describe how the Jiva Controller will clone the data from the source volume replicas to its replicas, but it suffices to say that using the cloned volume, the maya-apiserver can query for the status.
+
+  - If volume type is cStor, the change is in the way the CStorVolumeReplica CRs are created. The maya-apiserver will have to fetch the pools on which the source volume replicas are present, and create the CStorVolumeReplica on the same pools. In addition, the CStorVolumeReplica will contain the name of the source volume and the source snap. The YAML will look as follows:
+   ```
+   apiVersion: openebs.io/v1alpha1
+   kind: CStorVolumeReplica
+   metadata:
+     name: pvc-ee171da3-07d5-11e8-a5be-42010a8001be-cstor-rep-9440ab
+     poolguid: 7b99e406-1260-11e8-aa43-00505684eb2e
+   spec:
+     source-vol-name: pvc-ee171da3-07d5-11e8-a5be-42010a8001be
+     source-snap-name: snap1
+     capacity: 5G
+     cstor-controller-ip: <ip-address>
+     vol-name: pvc-54ad20e4-0082-46da-8bc7-ead47c9019e7
+     capacity: 5G
+   ```
+   cstor-pool-mgmt side-car while processing the CStorVolumeReplica, will check of the source-vol-name and instead of creating a new zvol, it will create a clone of the source-volume@source-snap. Once the clone (zvol) is created, it will proceed with registering them with controller. 
+
+* OpenEBS Provisioner will query for the status of the clone volume and when it goes to running state, it will create a PV for the cloned OpenEBS Volume (pvc-54ad20e4-0082-46da-8bc7-ead47c9019e7). The access mode will be set as read-write or read-only based on the snapshot yaml passed by admin
+
+* Kubernetes will then bind this cloned volume with the snapshot-pv claim.
+
+
+### Workflow for Delete Clone Volume
+The flow for deleting a cloned volume is similar to deleting a regular volume. 
+
+* Admin specifies the cloned PV/PVC that needs to be deleted. 
+
+* Kubernetes will forward the request to the OpenEBS Snapshot Provisioner
+
+* OpenEBS Snapshot Provisioner will invoke the Delete Volume API on the maya-apiserver. maya-apiserver will check for the type of the volumes and will clean up the respective objects.
 
 ### Revert the state of OpenEBS Volume to a previous snapshot
-This option is a distruptive operation.
+This option is a disruptive operation.
 * Admin will have stopped the workload (if possible) that is using the volume.
 * Admin will use mayactl to list the snapshot on the given volume
 * Admin will select the snapshot to revert to. 
 * mayactl will do the following:
   - issue commands to delete the snapshot via kubectl, that were taken after the selected snapshot (updating the k8s db)
-  - update the cStorVolumeSnapshot CR to "revert". 
-    * cstor-volume-mgmt will stop the target and update the status to "stopped"
-    * cstor-pool-mgmt will rollback the zvol to the snapshot for the corresponding volumes. 
-    * cstor-volume-mgmt will start the target (TODO - Confirm with Jeffry/Vitta)
+  - invoke the cstor-volume-mgmt SnapshotRollback API by passing the snapshot name to which Admin wants to revert.
 * Admin will start (or restart) the workload.
+
+
+
+## Feature Implementation Plan
+
+### Phase 1
+- Setup/Install of openebs snapshot provisioner 
+- Embed a gRPC based API server into the cstor-volume-mgmt sidecar. 
+- Implement the gRPC client in maya-apiserver to interact with cstor-volume-mgmt
+- Support for CreateSnapshot API in cstor-volume-mgmt gRPC
+- Support for DeleteSnapshot API in cstor-volume-mgmt gRPC
+- Support for ListSnapshot API in cstor-volume-mgmt gRPC
+- Support for CreateSnapshot API in maya-apiserver
+- Support for DeleteSnapshot API in maya-apiserver
+- Support for snapshot commands (create/delete/list) through mayactl for cstor volumes
+
+### Phase 2
+- Support for creating a clone from a snapshot by cstor-pool-mgmt, triggered by CStorVolumeReplica CR
+- Support for Clone API in maya-apiserver
+- Test Delete Clone Volume using Volume Delete API
+- Support for clone commands through mayactl for cstor volumes
+
+### Phase 2
+- Support for SnapshotRollBack API in cstor-volume-mgmt gRPC
+- Support for snapshot rollback via mayactl
+
+### Future
 
