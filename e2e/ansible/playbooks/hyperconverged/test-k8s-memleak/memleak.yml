@@ -1,9 +1,6 @@
 #Description: Memory resource utilization test with dd workload on OpenEBS JIVA.
-#Before running this ansible playbook make sure to run pre-requisites.yml
-#Variables required to run this test are placed under test-vars.yml, update variables accordingly.
-#Author: Sudarshan Darga
+#Variables required to run this test are placed under memleak-vars.yml, update variables accordingly.
 #Ansible Version: 2.4.3.0
-#Date: 09-03-2018
 - hosts: localhost
 
   vars_files:
