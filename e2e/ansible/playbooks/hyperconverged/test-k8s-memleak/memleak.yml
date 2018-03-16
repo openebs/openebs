@@ -124,23 +124,16 @@
          become: true
          delegate_to: "{{groups['kubernetes-kubeminions'].0}}"
 
-       - name: Get $HOME of Kube minion for kubernetes user
-         shell: source ~/.profile; echo $HOME
-         args:
-           executable: /bin/bash
-         register: kube_minion_home
-         delegate_to: "{{groups['kubernetes-kubeminions'].0}}"
        - block:
              - name: Copy the python script to kubeminion
                copy:
                   src: "{{ py_file }}"
-                  dest: "{{ kube_minion_home.stdout }}"
-               delegate_to: "{{ groups['kubernetes-kubeminions'].0 }}"
+                  dest: "{{ result_kube_home.stdout }}"
+               delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
 
              - name: Run python script for memory usage validation it takes couple of minutes
                shell: python test-mem.py
-               become: true
-               delegate_to: "{{groups['kubernetes-kubeminions'].0}}"
+               delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
                register: result
                failed_when: "'Pass' not in result.stdout"
               

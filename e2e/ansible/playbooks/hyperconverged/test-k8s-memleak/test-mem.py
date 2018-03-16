@@ -7,21 +7,20 @@ from __future__ import division
 import subprocess
 import time, os
 list = []
+cmd_cntrl_name = "kubectl get pod -l openebs/controller=jiva-controller --no-headers | awk '{print $1}'"
+out = subprocess.Popen(cmd_cntrl_name,stdout=subprocess.PIPE, shell=True)
+cntrl_name = out.communicate()
+cntrl_pod_name = cntrl_name[0].strip('\n')
+n = cntrl_pod_name.split('-')
+lst = n[:len(n)-2]
+lst.append("con")
+container_name = "-".join(lst)
+used_mem_process = "kubectl exec %s -c %s -- pmap -x 1 | awk ''/total'/ {print $3}'" %(cntrl_pod_name,container_name)
 n = 5
 count = 0
-#Obtaining memory consumed by longhorn process from the node where the controller
-#is scheduled.
+#Obtaining memory consumed by longhorn process from the cntroller pod.
 while count < n:
     count = count + 1
-    cmd_cntrl_name = "kubectl get pod -l openebs/controller=jiva-controller --no-headers | awk '{print $1}'"
-    out = subprocess.Popen(cmd_cntrl_name,stdout=subprocess.PIPE, shell=True)
-    cntrl_name = out.communicate()
-    cntrl_pod_name = cntrl_name[0].strip('\n')
-    n = cntrl_pod_name.split('-')
-    lst = n[:len(n)-2]
-    lst.append("con")
-    container_name = "-".join(lst)
-    used_mem_process = "kubectl exec %s -c %s -- pmap -x 1 | awk ''/total'/ {print $3}'" %(cntrl_pod_name,container_name)
     out = subprocess.Popen(used_mem_process,stdout=subprocess.PIPE, shell=True)
     used_mem = out.communicate()
     mem_in_mb = int(used_mem[0])/1024
