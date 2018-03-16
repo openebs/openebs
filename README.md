@@ -38,9 +38,9 @@ kubectl apply -f openebs-operator.yaml
 wget https://raw.githubusercontent.com/openebs/openebs/master/k8s/openebs-storageclasses.yaml
 kubectl apply -f openebs-storageclasses.yaml
 ```
-You could also follow our [QuickStart Guide](http://openebs.readthedocs.io/en/latest/getting_started/quick_install.html).
+You could also follow our [QuickStart Guide](https://docs.openebs.io/docs/overview.html).
 
-OpenEBS can be deployed on any Kubernetes cluster - either in cloud, on-premise or developer laptop (minikube). Please follow our [OpenEBS Setup](http://openebs.readthedocs.io/en/latest/install/install_overview.html) documentation. Also, we have a Vagrant environment available that includes a sample Kubernetes deployment and synthetic load that you can use to simulate the performance of OpenEBS. 
+OpenEBS can be deployed on any Kubernetes cluster - either in cloud, on-premise or developer laptop (minikube). Please follow our [OpenEBS Setup](https://docs.openebs.io/docs/overview.html) documentation. Also, we have a Vagrant environment available that includes a sample Kubernetes deployment and synthetic load that you can use to simulate the performance of OpenEBS. 
 
  
 ## Status

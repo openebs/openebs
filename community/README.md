@@ -38,7 +38,7 @@ Links in [openebs/contribute](../contribute) will help you get started with:
 ## Issues
 
 If you have a question about OpenEBS or have a problem using it,
-please start with the [troubleshooting guide](http://openebs.readthedocs.io/en/latest/troubleshooting/troubleshooting.html).
+please start with the [troubleshooting guide](https://docs.openebs.io/docs/troubleshooting.html).
 
 If that doesn't answer your questions, or if you think you found a bug,
 please [file an issue](https://github.com/openebs/openebs/issues).

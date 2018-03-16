@@ -57,7 +57,7 @@
       "title": "OpenEBS Docs",
       "tooltip": "OpenEBS Documentation",
       "type": "link",
-      "url": "http://openebs.readthedocs.io/en/latest/"
+      "url": "http://docs.openebs.io/"
     }
   ],
   "refresh": false,
