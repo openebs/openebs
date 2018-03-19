@@ -10,6 +10,13 @@
         msg: "{{ ansible_date_time.time }} OPENEBS TESTSUITE: STARTED"
       when: slack_notify | bool and lookup('env','SLACK_TOKEN')
 ###########################################################################################
+# TC NAME: test-k8s-memleak
+# TC DETAILS: Test memory consumption on k8s cluster with openebs storage
+# TC NOTES:
+#
+- include: playbooks/hyperconverged/test-k8s-memleak/memleak.yml
+#
+###########################################################################################
 # TC NAME: test-k8s-percona-mysql-pod
 # TC DETAILS: Deploys percona pod on k8s cluster with openebs storage
 # TC NOTES:           

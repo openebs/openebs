@@ -1,0 +1,156 @@
+#Description: Memory resource utilization test with dd workload on OpenEBS JIVA.
+#Variables required to run this test are placed under memleak-vars.yml, update variables accordingly.
+
+- hosts: localhost
+
+  vars_files:
+     - memleak-vars.yml
+  
+  tasks:
+       - name: Check whether maya-apiserver pod is deployed
+         shell: source ~/.profile; kubectl get pods | grep maya-apiserver
+         args:
+           executable: /bin/bash
+         register: result
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+         until: "'Running' in result.stdout"
+         delay: 120
+         retries: 5
+   
+       - name: Get $HOME of K8s master for kubernetes user
+         shell: source ~/.profile; echo $HOME
+         args:
+           executable: /bin/bash
+         register: result_kube_home
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+
+       - name: Copy the volume claim to kube master
+         copy:
+           src: "{{ volume_def }}"
+           dest: "{{ result_kube_home.stdout }}"
+         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"       
+
+       - name: Create a storage volume via a pvc
+         shell: source ~/.profile; kubectl apply -f "{{ volume_def }}"
+         args:
+           executable: /bin/bash
+         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+       
+       - name: Confirm volume container is running
+         shell: source ~/.profile; kubectl get pods | grep pvc | grep {{item}} | grep Running | wc -l
+         args:
+           executable: /bin/bash
+         register: result
+         until: result.stdout|int >= 1
+         delay: 30
+         retries: 10
+         with_items:
+           - ctrl
+           - rep
+         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+
+       - name: Get storage ctrl pod name
+         shell: source ~/.profile; kubectl get pods | grep ctrl
+         args:
+           executable: /bin/bash
+         register: ctrl_name
+         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+       
+       - name: Set ctrl pod name to variable
+         set_fact:
+           ctrl_pod_name: "{{ ctrl_name.stdout.split()[0] }}"
+
+       - name: Get IP address of ctrl pod
+         shell: source ~/.profile; kubectl describe pod {{ ctrl_pod_name }} | grep IP
+         args:
+           executable: /bin/bash
+         register: ctrl_IP
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+       - name: Set IP of Pod to variable
+         set_fact:
+           ctrl_ip: "{{ ctrl_IP.stdout_lines[0].split()[1]}}"
+
+
+       - name: Establish iSCSI session with volume
+         shell: iscsiadm -m discovery -t st -p {{ ctrl_ip }}:3260
+         become: true
+         delegate_to: "{{groups['kubernetes-kubeminions'].0}}"
+         register: result
+
+       - name: Store target iqn in variable
+         set_fact:
+           iqn: "{{result.stdout.split(',')[1].split()[1]}}"
+
+       - name: Login to iSCSI target
+         open_iscsi:
+           show_nodes: yes
+           login: yes
+           target: "{{iqn}}"
+         become: true
+         delegate_to: "{{groups['kubernetes-kubeminions'].0}}"
+         register: result
+
+       - name: Check device nodes
+         set_fact:
+           scsi_device: "{{result.devicenodes[0]}}"
+
+       - name: Create file system on iSCSI disk
+         filesystem:
+           fstype: ext4
+           dev: "{{scsi_device}}"
+           force: no
+         become: true
+         delegate_to: "{{groups['kubernetes-kubeminions'].0}}"
+
+       - name: Mount device by Label
+         mount:
+           name: "{{mount_point}}"
+           src: "{{scsi_device}}"
+           fstype: ext4
+           opts: discard,_netdev
+           state: mounted
+         become: true
+         delegate_to: "{{groups['kubernetes-kubeminions'].0}}"
+
+       - name: Place data using dd
+         shell: timeout 200s dd if=/dev/urandom of={{mount_point}}/f1 bs=512k count=10000 &
+         become: true
+         delegate_to: "{{groups['kubernetes-kubeminions'].0}}"
+
+       - name: Place data using dd
+         shell: timeout 200s dd if=/dev/urandom of={{mount_point}}/f2 bs=1m count=10000 &
+         become: true
+         delegate_to: "{{groups['kubernetes-kubeminions'].0}}"
+
+       - block:
+             - name: Copy the python script to kubeminion
+               copy:
+                  src: "{{ py_file }}"
+                  dest: "{{ result_kube_home.stdout }}"
+               delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+
+             - name: Run python script for memory usage validation it takes couple of minutes
+               shell: python test-mem.py
+               delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+               register: result
+               failed_when: "'Pass' not in result.stdout"
+              
+             - set_fact:
+                    flag: "PASS"
+         rescue:
+             - set_fact:
+                    flag: "FAIL"         
+
+         always:
+
+             - include: memleak-cleanup.yml
+               when: clean | bool
+
+             - name: Send slack notification
+               slack:
+                 token: "{{ lookup('env','SLACK_TOKEN') }}"
+                 msg: '{{ ansible_date_time.time }} TEST: {{test_name}}, RESULT: {{ flag }}'
+               when: slack_notify | bool and lookup('env','SLACK_TOKEN')
+

@@ -1,0 +1,33 @@
+---     
+- name: Logout to iSCSI target
+  open_iscsi:
+    show_nodes: yes
+    login: no
+    target: "{{iqn}}"
+  become: true
+  delegate_to: "{{groups['kubernetes-kubeminions'].0}}"
+  register: result
+
+- name: Delete the iSCSI target
+  shell: source ~/.profile; kubectl delete -f {{ volume_def }}
+  args:
+     executable: /bin/bash
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+- name: Unmount the ext4 filesystem
+  mount:
+     name: /mnt/jiva
+     state: absent
+  become: true
+  delegate_to: "{{groups['kubernetes-kubeminions'].0}}"
+
+- name: Confirm the iSCSI target has been deleted
+  shell: source ~/.profile; kubectl get pvc
+  args:
+     executable: /bin/bash
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+  register: result
+  until: "'pvc' not in result.stdout"
+  delay: 120
+  retries: 6
+
