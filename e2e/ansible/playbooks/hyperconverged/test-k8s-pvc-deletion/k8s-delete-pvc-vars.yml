@@ -1,0 +1,6 @@
+---
+test_name: Delete_PVC_K8s
+
+sc_def: storage-class.yaml
+pvc_def: create_pvc.yaml
+ 
