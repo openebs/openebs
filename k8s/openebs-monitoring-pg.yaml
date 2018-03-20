@@ -1,7 +1,7 @@
 # The following file is intended for deployments that are not already
 # configured with prometheus. This is a minified version of the config
 # from the files present under ./openebs-monitoring/
-# 
+#
 # Prometheus tunables
 apiVersion: v1
 kind: ConfigMap
@@ -23,12 +23,7 @@ data:
       scrape_interval: 5s
       evaluation_interval: 5s
     scrape_configs:
-    #- job_name: 'prometheus'
-      #static_configs:
-      # Added this to allow for federation collection
-      # Replace localhost with the nodeIP
-      #  - targets: ['localhost:32514']
-    - job_name: 'openebs-prometheus-server'
+    - job_name: 'prometheus'
       scheme: http
       kubernetes_sd_configs:
       - role: pod
@@ -87,7 +82,7 @@ spec:
           ports:
             - containerPort: 9090
           env:
-            # environment vars are stored in prometheus-env configmap. 
+            # environment vars are stored in prometheus-env configmap.
             - name: STORAGE_RETENTION
               valueFrom:
                 configMapKeyRef:
@@ -105,7 +100,6 @@ spec:
             limits:
               memory: "700M"
               cpu: "500m"
-          
           volumeMounts:
             # prometheus config file stored in the given mountpath
             - name: prometheus-server-volume
@@ -114,14 +108,14 @@ spec:
             - name: prometheus-storage-volume
               mountPath: /prometheus
       volumes:
-        # Prometheus Config file will be stored in this volume 
+        # Prometheus Config file will be stored in this volume
         - name: prometheus-server-volume
           configMap:
             name: openebs-prometheus-config
         # All the time series stored in this volume in form of .db file.
         - name: prometheus-storage-volume
           # containers in the Pod can all read and write the same files here.
-          emptyDir: {} 
+          emptyDir: {}
 ---
 # prometheus-service
 apiVersion: v1
@@ -129,7 +123,7 @@ kind: Service
 metadata:
   name: openebs-prometheus-service
 spec:
-  selector: 
+  selector:
     name: openebs-prometheus-server
   type: NodePort
   ports:
