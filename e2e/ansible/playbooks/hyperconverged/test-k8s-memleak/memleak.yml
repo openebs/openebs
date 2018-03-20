@@ -115,12 +115,9 @@
          delegate_to: "{{groups['kubernetes-kubeminions'].0}}"
 
        - name: Place data using dd
-         shell: timeout 200s dd if=/dev/urandom of={{mount_point}}/f1 bs=512k count=10000 &
-         become: true
-         delegate_to: "{{groups['kubernetes-kubeminions'].0}}"
-
-       - name: Place data using dd
-         shell: timeout 200s dd if=/dev/urandom of={{mount_point}}/f2 bs=1m count=10000 &
+         shell: |
+            timeout 200s dd if=/dev/urandom of={{mount_point}}/f1 bs={{block_size[0]}} count={{count_num}} oflag=dsync &
+            timeout 200s dd if=/dev/urandom of={{mount_point}}/f2 bs={{block_size[1]}} count={{count_num}} oflag=dsync &
          become: true
          delegate_to: "{{groups['kubernetes-kubeminions'].0}}"
 
