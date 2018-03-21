@@ -1,14 +1,12 @@
-# The example Pod utilizing the profile loaded by the sample daemon.
+# The deployment for cstor-pool and cstor-pool-mgmt.
 
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: cstor-deploy
-  # Note that the Pod does not need to be in the same namespace as the loader.
   labels:
     app: cstor
 spec:
-#  serviceAccountName: openebs-maya-operator
   replicas: 1
   selector:
     matchLabels:
@@ -28,8 +26,7 @@ spec:
 
         volumeMounts:
         - name: device
-          mountPath: /host/dev     
-          mountPropagation: Bidirectional
+          mountPath: /dev     
         - name: tmp
           mountPath: /tmp
           mountPropagation: Bidirectional
@@ -42,8 +39,7 @@ spec:
           privileged: true
         volumeMounts:
         - name: device
-          mountPath: /host/dev
-          mountPropagation: Bidirectional
+          mountPath: /dev
         - name: tmp
           mountPath: /tmp
           mountPropagation: Bidirectional

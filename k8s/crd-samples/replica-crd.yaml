@@ -3,7 +3,6 @@ kind: CustomResourceDefinition
 metadata:
   name: cstorvolumereplicas.openebs.io
 spec:
-  serviceAccountName: openebs-maya-operator
   group: openebs.io
   names:
     kind: CStorVolumeReplica

@@ -4,11 +4,10 @@ metadata:
   name: pool1
   node: node-host-label
 spec:
-#  serviceAccountName: openebs-crd-operator
   disks:
-   diskList: ["/tmp/img1.img","/tmp/img2.img"]
+   diskList: ["/dev/sdb1"]
   poolSpec:
    poolName: pool1
-   cachefile: /tmp/pool1.cache
-#  poolType: mirror
+   cacheFile: /tmp/pool1.cache
+   poolType: mirror
 
