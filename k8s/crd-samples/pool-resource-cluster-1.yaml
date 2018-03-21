@@ -1,14 +1,14 @@
 apiVersion: openebs.io/v1alpha1
-kind: CstorPool
+kind: CStorPool
 metadata:
   name: pool1
-  poolguid: 7b99e406-1260-11e8-aa43-00505684eb2e
   node: node-host-label
 spec:
-  serviceAccountName: openebs-crd-operator
-  disks: ["/tmp/img1.img","/tmp/img2.img"]
-  poolspec:
-   poolname: pool1
-   cachefile: /home/pool1.cache
-#  pooltype: mirror
+#  serviceAccountName: openebs-crd-operator
+  disks:
+   diskList: ["/tmp/img1.img","/tmp/img2.img"]
+  poolSpec:
+   poolName: pool1
+   cachefile: /tmp/pool1.cache
+#  poolType: mirror
 
