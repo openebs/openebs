@@ -3,18 +3,18 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: cstor-deploy
+  name: cstor-pool-deploy
   labels:
-    app: cstor
+    app: cstor-pool
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: cstor
+      app: cstor-pool
   template:
     metadata:
       labels:
-        app: cstor
+        app: cstor-pool
     spec:
       containers:
       - name: cstor-pool
