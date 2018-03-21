@@ -1,0 +1,13 @@
+apiVersion: openebs.io/v1alpha1
+kind: CStorPool
+metadata:
+  name: pool1
+  node: node-host-label
+spec:
+  disks:
+   diskList: ["/dev/sdb1"]
+  poolSpec:
+   poolName: pool1
+   cacheFile: /tmp/pool1.cache
+   poolType: mirror
+
