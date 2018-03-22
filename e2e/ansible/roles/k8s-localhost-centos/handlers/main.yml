@@ -1,0 +1,5 @@
+---
+- name: Start docker
+  command: systemctl start docker && systemctl start docker
+  become: true
+
