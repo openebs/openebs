@@ -2,9 +2,6 @@ apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
   name: {{ template "openebs.fullname" . }}-maya-apiserver
-{{- if .Values.rbacEnable }}
-  namespace: {{ .Values.rbac.namespace }}
-{{- end }}
   labels:
     app: {{ template "openebs.name" . }}
     chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
