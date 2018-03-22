@@ -2,9 +2,8 @@
 
 ## If true, create & use RBAC resources
 ##
-rbacEnable: true
 rbac:
-  namespace: "openebs"
+  create: true
 
 operator:
   name: "openebs-maya-operator"

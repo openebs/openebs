@@ -7,14 +7,14 @@
 ```
 helm repo add openebs-charts https://openebs.github.io/charts/
 helm repo update
-helm install openebs-charts/openebs
+helm install openebs-charts/openebs --name openebs --namespace openebs
 ```
 
 ## Installing OpenEBS from Chart codebase
 ```
 git clone https://github.com/openebs/openebs.git
 cd openebs/k8s/charts/openebs/
-helm install --name openebs .
+helm install --name openebs --namespace openebs .
 ```
 
 ## Unistalling OpenEBS from Chart codebase
@@ -30,7 +30,7 @@ The following tables lists the configurable parameters of the OpenEBS chart and 
 
 | Parameter                            | Description                                   | Default                           |
 | ------------------------------------ | --------------------------------------------- | --------------------------------- |
-| `rbacEnable`                         | Enable RBAC Resources                         | `true`                            |
+| `rbac.create`                        | Enable RBAC Resources                         | `true`                            |
 | `image.pullPolicy`                   | Container pull policy                         | `IfNotPresent`                    |
 | `apiserver.image`                    | Docker Image for API Server                   | `openebs/m-apiserver`             |
 | `apiserver.imageTag`                 | Docker Image Tag for API Server               | `0.5.3`                           |
