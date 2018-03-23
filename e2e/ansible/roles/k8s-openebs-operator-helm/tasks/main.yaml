@@ -1,0 +1,126 @@
+---
+- name: Install helm
+  shell: curl -Lo /tmp/helm-linux-amd64.tar.gz https://kubernetes-helm.storage.googleapis.com/helm-v2.6.2-linux-amd64.tar.gz; tar -xvf /tmp/helm-linux-amd64.tar.gz -C /tmp/; chmod +x  /tmp/linux-amd64/helm && sudo mv /tmp/linux-amd64/helm /usr/local/bin/
+  args:
+    executable: /bin/bash
+  
+#- name: Check if helm is installed
+#  shell: helm version
+#  args:
+#    executable: /bin/bash
+#  register: helm_version
+#  until: "'version.Version' in helm_version.stdout"
+#  delay: 10
+#  retries: 3
+
+- name: Tiller setup
+  shell: helm init
+  args:
+    executable: /bin/bash
+  register: tiller_out
+  until: "'Happy Helming' in tiller_out.stdout"
+  delay: 10
+  retries: 3
+
+- name: Check if tiller is configured
+  shell: helm version
+  args: 
+    executable: /bin/bash
+  register: tiller_version
+  until: "'Server: &version.Version' in tiller_version.stdout"
+  delay: 10
+  retries: 3
+
+- name: Creating service account
+  shell: kubectl -n kube-system create sa tiller
+  args:
+    executable: /bin/bash
+  register: tiller
+  until: "'serviceaccount \"tiller\" created' in tiller.stdout"
+  delay: 5
+  retries: 2
+
+- name: Create cluster rolebinding
+  shell: kubectl create clusterrolebinding tiller --clusterrole cluster-admin --serviceaccount=kube-system:tiller
+  args:
+    executable: /bin/bash
+  register: crb
+  until: "'clusterrolebinding \"tiller\" created' in crb.stdout"
+  delay: 5
+  retries: 2
+
+- name: Getting home directory in kubernetes master
+  shell: source ~/.profile; echo $HOME
+  args:
+    executable: /bin/bash
+  register: result_kube_home
+
+- name: Copy yaml file to kubernetes master
+  copy:
+    src: "{{ update_deploy_file }}"
+    dest: "{{ result_kube_home.stdout }}"
+
+- name : Update the deployment
+  shell: kubectl -n kube-system patch deploy/tiller-deploy -p "$(cat {{ update_deploy_file }})"
+  args:
+    executable: /bin/bash
+  register: tiller_deploy
+  until: "'deployment \"tiller-deploy\" patched' in tiller_deploy.stdout"
+  delay: 5
+  retries: 2
+
+- name: Adding OpenEBS charts to repo
+  shell: helm repo add openebs-charts "{{ charts }}"
+  args:
+    executable: /bin/bash
+  register: repos
+  until: "'\"openebs-charts\" has been added to your repositories' in repos.stdout"
+  delay: 5
+  retries: 2
+
+- name: Update the repo
+  shell: helm repo update
+  args:
+    executable: /bin/bash
+  register: update
+  until: "'Update Complete' in update.stdout"
+  delay: 5
+  retries: 2
+ 
+- name: Install openebs
+  shell: helm install openebs-charts/openebs
+  args:
+    executable: /bin/bash
+  register: openebs_out
+  until: "'The OpenEBS has been installed' in openebs_out.stdout"
+  delay: 10
+  retries: 3  
+
+- name: Check if provisioner is deployed
+  shell: kubectl get pods -n "{{ namespace }}" | grep "openebs-provisioner" 
+  args:
+    executable: /bin/bash
+  register: deployment
+  until: "'Running' in deployment.stdout"
+  delay: 10
+  retries: 5
+
+- name: Check if maya-apiserver is deployed
+  shell: kubectl get pods -n "{{ namespace }}" | grep "openebs-maya-apiserver"
+  args:
+    executable: /bin/bash
+  register: api_server
+  until: "'Running' in api_server.stdout"
+  delay: 10
+  retries: 5
+
+- name: Check if storage classes are created
+  shell: kubectl get sc
+  args:
+    executable: /bin/bash
+  register: storage_classes
+  until: "'openebs-cassandra' in storage_classes.stdout"
+  delay: 5
+  retries: 3
+
+

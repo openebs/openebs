@@ -1,0 +1,4 @@
+---
+charts: https://openebs.github.io/charts/
+namespace: openebs
+update_deploy_file: update.json
