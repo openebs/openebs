@@ -103,4 +103,14 @@ Vagrant.configure("2") do |config|
     inline: "sudo apt-get install -y python-minimal",
     privileged: true    
   end
+ 
+  config.vm.define "HCHost-03" do |vmCfg|
+    vmCfg.vm.network "private_network", ip: "172.28.128.34"
+    vmCfg.vm.hostname = "hch-03"
+
+    vmCfg.vm.provision :shell,
+    inline: "sudo apt-get install -y python-minimal",
+    privileged: true
+  end
+
 end
