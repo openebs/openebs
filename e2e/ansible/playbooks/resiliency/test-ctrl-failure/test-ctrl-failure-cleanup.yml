@@ -1,0 +1,64 @@
+---
+- name: Delete percona mysql pod 
+  shell: source ~/.profile; kubectl delete -f {{ percona_files.0 }} 
+  args:
+    executable: /bin/bash
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+- name: Confirm percona pod has been deleted
+  shell: source ~/.profile; kubectl get pods -l name=percona 
+  args:
+    executable: /bin/bash
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+  register: result
+  until: "'percona' not in result.stdout"
+  delay: 120 
+  retries: 6
+
+- name: Remove the percona liveness check config map 
+  shell: source ~/.profile; kubectl delete cm sqltest 
+  args:
+    executable: /bin/bash
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+  register: result
+  failed_when: "'configmap' and 'deleted' not in result.stdout"
+
+- name: Delete the chaoskube infrastructure
+  shell: source ~/.profile; kubectl delete -f {{ item }}
+  args: 
+    executable: /bin/bash
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+  with_items: "{{ chaoskube_files }}"
+
+- name: Confirm that the chaoskube pod has been deleted
+  shell: source ~/.profile; kubectl get pods -l app=chaoskube
+  args: 
+    executable: /bin/bash
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+  register: result
+  until: "'chaoskube' not in result.stdout"
+
+- name: Confirm the chaoskube sa has been deleted
+  shell: >
+    source ~/.profile; 
+    kubectl get sa --no-headers -o custom-columns=:metadata.name
+  args:
+    executable: /bin/bash
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+  register: result
+  failed_when: "'chaoskube' in result.stdout"
+
+- name: Confirm the chaoskube clusterrolebinding has been deleted
+  shell: >
+    source ~/.profile;
+    kubectl get clusterrolebinding --no-headers -o custom-columns=:metadata.name
+  args:
+    executable: /bin/bash
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+  register: result
+  failed_when: "'chaoskube' in result.stdout"
+
+
+  
+ 
+ 
