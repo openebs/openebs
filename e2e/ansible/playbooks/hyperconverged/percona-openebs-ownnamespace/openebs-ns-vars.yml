@@ -1,0 +1,32 @@
+---
+openebs_operator_link: https://raw.githubusercontent.com/openebs/openebs/master/k8s/openebs-operator.yaml
+
+openebs_operator: openebs-operator-ns-openebs.yaml
+
+openebs_operator_alias: openebs-operator.yaml
+
+openebs_storageclass: openebs-storageclasses.yaml
+
+openebs_percona: percona-ns-percona-sc-percona.yaml
+
+openebs_storageclasses_link: https://raw.githubusercontent.com/openebs/openebs/master/k8s/openebs-storageclasses.yaml
+
+percona_loadgen: sql-loadgen.yaml
+
+openebs_storageclasses_alias: openebs-storageclasses.yaml
+
+percona_mysql_plugin_link: https://raw.githubusercontent.com/openebs/openebs/master/k8s/demo/percona/demo-percona-mysql-pvc.yaml
+
+# Image tag for openebs containers
+# Accepted entries (ci, latest): Default: latest
+test_tag: latest
+
+
+pod_yaml_alias: demo-percona-mysql-pvc.yaml
+
+percona_mysql_vol_size: 5G
+
+
+deb_packages:
+  - python-pip
+

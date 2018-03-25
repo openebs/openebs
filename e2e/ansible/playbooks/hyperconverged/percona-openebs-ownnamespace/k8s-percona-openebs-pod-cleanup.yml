@@ -1,0 +1,41 @@
+- hosts: localhost
+
+  vars_files:
+    - openebs-ns-vars.yml
+
+  tasks:
+       
+       - name: Delete percona mysql pod
+         shell: source ~/.profile; kubectl delete -f "{{ openebs_percona }}"
+         args:
+           executable: /bin/bash
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+       - name: Confirm percona pod has been deleted
+         shell: source ~/.profile; kubectl get pods
+         args:
+           executable: /bin/bash
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+         register: result
+         until: "'percona' not in result.stdout"
+         delay: 120
+         retries: 6
+
+       - name: Delete the openebs operator
+         shell: source ~/.profile; kubectl delete -f "{{ openebs_operator }}"
+         args:
+           executable: /bin/bash
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+
+       - name: Confirm pod has been deleted
+         shell: source ~/.profile; kubectl get pods
+         args:
+           executable: /bin/bash
+         register: result
+         until: "'maya-apiserver' or 'openebs-provisioner' not in result.stdout"
+         delay: 10
+         retries: 6
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+
