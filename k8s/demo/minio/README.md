@@ -35,23 +35,24 @@
   pvc-a99c0535-30ac-11e8-9309-000c298ff5fc-ctrl-svc   ClusterIP   10.108.61.141   <none>        3260/TCP,9501/TCP   8s
   ```
 
-- Use the minio UI toupload some data on the OpenEBS PV and verify that the operation is successful
+- Use the minio UI to upload some data on the OpenEBS PV and verify that the operation is successful
   
   - On a browser, navigate to the IP address of any of the nodes in the cluster, at the exposed port 
   (32701 in the example above) and login using the default credentials *Access Key: minio, Secret key: minio123*
 
-  ![minio-login-screen.jpg]
+  ![minio login screen](images/minio-login-screen.jpg)
 
   - Minio has similar functionality to S3: file uploads, creating buckets, and storing other data. 
 
     In this step, use the icon at *bottom-right* of the screen to create a bucket & perform a file-upload 
 
-  ![minio-create-bucket.jpg]
-  ![minio-upload-file.jpg]
+  ![minio create bucket](images/minio-create-bucket.jpg)
+  
+  ![minio upload file](minio-upload-file.jpg)
 
   - Verify that the file-upload is successful 
 
-  ![minio-stored-file.jpg]
+  ![minio stored file](minio-stored-file.jpg)
 
   
    
