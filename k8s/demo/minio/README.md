@@ -48,11 +48,11 @@
 
   ![minio create bucket](images/minio-create-bucket.jpg)
   
-  ![minio upload file](minio-upload-file.jpg)
+  ![minio upload file](images/minio-upload-file.jpg)
 
   - Verify that the file-upload is successful 
 
-  ![minio stored file](minio-stored-file.jpg)
+  ![minio stored file](images/minio-stored-file.jpg)
 
   
    
