@@ -1,12 +1,16 @@
 ---
 - hosts: localhost
   roles:
-    - {role: k8s-localhost, when: build_type == "normal"} 
+    - {role: k8s-localhost, when: build_type == "normal" and ansible_distribution == 'Ubuntu'} 
+    - {role: k8s-localhost-centos, when: build_type == "normal" and ansible_distribution == 'CentOS'} 
 
 - hosts: kubernetes-kubemasters
   roles:
-    - k8s-master
+    - {role: k8s-master, when: ansible_distribution == 'Ubuntu'}
+    - {role: k8s-master-centos, when: ansible_distribution == 'CentOS'}
 
 - hosts: kubernetes-kubeminions
   roles: 
-    - k8s-hosts   
+    - {role: k8s-hosts, when: ansible_distribution == 'Ubuntu'} 
+    - {role: k8s-hosts-centos, when: ansible_distribution == 'CentOS'}
+

@@ -2,7 +2,7 @@
 test_name: volume_memcheck_test
 volume_def: test-pvc.yaml
 io_duration: 200s
-block_size: [512k,1m]
+block_size: [512k,1M]
 py_file: test-mem.py
 count_num: 10000
 mount_point: /mnt/jiva
