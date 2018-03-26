@@ -8,12 +8,12 @@
    - block:
        - name: Copy the machines.in template to inventory dir
          copy:
-           src: "{{ playbook_dir }}/templates/{{ ci_mode }}/machines.{{ ci_mode }}"
+           src: "{{ playbook_dir }}/templates/{{ platform}}/{{ ci_mode }}/machines.{{ ci_mode }}"
            dest: "{{ inventory_dir }}/machines.in"
 
        - name: Copy the Vagrantfile template to ansible dir  
          copy: 
-           src: "{{ playbook_dir }}/templates/{{ ci_mode }}/Vagrantfile.{{ ci_mode }}"
+           src: "{{ playbook_dir }}/templates/{{ platform}}/{{ ci_mode }}/Vagrantfile.{{ ci_mode }}"
            dest: "{{ playbook_dir }}/Vagrantfile"
        
        - name: For a build of type 'quick' change the box in Vagrantfile
