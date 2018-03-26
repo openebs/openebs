@@ -1,5 +1,5 @@
 ---
-platform: centos
+platform: ubuntu
 
 #########################################
 # Kubernetes Deployment Specification   #
