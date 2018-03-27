@@ -17,7 +17,7 @@ metadata:
 provisioner: openebs.io/provisioner-iscsi
 parameters:
   openebs.io/storage-pool: "default"
-  openebs.io/jiva-replica-count: "1"
+  openebs.io/jiva-replica-count: "3"
   openebs.io/volume-monitor: "true"
   openebs.io/capacity: 5G
 ---
@@ -28,7 +28,7 @@ metadata:
 provisioner: openebs.io/provisioner-iscsi
 parameters:
   openebs.io/storage-pool: "default"
-  openebs.io/jiva-replica-count: "2"
+  openebs.io/jiva-replica-count: "3"
   openebs.io/volume-monitor: "true"
   openebs.io/capacity: 5G
 ---
@@ -39,7 +39,7 @@ metadata:
 provisioner: openebs.io/provisioner-iscsi
 parameters:
   openebs.io/storage-pool: "default"
-  openebs.io/jiva-replica-count: "2"
+  openebs.io/jiva-replica-count: "3"
   openebs.io/volume-monitor: "true"
   openebs.io/capacity: 5G
 ---
@@ -50,7 +50,7 @@ metadata:
 provisioner: openebs.io/provisioner-iscsi
 parameters:
   openebs.io/storage-pool: "default"
-  openebs.io/jiva-replica-count: "2"
+  openebs.io/jiva-replica-count: "3"
   openebs.io/volume-monitor: "true"
   openebs.io/capacity: 5G
 ---
@@ -61,7 +61,7 @@ metadata:
 provisioner: openebs.io/provisioner-iscsi
 parameters:
   openebs.io/storage-pool: "default"
-  openebs.io/jiva-replica-count: "2"
+  openebs.io/jiva-replica-count: "3"
   openebs.io/volume-monitor: "true"
   openebs.io/capacity: 5G
 ---
@@ -72,7 +72,7 @@ metadata:
 provisioner: openebs.io/provisioner-iscsi
 parameters:
   openebs.io/storage-pool: "default"
-  openebs.io/jiva-replica-count: "2"
+  openebs.io/jiva-replica-count: "3"
   openebs.io/volume-monitor: "true"
   openebs.io/capacity: 10G
 ---
@@ -83,7 +83,7 @@ metadata:
 provisioner: openebs.io/provisioner-iscsi
 parameters:
   openebs.io/storage-pool: "default"
-  openebs.io/jiva-replica-count: "2"
+  openebs.io/jiva-replica-count: "3"
   openebs.io/volume-monitor: "true"
   openebs.io/capacity: 5G
 ---
@@ -94,7 +94,7 @@ metadata:
 provisioner: openebs.io/provisioner-iscsi
 parameters:
   openebs.io/storage-pool: "default"
-  openebs.io/jiva-replica-count: "2"
+  openebs.io/jiva-replica-count: "3"
   openebs.io/volume-monitor: "true"
   openebs.io/capacity: 5G
 ---
