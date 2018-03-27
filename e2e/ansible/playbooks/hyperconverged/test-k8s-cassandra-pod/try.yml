@@ -1,9 +1,0 @@
-- hosts: localhost
-
-  vars_files:
-    - k8s-cassandra-pod-vars.yml
-
-  tasks:
-    - include: k8s-cassandra-pod-cleanup.yml
-      when: clean | bool
-
