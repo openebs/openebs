@@ -17,8 +17,7 @@ cassandra_loadgen_link: https://raw.githubusercontent.com/openebs/openebs/master
 
 loadgen_yaml_alias: cassandra-loadgen.yaml
 
-io_minutes: 3m
-io_duration: 180
+io_minutes: 3
 
 files: 
   - Dockerfile

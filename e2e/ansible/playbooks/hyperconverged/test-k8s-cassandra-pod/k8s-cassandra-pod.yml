@@ -69,7 +69,7 @@
        - name: Replace the io_duration in cassandra loadgen yaml
          replace:
            path: "{{ result_kube_home.stdout }}/{{ loadgen_yaml_alias }}"
-           regexp: 'duration=5m'
+           regexp: 'duration=5'
            replace: 'duration={{ io_minutes }}'
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
  
@@ -129,9 +129,9 @@
          delay: 120
          retries: 15
 
-       - name: Wait for {{ io_duration }} secs to run load.
+       - name: Wait for {{ (io_minutes) | int *60 }} secs to run load.
          wait_for:
-              timeout: "{{ io_duration }}"
+              timeout: "{{ (io_minutes) | int *60 }}"
         
        - name: Verify load by using describe keyspaces
          shell: source {{ profile }}; kubectl exec cassandra-0 -- cqlsh --execute "describe keyspaces;"
