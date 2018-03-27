@@ -1,0 +1,51 @@
+---
+- name: Run apt-get update via shell
+  shell: apt-get update
+  become: true
+  delegate_to: "{{ groups['kubernetes-kubeminions'].0 }}"
+  ignore_errors: true
+  when: ansible_distribution == 'Ubuntu'
+
+- name: Install python-pip on K8S-minion
+  shell: apt-get install -y {{ item }}
+  become: true 
+  with_items: "{{ deb_packages }}"
+  delegate_to: "{{ groups['kubernetes-kubeminions'].0 }}"
+  when: ansible_distribution == 'Ubuntu'
+
+- name: Install PIP packages on K8s-minion
+  pip: 
+    name: "{{ item }}"
+    state: present
+  with_items: "{{ pip_packages }}"
+  delegate_to: "{{ groups['kubernetes-kubeminions'].0 }}" 
+  become: true
+  when: ansible_distribution == 'Ubuntu'  
+
+- name: Install curl git wget
+  shell: "yum install -y wget curl git"
+  become: true
+  delegate_to: "{{ groups['kubernetes-kubeminions'].0 }}"
+  when: ansible_distribution == 'CentOS'
+
+- name: get-pip
+  shell: "curl 'https://bootstrap.pypa.io/get-pip.py' -o 'get-pip.py'"
+  become: true
+  delegate_to: "{{ groups['kubernetes-kubeminions'].0 }}"
+  when: ansible_distribution == 'CentOS'
+
+- name: Install pip
+  shell: "python get-pip.py"
+  become: true
+  delegate_to: "{{ groups['kubernetes-kubeminions'].0 }}"
+  when: ansible_distribution == 'CentOS'
+      
+- name: Install PIP packages on K8s-minion
+  pip:
+    name: "{{ item }}"
+    state: present
+  with_items: "{{ pip_packages }}"
+  delegate_to: "{{ groups['kubernetes-kubeminions'].0 }}"
+  become: true
+  when: ansible_distribution == 'CentOS'
+
