@@ -265,17 +265,7 @@ cassandra-data-cassandra-1   Bound     pvc-f84a8133-e647-11e7-bc35-000c298ff5fc 
 Performance tests on OpenEBS can be run using the Cassandra-loadgen Kubernetes job (cassandra-loadgen.yaml). Follow the steps 
 shown below.
 
-- Get the IP address of any one of the Cassandra replicas using the command kubectl get pod <podname> -o wide.
-
-```
-test@Master:~/openebs/k8s/demo/cassandra$ kubectl get pods cassandra-0 -o wide
-NAME          READY     STATUS    RESTARTS   AGE       IP          NODE
-cassandra-0   1/1       Running   1          1d        10.47.0.4   host01
-```
-- In the loadgen job specification yaml, replace the following. 
-
-  - IP address in the pod spec
-  - Workload details (for details on supported workloads, refer https://docs.datastax.com/en/cassandra/2.1/cassandra/tools/toolsCStress_t.html) 
+- In the loadgen job specification yaml, replace the workload details (for details on supported workloads, refer https://docs.datastax.com/en/cassandra/2.1/cassandra/tools/toolsCStress_t.html) 
   
 ```
 ---
@@ -293,7 +283,7 @@ spec:
       - name: cassandra-loadgen
         image: cassandra
         command: ["/bin/bash"]
-        args: ["-c", "cassandra-stress write duration=5m no-warmup -node 10.47.0.4"]
+        args: ["-c", "cassandra-stress write duration=5m no-warmup -node cassandra-0.cassandra"]
         tty: true
   ```
 
