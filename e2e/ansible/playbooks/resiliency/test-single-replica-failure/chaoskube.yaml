@@ -1,0 +1,55 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: chaoskube
+  labels:
+    app: chaoskube
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: chaoskube
+    spec:
+      serviceAccountName: chaoskube
+      containers:
+      - name: chaoskube
+        image: quay.io/linki/chaoskube:v0.8.0
+        args:
+        # Provided below are possible flags to set in chaoskube.
+        # This deployment will create a vanilla chaoskube w/o policies
+        # which will be configured by a test playbook
+       
+        # kill a pod every 10 minutes
+        #- --interval=10m
+        
+        # only target pods in the test environment
+        #- --labels=openebs/controller=jiva-controller
+        
+        # only consider pods with this annotation
+        #- --annotations=chaos.alpha.kubernetes.io/enabled=true
+        
+        # exclude all pods in the kube-system namespace
+        #- --namespaces=!kube-system
+        
+        # don't kill anything on weekends
+        #- --excluded-weekdays=Sat,Sun
+        
+        # don't kill anything during the night or at lunchtime
+        #- --excluded-times-of-day=22:00-08:00,11:00-13:00
+        
+        # don't kill anything as a joke or on christmas eve
+        #- --excluded-days-of-year=Apr1,Dec24
+        
+        # let's make sure we all agree on what the above times mean
+        #- --timezone=UTC
+        
+        # terminate pods for real: this disables dry-run mode which is on by default
+        #- --no-dry-run
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: chaoskube
+  labels:
+    app: chaoskube
