@@ -1,0 +1,20 @@
+---
+test_name: test_single_replica_failure
+
+percona_files: 
+  - percona.yaml
+  - sql-test.sh
+
+chaoskube_files:
+  - rbac.yaml
+  - chaoskube.yaml 
+
+chaos_duration: 120
+
+chaos_interval: 20 
+
+test_pod_regex: maya*|openebs*|pvc*|percona*|chaos*
+
+test_log_path: setup/logs/single_replica_failure_test.log
+
+
