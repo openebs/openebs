@@ -6,8 +6,6 @@
   tasks:
    - block:
 
-       - include: k8s-cassandra-pod-prerequisites.yml 
-
        - name: Get $HOME of K8s master for kubernetes user
          shell: source {{ profile }}; echo $HOME
          args: 
