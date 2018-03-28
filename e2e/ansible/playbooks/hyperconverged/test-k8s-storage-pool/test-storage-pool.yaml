@@ -1,0 +1,49 @@
+- hosts: localhost
+
+  vars_files:
+    - storage-pool-vars.yml 
+
+  tasks:
+
+    - include: storage-pool-tasks.yml
+
+    - include: cleanup.yml
+
+
+    - name: sleep for 50 seconds and continue with play
+      wait_for: 
+        timeout: "50"
+
+    #Deploying Operator and application in openebs namespace
+    - include: storage-pool-both-ns-tasks.yml
+
+
+    - include: cleanup-both-nondef.yml
+
+    - name: Sleep 50 seconds
+      wait_for:
+        timeout: "50"
+
+
+
+    #Deploying operator in default namespace and PVC in openebs namespace
+    - include: storage-pool-operator-default-tasks.yml
+  
+    - include: cleanup_operator_def.yml
+
+    - name: Sleep 50 seconds
+      wait_for:
+        timeout: "50"
+   
+
+    #Deploying Operator in non default and PVC in default namespace
+    
+    - include: storage-pool-operator-nondefault-tasks.yml
+    
+    - include: cleanup_operator_nondef.yml
+    
+  
+    - name: Sleep 50 seconds
+      wait_for:
+        timeout: "50"
+     

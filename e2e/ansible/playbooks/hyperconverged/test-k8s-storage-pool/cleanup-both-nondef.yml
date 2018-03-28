@@ -1,0 +1,44 @@
+       
+       
+       - name: Delete PVC
+         shell: source ~/.profile; kubectl delete -f "{{ openebs_pvc }}" -n "{{ namespace }}"
+         args:
+           executable: /bin/bash
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+       - name: Confirm if the PVC has been deleted
+         shell: source ~/.profile; kubectl get pods --all-namespaces
+         args:
+           executable: /bin/bash
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+         register: result
+         until: "'pvc' not in result.stdout"
+         delay: 30 
+         retries: 6
+      
+       - name: Delete Storage_pool path
+         shell: source ~/.profile; kubectl delete -f "{{ storage_pool_path_creation }}"
+         args:
+           executable: /bin/bash
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+
+       - name: Delete the openebs operator
+         shell: source ~/.profile; kubectl delete -f "{{ openebs_ns_operator }}"
+         args:
+           executable: /bin/bash
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+         ignore_errors: true
+
+
+       - name: Confirm pod has been deleted
+         shell: source ~/.profile; kubectl get pods --all-namespaces
+         args:
+           executable: /bin/bash
+         register: result
+         until: "'maya-apiserver' or 'openebs-provisioner' not in result.stdout"
+         delay: 100
+         retries: 6
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+         
+
