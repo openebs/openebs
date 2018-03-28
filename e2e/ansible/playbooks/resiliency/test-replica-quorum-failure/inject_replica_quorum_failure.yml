@@ -1,0 +1,66 @@
+---
+- name: Get the resourceVersion of the replica deployment
+  shell: >
+    source ~/.profile; kubectl get deploy 
+    {{ replica_deploy }} -o yaml | grep resourceVersion
+    | awk '{print $2}' | sed 's|"||g'
+  args:
+    executable: /bin/bash
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+  register: rv_bef
+
+- name: Get replica pod name
+  shell: source ~/.profile; kubectl get pods | grep rep | shuf -n1 | awk 'FNR == 1 {print}' | awk {'print $1'} 
+  args:
+    executable: /bin/bash
+  register: result
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+- name: Kill replica pod
+  shell: source ~/.profile; kubectl delete pod {{ result.stdout }}
+  args:
+    executable: /bin/bash
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+- name: Get Controller SVC IP
+  shell: source ~/.profile; kubectl get svc | grep ctrl | awk {'print $3'}
+  args:
+    executable: /bin/bash
+  register: SVC
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+- name: Check if replica is rebuilded 
+  shell: curl GET http://{{ SVC.stdout }}:9501/v1/replicas | grep createTypes | jq -r '.data[].mode' | grep 'RW'
+  args:
+    executable: /bin/bash
+  register: result
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+  until: "result.stdout_lines | length  == 3" 
+  delay: 60
+  retries: 10
+
+- name: Verify replica pod status
+  shell: source ~/.profile; kubectl get pods -l openebs/replica=jiva-replica --no-headers | awk '{print $3}' | grep 'Running'
+  args:
+    executable: /bin/bash
+  register: result
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+  until: "result.stdout_lines | length  == 3"
+
+- name: Get the resourceVersion of the replica deployment
+  shell: >
+    source ~/.profile; kubectl get deploy 
+    {{ replica_deploy }} -o yaml | grep resourceVersion
+    | awk '{print $2}' | sed 's|"||g'
+  args:
+    executable: /bin/bash
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+  register: rv_aft    
+
+- name: Compare resourceVersions of replica deployments 
+  debug: 
+    msg: "Verified replica pods were restarted by fault injection"
+  failed_when: "rv_bef.stdout | int == rv_aft.stdout | int"
+  
+  
+
