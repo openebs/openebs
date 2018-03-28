@@ -1,0 +1,17 @@
+---
+
+openebs_pvc: test-pvc.yaml
+
+namespace: openebs
+
+openebs_ns_operator: openebs-operator-ns-openebs.yaml
+
+storage_pool_path: /mnt/openebs
+
+openebs_operator_link: https://raw.githubusercontent.com/openebs/openebs/master/k8s/openebs-operator.yaml
+
+percona_application: https://raw.githubusercontent.com/openebs/openebs/master/k8s/demo/percona/demo-percona-mysql-pvc.yaml
+
+openbs_storageclass: https://raw.githubusercontent.com/openebs/openebs/master/k8s/openebs-storageclasses.yaml
+
+storage_pool_path_creation: storage-pool-path_creation.yml

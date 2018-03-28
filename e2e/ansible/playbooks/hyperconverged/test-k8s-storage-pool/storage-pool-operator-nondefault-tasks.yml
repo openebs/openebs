@@ -1,0 +1,114 @@
+---
+- name: Check whether maya-apiserver pod is running
+  shell: source ~/.profile; kubectl get pods --all-namespaces | grep maya-apiserver
+  args:
+    executable: /bin/bash
+  register: result
+  until: "'Running' in result.stdout"
+  delay: 20
+  retries: 2
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+  ignore_errors: true
+  
+- block:
+      
+      - name: Delete the openebs operator
+        shell: source ~/.profile; kubectl delete -f "{{ openebs_operator_link }}"
+        args:
+          executable: /bin/bash
+        delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+      - name: Confirm pod has been deleted
+        shell: source ~/.profile; kubectl get pods
+        args:
+          executable: /bin/bash
+        register: result
+        until: "'maya-apiserver' or 'openebs-provisioner' not in result.stdout"
+        delay: 30
+        retries: 3
+        delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+  when: "result.rc == 0"
+    
+- name: Get $HOME of K8s master for kubernetes user
+  shell: source ~/.profile; echo $HOME
+  args:
+    executable: /bin/bash
+  register: result_kube_home
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+
+- name: Deploy openebs-operator 
+  shell: source ~/.profile; kubectl apply -f "{{ openebs_ns_operator }}"
+  args:
+    executable: /bin/bash
+  delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+
+- name: Check whether maya-apiserver pod is deployed
+  shell: source ~/.profile; kubectl get pods --all-namespaces | grep maya-apiserver
+  args:
+    executable: /bin/bash
+  register: result
+  until: "'Running' in result.stdout"
+  delay: 120
+  retries: 5
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+- name: Copy the storage pool creation yaml to kube master
+  copy:
+    src: "{{ storage_pool_path_creation }}"
+    dest: "{{ result_kube_home.stdout }}"
+  delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+
+- name: Create storage pool path /mnt/openebs
+  shell: source ~/.profile; kubectl apply -f "{{ storage_pool_path_creation }}"
+  args:
+    executable: /bin/bash
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+- name: Copy test-pvc yaml to kubemaster
+  copy:
+    src: "{{ openebs_pvc }}"
+    dest: "{{ result_kube_home.stdout }}"
+  delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+
+
+- name: Create PVC 
+  shell: source ~/.profile; kubectl apply -f "{{ openebs_pvc }}" 
+  args:
+    executable: /bin/bash
+  delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+
+- name: Confirm volume container is running
+  shell: source ~/.profile; kubectl get pods --all-namespaces | grep pvc | grep {{item}} | grep Running | wc -l
+  args:
+    executable: /bin/bash
+  register: result
+  until: result.stdout|int >= 1
+  delay: 30
+  retries: 10
+  with_items:
+    - ctrl
+    - rep
+  delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+
+- name: Get storage replica pod name
+  shell: source ~/.profile; kubectl get pods --all-namespaces | grep rep | awk {'print $2'} 
+  args:
+    executable: /bin/bash
+  register: rep_name
+  delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+       
+- name: Set replica pod name to variable
+  set_fact:
+    rep_pod_name: "{{ rep_name.stdout.split('-rep-')[0] }}"
+
+- name: find the pvc inside the /mnt/openebs
+  stat:
+   path: /mnt/openebs/{{ rep_pod_name }}
+  register: stat_result
+  become: true
+  delegate_to: "{{groups['kubernetes-kubeminions'].0}}"
+- debug:
+    msg: "File exists..."
+  when: stat_result.stat.exists

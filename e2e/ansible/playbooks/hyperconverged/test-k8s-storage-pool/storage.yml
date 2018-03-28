@@ -1,0 +1,28 @@
+- hosts: localhost
+
+  vars_files:
+    - storage-pool-vars.yml
+
+  tasks:
+
+       - name: Get storage replica pod name
+         shell: source ~/.profile; kubectl get pods --all-namespaces | grep rep | awk {'print $2'}
+         args:
+           executable: /bin/bash
+         register: rep_name
+         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+
+
+       - name: Set ctrl pod name to variable
+         set_fact:
+           rep_pod_name: "{{ rep_name.stdout.split('-rep-')[0] }}"
+
+       - name: find the pvc inside the /mnt/openebs
+         stat:
+          path: /mnt/openebs/{{ rep_pod_name }}
+         register: stat_result
+         become: true
+         delegate_to: "{{groups['kubernetes-kubeminions'].0}}"
+
+
+       
