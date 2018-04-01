@@ -1,0 +1,18 @@
+- hosts: localhost
+
+  vars_files:
+    storage-pool-vars.yml 
+
+- import_playbook: storage-pool-operator-default.yml  namespace=openebs
+
+- import_playbook: cleanup.yml namespace=openebs
+
+- import_playbook: storage-pvc-default.yml  namespace=default
+ 
+- import_playbook: cleanup_operator_nondef.yml namespace=default
+
+- import_playbook: storage-pvc-default.yml  namespace=openebs
+
+- import_playbook: cleanup_operator_nondef.yml  namespace=openebs
+
+     
