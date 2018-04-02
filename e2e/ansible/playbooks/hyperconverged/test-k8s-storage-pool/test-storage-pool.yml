@@ -1,0 +1,36 @@
+- hosts: localhost
+
+  vars_files:
+    - storage-pool-vars.yml
+
+  tasks:
+   
+    #Deploying operator in default and pvc in percona namespace
+    - include: deploy-openebs-pvc.yml 
+        operator_namespace=default
+        namespace=percona
+
+    - include: cleanup.yml
+        operator_namespace=default
+        namespace=percona
+    
+    #Deploying operator in openebs and pvc in default namespace
+    - include: deploy-openebs-pvc.yml
+        operator_namespace=openebs
+        namespace=default
+
+    - include: cleanup.yml
+        operator_namespace=openebs
+        namespace=default
+
+    #Deploying operator in openebs and pvc in openebs namespace
+    - include: deploy-openebs-pvc.yml
+        operator_namespace=openebs
+        namespace=percona
+
+    - include: cleanup.yml
+        operator_namespace=openebs
+        namespace=percona
+
+
+
