@@ -29,7 +29,7 @@
 
 **alertmanager.yaml:** This file is for creating deployment and alertmanager service.
 
-**alertmanager-config.yaml:** This is q configuration file for alertmanager, used to load templates and to set alerts in slack. This can be configured to set alerts at various platforms like e-mail, slack and so on.
+**alertmanager-config.yaml:** This is a configuration file for alertmanager, used to load templates and to set alerts in slack. This can be configured to set alerts at various platforms like e-mail, slack and so on.
 
 **alertmanager-templates.yaml:** This file is used to customize notifications sent to slack.
 
