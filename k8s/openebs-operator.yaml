@@ -38,6 +38,9 @@ rules:
 - apiGroups: ["*"]
   resources: ["storagepools"]
   verbs: ["get", "list"]
+- apiGroups: ["volumesnapshot.external-storage.k8s.io"]
+  resources: ["volumesnapshots","volumesnapshotdatas"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
 - nonResourceURLs: ["/metrics"]
   verbs: ["get"]
 ---
@@ -159,6 +162,29 @@ spec:
         - name: MAYA_PORTAL_URL
           value: "https://mayaonline.io/"
 ---
+kind: Deployment
+apiVersion: extensions/v1beta1
+metadata:
+  name: snapshot-controller
+  namespace: default
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: snapshot-controller
+    spec:
+      serviceAccountName: openebs-maya-operator
+      containers:
+        - name: snapshot-controller
+          image: openebs/k8s-snapshot-controller:ci
+          imagePullPolicy: "IfNotPresent"
+        - name: snapshot-provisioner
+          image: openebs/k8s-snapshot-provisioner:ci
+          imagePullPolicy: "IfNotPresent"
+---
 apiVersion: apiextensions.k8s.io/v1beta1
 kind: CustomResourceDefinition
 metadata:
@@ -215,6 +241,12 @@ parameters:
   openebs.io/jiva-replica-count: "3"
   openebs.io/volume-monitor: "true"
   openebs.io/capacity: 5G
+---
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  name: snapshot-promoter
+provisioner: volumesnapshot.external-storage.k8s.io/snapshot-promoter
 ---
 apiVersion: apiextensions.k8s.io/v1beta1
 kind: CustomResourceDefinition
