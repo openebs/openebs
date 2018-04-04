@@ -1,0 +1,14 @@
+---
+test_name: verify_replica_deployment_with_node_affinity
+
+openebs_namespace: openebs
+
+app_namespace: application
+
+patch_file: replica_patch.yaml
+
+create_sc: storage-class.yaml
+
+percona_link: https://raw.githubusercontent.com/openebs/openebs/master/k8s/demo/percona/demo-percona-mysql-pvc.yaml
+
+replica_count: 2 
