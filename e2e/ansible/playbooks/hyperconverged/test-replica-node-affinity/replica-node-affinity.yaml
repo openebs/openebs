@@ -162,37 +162,21 @@
 
        - set_fact:
             flag: "Pass"
-
-#Cleanup
-      
-       - name: Delete Percona deployment
-         shell: kubectl delete -f "{{ percona_link }}"
-         args:
-           executable: /bin/bash
-         register: del_out
-         until: "'percona' and 'deleted' in del_out.stdout"
-         delay: 30
-         retries: 5
-
-       - name: Remove copied files
-         shell: rm -rf "{{ patch_file }}" "{{ create_sc }}"
-         args:
-           executable: /bin/bash
-      
         
    - rescue:
        - set_fact:
            flag: "Fail"
 
      always:
+
+       - include: replica-node-affinity-cleanup.yaml
+
        - name: Send slack notification
          slack:
            token: "{{ lookup('env','SLACK_TOKEN') }}"
            msg: '{{ ansible_date_time.time }} TEST: {{test_name}}, RESULT: {{ flag }}'
          when: slack_notify | bool and lookup('env','SLACK_TOKEN')
 
-#  roles:
-#     - {role: k8s-openebs-uninstall-helm}
 
 
  
