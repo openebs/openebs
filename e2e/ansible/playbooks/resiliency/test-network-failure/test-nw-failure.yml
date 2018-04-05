@@ -121,8 +121,8 @@
 
        ########################################################
        #        INJECT FAULTS FOR SPECIFIED PERIOD            #
-       # (Obtain begin marker before fault-inject(FI),do ctrl # 
-       # failures, verify successful FI via end marker)       # 
+       # (Get pumba container details from the node where ctrl# 
+       #is schedule and induce n/w delays using pumba netem)  # 
        ########################################################
 
        - name: Get pumba container name
