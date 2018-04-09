@@ -80,7 +80,7 @@
     pod_name: "{{ result_name.stdout_lines[1].split()[0] }}"
 
 - name: Confirm that maya-cli is available in the maya-apiserver pod
-  shell: source ~/.profile; kubectl exec {{pod_name}} -c maya-apiserver -- maya version
+  shell: source ~/.profile; kubectl exec {{pod_name}} -c maya-apiserver -- mayactl version
   args:
     executable: /bin/bash
   register: result_vers

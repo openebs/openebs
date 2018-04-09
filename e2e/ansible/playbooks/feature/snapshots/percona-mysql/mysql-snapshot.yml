@@ -110,8 +110,8 @@
          shell: > 
            source ~/.profile; 
            kubectl exec {{maya_pod}} -c maya-apiserver 
-           -- maya snapshot create -volname {{vol_name}}
-           -snapname {{snap_name}} 
+           -- mayactl snapshot create --volname {{vol_name}}
+           --snapname {{snap_name}} 
          args:
            executable: /bin/bash
          register: result_snap
@@ -122,7 +122,7 @@
          shell: >
            source ~/.profile;
            kubectl exec {{maya_pod}} -c maya-apiserver
-           -- maya snapshot list -volname {{vol_name}}
+           -- mayactl snapshot list --volname {{vol_name}}
          args:
            executable: /bin/bash
          register: result_snap_list
@@ -144,8 +144,8 @@
          shell: >
            source ~/.profile;
            kubectl exec {{maya_pod}} -c maya-apiserver
-           -- maya snapshot revert -volname {{vol_name}}
-           -snapname {{snap_name}}
+           -- mayactl snapshot revert --volname {{vol_name}}
+           --snapname {{snap_name}}
          args:
            executable: /bin/bash
          register: result_snap
