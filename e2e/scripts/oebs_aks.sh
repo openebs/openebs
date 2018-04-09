@@ -1,7 +1,10 @@
 #!/bin/bash
 
-node_count="2" #--- number of nodes for the Azure kubernetes cluster
-node_vm_size="Standard_A2_v2" #--- VM size for the Azure Kubernetes  cluster
+node_count=$(echo $NODE COUNT) #--- number of nodes for the Azure kubernetes cluster
+node_vm_size=$(echo $NODE VM SIZE) #--- VM size for the Azure Kubernetes  cluster
+username=$(echo $USERNAME) #--- Username of the azure account 
+password=$(echo $PASSWORD) #--- Password for the azure account
+
 name=$(echo $(mktemp)| tr '[:upper:]' '[:lower:]' | cut -d '.' -f 2)
 
 echo "Installing Prerequisites..."
