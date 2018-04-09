@@ -1,0 +1,45 @@
+---
+- name: Delete pumba infrastructure
+  shell: source ~/.profile; kubectl delete daemonset  pumba
+  args:
+    executable: /bin/bash
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+- name: Confirm pumba pod has been deleted
+  shell: source ~/.profile; kubectl get pods --no-headers -l app=pumba
+  args:
+    executable: /bin/bash
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+  register: result
+  until: "'pumba' not in result.stdout"
+  delay: 120
+  retries: 6
+
+- name: Delete percona mysql pod 
+  shell: source ~/.profile; kubectl delete -f {{ percona_files.0 }} 
+  args:
+    executable: /bin/bash
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+- name: Confirm percona pod has been deleted
+  shell: source ~/.profile; kubectl get pods -l name=percona 
+  args:
+    executable: /bin/bash
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+  register: result
+  until: "'percona' not in result.stdout"
+  delay: 120 
+  retries: 6
+
+- name: Remove the percona liveness check config map 
+  shell: source ~/.profile; kubectl delete cm sqltest 
+  args:
+    executable: /bin/bash
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+  register: result
+  failed_when: "'configmap' and 'deleted' not in result.stdout"
+
+
+  
+ 
+ 

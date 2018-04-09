@@ -1,0 +1,18 @@
+---
+test_name: test_nw_failure
+
+percona_files:
+  - percona.yaml
+  - sql-test.sh
+
+delay_interavals: 
+  - 3000
+  - 6000
+  - 10000
+
+pumba_file: https://raw.githubusercontent.com/openebs/elves/master/chaos/pumba/pumba_kube.yml 
+
+test_pod_regex: maya*|openebs*|pvc*|percona*|pumba*
+
+test_log_path: setup/logs/network_failure_test.log
+
