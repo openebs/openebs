@@ -1,7 +1,7 @@
 #!/bin/bash
 
-node_count=$(echo $NODE COUNT) #--- number of nodes for the Azure kubernetes cluster
-node_vm_size=$(echo $NODE VM SIZE) #--- VM size for the Azure Kubernetes  cluster
+node_count=$(echo $NODE_COUNT) #--- number of nodes for the Azure kubernetes cluster
+node_vm_size=$(echo $NODE_VM_SIZE) #--- VM size for the Azure Kubernetes  cluster
 username=$(echo $USERNAME) #--- Username of the azure account 
 password=$(echo $PASSWORD) #--- Password for the azure account
 
