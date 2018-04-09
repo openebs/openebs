@@ -1,0 +1,18 @@
+---
+test_name: test_replica_quorum_failure
+
+percona_files: 
+  - percona.yaml
+  - sql-test.sh
+
+interval: 3
+
+fault_injection_file: inject_replica_quorum_failure.yml
+
+storage_class_file: replica-quorum-sc.yaml 
+
+test_pod_regex: maya*|openebs*|pvc*|percona*
+
+test_log_path: setup/logs/replica_quorum_failure_test.log
+
+
