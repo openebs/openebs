@@ -47,14 +47,14 @@
      delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
    - name: untaint the nodes for maya-apiserver
-     shell: source ~/.profile; kubectl taint nodes {{ node1 }} {{ operator_key }}:NoSchedule-; kubectl taint nodes {{ node2 }} {{ pvc_key }}:NoSchedule-; kubectl taint nodes {{ node3 }} {{ pvc_key }}:NoSchedule-
+     shell: source ~/.profile; kubectl taint nodes {{ node1 }} {{ operator_key }}:NoSchedule-; kubectl taint nodes {{ node_names[0] }} {{ pvc_key }}:NoSchedule-; kubectl taint nodes {{ node_names[1] }} {{ pvc_key }}:NoSchedule-
      args:
        executable: /bin/bash
      register: result
      delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
    - name: Check nodes are untainted
-     shell: source ~/.profile;  kubectl describe node {{ node1 }} {{ node2 }} {{ node3 }}  | grep NoSchedule
+     shell: source ~/.profile;  kubectl describe node {{ node1 }} {{ node_names[0] }} {{ node_names[1] }}  | grep NoSchedule
      args:
        executable: /bin/bash
      register: result
