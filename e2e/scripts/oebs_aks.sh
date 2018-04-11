@@ -40,8 +40,6 @@ function azure_login(){
      sleep 1
   else
      echo "Logging into Azure Account"
-     username=$(echo $USERNAME)
-     password=$(echo $PASSWORD)
      login=$(az login -u ${username} -p ${password})
      a=$(az account show | grep name | awk 'FNR == 2 {print $2}' | cut -d '"' -f2)
      echo "Logged in Account name :" ${a}
