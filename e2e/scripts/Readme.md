@@ -55,18 +55,9 @@ To verify the Created cluster run the following command.
 ```
 To verify the successful deployment of OpenEBS run the following command.
 ```
-    devops@Azure:~/openebs/k8s$ kubectl get pods --all-namespaces
+    devops@Azure:~/openebs/k8s$ kubectl get pods 
     NAMESPACE     NAME                                                            READY     STATUS    RESTARTS   AGE
     default       maya-apiserver-69f9db69-gfh4x                                   1/1       Running   0          17h
     default       openebs-provisioner-77cb47986c-4nghb                            1/1       Running   0          17h
-    kube-system   heapster-669488959c-wj76s                                       2/2       Running   0          18h
-    kube-system   kube-dns-v20-5bf84586f4-72vmh                                   3/3       Running   0          18h
-    kube-system   kube-dns-v20-5bf84586f4-tp9rj                                   3/3       Running   0          18h
-    kube-system   kube-proxy-l28s4                                                1/1       Running   0          18h
-    kube-system   kube-proxy-s2mhj                                                1/1       Running   0          18h
-    kube-system   kube-svc-redirect-4nfjk                                         1/1       Running   0          18h
-    kube-system   kube-svc-redirect-mvs5g                                         1/1       Running   0          18h
-    kube-system   kubernetes-dashboard-69bb965b88-t8x5v                           1/1       Running   0          18h
-    kube-system   tunnelfront-8d78b6c97-kvwsn                                     1/1       Running   0          18h
 ```
 
