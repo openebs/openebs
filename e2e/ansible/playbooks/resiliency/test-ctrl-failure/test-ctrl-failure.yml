@@ -1,3 +1,6 @@
+# test-ctrl-failure.yml
+# Author: Karthik
+# Description: Include resiliency test suite in OpenEBS e2e (Test: periodic controller failures)
 - hosts: localhost
  
   vars_files: 
@@ -19,12 +22,22 @@
          register: result_kube_home
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
-       - name: Copy the percona spec and liveness script to kubemaster 
-         copy:
-           src: "{{ item }}"
+       - name: Get percona spec and liveness scripts
+         get_url:
+           url: "{{ item }}"
            dest: "{{ result_kube_home.stdout }}"
          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
-         with_items: "{{ percona_files }}"
+         with_items: "{{ percona_links }}"
+
+       - name: Replace volume-claim name with test parameters
+         replace:
+           path: "{{ result_kube_home.stdout }}/percona.yaml"
+           regexp: '{{ item.0 }}'
+           replace: '{{ item.1 }}'
+         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+         with_together:
+           - "{{replace_item}}"
+           - "{{replace_with}}"
 
        - name: Copy the chaoskube specs to kubemaster  
          copy:
@@ -48,8 +61,8 @@
          register: result
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"    
          until: "'Running' in result.stdout"
-         delay: 120 
-         retries: 5
+         delay: 30 
+         retries: 10
       
        ####################################################
        #          SETUP FAULT-INJECTION ENV               #
@@ -71,7 +84,7 @@
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
          register: result_chaoskube 
          until: "'chaoskube' and 'Running' in result_chaoskube.stdout"
-         delay: 120
+         delay: 30
          retries: 15        
 
        - name: Create a configmap with the liveness sql script 
@@ -99,7 +112,7 @@
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
          register: result
          until: "'percona' and 'Running' in result.stdout"
-         delay: 120 
+         delay: 30 
          retries: 15
 
        - name: Set chaoskube pod name to variable 
@@ -176,7 +189,7 @@
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
          register: result
          until: "'percona' and 'Running' in result.stdout"
-         delay: 120 
+         delay: 30 
          retries: 15
 
        ########################################################
@@ -184,9 +197,6 @@
        # (Tear down application, liveness configmap as well as#
        # the FI (chaoskube) infrastructure. Also stop logger) # 
        ########################################################
-
-       - include: test-ctrl-failure-cleanup.yml
-         when: clean | bool
 
        - name: Terminate the log aggregator
          shell: source ~/.profile; killall stern
@@ -202,6 +212,9 @@
            flag: "Fail"
 
      always:
+       - include: test-ctrl-failure-cleanup.yml
+         when: clean | bool
+
        - name: Send slack notification
          slack: 
            token: "{{ lookup('env','SLACK_TOKEN') }}"
