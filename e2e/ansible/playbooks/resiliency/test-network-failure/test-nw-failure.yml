@@ -1,3 +1,6 @@
+# test-ctrl-failure.yml
+# Author: Sudarshan
+# Description: Include resiliency test suite in OpenEBS e2e (Test: periodic network failures)
 - hosts: localhost
  
   vars_files: 
