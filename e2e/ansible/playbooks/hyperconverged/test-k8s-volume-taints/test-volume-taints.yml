@@ -1,0 +1,240 @@
+- hosts: localhost
+
+  vars_files:
+    - volume-taints-vars.yml
+
+  tasks:
+
+   - block:
+   
+       - name: Check whether maya-apiserver pod is running
+         shell: source ~/.profile; kubectl get pods --all-namespaces | grep maya-apiserver
+         args:
+           executable: /bin/bash
+         register: result
+         until: "'Running' in result.stdout"
+         delay: 20
+         retries: 2
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+         ignore_errors: true
+  
+       - block:
+      
+           - name: Delete the openebs operator
+             shell: source ~/.profile; kubectl delete -f "{{ openebs_operator_link }}"
+             args:
+               executable: /bin/bash
+             delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+           - name: Confirm pod has been deleted
+             shell: source ~/.profile; kubectl get pods
+             args:
+               executable: /bin/bash
+             register: result
+             until: "'maya-apiserver' or 'openebs-provisioner' not in result.stdout"
+             delay: 30
+             retries: 3
+             delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+         when: "result.rc == 0"
+
+
+       - name: Taint the nodes for maya-apiserver
+         shell: source ~/.profile; kubectl taint nodes {{ node1 }} {{ operator_key }}={{ operator_value }}:NoSchedule
+         args:
+           executable: /bin/bash
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+       - name: Taint the nodes for the pvc
+         shell: source ~/.profile; kubectl taint nodes {{ item }} {{ pvc_key }}={{ pvc_value }}:NoSchedule
+         args:
+           executable: /bin/bash
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+         with_items: "{{ node_names }}"
+
+       - name: Check nodes are tainted
+         shell: source ~/.profile; kubectl describe node {{ node1 }} {{ node_names[0] }} {{ node_names[1] }}  | grep NoSchedule
+         args:
+           executable: /bin/bash
+         register: result
+         until: "'NoSchedule' in result.stdout"
+         delay: 30
+         retries: 3
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+       - name: Get $HOME of K8s master for kubernetes user
+         shell: source ~/.profile; echo $HOME
+         args:
+           executable: /bin/bash
+         register: result_kube_home
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+  
+       - name: Copy the openebs-operator to kube master
+         copy:
+           src: "{{ openebs_ns_operator }}"
+           dest: "{{ result_kube_home.stdout }}"
+         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+  
+       - name: Replacing the key and value in openebs-operator yaml
+         replace:
+           path: openebs-operator-ns-openebs.yaml
+           regexp: '{{ item.0 }}'
+           replace: '{{ item.1 }}'
+         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+         with_together:
+           - "{{operator_list}}"
+           - "{{replaceoperator_list}}"
+ 
+       - name: deploy the openebs-operator with openebs namespace
+         shell: source ~/.profile; kubectl apply -f "{{ openebs_ns_operator }}"
+         args:
+           executable: /bin/bash
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+       - name: Check whether maya-apiserver pod is deployed
+         shell: source ~/.profile; kubectl get pods --all-namespaces | grep maya-apiserver
+         args:
+           executable: /bin/bash
+         register: result
+         until: "'Running' in result.stdout"
+         delay: 120
+         retries: 5
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+       - name: Copy the volume-policies yaml to kube master
+         copy:
+           src: "{{ volume_policy }}"
+           dest: "{{ result_kube_home.stdout }}"
+         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+
+       - name: Replacing the key and value in volume-policies yaml
+         replace:
+           path: vol-policies.yaml
+           regexp: '{{ item.0 }}'
+           replace: '{{ item.1 }}'
+         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+         with_together:
+           - "{{list}}"
+           - "{{replace_list}}"
+
+       - name: deploy the volume-policies yaml
+         shell: source ~/.profile; kubectl apply -f "{{ volume_policy }}"
+         args:
+           executable: /bin/bash
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+
+       - name: download test-pvc file
+         get_url:
+           url: https://raw.githubusercontent.com/openebs/openebs/master/e2e/ansible/playbooks/hyperconverged/test-k8s-storage-pool/test-pvc.yaml
+           dest: "{{ result_kube_home.stdout }}"
+           force: yes
+         register: result
+         until:  "'OK' in result.msg"
+         delay: 5
+         retries: 3
+         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+  
+       - name: Replacing the storage class name in test-pvc yaml
+         replace:
+           path: test-pvc.yaml
+           regexp: 'storageClassName: openebs-standard'
+           replace: 'storageClassName: openebs-taints-0.6.0'
+         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+
+       - name: Create  namespace for PVC
+         shell: kubectl create ns "{{ namespace }}"
+         args:
+           executable: /bin/bash
+         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+         ignore_errors: true
+     
+
+       - name: deploy the test-pvc yaml
+         shell: source ~/.profile; kubectl apply -f test-pvc.yaml -n "{{ namespace }}"
+         args:
+           executable: /bin/bash
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+       - name: Confirm volume container is running
+         shell: source ~/.profile; kubectl get pods --all-namespaces | grep pvc | grep {{item}} | grep Running | wc -l
+         args:
+           executable: /bin/bash
+         register: result
+         until: result.stdout|int >= 1
+         delay: 30
+         retries: 5
+         with_items:
+           - ctrl
+           - rep
+         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+ 
+       - name: Obtain the list of replicas and their nodes
+         shell: source ~/.profile; kubectl get pods --all-namespaces -o wide | grep rep
+         args:
+           executable: /bin/bash
+         register: result
+         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+
+       - name: Set replica pod name to variable
+         set_fact:
+           rep1_node: "{{ result.stdout.split()[7] }}"
+
+       - name: Set replica pod name to variable
+         set_fact:
+           rep2_node: "{{ result.stdout.split()[15] }}"
+
+       - name: Verifying the replicas are deployed on tainted nodes
+         shell: echo " replicas are running on the tainted nodes"
+         when:  rep1_node  == node_names[0] or rep1_node == node_names[1] and rep2_node == node_names[0] or rep2_node == node_names[1]
+         register: result
+       - debug:
+           msg: "Replicas are deployed on dedicated nodes"
+         when: "result.rc == 0"    
+
+       - name: Get storage replica pod name
+         shell: source ~/.profile; kubectl get pods --all-namespaces | grep rep  | awk {'print $2'}
+         args:
+           executable: /bin/bash
+         register: rep_name
+         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+       
+       - name: Set replica pod name to variable
+         set_fact:
+           rep_pod_name: "{{ rep_name.stdout.split('-rep-')[0] }}"
+
+       - name: find the pvc inside the /mnt/openebs
+         stat:
+          path: /mnt/openebs/{{ rep_pod_name }}
+         register: stat_result
+         become: true
+         delegate_to: "{{groups['kubernetes-kubeminions'].0}}"
+       - debug:
+           msg: "File exists..."
+         when: stat_result.stat.exists
+
+       - include: cleanup.yml
+         when: clean | bool 
+
+       - set_fact:
+           flag: "Pass"
+
+     rescue: 
+       - set_fact: 
+           flag: "Fail"
+
+     always:
+       - name: Send slack notification
+         slack: 
+           token: "{{ lookup('env','SLACK_TOKEN') }}"
+           msg: '{{ ansible_date_time.time }} TEST: {{test_name}}, RESULT: {{ flag }}'
+         when: slack_notify | bool and lookup('env','SLACK_TOKEN')
+
+      
+
+
+
+
+
+
+

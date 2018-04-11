@@ -1,0 +1,64 @@
+
+   - name: Get $HOME of K8s master for kubernetes user
+     shell: source ~/.profile; echo $HOME
+     args:
+       executable: /bin/bash
+     register: result_kube_home
+     delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+   - name: Delete PVC
+     shell: source ~/.profile; kubectl delete -f test-pvc.yaml -n "{{ namespace }}" 
+     args:
+       executable: /bin/bash
+     delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+   - name: Confirm if the PVC has been deleted
+     shell: source ~/.profile; kubectl get pods --all-namespaces 
+     args:
+       executable: /bin/bash
+     delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+     register: result
+     until: "'pvc' not in result.stdout"
+     delay: 30
+     retries: 6
+
+   - name: Delete volume-policies yaml
+     shell: source ~/.profile; kubectl delete -f vol-policies.yaml   
+     args:
+       executable: /bin/bash
+     delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+     ignore_errors: true
+ 
+   - name: Delete openebs-operator with non-default namespace
+     shell: source ~/.profile; kubectl delete -f openebs-operator-ns-openebs.yaml 
+     args:
+       executable: /bin/bash
+     delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+     ignore_errors: true
+
+   - name: Confirm pod has been deleted
+     shell: source ~/.profile; kubectl get pods --all-namespaces
+     args:
+       executable: /bin/bash
+     register: result
+     until: "'maya-apiserver' or 'openebs-provisioner' not in result.stdout"
+     delay: 100
+     retries: 6
+     delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+   - name: untaint the nodes for maya-apiserver
+     shell: source ~/.profile; kubectl taint nodes {{ node1 }} {{ operator_key }}:NoSchedule-; kubectl taint nodes {{ node_names[0] }} {{ pvc_key }}:NoSchedule-; kubectl taint nodes {{ node_names[1] }} {{ pvc_key }}:NoSchedule-
+     args:
+       executable: /bin/bash
+     register: result
+     delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+   - name: Check nodes are untainted
+     shell: source ~/.profile;  kubectl describe node {{ node1 }} {{ node_names[0] }} {{ node_names[1] }}  | grep NoSchedule
+     args:
+       executable: /bin/bash
+     register: result
+     delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+     ignore_errors: true
+   - debug: msg='nodes are untainted'
+     when: result.stderr == "" 
