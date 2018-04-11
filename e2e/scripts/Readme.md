@@ -1,6 +1,6 @@
 ## OpenEBS on AZURE - Deployment using Shell script
 
-The purpose of this user guide is to provide the instructions to set up a Kubernetes cluster on AWS (Amazon Web Services) and have OpenEBS running in hyperconverged mode.
+The purpose of this user guide is to provide the instructions to set up a Kubernetes cluster on AKS and have OpenEBS running in hyperconverged mode.
 
 ### Prerequisites
 
