@@ -34,9 +34,16 @@ This script require the AZURE credentials to access AKS services.
 ```
 **NOTE:** Node count will be the number of nodes, and Node vm size is the size of the virtual machine. For details of node vm size goto the following URL  https://docs.microsoft.com/en-us/azure/cloud-services/cloud-services-sizes-specs
 
-Create a cluster on AKS
+### Create a cluster on AKS
 
-Run the  oebs_aks.sh to create AKS cluster and deploy OpenEBS. The above script will installs the Azure CLI, Kubectl,  iSCSI packages on Kubelet container and it deploy OpenEBS operator and OpenEBS storage class files. And It creates the Log file in the name of oebs_aks.log.
+Run the oebs_aks.sh to create a Kubernetes Cluster on AKS and deploy OpenEBS.
+
+The script will first install the following prerequisites:
+- Azure CLI
+- kubectl
+Once the Kubernetes Cluster is created, the script goes ahead and installs the ISCSI packages in the kubelet container of all worker nodes.
+
+Finally the script deploys OpenEBS operator and OpenEBS Storage Classes on the cluster
 
 To verify the resource group run the below command.
 ```
