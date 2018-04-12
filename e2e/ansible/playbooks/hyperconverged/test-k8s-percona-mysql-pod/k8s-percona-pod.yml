@@ -36,6 +36,16 @@
          delay: 120
          retries: 5
 
+       - name: Replace volume-claim name with test parameters
+         replace:
+           path: "{{ result_kube_home.stdout }}/{{ pod_yaml_alias }}"
+           regexp: '{{ item.0 }}'
+           replace: '{{ item.1 }}'
+         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+         with_together:
+           - "{{replace_item}}"
+           - "{{replace_with}}"
+
        - name: Replace volume size in plugin YAML
          lineinfile:
            path: "{{ result_kube_home.stdout }}/{{ pod_yaml_alias }}"

@@ -11,3 +11,11 @@ snap_name: quicksnap
 
 deb_packages:
   - mysql-client
+
+replace_item:
+  - demo-vol1-claim
+  - demo-vol1
+
+replace_with:
+  - mysql-snap-claim
+  - mysql-snap
