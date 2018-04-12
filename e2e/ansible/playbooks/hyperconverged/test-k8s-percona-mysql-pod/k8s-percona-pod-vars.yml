@@ -11,6 +11,14 @@ pod_yaml_alias: demo-percona-mysql-pvc.yaml
 
 percona_mysql_vol_size: 5G
 
+replace_item:
+  - demo-vol1-claim
+  - demo-vol1
+
+replace_with:
+  - percona-db-claim
+  - percona-db
+
 files: 
   - Dockerfile
   - MySQLLoadGenerate.sh
