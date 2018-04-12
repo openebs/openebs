@@ -6,4 +6,4 @@ block_size: [512k,1M]
 py_file: test-mem.py
 count_num: 10000
 mount_point: /mnt/jiva
-
+volume_claim: memleak-test
