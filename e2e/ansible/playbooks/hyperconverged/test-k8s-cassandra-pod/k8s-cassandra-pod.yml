@@ -141,9 +141,6 @@
          delay: 60
          retries: 5
       
-       - include: k8s-cassandra-pod-cleanup.yml
-         when: clean | bool 
-
        - name: Terminate the log aggregator
          shell: source {{ profile }}; killall stern
          args:
@@ -158,6 +155,9 @@
            flag: "Fail"
 
      always:
+       - include: k8s-cassandra-pod-cleanup.yml
+         when: clean | bool
+
        - name: Send slack notification
          slack: 
            token: "{{ lookup('env','SLACK_TOKEN') }}"
