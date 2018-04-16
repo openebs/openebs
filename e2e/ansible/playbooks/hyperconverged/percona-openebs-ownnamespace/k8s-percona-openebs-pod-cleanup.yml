@@ -1,18 +1,31 @@
-- hosts: localhost
 
-  vars_files:
-    - openebs-ns-vars.yml
 
-  tasks:
-       
+   
        - name: Delete percona mysql pod
-         shell: source ~/.profile; kubectl delete -f "{{ openebs_percona }}"
+         shell: source ~/.profile; kubectl delete -f "{{ percona_file }}" -n percona
          args:
            executable: /bin/bash
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
        - name: Confirm percona pod has been deleted
-         shell: source ~/.profile; kubectl get pods
+         shell: source ~/.profile; kubectl get pods --all-namespaces -l name=percona 
+         args:
+           executable: /bin/bash
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+         register: result
+         until: "'percona' not in result.stdout"
+         delay: 30
+         retries: 10
+
+       - name: Get pvc name to verify successful pvc deletion
+         shell: source ~/.profile; kubectl get pvc --all-namespaces | grep {{ replace_with.0 }} | awk {'print $3'}
+         args:
+           executable: /bin/bash
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+         register: pvc
+
+       - name: Confirm percona pvc pod has been deleted
+         shell: source ~/.profile; kubectl get pods --all-namespaces | grep {{ pvc.stdout }}
          args:
            executable: /bin/bash
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
@@ -20,16 +33,19 @@
          until: "'percona' not in result.stdout"
          delay: 120
          retries: 6
+         failed_when: "'pvc' and 'Running' in result.stdout"
+         delay: 30
+         retried: 10
 
        - name: Delete the openebs operator
          shell: source ~/.profile; kubectl delete -f "{{ openebs_operator }}"
          args:
            executable: /bin/bash
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-
+         ignore_errors: true
 
        - name: Confirm pod has been deleted
-         shell: source ~/.profile; kubectl get pods
+         shell: source ~/.profile; kubectl get pods --all-namespaces
          args:
            executable: /bin/bash
          register: result
@@ -37,5 +53,5 @@
          delay: 10
          retries: 6
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-
-
+     
+  
