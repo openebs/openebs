@@ -91,7 +91,8 @@
          args:
              executable: /bin/bash
          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
-         when: "'namespace' in result.stdout"
+         when: "'namespace' not in result.stdout"
+         ignore_errors: true
 
 
        - name: Copy test-pvc yaml to kubemaster
@@ -100,8 +101,16 @@
            dest: "{{ result_kube_home.stdout }}"
          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
 
+
+       - name: Replace volume-claim name with test parameters
+         replace:
+           path: "{{ result_kube_home.stdout }}/{{ openebs_pvc }}"
+           regexp: 'vut'
+           replace: '{{ volume_claim }}'
+         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+
        - name: Create PVC 
-         shell: source ~/.profile; kubectl apply -f "{{ openebs_pvc }}" -n "{{namespace}}"
+         shell: source ~/.profile; kubectl apply -f "{{ openebs_pvc }}" -n "{{ namespace }}"
          args:
            executable: /bin/bash
          register: pvc_out
