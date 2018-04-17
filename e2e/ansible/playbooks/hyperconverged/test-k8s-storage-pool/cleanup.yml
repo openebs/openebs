@@ -65,9 +65,20 @@
          retries: 6
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
      
+       - name: Remove test artifacts
+         file:
+           path: "{{ result_kube_home.stdout }}/{{ openebs_pvc }}"
+           state: absent
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}" 
+
+       - name: Remove test artifacts
+         file:
+           path: "{{ result_kube_home.stdout }}/{{ storage_pool_path_creation }}"
+           state: absent
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
        - name: sleep for 50 seconds and continue with play
          wait_for:
            timeout: "50"
 
- 
 
