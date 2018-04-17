@@ -9,6 +9,14 @@ chaoskube_files:
   - rbac.yaml
   - chaoskube.yaml 
 
+replace_item:
+  - demo-vol1-claim
+  - demo-vol1
+
+replace_with:
+  - test-single-rep
+  - single-rep
+
 chaos_duration: 120
 
 chaos_interval: 20 

@@ -15,6 +15,23 @@
   delay: 120 
   retries: 6
 
+- name: Get pvc name to verify successful pvc deletion
+  shell: source ~/.profile; kubectl get pvc | grep {{ replace_with.0 }} | awk {'print $3'}
+  args:
+    executable: /bin/bash
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+  register: pvc
+
+- name: Confirm pvc pod has been deleted
+  shell: source ~/.profile; kubectl get pods | grep {{ pvc.stdout }}
+  args:
+    executable: /bin/bash
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+  register: result
+  failed_when: "'pvc' and 'Running' in result.stdout"
+  delay: 30
+  retried: 10
+
 - name: Remove the percona liveness check config map 
   shell: source ~/.profile; kubectl delete cm sqltest 
   args:
@@ -58,7 +75,14 @@
   register: result
   failed_when: "'chaoskube' in result.stdout"
 
-
+- name: Remove test artifacts
+  shell: rm -rf {{ item.0 }}; rm -rf {{ item.1 }}
+  args:
+    executable: /bin/bash
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+  with_together:
+    - "{{percona_files}}"
+    - "{{chaoskube_files}}"
   
  
  
