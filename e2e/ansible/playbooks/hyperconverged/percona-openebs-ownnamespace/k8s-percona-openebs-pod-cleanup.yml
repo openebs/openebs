@@ -53,5 +53,17 @@
          delay: 10
          retries: 6
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-     
+    
+       - name: Remove test artifacts
+         file:
+           path: "{{ result_kube_home.stdout }}/{{ percona_file }}"
+           state: absent
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}" 
+
+       - name: Remove test artifacts
+         file:
+           path: "{{ result_kube_home.stdout }}/{{ openebs_operator }}"
+           state: absent
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
   
