@@ -1,0 +1,48 @@
+---
+- hosts: kubernetes-kubemasters
+  tasks:
+
+    #- name: Getting the response of volume api
+    #  shell: curl http://10.100.118.68:9501/v1/volumes > volume.json
+    #  args:
+    #    executable: /bin/bash
+   # - name: jmespath
+   #   shell: apt install python-jmespath -y
+   #   args:
+   #     executable: /bin/bash
+   #   become: true
+
+#    - name: Getting the response of volume api
+#      shell: curl http://10.105.253.9:9501/v1/volumes 
+#      args:
+#        executable: /bin/bash
+#      register: resp
+ 
+#    - name: Print data
+#      debug: 
+#        #msg: "{{ (resp.stdout | from_json).data[0] }}"
+#        msg: "{{ (resp.stdout | from_json).data[0].id  }}"
+   
+#    - set_fact:
+#        vol_id: "{{ (resp.stdout | from_json).data[0].id  }}"
+ 
+#    - name: Modify the capacity
+#      uri:
+#        url: http://10.105.253.9:9501/v1/volumes/{{vol_id}}?action=resize
+#        method: POST
+#        return_content: yes
+#        body: {"name":"pvc-8dab3cf6-430b-11e8-84ac-02b983f0a4db","size":"6 G"}
+#        body_format: json
+#        headers:
+#          Content-Type: "application/json"
+#      register: modify
+        - name: Running fsck on the new device
+          shell: e2fsck -f /dev/sdd -y
+          args:
+            executable: /bin/bash
+          become: true
+          register: fs_check
+          delegate_to: "{{groups['kubernetes-kubeminions'].1}}"
+          when: fs_check.stdout.rc == 0
+          ignore_errors: true
+

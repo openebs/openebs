@@ -1,0 +1,14 @@
+---
+- name: Delete percona deployment
+  shell: kubectl delete -f "{{ percona_def }}"
+  args:
+    executable: /bin/bash
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+- name: Delete the percona def copied
+  shell: rm -rf "{{ percona_def }}"
+  args:
+    executable: /bin/bash
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+  
+   
