@@ -1,0 +1,44 @@
+- hosts: localhost
+
+  vars_files:
+    - test-nw-failure-rep-vars.yml
+
+  tasks:
+   - block:
+       - name: Get the node details on which pvc-rep is scheduled
+#         shell: kubectl get pods -o wide | grep rep | awk 'FNR == 1 {print}' | awk {'print $7'}
+         shell: kubectl get pods -o wide | grep rep | awk {'print $7'}
+         args:
+           executable: /bin/bash
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+         register: node_rep
+
+       - name: Get the pvc-rep name
+         #shell: kubectl get pods | grep rep | awk 'FNR == 1 {print}' | awk {'print $1'}
+         shell: kubectl get pods | grep rep | awk {'print $1'}
+         args:
+           executable: /bin/bash
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+         register: pvc_rep_name
+
+       - name: Get the rep container name
+         shell: kubectl describe pod {{ pvc_rep_name.stdout_lines[0] }} | grep rep-con | awk {'print $1'}
+         args:
+           executable: /bin/bash
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+         register: container1
+
+       - name: Get the rep container name
+         shell: kubectl describe pod {{ pvc_rep_name.stdout_lines[1] }} | grep rep-con | awk {'print $1'}
+         args:
+           executable: /bin/bash
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+         register: container2
+
+       - name: Get the rep container name
+         shell: kubectl describe pod {{ pvc_rep_name.stdout_lines[2] }} | grep rep-con | awk {'print $1'}
+         args:
+           executable: /bin/bash
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+         register: container3
+
