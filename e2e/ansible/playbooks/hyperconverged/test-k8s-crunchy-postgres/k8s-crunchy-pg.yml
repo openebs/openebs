@@ -105,9 +105,6 @@
          register: result_service
          failed_when: "'pgset-master' and 'pgset-replica' not in result_service.stdout"
 
-       - include: k8s-crunchy-pg-cleanup.yml
-         when: clean | bool
-
        - name: Terminate the log aggregator
          shell: source ~/.profile; killall stern
          args:
@@ -122,6 +119,9 @@
            flag: "Fail"
 
      always:
+       - include: k8s-crunchy-pg-cleanup.yml
+         when: clean | bool
+
        - name: Send slack notification
          slack:
            token: "{{ lookup('env','SLACK_TOKEN') }}"

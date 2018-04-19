@@ -26,6 +26,16 @@
          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
          with_items: "{{ percona_files }}"
 
+       - name: Replace volume-claim name with test parameters
+         replace:
+           path: "{{ result_kube_home.stdout }}/percona.yaml"
+           regexp: '{{ item.0 }}'
+           replace: '{{ item.1 }}'
+         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+         with_together:
+           - "{{replace_item}}"
+           - "{{replace_with}}
+
        - name: Copy the chaoskube specs to kubemaster  
          copy:
            src: "{{ item }}"
@@ -230,8 +240,6 @@
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
          with_items: "{{ result_nodes.stdout_lines }}"
 
-       - include: test-single-replica-failure-cleanup.yml
-         when: clean | bool
 
        - name: Terminate the log aggregator
          shell: source ~/.profile; killall stern
@@ -247,6 +255,9 @@
            flag: "Fail"
 
      always:
+       - include: test-single-replica-failure-cleanup.yml
+         when: clean | bool
+
        - name: Send slack notification
          slack: 
            token: "{{ lookup('env','SLACK_TOKEN') }}"
