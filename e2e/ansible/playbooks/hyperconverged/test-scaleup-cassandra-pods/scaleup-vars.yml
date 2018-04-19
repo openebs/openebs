@@ -1,0 +1,24 @@
+---
+test_name: Scaleup_cassandra-application-pods
+
+test_log_path: setup/logs/hyperconverged_cassandra_db_on_k8s.log
+
+test_pod_regex: maya*|openebs*|pvc*|cassandra*
+
+cassandra_service_link: https://raw.githubusercontent.com/openebs/openebs/master/k8s/demo/cassandra/cassandra-service.yaml 
+
+svc_yaml_alias: cassandra-service.yaml
+
+cassandra_stateful_link: https://raw.githubusercontent.com/openebs/openebs/master/k8s/demo/cassandra/cassandra-statefulset.yaml
+
+stateful_yaml_alias: cassandra-statefulset.yaml
+
+cassandra_loadgen_link: https://raw.githubusercontent.com/openebs/openebs/master/k8s/demo/cassandra/cassandra-loadgen.yaml
+
+loadgen_yaml_alias: cassandra-loadgen.yaml
+
+io_minutes: 3
+
+profile: ~/.profile
+
+openebs_operator_link: https://raw.githubusercontent.com/openebs/openebs/master/k8s/openebs-operator.yaml

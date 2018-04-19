@@ -1,0 +1,231 @@
+- hosts: localhost
+ 
+  vars_files: 
+    - scaleup-vars.yml 
+ 
+  tasks:
+   - block:
+
+       - name: Get $HOME of K8s master for kubernetes user
+         shell: source {{ profile }}; echo $HOME
+         args: 
+           executable: /bin/bash
+         register: result_kube_home
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+       - name: Download YAML for cassandra service
+         get_url: 
+           url: "{{ cassandra_service_link }}"
+           dest: "{{ result_kube_home.stdout }}/{{ svc_yaml_alias }}"
+           force: yes
+         register: result
+         until:  "'OK' in result.msg"
+         delay: 5
+         retries: 3
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+       - name: Download YAML for cassandra statefulset
+         get_url:
+           url: "{{ cassandra_stateful_link }}"
+           dest: "{{ result_kube_home.stdout }}/{{ stateful_yaml_alias }}"
+           force: yes
+         register: result
+         until:  "'OK' in result.msg"
+         delay: 5
+         retries: 3
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+       - name: Download YAML for cassandra loadgen
+         get_url:
+           url: "{{ cassandra_loadgen_link }}"
+           dest: "{{ result_kube_home.stdout }}/{{ loadgen_yaml_alias }}"
+           force: yes
+         register: result
+         until:  "'OK' in result.msg"
+         delay: 5
+         retries: 3
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+   
+       - name: Get the number of nodes in the cluster
+         shell: source {{ profile }}; kubectl get nodes | grep 'Ready' | wc -l
+         args:
+           executable: /bin/bash
+         register: node_out
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+       - name: Fetch the node count from stdout
+         set_fact:
+            node_count: " {{ node_out.stdout}}"
+
+
+       - name: Replace the replica count in cassandra statefulset yaml
+         replace:
+           path: "{{ result_kube_home.stdout }}/{{ stateful_yaml_alias }}"
+           regexp: 'replicas: 3'
+           replace: 'replicas: {{ (node_count) |int-2 }}'
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+       
+       - name: Replace the io_duration in cassandra loadgen yaml
+         replace:
+           path: "{{ result_kube_home.stdout }}/{{ loadgen_yaml_alias }}"
+           regexp: 'duration=5'
+           replace: 'duration={{ io_minutes }}'
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+
+       - name: Deploy openebs-operator 
+         shell: source ~/.profile; kubectl apply -f "{{ openebs_operator_link }}" 
+         args:
+           executable: /bin/bash
+         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+
+       
+       - name: Check whether maya-apiserver pod is deployed
+         shell: source ~/.profile; kubectl get pods --all-namespaces | grep maya-apiserver
+         args:
+           executable: /bin/bash
+         register: result
+         until: "'Running' in result.stdout"
+         delay: 120
+         retries: 5
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}" 
+
+       - name: Deploy cassandra service
+         shell: source {{ profile }}; kubectl apply -f {{ svc_yaml_alias }} 
+         args: 
+           executable: /bin/bash
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+   
+       - name: Deploy cassandra statefulset
+         shell: source {{ profile }}; kubectl apply  -f {{ stateful_yaml_alias }}
+         args:
+           executable: /bin/bash
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+       - name: Confirm cassandra pod status is running
+         shell: source {{ profile }}; kubectl get pods | grep cassandra-0
+         args: 
+           executable: /bin/bash
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+         register: result
+         until: "'cassandra-0' and 'Running' in result.stdout"
+         delay: 120 
+         retries: 15
+
+       - name: Scale up Cassandra application pod
+         shell: source {{ profile }}; kubectl scale statefulsets cassandra --replicas={{ (node_count) |int-3 }}
+         args:
+           executable: /bin/bash
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+         register: result
+         until: "'scaled' in result.stdout"
+         delay: 60
+         retries: 5
+
+       - name: Confirm scaled up cassandra pod status is running
+         shell: source {{ profile }}; kubectl get pods | grep cassandra-1
+         args:
+           executable: /bin/bash
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+         register: result
+         until: "'cassandra-1' and 'Running' in result.stdout"
+         delay: 120
+         retries: 15
+
+
+       - name: Start cassandra load generation
+         shell: source {{ profile }}; kubectl create -f {{ loadgen_yaml_alias }}
+         args:
+           executable: /bin/bash
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+ 
+       - name: Verify load is running for specified duration
+         shell: source {{ profile }}; kubectl get pods | grep cassandra-loadgen
+         args:
+           executable: /bin/bash
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+         register: result
+         until: "'Running' in result.stdout"
+         delay: 120
+         retries: 15
+
+       - name: Wait for {{ (io_minutes) | int *60 }} secs to run load.
+         wait_for:
+              timeout: "{{ (io_minutes) | int *60 }}"
+        
+       - name: Verify load by using describe keyspaces
+         shell: source {{ profile }}; kubectl exec cassandra-0 -- cqlsh --execute "describe keyspaces;"
+         args:
+           executable: /bin/bash
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+         register: result
+         until: "'keyspace1' in result.stdout"
+         delay: 60
+         retries: 5
+         ignore_errors: true
+
+       - name: install python minimal and pip
+         shell: apt-get install -y python-minimal python-pip
+         become: true
+         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+         ignore_errors: true
+  
+       - name: Install cqlsh
+         shell: pip install cqlsh
+         become: true
+         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+         ignore_errors: true
+
+       - name: Get Data distribution percentages
+         shell: source {{ profile }}; kubectl exec cassandra-0 -- nodetool status
+         args:
+           executable: /bin/bash
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+         register: result
+
+       - name: Set Data distribution % of pod1 to variable
+         set_fact:
+           cassandra_pod1_percentage: "{{ result.stdout.split()[20] }}"
+   
+       - name: Set Data distribution % of pod2 to variable
+         set_fact:
+           cassandra_pod2_percentage: "{{ result.stdout.split()[28] }}"
+
+       - name: Verfy the Data distribution percentages
+         shell: echo "Verfiy the data distribution on all the cassandra pods"
+         when: cassandra_pod1_percentage != 0 and cassandra_pod2_percentage != 0
+         register: result
+       - debug:
+           msg: "Data is distributed on all the cassandra application pods"
+         when: "result.rc == 0"
+
+       - set_fact:
+           flag: "Pass"     
+
+     rescue: 
+       - set_fact: 
+           flag: "Fail" 
+
+     always:
+
+       - include: cleanup.yml
+         when: clean | bool 
+
+       - name: Send slack notification
+         slack: 
+           token: "{{ lookup('env','SLACK_TOKEN') }}"
+           msg: '{{ ansible_date_time.time }} TEST: {{test_name}}, RESULT: {{ flag }}'
+         when: slack_notify | bool and lookup('env','SLACK_TOKEN')
+      
+
+      
+
+
+     
+
+      
+
+     
+ 
+
+ 
