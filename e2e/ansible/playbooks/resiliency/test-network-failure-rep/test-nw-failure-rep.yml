@@ -1,6 +1,17 @@
 # test-network-failure-rep.yml
 # Author: Sudarshan
 # Description: Include resiliency test suite in OpenEBS e2e (Test: periodic replica network failures)
+
+###############################################################################################
+#Test Steps
+#1. Copy Test artifacts to Kubemaster.
+#2. Deploy Percona application with liveness probe running db queries continuously.
+#3. Deploy Pumba netem daemonset on all the nodes.
+#4. Gather Node,Replica Container and Pumba netem details required for test.
+#5. Induce periodic network failures on OpenEBS repilca container.
+#6. Check percona application status to veriy openebs replica sustain network failures.
+#7. Perform cleanup of test artifacts.
+###############################################################################################
 - hosts: localhost
  
   vars_files: 
