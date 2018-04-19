@@ -3,7 +3,7 @@
 # Description: Include resiliency test suite in OpenEBS e2e (Test: periodic replica network failures)
 
 ###############################################################################################
-#Test Steps
+#Test Steps:
 #1. Copy Test artifacts to Kubemaster.
 #2. Deploy Percona application with liveness probe running db queries continuously.
 #3. Deploy Pumba netem daemonset on all the nodes.
