@@ -14,6 +14,24 @@
          until: "'pvc' not in result.stdout"
          delay: 30
          retries: 6
+
+       - name: Get pvc name to verify successfull pvc deletion 
+         shell: source ~/.profile; kubectl get pvc --all-namespaces | grep {{ volume_claim }} |  awk {'print $3'}
+         args:
+         executable: /bin/bash
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+         register: pvc
+
+       - name: Confirm pvc pod has been deleted
+         shell: source ~/.profile; kubectl get pods --all-namespaces | grep {{ pvc.stdout }}
+         args:
+           executable: /bin/bash
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+         register: result
+         failed_when: "'pvc' and 'Running' in result.stdout"
+         delay: 30
+         retried: 10
+
       
        - name: Delete Storage_pool path
          shell: source ~/.profile; kubectl delete -f "{{ storage_pool_path_creation }}"
@@ -47,9 +65,20 @@
          retries: 6
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
      
+       - name: Remove test artifacts
+         file:
+           path: "{{ result_kube_home.stdout }}/{{ openebs_pvc }}"
+           state: absent
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}" 
+
+       - name: Remove test artifacts
+         file:
+           path: "{{ result_kube_home.stdout }}/{{ storage_pool_path_creation }}"
+           state: absent
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
        - name: sleep for 50 seconds and continue with play
          wait_for:
            timeout: "50"
 
- 
 

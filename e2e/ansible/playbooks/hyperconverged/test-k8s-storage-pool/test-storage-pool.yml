@@ -4,33 +4,50 @@
     - storage-pool-vars.yml
 
   tasks:
+  
+   - block:
+
    
-    #Deploying operator in default and pvc in percona namespace
-    - include: deploy-openebs-pvc.yml 
-        operator_namespace=default
-        namespace=percona
+       #Deploying operator in default and pvc in percona namespace
+       - include: deploy-openebs-pvc.yml 
+           operator_namespace=default
+           namespace=percona
 
-    - include: cleanup.yml
-        operator_namespace=default
-        namespace=percona
+       - include: cleanup.yml
+           operator_namespace=default
+           namespace=percona
     
-    #Deploying operator in openebs and pvc in default namespace
-    - include: deploy-openebs-pvc.yml
-        operator_namespace=openebs
-        namespace=default
+       #Deploying operator in openebs and pvc in default namespace
+       - include: deploy-openebs-pvc.yml
+           operator_namespace=openebs
+           namespace=default
 
-    - include: cleanup.yml
-        operator_namespace=openebs
-        namespace=default
+       - include: cleanup.yml
+           operator_namespace=openebs
+           namespace=default
 
-    #Deploying operator in openebs and pvc in openebs namespace
-    - include: deploy-openebs-pvc.yml
-        operator_namespace=openebs
-        namespace=percona
+       #Deploying operator in openebs and pvc in openebs namespace
+       - include: deploy-openebs-pvc.yml
+           operator_namespace=openebs
+           namespace=percona
+      
+       - include: cleanup.yml
+           operator_namespace=openebs
+           namespace=percona
 
-    - include: cleanup.yml
-        operator_namespace=openebs
-        namespace=percona
 
+       - set_fact:
+           flag: "Pass"
 
+     rescue: 
+       - set_fact: 
+           flag: "Fail"
+
+     always:
+
+       - name: Send slack notification
+         slack: 
+           token: "{{ lookup('env','SLACK_TOKEN') }}"
+           msg: '{{ ansible_date_time.time }} TEST: {{test_name}}, RESULT: {{ flag }}'
+         when: slack_notify | bool and lookup('env','SLACK_TOKEN')
 
