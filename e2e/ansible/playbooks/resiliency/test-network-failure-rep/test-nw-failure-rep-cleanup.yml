@@ -22,14 +22,14 @@
   delay: 30
   retries: 10
 
-- name: Delete percona mysql pod 
-  shell: source ~/.profile; kubectl delete -f {{ percona_files.0 }} 
+- name: Delete percona mysql pod
+  shell: source ~/.profile; kubectl delete -f {{ percona_files.0 }}
   args:
     executable: /bin/bash
   delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
 - name: Confirm percona pod has been deleted
-  shell: source ~/.profile; kubectl get pods -l name=percona 
+  shell: source ~/.profile; kubectl get pods -l name=percona
   args:
     executable: /bin/bash
   delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
@@ -48,8 +48,8 @@
   delay: 30
   retries: 10
 
-- name: Remove the percona liveness check config map 
-  shell: source ~/.profile; kubectl delete cm sqltest 
+- name: Remove the percona liveness check config map
+  shell: source ~/.profile; kubectl delete cm sqltest
   args:
     executable: /bin/bash
   delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
@@ -63,6 +63,6 @@
   delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
   with_items:
     - "{{percona_files}}"
-  
- 
- 
+
+
+
