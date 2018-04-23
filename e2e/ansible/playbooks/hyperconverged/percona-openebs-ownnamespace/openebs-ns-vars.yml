@@ -7,26 +7,34 @@ openebs_operator_alias: openebs-operator.yaml
 
 openebs_storageclass: openebs-storageclasses.yaml
 
-openebs_percona: percona-ns-percona-sc-percona.yaml
 
 openebs_storageclasses_link: https://raw.githubusercontent.com/openebs/openebs/master/k8s/openebs-storageclasses.yaml
 
-percona_loadgen: sql-loadgen.yaml
 
 openebs_storageclasses_alias: openebs-storageclasses.yaml
 
 percona_mysql_plugin_link: https://raw.githubusercontent.com/openebs/openebs/master/k8s/demo/percona/demo-percona-mysql-pvc.yaml
 
-# Image tag for openebs containers
-# Accepted entries (ci, latest): Default: latest
-test_tag: latest
 
+percona_links:
+  - https://raw.githubusercontent.com/openebs/elves/master/e2e/percona-liveness/percona.yaml
+  - https://raw.githubusercontent.com/openebs/elves/master/e2e/percona-liveness/sql-test.sh
 
-pod_yaml_alias: demo-percona-mysql-pvc.yaml
+percona_file: demo-percona-mysql-pvc.yaml
 
-percona_mysql_vol_size: 5G
+replace_item:
+  - demo-vol1-claim
+  - demo-vol1
 
+replace_with:
+  - percona-diffns-claim
+  - percona-diffns
+
+test_name: deploy openebs and percona with its own namespace
 
 deb_packages:
   - python-pip
 
+test_pod_regex: maya*|openebs*|pvc*|percona*
+
+test_log_path: setup/logs/openebs-percona-ownnamespace.log
