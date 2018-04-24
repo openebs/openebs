@@ -1,15 +1,22 @@
-# STEPS INVOLUVED:
+# Test name: Resize Jiva volume
+
+#Description: Check if the OpenEBS Jiva volume's capacity can be expanded.
+
+# STEPS INVOLVED:
 #1) Deploy OpenEBS
-#2) Deploy percona
-#3) Fill data
-#4) Get the node where application is running
+#2) Create label for a node.
+#3) Deploy percona with node selector applied.
+#4) Obtain iSCSI target details.
 #5) Unmount the file system
 #6) Logout the iscsi target
 #7) Get the id of the volume
 #8) Modfiy the volume size
 #9) Restart the replicas
-#10) Expanc the file system
+#10) Check the file system consistency
+#10) Expand the file system
 #)11) Mount the file system
+#12) Restart the application pod
+#13) Write data on the resized portion of the file system.
 
 
 - hosts: localhost
@@ -50,7 +57,9 @@
             executable: /bin/bash
           register: node_name
           delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
-  
+ 
+# Creating label "app=percona" for a node, so that node selector tage can be used in next task.
+ 
         - name: Creating label for the node
           shell: kubectl label nodes {{node_name.stdout}} app=percona
           args:
@@ -72,7 +81,7 @@
           retries: 5
         
         - name: Checking if the application is deployed successfully
-          shell: kubectl get pods --all-namespaces | grep percona
+          shell: kubectl get pods --all-namespaces --show-labels | grep "{{ app_label }}"
           args:
             executable: /bin/bash
           register: app_status
@@ -81,8 +90,8 @@
           delay: 30
           retries: 15
     
-        - name: Getting PV name
-          shell: kubectl get pv | grep openebs-percona | awk {'print $1'}
+        - name: Getting PV name from the pvc
+          shell: kubectl get pvc {{ claim_name }} -o custom-columns=:spec.volumeName --no-headers
           args:
             executable: /bin/bash
           register: pv
@@ -112,17 +121,10 @@
 
         - name: Unmount the file system
           mount:
-            name: "{{ mount_path.stdout }}"
+            path: "{{ mount_path.stdout }}"
             state: unmounted
           become: true
           delegate_to: "{{groups['kubernetes-kubeminions'].1}}"
-         # shell: umount -l "{{ mount_path.stdout }}"
-         # args:
-         #   executable: /bin/bash
-         # become: true
-         # register: unmount
-         # delegate_to: "{{groups['kubernetes-kubeminions'].1}}"
-
 
         - name: Finding the iSCSI target name
           shell: iscsiadm -m session | grep "{{ target_IP.stdout}}"| awk {'print $4'}
@@ -132,14 +134,11 @@
           register: iqn
           delegate_to: "{{groups['kubernetes-kubeminions'].1}}"
           
-
         - name: Logging out the iSCSI target 
           open_iscsi:
             login: no
             target: "{{ iqn.stdout }}"
-          #shell: iscsiadm -m node -T "{{ iqn.stdout }}" -u
-          #args: 
-          #  executable: /bin/bash
+            show_nodes: yes
           become: true
           delegate_to: "{{groups['kubernetes-kubeminions'].1}}"
 
@@ -164,34 +163,36 @@
               Content-Type: "application/json"
           register: modify
           delegate_to: "{{ groups['kubernetes-kubemasters'].0}}"
-         
-        - name: Get the list of pods
-          shell: kubectl get pods | grep {{ pv.stdout }} | grep rep | awk {'print $1'} | awk 'FNR == 1 {print}'
+
+        - name: Getting the replica pod names
+          shell:  kubectl get pods --all-namespaces --show-labels | grep openebs/replica=jiva-replica | awk {'print $2'}
           args:
             executable: /bin/bash
-          register: rep1
+          register: pods
           delegate_to: "{{ groups['kubernetes-kubemasters'].0}}"
 
-        - name: Get the list of pods
-          shell: kubectl get pods | grep {{ pv.stdout }} | grep rep | awk {'print $1'} | awk 'FNR == 2 {print}'
+        - name: Deleting the replica pods
+          shell: kubectl delete pod {{ item }}
           args:
             executable: /bin/bash
-          register: rep2
           delegate_to: "{{ groups['kubernetes-kubemasters'].0}}"
+          with_items: "{{ pods.stdout_lines }}"
+          register: delete_out
+          until: "'deleted' in delete_out.stdout"
+          delay: 20
+          retries: 10 
+          changed_when: true
+        
+        - name: Checking if the replica pods are created again.
+          shell: kubectl get pods --all-namespaces --show-labels | grep "{{ pv.stdout }}" | grep "{{ replica_label }}" | grep Running | wc -l
+          args:
+            executable: /bin/bash
+          register: result
+          delegate_to: "{{ groups['kubernetes-kubemasters'].0}}"
+          until: result.stdout|int == 3
+          delay: 30
+          retries: 10
 
-        - name: Get the list of pods
-          shell: kubectl get pods | grep {{ pv.stdout }} | grep rep | awk {'print $1'} | awk 'FNR == 3 {print}'
-          args:
-            executable: /bin/bash
-          register: rep3
-          delegate_to: "{{ groups['kubernetes-kubemasters'].0}}"
-
-        - name: Kill pods
-          shell: kubectl delete pod {{rep1.stdout}} {{rep2.stdout}} {{rep3.stdout}}
-          args:
-            executable: /bin/bash
-          delegate_to: "{{ groups['kubernetes-kubemasters'].0}}"
- 
         - name: Login to iSCSI target
           open_iscsi:
             show_nodes: yes
@@ -201,7 +202,8 @@
           delegate_to: "{{groups['kubernetes-kubeminions'].1}}"
       
         - name: Finding the new device name
-          shell: fdisk -l | grep "6 G" | awk {'print $2'} | sed 's/.$//'
+          shell: iscsiadm -m session -P3 | egrep 'iqn|disk' | grep disk | awk {'print $4'}
+          #shell: fdisk -l | grep "6 G" | awk {'print $2'} | sed 's/.$//'
           args:
             executable: /bin/bash
           become: true
@@ -209,7 +211,7 @@
           delegate_to: "{{groups['kubernetes-kubeminions'].1}}"
  
         - name: Running fsck on the new device
-          shell: e2fsck -f {{ new_device.stdout }} -y
+          shell: e2fsck -f /dev/{{ new_device.stdout }} -y
           args:
             executable: /bin/bash
           become: true
@@ -221,7 +223,7 @@
           ignore_errors: yes
 
         - name: Resizing the file system
-          shell: resize2fs {{ new_device.stdout }}
+          shell: resize2fs /dev/{{ new_device.stdout }}
           args:
             executable: /bin/bash
           become: true
@@ -230,9 +232,18 @@
           until: "'Resizing the filesystem on' in resize.stdout"
           delay: 20
           retries: 10
+
+        - name: Mounting the file system
+          mount:
+            path: "{{ mount_path.stdout }}"
+            src: "/dev/{{ new_device.stdout }}"
+            fstype: ext4
+            state: mounted
+          become: true
+          delegate_to: "{{groups['kubernetes-kubeminions'].1}}"
  
         - name: Getting application pod
-          shell: kubectl get pods --all-namespaces | grep percona | awk {'print$2'}
+          shell: kubectl get pods --all-namespaces --show-labels | grep {{ app_label }} | awk {'print $2'}
           args:
             executable: /bin/bash
           register: app
@@ -247,23 +258,41 @@
           until: "'deleted' in delete_app.stdout"
           delay: 10
           retries: 5
+ 
+        - name: Check if the application pod is running
+          shell: kubectl get pods --all-namespaces --show-labels | grep "{{app_label}}"
+          args:
+            executable: /bin/bash
+          register: app_out
+          delegate_to: "{{ groups['kubernetes-kubemasters'].0}}"
+          until: "'Running' in app_out.stdout"
+          delay: 20
+          retries: 10
   
-        - name: Mounting the file system
-          mount:
-            path: "{{ mount_path.stdout }}"
-            src: "{{ new_device.stdout }}"
-            fstype: ext4
-            state: mounted
+        - name: Writing data into the volume using dd
+          shell: dd if=/dev/urandom of="{{mount_path.stdout}}/f1" bs=4k seek=1250000 count=200
+          args:
+            executable: /bin/bash
+          become: true
           delegate_to: "{{groups['kubernetes-kubeminions'].1}}"
 
-        - set_fact:       
+        - name: Setting the Pass flag
+          set_fact:       
             flag: "PASS"
  
       rescue:
-        - set_fact:
+        - name: Setting the fail flag
+          set_fact:
             flag: "FAIL"
 
       always:
+        
+        - name: Remove the node label
+          shell: kubectl label node "{{node_name.stdout}}" app-
+          args:
+            executable: /bin/bash
+          delegate_to: "{{ groups['kubernetes-kubemasters'].0}}"
+         
 
         - include: resize-cleanup.yml
           when: clean | bool

@@ -15,11 +15,6 @@ spec:
       labels: 
         name: percona
     spec:
-      tolerations:
-      - key: "ak"
-        value: "av"
-        operator: "Equal"
-        effect: "NoSchedule"
       containers:
         - resources:
             limits:
@@ -43,12 +38,12 @@ spec:
       volumes:
         - name: demo-vol1
           persistentVolumeClaim:
-            claimName: demo-vol1-claim
+            claimName: percona-claim
 ---
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
-  name: demo-vol1-claim
+  name: percona-claim
 spec:
   storageClassName: openebs-percona
   accessModes:

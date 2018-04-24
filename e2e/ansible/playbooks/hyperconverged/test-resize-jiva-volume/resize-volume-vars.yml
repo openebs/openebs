@@ -2,6 +2,10 @@
 
 test_name: test-resize-jiva-volume
 
-percona_deploy: https://raw.githubusercontent.com/openebs/openebs/master/k8s/demo/percona/percona-openebs-deployment.yaml
-
 percona_def: percona-openebs-deployment.yaml
+
+claim_name: percona-claim
+
+app_label: "name=percona"
+
+replica_label: "openebs/replica=jiva-replica"
