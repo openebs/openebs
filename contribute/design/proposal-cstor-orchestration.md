@@ -25,7 +25,6 @@ As part of implementing the cStor, the following CRDs are loaded:
 - CStorPool
 - CStorVolume
 - CStorVolumeReplica
-(TODO: @ganesh) Fill in the YAMLs for the above CRDs. 
 
 ### Workflow for creating cStor StoragePools:
 
@@ -97,10 +96,13 @@ As part of implementing the cStor, the following CRDs are loaded:
        apiVersion: openebs.io/v1alpha1
        kind: CStorPool
        metadata:
-         name: pool1
+         #Name is auto generated using the prefix of StoragePoolClaim name and 
+         # nodename hash
+         name: pool1-84eb2e
          #Following uid will be auto generated when the CR is created.
-         #uid: 7b99e406-1260-11e8-aa43-00505684eb2e
-         node: node-host-label
+         uid: 7b99e406-1260-11e8-aa43-00505684eb2e
+         labels:
+           "kubernetes.io/hostname": "node-host-label"
        spec:
          disks:
            #Disks that are actually used for creating the cstor pool are listed here. 
@@ -112,7 +114,8 @@ As part of implementing the cStor, the following CRDs are loaded:
            #overProvisioning: false       
            # status is updated by the cstor-pool-mgmt to reflect the current status of the pool. 
            # The valid values are : init, online, offline
-           status: init
+       status:
+         phase: init
        ```
        
      * create a Deployment YAML file that contains the cStor container and its associated sidecars. The cStor sidecar is passed the “unique id” of the CStorPool (CR). The Deployment YAML will have the node selectors set to pin the containers to the node where the disks are attached.
@@ -136,7 +139,8 @@ As part of implementing the cStor, the following CRDs are loaded:
            labels:
              monitoring: volume_exporter_prometheus
              openebs/pool: cstor-pool
-             spc: spc-7b99e406-1260-11e8-aa43-00505684eb2e
+             spc: pool1
+             sp: spc-7b99e406-1260-11e8-aa43-00505684eb2e
          spec:
            containers:
            - name: spc-7b99e406-1260-11e8-aa43-00505684eb2e-pool-container
@@ -237,7 +241,7 @@ As part of implementing the cStor, the following CRDs are loaded:
       policies:
       - name: ReplicaCount
         value: "3"
-      - name: StoragePool
+      - name: StoragePoolClaim
         value: "pool1"
      ...
      ``` 
@@ -366,12 +370,16 @@ As part of implementing the cStor, the following CRDs are loaded:
        kind: CStorVolumeReplica
        metadata:
          name: pvc-ee171da3-07d5-11e8-a5be-42010a8001be-cstor-rep-9440ab
+         uid: ee171da3-07d5-11e8-a5be-42010a8001be
+         labels:
+           "pool.openebs.io/uid" : 7b99e406-1260-11e8-aa43-00505684eb2e
+           "pool.openebs.io/name" : pool1-84eb2e
        spec:
-         poolGUID: 7b99e406-1260-11e8-aa43-00505684eb2e
          cstorControllerIP: <ip-address>
          volumeName: demo-vol
          capacity: 5G
-         status: init
+       status:
+         phase: init
        ```
        
     * The cstor-sidecar (spc-7b99e406-1260-11e8-aa43-00505684eb2e-pool-mgmt) running in the CStorPool(7b99e406-1260-11e8-aa43-00505684eb2e), will watch on the CStorVolumeReplica CR for creating the zVol and associating itself with the OV cStorController. The cstor-sidecar will only be allowed to update the CStorVolumeReplica CR, it SHOULD NOT create/delete CStorVolumeReplica CR.
