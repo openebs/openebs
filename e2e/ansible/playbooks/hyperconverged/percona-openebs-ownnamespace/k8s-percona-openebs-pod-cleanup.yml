@@ -1,5 +1,11 @@
 
 
+       - name: Get pvc name to verify successful pvc deletion
+         shell: source ~/.profile; kubectl get pvc --all-namespaces | grep {{ replace_with.0 }} | awk {'print $3'}
+         args:
+           executable: /bin/bash
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+         register: pvc
 
        - name: Delete percona mysql pod
          shell: source ~/.profile; kubectl delete -f "{{ percona_file }}" -n percona
@@ -17,22 +23,12 @@
          delay: 30
          retries: 10
 
-       - name: Get pvc name to verify successful pvc deletion
-         shell: source ~/.profile; kubectl get pvc --all-namespaces | grep {{ replace_with.0 }} | awk {'print $3'}
-         args:
-           executable: /bin/bash
-         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-         register: pvc
-
        - name: Confirm percona pvc pod has been deleted
          shell: source ~/.profile; kubectl get pods --all-namespaces | grep {{ pvc.stdout }}
          args:
            executable: /bin/bash
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
          register: result
-         until: "'percona' not in result.stdout"
-         delay: 120
-         retries: 6
          failed_when: "'pvc' and 'Running' in result.stdout"
          delay: 30
          retried: 10
