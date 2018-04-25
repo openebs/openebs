@@ -31,7 +31,7 @@
          register: result
          failed_when: "'pvc' and 'Running' in result.stdout"
          delay: 30
-         retried: 10
+         retries: 10
 
        - name: Delete the openebs operator
          shell: source ~/.profile; kubectl delete -f "{{ openebs_operator }}"

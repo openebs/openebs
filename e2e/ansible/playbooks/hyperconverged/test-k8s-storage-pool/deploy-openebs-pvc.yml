@@ -53,6 +53,14 @@
          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
          when: "'openebs' in operator_namespace"
 
+       - name: Start the log aggregator to capture test pod logs
+         shell: >
+           source ~/.profile;
+           nohup stern --all-namespaces "{{test_pod_regex}}" --since 1m > "{{result_kube_home.stdout}}/{{test_log_path}}" &
+         args:
+           executable: /bin/bash
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
 
        - name: Check whether maya-apiserver pod is deployed
          shell: source ~/.profile; kubectl get pods --all-namespaces | grep maya-apiserver
@@ -63,6 +71,7 @@
          delay: 120
          retries: 5
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
 
        - name: Copy the storage pool creation yaml to kube master
          copy:
@@ -154,3 +163,8 @@
            msg: "File exists..."
          when: stat_result.stat.exists
 
+       - name: Terminate the log aggregator
+         shell: source {{ profile }}; killall stern
+         args:
+           executable: /bin/bash 
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}" 
