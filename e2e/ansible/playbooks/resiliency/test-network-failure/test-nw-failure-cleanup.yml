@@ -7,36 +7,19 @@
   register: pvc
 
 - name: Delete pumba infrastructure
-  shell: source ~/.profile; kubectl delete daemonset  pumba
-  args:
-    executable: /bin/bash
-  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+  include_tasks: "{{ localhost_home.stdout }}/{{utils_path}}/delete_deploy.yml"
+  vars:
+    app_yml: "{{ pumba_file }}"
 
-- name: Confirm pumba pod has been deleted
-  shell: source ~/.profile; kubectl get pods --no-headers -l app=pumba
-  args:
-    executable: /bin/bash
-  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-  register: result
-  until: "'pumba' not in result.stdout"
-  delay: 30
-  retries: 10
+- name: Delete percona mysql pod
+  include_tasks: "{{ localhost_home.stdout }}/{{utils_path}}/delete_deploy.yml"
+  vars:
+    app_yml: "{{ percona_files.0 }}"
 
-- name: Delete percona mysql pod 
-  shell: source ~/.profile; kubectl delete -f {{ percona_files.0 }} 
-  args:
-    executable: /bin/bash
-  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-
-- name: Confirm percona pod has been deleted
-  shell: source ~/.profile; kubectl get pods -l name=percona 
-  args:
-    executable: /bin/bash
-  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-  register: result
-  until: "'percona' not in result.stdout"
-  delay: 30
-  retries: 10
+- name: Confirm percona pod deletion
+  include_tasks: "{{ localhost_home.stdout }}/{{utils_path}}/delete_deploy_check.yml"
+  vars:
+    app: percona
 
 - name: Confirm pvc pod has been deleted
   shell: source ~/.profile; kubectl get pods | grep {{ pvc.stdout }}

@@ -1,6 +1,8 @@
 ---
 test_name: test_replica_quorum_failure
 
+utils_path: openebs/e2e/ansible/playbooks/utils
+
 percona_links:
   - https://raw.githubusercontent.com/openebs/elves/master/e2e/percona-liveness/percona.yaml
   - https://raw.githubusercontent.com/openebs/elves/master/e2e/percona-liveness/sql-test.sh

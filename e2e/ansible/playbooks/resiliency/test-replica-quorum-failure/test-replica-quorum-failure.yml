@@ -1,3 +1,18 @@
+# test-single-replica-failure.yml
+# Author: UdayKiran
+# Description: Replica failure test(Quorun met).
+
+###############################################################################################
+#Test Steps:
+#1. Copy Test artifacts to Kubemaster.
+#2. Deploy Percona application with liveness probe running db queries continuously.
+#3. Setup ChaosKube infrastructure.
+#4. Gather Node,Replica Container and Pumba netem details required for test.
+#5. Initiate single replica failure using ChaosKube.
+#6. Check percona application status to veriy openebs controller can sustain failures.
+#7. Perform cleanup of test artifacts.
+###############################################################################################
+
 - hosts: localhost
  
   vars_files: 
@@ -19,6 +34,12 @@
          register: result_kube_home
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
+       - name: Get $HOME of localhost
+         shell: source ~/.profile; echo $HOME
+         args:
+           executable: /bin/bash
+         register: localhost_home
+
        - name: Get percona spec and liveness scripts
          get_url:
            url: "{{ item }}"
@@ -27,14 +48,11 @@
          with_items: "{{ percona_links }}"
 
        - name: Replace volume-claim name with test parameters
-         replace:
+         include_tasks: "{{ localhost_home.stdout }}/{{utils_path}}/regex_task.yml"
+         vars:
            path: "{{ result_kube_home.stdout }}/percona.yaml"
-           regexp: '{{ item.0 }}'
-           replace: '{{ item.1 }}'
-         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
-         with_together:
-           - "{{replace_item}}"
-           - "{{replace_with}}"
+           regex1: "{{replace_item}}"
+           regex2: "{{replace_with}}"
 
        - name: Copy the fault injection specs to kubemaster  
          copy:
@@ -56,16 +74,11 @@
            executable: /bin/bash
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
-       - name: Check whether maya-apiserver pod is deployed
-         shell: source ~/.profile; kubectl get pods | grep maya-apiserver
-         args: 
-           executable: /bin/bash
-         register: result
-         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"    
-         until: "'Running' in result.stdout"
-         delay: 30 
-         retries: 15
-      
+       - name: Check status of maya-api server
+         include_tasks: "{{ localhost_home.stdout }}/{{utils_path}}/deploy_check.yml"
+         vars:
+            app: maya-api
+ 
        ####################################################
        #          SETUP FAULT-INJECTION ENV               #
        # (Setup chaoskube deployment with an empty policy,#
@@ -73,10 +86,9 @@
        ####################################################
 
        - name: Setup the storage class
-         shell: source ~/.profile; kubectl apply -f {{ storage_class_file }} 
-         args:
-           executable: /bin/bash
-         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+         include_tasks: "{{ localhost_home.stdout }}/{{utils_path}}/deploy_task.yml"
+         vars:
+           app_yml: "{{ storage_class_file }}"
 
        - name: Create a configmap with the liveness sql script 
          shell: source ~/.profile; kubectl create configmap sqltest --from-file={{ percona_files.1 }} 
@@ -87,24 +99,18 @@
          failed_when: "'configmap' and 'created' not in result.stdout"
 
        - name: Create percona deployment with OpenEBS storage
-         shell: source ~/.profile; kubectl apply -f {{ percona_files.0 }}
-         args:
-           executable: /bin/bash
-         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+         include_tasks: "{{ localhost_home.stdout }}/{{utils_path}}/deploy_task.yml"
+         vars:
+           app_yml: "{{ percona_files.0 }}"
 
-       - name: Wait for 120s to ensure liveness check starts 
+       - name: Wait for 120s to ensure liveness check starts
          wait_for:
            timeout: 120
-         
-       - name: Confirm percona pod is running
-         shell: source ~/.profile; kubectl get pods --no-headers -l name=percona   
-         args: 
-           executable: /bin/bash
-         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-         register: result
-         until: "'percona' and 'Running' in result.stdout"
-         delay: 30 
-         retries: 15
+
+       - name: Check whether percona application is running
+         include_tasks: "{{ localhost_home.stdout }}/{{utils_path}}/deploy_check.yml"
+         vars:
+            app: percona
 
        - name: Get the name of the volume replica deployment 
          shell: > 
@@ -124,6 +130,7 @@
        # (Obtain begin marker before fault-inject(FI),do ctrl # 
        # failures, verify successful FI via end marker)       # 
        ########################################################
+
        - name: Populate the iterator with the values to loop
          shell: >
            shuf -i 1-100 -n {{interval}}
@@ -140,24 +147,16 @@
        # pod is still in running state)                       #
        ########################################################
 
-       - name: Confirm percona application is still running
-         shell: source ~/.profile; kubectl get pods --no-headers -l name=percona   
-         args: 
-           executable: /bin/bash
-         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-         register: result
-         until: "'percona' and 'Running' in result.stdout"
-         delay: 30 
-         retries: 15
+       - name: Confirm percona pod is still running
+         include_tasks: "{{ localhost_home.stdout }}/{{utils_path}}/status_running.yml"
+         vars:
+            app: percona
 
        ########################################################
        #                        CLEANUP                       #			      
        # (Tear down application, liveness configmap as well as#
        # the FI (chaoskube) infrastructure. Also stop logger) # 
        ########################################################
-
-       - include: test-replica-quorum-failure-cleanup.yml
-         when: clean | bool
 
        - name: Terminate the log aggregator
          shell: source ~/.profile; killall stern
@@ -173,6 +172,10 @@
            flag: "Fail"
 
      always:
+  
+       - include: test-replica-quorum-failure-cleanup.yml
+         when: clean | bool
+
        - name: Send slack notification
          slack: 
            token: "{{ lookup('env','SLACK_TOKEN') }}"

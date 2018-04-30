@@ -7,36 +7,19 @@
   register: pvc
 
 - name: Delete pumba infrastructure
-  shell: source ~/.profile; kubectl delete daemonset  pumba
-  args:
-    executable: /bin/bash
-  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-
-- name: Confirm pumba pod has been deleted
-  shell: source ~/.profile; kubectl get pods --no-headers -l app=pumba
-  args:
-    executable: /bin/bash
-  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-  register: result
-  until: "'pumba' not in result.stdout"
-  delay: 30
-  retries: 10
+  include_tasks: "{{ localhost_home.stdout }}/{{utils_path}}/delete_deploy.yml"
+  vars:
+    app_yml: "{{ pumba_file }}"
 
 - name: Delete percona mysql pod
-  shell: source ~/.profile; kubectl delete -f {{ percona_files.0 }}
-  args:
-    executable: /bin/bash
-  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+  include_tasks: "{{ localhost_home.stdout }}/{{utils_path}}/delete_deploy.yml"
+  vars:
+    app_yml: "{{ percona_files.0 }}"
 
-- name: Confirm percona pod has been deleted
-  shell: source ~/.profile; kubectl get pods -l name=percona
-  args:
-    executable: /bin/bash
-  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-  register: result
-  until: "'percona' not in result.stdout"
-  delay: 30
-  retries: 10
+- name: Confirm percona pod deletion
+  include_tasks: "{{ localhost_home.stdout }}/{{utils_path}}/delete_deploy_check.yml"
+  vars:
+    app: percona
 
 - name: Confirm pvc pod has been deleted
   shell: source ~/.profile; kubectl get pods | grep {{ pvc.stdout }}
@@ -46,10 +29,10 @@
   register: result
   failed_when: "'pvc' and 'Running' in result.stdout"
   delay: 30
-  retries: 10
+  retried: 10
 
-- name: Remove the percona liveness check config map
-  shell: source ~/.profile; kubectl delete cm sqltest
+- name: Remove the percona liveness check config map 
+  shell: source ~/.profile; kubectl delete cm sqltest 
   args:
     executable: /bin/bash
   delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
@@ -63,6 +46,6 @@
   delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
   with_items:
     - "{{percona_files}}"
-
-
-
+  
+ 
+ 

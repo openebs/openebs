@@ -21,6 +21,8 @@ replace_with:
   - test-ctrl-failure
   - test-ctrl
 
+utils_path: openebs/e2e/ansible/playbooks/utils
+
 chaos_duration: 120
 
 chaos_interval: 20 
