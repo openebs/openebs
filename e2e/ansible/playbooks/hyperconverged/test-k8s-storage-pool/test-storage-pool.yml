@@ -21,19 +21,19 @@
     - storage-pool-vars.yml
 
   tasks:
-  
+
    - block:
 
-   
+
        #Deploying operator in default and pvc in percona namespace
-       - include: deploy-openebs-pvc.yml 
+       - include: deploy-openebs-pvc.yml
            operator_namespace=default
            namespace=percona
 
        - include: cleanup.yml
            operator_namespace=default
            namespace=percona
-    
+
        #Deploying operator in openebs and pvc in default namespace
        - include: deploy-openebs-pvc.yml
            operator_namespace=openebs
@@ -47,23 +47,24 @@
        - include: deploy-openebs-pvc.yml
            operator_namespace=openebs
            namespace=percona
-      
+
        - include: cleanup.yml
            operator_namespace=openebs
            namespace=percona
 
-
-       - set_fact:
+       - name: Set flag to pass if test case is passed
+         set_fact:
            flag: "Pass"
 
-     rescue: 
-       - set_fact: 
+     rescue:
+       - name: Set flag to fail if test case is failed
+         set_fact:
            flag: "Fail"
 
      always:
 
        - name: Send slack notification
-         slack: 
+         slack:
            token: "{{ lookup('env','SLACK_TOKEN') }}"
            msg: '{{ ansible_date_time.time }} TEST: {{test_name}}, RESULT: {{ flag }}'
          when: slack_notify | bool and lookup('env','SLACK_TOKEN')

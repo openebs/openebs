@@ -180,11 +180,13 @@
            executable: /bin/bash
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
-       - set_fact:
+       - name: Set flag tp pass if test case is passed
+         set_fact:
            flag: "Pass"
 
      rescue:
-       - set_fact:
+       - name: Set flag to fail if test case is failed
+         set_fact:
            flag: "Fail"
 
      always:

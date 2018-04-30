@@ -38,3 +38,9 @@ deb_packages:
 test_pod_regex: maya*|openebs*|pvc*|percona*
 
 test_log_path: setup/logs/openebs-percona-ownnamespace.log
+
+test_artifacts:
+   - demo-percona-mysql-pvc.yaml
+   - openebs-operator-ns-openebs.yaml
+
+
