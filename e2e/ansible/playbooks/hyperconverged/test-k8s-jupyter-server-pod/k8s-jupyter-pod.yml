@@ -1,3 +1,16 @@
+# k8s-jupyter-pod.yml
+# Description: Deploy Jupyter application using OpenEBS volume.
+
+###############################################################################################
+#Test Steps:
+#1. Check whether the OpenEBS components are deployed.
+#2. Download the test artifacts to k8s master.
+#3. Deploy Jupyter application.
+#4. Check if the application pod is up and running
+#5. Check if the Jupyter service us up.
+#7. Perform cleanup of test artifacts.
+###############################################################################################
+
 - hosts: localhost
  
   vars_files: 

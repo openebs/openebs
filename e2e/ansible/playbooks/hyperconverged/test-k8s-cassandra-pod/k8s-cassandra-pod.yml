@@ -1,3 +1,17 @@
+# k8s-cassandra-pod.yml
+# Description: Deploy Cassandra application as statefulset
+
+###############################################################################################
+#Test Steps:
+#1. Check whether the OpenEBS components are deployed.
+#2. Download the test artifacts to k8s master.
+#3. Get the number of nodes and set the replica count accordingly.
+#4. Deploy the cassandra service and the statefulset.
+#5. Check if the application pod is up and running
+#6. Generate the load.
+#7. Perform cleanup of test artifacts.
+###############################################################################################
+
 - hosts: localhost
  
   vars_files: 

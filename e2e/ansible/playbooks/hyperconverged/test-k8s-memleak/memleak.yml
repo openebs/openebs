@@ -1,5 +1,20 @@
-#Description: Memory resource utilization test with dd workload on OpenEBS JIVA.
-#Variables required to run this test are placed under memleak-vars.yml, update variables accordingly.
+# k8s-cassandra-pod.yml
+# Description:  Testing memory resource utilization test with dd workload on OpenEBS JIVA volume.
+
+###############################################################################################
+#Test Steps:
+#1. Check whether the OpenEBS components are deployed.
+#2. Copy the test artifacts to k8s master.
+#3. Create a storage volume
+#4. Obtain the IP address of the controller pod.
+#4. Discover the volume from one of the K8s nodes.
+#5. Check if the application pod is up and running
+#6. Create fils system and start the dd workload.
+#7. Copy the script to the K8s node.
+#8. Check if the memory consumption crosses the threshold value.
+#7. Perform cleanup of test artifacts.
+###############################################################################################
+
 
 - hosts: localhost
 

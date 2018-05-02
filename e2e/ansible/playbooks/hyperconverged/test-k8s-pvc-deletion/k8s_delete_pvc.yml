@@ -1,3 +1,20 @@
+# k8s_delete_pvc.yml
+# Description:  Test if the pvc and corresponding service gets deleted when the number of replicas are more than the nodes.
+
+###############################################################################################
+#Test Steps:
+#1. Obtain the number of nodes in cluster and ser the replica count accordingly.
+#2. Copy the test artifacts to k8s master
+#3. Check if the OpenEBS components are deployed
+#3. Create storage class and a volume.
+#4. Check if the volume pods are running.
+#5. Check if there is a volume in pending state.
+#6. Delete the volume.
+#7. Check if the volume, pods and service are deleted successfully.
+#7. Perform cleanup of test artifacts.
+###############################################################################################
+
+
 - hosts: localhost
 
   vars_files:

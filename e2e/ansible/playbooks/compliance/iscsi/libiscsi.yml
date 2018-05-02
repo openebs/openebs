@@ -1,3 +1,19 @@
+# libiscsi.yml
+#Description: Including libiscsi compliance test to OpenEBS e2e suite.
+
+###############################################################################################
+#Test Steps:
+#1. Install the packages and dependencies.
+#2. Copy the test artifacts to k8s master.
+#3. Create a storage volume
+#4. Obtain the IP address of the controller pod.
+#5. Copy the libsiscsi test packages to the minion.
+#4. Discover the volume from one of the K8s nodes.
+#6. Run libiscsi test suite.
+#7. Generate the test summary.
+#8. Perform test cleanup.
+###############################################################################################
+
 ---
 - hosts: localhost
 

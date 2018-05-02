@@ -1,3 +1,18 @@
+# k8s-percona-pod.yml
+# Description: Deploy percona application using OpenEBS volume.
+
+###############################################################################################
+#Test Steps:
+#1. Check whether the OpenEBS components are deployed.
+#2. Download the test artifacts to k8s master.
+#3. Deploy Percona application.
+#4. Check if the application pod is up and running
+#5. Check if the Percona service us up.
+#6. Copy files to the K8s node.
+#7. Pull mysql client image and generate load
+#8. Perform cleanup of test artifacts.
+###############################################################################################
+
 - hosts: localhost
  
   vars_files: 
