@@ -1,23 +1,76 @@
+#Description: Scaling up cassandra application pods and verifything the Data distribution across all the pods
+#Author: Swarna
+
+#############################################################################################################
+#Steps:
+#1. Downloading the cassandra service,statefulset and loadgen yaml files.
+#2. Getting the number of nodes in the Cluster.
+#3. Replace the application pod count in Cassandra-statefulset yaml file based on the nodes count.
+#4. Replace the IO duration time in Cassandra-loadgen yaml file.
+#5. Deploy the OpenEBS operatot yaml and check the maya-apiserver status.
+#6. Deploy cassandra Application and check the status.
+#7. Scale up the cassandra application pods.
+#8. Generate the load using cassandra-loadgen yaml.
+#9. Install python-minimal,pip and cqlsh packages.
+#10.Verify the data distribution acorss all the pods.
+#12.Perform Cleanup
+
+#############################################################################################################
+
+
 - hosts: localhost
- 
-  vars_files: 
-    - scaleup-vars.yml 
- 
+
+  vars_files:
+    - scaleup-vars.yml
+
   tasks:
    - block:
 
+
+
+       - name: Check whether maya-apiserver pod is running
+         shell: source ~/.profile; kubectl get pods --all-namespaces | grep maya-apiserver
+         args:
+           executable: /bin/bash
+         register: result
+         until: "'Running' in result.stdout"
+         delay: 20
+         retries: 2
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+         ignore_errors: true
+
+       - block:
+
+           - name: Delete the openebs operator
+             shell: source ~/.profile; kubectl delete -f "{{ openebs_operator_link }}"
+             args:
+               executable: /bin/bash
+             delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+           - name: Confirm pod has been deleted
+             shell: source ~/.profile; kubectl get pods
+             args:
+               executable: /bin/bash
+             register: result
+             until: "'maya-apiserver' or 'openebs-provisioner' not in result.stdout"
+             delay: 30
+             retries: 3
+             delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+         when: "result.rc == 0"
+
        - name: Get $HOME of K8s master for kubernetes user
          shell: source {{ profile }}; echo $HOME
-         args: 
+         args:
            executable: /bin/bash
          register: result_kube_home
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
        - name: Download YAML for cassandra service
-         get_url: 
+         get_url:
            url: "{{ cassandra_service_link }}"
            dest: "{{ result_kube_home.stdout }}/{{ svc_yaml_alias }}"
-           force: yes
+         force: yes
          register: result
          until:  "'OK' in result.msg"
          delay: 5
@@ -45,9 +98,9 @@
          delay: 5
          retries: 3
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-   
+
        - name: Get the number of nodes in the cluster
-         shell: source {{ profile }}; kubectl get nodes | grep 'Ready' | wc -l
+         shell: source {{ profile }}; kubectl get nodes | grep 'Ready' | grep 'none' | wc -l
          args:
            executable: /bin/bash
          register: node_out
@@ -62,9 +115,9 @@
          replace:
            path: "{{ result_kube_home.stdout }}/{{ stateful_yaml_alias }}"
            regexp: 'replicas: 3'
-           replace: 'replicas: {{ (node_count) |int-2 }}'
+           replace: 'replicas: {{ (node_count) |int-1 }}'
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-       
+
        - name: Replace the io_duration in cassandra loadgen yaml
          replace:
            path: "{{ result_kube_home.stdout }}/{{ loadgen_yaml_alias }}"
@@ -73,13 +126,13 @@
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
 
-       - name: Deploy openebs-operator 
-         shell: source ~/.profile; kubectl apply -f "{{ openebs_operator_link }}" 
+       - name: Deploy openebs-operator
+         shell: source ~/.profile; kubectl apply -f "{{ openebs_operator_link }}"
          args:
            executable: /bin/bash
          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
 
-       
+
        - name: Check whether maya-apiserver pod is deployed
          shell: source ~/.profile; kubectl get pods --all-namespaces | grep maya-apiserver
          args:
@@ -88,34 +141,38 @@
          until: "'Running' in result.stdout"
          delay: 120
          retries: 5
-         delegate_to: "{{groups['kubernetes-kubemasters'].0}}" 
-
-       - name: Deploy cassandra service
-         shell: source {{ profile }}; kubectl apply -f {{ svc_yaml_alias }} 
-         args: 
-           executable: /bin/bash
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-   
-       - name: Deploy cassandra statefulset
-         shell: source {{ profile }}; kubectl apply  -f {{ stateful_yaml_alias }}
+
+       - name: Start the log aggregator to capture test pod logs
+         shell: >
+           source {{ profile }};
+           nohup stern "{{test_pod_regex}}" --since 1m > "{{result_kube_home.stdout}}/{{test_log_path}}" &
          args:
            executable: /bin/bash
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
+       - name: Deploy cassandra service and statefulset
+         shell: source {{ profile }}; kubectl apply -f {{ item }}
+         args:
+           executable: /bin/bash
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+         with_items: "{{ cassandra_artifacts }}"
+
+
        - name: Confirm cassandra pod status is running
-         shell: source {{ profile }}; kubectl get pods | grep cassandra-0
-         args: 
+         shell: source {{ profile }}; kubectl get pods | grep cassandra | grep Running | wc -l
+         args:
            executable: /bin/bash
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
          register: result
-         until: "'cassandra-0' and 'Running' in result.stdout"
-         delay: 120 
+         until: (node_count)| int-1 == result.stdout|int
+         delay: 120
          retries: 15
 
        - name: Scale up Cassandra application pod
-         shell: source {{ profile }}; kubectl scale statefulsets cassandra --replicas={{ (node_count) |int-3 }}
+         shell: source {{ profile }}; kubectl scale statefulsets cassandra --replicas={{(node_count |int)}}
          args:
-           executable: /bin/bash
+            executable: /bin/bash
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
          register: result
          until: "'scaled' in result.stdout"
@@ -123,22 +180,21 @@
          retries: 5
 
        - name: Confirm scaled up cassandra pod status is running
-         shell: source {{ profile }}; kubectl get pods | grep cassandra-1
+         shell: source {{ profile }}; kubectl get pods | grep cassandra | grep Running | wc -l
          args:
            executable: /bin/bash
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
          register: result
-         until: "'cassandra-1' and 'Running' in result.stdout"
+         until: (node_count)| int == result.stdout|int
          delay: 120
          retries: 15
-
 
        - name: Start cassandra load generation
          shell: source {{ profile }}; kubectl create -f {{ loadgen_yaml_alias }}
          args:
            executable: /bin/bash
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
- 
+
        - name: Verify load is running for specified duration
          shell: source {{ profile }}; kubectl get pods | grep cassandra-loadgen
          args:
@@ -152,7 +208,7 @@
        - name: Wait for {{ (io_minutes) | int *60 }} secs to run load.
          wait_for:
               timeout: "{{ (io_minutes) | int *60 }}"
-        
+
        - name: Verify load by using describe keyspaces
          shell: source {{ profile }}; kubectl exec cassandra-0 -- cqlsh --execute "describe keyspaces;"
          args:
@@ -164,17 +220,6 @@
          retries: 5
          ignore_errors: true
 
-       - name: install python minimal and pip
-         shell: apt-get install -y python-minimal python-pip
-         become: true
-         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
-         ignore_errors: true
-  
-       - name: Install cqlsh
-         shell: pip install cqlsh
-         become: true
-         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
-         ignore_errors: true
 
        - name: Get Data distribution percentages
          shell: source {{ profile }}; kubectl exec cassandra-0 -- nodetool status
@@ -186,46 +231,59 @@
        - name: Set Data distribution % of pod1 to variable
          set_fact:
            cassandra_pod1_percentage: "{{ result.stdout.split()[20] }}"
-   
+
        - name: Set Data distribution % of pod2 to variable
          set_fact:
            cassandra_pod2_percentage: "{{ result.stdout.split()[28] }}"
 
+       - name: Set Data distribution % of pod3 to variable
+         set_fact:
+           cassandra_pod3_percentage: "{{ result.stdout.split()[36] }}"
+
+
        - name: Verfy the Data distribution percentages
-         shell: echo "Verfiy the data distribution on all the cassandra pods"
-         when: cassandra_pod1_percentage != 0 and cassandra_pod2_percentage != 0
+         command: echo "Verfiy the data distribution on all the cassandra pods"
+         when: cassandra_pod1_percentage != 0 and cassandra_pod2_percentage != 0 and cassandra_pod3_percentage !=0
          register: result
        - debug:
            msg: "Data is distributed on all the cassandra application pods"
          when: "result.rc == 0"
 
-       - set_fact:
-           flag: "Pass"     
+       - name: Terminate the log aggregator
+         shell: source {{ profile }}; killall stern
+         args:
+           executable: /bin/bash
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
-     rescue: 
-       - set_fact: 
-           flag: "Fail" 
+       - name: Set flag to pass if test case is passed
+         set_fact:
+           flag: "Pass"
+
+     rescue:
+       - name: Set flag to fail if test case is failed
+         set_fact:
+           flag: "Fail"
 
      always:
 
        - include: cleanup.yml
-         when: clean | bool 
+         when: clean | bool
 
        - name: Send slack notification
-         slack: 
+         slack:
            token: "{{ lookup('env','SLACK_TOKEN') }}"
            msg: '{{ ansible_date_time.time }} TEST: {{test_name}}, RESULT: {{ flag }}'
          when: slack_notify | bool and lookup('env','SLACK_TOKEN')
-      
-
-      
 
 
-     
 
-      
 
-     
- 
 
- 
+
+
+
+
+
+
+
+
