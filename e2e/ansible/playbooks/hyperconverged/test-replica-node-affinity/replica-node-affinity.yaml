@@ -6,21 +6,21 @@
 #Test Steps:
 #1. Check if the OpenEBS components are deployed
 #2. Obtain the storage class yaml from the deployment.
-#4. Modify the replica count in storageclass yaml and create it.
-#5. Deploy Percona application.
-#6. Check if the application and the volume pods are up and running.
-#7. Update the node names in the patch yaml.
-#8. Patch the deployment to include node affinity spec.
-#9. Delete the replica pod in one of the nodes and check if it gets scheduled on the same node again.
-#10. Delete the test artifacts.
+#3. Modify the replica count in storageclass yaml and create it.
+#4. Deploy Percona application.
+#5. Check if the application and the volume pods are up and running.
+#6. Update the node names in the patch yaml.
+#7. Patch the deployment to include node affinity spec.
+#8. Delete the replica pod in one of the nodes and check if it gets scheduled on the same node again.
+#9. Delete the test artifacts.
 ###############################################################################################
 
 
 - hosts: kubernetes-kubemasters
 
 #Deploying openebs using helm chart.
-  roles:
-    - {role: k8s-openebs-operator-helm}
+  #roles:
+  #  - {role: k8s-openebs-operator-helm}
 
   vars_files:
     - replica-node-affinity-vars.yaml
@@ -31,7 +31,7 @@
 
 # Checking if OpenEBS components are integrated successfully
 
-       - name: Check whether maya-apiserver pod is deployed
+       - name: 1) Check whether maya-apiserver pod is deployed
          shell: source ~/.profile; kubectl get pods --all-namespaces | grep maya-apiserver
          args:
            executable: /bin/bash
@@ -41,26 +41,26 @@
          delay: 30
          retries: 5
      
-       - name: Get $HOME of K8s master for kubernetes user
+       - name: 1a) Get $HOME of K8s master for kubernetes user
          shell: source ~/.profile; echo $HOME
          args:
            executable: /bin/bash
          register: result_kube_home
 
-       - name: Obtaining storage classes yaml
+       - name: 2) Obtaining storage classes yaml
          shell: kubectl get sc openebs-percona -o yaml > "{{ create_sc }}"
          args:
            executable: /bin/bash
 
 # Updating number of replica pods to 2
 
-       - name: Replace the replica count in storage classes yaml
+       - name: 3) Replace the replica count in storage classes yaml
          replace:
            path: "{{ create_sc }}"
            regexp: 'openebs.io/jiva-replica-count: "3"'
            replace: 'openebs.io/jiva-replica-count: "2"'
 
-       - name: Delete the existing storage class and create new one
+       - name: 3a) Delete the existing storage class and create new one
          shell: kubectl delete sc openebs-percona; kubectl apply -f "{{ create_sc }}"
          args:
            executable: /bin/bash
@@ -69,7 +69,7 @@
          delay: 10
          retries: 5
       
-       - name: Deploying Percona Application
+       - name: 4) Deploying Percona Application
          shell: kubectl create -f "{{ percona_link }}"
          args:
            executable: /bin/bash
@@ -78,7 +78,7 @@
          delay: 20
          retries: 6
        
-       - name: Confirm if the percona pod is running
+       - name: 5) Confirm if the percona pod is running
          shell: source ~/.profile; kubectl get pods --all-namespaces | grep percona
          args:
            executable: /bin/bash
@@ -88,7 +88,7 @@
          delay: 120
          retries: 10
    
-       - name: Check if the replica pods are created
+       - name: 5a) Check if the replica pods are created
          shell: kubectl get pods --all-namespaces | grep rep | grep -i running |wc -l
          args:
            executable: /bin/bash
@@ -99,48 +99,48 @@
          ignore_errors: true
 
     # Getting PV name
-       - name: Obtain PV name
+       - name: 5b) Obtain PV name
          shell: kubectl get pv | grep openebs-percona | awk '{print $1}'
          args:
            executable: /bin/bash
          register: pv_name
 
-       - name: Copy replica_patch.yaml to master
+       - name: 5c) Copy replica_patch.yaml to master
          copy:
            src: "{{ patch_file }}"
            dest: "{{ result_kube_home.stdout }}"
  
-       - name: Get the first node name where replica1 is scheduled
+       - name: 6) Get the first node name where replica1 is scheduled
          shell: kubectl get po --all-namespaces -o wide | grep "{{ pv_name.stdout }}" | grep rep | awk '{print $8}' | awk 'FNR == 1 {print}'
          args:
            executable: /bin/bash
          register: node1
      
-       - name: Get the second node name where replica1 is scheduled
+       - name: 6a) Get the second node name where replica1 is scheduled
          shell: kubectl get po --all-namespaces -o wide | grep "{{ pv_name.stdout }}" | grep rep | awk '{print $8}' | awk 'FNR == 2 {print}'
          args:
            executable: /bin/bash
          register: node2
     
-       - name: Update first node name in replica_patch file
+       - name: 6b) Update first node name in replica_patch file
          replace:
            path: "{{ patch_file }}"
            regexp: 'nodename_where_replica_pod_1_got_scheduled'
            replace: '{{ node1.stdout }}'
      
-       - name: Update second node name in replica_patch file
+       - name: 6c) Update second node name in replica_patch file
          replace:
            path: "{{ patch_file }}"
            regexp: 'nodename_where_replica_pod_2_got_scheduled'
            replace: '{{ node2.stdout }}'
 
-       - name: Obtain the deployment name 
+       - name: 7) Obtain the deployment name 
          shell: kubectl get deploy --all-namespaces |grep "{{ pv_name.stdout }}" | grep rep |awk '{print $2}'
          args:
            executable: /bin/bash
          register: deploy_name
    
-       - name: Update the replica deployment with node affinity property
+       - name: 7a) Update the replica deployment with node affinity property
          shell: kubectl patch deployment "{{ deploy_name.stdout }}" -p "$(cat replica_patch.yaml)"
          args:
            executable: /bin/bash
@@ -149,18 +149,18 @@
          delay: 20
          retries: 5
      
-       - name: Get pod name
+       - name: 8) Get pod name
          shell: kubectl get pods --all-namespaces -o wide | grep "{{ pv_name.stdout }}" | grep rep | grep "{{ node1.stdout }}" | awk '{print $2}'
          args:
            executable: /bin/bash
          register: pod_name 
 
-       - name: Delete the replica on one of the nodes
+       - name: 8a) Delete the replica on one of the nodes
          shell: kubectl delete pod "{{ pod_name.stdout }}" --grace-period=0 --force
          args:
            executable: /bin/bash
     
-       - name: Check the available replicas in deployment
+       - name: 8b) Check the available replicas in deployment
          shell: kubectl get deploy --all-namespaces | grep "{{ pv_name.stdout }}" | grep rep | awk '{print $6}'
          args: 
            executable: /bin/bash
@@ -169,7 +169,7 @@
          delay: 30
          retries: 5
   
-       - name: Check if the replica is scheduled again
+       - name: 8c) Check if the replica is scheduled again
          shell: kubectl get pods --all-namespaces -o wide | grep "{{ pv_name.stdout }}" | grep rep | grep Running | grep "{{ node1.stdout }}"
          args:
            executable: /bin/bash
@@ -187,7 +187,8 @@
 
      always:
 
-       - include: replica-node-affinity-cleanup.yaml
+       - name: 9) Cleaning up the test artifacts
+         include: replica-node-affinity-cleanup.yaml
 
        - name: Send slack notification
          slack:

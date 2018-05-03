@@ -3,14 +3,15 @@
 
 ###############################################################################################
 #Test Steps:
-#1. Check whether the OpenEBS components are deployed.
+#1. Install the prerequisites ans dependencies
 #2. Download the test artifacts to k8s master.
-#3. Deploy Percona application.
-#4. Check if the application pod is up and running
-#5. Check if the Percona service us up.
-#6. Copy files to the K8s node.
-#7. Pull mysql client image and generate load
-#8. Perform cleanup of test artifacts.
+#3. Check whether the OpenEBS components are deployed.
+#4. Deploy Percona application.
+#5. Check if the application pod is up and running
+#6. Check if the Percona service us up.
+#7. Copy files to the K8s node.
+#8. Pull mysql client image and generate load
+#9. Perform cleanup of test artifacts.
 ###############################################################################################
 
 - hosts: localhost
@@ -21,16 +22,17 @@
   tasks:
    - block:
 
-       - include: k8s-percona-pod-prerequisites.yml 
+       - name: 1) Install the prerequisites
+         include: k8s-percona-pod-prerequisites.yml 
 
-       - name: Get $HOME of K8s master for kubernetes user
+       - name: 2) Get $HOME of K8s master for kubernetes user
          shell: source ~/.profile; echo $HOME
          args: 
            executable: /bin/bash
          register: result_kube_home
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
-       - name: Download YAML for percona mysql plugin
+       - name: 2a) Download YAML for percona mysql plugin
          get_url: 
            url: "{{ percona_mysql_plugin_link }}"
            dest: "{{ result_kube_home.stdout }}/{{ pod_yaml_alias }}"
@@ -41,7 +43,7 @@
          retries: 3
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
-       - name: Check whether maya-apiserver pod is deployed
+       - name: 3) Check whether maya-apiserver pod is deployed
          shell: source ~/.profile; kubectl get pods | grep maya-apiserver
          args: 
            executable: /bin/bash
@@ -51,7 +53,7 @@
          delay: 120
          retries: 5
 
-       - name: Replace volume-claim name with test parameters
+       - name: 3a) Replace volume-claim name with test parameters
          replace:
            path: "{{ result_kube_home.stdout }}/{{ pod_yaml_alias }}"
            regexp: '{{ item.0 }}'
@@ -61,7 +63,7 @@
            - "{{replace_item}}"
            - "{{replace_with}}"
 
-       - name: Replace volume size in plugin YAML
+       - name: 3b) Replace volume size in plugin YAML
          lineinfile:
            path: "{{ result_kube_home.stdout }}/{{ pod_yaml_alias }}"
            regexp: "storage:"
@@ -76,13 +78,13 @@
            executable: /bin/bash
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
-       - name: Deploy percona mysql pod
+       - name: 4) Deploy percona mysql pod
          shell: source ~/.profile; kubectl create -f {{ pod_yaml_alias }} 
          args: 
            executable: /bin/bash
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
-       - name: Confirm pod status is running
+       - name: 5) Confirm pod status is running
          shell: source ~/.profile; kubectl get pods | grep percona
          args: 
            executable: /bin/bash
@@ -92,32 +94,32 @@
          delay: 120 
          retries: 15
      
-       - name: Get $HOME of K8s minion for kubernetes user
+       - name: 6) Get $HOME of K8s minion for kubernetes user
          shell: source ~/.profile; echo $HOME
          args:
            executable: /bin/bash
          register: result_kube_home
          delegate_to: "{{groups['kubernetes-kubeminions'].0}}"
 
-       - name: Get IP address of percona mysql pod
+       - name: 6a) Get IP address of percona mysql pod
          shell: source ~/.profile; kubectl describe pod percona 
          args:
            executable: /bin/bash
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
          register: result_IP
 
-       - name: Set IP of Pod to variable
+       - name: 6b) Set IP of Pod to variable
          set_fact:
            pod_ip: "{{ result_IP.stdout_lines[7].split()[1] }}"
 
-       - name: Copy files into kube minion
+       - name: 7) Copy files into kube minion
          copy:
            src: "{{ item }}"
            dest: "{{ result_kube_home.stdout }}"
          with_items: "{{ files }}"
          delegate_to: "{{ groups['kubernetes-kubeminions'].0 }}"
 
-       - name: Pull the mysql-client image
+       - name: 8) Pull the mysql-client image
          docker_image:
            name: openebs/tests-mysql-client
            state: present
@@ -125,7 +127,7 @@
          become: true
          delegate_to: "{{ groups['kubernetes-kubeminions'].0 }}"
 
-       - name: mysql-client docker instantiate
+       - name: 8a) mysql-client docker instantiate
          docker_container:
            name: client
            image: openebs/tests-mysql-client
@@ -149,7 +151,9 @@
            flag: "Fail"
 
      always:
-       - include: k8s-percona-pod-cleanup.yml
+      
+       - name: 9) Cleaning up the test artifacts.
+         include: k8s-percona-pod-cleanup.yml
          when: clean | bool
 
        - name: Send slack notification
