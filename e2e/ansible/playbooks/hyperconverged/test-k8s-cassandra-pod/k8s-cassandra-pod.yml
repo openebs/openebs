@@ -1,20 +1,20 @@
 - hosts: localhost
- 
-  vars_files: 
-    - k8s-cassandra-pod-vars.yml 
- 
+
+  vars_files:
+    - k8s-cassandra-pod-vars.yml
+
   tasks:
    - block:
 
        - name: Get $HOME of K8s master for kubernetes user
          shell: source {{ profile }}; echo $HOME
-         args: 
+         args:
            executable: /bin/bash
          register: result_kube_home
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
        - name: Download YAML for cassandra service
-         get_url: 
+         get_url:
            url: "{{ cassandra_service_link }}"
            dest: "{{ result_kube_home.stdout }}/{{ svc_yaml_alias }}"
            force: yes
@@ -63,17 +63,17 @@
            regexp: 'replicas: 3'
            replace: 'replicas: {{ (node_count) |int-1 }}'
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-       
+
        - name: Replace the io_duration in cassandra loadgen yaml
          replace:
            path: "{{ result_kube_home.stdout }}/{{ loadgen_yaml_alias }}"
            regexp: 'duration=5'
            replace: 'duration={{ io_minutes }}'
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
- 
+
        - name: Check whether maya-apiserver pod is deployed
          shell: source {{ profile }}; kubectl get pods | grep maya-apiserver
-         args: 
+         args:
            executable: /bin/bash
          register: result
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
@@ -83,18 +83,18 @@
 
        - name: Start the log aggregator to capture test pod logs
          shell: >
-           source {{ profile }}; 
-           nohup stern "{{test_pod_regex}}" --since 1m > "{{result_kube_home.stdout}}/{{test_log_path}}" & 
+           source {{ profile }};
+           nohup stern "{{test_pod_regex}}" --since 1m > "{{result_kube_home.stdout}}/{{test_log_path}}" &
          args:
            executable: /bin/bash
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
        - name: Deploy cassandra service
-         shell: source {{ profile }}; kubectl create -f {{ svc_yaml_alias }} 
-         args: 
+         shell: source {{ profile }}; kubectl create -f {{ svc_yaml_alias }}
+         args:
            executable: /bin/bash
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-   
+
        - name: Deploy cassandra statefulset
          shell: source {{ profile }}; kubectl create -f {{ stateful_yaml_alias }}
          args:
@@ -103,20 +103,20 @@
 
        - name: Confirm cassandra pod status is running
          shell: source {{ profile }}; kubectl get pods | grep cassandra-0
-         args: 
+         args:
            executable: /bin/bash
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
          register: result
          until: "'cassandra-0' and 'Running' in result.stdout"
-         delay: 120 
+         delay: 120
          retries: 15
-     
+
        - name: Start cassandra load generation
          shell: source {{ profile }}; kubectl create -f {{ loadgen_yaml_alias }}
          args:
            executable: /bin/bash
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
- 
+
        - name: Verify load is running for specified duration
          shell: source {{ profile }}; kubectl get pods | grep cassandra-loadgen
          args:
@@ -130,7 +130,7 @@
        - name: Wait for {{ (io_minutes) | int *60 }} secs to run load.
          wait_for:
               timeout: "{{ (io_minutes) | int *60 }}"
-        
+
        - name: Verify load by using describe keyspaces
          shell: source {{ profile }}; kubectl exec cassandra-0 -- cqlsh --execute "describe keyspaces;"
          args:
@@ -140,18 +140,20 @@
          until: "'keyspace1' in result.stdout"
          delay: 60
          retries: 5
-      
+
        - name: Terminate the log aggregator
          shell: source {{ profile }}; killall stern
          args:
-           executable: /bin/bash 
-         delegate_to: "{{groups['kubernetes-kubemasters'].0}}" 
+           executable: /bin/bash
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
-       - set_fact:
+       - name: setting flag if pass
+         set_fact:
            flag: "Pass"
 
-     rescue: 
-       - set_fact: 
+     rescue:
+       - name: setting flag if fail
+         set_fact:
            flag: "Fail"
 
      always:
@@ -159,7 +161,7 @@
          when: clean | bool
 
        - name: Send slack notification
-         slack: 
+         slack:
            token: "{{ lookup('env','SLACK_TOKEN') }}"
            msg: '{{ ansible_date_time.time }} TEST: {{test_name}}, RESULT: {{ flag }}'
          when: slack_notify | bool and lookup('env','SLACK_TOKEN')
