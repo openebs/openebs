@@ -1,3 +1,24 @@
+# test-volume-taints.yml
+
+###############################################################################################
+#Test Steps:
+#1. Check if the OpenEBS components are deployed.
+#2. Delete mapiserver if it is running
+#3. Taint the node for maya-api server and pvc
+#4. Check if the nodes are tainted
+#5. Copy the test artifacts to k8s master.
+#6. Edit the key, value in operator.yaml.
+#7. Deploy operator 
+#8. Copy and replace key,value in volume policies yaml.
+#9. Deploy volume policies.
+#10. Download test-pvc file
+#11. Create  namespace for PVC
+#12. Obtain the list of replicas and their nodes
+#13. Obtain PVC
+#14. Cleaning up the test artifacts
+###############################################################################################
+
+
 - hosts: localhost
 
   vars_files:
@@ -7,7 +28,7 @@
 
    - block:
    
-       - name: Check whether maya-apiserver pod is running
+       - name: 1) Check whether maya-apiserver pod is running
          shell: source ~/.profile; kubectl get pods --all-namespaces | grep maya-apiserver
          args:
            executable: /bin/bash
@@ -20,13 +41,13 @@
   
        - block:
       
-           - name: Delete the openebs operator
+           - name: 2) Delete the openebs operator
              shell: source ~/.profile; kubectl delete -f "{{ openebs_operator_link }}"
              args:
                executable: /bin/bash
              delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
-           - name: Confirm pod has been deleted
+           - name: 2a) Confirm pod has been deleted
              shell: source ~/.profile; kubectl get pods
              args:
                executable: /bin/bash
@@ -39,20 +60,20 @@
          when: "result.rc == 0"
 
 
-       - name: Taint the nodes for maya-apiserver
+       - name: 3) Taint the nodes for maya-apiserver
          shell: source ~/.profile; kubectl taint nodes {{ node1 }} {{ operator_key }}={{ operator_value }}:NoSchedule
          args:
            executable: /bin/bash
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
-       - name: Taint the nodes for the pvc
+       - name: 3a) Taint the nodes for the pvc
          shell: source ~/.profile; kubectl taint nodes {{ item }} {{ pvc_key }}={{ pvc_value }}:NoSchedule
          args:
            executable: /bin/bash
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
          with_items: "{{ node_names }}"
 
-       - name: Check nodes are tainted
+       - name: 4) Check nodes are tainted
          shell: source ~/.profile; kubectl describe node {{ node1 }} {{ node_names[0] }} {{ node_names[1] }}  | grep NoSchedule
          args:
            executable: /bin/bash
@@ -62,20 +83,20 @@
          retries: 3
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
-       - name: Get $HOME of K8s master for kubernetes user
+       - name: 5) Get $HOME of K8s master for kubernetes user
          shell: source ~/.profile; echo $HOME
          args:
            executable: /bin/bash
          register: result_kube_home
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
   
-       - name: Copy the openebs-operator to kube master
+       - name: 5a) Copy the openebs-operator to kube master
          copy:
            src: "{{ openebs_ns_operator }}"
            dest: "{{ result_kube_home.stdout }}"
          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
   
-       - name: Replacing the key and value in openebs-operator yaml
+       - name: 6) Replacing the key and value in openebs-operator yaml
          replace:
            path: openebs-operator-ns-openebs.yaml
            regexp: '{{ item.0 }}'
@@ -85,13 +106,13 @@
            - "{{operator_list}}"
            - "{{replaceoperator_list}}"
  
-       - name: deploy the openebs-operator with openebs namespace
+       - name: 7) Deploy the openebs-operator with openebs namespace
          shell: source ~/.profile; kubectl apply -f "{{ openebs_ns_operator }}"
          args:
            executable: /bin/bash
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
-       - name: Check whether maya-apiserver pod is deployed
+       - name: 7a) Check whether maya-apiserver pod is deployed
          shell: source ~/.profile; kubectl get pods --all-namespaces | grep maya-apiserver
          args:
            executable: /bin/bash
@@ -101,13 +122,13 @@
          retries: 5
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
-       - name: Copy the volume-policies yaml to kube master
+       - name: 8) Copy the volume-policies yaml to kube master
          copy:
            src: "{{ volume_policy }}"
            dest: "{{ result_kube_home.stdout }}"
          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
 
-       - name: Replacing the key and value in volume-policies yaml
+       - name: 8a) Replacing the key and value in volume-policies yaml
          replace:
            path: vol-policies.yaml
            regexp: '{{ item.0 }}'
@@ -117,14 +138,14 @@
            - "{{list}}"
            - "{{replace_list}}"
 
-       - name: deploy the volume-policies yaml
+       - name: 9) Deploy the volume-policies yaml
          shell: source ~/.profile; kubectl apply -f "{{ volume_policy }}"
          args:
            executable: /bin/bash
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
 
-       - name: download test-pvc file
+       - name: 10) Download test-pvc file
          get_url:
            url: https://raw.githubusercontent.com/openebs/openebs/master/e2e/ansible/playbooks/hyperconverged/test-k8s-storage-pool/test-pvc.yaml
            dest: "{{ result_kube_home.stdout }}"
@@ -135,14 +156,14 @@
          retries: 3
          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
   
-       - name: Replacing the storage class name in test-pvc yaml
+       - name: 10a) Replacing the storage class name in test-pvc yaml
          replace:
            path: test-pvc.yaml
            regexp: 'storageClassName: openebs-standard'
            replace: 'storageClassName: openebs-taints-0.6.0'
          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
 
-       - name: Create  namespace for PVC
+       - name: 11) Create  namespace for PVC
          shell: kubectl create ns "{{ namespace }}"
          args:
            executable: /bin/bash
@@ -150,13 +171,13 @@
          ignore_errors: true
      
 
-       - name: deploy the test-pvc yaml
+       - name: 11a) Deploy the test-pvc yaml
          shell: source ~/.profile; kubectl apply -f test-pvc.yaml -n "{{ namespace }}"
          args:
            executable: /bin/bash
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
-       - name: Confirm volume container is running
+       - name: 11b) Confirm volume container is running
          shell: source ~/.profile; kubectl get pods --all-namespaces | grep pvc | grep {{item}} | grep Running | wc -l
          args:
            executable: /bin/bash
@@ -169,22 +190,22 @@
            - rep
          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
  
-       - name: Obtain the list of replicas and their nodes
+       - name: 12) Obtain the list of replicas and their nodes
          shell: source ~/.profile; kubectl get pods --all-namespaces -o wide | grep rep
          args:
            executable: /bin/bash
          register: result
          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
 
-       - name: Set replica pod name to variable
+       - name: 12a) Set replica pod name to variable
          set_fact:
            rep1_node: "{{ result.stdout.split()[7] }}"
 
-       - name: Set replica pod name to variable
+       - name: 12b) Set replica pod name to variable
          set_fact:
            rep2_node: "{{ result.stdout.split()[15] }}"
 
-       - name: Verifying the replicas are deployed on tainted nodes
+       - name: 13) Verifying the replicas are deployed on tainted nodes
          shell: echo " replicas are running on the tainted nodes"
          when:  rep1_node  == node_names[0] or rep1_node == node_names[1] and rep2_node == node_names[0] or rep2_node == node_names[1]
          register: result
@@ -192,18 +213,18 @@
            msg: "Replicas are deployed on dedicated nodes"
          when: "result.rc == 0"    
 
-       - name: Get storage replica pod name
+       - name: 13a) Get storage replica pod name
          shell: source ~/.profile; kubectl get pods --all-namespaces | grep rep  | awk {'print $2'}
          args:
            executable: /bin/bash
          register: rep_name
          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
        
-       - name: Set replica pod name to variable
+       - name: 13b) Set replica pod name to variable
          set_fact:
            rep_pod_name: "{{ rep_name.stdout.split('-rep-')[0] }}"
 
-       - name: find the pvc inside the /mnt/openebs
+       - name: 13c) find the pvc inside the /mnt/openebs
          stat:
           path: /mnt/openebs/{{ rep_pod_name }}
          register: stat_result
@@ -213,9 +234,6 @@
            msg: "File exists..."
          when: stat_result.stat.exists
 
-       - include: cleanup.yml
-         when: clean | bool 
-
        - set_fact:
            flag: "Pass"
 
@@ -224,6 +242,11 @@
            flag: "Fail"
 
      always:
+
+       - name: 14) Cleaning up the test artifacts
+         include: cleanup.yml
+         when: clean | bool
+
        - name: Send slack notification
          slack: 
            token: "{{ lookup('env','SLACK_TOKEN') }}"

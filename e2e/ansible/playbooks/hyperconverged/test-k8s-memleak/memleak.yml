@@ -1,5 +1,20 @@
-#Description: Memory resource utilization test with dd workload on OpenEBS JIVA.
-#Variables required to run this test are placed under memleak-vars.yml, update variables accordingly.
+# k8s-cassandra-pod.yml
+# Description:  Testing memory resource utilization test with dd workload on OpenEBS JIVA volume.
+
+###############################################################################################
+#Test Steps:
+#1. Check whether the OpenEBS components are deployed.
+#2. Copy the test artifacts to k8s master.
+#3. Create a storage volume
+#4. Obtain the IP address of the controller pod.
+#5. Discover the volume from one of the K8s nodes.
+#6. Check if the application pod is up and running
+#7. Create file system and start the dd workload.
+#8. Copy the script to the K8s node.
+#9. Check if the memory consumption crosses the threshold value.
+#10. Perform cleanup of test artifacts.
+###############################################################################################
+
 
 - hosts: localhost
 
@@ -7,7 +22,7 @@
      - memleak-vars.yml
   
   tasks:
-       - name: Check whether maya-apiserver pod is deployed
+       - name: 1) Check whether maya-apiserver pod is deployed
          shell: source ~/.profile; kubectl get pods | grep maya-apiserver
          args:
            executable: /bin/bash
@@ -17,7 +32,7 @@
          delay: 120
          retries: 5
    
-       - name: Get $HOME of K8s master for kubernetes user
+       - name: 2) Get $HOME of K8s master for kubernetes user
          shell: source ~/.profile; echo $HOME
          args:
            executable: /bin/bash
@@ -25,26 +40,26 @@
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
 
-       - name: Copy the volume claim to kube master
+       - name: 2a) Copy the volume claim to kube master
          copy:
            src: "{{ volume_def }}"
            dest: "{{ result_kube_home.stdout }}"
          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"       
 
-       - name: Replace volume-claim name with test parameters
+       - name: 2b) Replace volume-claim name with test parameters
          replace:
            path: "{{ result_kube_home.stdout }}/{{ volume_def }}"
            regexp: 'vut'
            replace: '{{ volume_claim }}'
          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
 
-       - name: Create a storage volume via a pvc
+       - name: 3) Create a storage volume via a pvc
          shell: source ~/.profile; kubectl apply -f "{{ volume_def }}"
          args:
            executable: /bin/bash
          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
        
-       - name: Confirm volume container is running
+       - name: 3a) Confirm volume container is running
          shell: source ~/.profile; kubectl get pods | grep pvc | grep {{item}} | grep Running | wc -l
          args:
            executable: /bin/bash
@@ -57,40 +72,40 @@
            - rep
          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
 
-       - name: Get storage ctrl pod name
+       - name: 4) Get storage ctrl pod name
          shell: source ~/.profile; kubectl get pods | grep ctrl
          args:
            executable: /bin/bash
          register: ctrl_name
          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
        
-       - name: Set ctrl pod name to variable
+       - name: 4a) Set ctrl pod name to variable
          set_fact:
            ctrl_pod_name: "{{ ctrl_name.stdout.split()[0] }}"
 
-       - name: Get IP address of ctrl pod
+       - name: 4b) Get IP address of ctrl pod
          shell: source ~/.profile; kubectl describe pod {{ ctrl_pod_name }} | grep IP
          args:
            executable: /bin/bash
          register: ctrl_IP
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
-       - name: Set IP of Pod to variable
+       - name: 4c) Set IP of Pod to variable
          set_fact:
            ctrl_ip: "{{ ctrl_IP.stdout_lines[0].split()[1]}}"
 
 
-       - name: Establish iSCSI session with volume
+       - name: 5) Establish iSCSI session with volume
          shell: iscsiadm -m discovery -t st -p {{ ctrl_ip }}:3260
          become: true
          delegate_to: "{{groups['kubernetes-kubeminions'].0}}"
          register: result
 
-       - name: Store target iqn in variable
+       - name: 5a) Store target iqn in variable
          set_fact:
            iqn: "{{result.stdout.split(',')[1].split()[1]}}"
 
-       - name: Login to iSCSI target
+       - name: 6) Login to iSCSI target
          open_iscsi:
            show_nodes: yes
            login: yes
@@ -99,11 +114,11 @@
          delegate_to: "{{groups['kubernetes-kubeminions'].0}}"
          register: result
 
-       - name: Check device nodes
+       - name: 6a) Check device nodes
          set_fact:
            scsi_device: "{{result.devicenodes[0]}}"
 
-       - name: Create file system on iSCSI disk
+       - name: 7) Create file system on iSCSI disk
          filesystem:
            fstype: ext4
            dev: "{{scsi_device}}"
@@ -111,7 +126,7 @@
          become: true
          delegate_to: "{{groups['kubernetes-kubeminions'].0}}"
 
-       - name: Mount device by Label
+       - name: 7a) Mount device by Label
          mount:
            name: "{{mount_point}}"
            src: "{{scsi_device}}"
@@ -121,7 +136,7 @@
          become: true
          delegate_to: "{{groups['kubernetes-kubeminions'].0}}"
 
-       - name: Place data using dd
+       - name: 7b) Place data using dd
          shell: |
             timeout 200s dd if=/dev/urandom of={{mount_point}}/f1 bs={{block_size[0]}} count={{count_num}} oflag=dsync &
             timeout 200s dd if=/dev/urandom of={{mount_point}}/f2 bs={{block_size[1]}} count={{count_num}} oflag=dsync &
@@ -129,13 +144,13 @@
          delegate_to: "{{groups['kubernetes-kubeminions'].0}}"
 
        - block:
-             - name: Copy the python script to kubeminion
+             - name: 8) Copy the python script to kubeminion
                copy:
                   src: "{{ py_file }}"
                   dest: "{{ result_kube_home.stdout }}"
                delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
 
-             - name: Run python script for memory usage validation it takes couple of minutes
+             - name: 9) Run python script for memory usage validation it takes couple of minutes
                shell: python test-mem.py
                delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
                register: result

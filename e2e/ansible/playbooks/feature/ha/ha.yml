@@ -1,3 +1,20 @@
+# ha.yml
+#Description: Including libiscsi compliance test to OpenEBS e2e suite.
+
+###############################################################################################
+#Test Steps:
+#1. Install the packages and dependencies.
+#2. Copy the test artifacts to k8s master.
+#3. Check if the OpenEBS components are deployed.
+#3. Deploy Percona application.
+#4. Check if the pods are up and running.
+#5. Obtain the node where the conteoller pod is scheduled.
+#6. Make the current node unschedulable.
+#7. Delete the controller pod anc check if it is scheduled again on different node.
+#7. Check if the application pod runs seamlessly.
+#8. Perform test cleanup.
+###############################################################################################
+
 ---
 - hosts: localhost
 

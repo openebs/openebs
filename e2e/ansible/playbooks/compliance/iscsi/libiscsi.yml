@@ -1,3 +1,19 @@
+# libiscsi.yml
+#Description: Including libiscsi compliance test to OpenEBS e2e suite.
+
+###############################################################################################
+#Test Steps:
+#1. Install the packages and dependencies.
+#2. Copy the test artifacts to k8s master.
+#3. Create a storage volume
+#4. Obtain the IP address of the controller pod.
+#5. Copy the libsiscsi test packages to the minion.
+#6. Discover the volume from one of the K8s nodes.
+#7. Run libiscsi test suite.
+#8. Generate the test summary.
+#9. Perform test cleanup.
+###############################################################################################
+
 ---
 - hosts: localhost
 
@@ -7,22 +23,23 @@
   tasks: 
    - block: 
    
-       - include: libiscsi-prerequisites.yml 
+       - name: 1) Install the prerequisites
+         include: libiscsi-prerequisites.yml 
 
-       - name: Get $HOME of K8s master for kubernetes user
+       - name: 2) Get $HOME of K8s master for kubernetes user
          shell: source ~/.profile; echo $HOME
          args:
            executable: /bin/bash
          register: result_kube_home
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
-       - name: Copy the volume claim to kube master
+       - name: 2a) Copy the volume claim to kube master
          copy: 
            src: "{{ volume_def }}"
            dest: "{{ result_kube_home.stdout }}"
          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
        
-       - name: Start the log aggregator to capture test pod logs
+       - name: 2c) Start the log aggregator to capture test pod logs
          shell: >
            source ~/.profile;
            nohup stern "{{test_pod_regex}}" --since 1m > "{{result_kube_home.stdout}}/{{test_log_path}}" &
@@ -30,13 +47,13 @@
            executable: /bin/bash
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}" 
  
-       - name: Create a storage volume via a pvc 
+       - name: 3) Create a storage volume via a pvc 
          shell: source ~/.profile; kubectl apply -f "{{ volume_def }}"
          args:
            executable: /bin/bash
          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
 
-       - name: Confirm volume container is running 
+       - name: 3a) Confirm volume container is running 
          shell: source ~/.profile; kubectl get pods | grep pvc | grep {{item}} | grep Running | wc -l
          args:
            executable: /bin/bash
@@ -49,62 +66,62 @@
            - rep
          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
         
-       - name: Get storage ctrl pod name
+       - name: 4) Get storage ctrl pod name
          shell: source ~/.profile; kubectl get pods | grep ctrl
          args:
            executable: /bin/bash
          register: ctrl_name
          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
         
-       - name: Set ctrl pod name to variable 
+       - name: 4a) Set ctrl pod name to variable 
          set_fact: 
            ctrl_pod_name: "{{ ctrl_name.stdout.split()[0] }}"
 
-       - name: Get IP address of ctrl pod
+       - name: 4b) Get IP address of ctrl pod
          shell: source ~/.profile; kubectl describe pod {{ ctrl_pod_name }} | grep IP
          args:
            executable: /bin/bash
          register: ctrl_IP
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
     
-       - name: Set IP of Pod to variable
+       - name: 4c) Set IP of Pod to variable
          set_fact:
            ctrl_ip: "{{ ctrl_IP.stdout_lines[0].split()[1]}}" 
 
-       - name: Get $HOME of K8s minion for kubernetes user
+       - name: 5) Get $HOME of K8s minion for kubernetes user
          shell: source ~/.profile; echo $HOME
          args:
            executable: /bin/bash
          register: result_kube_home
          delegate_to: "{{groups['kubernetes-kubeminions'].0}}"
 
-       - name: Copy libiscsi test list into kube minion
+       - name: 5a) Copy libiscsi test list into kube minion
          copy:
            src: "{{ test_list }}"
            dest: "{{ result_kube_home.stdout }}"
          delegate_to: "{{ groups['kubernetes-kubeminions'].0 }}"
 
-       - name: Discover the iSCSI target using iscsi-ls 
+       - name: 6) Discover the iSCSI target using iscsi-ls 
          shell: iscsi-ls iscsi://{{ ctrl_ip }}
          register: target
          delegate_to: "{{ groups['kubernetes-kubeminions'].0 }}"
 
-       - name: Set target iqn to variable 
+       - name: 6a) Set target iqn to variable 
          set_fact:
            iqn: "{{ target.stdout.split()[0] | regex_replace('Target:','')}}"
 
-       - name: Create log directory for libiscsi test run
+       - name: 6b) Create log directory for libiscsi test run
          file: 
            path: "{{ result_kube_home.stdout }}/libiscsi_suite_logs"
            state: directory
          delegate_to: "{{ groups['kubernetes-kubeminions'].0 }}"
 
-       - name: Get test list from test file 
+       - name: 6c) Get test list from test file 
          command: cat {{ result_kube_home.stdout }}/{{ test_list }}       
          register: tests
          delegate_to: "{{ groups['kubernetes-kubeminions'].0 }}"
  
-       - name: Run the libiscsi test suites
+       - name: 7) Run the libiscsi test suites
          shell: >
            iscsi-test-cu --test={{ item }} 
            iscsi://{{ ctrl_ip }}/{{ iqn }}/0 
@@ -117,16 +134,17 @@
          with_items: "{{ tests.stdout_lines }}"
          ignore_errors: true
 
-       - name: Generate test summary 
+       - name: 8) Generate test summary 
          script: parse.sh {{ result_kube_home.stdout }}/libiscsi_suite_logs
          delegate_to: "{{ groups['kubernetes-kubeminions'].0 }}"
          register: summary
 
-       - name: Display the test status
+       - name: 8a) Display the test status
          debug:
            msg: "{{ summary.stdout }}"
-
-       - include: libiscsi-cleanup.yml
+ 
+       - name: 9) Cleaning up the test artifacts.
+         include: libiscsi-cleanup.yml
 
        - name: Terminate the log aggregator
          shell: source ~/.profile; killall stern
