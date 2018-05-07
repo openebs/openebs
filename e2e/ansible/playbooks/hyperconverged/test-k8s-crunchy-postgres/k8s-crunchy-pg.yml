@@ -14,33 +14,33 @@
 ###############################################################################################
 
 - hosts: localhost
- 
-  vars_files: 
-    - k8s-crunchy-pg-vars.yml 
- 
+
+  vars_files:
+    - k8s-crunchy-pg-vars.yml
+
   tasks:
-   
+
    - block:
 
        - name: 1) Install the prerequisites
          include: k8s-crunchy-pg-prerequisites.yml
-  
+
        - name: 2) Get $HOME of K8s master for kubernetes user
          shell: source ~/.profile; echo $HOME
-         args: 
+         args:
            executable: /bin/bash
          register: result_kube_home
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
        - name: 2a) Check whether maya-apiserver pod is deployed
          shell: source ~/.profile; kubectl get pods | grep maya-apiserver
-         args: 
+         args:
            executable: /bin/bash
          register: result
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
          until: "'Running' in result.stdout"
          delay: 120
-         retries: 5 
+         retries: 5
 
        - name: 3) Replace 'tree/master' with 'trunk' in the crunchy-postgres link
          debug:
@@ -50,7 +50,7 @@
        - name: 3a) Set the modified link as a fact
          set_fact:
            crunchy_dir: "{{ git_svn_link.msg }}"
-      
+
        - name: 3b) Download the crunch-postgres folder kubemaster home
          subversion:
            repo: "{{ crunchy_dir }}"
@@ -58,7 +58,7 @@
            dest: "{{ result_kube_home.stdout }}/crunchy-postgres"
            force: yes
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
- 
+
        - name: 4) Replace volume size in set.json
          lineinfile:
            path: "{{ result_kube_home.stdout }}/crunchy-postgres/set.json"
@@ -70,18 +70,18 @@
          command: cat {{ result_kube_home.stdout }}/crunchy-postgres/set.json
          register: jsonfile
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-       
+
        - name: 4b) Register the app label
          set_fact:
            label: "{{(jsonfile.stdout | from_json).spec.template.metadata.labels.app}}"
 
-       - name: 4c) Register the replica variable 
+       - name: 4c) Register the replica variable
          set_fact:
            replicas: "{{(jsonfile.stdout | from_json).spec.replicas}}"
 
-       - name: 4d) Comment the cleanup step in the run.sh with 
+       - name: 4d) Comment the cleanup step in the run.sh with
          lineinfile:
-           path: "{{ result_kube_home.stdout }}/crunchy-postgres/run.sh" 
+           path: "{{ result_kube_home.stdout }}/crunchy-postgres/run.sh"
            regexp: 'cleanup.sh'
            line: '#$DIR/cleanup.sh'
            backup: yes
@@ -97,20 +97,20 @@
 
        - name: 5) Run the shell script to setup postgres cluster
          shell: source ~/.profile; ./run.sh
-         args:  
+         args:
            chdir: "{{ result_kube_home.stdout }}/crunchy-postgres"
            executable: /bin/bash
          register: result
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
-       - name: 6) Confirm the postgres statefulset is running 
+       - name: 6) Confirm the postgres statefulset is running
          shell: source ~/.profile; kubectl get pods --selector=app={{ label }} | grep Running | wc -l
          args:
            executable: /bin/bash
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
          register: setup
          until: "replicas in setup.stdout"
-         delay: 120 
+         delay: 120
          retries: 15
 
        - name: 7) Verify that the postgres master and replica are available as cluster services
@@ -127,15 +127,17 @@
            executable: /bin/bash
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
-       - set_fact:
+       - name: setting flag if pass
+         set_fact:
            flag: "Pass"
-       
+
      rescue:
-       - set_fact:
+       - name: setting flag if fail
+         set_fact:
            flag: "Fail"
 
      always:
-     
+
        - name: 8) Cleaning up the test artifacts
          include: k8s-crunchy-pg-cleanup.yml
          when: clean | bool
@@ -146,7 +148,7 @@
            msg: '{{ ansible_date_time.time }} TEST: {{test_name}}, RESULT: {{ flag }}'
          when: slack_notify | bool and lookup('env','SLACK_TOKEN')
 
- 
-    
+
+
 
 

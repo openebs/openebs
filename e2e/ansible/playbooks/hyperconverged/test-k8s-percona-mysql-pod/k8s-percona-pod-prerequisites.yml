@@ -4,18 +4,20 @@
   become: true
   delegate_to: "{{ groups['kubernetes-kubeminions'].0 }}"
   ignore_errors: true
+  changed_when: true
 
 - name: Install python-pip on K8S-minion
   shell: apt-get install -y {{ item }}
-  become: true 
+  become: true
   with_items: "{{ deb_packages }}"
   delegate_to: "{{ groups['kubernetes-kubeminions'].0 }}"
+  changed_when: true
 
 - name: Install PIP packages on K8s-minion
-  pip: 
+  pip:
     name: "{{ item }}"
     state: present
   with_items: "{{ pip_packages }}"
-  delegate_to: "{{ groups['kubernetes-kubeminions'].0 }}" 
-  become: true  
-      
+  delegate_to: "{{ groups['kubernetes-kubeminions'].0 }}"
+  become: true
+

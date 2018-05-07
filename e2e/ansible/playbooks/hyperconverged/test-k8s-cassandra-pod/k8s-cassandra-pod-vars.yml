@@ -5,7 +5,7 @@ test_log_path: setup/logs/hyperconverged_cassandra_db_on_k8s.log
 
 test_pod_regex: maya*|openebs*|pvc*|cassandra*
 
-cassandra_service_link: https://raw.githubusercontent.com/openebs/openebs/master/k8s/demo/cassandra/cassandra-service.yaml 
+cassandra_service_link: https://raw.githubusercontent.com/openebs/openebs/master/k8s/demo/cassandra/cassandra-service.yaml
 
 svc_yaml_alias: cassandra-service.yaml
 

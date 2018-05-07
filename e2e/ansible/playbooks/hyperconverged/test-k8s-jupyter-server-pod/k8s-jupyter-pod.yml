@@ -12,23 +12,23 @@
 ###############################################################################################
 
 - hosts: localhost
- 
-  vars_files: 
-    - k8s-jupyter-pod-vars.yml 
- 
+
+  vars_files:
+    - k8s-jupyter-pod-vars.yml
+
   tasks:
-   
+
    - block:
 
        - name: 1) Get $HOME of K8s master for kubernetes user
          shell: source ~/.profile; echo $HOME
-         args: 
+         args:
            executable: /bin/bash
          register: result_kube_home
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
        - name: 2) Download YAML for jupyter notebook server plugin
-         get_url: 
+         get_url:
            url: "{{ jupyter_plugin_link }}"
            dest: "{{ result_kube_home.stdout }}/{{ pod_yaml_alias }}"
            force: yes
@@ -40,7 +40,7 @@
 
        - name: 2b) Check whether maya-apiserver is deployed
          shell: source ~/.profile; kubectl get pods | grep maya-apiserver
-         args: 
+         args:
            executable: /bin/bash
          register: result
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
@@ -56,34 +56,36 @@
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
        - name: 3) Deploy jupyter notebook server pod
-         shell: source ~/.profile; kubectl create -f {{ pod_yaml_alias }} 
-         args: 
+         shell: source ~/.profile; kubectl create -f {{ pod_yaml_alias }}
+         args:
            executable: /bin/bash
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
        - name: 4) Confirm pod status is running
          shell: source ~/.profile; kubectl get pods | grep jupyter
-         args: 
+         args:
            executable: /bin/bash
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
          register: result
          until: "'jupyter' and 'Running' in result.stdout"
-         delay: 120 
+         delay: 120
          retries: 15
 
        - name: 5) Verify that the jupyter notebook server is a cluster service
-         shell: source ~/.profile; kubectl get svc 
+         shell: source ~/.profile; kubectl get svc
          args:
            executable: /bin/bash
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
          register: result_service
          failed_when: "'jupyter-service' not in result_service.stdout"
 
-       - set_fact:
+       - name: setting flag if pass
+         set_fact:
            flag: "Pass"
-       
-     rescue: 
-       - set_fact:
+
+     rescue:
+       - name: setting flag if fail
+         set_fact:
            flag: "Fail"
 
      always:
@@ -95,6 +97,6 @@
        - name: Send slack notification
          slack:
            token: "{{ lookup('env','SLACK_TOKEN') }}"
-           msg: '{{ ansible_date_time.time }} TEST: {{test_name}}, RESULT: {{ flag }}' 
+           msg: '{{ ansible_date_time.time }} TEST: {{test_name}}, RESULT: {{ flag }}'
          when: slack_notify | bool and lookup('env','SLACK_TOKEN')
-                  
+
