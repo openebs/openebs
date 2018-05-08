@@ -1,0 +1,26 @@
+---
+test_name: test-node-eviction-out-of-disk
+
+utils_path: openebs/e2e/ansible/playbooks/utils
+
+patch_file: replica_patch.yaml
+
+create_sc: storage-class.yaml
+
+percona_link: https://raw.githubusercontent.com/openebs/openebs/master/k8s/demo/percona/demo-percona-mysql-pvc.yaml
+
+replica_count: 2 
+
+replace_item:
+  - nodename_where_replica_pod_1_got_scheduled
+  - nodename_where_replica_pod_2_got_scheduled
+
+replace_with:
+  - "{{node_details.results[0].stdout}}"
+  - "{{node_details.results[1].stdout}}"
+
+test_pod_regex: maya*|openebs*|pvc*|percona*
+
+test_log_path: setup/logs/test-node-eviction-out-of-disk.log
+
+key: node.kubernetes.io/out-of-disk

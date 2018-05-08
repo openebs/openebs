@@ -1,0 +1,26 @@
+---
+- name: Delete percona mysql pod
+  include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/delete_deploy.yml"
+  vars:
+    app_yml: "{{ percona_link }}"
+
+- name: Check status of percona
+  include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/delete_deploy_check.yml"
+  vars:
+    app: percona
+
+- name: Confirm pvc pod has been deleted
+  shell: source ~/.profile; kubectl get pods | grep pvc
+  args:
+    executable: /bin/bash
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+  register: result
+  failed_when: "'pvc' and 'Running' in result.stdout"
+  delay: 30
+  retries: 10
+
+- name: Remove copied files
+  shell: rm -rf "{{ patch_file }}" "{{ create_sc }}"
+  args:
+    executable: /bin/bash
+
