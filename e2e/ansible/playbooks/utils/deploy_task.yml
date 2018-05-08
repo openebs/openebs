@@ -1,0 +1,9 @@
+---
+- name: Deploy application files
+  shell: source ~/.profile; kubectl apply -f {{ item }}
+  args:
+    executable: /bin/bash
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+  with_items: "{{ app_yml }}"
+
+
