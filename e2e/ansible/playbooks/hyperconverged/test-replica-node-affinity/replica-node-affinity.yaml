@@ -156,7 +156,7 @@
          register: pod_name
 
        - name: 8a) Delete the replica on one of the nodes
-         command: kubectl delete pod "{{ pod_name.stdout }}" --grace-period=0 --force
+         shell: kubectl delete pod "{{ pod_name.stdout }}" --grace-period=0 --force
          args:
            executable: /bin/bash
 
