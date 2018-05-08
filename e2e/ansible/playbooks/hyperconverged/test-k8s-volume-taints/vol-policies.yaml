@@ -35,9 +35,6 @@ spec:
   - name: ReplicaImage
     value: openebs/jiva:0.5.0
   - name: ReplicaCount
-|1|mMWrHaeuj5Fh1uA5z/qaj1mlR1c=|/0fHJ7v7lAr3bFTQsSQiv1I/CAY= ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBH7cWMT0QWKE2ejgK6d8jYLG4L+MkDvooidBfMLS8Uxw2zC66b33phoVt/WziScyn8kSWrFFbTwTAHjw1mARA0Q=
-|1|A56+E/F9GdJTvtqHXl6i8Ouq/sE=|nq23O1MZfc/QqaYi5smqV0PnW88= ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBN2XR2bCP/xNyXlFtdIXFM0TD0dbINPtHGpr3Lka/+JwGMzyyampDaZjanduuUQfabTYNCEHq4OnioghP9b/bjc=
-|1|TXze/2804v0mqwwNHZKiHM9GKss=|2wKhErVljvO9eoA2jYYVWq15vvU= ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBEqGgSg03pBjEUXV/dnF0Xi9Kkc2FrwIM+6L+GPARr9mBlh7LizJkc/TV3DCEpmEtEFMGDdaU+JEfcS6SyjrDEg=
     value: "1"
   - name: StoragePool
     value: sp-mntdir
