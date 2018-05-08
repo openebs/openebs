@@ -34,12 +34,6 @@
          register: result_kube_home
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
-       - name: Get $HOME of localhost
-         shell: source ~/.profile; echo $HOME
-         args:
-           executable: /bin/bash
-         register: localhost_home
-
        - name: Get percona spec and liveness scripts
          get_url:
            url: "{{ item }}"
@@ -48,7 +42,7 @@
          with_items: "{{ percona_links }}"
 
        - name: Replace volume-claim name with test parameters
-         include_tasks: "{{ localhost_home.stdout }}/{{utils_path}}/regex_task.yml"
+         include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/regex_task.yml"
          vars:
            path: "{{ result_kube_home.stdout }}/percona.yaml"
            regex1: "{{replace_item}}"
@@ -63,7 +57,7 @@
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
        - name: Check status of maya-api server
-         include_tasks: "{{ localhost_home.stdout }}/{{utils_path}}/deploy_check.yml"
+         include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
          vars:
             app: maya-api
  
@@ -74,12 +68,12 @@
        ####################################################
 
        - name: Setup the pumba infrastructure
-         include_tasks: "{{ localhost_home.stdout }}/{{utils_path}}/deploy_task.yml"
+         include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_task.yml"
          vars:
            app_yml: "{{ pumba_file }}"
 
        - name: Check whether pumba infrastructure is created
-         include_tasks: "{{ localhost_home.stdout }}/{{utils_path}}/deploy_check.yml"
+         include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
          vars:
             app: pumba
 
@@ -92,7 +86,7 @@
          failed_when: "'configmap' and 'created' not in result.stdout"
 
        - name: Create percona deployment with OpenEBS storage
-         include_tasks: "{{ localhost_home.stdout }}/{{utils_path}}/deploy_task.yml"
+         include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_task.yml"
          vars:
            app_yml: "{{ percona_files.0 }}"
 
@@ -101,7 +95,7 @@
            timeout: 120
          
        - name: Check whether percona application is running
-         include_tasks: "{{ localhost_home.stdout }}/{{utils_path}}/deploy_check.yml"
+         include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
          vars:
             app: percona
 
@@ -159,7 +153,7 @@
        ########################################################
 
        - name: Confirm percona pod is still running
-         include_tasks: "{{ localhost_home.stdout }}/{{utils_path}}/status_running.yml"
+         include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/status_running.yml"
          vars:
             app: percona
 

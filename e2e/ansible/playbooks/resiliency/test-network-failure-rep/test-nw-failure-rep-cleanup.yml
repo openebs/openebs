@@ -7,17 +7,17 @@
   register: pvc
 
 - name: Delete pumba infrastructure
-  include_tasks: "{{ localhost_home.stdout }}/{{utils_path}}/delete_deploy.yml"
+  include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/delete_deploy.yml"
   vars:
     app_yml: "{{ pumba_file }}"
 
 - name: Delete percona mysql pod
-  include_tasks: "{{ localhost_home.stdout }}/{{utils_path}}/delete_deploy.yml"
+  include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/delete_deploy.yml"
   vars:
     app_yml: "{{ percona_files.0 }}"
 
 - name: Confirm percona pod deletion
-  include_tasks: "{{ localhost_home.stdout }}/{{utils_path}}/delete_deploy_check.yml"
+  include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/delete_deploy_check.yml"
   vars:
     app: percona
 
@@ -29,7 +29,7 @@
   register: result
   failed_when: "'pvc' and 'Running' in result.stdout"
   delay: 30
-  retried: 10
+  retries: 10
 
 - name: Remove the percona liveness check config map 
   shell: source ~/.profile; kubectl delete cm sqltest 
