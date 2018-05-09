@@ -48,25 +48,6 @@
   retries: 6
   changed_when: True
 
-- name: Delete the openebs operator
-  shell: source ~/.profile; kubectl delete -f "{{ openebs_operator_link }}"
-  args:
-    executable: /bin/bash
-  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-  changed_when: True
-
-- name: Confirm pod has been deleted
-  shell: source ~/.profile; kubectl get pods --all-namespaces
-  args:
-    executable: /bin/bash
-  register: result
-  until: "'maya-apiserver' or 'openebs-provisioner' not in result.stdout"
-  delay: 100
-  retries: 6
-  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-  changed_when: True
-
-
 - name: Remove test artifacts
   file:
     path: "{{ result_kube_home.stdout }}/{{ item }}"
