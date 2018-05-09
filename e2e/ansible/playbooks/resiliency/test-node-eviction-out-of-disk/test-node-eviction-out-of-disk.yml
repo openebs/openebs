@@ -23,51 +23,63 @@
    - block:
 
        ###################################################
-       #                PREPARE FOR TEST                 #
+       #              1)PREPARE FOR TEST                 #
        # (Place artifacts in kubemaster, start logger &  #
        # confirm OpenEBS operator is ready for requests. #
        ###################################################
 
-       - name: Get $HOME of K8s master for kubernetes user
+       - name: 1a) Get $HOME of K8s master for kubernetes user
          shell: source ~/.profile; echo $HOME
          args:
            executable: /bin/bash
          register: result_kube_home
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
-       - name: Check status of maya-api server
+       - name: 1b) Check status of maya-api server
          include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
          vars:
             app: maya-api
 
-       - name: Start the log aggregator to capture test pod logs
+       - name: 1c) Start the log aggregator to capture test pod logs
          shell: >
            source ~/.profile;
            nohup stern "{{test_pod_regex}}" --since 1m > "{{result_kube_home.stdout}}/{{test_log_path}}" &
          args:
            executable: /bin/bash
+         become: true
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
-       - name: Obtaining storage classes yaml
+       - name: 1d) Obtaining storage classes yaml
          shell: kubectl get sc openebs-percona -o yaml > "{{ create_sc }}"
          args:
            executable: /bin/bash
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
-       - name: Replace the replica count in storage classes yaml
+       - name: 1e) Get the Number of nodes count
+         shell: kubectl get nodes | grep 'Ready' | grep 'none' | wc -l
+         args:
+           executable: /bin/bash
+         register: node_out
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+       - name: Fetch the node count from stdout
+         set_fact:
+            node_count: " {{ node_out.stdout}}"
+
+       - name: 1f) Replace the replica count in storage classes yaml
          replace:
            path: "{{ create_sc }}"
            regexp: 'openebs.io/jiva-replica-count: "3"'
-           replace: 'openebs.io/jiva-replica-count: "2"'
+           replace: 'openebs.io/jiva-replica-count: "{{ (node_count) |int-1 }}"'
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
        ####################################################
-       #              Deploy Application                  #
+       #           2) Deploy Application                  #
        # (Apply replica patch and set NodeAffinity and    #
        # verify replica pods are re-scheduled and running)#
        ####################################################
 
-       - name: Delete the existing storage class and create new one
+       - name: 2a) Delete the existing storage class and create new one
          shell: kubectl delete sc openebs-percona; kubectl apply -f "{{ create_sc }}"
          args:
            executable: /bin/bash
@@ -77,7 +89,7 @@
          retries: 5
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
-       - name: Create percona deployment with OpenEBS storage
+       - name: 2b) Create percona deployment with OpenEBS storage
          include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_task.yml"
          vars:
            app_yml: "{{ percona_link }}"
@@ -87,7 +99,7 @@
          vars:
             app: percona
 
-       - name: Check specified number of replica pods are created
+       - name: 2c) Check specified number of replica pods are created
          shell: kubectl get pods --all-namespaces | grep rep | grep -i running |wc -l
          args:
            executable: /bin/bash
@@ -105,12 +117,12 @@
          register: pv_name
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
-       - name: Copy the replica patch specs to kubemaster
+       - name: 2d) Copy the replica patch specs to kubemaster
          include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/copy_task.yml"
          vars:
            files_to_copy: "{{ patch_file }}"
 
-       - name: Gather node details for scheduled replicas
+       - name: 2e) Gather node details for scheduled replicas
          shell: kubectl get pod --all-namespaces -o wide | grep "{{ pv_name.stdout }}" | grep rep | awk '{print $8}' | awk 'FNR == {{ item }} {print}'
          args:
            executable: /bin/bash
@@ -120,7 +132,7 @@
            - 2
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
-       - name: Update replica patch spec with node details
+       - name: 2f) Update replica patch spec with node details
          include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/regex_task.yml"
          vars:
            path: "{{ result_kube_home.stdout }}/{{ patch_file }}"
@@ -130,7 +142,7 @@
            - 0
            - 1
 
-       - name: Get deployment details to set node affinity
+       - name: 3a) Get deployment details to set node affinity
          shell: kubectl get deploy --all-namespaces |grep "{{ pv_name.stdout }}" | grep rep |awk '{print $2}'
          args:
            executable: /bin/bash
@@ -141,7 +153,7 @@
          wait_for:
            timeout: 120
 
-       - name: Set replica deployment with node affinity policy
+       - name: 3b) Set replica deployment with node affinity policy
          shell: kubectl patch deployment "{{ deploy_name.stdout }}" -p "$(cat replica_patch.yaml)"
          args:
            executable: /bin/bash
@@ -151,7 +163,7 @@
          retries: 5
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
-       - name: Check whether replica pods are re-scheduled and running
+       - name: 3c) Check whether replica pods are re-scheduled and running
          shell: kubectl get pods --all-namespaces | grep rep | grep -i running |wc -l
          args:
            executable: /bin/bash
@@ -202,14 +214,14 @@
        # on same node adhering NodeAffinity Policy)       #
        ####################################################
 
-       - name: Get pod_name to Verify replica pod is scheduled on same node
-         shell: kubectl get pods | grep pvc | grep -i Pending
+       - name: 4a) Get pod_name to Verify replica pod is scheduled on same node
+         shell: kubectl get pods | grep pvc | grep -i Pending | awk {'print $1'}
          args:
            executable: /bin/bash
          register: pod_name
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
-       - name: Untaint node with Eviction Condition node.kubernetes.io/out-of-disk
+       - name: 4b) Untaint node with Eviction Condition node.kubernetes.io/out-of-disk
          command: kubectl taint nodes {{ node_name.stdout }} {{ key }}:NoExecute-
          args:
            executable: /bin/bash
@@ -219,7 +231,7 @@
          retries: 15
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
-       - name: Verify replica pod is scheduled on same node adhering NodeAffinity Policy
+       - name: 4c) Verify replica pod is scheduled on same node adhering NodeAffinity Policy
          shell: kubectl get pods | grep {{ pod_name.stdout }}
          args:
            executable: /bin/bash
@@ -229,7 +241,7 @@
          delay: 30
          retries: 5
 
-       - name: Terminate the log aggregator
+       - name: 4d) Terminate the log aggregator
          shell: source ~/.profile; killall stern
          args:
            executable: /bin/bash
@@ -246,9 +258,9 @@
 
      always:
 
-       - include: test-node-eviction-out-of-disk-cleanup.yml
+       - include: 5) test-node-eviction-out-of-disk-cleanup.yml
 
-       - name: Send slack notification
+       - name: 6) Send slack notification
          slack:
            token: "{{ lookup('env','SLACK_TOKEN') }}"
            msg: '{{ ansible_date_time.time }} TEST: {{test_name}}, RESULT: {{ flag }}'
