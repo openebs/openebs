@@ -1,6 +1,6 @@
 ---
 - name: Check pod status
-  shell: source ~/.profile; kubectl get pods | grep {{ app }}
+  shell: source ~/.profile; kubectl get pods -n {{ ns }} | grep {{ app }}
   args:
     executable: /bin/bash
   register: result
@@ -8,4 +8,4 @@
   until: "app and 'Running' not in result.stdout"
   delay: 30
   retries: 15
-  ignore_errors: True
+  ignore_erros: true
