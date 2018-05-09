@@ -107,7 +107,7 @@
          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
          when: "'namespace' not in result.stdout"
          ignore_errors: true
-         chnaged_when: True
+         changed_when: True
 
        - name: Copy test-pvc yaml to kubemaster
          copy:
@@ -172,8 +172,9 @@
          when: stat_result.stat.exists
 
        - name: Terminate the log aggregator
-         shell: source {{ profile }}; killall stern
+         shell: source ~/.profile; killall stern
          args:
            executable: /bin/bash
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
          changed_when: True
+         ignore_errors: True
