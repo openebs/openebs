@@ -241,11 +241,11 @@
          delay: 30
          retries: 5
 
-       - name: 4d) Terminate the log aggregator
-         shell: source ~/.profile; killall stern
-         args:
-           executable: /bin/bash
-         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+       #- name: 4d) Terminate the log aggregator
+       #  shell: source ~/.profile; killall stern
+       #  args:
+       #    executable: /bin/bash
+       #  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
        - name: Test Passed
          set_fact:
@@ -258,7 +258,7 @@
 
      always:
 
-       - include: 5) test-node-eviction-out-of-disk-cleanup.yml
+       - include: test-node-eviction-out-of-disk-cleanup.yml
 
        - name: 6) Send slack notification
          slack:
