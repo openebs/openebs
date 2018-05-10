@@ -4,7 +4,7 @@ kind: Pod
 metadata:
   name: percona-new
   labels:
-    name: percona_new
+    name: percona-new
 spec:
   containers:
   - resources:

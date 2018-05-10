@@ -1,56 +1,6 @@
 ---
-- name: Delete the snapshot clai,
-  shell: source ~/.profile; kubectl delete -f {{ snapshot_claim }}
-  args:
-    executable: /bin/bash
-  register: delete_claim
-  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-  until: "'persistentvolumeclaim \"demo-snap-vol-claim\" deleted' in delete_claim.stdout"
-  delay: 20
-  retries: 5
-
-- name: Delete snapshot promoter sc
-  shell: source ~/.profile; kubectl delete -f {{ snapshot_sc }}
-  args:
-    executable: /bin/bash
-  register: delete_sc
-  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-  until: "'storageclass \"snapshot-promoter\" deleted' in delete_sc.stdout"
-  delay: 20
-  retries: 5
-
-- name: Delete volume snapshot
-  shell: source ~/.profile; kubectl delete -f {{ snapshot_sc }}
-  args:
-    executable: /bin/bash
-  register: delete_sp
-  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-  until: "'volumesnapshot \"snapshot-demo\" deleted' in delete_sp.stdout"
-  delay: 20
-  retries: 5
-
-- name: Delete snapshot-controller
-  shell: source ~/.profile; kubectl delete -f {{ snapshot_operator }}
-  args:
-    executable: /bin/bash
-  register: delete_pod
-  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-  until: "'deployment \"snapshot-controller\" deleted' in delete_pod.stdout"
-  delay: 20
-  retries: 5
-
-- name: Checking if the snapshot controller has been deleted.
-  shell: source ~/.profile; kubectl get pods
-  args:
-    executable: /bin/bash
-  register: list_pods
-  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-  until: "'snapshot-controller' not in list_pods.stdout"
-  delay: 30
-  retries: 15
-
 - name: Delete percona application deployed with snapped pvc
-  shell: source ~/.profile; kubectl delete -f percona
+  shell: source ~/.profile; kubectl delete -f "{{ percona }}"
   args:
     executable: /bin/bash
   register: delete_percona
@@ -69,8 +19,58 @@
   delay: 30
   retries: 15
 
+- name: Delete the snapshot claim
+  shell: source ~/.profile; kubectl delete -f "{{ snapshot_claim }}"
+  args:
+    executable: /bin/bash
+  register: delete_claim
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+  until: "'persistentvolumeclaim \"demo-snap-vol-claim\" deleted' in delete_claim.stdout"
+  delay: 20
+  retries: 5
+
+- name: Delete volume snapshot
+  shell: source ~/.profile; kubectl delete -f "{{ snapshot }}"
+  args:
+    executable: /bin/bash
+  register: delete_sp
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+  until: "'volumesnapshot \"snapshot-demo\" deleted' in delete_sp.stdout"
+  delay: 20
+  retries: 5
+
+- name: Delete snapshot promoter sc
+  shell: source ~/.profile; kubectl delete -f "{{ snapshot_sc }}"
+  args:
+    executable: /bin/bash
+  register: delete_sc
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+  until: "'storageclass \"snapshot-promoter\" deleted' in delete_sc.stdout"
+  delay: 20
+  retries: 5
+
+- name: Delete snapshot-controller
+  shell: source ~/.profile; kubectl delete -f "{{ snapshot_operator }}"
+  args:
+    executable: /bin/bash
+  register: delete_pod
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+  until: "'deployment \"snapshot-controller\" deleted' in delete_pod.stdout"
+  delay: 20
+  retries: 5
+
+- name: Checking if the snapshot controller has been deleted.
+  shell: source ~/.profile; kubectl get pods
+  args:
+    executable: /bin/bash
+  register: list_pods
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+  until: "'snapshot-controller' not in list_pods.stdout"
+  delay: 30
+  retries: 15
+
 - name: Delete the percona pod which was created before capturing snaphshot
-  shell: source ~/.profile; kubectl delete -f {{ percona_link }}
+  shell: source ~/.profile; kubectl delete -f "{{ percona_link }}"
   args:
     executable: /bin/bash
   register: delete_percona_out
@@ -99,45 +99,11 @@
   delay: 30
   retries: 15
 
-- name: Delete openebs ci
-  shell: source ~/.profile; kubectl delete -f {{ openebs_ci }}
-  args:
-    executable: /bin/bash
-  register: delete_out
-  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
- 
-- name: Check if ci openebs components are deleted
-  shell: source ~/.profile; kubectl get pods
-  args:
-    executable: /bin/bash
-  register: delete_result
-  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-  until: "'maya-apiserver' and 'openebs-provisioner' not in delete_result.stdout"
-  delay: 30
-  retries: 15
-
 - name: Remove snapshot specific files
   file:
     path: "{{ item }}"
     state: absent
   with_items:
-    - {{ snapshot_files }}
+    - "{{ snapshot_files }}"
+    - "{{ percona }}"
   delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-
-- name: Deploy OpenEBS
-  shell: source ~/.profile; kubectl create -f {{ openebs_link }}
-  args:
-    executable: /bin/bash
-  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-
-- name: Check if OpenEBS has been deployed
-  shell: source ~/.profile; kubectl get pods | grep -i Running
-  args:
-    executable: /bin/bash
-  register: pod_result
-  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-  until: "'maya-apiserver' and 'openebs-provisioner' in pod_result.stdout"
-  delay: 30
-  retries: 15
-
-- 

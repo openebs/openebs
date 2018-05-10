@@ -3,13 +3,9 @@ test_name: kubectl_snapshot_restore
 
 test_log_path: setup/logs/snap_create_revert.log
 
-test_pod_regex: maya*|openebs*|pvc*
+test_pod_regex: maya*|openebs*|pvc*|snapshot*
 
-percona_link: https://raw.githubusercontent.com/openebs/openebs/master/k8s/demo/percona/demo-percona-mysql-pvc.yaml 
-
-openebs_link: https://raw.githubusercontent.com/openebs/openebs/master/k8s/openebs-operator.yaml
-
-openebs_ci: openebs-operator.yaml
+percona_link: https://raw.githubusercontent.com/openebs/openebs/master/k8s/demo/percona/demo-percona-mysql-pvc.yaml
 
 snapshot_operator: snapshot-operator.yml
 
@@ -25,5 +21,6 @@ snapshot_files:
   - snapshot-promoter-sc.yml
   - snapshot-claim.yml
 
-percona: demo-percona-mysql-pvc.yaml 
+percona: demo-percona-mysql-pvc.yaml
 
+pod_name: percona
