@@ -10,7 +10,7 @@
     app: percona
 
 - name: Delete nodeeviction ns
-  shell: kubectl delete ns nodeeviction
+  shell: kubectl delete ns {{ namespace }}
   args:
     executable: /bin/bash
   register: ns_out
@@ -20,14 +20,15 @@
   delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
 - name: Confirm pvc pod has been deleted
-  shell: source ~/.profile; kubectl get pods -n nodeeviction | grep pvc
+  shell: source ~/.profile; kubectl get pods -n {{ namespace }} | grep pvc
   args:
     executable: /bin/bash
   delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
   register: result
-  until: "'pvc' not in result.stdout"
+  until: "result.rc!=0"
   delay: 30
   retries: 10
+  ignore_errors: true
 
 - name: Remove copied files
   shell: rm -rf "{{ patch_file }}" "{{ create_sc }}"

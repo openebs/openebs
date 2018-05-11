@@ -76,7 +76,7 @@
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
        - name: Create nodeeviction namespace
-         shell: kubectl create ns nodeeviction
+         shell: kubectl create ns {{ namespace }}
          args:
            executable: /bin/bash
          register: ns_out
@@ -88,11 +88,11 @@
        - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_task.yml"
          vars:
            app_yml: "{{ percona_link }}"
-           ns: nodeeviction
+           ns: "{{ namespace }}"
 
        - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
          vars:
-            ns: nodeeviction
+            ns: "{{ namespace }}"
             app: percona
 
        - name: 2c) Check specified number of replica pods are created
@@ -100,7 +100,7 @@
          args:
            executable: /bin/bash
          register: rep_count
-         until: "'2' in rep_count.stdout"
+         until: "'{{ (node_count) |int-1 }}' in rep_count.stdout"
          delay: 30
          retries: 15
          ignore_errors: true
@@ -118,26 +118,20 @@
            files_to_copy: "{{ patch_file }}"
 
        - name: 2e) Gather node details for scheduled replicas
-         shell: kubectl get pod -n nodeeviction -o wide | grep "{{ pv_name.stdout }}" | grep rep | awk '{print $7}' | awk 'FNR == {{ item }} {print}'
+         shell: kubectl get pod -n {{ namespace }} -o wide | grep "{{ pv_name.stdout }}" | grep rep | awk '{print $7}'
          args:
            executable: /bin/bash
          register: node_details
-         with_items:
-           - 1
-           - 2
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
        - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/regex_task.yml"
          vars:
            path: "{{ result_kube_home.stdout }}/{{ patch_file }}"
            regex1: "{{replace_item}}"
-           regex2: "{{node_details[{{ item }}].stdout}}"
-         with_items:
-           - 0
-           - 1
+           regex2: "{{replace_with}}"
 
        - name: 3a) Get deployment details to set node affinity
-         shell: kubectl get deploy -n nodeeviction |grep "{{ pv_name.stdout }}" | grep rep |awk '{print $1}'
+         shell: kubectl get deploy -n {{ namespace }} |grep "{{ pv_name.stdout }}" | grep rep |awk '{print $1}'
          args:
            executable: /bin/bash
          register: deploy_name
@@ -148,7 +142,7 @@
            timeout: 120
 
        - name: 3b) Set replica deployment with node affinity policy
-         shell: kubectl patch deployment "{{ deploy_name.stdout }}" -n nodeeviction -p "$(cat replica_patch.yaml)"
+         shell: kubectl patch deployment "{{ deploy_name.stdout }}" -n {{ namespace }} -p "$(cat replica_patch.yaml)"
          args:
            executable: /bin/bash
          register: patch_out
@@ -158,7 +152,7 @@
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
        - name: 3c) Check whether replica pods are re-scheduled and running
-         shell: kubectl get pods -n nodeeviction | grep rep | grep -i running |wc -l
+         shell: kubectl get pods -n {{ namespace }} | grep rep | grep -i running |wc -l
          args:
            executable: /bin/bash
          register: rep_count
@@ -175,7 +169,7 @@
        ####################################################
 
        - name: 4a) Get node on which replica is scheduled
-         shell: kubectl get pods -n nodeeviction -o wide | grep rep | awk 'FNR == 1 {print}' | awk {'print $7'}
+         shell: kubectl get pods -n {{ namespace }} -o wide | grep rep | awk 'FNR == 1 {print}' | awk {'print $7'}
          args:
            executable: /bin/bash
          register: node_name
@@ -192,7 +186,7 @@
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
        - name: 4c) Verify replica pod remains in Pending state
-         shell: kubectl get pods -n nodeeviction | grep pvc | grep -i Pending |wc -l
+         shell: kubectl get pods -n {{ namespace }} | grep pvc | grep -i Pending |wc -l
          args:
            executable: /bin/bash
          register: check_replica
@@ -209,7 +203,7 @@
        ####################################################
 
        - name: 5a) Get pod_name to Verify replica pod is scheduled on same node
-         shell: kubectl get pods -n nodeeviction | grep pvc | grep -i Pending | awk {'print $1'}
+         shell: kubectl get pods -n {{ namespace }} | grep pvc | grep -i Pending | awk {'print $1'}
          args:
            executable: /bin/bash
          register: pod_name
@@ -226,7 +220,7 @@
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
        - name: 5c) Verify replica pod is scheduled on same node adhering NodeAffinity Policy
-         shell: kubectl get pods -n nodeeviction -o wide | grep {{ node_name.stdout }} | grep {{ pod_name.stdout }}
+         shell: kubectl get pods -n {{ namespace }} -o wide | grep {{ node_name.stdout }} | grep {{ pod_name.stdout }}
          args:
            executable: /bin/bash
          register: replica_status
@@ -260,11 +254,11 @@
         
          always:
 
-           - name: 5) Terminate the log aggregator
-             shell: source ~/.profile; killall stern
-             args:
-               executable: /bin/bash
-             delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+           #- name: 5) Terminate the log aggregator
+           #  shell: source ~/.profile; killall stern
+           #  args:
+           #    executable: /bin/bash
+           #  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
            
 
            - name: 6) Send slack notification

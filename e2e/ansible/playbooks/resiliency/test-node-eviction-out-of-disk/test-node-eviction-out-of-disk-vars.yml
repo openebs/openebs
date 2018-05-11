@@ -1,6 +1,8 @@
 ---
 test_name: test-node-eviction-out-of-disk
 
+namespace: nodeeviction
+
 utils_path: openebs/e2e/ansible/playbooks/utils
 
 patch_file: replica_patch.yaml
@@ -14,8 +16,8 @@ replace_item:
   - nodename_where_replica_pod_2_got_scheduled
 
 replace_with:
-  - "{{node_details.results[0].stdout}}"
-  - "{{node_details.results[1].stdout}}"
+  - "{{node_details.stdout_lines[0]}}"
+  - "{{node_details.stdout_lines[1]}}"
 
 test_pod_regex: maya*|openebs*|pvc*|percona*
 
