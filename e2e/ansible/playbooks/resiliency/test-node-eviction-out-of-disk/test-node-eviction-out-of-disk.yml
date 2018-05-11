@@ -254,11 +254,11 @@
         
          always:
 
-           #- name: 5) Terminate the log aggregator
-           #  shell: source ~/.profile; killall stern
-           #  args:
-           #    executable: /bin/bash
-           #  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+           - name: 5) Terminate the log aggregator
+             shell: source ~/.profile; killall stern
+             args:
+               executable: /bin/bash
+             delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
            
 
            - name: 6) Send slack notification
