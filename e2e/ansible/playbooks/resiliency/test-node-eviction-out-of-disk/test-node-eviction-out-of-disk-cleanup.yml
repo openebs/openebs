@@ -1,12 +1,10 @@
 ---
-- name: Delete percona mysql pod
-  include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/delete_deploy.yml"
+- include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/delete_deploy.yml"
   vars:
     app_yml: "{{ percona_link }}"
     ns: nodeeviction
 
-- name: Check status of percona
-  include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/delete_deploy_check.yml"
+- include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/delete_deploy_check.yml"
   vars:
     ns: nodeeviction
     app: percona
@@ -27,7 +25,7 @@
     executable: /bin/bash
   delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
   register: result
-  failed_when: "'pvc' and 'Running' in result.stdout"
+  until: "'pvc' not in result.stdout"
   delay: 30
   retries: 10
 

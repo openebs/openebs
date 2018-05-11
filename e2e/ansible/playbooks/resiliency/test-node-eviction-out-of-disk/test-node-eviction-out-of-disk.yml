@@ -30,8 +30,7 @@
        # confirm OpenEBS operator is ready for requests. #
        ###################################################
 
-       - name: 1a) Check status of maya-api server
-         include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
+       - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
          vars:
             ns: openebs
             app: maya-api
@@ -86,14 +85,12 @@
          retries: 5
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
-       - name: 2b) Create percona deployment with OpenEBS storage
-         include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_task.yml"
+       - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_task.yml"
          vars:
            app_yml: "{{ percona_link }}"
            ns: nodeeviction
 
-       - name: Check whether percona application is running
-         include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
+       - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
          vars:
             ns: nodeeviction
             app: percona
@@ -116,8 +113,7 @@
          register: pv_name
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
-       - name: 2d) Copy the replica patch specs to kubemaster
-         include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/copy_task.yml"
+       - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/copy_task.yml"
          vars:
            files_to_copy: "{{ patch_file }}"
 
@@ -131,8 +127,7 @@
            - 2
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
-       - name: 2f) Update replica patch spec with node details
-         include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/regex_task.yml"
+       - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/regex_task.yml"
          vars:
            path: "{{ result_kube_home.stdout }}/{{ patch_file }}"
            regex1: "{{replace_item}}"
@@ -264,11 +259,12 @@
                cflag: cleanup_fail
         
          always:
-           #- name: 5) Terminate the log aggregator
-           #  shell: source ~/.profile; killall stern
-           #  args:
-           #    executable: /bin/bash
-           #  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+           - name: 5) Terminate the log aggregator
+             shell: source ~/.profile; killall stern
+             args:
+               executable: /bin/bash
+             delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
            
 
            - name: 6) Send slack notification
