@@ -11,6 +11,7 @@ To get started, all you need to have is an Ubuntu Host or VM with minimum RAM (8
 
 - [Dedicated](../dedicated/tutorial-ubuntu1604-vagrant.md)
 
-
-
+## Running Wordpress with MySQL on Kubernetes
+Follow the link for getting familiar with running Wordpress with MySQL on Kubernetes 
+https://buddy.works/guides/how-run-wordpress-on-kubernetes
 
