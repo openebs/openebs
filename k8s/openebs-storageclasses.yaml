@@ -42,6 +42,7 @@ parameters:
   openebs.io/jiva-replica-count: "3"
   openebs.io/volume-monitor: "true"
   openebs.io/capacity: 5G
+  openebs.io/fstype: "xfs"
 ---
 apiVersion: storage.k8s.io/v1
 kind: StorageClass

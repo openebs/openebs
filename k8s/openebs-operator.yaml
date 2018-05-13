@@ -37,7 +37,7 @@ rules:
   verbs: [ "get", "list", "create" ]
 - apiGroups: ["*"]
   resources: ["storagepools"]
-  verbs: ["get", "list"] 
+  verbs: ["get", "list"]
 - nonResourceURLs: ["/metrics"]
   verbs: ["get"]
 ---
@@ -141,6 +141,13 @@ spec:
         # This is supported for openebs provisioner version 0.5.2 onwards
         #- name: OPENEBS_IO_KUBE_CONFIG
         #  value: "/home/ubuntu/.kube/config"
+        # OPENEBS_VALID_FSTYPE enables openebs provisioner to provision openebs
+        # volume other then ext4(default fstype). After adding "openebs.io/fstype"
+        # parameters in StorageClasse will provision the volume with specified fstype.
+        # This is ignored if empty.
+        # This is supported for openebs provisioner version 0.5.4 onwards
+        #- name: OPENEBS_VALID_FSTYPE
+        #  value: "ext4,xfs"
         - name: NODE_NAME
           valueFrom:
             fieldRef:
