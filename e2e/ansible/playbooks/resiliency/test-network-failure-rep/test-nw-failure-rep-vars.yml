@@ -24,6 +24,8 @@ delay_interavals:
   - 6000
   - 10000
 
+namespace: nw-rep
+
 pumba_file: https://raw.githubusercontent.com/openebs/elves/master/chaos/pumba/pumba_kube.yml 
 
 test_pod_regex: maya*|openebs*|pvc*|percona*|pumba*

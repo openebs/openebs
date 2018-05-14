@@ -14,25 +14,19 @@
 ###############################################################################################
 
 - hosts: localhost
- 
-  vars_files: 
-    - test-nw-failure-vars.yml 
- 
+
+  vars_files:
+    - test-nw-failure-vars.yml
+
   tasks:
    - block:
+       - include: test-nw-failure-prereq.yml
 
        ###################################################
        #                PREPARE FOR TEST                 #
-       # (Place artifacts in kubemaster, start logger &  # 
+       # (Place artifacts in kubemaster, start logger &  #
        # confirm OpenEBS operator is ready for requests. #
        ###################################################
-
-       - name: Get $HOME of K8s master for kubernetes user
-         shell: source ~/.profile; echo $HOME
-         args: 
-           executable: /bin/bash
-         register: result_kube_home
-         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
        - name: Get percona spec and liveness scripts
          get_url:
@@ -48,86 +42,91 @@
            regex1: "{{replace_item}}"
            regex2: "{{replace_with}}"
 
-       - name: Start the log aggregator to capture test pod logs
-         shell: >
-           source ~/.profile;
-           nohup stern "{{test_pod_regex}}" --since 1m > "{{result_kube_home.stdout}}/{{test_log_path}}" &
-         args:
-           executable: /bin/bash
-         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-
        - name: Check status of maya-api server
          include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
          vars:
+            ns: openebs
             app: maya-api
- 
+
        ####################################################
        #          SETUP FAULT-INJECTION ENV               #
        # (Setup pumba deployment with an empty policy,    #
-       # deploy percona w/ a liveness check for DB writes)# 
+       # deploy percona w/ a liveness check for DB writes)#
        ####################################################
 
        - name: Setup the pumba infrastructure
          include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_task.yml"
          vars:
            app_yml: "{{ pumba_file }}"
+           ns: default
 
        - name: Check whether pumba infrastructure is created
          include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
          vars:
+            ns: default
             app: pumba
 
+       - name: Create test specific namespace
+         command: kubectl create ns {{ namespace }}
+         register: ns_out
+         until: "'created' in ns_out.stdout"
+         delay: 10
+         retries: 5
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
        - name: Create a configmap with the liveness sql script
-         shell: source ~/.profile; kubectl create configmap sqltest --from-file={{ percona_files.1 }} 
-         args: 
+         shell: source ~/.profile; kubectl create configmap sqltest --from-file={{ percona_files.1 }} -n {{ namespace }}
+         args:
            executable: /bin/bash
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-         register: result 
+         register: result
          failed_when: "'configmap' and 'created' not in result.stdout"
 
        - name: Create percona deployment with OpenEBS storage
          include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_task.yml"
          vars:
            app_yml: "{{ percona_files.0 }}"
+           ns: "{{ namespace }}"
 
-       - name: Wait for 120s to ensure liveness check starts 
+       - name: Wait for 120s to ensure liveness check starts
          wait_for:
            timeout: 120
-         
+
        - name: Check whether percona application is running
          include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
          vars:
+            ns: "{{ namespace }}"
             app: percona
 
-       - name: Get the node details on which pvc-ctrl is scheduled 
-         shell: kubectl get pods -o wide | grep ctrl | awk {'print $7'}
+       - name: Get the node details on which pvc-ctrl is scheduled
+         shell: kubectl get pods -n {{ namespace }} -o wide | grep ctrl | awk {'print $7'}
          args:
            executable: /bin/bash
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
          register: node_cntrl
 
        - name: Get the pvc-cntrl name
-         shell: kubectl get pods | grep ctrl | awk {'print $1'}
+         shell: kubectl get pods -n {{ namespace }} | grep ctrl | awk {'print $1'}
          args:
            executable: /bin/bash
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
          register: pvc_cntrl_name
 
        - name: Get the cntrl container name
-         shell: kubectl describe pod {{ pvc_cntrl_name.stdout }} | grep ctrl-con | awk {'print $1'}
+         shell: kubectl describe pod {{ pvc_cntrl_name.stdout }} -n {{ namespace }} | grep ctrl-con | awk {'print $1'}
          args:
            executable: /bin/bash
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
          register: con_name
-               
+
        - name: Set container name to variable
          set_fact:
-           container: "{{ con_name.stdout }}"        
+           container: "{{ con_name.stdout }}"
 
        ########################################################
        #        INJECT FAULTS FOR SPECIFIED PERIOD            #
-       # (Obtain begin marker before fault-inject(FI),do ctrl # 
-       # failures, verify successful FI via end marker)       # 
+       # (Obtain begin marker before fault-inject(FI),do ctrl #
+       # failures, verify successful FI via end marker)       #
        ########################################################
 
        - name: Get pumba container name
@@ -138,8 +137,8 @@
          register: pumba_name
 
        - name: Initiate periodic network failures from pumba
-         shell: > 
-           kubectl exec {{ pumba_name.stdout }} -- pumba netem --interface eth0 
+         shell: >
+           kubectl exec {{ pumba_name.stdout }} -- pumba netem --interface eth0
            --duration 1m delay --time {{ item }} re2:k8s_{{ container[:-1] }}; sleep 10
          args:
            executable: /bin/bash
@@ -152,37 +151,50 @@
        # pod is still in running state)                       #
        ########################################################
 
-       - name: Confirm percona pod is still running
-         include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/status_running.yml"
+       - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
          vars:
+            ns: "{{ namespace }}"
             app: percona
 
        ########################################################
-       #                        CLEANUP                       #			      
+       #                        CLEANUP                       #
        # (Tear down application, liveness configmap as well as#
-       # the FI (chaoskube) infrastructure. Also stop logger) # 
+       # the FI (chaoskube) infrastructure. Also stop logger) #
        ########################################################
 
-       - name: Terminate the log aggregator
-         shell: source ~/.profile; killall stern
-         args:
-           executable: /bin/bash 
-         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"  
-
-       - set_fact:
+       - name: Test Passed
+         set_fact:
            flag: "Pass"
 
-     rescue: 
-       - set_fact: 
+     rescue:
+       - name: Test Failed
+         set_fact:
            flag: "Fail"
 
      always:
-       - include: test-nw-failure-cleanup.yml
-         when: clean | bool
+       - block:
 
-       - name: Send slack notification
-         slack: 
-           token: "{{ lookup('env','SLACK_TOKEN') }}"
-           msg: '{{ ansible_date_time.time }} TEST: {{test_name}}, RESULT: {{ flag }}'
-         when: slack_notify | bool and lookup('env','SLACK_TOKEN')
+           - include: test-nw-failure-cleanup.yml
 
+           - name: Test Cleanup Passed
+             set_fact:
+               cflag: cleanup_pass
+
+         rescue:
+           - name: Test Cleanup Failed
+             set_fact:
+               cflag: cleanup_fail
+
+         always:
+
+           #- name: Terminate the log aggregator
+           #  shell: source ~/.profile; killall stern
+           #  args:
+           #    executable: /bin/bash
+           #  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+           - name: Send slack notification
+             slack:
+               token: "{{ lookup('env','SLACK_TOKEN') }}"
+               msg: '{{ ansible_date_time.time }} TEST: {{test_name}}, RESULT: {{ flag }}'
+             when: slack_notify | bool and lookup('env','SLACK_TOKEN')

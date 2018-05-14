@@ -17,6 +17,8 @@ replace_with:
   - test-nw-failure
   - test-nw
 
+namespace: nw-ctrl
+
 utils_path: openebs/e2e/ansible/playbooks/utils
 
 delay_interavals: 
