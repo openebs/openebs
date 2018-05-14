@@ -28,7 +28,7 @@
   tasks:
 
     - block:
-        
+
         - include: prerequisites.yml
 
         - name: 1) Check if openebs-provisioner and maya-apiserver are running
@@ -166,7 +166,7 @@
           until: "'Bound' in pvc_out.stdout"
           delay: 60
           retries: 10
- 
+
         - name: 10) Obtaining new PV name
           shell: source ~/.profile; kubectl get pv | grep demo-snap-vol-claim | awk {'print $1'}
           args:
@@ -183,7 +183,7 @@
 
         - name: 10b) Checking if the sync completed
           shell: source ~/.profile; kubectl logs {{new_ctrl_pod.stdout}}
-          args: 
+          args:
             executable: /bin/bash
           register: ctrl_log
           delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
