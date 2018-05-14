@@ -8,7 +8,7 @@
 #4. Check if the nodes are tainted
 #5. Copy the test artifacts to k8s master.
 #6. Edit the key, value in operator.yaml.
-#7. Deploy operator 
+#7. Deploy operator
 #8. Copy and replace key,value in volume policies yaml.
 #9. Deploy volume policies.
 #10. Download test-pvc file
@@ -27,7 +27,7 @@
   tasks:
 
    - block:
-   
+
        - name: 1) Check whether maya-apiserver pod is running
          shell: source ~/.profile; kubectl get pods --all-namespaces | grep maya-apiserver
          args:
@@ -38,9 +38,9 @@
          retries: 2
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
          ignore_errors: true
-  
+
        - block:
-      
+
            - name: 2) Delete the openebs operator
              shell: source ~/.profile; kubectl delete -f "{{ openebs_operator_link }}"
              args:
@@ -89,13 +89,13 @@
            executable: /bin/bash
          register: result_kube_home
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-  
+
        - name: 5a) Copy the openebs-operator to kube master
          copy:
            src: "{{ openebs_ns_operator }}"
            dest: "{{ result_kube_home.stdout }}"
          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
-  
+
        - name: 6) Replacing the key and value in openebs-operator yaml
          replace:
            path: openebs-operator-ns-openebs.yaml
@@ -105,7 +105,7 @@
          with_together:
            - "{{operator_list}}"
            - "{{replaceoperator_list}}"
- 
+
        - name: 7) Deploy the openebs-operator with openebs namespace
          shell: source ~/.profile; kubectl apply -f "{{ openebs_ns_operator }}"
          args:
@@ -155,7 +155,7 @@
          delay: 5
          retries: 3
          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
-  
+
        - name: 10a) Replacing the storage class name in test-pvc yaml
          replace:
            path: test-pvc.yaml
@@ -164,12 +164,12 @@
          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
 
        - name: 11) Create  namespace for PVC
-         shell: kubectl create ns "{{ namespace }}"
+         command: kubectl create ns "{{ namespace }}"
          args:
            executable: /bin/bash
          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
          ignore_errors: true
-     
+
 
        - name: 11a) Deploy the test-pvc yaml
          shell: source ~/.profile; kubectl apply -f test-pvc.yaml -n "{{ namespace }}"
@@ -189,7 +189,7 @@
            - ctrl
            - rep
          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
- 
+
        - name: 12) Obtain the list of replicas and their nodes
          shell: source ~/.profile; kubectl get pods --all-namespaces -o wide | grep rep
          args:
@@ -206,12 +206,12 @@
            rep2_node: "{{ result.stdout.split()[15] }}"
 
        - name: 13) Verifying the replicas are deployed on tainted nodes
-         shell: echo " replicas are running on the tainted nodes"
+         command: echo " replicas are running on the tainted nodes"
          when:  rep1_node  == node_names[0] or rep1_node == node_names[1] and rep2_node == node_names[0] or rep2_node == node_names[1]
          register: result
        - debug:
            msg: "Replicas are deployed on dedicated nodes"
-         when: "result.rc == 0"    
+         when: "result.rc == 0"
 
        - name: 13a) Get storage replica pod name
          shell: source ~/.profile; kubectl get pods --all-namespaces | grep rep  | awk {'print $2'}
@@ -219,7 +219,7 @@
            executable: /bin/bash
          register: rep_name
          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
-       
+
        - name: 13b) Set replica pod name to variable
          set_fact:
            rep_pod_name: "{{ rep_name.stdout.split('-rep-')[0] }}"
@@ -234,11 +234,13 @@
            msg: "File exists..."
          when: stat_result.stat.exists
 
-       - set_fact:
+       - name: setting flag if pass
+         set_fact:
            flag: "Pass"
 
-     rescue: 
-       - set_fact: 
+     rescue:
+       - name: setting flag if fail
+         set_fact:
            flag: "Fail"
 
      always:
@@ -248,12 +250,12 @@
          when: clean | bool
 
        - name: Send slack notification
-         slack: 
+         slack:
            token: "{{ lookup('env','SLACK_TOKEN') }}"
            msg: '{{ ansible_date_time.time }} TEST: {{test_name}}, RESULT: {{ flag }}'
          when: slack_notify | bool and lookup('env','SLACK_TOKEN')
 
-      
+
 
 
 

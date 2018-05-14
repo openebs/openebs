@@ -1,7 +1,7 @@
 apiVersion: openebs.io/v1alpha1
 kind: StoragePool
 metadata:
-  name: sp-mntdir 
+  name: sp-mntdir
   type: hostdir
 spec:
   path: "/mnt/openebs"
@@ -300,7 +300,7 @@ data:
           tolerations:
           {{- if ne $isTaintTolerations "false" }}
           {{- range $k, $v := $taintTolerationsVal }}
-          - 
+          -
           {{- range $kk, $vv := $v }}
             {{ $kk }}: {{ $vv }}
           {{- end }}
@@ -308,7 +308,7 @@ data:
           {{- end }}
           {{- if ne $isEvictionTolerations "false" }}
           {{- range $k, $v := $evictionTolerationsVal }}
-          - 
+          -
           {{- range $kk, $vv := $v }}
             {{ $kk }}: {{ $vv }}
           {{- end }}

@@ -6,7 +6,7 @@ openebs_ns_operator: openebs-operator-ns-openebs.yaml
 
 test_name: Testing Volume taint policy
 
-test-pvc: https://raw.githubusercontent.com/openebs/openebs/master/e2e/ansible/playbooks/hyperconverged/test-k8s-storage-pool/test-pvc.yaml 
+test-pvc: https://raw.githubusercontent.com/openebs/openebs/master/e2e/ansible/playbooks/hyperconverged/test-k8s-storage-pool/test-pvc.yaml
 
 operator_key: key1
 
@@ -23,7 +23,7 @@ node1: kubeminion-01
 operator_list:
        - 'key: "k"'
        - 'value: "v"'
-replaceoperator_list: 
+replaceoperator_list:
               - 'key: "key1"'
               - 'value: "value1"'
 list:
