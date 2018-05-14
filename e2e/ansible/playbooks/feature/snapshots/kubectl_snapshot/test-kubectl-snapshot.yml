@@ -185,7 +185,7 @@
           shell: source ~/.profile; kubectl logs {{new_ctrl_pod.stdout}}
           args: 
             executable: /bin/bash
-          regsiter: ctrl_log
+          register: ctrl_log
           delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
           until: "'Done synchronizing' in ctrl_log.stdout"
           delay: 100
