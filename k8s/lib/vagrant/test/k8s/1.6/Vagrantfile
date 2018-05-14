@@ -99,7 +99,7 @@ def configureVM(vmCfg, hostname, cpus, mem)
   #Adding Vagrant-cachier
   if Vagrant.has_plugin?("vagrant-cachier")
     vmCfg.cache.scope = :machine
-    mCfg.cache.enable :apt
+    vmCfg.cache.enable :apt
     vmCfg.cache.enable :gem
   end
 
@@ -157,7 +157,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
           vmCfg.vm.provider "virtualbox" do |vb|
            vb.customize ["modifyvm", :id, "--uartmode1", "file", File.join(Dir.pwd, "kubemaster-%02d-console.log" % [i] )]
         end
-        vmCfg = configureVM(vmCfg, hostname, cpus, mem)
+      vmCfg = configureVM(vmCfg, hostname, cpus, mem)
 
         # Run in dedicated deployment mode or hyperconverged mode
         if ((deploy_Mode.to_i == DEPLOY_MODE_DEDICATED.to_i) || \
@@ -189,13 +189,13 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       config.vm.define hostname do |vmCfg|
         vmCfg.vm.box = "openebs/k8s-1.6"
           vmCfg.vm.provider "virtualbox" do |vb|
-           vb.customize ["modifyvm", :id, "--uartmode1", "file", File.join(Dir.pwd, "kubeminion-%02d-console.log" % [i] )]
+            vb.customize ["modifyvm", :id, "--uartmode1", "file", File.join(Dir.pwd, "kubeminion-%02d-console.log" % [i] )]
         end
         vmCfg = configureVM(vmCfg, hostname, cpus, mem)
 
         # Run in dedicated deployment mode or hyperconverged mode
         if ((deploy_Mode.to_i == DEPLOY_MODE_DEDICATED.to_i) || \
-          (deploy_Mode.to_i == DEPLOY_MODE_HC.to_i))
+            (deploy_Mode.to_i == DEPLOY_MODE_HC.to_i))
 
           # This runs only when the VM is first provisioned.
           # Get the Master IP to join the cluster.
@@ -216,9 +216,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
               master_ip_address = `#{get_ip_address}`
               if master_ip_address == ""
-                  info"The Kubernetes Master is down, \
-                  bring it up and manually run: \
-                  configure_k8s_host.sh script on Kubernetes Minion."
+                info"The Kubernetes Master is down, \
+                bring it up and manually run: \
+                configure_k8s_host.sh script on Kubernetes Minion."
               else
                 get_token_name = %Q(vagrant ssh \
                 #{master_hostname} -c \
@@ -279,7 +279,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         config.vm.define hostname do |vmCfg|
           vmCfg.vm.box = "openebs/openebs-0.2"
             vmCfg.vm.provider "virtualbox" do |vb|
-           vb.customize ["modifyvm", :id, "--uartmode1", "file", File.join(Dir.pwd, "openebs-openebs-0.2-cloudimg-console.log")]
+          vb.customize ["modifyvm", :id, "--uartmode1", "file", File.join(Dir.pwd, "openebs-openebs-0.2-cloudimg-console.log")]
           end
           vmCfg = configureVM(vmCfg, hostname, cpus, mem)
 
@@ -367,9 +367,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
                 else
                   get_ip_address = %Q(vagrant ssh \
                   #{hostname}  -c 'ifconfig | grep -oP \
-                  "inet addr:\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}" \
                   | grep -oP "\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}" \
                   | sort | tail -n 1 | head -n 1')
+                  "inet addr:\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}" \
 
                   host_ip_address = `#{get_ip_address}`
 
