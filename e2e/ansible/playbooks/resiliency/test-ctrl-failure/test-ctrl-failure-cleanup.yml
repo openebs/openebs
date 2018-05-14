@@ -56,12 +56,6 @@
 
 - name: Delete namespace
   command: kubectl delete ns {{ namespace }}
-  args:
-    executable: /bin/bash
-  register: ns_out
-  until: "'deleted' in ns_out.stdout"
-  delay: 10
-  retries: 5
   delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
   changed_when: true
 

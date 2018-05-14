@@ -62,12 +62,6 @@
 
        - name: Create test specific namespace
          command: kubectl create ns {{ namespace }}
-         args:
-           executable: /bin/bash
-         register: ns_out
-         until: "'created' in ns_out.stdout"
-         delay: 10
-         retries: 5
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
        - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_task.yml"
@@ -206,11 +200,11 @@
 
          always:
 
-           #- name: 5) Terminate the log aggregator
-           #  shell: source ~/.profile; killall stern
-           #  args:
-           #    executable: /bin/bash
-           #  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+           - name: 5) Terminate the log aggregator
+             shell: source ~/.profile; killall stern
+             args:
+               executable: /bin/bash
+             delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
            - name: Send slack notification
              slack:

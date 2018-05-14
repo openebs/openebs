@@ -39,7 +39,6 @@
 
 - name: Delete namespace
   command: kubectl delete ns {{ namespace }}
-  register: ns_out
   delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
   changed_when: true
 

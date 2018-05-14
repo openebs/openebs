@@ -68,10 +68,6 @@
 
        - name: Create test specific namespace
          command: kubectl create ns {{ namespace }}
-         register: ns_out
-         until: "'created' in ns_out.stdout"
-         delay: 10
-         retries: 5
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
        - name: Create a configmap with the liveness sql script
@@ -187,11 +183,11 @@
 
          always:
 
-           #- name: Terminate the log aggregator
-           #  shell: source ~/.profile; killall stern
-           #  args:
-           #    executable: /bin/bash
-           #  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+           - name: Terminate the log aggregator
+             shell: source ~/.profile; killall stern
+             args:
+               executable: /bin/bash
+             delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
            - name: Send slack notification
              slack:
