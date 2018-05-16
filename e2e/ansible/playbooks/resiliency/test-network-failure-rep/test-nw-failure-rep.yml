@@ -20,18 +20,13 @@
   tasks:
    - block:
 
+       - include: test-nw-failure-rep-prereq.yml
+
        ###################################################
        #                PREPARE FOR TEST                 #
        # (Place artifacts in kubemaster, start logger &  #
        # confirm OpenEBS operator is ready for requests. #
        ###################################################
-
-       - name: Get $HOME of K8s master for kubernetes user
-         shell: source ~/.profile; echo $HOME
-         args:
-           executable: /bin/bash
-         register: result_kube_home
-         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
        - name: Get percona spec and liveness scripts
          get_url:
@@ -47,17 +42,10 @@
            regex1: "{{replace_item}}"
            regex2: "{{replace_with}}"
 
-       - name: Start the log aggregator to capture test pod logs
-         shell: >
-           source ~/.profile;
-           nohup stern "{{test_pod_regex}}" --since 1m > "{{result_kube_home.stdout}}/{{test_log_path}}" &
-         args:
-           executable: /bin/bash
-         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-
        - name: Check status of maya-api server
          include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
          vars:
+            ns: openebs
             app: maya-api
 
        ####################################################
@@ -70,14 +58,20 @@
          include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_task.yml"
          vars:
            app_yml: "{{ pumba_file }}"
+           ns: default
 
        - name: Check whether pumba infrastructure is created
          include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
          vars:
+            ns: default
             app: pumba
 
+       - name: Create test specific namespace
+         command: kubectl create ns {{ namespace }}
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
        - name: Create a configmap with the liveness sql script
-         shell: source ~/.profile; kubectl create configmap sqltest --from-file={{ percona_files.1 }}
+         shell: source ~/.profile; kubectl create configmap sqltest --from-file={{ percona_files.1 }} -n {{ namespace }}
          args:
            executable: /bin/bash
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
@@ -88,6 +82,7 @@
          include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_task.yml"
          vars:
            app_yml: "{{ percona_files.0 }}"
+           ns: "{{ namespace }}"
 
        - name: Wait for 120s to ensure liveness check starts
          wait_for:
@@ -96,24 +91,25 @@
        - name: Check whether percona application is running
          include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
          vars:
+            ns: "{{ namespace }}"
             app: percona
 
        - name: Get the node details on which pvc-rep is scheduled
-         shell: kubectl get pods -o wide | grep rep | awk 'FNR == 1 {print}' | awk {'print $7'}
+         shell: kubectl get pods -n {{ namespace }} -o wide | grep rep | awk 'FNR == 1 {print}' | awk {'print $7'}
          args:
            executable: /bin/bash
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
          register: node_rep
 
        - name: Get the pvc-rep name
-         shell: kubectl get pods | grep rep | awk 'FNR == 1 {print}' | awk {'print $1'}
+         shell: kubectl get pods -n {{ namespace }} | grep rep | awk 'FNR == 1 {print}' | awk {'print $1'}
          args:
            executable: /bin/bash
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
          register: pvc_rep_name
 
        - name: Get the rep container name
-         shell: kubectl describe pod {{ pvc_rep_name.stdout }} | grep rep-con | awk {'print $1'}
+         shell: kubectl describe pod {{ pvc_rep_name.stdout }} -n {{ namespace }} | grep rep-con | awk {'print $1'}
          args:
            executable: /bin/bash
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
@@ -154,6 +150,7 @@
        - name: Confirm percona pod is still running
          include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/status_running.yml"
          vars:
+            ns: "{{ namespace }}"
             app: percona
 
        ########################################################
@@ -162,26 +159,40 @@
        # the FI (chaoskube) infrastructure. Also stop logger) #
        ########################################################
 
-       - name: Terminate the log aggregator
-         shell: source ~/.profile; killall stern
-         args:
-           executable: /bin/bash
-         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-
-       - set_fact:
+       - name: Test Passed
+         set_fact:
            flag: "Pass"
 
      rescue:
-       - set_fact:
+       - name: Test Failed
+         set_fact:
            flag: "Fail"
 
      always:
-       - include: test-nw-failure-rep-cleanup.yml
-         when: clean | bool
+       - block:
 
-       - name: Send slack notification
-         slack:
-           token: "{{ lookup('env','SLACK_TOKEN') }}"
-           msg: '{{ ansible_date_time.time }} TEST: {{test_name}}, RESULT: {{ flag }}'
-         when: slack_notify | bool and lookup('env','SLACK_TOKEN')
+           - include: test-nw-failure-rep-cleanup.yml
+
+           - name: Test Cleanup Passed
+             set_fact:
+               cflag: cleanup_pass
+
+         rescue:
+           - name: Test Cleanup Failed
+             set_fact:
+               cflag: cleanup_fail
+
+         always:
+
+           - name: Terminate the log aggregator
+             shell: source ~/.profile; killall stern
+             args:
+               executable: /bin/bash
+             delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+           - name: Send slack notification
+             slack:
+               token: "{{ lookup('env','SLACK_TOKEN') }}"
+               msg: '{{ ansible_date_time.time }} TEST: {{test_name}}, RESULT: {{ flag }}'
+             when: slack_notify | bool and lookup('env','SLACK_TOKEN')
 

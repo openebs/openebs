@@ -2,11 +2,11 @@
 - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/delete_deploy.yml"
   vars:
     app_yml: "{{ percona_link }}"
-    ns: nodeeviction
+    ns: "{{ namespace }}"
 
 - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/delete_deploy_check.yml"
   vars:
-    ns: nodeeviction
+    ns: "{{ namespace }}"
     app: percona
 
 - name: Delete nodeeviction ns

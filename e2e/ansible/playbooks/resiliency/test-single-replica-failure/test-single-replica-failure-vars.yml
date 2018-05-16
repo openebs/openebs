@@ -5,13 +5,13 @@ percona_links:
   - https://raw.githubusercontent.com/openebs/elves/master/e2e/percona-liveness/percona.yaml
   - https://raw.githubusercontent.com/openebs/elves/master/e2e/percona-liveness/sql-test.sh
 
-percona_files: 
+percona_files:
   - percona.yaml
   - sql-test.sh
 
 chaoskube_files:
   - rbac.yaml
-  - chaoskube.yaml 
+  - chaoskube.yaml
 
 replace_item:
   - demo-vol1-claim
@@ -23,7 +23,9 @@ replace_with:
 
 chaos_duration: 120
 
-chaos_interval: 20 
+chaos_interval: 20
+
+namespace: single-replica
 
 utils_path: openebs/e2e/ansible/playbooks/utils
 
