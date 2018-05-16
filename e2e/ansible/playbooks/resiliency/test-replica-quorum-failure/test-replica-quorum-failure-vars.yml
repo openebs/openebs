@@ -7,7 +7,7 @@ percona_links:
   - https://raw.githubusercontent.com/openebs/elves/master/e2e/percona-liveness/percona.yaml
   - https://raw.githubusercontent.com/openebs/elves/master/e2e/percona-liveness/sql-test.sh
 
-percona_files: 
+percona_files:
   - percona.yaml
   - sql-test.sh
 
@@ -21,9 +21,11 @@ replace_with:
 
 interval: 3
 
+namespace: replica-quorum
+
 fault_injection_file: inject_replica_quorum_failure.yml
 
-storage_class_file: replica-quorum-sc.yaml 
+storage_class_file: replica-quorum-sc.yaml
 
 test_pod_regex: maya*|openebs*|pvc*|percona*
 

@@ -13,25 +13,20 @@
 #7. Perform cleanup of test artifacts.
 ###############################################################################################
 - hosts: localhost
- 
-  vars_files: 
-    - test-single-replica-failure-vars.yml 
- 
+
+  vars_files:
+    - test-single-replica-failure-vars.yml
+
   tasks:
    - block:
 
+       - include: test-single-replica-failure-prereq.yml
+
        ###################################################
        #                PREPARE FOR TEST                 #
-       # (Place artifacts in kubemaster, start logger &  # 
+       # (Place artifacts in kubemaster, start logger &  #
        # confirm OpenEBS operator is ready for requests. #
        ###################################################
-
-       - name: Get $HOME of K8s master for kubernetes user
-         shell: source ~/.profile; echo $HOME
-         args: 
-           executable: /bin/bash
-         register: result_kube_home
-         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
        - name: Get percona spec and liveness scripts
          get_url:
@@ -53,51 +48,52 @@
            destination_node: "{{groups['kubernetes-kubemasters'].0}}"
            files_to_copy: "{{ chaoskube_files }}"
 
-       - name: Start the log aggregator to capture test pod logs
-         shell: >
-           source ~/.profile;
-           nohup stern "{{test_pod_regex}}" --since 1m > "{{result_kube_home.stdout}}/{{test_log_path}}" &
-         args:
-           executable: /bin/bash
-         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-
        - name: Check status of maya-api server
          include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
          vars:
+            ns: openebs
             app: maya-api
- 
+
        ####################################################
        #          SETUP FAULT-INJECTION ENV               #
        # (Setup chaoskube deployment with an empty policy,#
-       # deploy percona w/ a liveness check for DB writes)# 
+       # deploy percona w/ a liveness check for DB writes)#
        ####################################################
 
        - name: Setup the chaoskube infrastructure
          include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_task.yml"
          vars:
            app_yml: "{{ chaoskube_files }}"
+           ns: default
 
        - name: Check whether chaoskube infrastructure is created
          include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
          vars:
             app: chaoskube
+            ns: default
 
-       - name: Create a configmap with the liveness sql script 
-         shell: source ~/.profile; kubectl create configmap sqltest --from-file={{ percona_files.1 }} 
-         args: 
+       - name: Create test specific namespace
+         command: kubectl create ns {{ namespace }}
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+       - name: Create a configmap with the liveness sql script
+         shell: source ~/.profile; kubectl create configmap sqltest --from-file={{ percona_files.1 }} -n {{ namespace }}
+         args:
            executable: /bin/bash
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-         register: result 
+         register: result
          failed_when: "'configmap' and 'created' not in result.stdout"
 
        - name: Create percona deployment with OpenEBS storage
          include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_task.yml"
          vars:
            app_yml: "{{ percona_files.0 }}"
+           ns: "{{ namespace }}"
 
        - name: Check whether percona application is running
          include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
          vars:
+            ns: "{{ namespace }}"
             app: percona
 
        - name: Wait for 120s to ensure liveness check starts
@@ -108,22 +104,22 @@
          set_fact:
            chaospod: "{{ result.stdout_lines[0].split()[0] }}"
 
-       - name: Get the name of the volume single replica deployment 
-         shell: > 
-           source ~/.profile; kubectl get deployments 
+       - name: Get the name of the volume single replica deployment
+         shell: >
+           source ~/.profile; kubectl get deployments -n {{ namespace }}
            -l openebs/replica=jiva-replica --no-headers
          args:
            executable: /bin/bash
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
          register: result_deploy
 
-       - name: Set the replica deployment name to variable 
-         set_fact: 
+       - name: Set the replica deployment name to variable
+         set_fact:
            replica_deploy: "{{ result_deploy.stdout_lines[0].split()[0] }}"
 
        - name: Get the name of the single replica pod to a variable
          shell: >
-           source ~/.profile; kubectl get pods 
+           source ~/.profile; kubectl get pods -n {{ namespace }}
            -l openebs/replica=jiva-replica --no-headers
          args:
            executable: /bin/bash
@@ -136,7 +132,7 @@
 
        - name: Get the name of the node the single replica pod is deployed
          shell: >
-           source ~/.profile; kubectl describe pod {{ replica_pod }} | grep "Node:" | awk '{print $2}' | cut -d '/' -f1           
+           source ~/.profile; kubectl describe pod {{ replica_pod }} -n {{ namespace }} | grep "Node:" | awk '{print $2}' | cut -d '/' -f1
          args:
            executable: /bin/bash
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
@@ -144,8 +140,8 @@
 
        - name: Get the names of the nodes to be cordoned
          shell: >
-           source ~/.profile; 
-           kubectl get nodes --no-headers | grep -v {{ result_node.stdout }} | awk '{print $1}'           
+           source ~/.profile;
+           kubectl get nodes --no-headers | grep -v {{ result_node.stdout }} | awk '{print $1}'
          args:
            executable: /bin/bash
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
@@ -153,53 +149,53 @@
 
        - name: Cordon the nodes
          shell: >
-           source ~/.profile; kubectl cordon {{ item }}           
+           source ~/.profile; kubectl cordon {{ item }}
          args:
            executable: /bin/bash
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-         with_items: "{{ result_nodes.stdout_lines }}"                                      
+         with_items: "{{ result_nodes.stdout_lines }}"
 
        ########################################################
        #        INJECT FAULTS FOR SPECIFIED PERIOD            #
-       # (Obtain begin marker before fault-inject(FI),do ctrl # 
-       # failures, verify successful FI via end marker)       # 
+       # (Obtain begin marker before fault-inject(FI),do ctrl #
+       # failures, verify successful FI via end marker)       #
        ########################################################
 
        - name: Get the resourceVersion of the replica deployment
          shell: >
-           source ~/.profile; kubectl get deploy 
+           source ~/.profile; kubectl get deploy -n {{ namespace }}
            {{ replica_deploy }} -o yaml | grep resourceVersion
            | awk '{print $2}' | sed 's|"||g'
          args:
            executable: /bin/bash
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-         register: rv_bef          
- 
+         register: rv_bef
+
        - name: Initiate periodic replica failures from chaoskube
          shell: >
-           source ~/.profile; kubectl exec {{ chaospod }}  
-           -- timeout -t {{ chaos_duration }} chaoskube 
+           source ~/.profile; kubectl exec {{ chaospod }}
+           -- timeout -t {{ chaos_duration }} chaoskube
            --labels 'openebs/replica=jiva-replica'
-           --no-dry-run --interval={{ chaos_interval }}s 
+           --no-dry-run --interval={{ chaos_interval }}s
            --debug
          args:
            executable: /bin/bash
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
          register: chaos_result
-         ignore_errors: true 
+         ignore_errors: true
 
        - name: Get the resourceVersion of the replica deployment
          shell: >
-           source ~/.profile; kubectl get deploy 
+           source ~/.profile; kubectl get deploy -n {{ namespace }}
            {{ replica_deploy }} -o yaml | grep resourceVersion
            | awk '{print $2}' | sed 's|"||g'
          args:
            executable: /bin/bash
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-         register: rv_aft    
- 
-       - name: Compare resourceVersions of replica deployments 
-         debug: 
+         register: rv_aft
+
+       - name: Compare resourceVersions of replica deployments
+         debug:
            msg: "Verified replica pods were restarted by chaoskube"
          failed_when: "rv_bef.stdout | int == rv_aft.stdout | int"
 
@@ -212,42 +208,56 @@
        - name: Confirm percona pod is still running
          include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/status_running.yml"
          vars:
+            ns: "{{ namespace }}"
             app: percona
 
        ########################################################
-       #                        CLEANUP                       #			      
+       #                        CLEANUP                       #
        # (Tear down application, liveness configmap as well as#
-       # the FI (chaoskube) infrastructure. Also stop logger) # 
+       # the FI (chaoskube) infrastructure. Also stop logger) #
        ########################################################
        - name: Uncordon the nodes
          shell: >
-           source ~/.profile; kubectl uncordon {{ item }}           
+           source ~/.profile; kubectl uncordon {{ item }}
          args:
            executable: /bin/bash
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
          with_items: "{{ result_nodes.stdout_lines }}"
 
-
-       - name: Terminate the log aggregator
-         shell: source ~/.profile; killall stern
-         args:
-           executable: /bin/bash 
-         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"  
-
-       - set_fact:
+       - name: Test Passed
+         set_fact:
            flag: "Pass"
 
-     rescue: 
-       - set_fact: 
+     rescue:
+       - name: Test Failed
+         set_fact:
            flag: "Fail"
 
      always:
-       - include: test-single-replica-failure-cleanup.yml
-         when: clean | bool
+       - block:
 
-       - name: Send slack notification
-         slack: 
-           token: "{{ lookup('env','SLACK_TOKEN') }}"
-           msg: '{{ ansible_date_time.time }} TEST: {{test_name}}, RESULT: {{ flag }}'
-         when: slack_notify | bool and lookup('env','SLACK_TOKEN')
+           - include: test-single-replica-failure-cleanup.yml
+
+           - name: Test Cleanup Passed
+             set_fact:
+               cflag: cleanup_pass
+
+         rescue:
+           - name: Test Cleanup Failed
+             set_fact:
+               cflag: cleanup_fail
+
+         always:
+
+          # - name: 5) Terminate the log aggregator
+          #   shell: source ~/.profile; killall stern
+          #   args:
+          #     executable: /bin/bash
+          #   delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+           - name: Send slack notification
+             slack:
+               token: "{{ lookup('env','SLACK_TOKEN') }}"
+               msg: '{{ ansible_date_time.time }} TEST: {{test_name}}, RESULT: {{ flag }}'
+             when: slack_notify | bool and lookup('env','SLACK_TOKEN')
 
