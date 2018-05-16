@@ -33,7 +33,7 @@ You can also help with some existing issues under this category available at [de
 - Create a new development branch in your forked repository with the following naming convention: *"task description-#issue"*
 
   Example:
-     This change is being developed with the branch named : OpenEBS-DevDoc-PR-Workflow-#213
+     This change is being developed with the branch named: OpenEBS-DevDoc-PR-Workflow-#213
 
 ## Commit your changes
 - Reference the issue number along with a brief description in your commits
