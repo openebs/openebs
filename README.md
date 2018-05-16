@@ -42,6 +42,42 @@ You could also follow our [QuickStart Guide](https://docs.openebs.io/docs/overvi
 
 OpenEBS can be deployed on any Kubernetes cluster - either in cloud, on-premise or developer laptop (minikube). Please follow our [OpenEBS Setup](https://docs.openebs.io/docs/overview.html) documentation. Also, we have a Vagrant environment available that includes a sample Kubernetes deployment and synthetic load that you can use to simulate the performance of OpenEBS. 
 
+## Deploying kube-state-metrics
+
+Install this project to your ```$GOPATH``` using go get:
+
+```go get k8s.io/kube-state-metrics```
+### Building the Docker container
+
+Simple run the following command in this root folder, which will create a self-contained, statically-linked binary and build a Docker image: 
+
+```make container```
+### Usage
+
+Simply build and run kube-state-metrics inside a Kubernetes pod which has a service account token that has read-only access to the Kubernetes cluster.  
+
+### Kubernetes Deployment
+
+To deploy this project, you can simply run ```kubectl apply -f kubernetes``` and a Kubernetes service and deployment will be created. (Note: Adjust the apiVersion of some resource if your kubernetes cluster's version is not 1.8+, check the yaml file for more information). The service already has a ```prometheus.io/scrape: 'true'``` annotation and if you added the recommended Prometheus service-endpoint scraping configuration, Prometheus will pick it up automatically and you can start using the generated metrics right away.
+
+*Note*: Google Kubernetes Engine (GKE) Users - GKE has strict role permissions that will prevent the kube-state-metrics roles and role bindings from being created. To work around this, you can give your GCP identity the cluster-admin role by running the following one-liner:
+  
+```kubectl create clusterrolebinding cluster-admin-binding --clusterrole=cluster-admin --user=$(gcloud info | grep Account | cut -d '[' -f 2 | cut -d ']' -f 1)```
+
+After running the above, if you see ```Clusterrolebinding "cluster-admin-binding"``` created, then you are able to continue with the setup of this service.
+
+### Development
+
+When developing, test a metric dump against your local Kubernetes cluster by running:
+
+    Users can override the apiserver address in KUBE-CONFIG file with --apiserver command line.
+
+```go install kube-state-metrics --port=8080 --telemetry-port=8081 --kubeconfig=<KUBE-CONFIG> --apiserver=<APISERVER>``` 
+
+Then curl the metrics endpoint
+
+```curl localhost:8080/metrics```
+
  
 ## Status
 We are approaching beta stage with active development underway. See our [Project Tracker](https://github.com/openebs/openebs/wiki/Project-Tracker) for more details.
