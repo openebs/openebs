@@ -3,7 +3,7 @@
 [![Build Status](https://img.shields.io/travis/openebs/openebs/master.svg?style=flat-square)](https://travis-ci.org/openebs/jiva)
 [![Docker Pulls](https://img.shields.io/docker/pulls/openebs/jiva.svg?style=flat-square)](https://hub.docker.com/r/openebs/jiva/)
 [![Releases](https://img.shields.io/github/release/openebs/openebs/all.svg?style=flat-square)](https://github.com/openebs/openebs/releases)
-[![Slack](https://openebsslacksignup.herokuapp.com/badge.svg?style=flat-square)]( https://openebsslacksignup.herokuapp.com/)
+[![Slack](https://img.shields.io/badge/slack-1/821-ff1493.svg?style=flat-square)]( https://openebsslacksignup.herokuapp.com/)
 [![Twitter](https://img.shields.io/twitter/follow/openebs.svg?style=social&label=Follow)](https://twitter.com/intent/follow?screen_name=openebs)
 
 http://www.openebs.io/
@@ -24,7 +24,7 @@ Our vision is simple: let us let storage and storage services for persistent wor
  
 OpenEBS can scale to include an  arbitrarily large number of containerized storage controllers. Thanks in part to some advancements in the metadata management which removes a common bottleneck to scale out storage performance. Again, we learnt the hard way over the years at CloudByte and are extremely happy to see initial scale out performance figures with OpenEBS; much credit goes to the orchestration and containerization as well.
  
-## Installation and Getting Started
+## Installation and Getting Started.
  
 OpenEBS can be setup in few easy steps.  You can get going on your choice of Kubernetes cluster by having open-iscsi installed on the Kubernetes nodes and running the openebs-operator using kubectl. 
 
