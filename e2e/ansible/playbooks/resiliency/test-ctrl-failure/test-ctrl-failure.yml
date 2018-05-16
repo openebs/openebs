@@ -145,7 +145,7 @@
 
        - name: Get the resourceVersion of the controller deployment
          shell: >
-           source ~/.profile; kubectl get deploy
+           source ~/.profile; kubectl get deploy -n {{ namespace }}
            {{ ctrl_deploy }} -o yaml | grep resourceVersion
            | awk '{print $2}' | sed 's|"||g'
          args:
