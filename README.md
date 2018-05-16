@@ -72,5 +72,5 @@ Please start with the pinned repositories or with [OpenEBS Architecture](./contr
 ## License
 
 OpenEBS is developed under Apache 2.0 License at the project level. 
-Some components of the project are derived from other opensource projects like Nomad, Longhorn 
+Some components of the project are derived from other open source projects like Nomad, Longhorn 
 and are distributed under their respective licenses. 
