@@ -60,12 +60,17 @@
        # deploy percona w/ a liveness check for DB writes)#
        ####################################################
 
-       - name: Setup the chaoskube infrastructure
-         include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_task.yml"
+       - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_task.yml"
          vars:
            app_yml: "{{ chaoskube_files }}"
            ns: default
-     
+
+       - name: Check whether chaoskube infrastructure is created
+         include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
+         vars:
+            ns: default
+            app: chaoskube
+
        - name: Set chaoskube pod name to variable
          set_fact:
            chaospod: "{{ result.stdout_lines[0].split()[0] }}"
