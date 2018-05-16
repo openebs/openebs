@@ -211,7 +211,7 @@
        ########################################################
 
        - name: Confirm percona pod is still running
-         include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/status_running.yml"
+         include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
          vars:
             ns: "{{ namespace }}"
             app: percona
