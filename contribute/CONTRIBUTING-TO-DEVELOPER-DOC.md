@@ -20,14 +20,14 @@ At a very high level, the process to contribute and improve is pretty simple:
 The following sections describe some guidelines that can come in handy with the above process. 
 *Followed by the guidelines, is a cheat sheet with frequently used git commands.*
 
-## Submit an Issue describing your proposed change.
+## Submit an Issue describing your proposed change
 
 Some general guidelines when submitting issues for developer documentation:
-- If the proposed change requires an update to the existing page, please provide a link to the page in the issue. 
+- If the proposed change requires an update to the existing page, please provide a link to the page in the issue 
 
 You can also help with some existing issues under this category available at [developer documentation issues list](https://github.com/openebs/openebs/labels/documentation%2Fdevel)
 
-## Create your development branch. 
+## Create your development branch
 
 - Fork the openebs repository and if you had previously forked, rebase with master to fetch latest changes
 - Create a new development branch in your forked repository with the following naming convention: *"task description-#issue"*
@@ -37,15 +37,15 @@ You can also help with some existing issues under this category available at [de
 
 ## Commit your changes
 - Reference the issue number along with a brief description in your commits
-- Set your commit.template to the `COMMIT_TEMPLATE` given in the `.github` directory.
+- Set your commit.template to the `COMMIT_TEMPLATE` given in the `.github` directory
   `git config --local commit.template $GOPATH/src/github.com/openebs/openebs/.github`
 
-## Submit a Pull request. 
+## Submit a Pull request
 - Rebase your development branch 
 - Submit the PR from the development branch to the openebs/openebs:master
-- Incorporate review comments, if any, in the development branch. 
-- Once the PR is accepted, close the branch.
-- After the PR is merged the development branch in the forked repository can be deleted.
+- Incorporate review comments, if any, in the development branch 
+- Once the PR is accepted, close the branch
+- After the PR is merged the development branch in the forked repository can be deleted
 
 # Git Cheat Sheet 
 
