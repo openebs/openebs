@@ -13,6 +13,7 @@ That said, OpenEBS is an innovation in open-source. You are welcome to contribut
 - Submit proposals for new features/enhancements.
 - Submit fixes for bugs reported/found. 
 - Submit changes to the source code.
+- Solve existing Issues.
 
 There are just a few simple guidelines that you need to follow before providing your hacks. 
 
@@ -26,7 +27,7 @@ When raising issues, please specify the following:
 
 ## Submit Change to Improve Documentation
 
-Getting documentation right is hard! Refer to this [page](./contribute/CONTRIBUTING-TO-DEVELOPER-DOC.md) page for more information on you could improve the developer documentation by submitting pull requests.
+Getting documentation right is hard! Refer to this [page](./contribute/CONTRIBUTING-TO-DEVELOPER-DOC.md) page for more information on you could improve the developer documentation by submitting pull requests with appropriate tags. Here's a [list of tags](./contribute/labels-of-issues.md) that could be used. 
 
 
 ## Submit Proposals for New Features
@@ -35,7 +36,12 @@ There is always something more that is required, to make it easier to suit your 
 
 ## Contributing to Source Code & Bug Fixes
 
-Provide PRs for bug fixes or enhancements to the source code.
+Provide PRs with appropriate tags for bug fixes or enhancements to the source code. For a list of tags that could be used, take a look [here]((./contribute/labels-of-issues.md)).
+
+Refer to this [document](./contribute/design/code-structuring.md) for more information on code structuring and some guidelines on the same.
+
+## Solving existing Issues
+Head over to [issues](www.github.com/openebs/openebs/issues) to find issues where helped is needed from contributors, look over our [list of labels guide](./contribute/labels-of-issues.md) to help you find issues that you can solve faster. **(What guidelines are used here by OpenEBS, need to add the same. - Review needed)**
 
 ---
 ### Sign your work

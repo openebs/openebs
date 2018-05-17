@@ -26,8 +26,6 @@ The application pods will access the storage via the iSCSI Target Container, whi
 - [openebs/jiva](https://github.com/openebs/jiva) Storage Controller functionality includes the replication logic 
 - [openebs/gotgt](https://github.com/openebs/gotgt) iSCSI Target functionality used by *openebs/jiva*.
 
-
-
 ## OpenEBS Control Plane (aka OpenEBS Storage Orchestration, aka maya)
 
 OpenEBS Control Plane - auguments the functionality provided by the Container Orchestrator, with storage specific orchestration capabilities, via a set of services. OpenEBS control plane can hook into any of the container orchestrators like Kubernetes, Docker Swarm, Nomad, etc., making it possible to run OpenEBS hyper-converged with Container Orchestrators. 
@@ -55,7 +53,5 @@ Monitoring and Tracing capabilities are added by instrumenting the above service
 - [openebs/maya](https://github.com/openebs/maya) The code for all binaries that are specific (non-plugins) are stored in this repository - like maya-apiserver, maya-agent, maya-mulebot, maya-connect, mayactl and so on.
 - [openebs-dashboard](https://github.com/openebs/dashboard) A fork of the Kubernetes dashboard project, that is extended with storage functionality.
 - [openebs-provisioner](https://github.com/openebs/external-storage/tree/master/openebs) is the OpenEBS K8s Provisioner forked from Kubernetes Incubator project. 
-
-
 
 *Note: In future, OpenEBS can also be deployed as a storage service (non hyperconverged) like the traditional software defined storage, and can be connected via the storage plugins.*
