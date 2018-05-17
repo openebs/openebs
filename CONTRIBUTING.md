@@ -26,7 +26,8 @@ When raising issues, please specify the following:
 
 ## Submit Change to Improve Documentation
 
-Getting documentation right is hard! Please raise a PR with your proposed changes. Giving details on what exactly you trying to improve in the documentation.
+Getting documentation right is hard! Refer to this [page](./contribute/CONTRIBUTING-TO-DEVELOPER-DOC.md) page for more information on you could improve the developer documentation by submitting pull requests.
+
 
 ## Submit Proposals for New Features
 
