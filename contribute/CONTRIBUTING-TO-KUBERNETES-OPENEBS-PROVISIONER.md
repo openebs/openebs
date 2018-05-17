@@ -1,4 +1,4 @@
-# PR workflow for contributing to OpenEBS kubernetes provisioner
+# Contributing to OpenEBS kubernetes provisioner
 
 This document describes process for creating contributing to [openebs/external-storage](https://github.com/openebs/external-storage) project.
 At a very high level, the process to contribute and improve is pretty simple:
@@ -7,7 +7,6 @@ At a very high level, the process to contribute and improve is pretty simple:
 - Commit your changes
 - Submit your Pull Request
 - Sync  `openebs/external-storage`  repository
-
 
 ### Submit an Issue describing your proposed change
 Some general guidelines when submitting issues for openebs volume provisioner:
@@ -32,7 +31,7 @@ Some general guidelines when submitting issues for openebs volume provisioner:
    - You can request to `openebs/external-storage` maintainer/Owners to sync up the `openebs/external-storage` repository.
    - Your changes will appear in `openebs/external-storage` once it is synced.
 
-## Git cheat sheet:
+# Git cheat sheet:
 Fork the `kubernetes-incubator/external-storage` repository into your account, referred in the below instructions as $user.
 
 ### Setting up Development Environment for OpenEBS volume provisioner
@@ -91,12 +90,15 @@ git status
 git push origin <branch-name>  #After this changes will appear in your $user/external-storage:<branch-name>
 
 ```
+
 ### Create pull request to `kubernetes-incubator/external-storage`
 
 Once above steps are done, then you shall see your changes in branch `<branch-name>` of `$user/external-storage` on github. You can create a PR to `kubernetes-incubator/external-storage`. 
 You can add label `area/openebs` to your PR by commenting `/area openebs` in the comment section of your PR. 
 
-
 ### Fetching latest changes to `openebs/external-storage`
 Once, Pull Request is merged in `kubernetes-incubator/external-storage` then ask one of the OpenEBS owner to fetch latest changes to `openebs/external-storage`.
 Owners will fetch latest changes from `kubernetes-incubator/external-storage` to `openebs/external-storage`repo. Your changes shall appear here! :smile:
+
+If you need any help with git, refer to this [cheat sheet](./contribute/git-cheatsheet.md).
+Go back to [**Contributing to OpenEBS**](./contribute/CONTRIBUTING.md).

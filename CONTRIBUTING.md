@@ -40,7 +40,7 @@ Provide PRs with appropriate tags for bug fixes or enhancements to the source co
 
 Refer to this [document](./contribute/design/code-structuring.md) for more information on code structuring and some guidelines on the same.
 
-## Solving existing Issues
+## Solve Existing Issues
 Head over to [issues](www.github.com/openebs/openebs/issues) to find issues where helped is needed from contributors, look over our [list of labels guide](./contribute/labels-of-issues.md) to help you find issues that you can solve faster. **(What guidelines are used here by OpenEBS, need to add the same. - Review needed)**
 
 ---
