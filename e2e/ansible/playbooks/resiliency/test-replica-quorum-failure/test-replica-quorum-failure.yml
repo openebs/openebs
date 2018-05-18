@@ -150,12 +150,12 @@
 
        - name: Test Passed
          set_fact:
-           flag: "Pass"
+           flag: "Test Passed"
 
      rescue:
        - name: Test Failed
          set_fact:
-           flag: "Fail"
+           flag: "Test Failed"
 
      always:
        - block:
@@ -164,12 +164,12 @@
 
            - name: Test Cleanup Passed
              set_fact:
-               cflag: cleanup_pass
+               cflag: "Cleanup Passed"
 
          rescue:
            - name: Test Cleanup Failed
              set_fact:
-               cflag: cleanup_fail
+               cflag: "Cleanup Failed"
 
          always:
 
@@ -182,6 +182,6 @@
            - name: Send slack notification
              slack:
                token: "{{ lookup('env','SLACK_TOKEN') }}"
-               msg: '{{ ansible_date_time.time }} TEST: {{test_name}}, RESULT: {{ flag }}'
+               msg: '{{ ansible_date_time.time }} TEST: {{test_name}}, RESULT: {{ flag }},{{ cflag }}'
              when: slack_notify | bool and lookup('env','SLACK_TOKEN')
 

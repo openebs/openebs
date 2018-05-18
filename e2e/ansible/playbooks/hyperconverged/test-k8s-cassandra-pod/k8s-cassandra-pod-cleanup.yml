@@ -1,34 +1,31 @@
 ---
 - name: Delete cassandra service pod
-  shell: source {{ profile }}; kubectl delete -f {{ svc_yaml_alias }}
-  args:
-    executable: /bin/bash
-  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-  changed_when: true
+  include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/delete_deploy.yml"
+  vars:
+    ns: default
+    app_yml: "{{ svc_yaml_alias }}"
 
 - name: Delete cassandra statefulset pod
-  shell: source {{ profile }}; kubectl delete -f {{ stateful_yaml_alias }}
-  args:
-    executable: /bin/bash
-  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-  changed_when: true
+  include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/delete_deploy.yml"
+  vars:
+    ns: default
+    app_yml: "{{ stateful_yaml_alias }}"
 
 - name: Delete cassandra loadgen pod
-  shell: source {{ profile }}; kubectl delete -f {{ loadgen_yaml_alias }}
-  args:
-    executable: /bin/bash
-  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-  changed_when: true
+  include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/delete_deploy.yml"
+  vars:
+    ns: default
+    app_yml: "{{ loadgen_yaml_alias }}"
 
-- name: Get pvcs
-  shell: source {{ profile }}; kubectl get pvc -o custom-columns=:metadata.name --no-headers | grep cassandra-data
+- name: Get cassandra pvcs
+  shell: kubectl get pvc -o custom-columns=:metadata.name --no-headers | grep cassandra-data
   args:
     executable: /bin/bash
   register: result
   delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
   changed_when: true
 
-- name: Delete pvcs
+- name: Delete cassandra pvcs
   shell: source {{ profile }}; kubectl delete pvc {{ item }}
   args:
     executable: /bin/bash
@@ -47,3 +44,21 @@
   delay: 120
   retries: 6
   changed_when: true
+
+- name: Get cassandra deploy
+  shell: source {{ profile }}; kubectl get deploy --no-headers | awk {'print $1'}
+  args:
+    executable: /bin/bash
+  register: result
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+  changed_when: true
+
+- name: Delete cassandra deploy
+  shell: source {{ profile }}; kubectl delete deploy {{ item }}
+  args:
+    executable: /bin/bash
+  with_items:
+    - "{{ result.stdout_lines }}"
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+  changed_when: true
+
