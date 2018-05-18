@@ -2,9 +2,9 @@
 
 Great!! We are always on the lookout for more OpenEBS hackers. You can get started by reading this [Overview](./contribute/design/README.md)
 
-First: if you're unsure or afraid of anything, just ask or submit the issue or pull request anyways. You won't be yelled at for giving your best effort. The worst that can happen is that you'll be politely asked to change something. We appreciate any sort of contributions, and don't want a wall of rules to get in the way of that.
+Firstly, if you are unsure or afraid of anything, just ask or submit the issue or pull request anyways. You won't be yelled at for giving your best effort. The worst that can happen is that you'll be politely asked to change something. We appreciate any sort of contributions, and don't want a wall of rules to get in the way of that.
 
-However, for those individuals who want a bit more guidance on the best way to contribute to the project, read on. This document will cover what we're looking for. By addressing all the points we're looking for, it raises the chances we can quickly merge or address your contributions.
+However, for those individuals who want a bit more guidance on the best way to contribute to the project, read on. This document will cover all the points we're looking for in your contributions, raising your chances of quickly merging or addressing your contributions.
 
 That said, OpenEBS is an innovation in open-source. You are welcome to contribute in any way you can and all the help provided is very much appreciated. 
 
@@ -13,21 +13,21 @@ That said, OpenEBS is an innovation in open-source. You are welcome to contribut
 - Submit proposals for new features/enhancements.
 - Submit fixes for bugs reported/found. 
 - Submit changes to the source code.
-- Solve existing Issues.
+- Solve existing issues.
 
 There are just a few simple guidelines that you need to follow before providing your hacks. 
 
 ## Raising Issues
 
 When raising issues, please specify the following:
-- Setup details (like hyperconverged/dedicated), orchestration engine - kubernetes, docker swarm etc. 
-- Scenario where the issue was seen to occur (With details on how to reproduce it)
+- Setup details (like hyperconverged/dedicated), orchestration engine - Kubernetes, Docker Swarm etc. 
+- Scenario where the issue occured (with details on how to reproduce it)
 - If the issue is with storage, include maya version, maya osh-status and maya omm-status.
-- Errors and log messages that are thrown by the software
+- Errors and log messages that are displayed by the software
 
 ## Submit Change to Improve Documentation
 
-Getting documentation right is hard! Refer to this [page](./contribute/CONTRIBUTING-TO-DEVELOPER-DOC.md) page for more information on you could improve the developer documentation by submitting pull requests with appropriate tags. Here's a [list of tags](./contribute/labels-of-issues.md) that could be used. 
+Getting documentation right is hard! Refer to this [page](./contribute/CONTRIBUTING-TO-DEVELOPER-DOC.md) page for more information on how you could improve the developer documentation by submitting pull requests with appropriate tags. Here's a [list of tags](./contribute/labels-of-issues.md) that could be used. 
 
 
 ## Submit Proposals for New Features
@@ -36,12 +36,12 @@ There is always something more that is required, to make it easier to suit your 
 
 ## Contributing to Source Code & Bug Fixes
 
-Provide PRs with appropriate tags for bug fixes or enhancements to the source code. For a list of tags that could be used, take a look [here]((./contribute/labels-of-issues.md)).
+Provide PRs with appropriate tags for bug fixes or enhancements to the source code. For a list of tags that could be used, see [this]((./contribute/labels-of-issues.md)).
 
 Refer to this [document](./contribute/design/code-structuring.md) for more information on code structuring and some guidelines on the same.
 
 ## Solve Existing Issues
-Head over to [issues](www.github.com/openebs/openebs/issues) to find issues where helped is needed from contributors, look over our [list of labels guide](./contribute/labels-of-issues.md) to help you find issues that you can solve faster. **(What guidelines are used here by OpenEBS, need to add the same. - Review needed)**
+Head over to [issues](www.github.com/openebs/openebs/issues) to find issues where help is needed from contributors. See our [list of labels guide](./contribute/labels-of-issues.md) to help you find issues that you can solve faster. **(What guidelines are used here by OpenEBS, need to add the same. - Review needed)**
 
 ---
 ### Sign your work

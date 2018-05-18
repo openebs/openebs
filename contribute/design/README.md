@@ -26,9 +26,9 @@ The application pods will access the storage via the iSCSI Target Container, whi
 - [openebs/jiva](https://github.com/openebs/jiva) Storage Controller functionality includes the replication logic 
 - [openebs/gotgt](https://github.com/openebs/gotgt) iSCSI Target functionality used by *openebs/jiva*.
 
-## OpenEBS Control Plane (aka OpenEBS Storage Orchestration, aka maya)
+## OpenEBS Control Plane (aka OpenEBS Storage Orchestration, aka Maya)
 
-OpenEBS Control Plane - auguments the functionality provided by the Container Orchestrator, with storage specific orchestration capabilities, via a set of services. OpenEBS control plane can hook into any of the container orchestrators like Kubernetes, Docker Swarm, Nomad, etc., making it possible to run OpenEBS hyper-converged with Container Orchestrators. 
+OpenEBS Control Plane - augments the functionality provided by the Container Orchestrator, with storage specific orchestration capabilities, via a set of services. OpenEBS control plane can hook into any of the container orchestrators like Kubernetes, Docker Swarm, Nomad, etc., making it possible to run OpenEBS hyperconverged with Container Orchestrators. 
 
 ![OpenEBS Control Plane](../../documentation/source/_static/OpenEBS-Control-Plane.png)
 
@@ -38,9 +38,9 @@ OpenEBS Control Plane is also delivered as micro-services, where the services bu
   - Kube Dashboard - [openebs-dashboard](https://github.com/openebs/dashboard)
   - Extended Schema - like CRDs in case of Kubernetes to store the OpenEBS specific configuration related data
 - Cluster Services, provides OpenEBS specific storage intelligence like:
-  - maya-apiserver - includes the API for performing Volume operations that can translate requests into CO specific operations
-  - maya-mulebot - uses the information gathered to suggest optimized placement and event handling tips
-  - maya-connect - allows to upload the monitoring data to maya-cloud for further storage access pattern analysis
+  - Maya-apiserver - includes the API for performing Volume operations that can translate requests into CO specific operations
+  - Maya-mulebot - uses the information gathered to suggest optimized placement and event handling tips
+  - Maya-connect - allows to upload the monitoring data to maya-cloud for further storage access pattern analysis
 - Node Services, provides OpenEBS specific storage intelligence running along-side kubelet like:
   - maya-agent - includes storage management functionality 
 
@@ -54,4 +54,4 @@ Monitoring and Tracing capabilities are added by instrumenting the above service
 - [openebs-dashboard](https://github.com/openebs/dashboard) A fork of the Kubernetes dashboard project, that is extended with storage functionality.
 - [openebs-provisioner](https://github.com/openebs/external-storage/tree/master/openebs) is the OpenEBS K8s Provisioner forked from Kubernetes Incubator project. 
 
-*Note: In future, OpenEBS can also be deployed as a storage service (non hyperconverged) like the traditional software defined storage, and can be connected via the storage plugins.*
+***Note:** In future, OpenEBS can also be deployed as a storage service (non hyperconverged) like the traditional software defined storage, and can be connected via the storage plugins.*

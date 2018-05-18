@@ -6,8 +6,8 @@ Kubernetes YAML files for running application using OpenEBS Volumes are located 
 
 Each application example should comprise of the following:
 - K8s YAML file(s) for starting the application and its associated components. The volumes should point to OpenEBS Storage Class. If the existing storage-classes don't suit the need, create a new storage class in: [openebs-storageclasses.yaml](../k8s/openebs-storageclasses.yaml) 
-- K8s YAML files for starting a client that access the application. This is optional, in case the Application itself provides a mechanism like in case of Jupyter, Wordpress etc., When demonstrating database like applications like Cassandra, Reddis, it is recommended to have a mechanism to test that application is launched. 
-- Instruction Guide, that will help launch and verify the application
+- K8s YAML files for starting a client that access the application. This is optional, in case the application itself provides a mechanism like in Jupyter, Wordpress etc. When demonstrating database like applications such as Cassandra, Redis, and so on, it is recommended to have a mechanism to test that the application is launched. 
+- Instruction Guide, that will help launch and verify the application.
 
 At a very high level, the process to contribute and improve is pretty simple:
 - Submit an Issue describing your proposed change. Or pick an existing issue tagged as [applications](https://github.com/openebs/openebs/labels/application)
@@ -16,18 +16,18 @@ At a very high level, the process to contribute and improve is pretty simple:
 - Submit your Pull Request
 - Submit an issue to update the [User Documentation](https://github.com/openebs/openebs/blob/master/documentation/source/install/install_usecases.rst)
 
-*Note: You could also help by just adding new issues for applications that are currently missing in the examples or by raising issues on existing applications for further enhancements.*
+***Note:** You could also help by just adding new issues for applications that are currently missing in the examples or by raising issues on existing applications for further enhancements.*
 
-The following sections describe some guidelines that can come in handy with the above process. 
+The following sections describe some guidelines that are helpful with the above process. 
 
-*Followed by the guidelines, is a [cheatsheet](./contribute/git-cheatsheet.md) with frequently used git commands.*
+*Following the guidelines, here is a [cheatsheet](./contribute/git-cheatsheet.md) with frequently used git commands.*
 
-## Submit an Issue describing your proposed change.
+## Submit an Issue describing your proposed change
 
 Some general guidelines when submitting issues for example applications:
 - If the proposed change requires an update to the existing example, please provide a link to the example in the issue. 
 
-## Create your development branch. 
+## Create your development branch
 
 - Fork the openebs repository and if you had previously forked, rebase with master to fetch latest changes
 - Create a new development branch in your forked repository with the following naming convention: *"task description-#issue"*
@@ -40,7 +40,7 @@ Some general guidelines when submitting issues for example applications:
 - Set your commit.template to the `COMMIT_TEMPLATE` given in the `.github` directory.
   `git config --local commit.template $GOPATH/src/github.com/openebs/openebs/.github`
 
-## Submit a Pull request. 
+## Submit a Pull request
 - Rebase your development branch 
 - Submit the PR from the development branch to the openebs/openebs:master
 - Incorporate review comments, if any, in the development branch. 

@@ -24,13 +24,13 @@ The following sections describe some guidelines that can come in handy with the 
 
 Some general guidelines when submitting issues for developer documentation:
 - If the proposed change requires an update to the existing page, please provide a link to the page in the issue. 
-- If you want to add a new page, then go ahead open up an issue. 
+- If you want to add a new page, then go ahead and open an issue. 
 
 You can also help with some existing issues under this category available at [developer documentation issues list](https://github.com/openebs/openebs/labels/documentation%2Fdevel)
 
 ## Create your development branch. 
 
-- Fork the openebs repository and if you had previously forked, rebase with master to fetch latest changes
+- Fork the [OpenEBS](www.github.com/openebs/openebs) repository and if you have forked it already, rebase with master branch to fetch latest changes to your local system. 
 - Create a new development branch in your forked repository with the following naming convention: *"task description-#issue"*
 
   **Example:**     This change is being developed with the branch named : OpenEBS-DevDoc-PR-Workflow-#213

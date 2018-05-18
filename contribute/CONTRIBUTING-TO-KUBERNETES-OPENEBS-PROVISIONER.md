@@ -1,6 +1,6 @@
-# Contributing to OpenEBS kubernetes provisioner
+# Contributing to OpenEBS Kubernetes Provisioner
 
-This document describes process for creating contributing to [openebs/external-storage](https://github.com/openebs/external-storage) project.
+This document describes the process for contributing to [openebs/external-storage](https://github.com/openebs/external-storage) project.
 At a very high level, the process to contribute and improve is pretty simple:
 - Submit an Issue describing your proposed change
 - Create your development branch
@@ -9,8 +9,8 @@ At a very high level, the process to contribute and improve is pretty simple:
 - Sync  `openebs/external-storage`  repository
 
 ### Submit an Issue describing your proposed change
-Some general guidelines when submitting issues for openebs volume provisioner:
-   - It is advisable to perform search on the already existing issues related to openebs-provisioner at [issues related to openebs-provisioner](https://github.com/openebs/openebs/issues?utf8=%E2%9C%93&q=label%3Aarea%2Fvolume-provisioning%20label%3Arepo%2Fk8s-provisioner%20) if your issue isn't listed there then you can move to the next step.
+Some general guidelines when submitting issues for OpenEBS volume provisioner:
+   - It is advisable to search the existing issues related to openebs-provisioner at [issues related to openebs-provisioner](https://github.com/openebs/openebs/issues?utf8=%E2%9C%93&q=label%3Aarea%2Fvolume-provisioning%20label%3Arepo%2Fk8s-provisioner%20) if your issue is not listed there then you can move to the next step.
     - If you encounter any issue/bug or have feature request then raise an issue in [openebs/openebs](https://github.com/openebs/openebs/issues) and label it as `area/volume-provisioning` & `repo/k8s-provisioner`.
 
 ### Create your development branch
@@ -21,18 +21,18 @@ Some general guidelines when submitting issues for openebs volume provisioner:
    - Reference the issue number along with a brief description in your commits.
 
 ### Submit a Pull request
-   - If you are contributing to the kubernetes project for the first time then you need to sign [CNCF CLA](https://identity.linuxfoundation.org/projects/cncf) otherwise you can proceed to the next steps.
+   - If you are contributing to the Kubernetes project for the first time then you need to sign [CNCF CLA](https://identity.linuxfoundation.org/projects/cncf) otherwise you can proceed to the next steps.
    - Rebase your development branch
    - Submit the PR from the development branch to the `kubernetes-incubator/external-storage:master`
    - Update the PR as per comments given by reviewers.
    - Once the PR is accepted, close the branch.
 
 ### Sync openebs/external-storage repository
-   - You can request to `openebs/external-storage` maintainer/Owners to sync up the `openebs/external-storage` repository.
+   - You can remove to `openebs/external-storage` maintainer/owners to synchronize the `openebs/external-storage` repository.
    - Your changes will appear in `openebs/external-storage` once it is synced.
 
 # Git cheat sheet:
-Fork the `kubernetes-incubator/external-storage` repository into your account, referred in the below instructions as $user.
+Fork the `kubernetes-incubator/external-storage` repository  into your account $user as referred in the following instructions.
 
 ### Setting up Development Environment for OpenEBS volume provisioner
 
@@ -93,12 +93,12 @@ git push origin <branch-name>  #After this changes will appear in your $user/ext
 
 ### Create pull request to `kubernetes-incubator/external-storage`
 
-Once above steps are done, then you shall see your changes in branch `<branch-name>` of `$user/external-storage` on github. You can create a PR to `kubernetes-incubator/external-storage`. 
+Once above procedure is followed, you will see your changes in branch `<branch-name>` of `$user/external-storage` on Github. You can create a PR at `kubernetes-incubator/external-storage`. 
 You can add label `area/openebs` to your PR by commenting `/area openebs` in the comment section of your PR. 
 
 ### Fetching latest changes to `openebs/external-storage`
-Once, Pull Request is merged in `kubernetes-incubator/external-storage` then ask one of the OpenEBS owner to fetch latest changes to `openebs/external-storage`.
-Owners will fetch latest changes from `kubernetes-incubator/external-storage` to `openebs/external-storage`repo. Your changes shall appear here! :smile:
+Once, PR is merged in `kubernetes-incubator/external-storage`, ask one of the OpenEBS owner to fetch latest changes to `openebs/external-storage`.
+Owners will fetch latest changes from `kubernetes-incubator/external-storage` to `openebs/external-storage`repo. Your changes will appear here! :smile:
 
 If you need any help with git, refer to this [cheat sheet](./contribute/git-cheatsheet.md).
 Go back to [**Contributing to OpenEBS**](./contribute/CONTRIBUTING.md).
