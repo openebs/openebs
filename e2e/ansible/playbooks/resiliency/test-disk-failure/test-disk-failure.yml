@@ -1,0 +1,179 @@
+# test-disk-failure.yaml
+
+# Description: Test-Disk failure
+
+- hosts: localhost
+
+  vars_files:
+    - test-disk-failure-vars.yml
+
+  tasks:
+   - block:
+
+       - name: Get $HOME of K8s master for kubernetes user
+         shell: echo $HOME
+         args:
+           executable: /bin/bash
+         register: result_kube_home
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+         changed_when: True
+
+       - name: Get the disk name by using UUID
+         shell: blkid | grep {{ uuid }} | awk '{print $1}' | cut -d "/" -f3 | cut -d ":" -f1
+         args:
+           executable: /bin/bash
+         become: true
+         register: result_disk
+         delegate_to: "{{ groups['kubernetes-kubeminions'].0 }}"
+
+       - name: Get the Mount point of the disk using UUID
+         shell: lsblk -f | grep {{ uuid }} | awk '{print $4}'
+         args:
+           executable: /bin/bash
+         become: true
+         register: result_mountpoint
+         delegate_to: "{{ groups['kubernetes-kubeminions'].0 }}"
+
+       - name: Check status of maya-api server
+         include_tasks: "{{ ansible_env.HOME }}/{{utils_path}}/deploy_check.yml"
+         vars:
+           ns: default
+           app: maya-api
+
+       - name: Get the storage pool creation YAML file
+         get_url:
+           url: "{{ storage_pool_link }}"
+           dest: "{{ result_kube_home.stdout }}"
+         register: result_storagepool
+         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+
+       - name: Replace storage pool name with test parameters
+         include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/regex_task.yml"
+         vars:
+           path: "{{ result_kube_home.stdout }}/storage-pool-path_creation.yml"
+           regex1: "{{replace_item}}"
+           regex2: "{{replace_with}}"
+
+       - name: create the storage pool path
+         shell: source ~/.profile; kubectl apply -f storage-pool-path_creation.yml
+         args:
+           executable: /bin/bash
+         register: result_sp_path
+         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+
+       - name: Obtaining storage classes yaml
+         shell: kubectl get sc openebs-percona -o yaml > "{{ create_sc }}"
+         args:
+           executable: /bin/bash
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+       - name: Replace storage class file with test parameters
+         replace:
+           path: "{{ result_kube_home.stdout }}/{{ create_sc }}"
+           regexp: 'openebs.io/storage-pool: default'
+           replace: 'openebs.io/storage-pool: disk'
+         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+
+       - name:  Delete the existing storage class and create new one
+         shell: kubectl delete sc openebs-percona; kubectl apply -f "{{ create_sc }}"
+         args:
+           executable: /bin/bash
+         register: result_sc_out
+         until: "'created' in result_sc_out.stdout"
+         delay: 10
+         retries: 5
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+       - name: Obtain the sql test script file
+         get_url:
+           url: "{{ sql_test_link }}"
+           dest: "{{ result_kube_home.stdout }}"
+         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+
+       - name: Create the configmap test
+         shell: kubectl create configmap sqltest --from-file=sql-test.sh
+         args:
+           executable: /bin/bash
+         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+
+       - name: Get the percona liveliness application yaml
+         get_url:
+           url: "{{ percona_link }}"
+           dest: "{{ result_kube_home.stdout }}"
+         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+
+       - name: Deploying percona application
+         shell: kubectl apply -f percona.yaml
+         args:
+           executable: /bin/bash
+         register: result_percona
+         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+
+       - name: Check whether percona application is running
+         include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
+         vars:
+           app: percona
+           ns: default
+
+       - name: Check Replica  pod status
+         shell: kubectl get pods --all-namespaces | grep pvc
+         args:
+           executable: /bin/bash
+         register: result_pvc
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+         until: " pvc and 'Running' in result_pvc.stdout"
+         delay: 30
+         retries: 15
+
+       - name: Failing the additional disk
+         shell: echo 1 > /sys/block/{{ result_disk.stdout }}/device/delete
+         args:
+           executable: /bin/bash
+         become: true
+         delegate_to: "{{ groups['kubernetes-kubeminions'].0 }}"
+
+       - name: List the available scsi host
+         shell: ls /sys/class/scsi_host/
+         args:
+           executable: /bin/bash
+         become: true
+         register: result_host
+         delegate_to: "{{ groups['kubernetes-kubeminions'].0 }}"
+
+       - name: Rescan the disk
+         shell: echo "- - -" > /sys/class/scsi_host/{{ item }}/scan
+         args:
+           executable: /bin/bash
+         become: true
+         with_items: "{{ result_host.stdout_lines }}"
+         delegate_to: "{{ groups['kubernetes-kubeminions'].0 }}"
+
+       - name: Checking the  Mount point using UUID after failing the disk
+         shell: lsblk -f | grep {{ uuid }} | awk '{print $4}'
+         args:
+           executable: /bin/bash
+         become: true
+         register: result_scan_mp
+         delegate_to: "{{ groups['kubernetes-kubeminions'].0 }}"
+
+       - name: Get the disk name by using UUID
+         shell: blkid | grep {{ uuid }} | awk '{print $1}' | cut -d "/" -f3 | cut -d ":" -f1
+         args:
+           executable: /bin/bash
+         become: true
+         register: result_scan_disk
+         delegate_to: "{{ groups['kubernetes-kubeminions'].0 }}"
+
+       - name: Remount the disk
+         shell: mount /dev/{{ result_scan_disk.stdout }} {{ result_mountpoint.stdout }}
+         args:
+           executable: /bin/bash
+         become: true
+         delegate_to: "{{ groups['kubernetes-kubeminions'].0 }}"
+
+       - name: Check Replica  pod status
+         shell: kubectl get pods | grep pvc
+         args:
+           executable: /bin/bash
+         register: result_status
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"

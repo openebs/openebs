@@ -1,0 +1,26 @@
+---
+- include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/delete_deploy.yml"
+  vars:
+    app_yml: "{{ percona_link }}"
+    ns: default
+
+- include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/delete_deploy_check.yml"
+  vars:
+    ns: default
+    app: percona
+
+- name: Confirm pvc pod has been deleted
+  shell: source ~/.profile; kubectl get pods --all-namespaces | grep pvc
+  args:
+    executable: /bin/bash
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+  register: result
+  until: "result.rc!=0"
+  delay: 30
+  retries: 10
+  ignore_errors: true
+
+- name: Remove copied files
+  shell: rm -rf sql-test.sh "{{ create_sc }}" percona.yaml storage-pool-path_creation.yml
+    executable: /bin/bash
+
