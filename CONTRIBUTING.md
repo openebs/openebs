@@ -1,6 +1,6 @@
 # Contributing to OpenEBS
 
-Great!! We are always on the lookout for more OpenEBS hackers. You can get started by reading this [Overview](./contribute/design/README.md)
+Great!! We are always on the lookout for more OpenEBS hackers. You can get started by reading this [overview](./contribute/design/README.md)
 
 Firstly, if you are unsure or afraid of anything, just ask or submit the issue or pull request anyways. You won't be yelled at for giving your best effort. The worst that can happen is that you'll be politely asked to change something. We appreciate any sort of contributions, and don't want a wall of rules to get in the way of that.
 
@@ -27,21 +27,29 @@ When raising issues, please specify the following:
 
 ## Submit Change to Improve Documentation
 
-Getting documentation right is hard! Refer to this [page](./contribute/CONTRIBUTING-TO-DEVELOPER-DOC.md) page for more information on how you could improve the developer documentation by submitting pull requests with appropriate tags. Here's a [list of tags](./contribute/labels-of-issues.md) that could be used. 
-
+Getting documentation right is hard! Refer to this [page](./contribute/CONTRIBUTING-TO-DEVELOPER-DOC.md) for more information on how you could improve the developer documentation by submitting pull requests with appropriate tags. Here's a [list of tags](./contribute/labels-of-issues.md) that could be used for the same. Help us keep our documentation clean, easy to understand, and accessible.
 
 ## Submit Proposals for New Features
 
 There is always something more that is required, to make it easier to suit your use-cases. Feel free to join the discussion on new features or raise a PR with your proposed change. 
 
+- Join us at [Slack](https://openebsslacksignup.herokuapp.com/)
+ 	 - Already signed up? Head to our discussions at [#openebs-users](https://openebs-community.slack.com/messages/openebs-users/)
+
+
 ## Contributing to Source Code & Bug Fixes
 
 Provide PRs with appropriate tags for bug fixes or enhancements to the source code. For a list of tags that could be used, see [this]((./contribute/labels-of-issues.md)).
 
-Refer to this [document](./contribute/design/code-structuring.md) for more information on code structuring and some guidelines on the same.
+- For contributing to K8s demo, please refer to this [document](./contribute/CONTRIBUTING-TO-K8S-DEMO.md).
+- For contributing to Kubernetes OpenEBS Provisioner, please refer to this [document](./contribute/CONTRIBUTING-TO-KUBERNETES-OPENEBS-PROVISIONER.md).
+
+Refer to this [document](./contribute/design/code-structuring.md) for more information on code structuring and guidelines to follow on the same.
 
 ## Solve Existing Issues
-Head over to [issues](www.github.com/openebs/openebs/issues) to find issues where help is needed from contributors. See our [list of labels guide](./contribute/labels-of-issues.md) to help you find issues that you can solve faster. **(What guidelines are used here by OpenEBS, need to add the same. - Review needed)**
+Head over to [issues](www.github.com/openebs/openebs/issues) to find issues where help is needed from contributors. See our [list of labels guide](./contribute/labels-of-issues.md) to help you find issues that you can solve faster.
+
+ **(What guidelines are used here by OpenEBS, need to add the same. - Review needed)**
 
 ---
 ### Sign your work
