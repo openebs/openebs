@@ -5,11 +5,10 @@ metadata:
   name: {{ template "openebs.fullname" . }}-grafana
   labels:
     app: {{ template "openebs.name" . }}
-    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    chart: {{ template "openebs.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
-    component: {{ template "openebs.fullname" . }}
-    role: grafana
+    component: grafana
 spec:
   replicas: 1
   revisionHistoryLimit: 2
@@ -18,9 +17,9 @@ spec:
       labels:
         app: {{ template "openebs.name" . }}
         release: {{ .Release.Name }}
-        component: {{ template "openebs.fullname" . }}
-        role: grafana
+        component: grafana
     spec:
+      serviceAccountName: {{ template "openebs.serviceAccountName". }}
       containers:
       - name: {{ template "openebs.name" . }}-grafana
         image: "{{ .Values.grafana.image }}:{{ .Values.grafana.imageTag }}"

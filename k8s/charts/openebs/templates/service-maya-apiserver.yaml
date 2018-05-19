@@ -1,13 +1,12 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ template "openebs.fullname" . }}-maya-apiservice
+  name: {{ template "openebs.fullname" . }}-apiservice
   labels:
     app: {{ template "openebs.name" . }}
-    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    chart: {{ template "openebs.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
-    role: apiserver
 spec:
   ports:
   - name: api
@@ -17,6 +16,5 @@ spec:
   selector:
     app: {{ template "openebs.name" . }}
     release: {{ .Release.Name }}
-    component: {{ template "openebs.fullname" . }}
-    role: apiserver
+    component: apiserver
   sessionAffinity: None

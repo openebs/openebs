@@ -5,11 +5,10 @@ metadata:
   name: {{ template "openebs.fullname" . }}-prometheus
   labels:
     app: {{ template "openebs.name" . }}
-    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    chart: {{ template "openebs.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
-    component: {{ template "openebs.fullname" . }}
-    role: prometheus
+    component: prometheus
 spec:
   replicas: 1
   template:
@@ -17,10 +16,9 @@ spec:
       labels:
         app: {{ template "openebs.name" . }}
         release: {{ .Release.Name }}
-        component: {{ template "openebs.fullname" . }}
-        role: prometheus
+        component: prometheus
     spec:
-      serviceAccountName: {{ .Values.operator.name }}
+      serviceAccountName: {{ template "openebs.serviceAccountName". }}
       containers:
         - name: {{ template "openebs.name" . }}-prometheus
           image: "{{ .Values.prometheus.image }}:{{ .Values.prometheus.imageTag }}"
