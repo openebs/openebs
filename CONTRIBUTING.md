@@ -43,14 +43,15 @@ Provide PRs with appropriate tags for bug fixes or enhancements to the source co
 * For contributing to K8s demo, please refer to this [document](./contribute/CONTRIBUTING-TO-K8S-DEMO.md).
 	- For checking out how OpenEBS works with K8s, refer to this [document](./k8s/README.md) 
 - For contributing to Kubernetes OpenEBS Provisioner, please refer to this [document](./contribute/CONTRIBUTING-TO-KUBERNETES-OPENEBS-PROVISIONER.md).
-- For contributing to CI and e2e, refer to this [document](./contribute/CONTRIBUTING-TO-CI-AND-E2E.md)
-
+* For contributing to CI and e2e, refer to this [document](./contribute/CONTRIBUTING-TO-CI-AND-E2E.md)
+	- Refer to this [overview](./e2e/README.md) of e2e.
+	
 Refer to this [document](./contribute/design/code-structuring.md) for more information on code structuring and guidelines to follow on the same.
 
 ## Solve Existing Issues
 Head over to [issues](www.github.com/openebs/openebs/issues) to find issues where help is needed from contributors. See our [list of labels guide](./contribute/labels-of-issues.md) to help you find issues that you can solve faster.
 
- **(What guidelines are used here by OpenEBS, need to add the same. - Review needed)**
+A person looking to contribute can take up an issue by claiming it as a comment/assign their Github ID to it. In case there is no PR or update on progress for a week on the said issue, then the issue opens up again, for anyone to take up again. We need to consider high priority issues/regressions where response time needs to be a day or so. 
 
 ---
 ### Sign your work
@@ -65,3 +66,9 @@ If you can certify it, then just add a line to every git commit message:
 or use the command `git commit -s -m "commit message comes here"` to sign-off on your commits.
 
 Use your real name (sorry, no pseudonyms or anonymous contributions). If you set your `user.name` and `user.email` git configs, you can sign your commit automatically with `git commit -s`. You can also use git [aliases](https://git-scm.com/book/tr/v2/Git-Basics-Git-Aliases) like `git config --global alias.ci 'commit -s'`. Now you can commit with `git ci` and the commit will be signed.
+
+---
+
+## Join our community 
+
+Want to actively develop and contribute in the OpenEBS community, refer to this [document](./community/README.md).

@@ -57,6 +57,7 @@ We welcome your feedback and contributions in any form possible.
 - Want to help with fixes and features?
   - See [open issues](https://github.com/openebs/openebs/labels)
   - See [contributing guide](./CONTRIBUTING.md)
+  - Want to join our community, [check this out](./community/README.md). 
 
 ## Show me the Code
 
