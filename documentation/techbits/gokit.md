@@ -9,16 +9,16 @@ OpenEBS being a container native project is delivered via set of containers. For
 * openebs/maya aka maya-cli : is the command line interface like kubectl for interacting with maya services for performing storage operations.
 * openebs/mayaserver : or m-apiserver abstracts a generic volume api that can be used to provision OpenEBS Disks using containers launched using the CO like K8s, nomad etc.,
 * openebs/openebs-k8s-provisioner : is the K8s controller for dynamically creating OpenEBS PVs
-With these projects, we are already seeing how code gets duplicated when each of these projects are independently developed. For example maya-cli and openebs-k8s-provisioner both need to interact with maya-apiserver, which resulted in maya-apiserver-client code being written in maya-cli and openebs-k8s-provisioner. Similarly, openebs-k8s-provisioner and maya-apiserver have duplicated code w.r.t to accessing the K8s services.
+With these projects, we are already seeing how code gets duplicated when each of these projects are independently developed. For example maya-cli and openebs-k8s-provisioner both need to interact with maya-api-server, which resulted in maya-api-server-client code being written in maya-cli and openebs-k8s-provisioner. Similarly, openebs-k8s-provisioner and maya-api-server have duplicated code w.r.t to accessing the K8s services.
 
-To avoid this duplicity of code using the kit project, we are transforming openebs/maya into a Kit project for the Application projects like maya-apiserver, openebs-k8s-provisioner and many more coming up in the future. openebs/maya contains all the kubernetes & nomad API’s, common utilities etc. needed for development of maya-apiserver and maya-storage-bot. In the near future, we are trying to push our custom libraries to maya. So that, it will become a promising Go kit project for OpenEBS community.
+To avoid this duplicity of code using the kit project, we are transforming openebs/maya into a Kit project for the Application projects like maya-api-server, openebs-k8s-provisioner and many more coming up in the future. openebs/maya contains all the kubernetes & nomad API’s, common utilities etc. needed for development of maya-api-server and maya-storage-bot. In the near future, we are trying to push our custom libraries to maya. So that, it will become a promising Go kit project for OpenEBS community.
 
 Lets now see, how maya (as kit project) adheres to the package oriented design principles:
 
 
 - Usability    
     
-    We moved common packages such as orchprovider, types, pkg to maya from maya-apiserver. These packages are very generic and can be used in most of the Go projects in OpenEBS organization. Brief details about new packages in Maya. 
+    We moved common packages such as orchprovider, types, pkg to maya from maya-api-server. These packages are very generic and can be used in most of the Go projects in OpenEBS organization. Brief details about new packages in Maya. 
    *  Orchprovider : orchprovider contains packages of different orchestrators such as kubernetes and nomad.
    *  types: types provides all the generic types related to orchestrator.
    *  pkg: pkg contains packages like nethelper, util etc.
