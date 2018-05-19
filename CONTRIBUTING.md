@@ -2,7 +2,7 @@
 
 Great!! We are always on the lookout for more OpenEBS hackers. You can get started by reading this [Overview](./contribute/design/README.md)
 
-OpenEBS is innovation in OpenSource. You are welcome to contribute in any way you can and all the help you can provide is very much appreciated. 
+OpenEBS is innovation in Open Source. You are welcome to contribute in any way you can and all the help you can provide is very much appreciated. 
 
 - Raise Issues on either the functionality or documentation
 - Submit Changes to Improve Documentation 
