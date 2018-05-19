@@ -20,10 +20,10 @@ There are just a few simple guidelines that you need to follow before providing 
 ## Raising Issues
 
 When raising issues, please specify the following:
-- Setup details (like hyperconverged/dedicated), orchestration engine - Kubernetes, Docker Swarm etc. 
-- A Scenario where the issue occurred (with details on how to reproduce it)
-- If the issue is with storage, include maya version, maya osh-status, and maya omm-status.
+- Setup details needs to be filled as specified in the issue template clearly for the reviewer to check.
+- A scenario where the issue occurred (with details on how to reproduce it).
 - Errors and log messages that are displayed by the software.
+- Any other details that might be useful.
 
 ## Submit Change to Improve Documentation
 
@@ -49,7 +49,7 @@ Provide PRs with appropriate tags for bug fixes or enhancements to the source co
 Refer to this [document](./contribute/design/code-structuring.md) for more information on code structuring and guidelines to follow on the same.
 
 ## Solve Existing Issues
-Head over to [issues](www.github.com/openebs/openebs/issues) to find issues where help is needed from contributors. See our [list of labels guide](./contribute/labels-of-issues.md) to help you find issues that you can solve faster.
+Head over to [issues](https://github.com/openebs/openebs/issues) to find issues where help is needed from contributors. See our [list of labels guide](./contribute/labels-of-issues.md) to help you find issues that you can solve faster.
 
 A person looking to contribute can take up an issue by claiming it as a comment/assign their Github ID to it. In case there is no PR or update on progress for a week on the said issue, then the issue opens up again, for anyone to take up again. We need to consider high priority issues/regressions where response time needs to be a day or so. 
 

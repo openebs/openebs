@@ -10,11 +10,11 @@ Each application example should comprise of the following:
 - Instruction Guide, that will help launch and verify the application.
 
 At a very high level, the process to contribute and improve is pretty simple:
-- Submit an Issue describing your proposed change. Or pick an existing issue tagged as [applications](https://github.com/openebs/openebs/labels/application)
-- Create your development branch
-- Commit your changes
-- Submit your Pull Request
-- Submit an issue to update the [User Documentation](https://github.com/openebs/openebs/blob/master/documentation/source/install/install_usecases.rst)
+- Submit an Issue describing your proposed change. Or pick an existing issue tagged as [applications](https://github.com/openebs/openebs/labels/application).
+- Create your development branch.
+- Commit your changes.
+- Submit your Pull Request.
+- Submit an issue to update the User Documentation.
 
 ***Note:** You could also help by just adding new issues for applications that are currently missing in the examples or by raising issues on existing applications for further enhancements.*
 
