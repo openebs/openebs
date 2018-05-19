@@ -4,15 +4,15 @@
 
 Let us assume that you already have a working go environment. You to make sure that your $GOPATH/bin is included in your PATH.
 
-### Install vim, if not already done.
+### Install vim, if not already done
 ```
 sudo apt-get install vim
 ```
 
 
-## Install and setup vim-go
+### Install and setup vim-go
 
-The following link has a pretty detailed instructions on setting up vim-go and using the shortcuts. 
+The following link has a pretty detailed instructions on setting up vim-go and using the shortcuts.
 - https://github.com/fatih/vim-go-tutorial#quick-setup
 
 The following is an extract of the command required to install on Ubuntu.
@@ -43,14 +43,12 @@ Now run the following in the same vim editor:
 :GoInstallBinaries
 ```
 
-You should see the dependent go binaries downloaded and installed in your GOPATH/bin
+You should see the dependent go binaries downloaded and installed in your GOPATH/bin.
 
 
-## Using vim-go
+### Using vim-go
 
 The vim-go repository provides a large number of additional plugins and shortcuts that can be added to the .vimrc. However, with the default .vimrc use above you can already get going:
 - Initiate the build ":GoBuild"
 - Navigate to the definition "ctrl-{"
 - Navigate back "ctrl-o"
-
-
