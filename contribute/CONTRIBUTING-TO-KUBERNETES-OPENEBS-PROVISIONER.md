@@ -100,5 +100,5 @@ You can add label `area/openebs` to your PR by commenting `/area openebs` in the
 Once, PR is merged in `kubernetes-incubator/external-storage`, ask one of the OpenEBS owner to fetch latest changes to `openebs/external-storage`.
 Owners will fetch latest changes from `kubernetes-incubator/external-storage` to `openebs/external-storage`repo. Your changes will appear here! :smile:
 
-If you need any help with git, refer to this [cheat sheet](./contribute/git-cheatsheet.md).
-Go back to [**Contributing to OpenEBS**](./contribute/CONTRIBUTING.md).
+If you need any help with git, refer to this [cheat sheet](./git-cheatsheet.md).
+Go back to [**Contributing to OpenEBS**](../CONTRIBUTING.md).

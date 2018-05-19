@@ -2,7 +2,7 @@
 
 Great!! We are always on the lookout for more OpenEBS hackers. You can get started by reading this [overview](./contribute/design/README.md)
 
-Firstly, if you are unsure or afraid of anything, just ask or submit the issue or pull request anyways. You won't be yelled at for giving your best effort. The worst that can happen is that you'll be politely asked to change something. We appreciate any sort of contributions, and don't want a wall of rules to get in the way of that.
+Firstly, if you are unsure or afraid of anything, just ask or submit the issue or pull request anyways. You won't be yelled at for giving your best effort. The worst that can happen is that you'll be politely asked to change something. We appreciate any sort of contributions and don't want a wall of rules to get in the way of that.
 
 However, for those individuals who want a bit more guidance on the best way to contribute to the project, read on. This document will cover all the points we're looking for in your contributions, raising your chances of quickly merging or addressing your contributions.
 
@@ -21,9 +21,9 @@ There are just a few simple guidelines that you need to follow before providing 
 
 When raising issues, please specify the following:
 - Setup details (like hyperconverged/dedicated), orchestration engine - Kubernetes, Docker Swarm etc. 
-- Scenario where the issue occured (with details on how to reproduce it)
-- If the issue is with storage, include maya version, maya osh-status and maya omm-status.
-- Errors and log messages that are displayed by the software
+- A Scenario where the issue occurred (with details on how to reproduce it)
+- If the issue is with storage, include maya version, maya osh-status, and maya omm-status.
+- Errors and log messages that are displayed by the software.
 
 ## Submit Change to Improve Documentation
 
@@ -36,13 +36,14 @@ There is always something more that is required, to make it easier to suit your 
 - Join us at [Slack](https://openebsslacksignup.herokuapp.com/)
  	 - Already signed up? Head to our discussions at [#openebs-users](https://openebs-community.slack.com/messages/openebs-users/)
 
-
 ## Contributing to Source Code & Bug Fixes
 
 Provide PRs with appropriate tags for bug fixes or enhancements to the source code. For a list of tags that could be used, see [this]((./contribute/labels-of-issues.md)).
 
-- For contributing to K8s demo, please refer to this [document](./contribute/CONTRIBUTING-TO-K8S-DEMO.md).
+* For contributing to K8s demo, please refer to this [document](./contribute/CONTRIBUTING-TO-K8S-DEMO.md).
+	- For checking out how OpenEBS works with K8s, refer to this [document](./k8s/README.md) 
 - For contributing to Kubernetes OpenEBS Provisioner, please refer to this [document](./contribute/CONTRIBUTING-TO-KUBERNETES-OPENEBS-PROVISIONER.md).
+- For contributing to CI and e2e, refer to this [document](./contribute/CONTRIBUTING-TO-CI-AND-E2E.md)
 
 Refer to this [document](./contribute/design/code-structuring.md) for more information on code structuring and guidelines to follow on the same.
 
@@ -54,7 +55,7 @@ Head over to [issues](www.github.com/openebs/openebs/issues) to find issues wher
 ---
 ### Sign your work
 
-We use the Developer Certificate of Origin (DCO) as a additional safeguard for the OpenEBS project. This is a well established and widely used mechanism to assure contributors have confirmed their right to license their contribution under the project's license. Please read [developer-certificate-of-origin](https://github.com/openebs/openebs/blob/master/contribute/developer-certificate-of-origin).
+We use the Developer Certificate of Origin (DCO) as an additional safeguard for the OpenEBS project. This is a well established and widely used mechanism to assure contributors have confirmed their right to license their contribution under the project's license. Please read [developer-certificate-of-origin](./contribute/developer-certificate-of-origin.md).
 
 If you can certify it, then just add a line to every git commit message:
 

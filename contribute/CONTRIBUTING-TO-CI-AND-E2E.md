@@ -92,7 +92,7 @@ The Jenkins configuration used to setup OpenEBS e2e can be found [here](https://
 
 Getting Documentation Right is Hard! Please raise a PR with you proposed changes to the READMEs, tutorials, and deployment guides in openebs/e2e.
 
-If you need any help with git, refer to this [cheat sheet](./contribute/git-cheatsheet.md).
-Go back to [**Contributing to OpenEBS**](./contribute/CONTRIBUTING.md).
+If you need any help with git, refer to this [cheat sheet](./git-cheatsheet.md).
+Go back to [**Contributing to OpenEBS**](../CONTRIBUTING.md).
 
 # HAPPY TESTING !!

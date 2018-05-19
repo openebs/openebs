@@ -47,5 +47,5 @@ You can also help with some existing issues under this category available at [de
 - Once the PR is accepted, close the branch.
 - After the PR is merged the development branch in the forked repository can be deleted.
 
-If you need any help with git, refer to this [cheat sheet](./contribute/git-cheatsheet.md).
-Go back to [**Contributing to OpenEBS**](./contribute/CONTRIBUTING.md).
+If you need any help with git, refer to this [cheat sheet](./git-cheatsheet.md).
+Go back to [**Contributing to OpenEBS**](../CONTRIBUTING.md).

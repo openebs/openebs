@@ -24,24 +24,14 @@ To dig deeper, please start by having a look at [OpenEBS Architecture](../contri
 
 There's always code that can be clarified and variables or functions that can be renamed or commented and need for more test coverage.
 
-
 ## Getting Started
 
-Links in [openebs/contribute](../contribute) will help you get started with:
-
-- [OpenEBS Development](../contribute/CONTRIBUTING-TO-DEVELOPER-DOC.md).
-
-- [OpenEBS E2E](../contribute/CONTRIBUTING-TO-CI-AND-E2E.md).
-
-- [Demo Applications](../contribute/CONTRIBUTING-TO-K8S-DEMO.md)
+Read the [CONTRIBUTING.md](../CONTRIBUTING.md) will help you get started with:
 
 ## Issues
 
-If you have a question about OpenEBS or have a problem using it,
-please start with the [troubleshooting guide](https://docs.openebs.io/docs/troubleshooting.html).
-
-If that doesn't answer your questions, or if you think you found a bug,
-please [file an issue](https://github.com/openebs/openebs/issues).
+If you have a question about OpenEBS or have a problem using it, please start with the [troubleshooting guide](https://docs.openebs.io/docs/troubleshooting.html).
+If that doesn't answer your questions, or if you think you found a bug, please [file an issue](https://github.com/openebs/openebs/issues).
 
 ## Weekly Meeting
 
@@ -56,3 +46,5 @@ Map that to your local time with this [timezone table](https://www.google.com/se
 - Agenda and any notes from each meeting are captured in this [document](https://docs.google.com/document/d/1mHL1ypds4Hf6OnOGz2dOufamu4LiSt4Sgnl9QFrxDls).
 
 - Feature requests and current release tasks are captured in this [planning sheet](https://docs.google.com/spreadsheets/d/1bbphUqbxShBhgr1VHaEQUzIGMaJJacPNKc1ckNXU1QE).
+
+Go back to [**Contributing to OpenEBS**](./CONTRIBUTING.md).

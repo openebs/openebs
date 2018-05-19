@@ -20,7 +20,7 @@ At a very high level, the process to contribute and improve is pretty simple:
 
 The following sections describe some guidelines that are helpful with the above process. 
 
-*Following the guidelines, here is a [cheatsheet](./contribute/git-cheatsheet.md) with frequently used git commands.*
+*Following the guidelines, here is a [cheatsheet](./git-cheatsheet.md) with frequently used git commands.*
 
 ## Submit an Issue describing your proposed change
 
@@ -47,5 +47,5 @@ Some general guidelines when submitting issues for example applications:
 - Once the PR is accepted, close the branch.
 - After the PR is merged the development branch in the forked repository can be deleted.
 
-If you need any help with git, refer to this [cheat sheet](./contribute/git-cheatsheet.md).
-Go back to [**Contributing to OpenEBS**](./contribute/CONTRIBUTING.md).
+If you need any help with git, refer to this [cheat sheet](./git-cheatsheet.md).
+Go back to [**Contributing to OpenEBS**](../CONTRIBUTING.md).
