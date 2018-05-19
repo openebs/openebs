@@ -11,7 +11,7 @@ At a very high level, the process to contribute and improve is pretty simple:
 ### Submit an Issue describing your proposed change
 Some general guidelines when submitting issues for OpenEBS volume provisioner:
    - It is advisable to search the existing issues related to openebs-provisioner at [issues related to openebs-provisioner](https://github.com/openebs/openebs/issues?utf8=%E2%9C%93&q=label%3Aarea%2Fvolume-provisioning%20label%3Arepo%2Fk8s-provisioner%20) if your issue is not listed there then you can move to the next step.
-    - If you encounter any issue/bug or have feature request then raise an issue in [openebs/openebs](https://github.com/openebs/openebs/issues) and label it as `area/volume-provisioning` & `repo/k8s-provisioner`.
+    - If you encounter any issue/bug or have feature request then raise an issue in [openebs/openebs](https://github.com/openebs/openebs/issues) and label it as `area/volume-provisioning` & `repo/k8s-provisioner`
 
 ### Create your development branch
    - Fork the [kubernetes-incubator/external-storage](https://github.com/kubernetes-incubator/external-storage) repository.
@@ -28,7 +28,7 @@ Some general guidelines when submitting issues for OpenEBS volume provisioner:
    - Once the PR is accepted, close the branch.
 
 ### Sync openebs/external-storage repository
-   - You can remove to `openebs/external-storage` maintainer/owners to synchronize the `openebs/external-storage` repository.
+   - You can request to `openebs/external-storage` maintainer/owners to synchronize the `openebs/external-storage` repository.
    - Your changes will appear in `openebs/external-storage` once it is synced.
 
 # Git cheat sheet:
