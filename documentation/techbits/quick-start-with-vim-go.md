@@ -1,6 +1,6 @@
 # Setting up vim-go on Ubuntu 16.06
 
-## Pre-requisites
+### Pre-requisites
 
 Let us assume that you already have a working go environment. You to make sure that your $GOPATH/bin is included in your PATH.
 
@@ -10,7 +10,7 @@ sudo apt-get install vim
 ```
 
 
-## Install and setup vim-go
+### Install and setup vim-go
 
 The following link has a pretty detailed instructions on setting up vim-go and using the shortcuts. 
 - https://github.com/fatih/vim-go-tutorial#quick-setup
@@ -46,7 +46,7 @@ Now run the following in the same vim editor:
 You should see the dependent go binaries downloaded and installed in your GOPATH/bin
 
 
-## Using vim-go
+### Using vim-go
 
 The vim-go repository provides a large number of additional plugins and shortcuts that can be added to the .vimrc. However, with the default .vimrc use above you can already get going:
 - Initiate the build ":GoBuild"
