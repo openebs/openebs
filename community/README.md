@@ -1,6 +1,6 @@
 # Welcome to OpenEBS Community
 
-This is a meta-repository for OpenEBS. Here, you will find links to various artifacts related to documentation, e2e tests and code related to building and deploying OpenEBS.
+This is a meta-repository for OpenEBS. Here, you will find links to various artifacts related to documentation, e2e tests, and code related to building and deploying OpenEBS.
 
 Nevertheless, below find a list of many general channels, groups and meetings devoted to OpenEBS.
 
@@ -8,7 +8,7 @@ Nevertheless, below find a list of many general channels, groups and meetings de
 
 - [Slack](https://slack.openebs.io) - Sign Up.
 
-- [Blog](https://blog.openebs.io) - Blogs on Containerized Storage and DEVOPS.
+- [Blog](https://blog.openebs.io) - Blogs on Containerized Storage, and DevOps.
 
 - [Twitter](https://twitter.com/openebs) - Follow.
 
@@ -35,7 +35,7 @@ If that doesn't answer your questions, or if you think you found a bug, please [
 
 ## Weekly Meeting
 
-We have weekly contributor meeting every Friday at 10am Indian Standard Time over [Zoom](https://zoom.us/j/438333946).
+We have weekly contributor meeting every Friday at 10 am Indian Standard Time over [Zoom](https://zoom.us/j/438333946).
 
 To add this event to your calendar, please send a mail to nisanta.sahoo@openebs.io or use the following [public event link](https://calendar.google.com/calendar/embed?src=openebs%40gmail.com&ctz=Asia%2FCalcutta).
 

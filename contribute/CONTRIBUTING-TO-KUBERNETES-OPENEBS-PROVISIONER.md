@@ -32,7 +32,7 @@ Some general guidelines when submitting issues for OpenEBS volume provisioner:
    - Your changes will appear in `openebs/external-storage` once it is synced.
 
 # Git cheat sheet:
-Fork the `kubernetes-incubator/external-storage` repository  into your account $user as referred in the following instructions.
+Fork the `kubernetes-incubator/external-storage` repository into your account $user as referred in the following instructions.
 
 ### Setting up Development Environment for OpenEBS volume provisioner
 
@@ -43,10 +43,10 @@ cd $working_dir
 
 ```
 
-Set `user` to match your github profile name:
+Set `user` to match your Github profile name:
 
 ```
-user={your github profile name}
+user={your Github profile name}
 ```
 
 ### Clone your repo 
@@ -94,7 +94,7 @@ git push origin <branch-name>  #After this changes will appear in your $user/ext
 ### Create pull request to `kubernetes-incubator/external-storage`
 
 Once above procedure is followed, you will see your changes in branch `<branch-name>` of `$user/external-storage` on Github. You can create a PR at `kubernetes-incubator/external-storage`. 
-You can add label `area/openebs` to your PR by commenting `/area openebs` in the comment section of your PR. 
+You can add the label `area/openebs` to your PR by commenting `/area openebs` in the comment section of your PR. 
 
 ### Fetching latest changes to `openebs/external-storage`
 Once, PR is merged in `kubernetes-incubator/external-storage`, ask one of the OpenEBS owner to fetch latest changes to `openebs/external-storage`.

@@ -9,10 +9,10 @@ mkdir -p $working_dir
 cd $working_dir
 ```
 
-Set `user` to match your github profile name:
+Set `user` to match your Github profile name:
 
 ```
-user={your github profile name}
+user={your Github profile name}
 ```
 
 ## The steps mentioned here are w.r.t contribution towards openebs/openebs project
@@ -66,8 +66,8 @@ git branch -d <branch_name>
 ```
 
 ## Writing a Unit Test
-Though it is important to write unit tests, do not try to achive 100% code coverage if it complicates writing these tests. If a unit test is simple to write & understand, most probably it will be extended when new code gets added. However, reverse will lead to its removal on the whole. In other words, complicated unit tests will lead to decrease in the overall coverage in the long run.
+Though it is important to write unit tests, do not try to achieve 100% code coverage if it complicates writing these tests. If a unit test is simple to write & understand, most probably it will be extended when new code gets added. However, the reverse will lead to its removal on the whole. In other words, complicated unit tests will lead to decrease in the overall coverage in the long run.
 
-OpenEBS being an OpenSource project will always try to experiment new ideas and concepts. Hence, writing unit tests will provide the necessary checklist that reduces the scope for errors.
+OpenEBS being an OpenSource project will always try to experiment with new ideas and concepts. Hence, writing unit tests will provide the necessary checklist that reduces the scope for errors.
 
 Go back to [**Contributing to OpenEBS**](./CONTRIBUTING.md).

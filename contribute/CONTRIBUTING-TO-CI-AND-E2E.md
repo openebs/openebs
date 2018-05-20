@@ -1,15 +1,16 @@
 ## INTRODUCTION TO OPENEBS E2E
 
-OpenEBS e2e is focused on workload simulation and application deployment on OpenEBS storage, predominantly in a Kubernetes environment. In its current state, it includes application workflow tests, basic compliance and resiliency tests. 
-The scope of the said tests is expected to evolve over time to include performance and security tests as well. 
-e2e is mostly written in Ansible, that is, as Ansible playbooks with docker used for test images (these include standard 
-application images from dockerhub as well as custom-built images stored in openebs/test-storage). Since the tests are performed  in a Kubernetes environment, the test images are typically deployed as "pods" and "jobs". Therefore they are accompanied by the respective YAML specification files.
+OpenEBS e2e is focused on workload simulation and application deployment on OpenEBS storage, predominantly in a Kubernetes environment. In its current state, it includes application workflow tests, basic compliance and resiliency tests. The scope of the said tests is expected to evolve over time to include performance and security tests as well.
+ 
+E2e is mostly written in Ansible, that is, as Ansible playbooks with docker used for test images (these include standard application images from dockerhub as well as custom-built images stored in openebs/test-storage). 
+
+Since the tests are performed in a Kubernetes environment, the test images are typically deployed as "pods" and "jobs". Therefore they are accompanied by the respective YAML specification files.
 
 ## BUILDING BLOCKS OF OPENEBS CI
 
 OpenEBS Continuous Integration (CI) has two distinct parts:
 
-- Travis is used to run unit tests, build code and push images to dockerhub (in case of repositories where image is the build artifact).
+- Travis is used to run unit tests, build code and push images to dockerhub (in case of repositories where the image is the build artifact).
 - Jenkins pulls these images, creates the Kubernetes-based test environment and executes e2e. It is also used to run tests on commits that change application specifications or OpenEBS Kubernetes deployment specifications.
 
 While you can run OpenEBS e2e as a standalone suite, the priority is to run them on commits done on the core OpenEBS Github repositories such as openebs/openebs, openebs/mayaserver, openebs/jiva. This part of the continuous integration is built around a dedicated Jenkins server. On detecting commits via a polling mechanism, Jenkins launches VMs using Vagrant and runs the Ansible playbooks to setup the environment and execute e2e tests. The openebs/e2e project focuses on this part of the CI.
@@ -20,7 +21,7 @@ The following schema illustrates the workflow:-
 
 ## CONTRIBUTING TO E2E and OPENEBS CI 
 
-Contributions are welcome!!  Before starting, reading of the project documentation at [https://docs.openebs.io/](https://docs.openebs.io/) is highly recommended. Please raise a Github issue for any questions you may have on the project in general or e2e or CI in particular.
+Contributions are welcome!!  Before starting, read the project documentation at [https://docs.openebs.io/](https://docs.openebs.io/) is highly recommended. Please raise a Github issue for any questions you may have on the project in general or e2e or CI in particular.
 You can post questions on the OpenEBS [slack channel](http://slack.openebs.io/) too.
 
 You could contribute to any of the following areas: 
@@ -51,7 +52,7 @@ To add new applications to e2e, please consider the points made here, if applica
 - https://www.mirantis.com/blog/introduction-to-yaml-creating-a-kubernetes-deployment/
 - https://kubernetes.io/docs/tutorials/stateful-application/basic-stateful-set/
 
-These can be placed here : https://github.com/openebs/openebs/tree/master/k8s/demo
+These can be placed here: https://github.com/openebs/openebs/tree/master/k8s/demo
 
 ### Create Ansible playbooks to execute test workflows
 
@@ -90,7 +91,7 @@ The Jenkins configuration used to setup OpenEBS e2e can be found [here](https://
 
 ### Raise or fix issues on the e2e, CI documentation
 
-Getting Documentation Right is Hard! Please raise a PR with you proposed changes to the READMEs, tutorials, and deployment guides in openebs/e2e.
+Getting Documentation Right is Hard! Please raise a PR with your proposed changes to the READMEs, tutorials, and deployment guides in openebs/e2e.
 
 If you need any help with git, refer to this [cheat sheet](./git-cheatsheet.md).
 Go back to [**Contributing to OpenEBS**](../CONTRIBUTING.md).
