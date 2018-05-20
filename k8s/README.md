@@ -6,7 +6,6 @@ If this is your first time to Kubernetes, please go through these introductory t
 - https://www.udacity.com/course/scalable-microservices-with-kubernetes--ud615
 - https://kubernetes.io/docs/tutorials/kubernetes-basics/
 
-
 ## Usage
 
 ### Enable OpenEBS on K8s

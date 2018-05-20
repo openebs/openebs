@@ -1,9 +1,9 @@
 # List of labels for issues and PRs on OpenEBS Project
 
-This document provides list of labels and their purpose. These labels can be attached to issues and PRs. Aim behind having such list of labels is, we can sort and distinguish issues. This list will help new community members to dive-in OpenEBS if they wish to contribute to project or investigate the problem.
+This document provides a list of labels and their purpose. These labels can be attached to issues and PRs. The aim behind having such list of labels is, we can sort and distinguish issues. This list will help new community members to dive-in OpenEBS if they wish to contribute to project or investigate the problem.
 
 Use case:
-> I am beginner, I want to contribute to OpenEBS project and I am not sure from where to begin?
+> I am a beginner, I want to contribute to OpenEBS project and I am not sure from where to begin?
 
 Answer:
 >Start looking into the issues tagged with labels such as `help/small` , `size/XS`, `kind/unit-test` etc. Solve such issues and raise PR.
@@ -22,7 +22,7 @@ Labels prefixed with *kind* indicate the type of issue and PR. Suppose, you want
 | kind/improve | Needs improvement |
 | kind/e2e-test | Need/Add end to end test |
 | kind/unit-test | Need/Add Unit test|
-| kind/security  | Security related concerns  |
+| kind/security  | Security-related concerns  |
 | kind/testing  |  Needs/Adds tests |
 
 ---
@@ -34,7 +34,7 @@ Labels prefixed with *help* implies that issue needs some help from community/us
 | Label | Description |
 |---|---|
 | help/small  | Need small help on docs (beginner level)|
-| help/medium | Need help to fix code ( Intermediate level) |
+| help/medium | Need help to fix the code ( Intermediate level) |
 | help/large | Need help on design changes and code review (Expert level) |
 
 ---
@@ -70,7 +70,7 @@ Labels prefixed with *size* defines the size of change done in particular PR.
 #### NOTE:
 
 ```
-Please do not club major changes into single PR. It'll be difficult for reviewer to review big PR. In that case, reviewer may discard your PR and will ask you create multiple PRs.
+Please do not club major changes into single PR. It'll be difficult for a reviewer to review a big PR. In that case, reviewer may discard your PR and will ask you create multiple PRs.
 ```
 
 ---
@@ -81,16 +81,16 @@ Labels with prefix *priority* defines the severity of the issue. Severity level 
 
 | Label | Description |
 |---|---|
-| priority/0 | Urgent : Must be fixed in the next build |
-| priority/1 | High  : Must be fixed in any of the upcoming builds but should be included in the release. |
-| priority/2 | Medium: May be fixed after the release / in the next release |
-| priority/3 | Low: May or may not be fixed at all |
+| priority/0 | Urgent: Must be fixed in the next build. |
+| priority/1 | High: Must be fixed in any of the upcoming builds but should be included in the release. |
+| priority/2 | Medium: Maybe fixed after the release / in the next release. |
+| priority/3 | Low: May or may not be fixed at all. |
 
 ---
 
 ### Repo
 
-Labels with prefix *repo* points the repository where given issue needs to be fixed. If users have no idea where to file the issue then they can file issue in `openebs/openebs` later OpenEBS contributors/authors/owners will tag issue with appropriate repository using *repo* label.
+Labels with prefix *repo* points the repository where given issue needs to be fixed. If users have no idea where to file the issue then they can file a issue in `openebs/openebs` later OpenEBS contributors/authors/owners will tag issue with the appropriate repository using *repo* label.
 
 | Label | Description |
 |---|---|
@@ -103,7 +103,7 @@ Labels with prefix *repo* points the repository where given issue needs to be fi
 
 ### General
 
-As name suggests, this contains general category labels and they are self explanatory.
+As the name suggests, this contains general category labels and they are self-explanatory.
 
 | Label | Description |
 |---|---|
