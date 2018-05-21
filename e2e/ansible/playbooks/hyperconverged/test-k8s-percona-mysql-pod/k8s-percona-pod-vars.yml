@@ -30,3 +30,7 @@ pip_packages:
   - 'docker-py==1.9.0'
 
 mysql_load_duration: 120
+
+namespace: percona-mysql-test
+
+utils_path: openebs/e2e/ansible/playbooks/utils
