@@ -29,7 +29,7 @@ spec:
           mountPath: /dev     
         - name: tmp
           mountPath: /tmp
-          mountPropagation: Bidirectional
+#         mountPropagation: Bidirectional
         lifecycle:
           postStart:
             exec:
@@ -46,10 +46,10 @@ spec:
           mountPath: /dev
         - name: tmp
           mountPath: /tmp
-          mountPropagation: Bidirectional
+#          mountPropagation: Bidirectional
         env:
         - name: cstorid
-          value: "878c7a8d-5cf2-11e8-b0f5-54e1ad4a9dd4"
+          value: "9368bb1c-5cfc-11e8-b6fb-54e1ad4a9dd4"
 
         lifecycle:
           postStart:

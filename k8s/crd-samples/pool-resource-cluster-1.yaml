@@ -8,7 +8,7 @@ metadata:
   finalizers: ["openebs"]
 spec:
   disks:
-   diskList: ["/tmp/img1.img"]
+   diskList: ["/dev/sdb1"]
   poolSpec:
    cacheFile: /tmp/pool1.cache
    poolType: striped
