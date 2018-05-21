@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
       - name: cstor-pool
-        image: openebs/cstor-main:ci
+        image: openebs/cstor-pool:ci
         ports:
         - containerPort: 80
         securityContext: 
@@ -30,9 +30,13 @@ spec:
         - name: tmp
           mountPath: /tmp
           mountPropagation: Bidirectional
+        lifecycle:
+          postStart:
+            exec:
+              command: ["/bin/sh", "-c", "sleep 15"]
 
       - name:    cstor-pool-mgmt
-        image: openebs/cstor-pool-mgmt:ci
+        image: gkganeshr/cstor-pool-mgmt:v1
         ports:
         - containerPort: 80
         securityContext: 
@@ -43,6 +47,14 @@ spec:
         - name: tmp
           mountPath: /tmp
           mountPropagation: Bidirectional
+        env:
+        - name: cstorid
+          value: "878c7a8d-5cf2-11e8-b0f5-54e1ad4a9dd4"
+
+        lifecycle:
+          postStart:
+            exec:
+              command: ["/bin/sh", "-c", "sleep 15"]
 
       volumes:
       - name: device
@@ -53,5 +65,5 @@ spec:
           type: Directory
       - name: tmp
         hostPath:
-          path: /tmp
+          path: /var/openebs/shared-a2b
           type: Directory
