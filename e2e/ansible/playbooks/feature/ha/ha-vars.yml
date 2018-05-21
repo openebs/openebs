@@ -11,8 +11,9 @@ pod_yaml_alias: demo-percona-mysql-pvc.yaml
 
 deb_packages:
   - mysql-client
+             
+namespace: ha-name
 
+utils_path: openebs/e2e/ansible/playbooks/utils 
 
-
-
-
+app: percona
