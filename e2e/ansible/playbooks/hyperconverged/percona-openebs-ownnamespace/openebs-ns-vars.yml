@@ -7,6 +7,7 @@ openebs_operator_alias: openebs-operator.yaml
 
 openebs_storageclass: openebs-storageclasses.yaml
 
+utils_path: openebs/e2e/ansible/playbooks/utils
 
 openebs_storageclasses_link: https://raw.githubusercontent.com/openebs/openebs/master/k8s/openebs-storageclasses.yaml
 
@@ -43,4 +44,4 @@ test_artifacts:
    - demo-percona-mysql-pvc.yaml
    - openebs-operator-ns-openebs.yaml
 
-
+namespace: percona-app
