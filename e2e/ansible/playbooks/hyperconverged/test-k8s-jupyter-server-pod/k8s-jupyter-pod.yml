@@ -20,33 +20,19 @@
 
    - block:
 
-       - name: 1) Get $HOME of K8s master for kubernetes user
-         shell: source ~/.profile; echo $HOME
-         args:
-           executable: /bin/bash
-         register: result_kube_home
-         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+       - include: k8s-jupyter-pod-prereq.yml
 
-       - name: 2) Download YAML for jupyter notebook server plugin
-         get_url:
+       - name: a) Download YAML for jupyter notebook server plugin
+         include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/get_url.yml"
+         vars:
            url: "{{ jupyter_plugin_link }}"
            dest: "{{ result_kube_home.stdout }}/{{ pod_yaml_alias }}"
-           force: yes
-         register: result
-         until:  "'OK' in result.msg"
-         delay: 5
-         retries: 3
-         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
        - name: 2b) Check whether maya-apiserver is deployed
-         shell: source ~/.profile; kubectl get pods | grep maya-apiserver
-         args:
-           executable: /bin/bash
-         register: result
-         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-         until: "'Running' in result.stdout"
-         delay: 120
-         retries: 5
+         include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
+         vars:
+            ns: openebs
+            app: maya-api
 
        - name: 2c) Replace volume size in plugin YAML
          lineinfile:
@@ -56,20 +42,16 @@
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
        - name: 3) Deploy jupyter notebook server pod
-         shell: source ~/.profile; kubectl create -f {{ pod_yaml_alias }}
-         args:
-           executable: /bin/bash
-         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+         include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_task.yml"
+         vars:
+           app_yml: "{{ pod_yaml_alias }}"
+           ns: default
 
        - name: 4) Confirm pod status is running
-         shell: source ~/.profile; kubectl get pods | grep jupyter
-         args:
-           executable: /bin/bash
-         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-         register: result
-         until: "'jupyter' and 'Running' in result.stdout"
-         delay: 120
-         retries: 15
+         include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
+         vars:
+            ns: default
+            app: jupyter
 
        - name: 5) Verify that the jupyter notebook server is a cluster service
          shell: source ~/.profile; kubectl get svc
@@ -79,24 +61,40 @@
          register: result_service
          failed_when: "'jupyter-service' not in result_service.stdout"
 
-       - name: setting flag if pass
+       - name: Test Passed
          set_fact:
-           flag: "Pass"
+           flag: "Test Passed"
 
      rescue:
-       - name: setting flag if fail
+       - name: Test Failed
          set_fact:
-           flag: "Fail"
+           flag: "Test Failed"
 
      always:
+       - block:
 
-       - name: 6) Cleaning up the test artifacts
-         include: k8s-jupyter-pod-cleanup.yml
-         when: clean | bool
+           - include: k8s-jupyter-pod-cleanup.yml
 
-       - name: Send slack notification
-         slack:
-           token: "{{ lookup('env','SLACK_TOKEN') }}"
-           msg: '{{ ansible_date_time.time }} TEST: {{test_name}}, RESULT: {{ flag }}'
-         when: slack_notify | bool and lookup('env','SLACK_TOKEN')
+           - name: Test Cleanup Passed
+             set_fact:
+               cflag: "Cleanup Passed"
+
+         rescue:
+           - name: Test Cleanup Failed
+             set_fact:
+               cflag: "Cleanup Failed"
+
+         always:
+
+           - name: 5) Terminate the log aggregator
+             shell: source ~/.profile; killall stern
+             args:
+               executable: /bin/bash
+             delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+           - name: Send slack notification
+             slack:
+               token: "{{ lookup('env','SLACK_TOKEN') }}"
+               msg: '{{ ansible_date_time.time }} TEST: {{test_name}}, RESULT: {{ flag }},{{ cflag }}'
+             when: slack_notify | bool and lookup('env','SLACK_TOKEN')
 

@@ -1,6 +1,6 @@
 ---
 - name: Get pvc name to verify successful pvc deletion
-  shell: source ~/.profile; kubectl get pvc | grep {{ volume_claim }} | awk {'print $3'}
+  shell: source ~/.profile; kubectl get pvc -n | grep {{ volume_claim }} | awk {'print $3'}
   args:
     executable: /bin/bash
   delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
@@ -8,25 +8,19 @@
   changed_when: true
 
 - name: Delete jupyter server pod
-  shell: source ~/.profile; kubectl delete -f {{ pod_yaml_alias }}
-  args:
-    executable: /bin/bash
-  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-  changed_when: true
+  include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/delete_deploy.yml"
+  vars:
+    ns: default
+    app_yml: "{{ pod_yaml_alias }}"
 
 - name: Confirm jupyter pod has been deleted
-  shell: source ~/.profile; kubectl get pods
-  args:
-    executable: /bin/bash
-  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-  register: result
-  until: "'jupyter' not in result.stdout"
-  delay: 120
-  retries: 6
-  changed_when: true
+  include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/delete_deploy_check.yml"
+  vars:
+    ns: default
+    app: jupyter
 
 - name: Confirm pvc pod has been deleted
-  shell: source ~/.profile; kubectl get pods | grep {{ pvc.stdout }}
+  shell: source ~/.profile; kubectl get pods -n | grep {{ pvc.stdout }}
   args:
     executable: /bin/bash
   delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
