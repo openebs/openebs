@@ -12,5 +12,7 @@ test_list: run-tests.out
 deb_packages:
   - libiscsi-bin
   
+namespace: libiscsi-test
 
+utils_path: openebs/e2e/ansible/playbooks/utils
 

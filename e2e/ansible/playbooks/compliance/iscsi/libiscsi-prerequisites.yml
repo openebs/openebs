@@ -1,8 +1,10 @@
 ---
-- name: Run apt-get update via shell
-  shell: apt-get update
+- name: Run apt-get update 
+  apt: >
+    update_cache=yes
+    cache_valid_time=3600
   become: true
-  delegate_to: "{{ groups['kubernetes-kubeminions'].0 }}"
+  delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
   ignore_errors: true
 
 - name: Install libiscsi on K8S-minion
@@ -10,3 +12,24 @@
   become: true
   with_items: "{{ deb_packages }}"
   delegate_to: "{{ groups['kubernetes-kubeminions'].0 }}"
+  tags:
+   - skip_ansible_lint
+
+- name: Get $HOME of K8s master for kubernetes user
+  shell: source ~/.profile; echo $HOME
+  args:
+    executable: /bin/bash
+  register: result_kube_home
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+  changed_when: true
+
+- name: Start the log aggregator to capture test pod logs
+  shell: >
+    source ~/.profile;
+    nohup stern "{{test_pod_regex}}" --since 1m > "{{result_kube_home.stdout}}/{{test_log_path}}" &
+  args:
+    executable: /bin/bash
+  become: true
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+  changed_when: true
+
