@@ -2,12 +2,12 @@
 
 OpenEBS is an open source storage platform delivering containerized block storage for containers. 
 
-Yes! The storage controller functionality is itself, delivered as containers. An OpenEBS Volume comprises of one or more containers working as a clustered microservice, providing block storage to other containers. This micro-services based architecture for storage controller functionality - where data for each volume is served by its own set of containers as against a single monolithic storage controller serving multiple volumes. This is what differentiates OpenEBS from traditional storage appliances..
+Yes! The storage controller functionality is itself, delivered as containers. An OpenEBS Volume comprises of one or more containers working as a clustered microservice, providing block storage to other containers. This is a micro-services based architecture for storage controller functionality - where data for each volume is served by its own set of containers as against a single monolithic storage controller serving multiple volumes. This is what differentiates OpenEBS from traditional storage appliances.
 
 OpenEBS Storage Controller functionality comprises of several micro-services (or containers) that can be classified into two broad categories: 
 - OpenEBS Data Plane - that serves the data to the applications and 
 - OpenEBS Control Plane - that manages the OpenEBS Volume Containers
-If you notice this classification, resembling a typical Container Orchestrator (CO), it is because OpenEBS Volumes are delivered through containers and these containers are better managed by COs! Hence OpenEBS Control Plane services work in conjunction with the CO - schedulers, apiserver, and so on.
+Hence, If you notice this classification, resembling a typical Container Orchestrator (CO), it is because OpenEBS Volumes are delivered through containers and these containers are better managed by COs! Hence OpenEBS Control Plane services work in conjunction with the CO - schedulers, apiserver, and so on.
  
 ## OpenEBS Volume Container (aka jiva, aka data plane)
 
@@ -17,7 +17,7 @@ If you notice this classification, resembling a typical Container Orchestrator (
 
 OpenEBS Volumes provide persistent storage for containers, with resiliency against system failures, faster access to the storage, snapshot and backup capabilities. In addition, it provides a mechanism for monitoring the usage and enforcing QoS policies. 
 
-The Disks where data is persisted are called as *Storage Backends*, which can be either host directories, attached block devices or remote disks. Each OpenEBS Volume comprises of an iSCSI Target Container (represented as openebs-vol1 in the above diagram) and one or more Replica Containers (openebs-vol1-R1 and openebs-vol1-R2).
+The Disks where data is persisted are called as *Storage Backends*, which can be either host directories, attached block devices or remote disks. Each OpenEBS Volume comprises of an iSCSI Target Container (represented as openebs-vol1 in the above diagram) and one or more Replicas Containers (openebs-vol1-R1 and openebs-vol1-R2).
 
 The application pods will access the storage via the iSCSI Target Container, which replicates the data to all its replica's. In the event of node failure, the iSCSI Target Container starts on one of the remaining online nodes and will serve the data by connecting to the available Replica containers.
 
@@ -44,9 +44,9 @@ OpenEBS Control Plane is also delivered as micro-services, where the services bu
 - Node Services provides OpenEBS specific storage intelligence running along-side kubelet like:
   - Maya-agent - includes storage management functionality 
 
-Monitoring and Tracing capabilities are added by instrumenting the above services with prometheus, heapster, grafana, and jaegar. 
+Monitoring and tracing capabilities are added by instrumenting the above services with Prometheus, Grafana, and Jaegar. 
 
-*Note: In case of K8s, the monitoring aspects like heapster can be changed in future, depending on the outcome from sig-instrumention design proposals*
+*Note: In case of K8s, the monitoring aspects like heapster can be changed in future, depending on the outcome from sig-instrumentation design proposals*
 
 ### Source Code
 
