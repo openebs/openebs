@@ -47,7 +47,7 @@ We are approaching beta stage with active development underway. See our [Project
  
 ## Contributing
  
-We welcome your feedback and contributions in any form possible.
+OpenEBS welcomes your feedback and contributions in any form possible.
  
 - Join us at [Slack](https://openebsslacksignup.herokuapp.com/)
   - Already signed up? Head to our discussions at [#openebs-users](https://openebs-community.slack.com/messages/openebs-users/)
@@ -71,5 +71,5 @@ Please start with the pinned repositories or with [OpenEBS Architecture](./contr
 
 ## License
 
-OpenEBS is developed under Apache 2.0 License at the project level. 
+OpenEBS is developed under Apache 2.0 license at the project level. 
 Some components of the project are derived from other open source projects like Nomad, Longhorn and are distributed under their respective licenses. 
