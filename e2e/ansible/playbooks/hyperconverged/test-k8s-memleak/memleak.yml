@@ -144,7 +144,7 @@
            delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
 
          - name: 9) Run python script for memory usage validation it takes couple of minutes
-           shell: python test-mem.py
+           shell: python test-mem.py {{ namespace }}
            delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
            register: result
            failed_when: "'Pass' not in result.stdout"
