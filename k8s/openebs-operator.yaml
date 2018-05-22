@@ -162,10 +162,10 @@ spec:
         - name: MAYA_PORTAL_URL
           value: "https://mayaonline.io/"
 ---
+apiVersion: apps/v1beta1
 kind: Deployment
-apiVersion: extensions/v1beta1
 metadata:
-  name: snapshot-controller
+  name: openebs-snapshot-controller
   namespace: default
 spec:
   replicas: 1
@@ -174,7 +174,7 @@ spec:
   template:
     metadata:
       labels:
-        app: snapshot-controller
+        app: openebs-snapshot-controller
     spec:
       serviceAccountName: openebs-maya-operator
       containers:
