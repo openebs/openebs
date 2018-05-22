@@ -1,5 +1,5 @@
 # test-disk-failure.yaml
-
+# Author: nsathyaseelan
 # Description: Include resiliency test suite in OpenEBS e2e (Test: disk failure)
 
 ###############################################################################################
@@ -9,11 +9,11 @@
 #3. Create Storage classes with the newly added storage pool path.
 #4. Deploy Percona application.
 #5. Failing the additional disk in node.
-#6. Verify replica pod stays in 'Pending'.
+#6. Verify replica pod status.
 #7. List the scsi hosts and Rescan the disk.
 #8. Get the disk name by using UUID.
 #9. Remount the Disk with the same Mount Point.
-#10 Verify replica pod is scheduled and Running .
+#10 Verify replica pod is scheduled and Running.
 #11 Perform cleanup of test artifacts.
 ###############################################################################################
 
@@ -25,15 +25,16 @@
   tasks:
    - block:
 
-       - include: test-disk-failure-prereq.yml
+       - name: 1) Install the prerequisites
+         include: test-disk-failure-prereq.yml
 
-       - name: Check status of maya-api server
+       - name: 2) Check status of maya-api server
          include_tasks: "{{ ansible_env.HOME }}/{{utils_path}}/deploy_check.yml"
          vars:
            ns: openebs
            app: maya-api
 
-       - name: Get the disk name by using UUID
+       - name: 3) Get the disk name by using UUID
          shell: blkid | grep {{ uuid }} | awk '{print $1}' | cut -d "/" -f3 | cut -d ":" -f1
          args:
            executable: /bin/bash
@@ -41,7 +42,7 @@
          register: result_disk
          delegate_to: "{{ groups['kubernetes-kubeminions'].0 }}"
 
-       - name: Get the Mount point of the disk using UUID
+       - name: 3a) Get the Mount point of the disk using UUID
          shell: lsblk -f | grep {{ uuid }} | awk '{print $4}'
          args:
            executable: /bin/bash
@@ -49,47 +50,47 @@
          register: result_mountpoint
          delegate_to: "{{ groups['kubernetes-kubeminions'].0 }}"
 
-       - name: Obtaining the storage pool creation yaml file
+       - name: 4) Obtaining the storage pool creation yaml file
          get_url:
            url: "{{ storage_pool_link }}"
            dest: "{{ result_kube_home.stdout }}"
          register: result_storagepool
          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
 
-       - name: Replace storage pool name with test parameters
+       - name: 4a) Replace storage pool name with test parameters
          include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/regex_task.yml"
          vars:
            path: "{{ result_kube_home.stdout }}/storage-pool-path_creation.yml"
            regex1: "{{replace_item}}"
            regex2: "{{replace_with}}"
 
-       - name: Create the Namespace
+       - name: 5) Create the Namespace
          shell: kubectl create ns {{ namespace }}
          args:
            executable: /bin/bash
          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
 
-       - name: Create the storage pool path
+       - name: 6) Create the storage pool path
          shell: source ~/.profile; kubectl apply -f storage-pool-path_creation.yml  -n {{ namespace }}
          args:
            executable: /bin/bash
          register: result_sp_path
          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
 
-       - name: Obtaining storage classes yaml
+       - name: 7) Obtaining storage classes yaml
          shell: kubectl get sc openebs-percona -o yaml > "{{ create_sc }}"
          args:
            executable: /bin/bash
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
-       - name: Replace storage class file with test parameters
+       - name: 7a) Replace storage class file with test parameters
          replace:
            path: "{{ result_kube_home.stdout }}/{{ create_sc }}"
            regexp: 'openebs.io/storage-pool: default'
            replace: 'openebs.io/storage-pool: disk'
          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
 
-       - name:  Delete the existing storage class and create new one
+       - name:  7b) Delete the existing storage class and create new one
          shell: kubectl delete sc openebs-percona; kubectl apply -f "{{ create_sc }}"
          args:
            executable: /bin/bash
@@ -99,58 +100,58 @@
          retries: 5
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
-       - name: Obtain the sql test script file
+       - name: 8) Obtain the sql test script file
          get_url:
            url: "{{ sql_test_link }}"
            dest: "{{ result_kube_home.stdout }}"
          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
 
-       - name: Create the configmap test
-         shell: kubectl create configmap sqltest --from-file=sql-test.sh -n {{ namespace }}
+       - name: 8a) Create the configmap test
+         command: kubectl create configmap sqltest --from-file=sql-test.sh -n {{ namespace }}
          args:
            executable: /bin/bash
          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
 
-       - name: Obtaining the percona liveliness application yaml
+       - name: 9) Obtaining the percona liveliness application yaml
          get_url:
            url: "{{ percona_link }}"
            dest: "{{ result_kube_home.stdout }}"
          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
 
-       - name: Create percona deployment with OpenEBS storage
+       - name: 9a) Create percona deployment with OpenEBS storage
          include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_task.yml"
          vars:
            app_yml: "{{ percona_files.0 }}"
            ns: {{ namespace }}
 
-       - name: Check whether percona application is running
+       - name: 9b) Check whether percona application is running
          include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
          vars:
            app: percona
            ns: {{ namespace }}
 
-       - name: Check Replica pod status
+       - name: 9c) Check Replica pod status
          include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
          vars:
            app: pvc
            ns: {{ namespace }}
 
-       - name: Failing the additional disk
+       - name: 10) Failing the additional disk
          shell: echo 1 > /sys/block/{{ result_disk.stdout }}/device/delete
          args:
            executable: /bin/bash
          become: true
          delegate_to: "{{ groups['kubernetes-kubeminions'].0 }}"
 
-       - name: List the available scsi host
-         shell: ls /sys/class/scsi_host/
+       - name: 11) List the available scsi host
+         command: ls /sys/class/scsi_host/
          args:
            executable: /bin/bash
          become: true
          register: result_host
          delegate_to: "{{ groups['kubernetes-kubeminions'].0 }}"
 
-       - name: Rescan the disk
+       - name: 11a) Rescan the disk
          shell: echo "- - -" > /sys/class/scsi_host/{{ item }}/scan
          args:
            executable: /bin/bash
@@ -158,7 +159,7 @@
          with_items: "{{ result_host.stdout_lines }}"
          delegate_to: "{{ groups['kubernetes-kubeminions'].0 }}"
 
-       - name: Get the disk name by using UUID
+       - name: 11b) Get the disk name using UUID
          shell: blkid | grep {{ uuid }} | awk '{print $1}' | cut -d "/" -f3 | cut -d ":" -f1
          args:
            executable: /bin/bash
@@ -166,36 +167,48 @@
          register: result_scan_disk
          delegate_to: "{{ groups['kubernetes-kubeminions'].0 }}"
 
-       - name: Remount the disk
+       - name: 12) Remount the disk
          shell: mount /dev/{{ result_scan_disk.stdout }} {{ result_mountpoint.stdout }}
          args:
            executable: /bin/bash
          become: true
          delegate_to: "{{ groups['kubernetes-kubeminions'].0 }}"
+         tags:
+         - skip_ansible_lint
 
-       - name: Check Replica pod status
+       - name: 13) Check Replica pod status
          include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
          vars:
            app: pvc
            ns: {{ namespace }}
+           
+       - name: Test Passed
+         set_fact:
+           flag: "Test Passed"
+
+     rescue:
+       - name: Test Failed
+         set_fact:
+           flag: "Test Failed"
 
      always:
        - block:
 
-           - include: test-disk-failure-cleanup.yml
+           - name: 14) Cleaning up the test artifacts 
+             include: test-disk-failure-cleanup.yml
 
            - name: Test Cleanup Passed
              set_fact:
-               cflag: cleanup_pass
+               cflag: "Cleanup Passed"
 
          rescue:
            - name: Test Cleanup Failed
              set_fact:
-               cflag: cleanup_fail
+               cflag: "Cleanup Failed"
 
          always:
 
-           - name: Terminate the log aggregator
+           - name: 15) Terminate the log aggregator
              shell: source ~/.profile; killall stern
              args:
                executable: /bin/bash
@@ -205,5 +218,4 @@
              slack:
                token: "{{ lookup('env','SLACK_TOKEN') }}"
                msg: '{{ ansible_date_time.time }} TEST: {{test_name}}, RESULT: {{ flag }}, {{ cflag }}'
-             when: slack_notify | bool and lookup('env','SLACK_TOKEN')
-                                                                         
+             when: slack_notify | bool and lookup('env','SLACK_TOKEN')                                                                         

@@ -19,7 +19,8 @@
   delay: 30
   retries: 10
   ignore_errors: true
-
+  changed_when: true
+  
 - name: Remove the percona liveness check config map
   shell: source ~/.profile; kubectl delete cm sqltest -n {{ namespace }}
   args:
