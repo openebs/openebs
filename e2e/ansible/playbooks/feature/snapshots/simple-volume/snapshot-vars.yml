@@ -18,6 +18,6 @@ test_data_size: 1
 
 checksum: sha1
 
-ns: openebs
+#ns: openebs
 
 snap_name: quicksnap

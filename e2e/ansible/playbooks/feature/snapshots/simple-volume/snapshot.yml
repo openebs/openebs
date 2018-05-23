@@ -27,11 +27,10 @@
          command: kubectl create ns {{ namespace }}
          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
 
-       - name: Create a storage volume via a pvc
-         shell: source ~/.profile; kubectl apply -f "{{ volume_def }}" -n {{namespace}}
-         args:
-           executable: /bin/bash
-         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+       - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_task.yml"
+         vars:
+           app_yml: "{{ volume_def }}"
+           ns: "{{ namespace }}"
 
        - name: Confirm volume container is running
          shell: >
@@ -263,12 +262,12 @@
 
        - name: Test Passed
          set_fact:
-           flag: "Pass"
+           flag: "Test Passed"
 
      rescue:
        - name: Test Failed
          set_fact:
-           flag: "Fail"
+           flag: "Test Failed"
 
      always:
       - block:
@@ -277,12 +276,12 @@
 
         - name: Test Cleanup Pass
           set_fact:
-            cflag: cleanup_pass
+            cflag: "Cleanup Passed"
 
         rescue:
         - name: Test Cleanup Fail
           set_fact:
-            cflag: cleanup_fail
+            cflag: "Cleanup Failed"
 
         always:
         - name: Terminate the log aggregator
