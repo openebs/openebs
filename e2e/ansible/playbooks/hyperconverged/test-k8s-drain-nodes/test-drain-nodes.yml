@@ -24,13 +24,7 @@
    - block:
 
 
-
-       - name: Get $HOME of K8s master for kubernetes user
-         shell: source {{ profile }}; echo $HOME
-         args:
-           executable: /bin/bash
-         register: result_kube_home
-         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+       - include: pre-requisites.yml
 
        - name: Get the Number of nodes count
          shell: source {{ profile }}; kubectl get nodes | grep 'Ready' | grep 'none' | wc -l
@@ -44,23 +38,12 @@
             node_count: " {{ node_out.stdout}}"
 
 
-       - name: Check whether maya-apiserver pod is deployed
-         shell: source ~/.profile; kubectl get pods --all-namespaces | grep maya-apiserver
-         args:
-           executable: /bin/bash
-         register: result
-         until: "'Running' in result.stdout"
-         delay: 120
-         retries: 5
-         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+       - name: Check status of maya-apiserver
+         include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
+         vars:
+           ns: openebs
+           app: maya-apiserver
 
-       - name: Start the log aggregator to capture test pod logs
-         shell: >
-           source {{ profile }};
-           nohup stern "{{test_pod_regex}}" --since 1m > "{{result_kube_home.stdout}}/{{test_log_path}}" &
-         args:
-           executable: /bin/bash
-         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
        - name: Obtaining storage classes yaml
          shell: kubectl get sc openebs-percona -o yaml > "{{ create_sc }}"
@@ -85,26 +68,28 @@
          retries: 5
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
+       - name: Create namespace to deploy application
+         shell: source ~/.profile; kubectl create ns {{ namespace }}
+         args:
+           executable: /bin/bash
+         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
 
 
        - name: Deploy percona application
-         shell: source {{ profile }}; kubectl apply -f {{ percona_link }}
+         shell: source {{ profile }}; kubectl apply -f {{ percona_link }} -n {{ namespace }}
          args:
            executable: /bin/bash
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
-       - name: Confirm if the percona pod is running
-         shell: source ~/.profile; kubectl get pods --all-namespaces | grep percona
-         args:
-           executable: /bin/bash
-         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-         register: result
-         until: "'percona' and 'Running' in result.stdout"
-         delay: 120
-         retries: 10
+       - name: Check percona pod is running
+         include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
+         vars:
+           ns: "{{namespace}}"
+           app: percona
+
 
        - name: Check if the replica pods are created and running
-         shell: source ~/.profile; kubectl get pods --all-namespaces | grep rep | grep -i running |wc -l
+         shell: source ~/.profile; kubectl get pods -n {{ namespace }} | grep rep | grep -i running |wc -l
          args:
            executable: /bin/bash
          register: rep_count
@@ -116,7 +101,7 @@
 
 
        - name: Get PV name
-         shell: source ~/.profile; kubectl get pv | grep openebs-percona | awk '{print $1}'
+         shell: source ~/.profile; kubectl get pv -n {{ namespace }}| grep openebs-percona | awk '{print $1}'
          args:
            executable: /bin/bash
          register: pv_name
@@ -130,7 +115,7 @@
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
        - name: Get the node name where replica1 is scheduled
-         shell: source ~/.profile; kubectl get po --all-namespaces -o wide | grep "{{ pv_name.stdout }}" | grep rep | awk '{print $8}' | awk 'FNR == 1 {print}'
+         shell: source ~/.profile; kubectl get po -n {{ namespace }} -o wide | grep "{{ pv_name.stdout }}" | grep rep | awk '{print $7}' | awk 'FNR == 1 {print}'
          args:
            executable: /bin/bash
          register: node1
@@ -138,7 +123,7 @@
 
 
        - name: Get the node name where replica2 is scheduled
-         shell: source ~/.profile; kubectl get po --all-namespaces -o wide | grep "{{ pv_name.stdout }}" | grep rep | awk '{print $8}' | awk 'FNR == 2 {print}'
+         shell: source ~/.profile; kubectl get po -n {{ namespace }} -o wide | grep "{{ pv_name.stdout }}" | grep rep | awk '{print $7}' | awk 'FNR == 2 {print}'
          args:
            executable: /bin/bash
          register: node2
@@ -161,8 +146,8 @@
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
 
-       - name: Get the deployment namee
-         shell: source ~/.profile; kubectl get deploy --all-namespaces |grep "{{ pv_name.stdout }}" | grep rep |awk '{print $2}'
+       - name: Get the deployment name
+         shell: source ~/.profile; kubectl get deploy -n {{ namespace }} |grep "{{ pv_name.stdout }}" | grep rep |awk '{print $1}'
          args:
            executable: /bin/bash
          register: deploy_name
@@ -170,7 +155,7 @@
 
 
        - name: Apply the node affinity property
-         shell: source ~/.profile; kubectl patch deployment "{{ deploy_name.stdout }}" -p "$(cat replica_patch.yaml)"
+         shell: source ~/.profile; kubectl patch deployment "{{ deploy_name.stdout }}" -n {{ namespace }} -p "$(cat replica_patch.yaml)"
          args:
            executable: /bin/bash
          register: patch_out
@@ -188,7 +173,7 @@
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
        - name: Check the available replicas in deployment
-         shell: kubectl get deploy --all-namespaces | grep "{{ pv_name.stdout }}" | grep rep | awk '{print $6}'
+         shell: kubectl get deploy -n {{ namespace }} | grep "{{ pv_name.stdout }}" | grep rep | awk '{print $6}'
          args:
            executable: /bin/bash
          register: available_pods
@@ -200,7 +185,7 @@
 
 
        - name: Check if the replica is in pending state after node drain
-         shell: kubectl get pods --all-namespaces -o wide | grep "{{ pv_name.stdout }}" | grep rep | grep Pending
+         shell: kubectl get pods -n {{ namespace }} -o wide | grep "{{ pv_name.stdout }}" | grep rep | grep Pending
          args:
            executable: /bin/bash
          register: result
@@ -209,30 +194,44 @@
          retries: 15
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
-       - name: Terminate the log aggregator
-         shell: source ~/.profile; killall stern
-         args:
-           executable: /bin/bash
-         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-
-       - name: Set flag to pass if test case is passed
+       - name: Test playbook passed
          set_fact:
-           flag: "Pass"
+           flag: "Test Passed"
 
      rescue:
-       - name: Set flag to fail if test case is failed
+       - name: Test playbook failed
          set_fact:
-           flag: "Fail"
+           flag: "Test Failed"
 
      always:
+       - block:
 
-       - include: cleanup.yml
-         when: clean | bool
+           - include: cleanup.yml
+             when: clean | bool
 
-       - name: Send slack notification
-         slack:
-           token: "{{ lookup('env','SLACK_TOKEN') }}"
-           msg: '{{ ansible_date_time.time }} TEST: {{test_name}}, RESULT: {{ flag }}'
-         when: slack_notify | bool and lookup('env','SLACK_TOKEN')
+           - name: Test Cleanup Passed
+             set_fact:
+               cflag: "Cleanup Passed"
+
+         rescue:
+           - name: Test Cleanup Failed
+             set_fact:
+               cflag: "Cleanup Failed"
+
+         always:
+
+           - name: Terminate the log aggregator
+             shell: source ~/.profile; killall stern
+             args:
+               executable: /bin/bash
+             delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+
+           - name: Send slack notification
+             slack:
+               token: "{{ lookup('env','SLACK_TOKEN') }}"
+               msg: '{{ ansible_date_time.time }} TEST: {{test_name}}, RESULT: {{ flag }}'
+             when: slack_notify | bool and lookup('env','SLACK_TOKEN')
+
 
 

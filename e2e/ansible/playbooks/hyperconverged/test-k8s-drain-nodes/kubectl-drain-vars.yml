@@ -1,5 +1,6 @@
 test_name: verifiy_kubectl_drain_behaviour
 
+utils_path: openebs/e2e/ansible/playbooks/utils
 
 test_log_path: setup/logs/kubectl-drain-behaviour.log
 
@@ -17,3 +18,4 @@ test_artifacts:
   -  storage-class.yml
   -  replica_patch.yaml
 
+namespace: drain-node

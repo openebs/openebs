@@ -17,6 +17,8 @@ loadgen_yaml_alias: cassandra-loadgen.yaml
 
 io_minutes: 3
 
+namespace: scaleup-pods
+
 profile: ~/.profile
 
 cassandra_artifacts:
@@ -31,3 +33,6 @@ test_artifacts:
   -  cassandra-service.yaml
   -  cassandra-statefulset.yaml
   -  cassandra-loadgen.yaml
+
+utils_path: openebs/e2e/ansible/playbooks/utils
+

@@ -26,45 +26,8 @@
   tasks:
    - block:
 
+       - include: pre-requisites.yml
 
-
-       - name: Check whether maya-apiserver pod is running
-         shell: source ~/.profile; kubectl get pods --all-namespaces | grep maya-apiserver
-         args:
-           executable: /bin/bash
-         register: result
-         until: "'Running' in result.stdout"
-         delay: 20
-         retries: 2
-         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-         ignore_errors: true
-
-       - block:
-
-           - name: Delete the openebs operator
-             shell: source ~/.profile; kubectl delete -f "{{ openebs_operator_link }}"
-             args:
-               executable: /bin/bash
-             delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-
-           - name: Confirm pod has been deleted
-             shell: source ~/.profile; kubectl get pods
-             args:
-               executable: /bin/bash
-             register: result
-             until: "'maya-apiserver' or 'openebs-provisioner' not in result.stdout"
-             delay: 30
-             retries: 3
-             delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-
-         when: "result.rc == 0"
-
-       - name: Get $HOME of K8s master for kubernetes user
-         shell: source {{ profile }}; echo $HOME
-         args:
-           executable: /bin/bash
-         register: result_kube_home
-         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
        - name: Download YAML for cassandra service
          get_url:
@@ -125,31 +88,11 @@
            replace: 'duration={{ io_minutes }}'
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
-
-       - name: Deploy openebs-operator
-         shell: source ~/.profile; kubectl apply -f "{{ openebs_operator_link }}"
-         args:
-           executable: /bin/bash
-         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
-
-
-       - name: Check whether maya-apiserver pod is deployed
-         shell: source ~/.profile; kubectl get pods --all-namespaces | grep maya-apiserver
-         args:
-           executable: /bin/bash
-         register: result
-         until: "'Running' in result.stdout"
-         delay: 120
-         retries: 5
-         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-
-       - name: Start the log aggregator to capture test pod logs
-         shell: >
-           source {{ profile }};
-           nohup stern "{{test_pod_regex}}" --since 1m > "{{result_kube_home.stdout}}/{{test_log_path}}" &
-         args:
-           executable: /bin/bash
-         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+       - name: Check status of maya-apiserver
+         include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
+         vars:
+           ns: openebs
+           app: maya-apiserver
 
        - name: Deploy cassandra service and statefulset
          shell: source {{ profile }}; kubectl apply -f {{ item }}
@@ -249,31 +192,45 @@
            msg: "Data is distributed on all the cassandra application pods"
          when: "result.rc == 0"
 
-       - name: Terminate the log aggregator
-         shell: source {{ profile }}; killall stern
-         args:
-           executable: /bin/bash
-         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
-       - name: Set flag to pass if test case is passed
+       - name: Test playbook passed
          set_fact:
-           flag: "Pass"
+           flag: "Test Passed"
 
      rescue:
-       - name: Set flag to fail if test case is failed
+       - name: Test playbook failed
          set_fact:
-           flag: "Fail"
+           flag: "Test Failed"
 
      always:
+       - block:
 
-       - include: cleanup.yml
-         when: clean | bool
+           - include: cleanup.yml
+             when: clean | bool
 
-       - name: Send slack notification
-         slack:
-           token: "{{ lookup('env','SLACK_TOKEN') }}"
-           msg: '{{ ansible_date_time.time }} TEST: {{test_name}}, RESULT: {{ flag }}'
-         when: slack_notify | bool and lookup('env','SLACK_TOKEN')
+           - name: Test Cleanup Passed
+             set_fact:
+               cflag: "Cleanup Passed"
+
+         rescue:
+           - name: Test Cleanup Failed
+             set_fact:
+               cflag: "Cleanup Failed"
+
+         always:
+
+           - name: Terminate the log aggregator
+             shell: source ~/.profile; killall stern
+             args:
+               executable: /bin/bash
+             delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+
+           - name: Send slack notification
+             slack:
+               token: "{{ lookup('env','SLACK_TOKEN') }}"
+               msg: '{{ ansible_date_time.time }} TEST: {{test_name}}, RESULT: {{ flag }}'
+             when: slack_notify | bool and lookup('env','SLACK_TOKEN')
 
 
 
