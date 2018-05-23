@@ -4,7 +4,7 @@
 
 ###############################################################################################
 #Test Steps:
-#1. Check if the OpenEBS components are deployed
+#1. Check if the OpenEBS components are deployed in openebs namespace.
 #2. Obtain the storage class yaml from the deployment.
 #3. Modify the replica count in storageclass yaml and create it.
 #4. Deploy Percona application.
