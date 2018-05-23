@@ -1,5 +1,5 @@
 ---
-- name: Deploy application files
+- name: Delete application 
   shell: source ~/.profile; kubectl delete -f {{ item }} -n {{ ns }}
   args:
     executable: /bin/bash

@@ -25,43 +25,25 @@
        - name: 1) Install the prerequisites
          include: k8s-percona-pod-prerequisites.yml
 
-       - name: 2) Get $HOME of K8s master for kubernetes user
-         shell: source ~/.profile; echo $HOME
-         args:
-           executable: /bin/bash
-         register: result_kube_home
-         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-
-       - name: 2a) Download YAML for percona mysql plugin
-         get_url:
+       - name: 2) Download YAML for percona mysql plugin
+         include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/get_url.yml"
+         vars:
            url: "{{ percona_mysql_plugin_link }}"
            dest: "{{ result_kube_home.stdout }}/{{ pod_yaml_alias }}"
-           force: yes
-         register: result
-         until:  "'OK' in result.msg"
-         delay: 5
-         retries: 3
-         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+           delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
        - name: 3) Check whether maya-apiserver pod is deployed
-         shell: source ~/.profile; kubectl get pods | grep maya-apiserver
-         args:
-           executable: /bin/bash
-         register: result
-         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-         until: "'Running' in result.stdout"
-         delay: 120
-         retries: 5
+         include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
+         vars:
+            ns: openebs
+            app: maya-api
 
        - name: 3a) Replace volume-claim name with test parameters
-         replace:
+         include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/regex_task.yml"
+         vars:
            path: "{{ result_kube_home.stdout }}/{{ pod_yaml_alias }}"
-           regexp: '{{ item.0 }}'
-           replace: '{{ item.1 }}'
-         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
-         with_together:
-           - "{{replace_item}}"
-           - "{{replace_with}}"
+           regex1: "{{replace_item}}"
+           regex2: "{{replace_with}}"
 
        - name: 3b) Replace volume size in plugin YAML
          lineinfile:
@@ -70,29 +52,21 @@
            line: "      storage: \"{{percona_mysql_vol_size}}\""
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
-       - name: Start the log aggregator to capture test pod logs
-         shell: >
-           source ~/.profile;
-           nohup stern "{{test_pod_regex}}" --since 1m > "{{result_kube_home.stdout}}/{{test_log_path}}" &
-         args:
-           executable: /bin/bash
+       - name: 4) Create test specific namespace
+         command: kubectl create ns {{ namespace }}
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
-       - name: 4) Deploy percona mysql pod
-         shell: source ~/.profile; kubectl create -f {{ pod_yaml_alias }}
-         args:
-           executable: /bin/bash
-         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+       - name: 4a) Deploy percona applcation
+         include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_task.yml"
+         vars:
+           app_yml: "{{ pod_yaml_alias }}"
+           ns: "{{ namespace }}"
 
-       - name: 5) Confirm pod status is running
-         shell: source ~/.profile; kubectl get pods | grep percona
-         args:
-           executable: /bin/bash
-         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-         register: result
-         until: "'percona' and 'Running' in result.stdout"
-         delay: 120
-         retries: 15
+       - name: 5) Check application status
+         include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
+         vars:
+            ns: "{{ namespace }}"
+            app: percona
 
        - name: 6) Get $HOME of K8s minion for kubernetes user
          shell: source ~/.profile; echo $HOME
@@ -102,7 +76,7 @@
          delegate_to: "{{groups['kubernetes-kubeminions'].0}}"
 
        - name: 6a) Get IP address of percona mysql pod
-         shell: source ~/.profile; kubectl describe pod percona
+         shell: source ~/.profile; kubectl describe pod percona -n {{ namespace }}
          args:
            executable: /bin/bash
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
@@ -137,29 +111,39 @@
          become: true
          delegate_to: "{{ groups['kubernetes-kubeminions'].0 }}"
 
-       - name: Terminate the log aggregator
-         shell: source ~/.profile; killall stern
-         args:
-           executable: /bin/bash
-         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-
-       - name: setting flag if pass
+       - name: Test Passed
          set_fact:
-           flag: "Pass"
+           flag: "Test Passed"
 
      rescue:
-       - name: setting flag if fail
+       - name: Test Failed
          set_fact:
-           flag: "Fail"
+           flag: "Test Failed"
 
      always:
+       - block:
 
-       - name: 9) Cleaning up the test artifacts.
-         include: k8s-percona-pod-cleanup.yml
-         when: clean | bool
+           - include: k8s-percona-pod-cleanup.yml
 
-       - name: Send slack notification
-         slack:
-           token: "{{ lookup('env','SLACK_TOKEN') }}"
-           msg: '{{ ansible_date_time.time }} TEST: {{test_name}}, RESULT: {{ flag }}'
-         when: slack_notify | bool and lookup('env','SLACK_TOKEN')
+           - name: Test Cleanup Passed
+             set_fact:
+               cflag: "Cleanup Passed"
+
+         rescue:
+           - name: Test Cleanup Failed
+             set_fact:
+               cflag: "Cleanup Failed"
+
+         always:
+
+           - name: 7) Terminate the log aggregator
+             shell: source ~/.profile; killall stern
+             args:
+               executable: /bin/bash
+             delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+           - name: Send slack notification
+             slack:
+               token: "{{ lookup('env','SLACK_TOKEN') }}"
+               msg: '{{ ansible_date_time.time }} TEST: {{test_name}}, RESULT: {{ flag }},{{ cflag }}'
+

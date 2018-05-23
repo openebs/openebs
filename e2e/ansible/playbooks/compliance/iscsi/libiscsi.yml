@@ -20,73 +20,62 @@
   vars_files:
     - libiscsi-vars.yml
 
-  tasks: 
-   - block: 
-   
+  tasks:
+   - block:
+
        - name: 1) Install the prerequisites
-         include: libiscsi-prerequisites.yml 
+         include: libiscsi-prerequisites.yml
 
-       - name: 2) Get $HOME of K8s master for kubernetes user
-         shell: source ~/.profile; echo $HOME
-         args:
-           executable: /bin/bash
-         register: result_kube_home
-         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-
-       - name: 2a) Copy the volume claim to kube master
-         copy: 
+       - name: 2) Copy the volume claim to kube master
+         copy:
            src: "{{ volume_def }}"
            dest: "{{ result_kube_home.stdout }}"
          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
-       
-       - name: 2c) Start the log aggregator to capture test pod logs
-         shell: >
-           source ~/.profile;
-           nohup stern "{{test_pod_regex}}" --since 1m > "{{result_kube_home.stdout}}/{{test_log_path}}" &
-         args:
-           executable: /bin/bash
-         delegate_to: "{{groups['kubernetes-kubemasters'].0}}" 
- 
-       - name: 3) Create a storage volume via a pvc 
-         shell: source ~/.profile; kubectl apply -f "{{ volume_def }}"
+
+       - name: 3) Create test specific namespace
+         command: kubectl create ns {{ namespace }}
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+       - name: 3a) Create a storage volume via a pvc
+         shell: source ~/.profile; kubectl apply -f "{{ volume_def }}" -n {{ namespace }}
          args:
            executable: /bin/bash
          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
 
-       - name: 3a) Confirm volume container is running 
-         shell: source ~/.profile; kubectl get pods | grep pvc | grep {{item}} | grep Running | wc -l
+       - name: 3b) Confirm volume container is running
+         shell: source ~/.profile; kubectl get pods -n {{ namespace }} | grep pvc | grep {{item}} | grep Running | wc -l
          args:
            executable: /bin/bash
          register: result
          until: result.stdout|int >= 1
          delay: 30
-         retries: 10 
-         with_items: 
+         retries: 10
+         with_items:
            - ctrl
            - rep
          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
-        
+
        - name: 4) Get storage ctrl pod name
-         shell: source ~/.profile; kubectl get pods | grep ctrl
+         shell: source ~/.profile; kubectl get pods -n {{ namespace }} | grep ctrl
          args:
            executable: /bin/bash
          register: ctrl_name
          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
-        
-       - name: 4a) Set ctrl pod name to variable 
-         set_fact: 
+
+       - name: 4a) Set ctrl pod name to variable
+         set_fact:
            ctrl_pod_name: "{{ ctrl_name.stdout.split()[0] }}"
 
        - name: 4b) Get IP address of ctrl pod
-         shell: source ~/.profile; kubectl describe pod {{ ctrl_pod_name }} | grep IP
+         shell: source ~/.profile; kubectl describe pod {{ ctrl_pod_name }} -n {{ namespace }} | grep IP
          args:
            executable: /bin/bash
          register: ctrl_IP
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-    
+
        - name: 4c) Set IP of Pod to variable
          set_fact:
-           ctrl_ip: "{{ ctrl_IP.stdout_lines[0].split()[1]}}" 
+           ctrl_ip: "{{ ctrl_IP.stdout_lines[0].split()[1]}}"
 
        - name: 5) Get $HOME of K8s minion for kubernetes user
          shell: source ~/.profile; echo $HOME
@@ -101,32 +90,34 @@
            dest: "{{ result_kube_home.stdout }}"
          delegate_to: "{{ groups['kubernetes-kubeminions'].0 }}"
 
-       - name: 6) Discover the iSCSI target using iscsi-ls 
+       - name: 6) Discover the iSCSI target using iscsi-ls
          shell: iscsi-ls iscsi://{{ ctrl_ip }}
          register: target
          delegate_to: "{{ groups['kubernetes-kubeminions'].0 }}"
+         tags:
+           - skip_ansible_lint
 
-       - name: 6a) Set target iqn to variable 
+       - name: 6a) Set target iqn to variable
          set_fact:
            iqn: "{{ target.stdout.split()[0] | regex_replace('Target:','')}}"
 
        - name: 6b) Create log directory for libiscsi test run
-         file: 
+         file:
            path: "{{ result_kube_home.stdout }}/libiscsi_suite_logs"
            state: directory
          delegate_to: "{{ groups['kubernetes-kubeminions'].0 }}"
 
-       - name: 6c) Get test list from test file 
-         command: cat {{ result_kube_home.stdout }}/{{ test_list }}       
+       - name: 6c) Get test list from test file
+         command: cat {{ result_kube_home.stdout }}/{{ test_list }}
          register: tests
          delegate_to: "{{ groups['kubernetes-kubeminions'].0 }}"
- 
+
        - name: 7) Run the libiscsi test suites
          shell: >
-           iscsi-test-cu --test={{ item }} 
-           iscsi://{{ ctrl_ip }}/{{ iqn }}/0 
-           --dataloss --allow-sanitize 
-           > {{ result_kube_home.stdout }}/libiscsi_suite_logs/{{ item }}.log 
+           iscsi-test-cu --test={{ item }}
+           iscsi://{{ ctrl_ip }}/{{ iqn }}/0
+           --dataloss --allow-sanitize
+           > {{ result_kube_home.stdout }}/libiscsi_suite_logs/{{ item }}.log
            2>&1
          args:
            executable: /bin/bash
@@ -134,7 +125,7 @@
          with_items: "{{ tests.stdout_lines }}"
          ignore_errors: true
 
-       - name: 8) Generate test summary 
+       - name: 8) Generate test summary
          script: parse.sh {{ result_kube_home.stdout }}/libiscsi_suite_logs
          delegate_to: "{{ groups['kubernetes-kubeminions'].0 }}"
          register: summary
@@ -142,37 +133,41 @@
        - name: 8a) Display the test status
          debug:
            msg: "{{ summary.stdout }}"
- 
-       - name: 9) Cleaning up the test artifacts.
-         include: libiscsi-cleanup.yml
 
-       - name: Terminate the log aggregator
-         shell: source ~/.profile; killall stern
-         args:
-           executable: /bin/bash
-         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+       - name: Test Passed
+         set_fact:
+           flag: "Test Passed"
 
-       - set_fact:
-           flag: "Pass"
-           flag_msg: "Ran libiscsi test suite successfully"
+     rescue:
+       - name: Test Failed
+         set_fact:
+           flag: "Test Failed"
 
-     rescue: 
-        - set_fact:
-            flag: "Fail" 
-            flag_msg: "Failed to run libiscsi test suite"
-            
      always:
        - block:
 
-           - name: Send test status slack notification
+           - include: libiscsi-cleanup.yml
+
+           - name: Test Cleanup Passed
+             set_fact:
+               cflag: "Cleanup Passed"
+
+         rescue:
+           - name: Test Cleanup Failed
+             set_fact:
+               cflag: "Cleanup Failed"
+
+         always:
+
+           - name: 9) Terminate the log aggregator
+             shell: source ~/.profile; killall stern
+             args:
+               executable: /bin/bash
+             delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+           - name: Send slack notification
              slack:
                token: "{{ lookup('env','SLACK_TOKEN') }}"
-               msg: '{{ ansible_date_time.time }} {{ flag_msg }}'   
-        
-           - name: Send test details slack notification
-             slack:
-               token: "{{ lookup('env','SLACK_TOKEN') }}"
-               msg: "{{ summary.stdout }}"
-             when: flag == "Pass"
-         
-         when: slack_notify | bool and lookup('env','SLACK_TOKEN')
+               msg: '{{ ansible_date_time.time }} TEST: {{test_name}}, RESULT: {{ flag }},{{ cflag }}'
+             when: slack_notify | bool and lookup('env','SLACK_TOKEN')
+

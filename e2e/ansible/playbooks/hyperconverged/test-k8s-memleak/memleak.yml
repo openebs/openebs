@@ -15,161 +15,173 @@
 #10. Perform cleanup of test artifacts.
 ###############################################################################################
 
-
 - hosts: localhost
 
   vars_files:
-     - memleak-vars.yml
-  
+   - memleak-vars.yml
+
   tasks:
-       - name: 1) Check whether maya-apiserver pod is deployed
-         shell: source ~/.profile; kubectl get pods | grep maya-apiserver
-         args:
-           executable: /bin/bash
-         register: result
-         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-         until: "'Running' in result.stdout"
-         delay: 120
-         retries: 5
-   
-       - name: 2) Get $HOME of K8s master for kubernetes user
-         shell: source ~/.profile; echo $HOME
-         args:
-           executable: /bin/bash
-         register: result_kube_home
-         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+   - include: memleak-prereq.yml
+
+   - name: 1) Check whether maya-apiserver pod is deployed
+     include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
+     vars:
+       ns: openebs
+       app: maya-api
+
+   - name: 2a) Copy the volume claim to kube master
+     copy:
+       src: "{{ volume_def }}"
+       dest: "{{ result_kube_home.stdout }}"
+     delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+
+   - name: 2b) Replace volume-claim name with test parameters
+     replace:
+       path: "{{ result_kube_home.stdout }}/{{ volume_def }}"
+       regexp: 'vut'
+       replace: '{{ volume_claim }}'
+     delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+
+   - name: Create test specific namespace
+     command: kubectl create ns {{ namespace }}
+     delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+   - name: 3) Create a storage volume via a pvc
+     include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_task.yml"
+     vars:
+       app_yml: "{{ volume_def }}"
+       ns: "{{ namespace }}"
+
+   - name: 3a) Confirm volume container is running
+     shell: source ~/.profile; kubectl get pods -n {{ namespace }} | grep pvc | grep {{item}} | grep Running | wc -l
+     args:
+       executable: /bin/bash
+     register: result
+     until: result.stdout|int >= 1
+     delay: 30
+     retries: 20
+     with_items:
+       - ctrl
+       - rep
+     delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+
+   - name: 4) Get storage ctrl pod name
+     shell: source ~/.profile; kubectl get pods -n {{ namespace }} | grep ctrl
+     args:
+       executable: /bin/bash
+     register: ctrl_name
+     delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+
+   - name: 4a) Set ctrl pod name to variable
+     set_fact:
+       ctrl_pod_name: "{{ ctrl_name.stdout.split()[0] }}"
+
+   - name: 4b) Get IP address of ctrl pod
+     shell: source ~/.profile; kubectl describe pod {{ ctrl_pod_name }} -n {{ namespace }} | grep IP
+     args:
+       executable: /bin/bash
+     register: ctrl_IP
+     delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+   - name: 4c) Set IP of Pod to variable
+     set_fact:
+       ctrl_ip: "{{ ctrl_IP.stdout_lines[0].split()[1]}}"
 
 
-       - name: 2a) Copy the volume claim to kube master
-         copy:
-           src: "{{ volume_def }}"
-           dest: "{{ result_kube_home.stdout }}"
-         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"       
+   - name: 5) Establish iSCSI session with volume
+     shell: iscsiadm -m discovery -t st -p {{ ctrl_ip }}:3260
+     become: true
+     delegate_to: "{{groups['kubernetes-kubeminions'].0}}"
+     register: result
 
-       - name: 2b) Replace volume-claim name with test parameters
-         replace:
-           path: "{{ result_kube_home.stdout }}/{{ volume_def }}"
-           regexp: 'vut'
-           replace: '{{ volume_claim }}'
-         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+   - name: 5a) Store target iqn in variable
+     set_fact:
+       iqn: "{{result.stdout.split(',')[1].split()[1]}}"
 
-       - name: 3) Create a storage volume via a pvc
-         shell: source ~/.profile; kubectl apply -f "{{ volume_def }}"
-         args:
-           executable: /bin/bash
-         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
-       
-       - name: 3a) Confirm volume container is running
-         shell: source ~/.profile; kubectl get pods | grep pvc | grep {{item}} | grep Running | wc -l
-         args:
-           executable: /bin/bash
-         register: result
-         until: result.stdout|int >= 1
-         delay: 30
-         retries: 10
-         with_items:
-           - ctrl
-           - rep
-         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+   - name: 6) Login to iSCSI target
+     open_iscsi:
+       show_nodes: yes
+       login: yes
+       target: "{{iqn}}"
+     become: true
+     delegate_to: "{{groups['kubernetes-kubeminions'].0}}"
+     register: result
 
-       - name: 4) Get storage ctrl pod name
-         shell: source ~/.profile; kubectl get pods | grep ctrl
-         args:
-           executable: /bin/bash
-         register: ctrl_name
-         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
-       
-       - name: 4a) Set ctrl pod name to variable
-         set_fact:
-           ctrl_pod_name: "{{ ctrl_name.stdout.split()[0] }}"
+   - name: 6a) Check device nodes
+     set_fact:
+       scsi_device: "{{result.devicenodes[0]}}"
 
-       - name: 4b) Get IP address of ctrl pod
-         shell: source ~/.profile; kubectl describe pod {{ ctrl_pod_name }} | grep IP
-         args:
-           executable: /bin/bash
-         register: ctrl_IP
-         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+   - name: 7) Create file system on iSCSI disk
+     filesystem:
+       fstype: ext4
+       dev: "{{scsi_device}}"
+       force: no
+     become: true
+     delegate_to: "{{groups['kubernetes-kubeminions'].0}}"
 
-       - name: 4c) Set IP of Pod to variable
-         set_fact:
-           ctrl_ip: "{{ ctrl_IP.stdout_lines[0].split()[1]}}"
+   - name: 7a) Mount device by Label
+     mount:
+       name: "{{mount_point}}"
+       src: "{{scsi_device}}"
+       fstype: ext4
+       opts: discard,_netdev
+       state: mounted
+     become: true
+     delegate_to: "{{groups['kubernetes-kubeminions'].0}}"
 
+   - name: 7b) Place data using dd
+     shell: |
+        timeout 200s dd if=/dev/urandom of={{mount_point}}/f1 bs={{block_size[0]}} count={{count_num}} oflag=dsync &
+        timeout 200s dd if=/dev/urandom of={{mount_point}}/f2 bs={{block_size[1]}} count={{count_num}} oflag=dsync &
+     become: true
+     delegate_to: "{{groups['kubernetes-kubeminions'].0}}"
 
-       - name: 5) Establish iSCSI session with volume
-         shell: iscsiadm -m discovery -t st -p {{ ctrl_ip }}:3260
-         become: true
-         delegate_to: "{{groups['kubernetes-kubeminions'].0}}"
-         register: result
+   - block:
+         - name: 8) Copy the python script to kubeminion
+           copy:
+              src: "{{ py_file }}"
+              dest: "{{ result_kube_home.stdout }}"
+           delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
 
-       - name: 5a) Store target iqn in variable
-         set_fact:
-           iqn: "{{result.stdout.split(',')[1].split()[1]}}"
+         - name: 9) Run python script for memory usage validation it takes couple of minutes
+           shell: python test-mem.py {{ namespace }}
+           delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+           register: result
+           failed_when: "'Pass' not in result.stdout"
 
-       - name: 6) Login to iSCSI target
-         open_iscsi:
-           show_nodes: yes
-           login: yes
-           target: "{{iqn}}"
-         become: true
-         delegate_to: "{{groups['kubernetes-kubeminions'].0}}"
-         register: result
+         - name: Test Passed
+           set_fact:
+                flag: "Test Passed"
+     rescue:
+         - name: Test Failed
+           set_fact:
+                flag: "Test Failed"
 
-       - name: 6a) Check device nodes
-         set_fact:
-           scsi_device: "{{result.devicenodes[0]}}"
-
-       - name: 7) Create file system on iSCSI disk
-         filesystem:
-           fstype: ext4
-           dev: "{{scsi_device}}"
-           force: no
-         become: true
-         delegate_to: "{{groups['kubernetes-kubeminions'].0}}"
-
-       - name: 7a) Mount device by Label
-         mount:
-           name: "{{mount_point}}"
-           src: "{{scsi_device}}"
-           fstype: ext4
-           opts: discard,_netdev
-           state: mounted
-         become: true
-         delegate_to: "{{groups['kubernetes-kubeminions'].0}}"
-
-       - name: 7b) Place data using dd
-         shell: |
-            timeout 200s dd if=/dev/urandom of={{mount_point}}/f1 bs={{block_size[0]}} count={{count_num}} oflag=dsync &
-            timeout 200s dd if=/dev/urandom of={{mount_point}}/f2 bs={{block_size[1]}} count={{count_num}} oflag=dsync &
-         become: true
-         delegate_to: "{{groups['kubernetes-kubeminions'].0}}"
-
+     always:
        - block:
-             - name: 8) Copy the python script to kubeminion
-               copy:
-                  src: "{{ py_file }}"
-                  dest: "{{ result_kube_home.stdout }}"
-               delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
 
-             - name: 9) Run python script for memory usage validation it takes couple of minutes
-               shell: python test-mem.py
-               delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-               register: result
-               failed_when: "'Pass' not in result.stdout"
-              
-             - set_fact:
-                    flag: "PASS"
+           - include: memleak-cleanup.yml
+
+           - name: Test Cleanup Passed
+             set_fact:
+               cflag: "Cleanup Passed"
+
          rescue:
-             - set_fact:
-                    flag: "FAIL"         
+           - name: Test Cleanup Failed
+             set_fact:
+               cflag: "Cleanup Failed"
 
          always:
 
-             - include: memleak-cleanup.yml
-               when: clean | bool
+           - name: 5) Terminate the log aggregator
+             shell: source ~/.profile; killall stern
+             args:
+               executable: /bin/bash
+             delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
-             - name: Send slack notification
-               slack:
-                 token: "{{ lookup('env','SLACK_TOKEN') }}"
-                 msg: '{{ ansible_date_time.time }} TEST: {{test_name}}, RESULT: {{ flag }}'
-               when: slack_notify | bool and lookup('env','SLACK_TOKEN')
+           - name: Send slack notification
+             slack:
+               token: "{{ lookup('env','SLACK_TOKEN') }}"
+               msg: '{{ ansible_date_time.time }} TEST: {{test_name}}, RESULT: {{ flag }},{{ cflag }}'
+             when: slack_notify | bool and lookup('env','SLACK_TOKEN')
 

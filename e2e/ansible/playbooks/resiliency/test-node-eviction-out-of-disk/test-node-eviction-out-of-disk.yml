@@ -231,27 +231,27 @@
 
        - name: Test Passed
          set_fact:
-            flag: "Pass"
+           flag: "Test Passed"
 
-   - rescue:
+     rescue:
        - name: Test Failed
          set_fact:
-           flag: "Fail"
+           flag: "Test Failed"
 
      always:
        - block:
- 
+
            - include: test-node-eviction-out-of-disk-cleanup.yml
 
            - name: Test Cleanup Passed
              set_fact:
-               cflag: cleanup_pass
+               cflag: "Cleanup Passed"
 
          rescue:
            - name: Test Cleanup Failed
              set_fact:
-               cflag: cleanup_fail
-        
+               cflag: "Cleanup Failed"
+
          always:
 
            - name: 5) Terminate the log aggregator
@@ -259,10 +259,10 @@
              args:
                executable: /bin/bash
              delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-           
 
-           - name: 6) Send slack notification
+           - name: Send slack notification
              slack:
                token: "{{ lookup('env','SLACK_TOKEN') }}"
-               msg: '{{ ansible_date_time.time }} TEST: {{test_name}}, RESULT: {{ flag }}, {{ cflag }}'
+               msg: '{{ ansible_date_time.time }} TEST: {{test_name}}, RESULT: {{ flag }},{{ cflag }}'
              when: slack_notify | bool and lookup('env','SLACK_TOKEN')
+

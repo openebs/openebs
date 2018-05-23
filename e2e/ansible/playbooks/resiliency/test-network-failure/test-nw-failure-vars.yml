@@ -1,5 +1,5 @@
 ---
-test_name: test_nw_failure
+test_name: test_nw_failure_ctrl
 
 percona_links:
   - https://raw.githubusercontent.com/openebs/elves/master/e2e/percona-liveness/percona.yaml

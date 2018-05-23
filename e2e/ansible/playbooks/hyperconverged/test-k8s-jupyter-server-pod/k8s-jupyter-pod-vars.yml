@@ -2,9 +2,18 @@
 test_name: hyperconverged_jupyter_server_on_k8s
 
 jupyter_plugin_link: https://raw.githubusercontent.com/openebs/openebs/master/k8s/demo/jupyter/demo-jupyter-openebs.yaml
+
 pod_yaml_alias: demo-jupyter-openebs.yaml
 
 volume_claim: jupyter-data-vol-claim
 
 jupyter_server_vol_size: 5G
+
+namespace: jupyter-test
+
+utils_path: openebs/e2e/ansible/playbooks/utils
+
+test_pod_regex: maya*|openebs*|pvc*|jupyter*
+
+test_log_path: setup/logs/jupyter_test.log
 
