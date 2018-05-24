@@ -34,7 +34,7 @@
        - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
          vars:
             ns: openebs
-            app: maya-api
+            app: openebs-api
 
        - name: Download YAML for percona mysql plugin
          get_url:
