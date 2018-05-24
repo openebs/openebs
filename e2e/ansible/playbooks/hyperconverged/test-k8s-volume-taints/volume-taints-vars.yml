@@ -1,8 +1,13 @@
 ---
+utils_path: openebs/e2e/ansible/playbooks/utils
 
-volume_policy: vol-policies.yaml
+test_log_path: setup/logs/volume_taints.log
 
-openebs_ns_operator: openebs-operator-ns-openebs.yaml
+test_pod_regex: maya*|openebs*|pvc*
+
+volume_policy: openebs-volumepolicies.yaml
+
+storage_pool: storage-pool-path_creation.yml
 
 test_name: Testing Volume taint policy
 
@@ -16,7 +21,7 @@ pvc_key: key2
 
 pvc_value: value2
 
-namespace: percona
+namespace: cas-template 
 
 node1: kubeminion-01
 
@@ -38,4 +43,7 @@ node_names:
   - kubeminion-02
   - kubeminion-03
 
-openebs_operator_link: https://raw.githubusercontent.com/openebs/openebs/master/k8s/openebs-operator.yaml
+test_artifacts:
+  -  storage-pool-path_creation.yml
+  -  openebs-volumepolicies.yaml
+  -  test-pvc.yaml
