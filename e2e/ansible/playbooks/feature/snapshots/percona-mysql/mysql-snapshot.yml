@@ -33,22 +33,7 @@
          set_fact:
            maya_pod: "{{ result.stdout_lines[0].split()[0] }}"
 
-       - name: Copy the deployment specification to kube master
-         copy:
-           src: "{{ volume_def }}"
-           dest: "{{ result_kube_home.stdout }}"
-         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
-
-       - name: Replace volume-claim name with test parameters
-         replace:
-           path: "{{ result_kube_home.stdout }}/{{ volume_def }}"
-           regexp: '{{ item.0 }}'
-           replace: '{{ item.1 }}'
-         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
-         with_together:
-           - "{{replace_item}}"
-           - "{{replace_with}}"
-
+       
        - name: Create namespace
          command: kubectl create ns {{ namespace }}
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
@@ -197,12 +182,12 @@
 
        - name: Test Passed
          set_fact:
-           flag: "Pass"
+           flag: "Test Pass"
 
      rescue:
        - name: Test Failed
          set_fact:
-           flag: "Fail"
+           flag: "Test Failed"
 
      always:
        - block:
@@ -211,25 +196,25 @@
 
            - name: Test Cleanup Passed
              set_fact:
-               cflag: cleanup_pass
+               cflag: "Cleanup_Passed"
 
          rescue:
            - name: Test Cleanup Failed
              set_fact:
-               cflag: cleanup_fail
+               cflag: "Cleanup_Failed"
 
          always:
 
-#           - name: Terminate the log aggregator
-#             shell: source ~/.profile; killall stern
-#             args:
-#               exedcutable: /bin/bash
-#             delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+           - name: Terminate the log aggregator
+             shell: source ~/.profile; killall stern
+             args:
+               exedcutable: /bin/bash
+             delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
 
            - name: Send slack notification
              slack:
                token: "{{ lookup('env','SLACK_TOKEN') }}"
-               msg: '{{ ansible_date_time.time }} TEST: {{test_name}}, RESULT: {{ flag }}'
+               msg: '{{ ansible_date_time.time }} TEST: {{test_name}}, RESULT: {{ flag }},{{cflag}}'
              when: slack_notify | bool and lookup('env','SLACK_TOKEN')
 
