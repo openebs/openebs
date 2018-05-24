@@ -16,3 +16,4 @@
    become: true
    delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
    changed_when: true
+

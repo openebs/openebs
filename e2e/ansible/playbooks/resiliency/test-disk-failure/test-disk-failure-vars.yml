@@ -24,5 +24,8 @@ replace_with:
   - disk
   - "{{result_mountpoint.stdout}}"
 
-namespace: disk-failure
+test_pod_regex: maya*|openebs*|pvc*|percona*
+ 
+test_log_path: setup/logs/test-disk-failure.log
 
+namespace: disk-failure

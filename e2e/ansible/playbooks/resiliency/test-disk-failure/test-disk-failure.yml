@@ -13,7 +13,7 @@
 #7. List the scsi hosts and Rescan the disk.
 #8. Get the disk name by using UUID.
 #9. Remount the Disk with the same Mount Point.
-#10 Verify replica pod is scheduled and Running.
+#10 Verify replica pod is scheduled and Running .
 #11 Perform cleanup of test artifacts.
 ###############################################################################################
 
@@ -32,10 +32,12 @@
          include_tasks: "{{ ansible_env.HOME }}/{{utils_path}}/deploy_check.yml"
          vars:
            ns: openebs
-           app: maya-api
+           app: openebs-api
 
        - name: 3) Get the disk name by using UUID
-         shell: blkid | grep {{ uuid }} | awk '{print $1}' | cut -d "/" -f3 | cut -d ":" -f1
+         shell: >
+              blkid | grep {{ uuid }} | awk '{print $1}'
+              | cut -d "/" -f3 | cut -d ":" -f1
          args:
            executable: /bin/bash
          become: true
@@ -65,32 +67,32 @@
            regex2: "{{replace_with}}"
 
        - name: 5) Create the Namespace
-         shell: kubectl create ns {{ namespace }}
+         command: kubectl create ns {{ namespace }}
          args:
-           executable: /bin/bash
+          executable: /bin/bash
          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
 
-       - name: 6) Create the storage pool path
+       - name: 5)Create the storage pool path
          shell: source ~/.profile; kubectl apply -f storage-pool-path_creation.yml  -n {{ namespace }}
          args:
            executable: /bin/bash
          register: result_sp_path
          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
 
-       - name: 7) Obtaining storage classes yaml
+       - name: 5a) Obtaining storage classes yaml
          shell: kubectl get sc openebs-percona -o yaml > "{{ create_sc }}"
          args:
            executable: /bin/bash
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
-       - name: 7a) Replace storage class file with test parameters
+       - name: 5b) Replace storage class file with test parameters
          replace:
            path: "{{ result_kube_home.stdout }}/{{ create_sc }}"
            regexp: 'openebs.io/storage-pool: default'
            replace: 'openebs.io/storage-pool: disk'
          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
 
-       - name:  7b) Delete the existing storage class and create new one
+       - name:  5c) Delete the existing storage class and create new one
          shell: kubectl delete sc openebs-percona; kubectl apply -f "{{ create_sc }}"
          args:
            executable: /bin/bash
@@ -100,53 +102,129 @@
          retries: 5
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
-       - name: 8) Obtain the sql test script file
+       - name: 6) Obtain the sql test script file
          get_url:
            url: "{{ sql_test_link }}"
            dest: "{{ result_kube_home.stdout }}"
          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
 
-       - name: 8a) Create the configmap test
-         command: kubectl create configmap sqltest --from-file=sql-test.sh -n {{ namespace }}
+       - name: 6a) Create the configmap test
+         command: kubectl create configmap sqltest --from-file=sql-test.sh  -n {{ namespace }}
          args:
            executable: /bin/bash
          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
 
-       - name: 9) Obtaining the percona liveliness application yaml
+       - name: 7) Obtaining the percona liveliness application yaml
          get_url:
            url: "{{ percona_link }}"
            dest: "{{ result_kube_home.stdout }}"
          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
 
-       - name: 9a) Create percona deployment with OpenEBS storage
+       - name: 7a) Create percona deployment with OpenEBS storage
          include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_task.yml"
          vars:
            app_yml: "{{ percona_files.0 }}"
-           ns: {{ namespace }}
+           ns: "{{ namespace }}"
 
-       - name: 9b) Check whether percona application is running
+       - name: 7c) Check whether percona application is running
          include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
          vars:
            app: percona
-           ns: {{ namespace }}
+           ns: "{{ namespace }}"
 
-       - name: 9c) Check Replica pod status
+       - name: 7d) Check Replica pod status
          include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
          vars:
            app: pvc
-           ns: {{ namespace }}
+           ns: "{{ namespace }}"
 
-       - name: 10) Failing the additional disk
+       - name: 8) Obtaining the replica pods running on specified node
+         shell: >
+            kubectl get pods -o wide -n {{ namespace }}
+            | grep newos2 | grep rep | awk '{ print $1 }'
+         args:
+           executable: /bin/bash
+         become: true
+         register: result_path
+         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+
+       - name: 8a) Check Replica pods running on specified storage pool path
+         shell: >
+           kubectl describe pod  -n {{ namespace }} "{{ result_path.stdout }}"
+           | grep "{{ result_mountpoint.stdout }}" | awk '{print $2}'
+         args:
+           executable: /bin/bash
+         become: true
+         register: result_rep_path
+         failed_when: 'result_rep_path.rc!=0'
+         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+
+       - name: 9) Failing the additional disk
          shell: echo 1 > /sys/block/{{ result_disk.stdout }}/device/delete
          args:
            executable: /bin/bash
          become: true
          delegate_to: "{{ groups['kubernetes-kubeminions'].0 }}"
 
-       - name: 11) List the available scsi host
-         command: ls /sys/class/scsi_host/
+       - name: 9a) Check the Disk is failing
+         shell: lsblk | grep {{ result_disk.stdout }}
          args:
            executable: /bin/bash
+         become: true
+         register: result_disk_check
+         failed_when: 'result_disk_check.rc!=1'
+         delegate_to: "{{ groups['kubernetes-kubeminions'].0 }}"
+
+       - name: 10) Check the replica pod on the specified node
+         shell: >
+          kubectl get pods -o wide -n {{ namespace }}
+          | grep "{{ groups['kubernetes-kubeminions'].0 }}" | grep rep | awk '{ print $1 }'
+         args:
+           executable: /bin/bash
+         register: result_rep
+         become: true
+         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+         
+           ######################################################################## 
+           # After failing the underlying Disk it is expected that the replica    #
+           # will crash. But the actual behaviour replica is still in Running     #
+           # state. Refer : https://github.com/openebs/openebs/issues/1387        #
+           ########################################################################
+
+       - name: 10a) Delete the replica pod on the specified node
+         command: kubectl delete pod -n {{ namespace }} {{ result_rep.stdout }}
+         args:
+           executable: /bin/bash
+         become: true
+         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+
+       - name: Wait for 120s to ensure liveness check starts
+         wait_for:
+           timeout: 120
+
+       - name: 10b) Check the replica pod status scheduled on the specified node
+         shell: >
+           kubectl get pods -o wide -n {{ namespace }}
+           | grep "{{ groups['kubernetes-kubeminions'].0 }}" | grep rep | awk '{ print $3 }'
+         args:
+           executable: /bin/bash
+         register: result_rep_status
+         failed_when: "'Running' in result_rep_status.stdout"
+         become: true
+         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+
+       - name: 10c) Check the percona application pod status
+         shell: >
+           kubectl get pods -o wide -n {{ namespace }} | grep percona | awk '{ print $3 }'
+         args:
+           executable: /bin/bash
+         register: result_pod_status
+         become: true
+         failed_when: "'Running' not in  result_pod_status.stdout"
+         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+
+       - name: 11) List the available scsi host
+         command: ls /sys/class/scsi_host/
          become: true
          register: result_host
          delegate_to: "{{ groups['kubernetes-kubeminions'].0 }}"
@@ -159,42 +237,67 @@
          with_items: "{{ result_host.stdout_lines }}"
          delegate_to: "{{ groups['kubernetes-kubeminions'].0 }}"
 
-       - name: 11b) Get the disk name using UUID
-         shell: blkid | grep {{ uuid }} | awk '{print $1}' | cut -d "/" -f3 | cut -d ":" -f1
+       - name: 12) Get the disk name by using UUID
+         shell: >
+            blkid | grep {{ uuid }} | awk '{print $1}'
+            | cut -d "/" -f3 | cut -d ":" -f1
          args:
            executable: /bin/bash
          become: true
          register: result_scan_disk
          delegate_to: "{{ groups['kubernetes-kubeminions'].0 }}"
 
-       - name: 12) Remount the disk
+       - name: 12a) Remount the disk
          shell: mount /dev/{{ result_scan_disk.stdout }} {{ result_mountpoint.stdout }}
          args:
            executable: /bin/bash
          become: true
          delegate_to: "{{ groups['kubernetes-kubeminions'].0 }}"
          tags:
-         - skip_ansible_lint
+          - skip_ansible_lint
 
        - name: 13) Check Replica pod status
          include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
          vars:
            app: pvc
-           ns: {{ namespace }}
-           
+           ns: "{{ namespace }}"
+
+       - name: 14) Get Controller SVC IP
+         shell: >
+            source ~/.profile;
+            kubectl get svc -n {{ namespace }} | grep ctrl | awk {'print $3'}
+         args:
+           executable: /bin/bash
+         register: result_svc
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+         changed_when: true
+
+       - name: 14a) Check if replica is rebuilded
+         shell: curl GET http://{{ result_svc.stdout }}:9501/v1/replicas | grep createTypes | jq -r '.data[].mode' | grep 'RW'
+         args:
+           executable: /bin/bash
+         register: result
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+         until: "result.stdout_lines | length  == 3"
+         delay: 60
+         retries: 10
+         changed_when: true
+         tags:
+          - skip_ansible_lint
+
        - name: Test Passed
          set_fact:
-           flag: "Test Passed"
+            flag: "Test Passed"
 
      rescue:
-       - name: Test Failed
-         set_fact:
-           flag: "Test Failed"
+        - name: Test Failed
+          set_fact:
+            flag: "Test Failed"
 
      always:
        - block:
 
-           - name: 14) Cleaning up the test artifacts 
+           - name: 15) Cleaning up the test artifacts
              include: test-disk-failure-cleanup.yml
 
            - name: Test Cleanup Passed
@@ -208,7 +311,7 @@
 
          always:
 
-           - name: 15) Terminate the log aggregator
+           - name: 16) Terminate the log aggregator
              shell: source ~/.profile; killall stern
              args:
                executable: /bin/bash
@@ -218,4 +321,4 @@
              slack:
                token: "{{ lookup('env','SLACK_TOKEN') }}"
                msg: '{{ ansible_date_time.time }} TEST: {{test_name}}, RESULT: {{ flag }}, {{ cflag }}'
-             when: slack_notify | bool and lookup('env','SLACK_TOKEN')                                                                         
+             when: slack_notify | bool and lookup('env','SLACK_TOKEN')
