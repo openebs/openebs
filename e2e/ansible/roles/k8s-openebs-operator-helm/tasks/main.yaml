@@ -8,6 +8,7 @@
 # 6) Update the deployment with the service account
 # 7) Install OpenEBS using stable helm chart
 # 8) Check if the installation is successful
+# 9) Create the default storage classes
 
 - name: 1) Install helm
   shell: curl -Lo /tmp/helm-linux-amd64.tar.gz https://kubernetes-helm.storage.googleapis.com/helm-v2.6.2-linux-amd64.tar.gz; tar -xvf /tmp/helm-linux-amd64.tar.gz -C /tmp/; chmod +x  /tmp/linux-amd64/helm && sudo mv /tmp/linux-amd64/helm /usr/local/bin/
@@ -107,7 +108,7 @@
   retries: 15
 
 - name: 8a) Check if maya-apiserver is deployed
-  shell: kubectl get pods -n "{{ namespace }}" | grep "openebs-maya-apiserver"
+  shell: kubectl get pods -n "{{ namespace }}" | grep "openebs-apiserver"
   args:
     executable: /bin/bash
   register: api_server
@@ -115,13 +116,9 @@
   delay: 60
   retries: 15
 
-- name: 8b) Check if storage classes are created
-  shell: kubectl get sc
+- name: 9) Create the default storage classes
+  shell: kubectl apply -f "{{ storage_classes }}"
   args:
     executable: /bin/bash
-  register: storage_classes
-  until: "'openebs-cassandra' in storage_classes.stdout"
-  delay: 10
-  retries: 3
 
 

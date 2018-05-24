@@ -2,3 +2,4 @@
 #charts: https://openebs.github.io/charts/
 namespace: openebs
 update_deploy_file: update.json
+storage_classes: https://raw.githubusercontent.com/openebs/openebs/master/k8s/openebs-storageclasses.yaml
