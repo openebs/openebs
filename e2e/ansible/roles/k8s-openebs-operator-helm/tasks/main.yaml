@@ -1,10 +1,20 @@
 ---
-- name: Install helm
+# Steps
+# 1) Downloading helm
+# 2) Initialising helm
+# 3) Check if the tiller is deployed
+# 4) Create service account for tiller
+# 5) Create cluster role binding
+# 6) Update the deployment with the service account
+# 7) Install OpenEBS using stable helm chart
+# 8) Check if the installation is successful
+
+- name: 1) Install helm
   shell: curl -Lo /tmp/helm-linux-amd64.tar.gz https://kubernetes-helm.storage.googleapis.com/helm-v2.6.2-linux-amd64.tar.gz; tar -xvf /tmp/helm-linux-amd64.tar.gz -C /tmp/; chmod +x  /tmp/linux-amd64/helm && sudo mv /tmp/linux-amd64/helm /usr/local/bin/
   args:
     executable: /bin/bash
 
-- name: Tiller setup
+- name: 2) Tiller setup
   shell: helm init
   args:
     executable: /bin/bash
@@ -13,7 +23,7 @@
   delay: 30
   retries: 15
 
-- name: Check if tiller is configured
+- name: 3) Check if tiller is configured
   shell: helm version
   args:
     executable: /bin/bash
@@ -22,7 +32,7 @@
   delay: 30
   retries: 5
 
-- name: Creating service account
+- name: 4) Creating service account
   shell: kubectl -n kube-system create sa tiller
   args:
     executable: /bin/bash
@@ -31,7 +41,7 @@
   delay: 60
   retries: 5
 
-- name: Create cluster rolebinding
+- name: 5) Create cluster rolebinding
   shell: kubectl create clusterrolebinding tiller --clusterrole cluster-admin --serviceaccount=kube-system:tiller
   args:
     executable: /bin/bash
@@ -40,18 +50,18 @@
   delay: 20
   retries: 5
 
-- name: Getting home directory in kubernetes master
+- name: 6) Getting home directory in kubernetes master
   shell: source ~/.profile; echo $HOME
   args:
     executable: /bin/bash
   register: result_kube_home
 
-- name: Copying the patch yaml file to kubernetes master
+- name: 6a) Copying the patch yaml file to kubernetes master
   copy:
     src: "{{ update_deploy_file }}"
     dest: "{{ result_kube_home.stdout }}"
 
-- name : Update the deployment
+- name : 6b) Update the deployment
   shell: kubectl -n kube-system patch deploy/tiller-deploy -p "$(cat {{ update_deploy_file }})"
   args:
     executable: /bin/bash
@@ -78,7 +88,7 @@
 #  delay: 20
 #  retries: 6
 
-- name: Install openebs
+- name: 7) Install openebs
   shell: helm install stable/openebs --name openebs --namespace openebs
   args:
     executable: /bin/bash
@@ -87,7 +97,7 @@
   delay: 120
   retries: 5
 
-- name: Check if provisioner is deployed
+- name: 8) Check if provisioner is deployed
   shell: kubectl get pods -n "{{ namespace }}" | grep "openebs-provisioner"
   args:
     executable: /bin/bash
@@ -96,7 +106,7 @@
   delay: 60
   retries: 15
 
-- name: Check if maya-apiserver is deployed
+- name: 8a) Check if maya-apiserver is deployed
   shell: kubectl get pods -n "{{ namespace }}" | grep "openebs-maya-apiserver"
   args:
     executable: /bin/bash
@@ -105,7 +115,7 @@
   delay: 60
   retries: 15
 
-- name: Check if storage classes are created
+- name: 8b) Check if storage classes are created
   shell: kubectl get sc
   args:
     executable: /bin/bash
