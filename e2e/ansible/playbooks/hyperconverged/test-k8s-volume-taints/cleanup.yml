@@ -18,7 +18,7 @@
      retries: 6
      changed_when: true
 
-   - name: Delete storage pool CRD yaml
+   - name: Delete Volume policy yaml
      shell: source ~/.profile; kubectl delete -f {{ volume_policy }}
      args:
        executable: /bin/bash
@@ -26,7 +26,7 @@
      ignore_errors: true
      changed_when: True
 
-   - name: Delete volume-policies yaml
+   - name: Delete Storage Pool CRD yaml
      shell: source ~/.profile; kubectl delete -f {{ storage_pool }}
      args:
        executable: /bin/bash
