@@ -222,7 +222,7 @@
 
        ############## Verifying the Storage Pool policy #######################
 
-       - name: 13c) find the pvc inside the /mnt/openebs
+       - name: Find the pvc inside the /mnt/openebs
          stat:
           path: /mnt/openebs/{{ rep_pod_name }}
          register: stat_result
