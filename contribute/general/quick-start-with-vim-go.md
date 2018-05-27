@@ -1,6 +1,6 @@
-# Setting up vim-go on Ubuntu 16.04
+### Setting up vim-go on Ubuntu 16.04
 
-## Pre-requisites
+### Pre-requisites
 
 Let us assume that you already have a working Go environment. You to make sure that your $GOPATH/bin is included in your PATH.
 
