@@ -71,24 +71,6 @@
   delay: 20
   retries: 6
 
-#- name: Adding OpenEBS charts to repo
-#  shell: helm repo add openebs-charts "{{ charts }}"
-#  args:
-#    executable: /bin/bash
-#  register: repos
-#  until: "'\"openebs-charts\" has been added to your repositories' in repos.stdout"
-#  delay: 20
-#  retries: 6
-
-#- name: Update the repo
-#  shell: helm repo update
-#  args:
-#    executable: /bin/bash
-#  register: update
-#  until: "'Update Complete' in update.stdout"
-#  delay: 20
-#  retries: 6
-
 - name: 7) Install openebs
   shell: helm install stable/openebs --name openebs --namespace openebs
   args:
