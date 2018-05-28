@@ -3,6 +3,11 @@
 # Description: Include resiliency test suite in OpenEBS e2e (Test: disk failure)
 
 ###############################################################################################
+# Prerequisities:
+# 1. Add a Disk, Format and Mount the disk in kubernetes node.
+# 2. Get the UUID of the Additional disk.
+# 3. Run the Playbook with the UUID of the additional Disk as a external variable.
+#
 #Test Steps:
 #1. Copy/Gather Test artifacts to Kubemaster.
 #2. Create Storage pool Path to the additional disk in Nodes.
