@@ -63,7 +63,7 @@
          include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
          vars:
            ns: openebs
-           app: openebs-api
+           app: maya-apiserver
 
        - name: Copy the storage-pool creation  yaml to kube master
          copy:
@@ -162,6 +162,40 @@
            - rep
          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
 
+       - name: Get storage ctrl pod name
+         shell: source ~/.profile; kubectl get pods -n kube-system | grep ctrl | awk {'print $1'}
+         args:
+           executable: /bin/bash
+         register: ctrl_name
+         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+
+       - name: Set ctrl pod name to variable
+         set_fact:
+           ctrl_pod_name: "{{ ctrl_name.stdout.split()[0] }}"
+
+       ###### Verifying the Volume-Monitor policy ######################################################################
+
+       - name: Check the maya-exporter container is running
+         shell: source ~/.profile; kubectl get pods {{ ctrl_pod_name  }} -n {{ namespace }} -o jsonpath='{.spec.containers[*].name}'
+         args:
+           executable: /bin/bash
+         register: container_result
+         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+         failed_when: "'maya-exporter' not in container_result.stdout"
+         ignore_errors: true
+
+       - name: Check all the containters are READY and Running in controller pod
+         shell: source ~/.profile; kubectl get pods -n {{ namespace }} | grep ctrl  | awk {'print $2'}
+         args:
+           executable: /bin/bash
+         register: container1_result
+         until: "'2/2' in container1_result.stdout"
+         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+         delay: 30
+         retries: 5
+
+
+
        - name: Get the count of the running replicas
          shell: source ~/.profile; kubectl get pods -n {{ namespace }} | grep pvc | grep rep | grep Running | wc -l
          args:
@@ -222,7 +256,7 @@
 
        ############## Verifying the Storage Pool policy #######################
 
-       - name: Find the pvc inside the /mnt/openebs
+       - name: 13c) find the pvc inside the /mnt/openebs
          stat:
           path: /mnt/openebs/{{ rep_pod_name }}
          register: stat_result
