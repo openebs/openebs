@@ -30,8 +30,8 @@
     executable: /bin/bash
   register: tiller_version
   until: "'Server: &version.Version' in tiller_version.stdout"
-  delay: 30
-  retries: 5
+  delay: 120
+  retries: 10
 
 - name: 4) Creating service account
   shell: kubectl -n kube-system create sa tiller
