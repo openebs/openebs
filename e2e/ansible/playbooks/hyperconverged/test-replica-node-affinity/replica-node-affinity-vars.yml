@@ -9,9 +9,7 @@ percona_link: https://raw.githubusercontent.com/openebs/openebs/master/k8s/demo/
 
 replica_count: 2
 
-namespace: node-affinity
-
-utils_path: /home/giri/new_fork/openebs/e2e/ansible/playbooks/utils
+utils_path: openebs/e2e/ansible/playbooks/utils
 
 test_pod_regex: maya*|openebs*|pvc*|percona*|
 

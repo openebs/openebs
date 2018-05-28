@@ -38,7 +38,7 @@
          include_tasks: "{{utils_path}}/deploy_check.yml"
          vars:
             ns: openebs
-            app: maya-api
+            app: openebs-api
 
        - name: 2) Obtaining storage classes yaml
          shell: kubectl get sc openebs-percona -o yaml > "{{ create_sc }}"
@@ -48,15 +48,23 @@
        - name: 2b) Create test specific namespace
          command: kubectl create ns {{ namespace }}
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-         
 
-# Updating number of replica pods to 2
+       - name: 2c) Get the number of nodes in the cluster
+         shell: kubectl get nodes | grep '<none>' | wc -l
+         args:
+           executable: /bin/bash
+         register: node_out
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+       - name: 2d) Fetch the node count from stdout
+         set_fact:
+            node_count: " {{ node_out.stdout}}"
 
        - name: 3) Replace the replica count in storage classes yaml
          replace:
            path: "{{ create_sc }}"
            regexp: 'openebs.io/jiva-replica-count: "3"'
-           replace: 'openebs.io/jiva-replica-count: "2"'
+           replace: 'openebs.io/jiva-replica-count: "{{ (node_count) |int-1}}"'
 
        - name: 3a) Delete the existing storage class and create new one
          shell: kubectl delete sc openebs-percona; sleep 20; kubectl apply -f "{{ create_sc }}"
