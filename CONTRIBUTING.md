@@ -6,7 +6,7 @@ Firstly, if you are unsure or afraid of anything, just ask or submit the issue o
 
 However, for those individuals who want a bit more guidance on the best way to contribute to the project, read on. This document will cover all the points we're looking for in your contributions, raising your chances of quickly merging or addressing your contributions.
 
-That said, OpenEBS is an innovation in open-source. You are welcome to contribute in any way you can and all the help provided is very much appreciated. 
+That said, OpenEBS is an innovation in Open Source. You are welcome to contribute in any way you can and all the help provided is very much appreciated. 
 
 - [Raise issues to request new functionality, fix documentation or for reporting bugs.](#raising-issues)
 - [Submit changes to improve documentation.](#submit-change-to-improve-documentation) 
