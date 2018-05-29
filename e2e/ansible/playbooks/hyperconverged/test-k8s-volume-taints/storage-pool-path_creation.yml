@@ -1,0 +1,8 @@
+apiVersion: openebs.io/v1alpha1
+kind: StoragePool
+metadata:
+    name: sp-mntdir
+    type: hostdir
+spec:
+    path: "/mnt/openebs"
+

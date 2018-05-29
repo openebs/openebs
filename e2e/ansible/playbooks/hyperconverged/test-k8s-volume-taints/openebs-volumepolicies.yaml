@@ -1,73 +1,3 @@
-apiVersion: openebs.io/v1alpha1
-kind: StoragePool
-metadata:
-  name: sp-mntdir 
-  type: hostdir
-spec:
-  path: "/mnt/openebs"
----
-apiVersion: storage.k8s.io/v1
-kind: StorageClass
-metadata:
-  name: openebs-taints-0.6.0
-  annotations:
-    provisioner.openebs.io/version: 0.6.0
-provisioner: openebs.io/provisioner-iscsi
-parameters:
-  openebs.io/volume-policy: openebs-policy-taints-0.6.0
-  openebs.io/storage-pool: "sp-mntdir"
-  openebs.io/jiva-replica-count: "2"
-  openebs.io/volume-monitor: "true"
-  openebs.io/capacity: 5G
-
-
----
-apiVersion: openebs.io/v1alpha1
-kind: VolumePolicy
-metadata:
-  name: openebs-policy-taints-0.6.0
-spec:
-  policies:
-  #- name: VolumeMonitor
-  #  enabled: "true"
-  - name: ControllerImage
-    value: openebs/jiva:0.5.0
-  - name: ReplicaImage
-    value: openebs/jiva:0.5.0
-  - name: ReplicaCount
-    value: "1"
-  - name: StoragePool
-    value: sp-mntdir
-  - name: TaintTolerations
-    value: |-
-      t1:
-        key: jk
-        operator: Equal
-        value: jv
-        effect: NoSchedule
-
-  - name: EvictionTolerations
-    value: |-
-      t1:
-        effect: NoExecute
-        key: node.alpha.kubernetes.io/notReady
-        operator: Exists
-      t2:
-        effect: NoExecute
-        key: node.alpha.kubernetes.io/unreachable
-        operator: Exists
-  run:
-    searchNamespace: default
-    tasks:
-    - template: volume-service-0.6.0
-      identity: vsvc
-    - template: volume-path-0.6.0
-      identity: vpath
-    - template: volume-controller-0.6.0
-      identity: vctrl
-    - template: volume-replica-0.6.0
-      identity: vrep
----
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -75,7 +5,6 @@ metadata:
   annotations:
     openebs.io/policy: VolumePolicy
     policy.openebs.io/version: 0.6.0
-  namespace: default
 data:
   meta: |
     runNamespace: {{ .Volume.runNamespace }}
@@ -117,7 +46,6 @@ metadata:
   annotations:
     openebs.io/policy: VolumePolicy
     policy.openebs.io/version: 0.6.0
-  namespace: default
 data:
   meta: |
     runNamespace: {{ .Volume.runNamespace }}
@@ -133,7 +61,6 @@ metadata:
   annotations:
     openebs.io/policy: VolumePolicy
     policy.openebs.io/version: 0.6.0
-  namespace: default
 data:
   meta: |
     runNamespace: {{ .Volume.runNamespace }}
@@ -141,8 +68,6 @@ data:
     kind: Deployment
     action: put
   task: |
-    {{- $isMonitor := .Policy.VolumeMonitor.enabled | default "true" | lower -}}
-    {{- $monitorVal := .Policy.VolumeMonitor.value | default "openebs/m-exporter:0.5.0" -}}
     apiVersion: extensions/v1beta1
     Kind: Deployment
     metadata:
@@ -154,18 +79,14 @@ data:
         vsm: {{ .Volume.owner }}
         openebs.io/pv: {{ .Volume.owner }}
       annotations:
-        {{- if eq $isMonitor "true" }}
         openebs.io/volume-monitor: "true"
-        {{- end}}
         openebs.io/volume-type: jiva
       name: {{ .Volume.owner }}-ctrl
     spec:
       replicas: 1
       selector:
         matchLabels:
-          {{- if eq $isMonitor "true" }}
           monitoring: volume_exporter_prometheus
-          {{- end}}
           openebs.io/controller: jiva-controller
           openebs/controller: jiva-controller
           openebs.io/pv: {{ .Volume.owner }}
@@ -173,9 +94,7 @@ data:
       template:
         metadata:
           labels:
-            {{- if eq $isMonitor "true" }}
             monitoring: volume_exporter_prometheus
-            {{- end}}
             openebs.io/controller: jiva-controller
             openebs/controller: jiva-controller
             openebs.io/pv: {{ .Volume.owner }}
@@ -198,17 +117,15 @@ data:
               protocol: TCP
             - containerPort: 9501
               protocol: TCP
-          {{- if eq $isMonitor "true" }}
           - args:
             - -c=http://127.0.0.1:9501
             command:
             - maya-volume-exporter
-            image: {{ $monitorVal }}
+            image: {{ .Policy.VolumeMonitor.value }}
             name: maya-volume-exporter
             ports:
             - containerPort: 9500
               protocol: TCP
-          {{- end}}
           tolerations:
           - effect: NoExecute
             key: node.alpha.kubernetes.io/notReady
@@ -217,7 +134,7 @@ data:
           - effect: NoExecute
             key: node.alpha.kubernetes.io/unreachable
             operator: Exists
-            tolerationSeconds: 0
+            tolerationSeconds: 0                  
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -226,7 +143,6 @@ metadata:
   annotations:
     openebs.io/policy: VolumePolicy
     policy.openebs.io/version: 0.6.0
-  namespace: default
 data:
   meta: |
     runNamespace: {{ .Volume.runNamespace }}
@@ -234,10 +150,6 @@ data:
     kind: Deployment
     action: put
   task: |
-    {{- $isTaintTolerations := .Policy.TaintTolerations.value | default "false" -}}
-    {{- $taintTolerationsVal := fromYaml .Policy.TaintTolerations.value -}}
-    {{- $isEvictionTolerations := .Policy.EvictionTolerations.value | default "false" -}}
-    {{- $evictionTolerationsVal := fromYaml .Policy.EvictionTolerations.value -}}
     apiVersion: extensions/v1beta1
     kind: Deployment
     metadata:
@@ -298,23 +210,69 @@ data:
             - name: openebs
               mountPath: /openebs
           tolerations:
-          {{- if ne $isTaintTolerations "false" }}
-          {{- range $k, $v := $taintTolerationsVal }}
-          - 
-          {{- range $kk, $vv := $v }}
-            {{ $kk }}: {{ $vv }}
-          {{- end }}
-          {{- end }}
-          {{- end }}
-          {{- if ne $isEvictionTolerations "false" }}
-          {{- range $k, $v := $evictionTolerationsVal }}
-          - 
-          {{- range $kk, $vv := $v }}
-            {{ $kk }}: {{ $vv }}
-          {{- end }}
-          {{- end }}
-          {{- end }}
+          - effect: NoExecute
+            key: node.alpha.kubernetes.io/notReady
+            operator: Exists
+          - effect: NoExecute
+            key: node.alpha.kubernetes.io/unreachable
+            operator: Exists
           volumes:
           - name: openebs
             hostPath:
               path: {{ .TaskResult.vpath.storagePoolPath }}/{{ .Volume.owner }}
+---
+apiVersion: openebs.io/v1alpha1
+kind: VolumePolicy
+metadata:
+  name: openebs-policy-0.6.0
+spec:
+  policies:
+  - name: VolumeMonitor
+    value: openebs/m-exporter:ci
+  - name: ControllerImage
+    value: openebs/jiva:ci
+  - name: ReplicaImage
+    value: openebs/jiva:ci
+  - name: ReplicaCount
+    value: "2"
+  - name: StoragePool
+    value: ssd
+  - name: TaintTolerations
+    value: |-
+      t1:
+        key: jk
+        operator: Equal
+        value: jv
+        effect: NoSchedule
+  - name: EvictionTolerations
+    value: |-
+      t1:
+        effect: NoExecute
+        key: node.alpha.kubernetes.io/notReady
+        operator: Exists
+      t2:
+        effect: NoExecute
+        key: node.alpha.kubernetes.io/unreachable
+        operator: Exists
+
+  run:
+    searchNamespace: default
+    tasks:
+    - template: volume-service-0.6.0
+      identity: vsvc
+    - template: volume-path-0.6.0
+      identity: vpath
+    - template: volume-controller-0.6.0
+      identity: vctrl
+    - template: volume-replica-0.6.0
+      identity: vrep
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: openebs-standard-0.6.0
+  annotations:
+    provisioner.openebs.io/version: 0.6.0
+provisioner: openebs.io/provisioner-iscsi
+parameters:
+  openebs.io/volume-policy: openebs-policy-0.6.0

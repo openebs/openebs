@@ -1,19 +1,14 @@
 
-   - name: Get $HOME of K8s master for kubernetes user
-     shell: source ~/.profile; echo $HOME
-     args:
-       executable: /bin/bash
-     register: result_kube_home
-     delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
    - name: Delete PVC
-     shell: source ~/.profile; kubectl delete -f test-pvc.yaml -n "{{ namespace }}" 
+     shell: source ~/.profile; kubectl delete -f test-pvc.yaml -n {{ namespace }}
      args:
        executable: /bin/bash
      delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+     changed_when: True
 
    - name: Confirm if the PVC has been deleted
-     shell: source ~/.profile; kubectl get pods --all-namespaces 
+     shell: source ~/.profile; kubectl get pods -n {{ namespace }}
      args:
        executable: /bin/bash
      delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
@@ -21,37 +16,42 @@
      until: "'pvc' not in result.stdout"
      delay: 30
      retries: 6
+     changed_when: true
 
-   - name: Delete volume-policies yaml
-     shell: source ~/.profile; kubectl delete -f vol-policies.yaml   
+   - name: Delete Volume policy yaml
+     shell: source ~/.profile; kubectl delete -f {{ volume_policy }}
      args:
        executable: /bin/bash
      delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
      ignore_errors: true
- 
-   - name: Delete openebs-operator with non-default namespace
-     shell: source ~/.profile; kubectl delete -f openebs-operator-ns-openebs.yaml 
+     changed_when: True
+
+   - name: Delete Storage Pool CRD yaml
+     shell: source ~/.profile; kubectl delete -f {{ storage_pool }}
+     args:
+       executable: /bin/bash
+     delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+     changed_when: True
+
+   - name: Delete namespace
+     shell: source ~/.profile; kubectl delete ns {{ namespace }}
      args:
        executable: /bin/bash
      delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
-     ignore_errors: true
-
-   - name: Confirm pod has been deleted
-     shell: source ~/.profile; kubectl get pods --all-namespaces
-     args:
-       executable: /bin/bash
      register: result
-     until: "'maya-apiserver' or 'openebs-provisioner' not in result.stdout"
-     delay: 100
-     retries: 6
-     delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+     until: "'deleted' in result.stdout"
+     delay: 10
+     retries: 5
+     changed_when: True
 
-   - name: untaint the nodes for maya-apiserver
+
+   - name: untaint the nodes
      shell: source ~/.profile; kubectl taint nodes {{ node1 }} {{ operator_key }}:NoSchedule-; kubectl taint nodes {{ node_names[0] }} {{ pvc_key }}:NoSchedule-; kubectl taint nodes {{ node_names[1] }} {{ pvc_key }}:NoSchedule-
      args:
        executable: /bin/bash
      register: result
      delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+     changed_when: True
 
    - name: Check nodes are untainted
      shell: source ~/.profile;  kubectl describe node {{ node1 }} {{ node_names[0] }} {{ node_names[1] }}  | grep NoSchedule
@@ -60,5 +60,15 @@
      register: result
      delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
      ignore_errors: true
+     changed_when: True
    - debug: msg='nodes are untainted'
-     when: result.stderr == "" 
+     when: result.stderr == ""
+
+   - name: Remove test artifacts
+     file:
+       path: "{{ result_kube_home.stdout }}/{{ item }}"
+       state: absent
+     delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+     with_items:
+         - "{{test_artifacts}}"
+
