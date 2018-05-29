@@ -86,7 +86,7 @@ function setup_local_env() {
     sudo apt-get install -y unzip curl wget jq
 
     IS_AWS_CLI_INSTALLED=$(which aws >> /dev/null 2>&1; echo $?)
-    if [ $IS_AWS_CLI_INSTALLED -eq 0 ]; then
+    if [[ $IS_AWS_CLI_INSTALLED -eq 0 ]]; then
         echo "aws is installed; Skipping"
         sleep 2
     else
@@ -97,7 +97,7 @@ function setup_local_env() {
     fi
 
     IS_TERRAFORM_INSTALLED=$(which terraform >> /dev/null 2>&1; echo $?)
-    if [ $IS_TERRAFORM_INSTALLED -eq 0 ]; then
+    if [[ $IS_TERRAFORM_INSTALLED -eq 0 ]]; then
         echo "terraform is installed; Skipping"
         sleep 2
     else 
@@ -110,7 +110,7 @@ function setup_local_env() {
     fi
 
     IS_KOPS_INSTALLED=$(which kops >> /dev/null 2>&1; echo $?)
-    if [ $IS_KOPS_INSTALLED -eq 0 ]; then
+    if [[ $IS_KOPS_INSTALLED -eq 0 ]]; then
         echo "kops is installed; Skipping"
         sleep 2
     else
@@ -175,7 +175,7 @@ function create_terraform_file() {
     aws s3api create-bucket --bucket openebs-k8s-`echo $s3_bucket_name`-local-state-store &
     show_progress_bar
 
-    if [ -e ~/.ssh/id_rsa.pub ];then
+    if [[ -e ~/.ssh/id_rsa.pub ]];then
         echo "Using Public Key for Passwordless SSH."
     else
         echo "Generating Public Key for Passwordless SSH"
@@ -184,12 +184,12 @@ function create_terraform_file() {
 
     echo "Generating terraform file(.tf)"
 
-    if [ "$ami_vm_os" = "ubuntu" ]; then
+    if [[ $ami_vm_os = "ubuntu" ]]; then
         # Ubuntu Image
         amazon_machine_image="ami-2757f631"
     else 
     
-        if [ "$ami_vm_os" = "coreos" ]; then
+        if [[ $ami_vm_os = "coreos" ]]; then
             # CoreOS Image
             amazon_machine_image="ami-ee774a95"
         fi
@@ -209,7 +209,7 @@ function create_terraform_file() {
 
     add_network_rules
 
-    if [ "$ami_vm_os" = "coreos" ]; then
+    if [[ $ami_vm_os = "coreos" ]]; then
         # CoreOS
         start_iscsi_services
     fi
@@ -218,12 +218,12 @@ function create_terraform_file() {
 
 function apply_openebs_operator(){
     
-    if [ "$amazon_machine_image" = "ami-2757f631" ]; then        
+    if [[ $amazon_machine_image = "ami-2757f631" ]]; then        
         # Ubuntu Image
         ssh -i ~/.ssh/id_rsa ubuntu@$public_ip_addr 'source /etc/profile; kubectl create -f https://raw.githubusercontent.com/openebs/openebs/master/k8s/openebs-operator.yaml'
         ssh -i ~/.ssh/id_rsa ubuntu@$public_ip_addr 'source /etc/profile; kubectl create -f https://raw.githubusercontent.com/openebs/openebs/master/k8s/openebs-storageclasses.yaml'
     else
-        if [ "$amazon_machine_image" = "ami-ee774a95" ]; then
+        if [[ $amazon_machine_image = "ami-ee774a95" ]]; then
             echo "Apply OpenEBS Operator..." 
             # CoreOS Image
             ssh -i ~/.ssh/id_rsa core@$public_ip_addr 'source /etc/profile; kubectl create -f https://raw.githubusercontent.com/openebs/openebs/master/k8s/openebs-operator.yaml'
@@ -266,16 +266,16 @@ function ssh_aws_ec2() {
     
     is_node_master=$(aws ec2 describe-instances --region us-east-1 --filters "Name=ip-address, Values=$public_ip_addr" --query 'Reservations[].Instances[].[SecurityGroups[].GroupName]' | grep masters)
 
-    if [ "$amazon_machine_image" = "ami-2757f631" ]; then
+    if [[ $amazon_machine_image = "ami-2757f631" ]]; then
         # Ubuntu Image
 
-        if [ ! -z "$is_node_master" ]; then
+        if [[ ! -z $is_node_master ]]; then
 
             disp_conn_node="Connecting to Kubernetes Master Node..."
  
             openebs_pod_status=$(ssh -i ~/.ssh/id_rsa ubuntu@$public_ip_addr 'source /etc/profile; kubectl get pods | grep -q maya-apiserver; if [ $? -ne 0 ]; then echo "true"; else echo "false"; fi')
 
-            if [ "$openebs_pod_status" = "true" ]; then
+            if [[ $openebs_pod_status = "true" ]]; then
                 # Apply OpenEBS Operator to the kubernetes cluster
                 apply_openebs_operator            
             fi
@@ -283,16 +283,16 @@ function ssh_aws_ec2() {
         echo $disp_conn_node
         ssh -i ~/.ssh/id_rsa ubuntu@$public_ip_addr
     else
-        if [ "$amazon_machine_image" = "ami-ee774a95" ]; then
+        if [[ $amazon_machine_image = "ami-ee774a95" ]]; then
             # CoreOS Image
 
-            if [ ! -z "$is_node_master" ]; then
+            if [[ ! -z $is_node_master ]]; then
 
                 disp_conn_node="Connecting to Kubernetes Master Node..."
  
                 openebs_pod_status=$(ssh -i ~/.ssh/id_rsa core@$public_ip_addr 'source /etc/profile; kubectl get pods | grep -q maya-apiserver; if [ $? -ne 0 ]; then echo "true"; else echo "false"; fi')
 
-                if [ "$openebs_pod_status" = "true" ]; then
+                if [[ $openebs_pod_status = "true" ]]; then
                     # Apply OpenEBS Operator to the kubernetes cluster
                     apply_openebs_operator
                 fi
@@ -312,12 +312,12 @@ function delete_cluster()
             [Yy]* )
                   # Get state details from config data generated by cluster creation
                   
-                  if [ -f "s3bucket.out" ]; then 
+                  if [[ -f "s3bucket.out" ]]; then 
                       clusterstate=s3://$(cat s3bucket.out)
                   
-                  elif [ -d "data" ]; then
+                  elif [[ -d "data" ]]; then
                       res=`grep -r ConfigBase data` 
-                      if [ $? -ne 0 ]; then  
+                      if [[ $? -ne 0 ]]; then  
                           printf "\nCluster state is invalid, please check aws console\n"
                           exit;
                       else
@@ -334,7 +334,7 @@ function delete_cluster()
                   echo "Deleting the cluster.."
                   kops delete cluster --name=openebs.k8s.local --state=$clusterstate --yes 
                   
-                  if [ $? -ne 0 ]; then
+                  if [[ $? -ne 0 ]]; then
                       #echo "Kops delete cluster failed with errors, please check logs.."
                       printf "\nKops delete cluster failed with errors, please check logs..\n"
                       while true; do 
@@ -358,7 +358,7 @@ function delete_cluster()
                   
                   aws s3api delete-bucket --bucket=`echo $clusterstate | sed 's|s3://||g'
 `
-                  if [ $? -ne 0 ]; then 
+                  if [[ $? -ne 0 ]]; then 
                       echo "Failed to delete s3 bucket, please check logs"
                       exit;
                   fi 
@@ -401,7 +401,7 @@ function show_progress_bar() {
     local pid=$!
     local delay=0.1
     local spinstr='|/-\'
-    while [ "$(ps a | awk '{print $1}' | grep $pid)" ]; do
+    while [[ $(ps a | awk '{print $1}' | grep $pid) ]]; do
         local temp=${spinstr#?}
         printf " [%c]  " "$spinstr"
         local spinstr=$temp${spinstr%"$temp"}
@@ -435,12 +435,12 @@ do
                         ;;
         --ssh-aws-ec2)  # Takes an option argument, 
                         # ensuring it has been specified.
-                        if [ -n "$2" ]; then
+                        if [[ -n $2 ]]; then
                            is_valid_ip $(echo $2)
-                            if [ $? -eq 0 ]; then
+                            if [[ $? -eq 0 ]]; then
                                 public_ip_addr=$(echo $2)
                                 is_aws_node=$(aws ec2 describe-instances --region us-east-1 --filters "Name=ip-address, Values=$public_ip_addr" --output text)
-                                if [ -z "$is_aws_node" ]; then
+                                if [[ -z $is_aws_node ]]; then
                                     echo "Not a valid AWS Node"
                                     exit;
                                 fi 
@@ -460,10 +460,10 @@ do
         --ssh-aws-ec2=?*)  # Delete everything up to "=" 
                         # and assign the remainder.                        
                         is_valid_ip $(echo ${1#*=})
-                        if [ $? -eq 0 ]; then
+                        if [[ $? -eq 0 ]]; then
                             public_ip_addr=$(echo ${1#*=})
                             is_aws_node=$(aws ec2 describe-instances --region us-east-1 --filters "Name=ip-address, Values=$public_ip_addr" --output text)
-                            if [ -z "$is_aws_node" ]; then
+                            if [[ -z $is_aws_node ]]; then
                                 echo "Not a valid AWS Node"
                                 exit;
                             fi
@@ -488,7 +488,7 @@ do
 
         --ami-vm-os)  # Takes an option argument, 
                         # ensuring it has been specified.
-                        if [ -n "$2" ]; then
+                        if [[ -n $2 ]]; then
                             ami_vm_os="$(echo $2 | tr '[:upper:]' '[:lower:]')"                            
                         else
                             ami_vm_os="ubuntu"                            
@@ -523,14 +523,14 @@ do
 shift
 done
 
-if [ "$run_cluster_func" = true ] ; then
+if [[ $run_cluster_func = true ]] ; then
     create_cluster_config
 fi
 
-if [ "$run_ssh_func" = true ] ; then
+if [[ $run_ssh_func = true ]] ; then
     ssh_aws_ec2
 fi
 
-if [ "$delete_cluster_func" = true ] ; then
+if [[ $delete_cluster_func = true ]] ; then
     delete_cluster
 fi 
