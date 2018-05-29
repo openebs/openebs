@@ -14,9 +14,12 @@
   retries: 5
 
 - name: Remove copied files
-  shell: rm -rf "{{ patch_file }}" "{{ create_sc }}"
-  args:
-    executable: /bin/bash
+  file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+    - "{{ patch_file }}"
+    - "{{ create_sc }}"
   delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
 - name: Delete the namespace
@@ -35,7 +38,7 @@
     executable: /bin/bash
   register: ns_out
   delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-  until: '"{{namespace}}" not in ns_out.stdout'
+  until: '"{{ namespace }}" not in ns_out.stdout'
   delay: 60
   retries: 15
 
