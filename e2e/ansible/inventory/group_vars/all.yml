@@ -24,6 +24,15 @@ weave_version_list:
   - 1.9.4
   - 2.0.4 
 
+#######################################
+#     OpenEBS deployment type         #
+#######################################
+#Option to specify OpenEBS deployment type
+# It can be either kubectl or helm based installation
+
+openebs_deploy: helm
+
+
 #########################################
 # OpenEBS Deployment Specifications     #
 #########################################
@@ -80,3 +89,4 @@ logging: true
 #normal builds upon vanilla VMs
 
 build_type: normal
+
