@@ -1,0 +1,198 @@
+# test-network-failure-rep.yml
+# Author: Sudarshan
+# Description: Include resiliency test suite in OpenEBS e2e (Test: periodic replica network failures)
+
+###############################################################################################
+#Test Steps:
+#1. Copy Test artifacts to Kubemaster.
+#2. Deploy Percona application with liveness probe running db queries continuously.
+#3. Deploy Pumba netem daemonset on all the nodes.
+#4. Gather Node,Replica Container and Pumba netem details required for test.
+#5. Induce periodic network failures on OpenEBS repilca container.
+#6. Check percona application status to veriy openebs replica sustain network failures.
+#7. Perform cleanup of test artifacts.
+###############################################################################################
+- hosts: localhost
+
+  vars_files:
+    - test-nw-failure-rep-vars.yml
+
+  tasks:
+   - block:
+
+       - include: test-nw-failure-rep-prereq.yml
+
+       ###################################################
+       #                PREPARE FOR TEST                 #
+       # (Place artifacts in kubemaster, start logger &  #
+       # confirm OpenEBS operator is ready for requests. #
+       ###################################################
+
+       - name: Get percona spec and liveness scripts
+         get_url:
+           url: "{{ item }}"
+           dest: "{{ result_kube_home.stdout }}"
+         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+         with_items: "{{ percona_links }}"
+
+       - name: Replace volume-claim name with test parameters
+         include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/regex_task.yml"
+         vars:
+           path: "{{ result_kube_home.stdout }}/percona.yaml"
+           regex1: "{{replace_item}}"
+           regex2: "{{replace_with}}"
+
+       - name: Check status of maya-api server
+         include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
+         vars:
+            ns: openebs
+            app: maya-api
+
+       ####################################################
+       #          SETUP FAULT-INJECTION ENV               #
+       # (Setup pumba deployment with an empty policy,    #
+       # deploy percona w/ a liveness check for DB writes)#
+       ####################################################
+
+       - name: Setup the pumba infrastructure
+         include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_task.yml"
+         vars:
+           app_yml: "{{ pumba_file }}"
+           ns: default
+
+       - name: Check whether pumba infrastructure is created
+         include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
+         vars:
+            ns: default
+            app: pumba
+
+       - name: Create test specific namespace
+         command: kubectl create ns {{ namespace }}
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+       - name: Create a configmap with the liveness sql script
+         shell: source ~/.profile; kubectl create configmap sqltest --from-file={{ percona_files.1 }} -n {{ namespace }}
+         args:
+           executable: /bin/bash
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+         register: result
+         failed_when: "'configmap' and 'created' not in result.stdout"
+
+       - name: Create percona deployment with OpenEBS storage
+         include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_task.yml"
+         vars:
+           app_yml: "{{ percona_files.0 }}"
+           ns: "{{ namespace }}"
+
+       - name: Wait for 120s to ensure liveness check starts
+         wait_for:
+           timeout: 120
+
+       - name: Check whether percona application is running
+         include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
+         vars:
+            ns: "{{ namespace }}"
+            app: percona
+
+       - name: Get the node details on which pvc-rep is scheduled
+         shell: kubectl get pods -n {{ namespace }} -o wide | grep rep | awk 'FNR == 1 {print}' | awk {'print $7'}
+         args:
+           executable: /bin/bash
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+         register: node_rep
+
+       - name: Get the pvc-rep name
+         shell: kubectl get pods -n {{ namespace }} | grep rep | awk 'FNR == 1 {print}' | awk {'print $1'}
+         args:
+           executable: /bin/bash
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+         register: pvc_rep_name
+
+       - name: Get the rep container name
+         shell: kubectl describe pod {{ pvc_rep_name.stdout }} -n {{ namespace }} | grep rep-con | awk {'print $1'}
+         args:
+           executable: /bin/bash
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+         register: con_name
+
+       - name: Set container name to variable
+         set_fact:
+           container: "{{ con_name.stdout }}"
+
+       ########################################################
+       #        INJECT FAULTS FOR SPECIFIED PERIOD            #
+       # (Obtain begin marker before fault-inject(FI),do ctrl #
+       # failures, verify successful FI via end marker)       #
+       ########################################################
+
+       - name: Get pumba container name
+         shell: kubectl get pods -o wide | grep {{ node_rep.stdout }} | grep pumba | awk {'print $1'}
+         args:
+           executable: /bin/bash
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+         register: pumba_name
+
+       - name: Initiate periodic network failures from pumba
+         shell: >
+           kubectl exec {{ pumba_name.stdout }} -- pumba netem --interface eth0
+           --duration 1m delay --time {{ item }} re2:k8s_{{ container[:-1] }}; sleep 10
+         args:
+           executable: /bin/bash
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+         with_items: "{{ delay_interavals }}"
+
+       ########################################################
+       #        VERIFY RESILINCY/FAULT-TOLERATION             #
+       # (Confirm liveness checks on percona are successful & #
+       # pod is still in running state)                       #
+       ########################################################
+
+       - name: Confirm percona pod is still running
+         include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
+         vars:
+            ns: "{{ namespace }}"
+            app: percona
+
+       ########################################################
+       #                        CLEANUP                       #
+       # (Tear down application, liveness configmap as well as#
+       # the FI (chaoskube) infrastructure. Also stop logger) #
+       ########################################################
+
+       - name: Test Passed
+         set_fact:
+           flag: "Test Passed"
+
+     rescue:
+       - name: Test Failed
+         set_fact:
+           flag: "Test Failed"
+
+     always:
+       - block:
+
+           - include: test-nw-failure-rep-cleanup.yml
+
+           - name: Test Cleanup Passed
+             set_fact:
+               cflag: "Cleanup Passed"
+
+         rescue:
+           - name: Test Cleanup Failed
+             set_fact:
+               cflag: "Cleanup Failed"
+
+         always:
+
+           - name: Terminate the log aggregator
+             shell: source ~/.profile; killall stern
+             args:
+               executable: /bin/bash
+             delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+           - name: Send slack notification
+             slack:
+               token: "{{ lookup('env','SLACK_TOKEN') }}"
+               msg: '{{ ansible_date_time.time }} TEST: {{test_name}}, RESULT: {{ flag }},{{ cflag }}'
+             when: slack_notify | bool and lookup('env','SLACK_TOKEN')
+
