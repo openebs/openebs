@@ -7,8 +7,6 @@ create_sc: storage-class.yaml
 
 percona_link: https://raw.githubusercontent.com/openebs/openebs/master/k8s/demo/percona/demo-percona-mysql-pvc.yaml
 
-replica_count: 2
-
 utils_path: openebs/e2e/ansible/playbooks/utils
 
 test_pod_regex: maya*|openebs*|pvc*|percona*|

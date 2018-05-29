@@ -38,7 +38,7 @@
          include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
          vars:
             ns: openebs
-            app: openebs-api
+            app: openebs-apiserver
 
        - name: 2) Obtaining storage classes yaml
          shell: kubectl get sc openebs-percona -o yaml > "{{ create_sc }}"
@@ -184,7 +184,7 @@
          register: pod_delete
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
          until: "'deleted' in pod_delete.stdout"
-         delay: 20
+         delay: 60
          retries: 3
 
        - name: 8b) Check the available replicas in deployment
@@ -211,7 +211,7 @@
          set_fact:
             flag: "Test Passed"
 
-   - rescue:
+     rescue:
        - name: Setting fail flag
          set_fact:
            flag: "Test failed"
@@ -220,22 +220,20 @@
 
        - block:
 
-           - name: 9) Cleaning up the test artifacts
-             include: replica-node-affinity-cleanup.yml
+           - include: replica-node-affinity-cleanup.yml
 
-           - name: 9a) Set Passed to cleanup flag.
+           - name: Test Cleanup Passed
              set_fact:
-               cflag: "Cleanup Passed"
+               cflag: cleanup_pass
 
          rescue:
-
-           - name: 10) Set Failed to cleanup flag
+           - name: Test Cleanup Failed
              set_fact:
-               cflag: "Cleanup Failed"
+               cflag: cleanup_fail
 
          always:
 
-           - name: 11) Terminate the log aggregator
+           - name: 5) Terminate the log aggregator
              shell: source ~/.profile; killall stern
              args:
                executable: /bin/bash
@@ -244,6 +242,6 @@
            - name: Send slack notification
              slack:
                token: "{{ lookup('env','SLACK_TOKEN') }}"
-               msg: '{{ ansible_date_time.time }} TEST: {{test_name}}, RESULT: {{ flag }} {{ cflag }}'
+               msg: '{{ ansible_date_time.time }} TEST: {{test_name}}, RESULT: {{ flag }}'
              when: slack_notify | bool and lookup('env','SLACK_TOKEN')
 
