@@ -24,7 +24,7 @@ sudo apt-get update
 sudo apt-get install -y jenkins
 
 IS_VAGRANT_INSTALLED=$(which vagrant >> /dev/null 2>&1; echo $?)
-if [ $IS_VAGRANT_INSTALLED -eq 0 ]; then
+if [[ $IS_VAGRANT_INSTALLED -eq 0 ]]; then
     echo "vagrant is installed; Skipping"
     sleep 2
 else
@@ -34,7 +34,7 @@ else
 fi
 
 IS_VIRTUALBOX_INSTALLED=$(which vboxmanage >> /dev/null 2>&1; echo $?)
-if [ $IS_VIRTUALBOX_INSTALLED -eq 0 ]; then
+if [[ $IS_VIRTUALBOX_INSTALLED -eq 0 ]]; then
     echo "virtualbox is installed; Skipping"
     sleep 2
 else
