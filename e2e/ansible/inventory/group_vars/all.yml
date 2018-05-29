@@ -30,7 +30,7 @@ weave_version_list:
 #Option to specify OpenEBS deployment type
 # It can be either kubectl or helm based installation
 
-openebs_deploy: kubectl
+openebs_deploy: helm
 
 
 #########################################
