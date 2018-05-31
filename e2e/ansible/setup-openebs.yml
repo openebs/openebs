@@ -11,9 +11,13 @@
 
 - hosts: kubernetes-kubemasters 
   roles: 
+<<<<<<< HEAD
     - {role: k8s-openebs-operator-helm, when: deployment_mode == "hyperconverged" and openebs_deploy == "helm"}
 
 - hosts: kubernetes-kubemasters
   roles:
     - {role: k8s-openebs-operator, when: deployment_mode == "hyperconverged" and openebs_deploy == "kubectl"}
+=======
+    - {role: k8s-openebs-operator-helm, when: deployment_mode == "hyperconverged"}
+>>>>>>> 24902556589f6822d183fc625e15f51e020f5618
 
