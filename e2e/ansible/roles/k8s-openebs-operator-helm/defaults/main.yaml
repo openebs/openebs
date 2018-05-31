@@ -1,4 +1,8 @@
 ---
+<<<<<<< HEAD
+=======
+#charts: https://openebs.github.io/charts/
+>>>>>>> 24902556589f6822d183fc625e15f51e020f5618
 namespace: openebs
 update_deploy_file: update.json
 storage_classes: https://raw.githubusercontent.com/openebs/openebs/master/k8s/openebs-storageclasses.yaml

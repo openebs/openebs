@@ -15,7 +15,11 @@
   args:
     executable: /bin/bash
 
+<<<<<<< HEAD
 - name: 2) Tiller setup.
+=======
+- name: Tiller setup
+>>>>>>> 24902556589f6822d183fc625e15f51e020f5618
   shell: helm init
   args:
     executable: /bin/bash
@@ -30,10 +34,24 @@
     executable: /bin/bash
   register: tiller_version
   until: "'Server: &version.Version' in tiller_version.stdout"
+<<<<<<< HEAD
   delay: 120
   retries: 10
 
 - block:
+=======
+  delay: 30
+  retries: 5
+
+- name: Creating service account
+  shell: kubectl -n kube-system create sa tiller
+  args:
+    executable: /bin/bash
+  register: tiller
+  until: "'serviceaccount \"tiller\" created' in tiller.stdout"
+  delay: 60
+  retries: 5
+>>>>>>> 24902556589f6822d183fc625e15f51e020f5618
 
     - name: 4) Checking if the tiller service account already exists.
       shell: kubectl get sa -n kube-system | grep tiller
@@ -83,7 +101,11 @@
     executable: /bin/bash
   register: result_kube_home
 
+<<<<<<< HEAD
 - name: 6a) Copying the patch yaml file to kubernetes master.
+=======
+- name: Copying the patch yaml file to kubernetes master
+>>>>>>> 24902556589f6822d183fc625e15f51e020f5618
   copy:
     src: "{{ update_deploy_file }}"
     dest: "{{ result_kube_home.stdout }}"
@@ -93,11 +115,37 @@
   args:
     executable: /bin/bash
   register: tiller_deploy
+<<<<<<< HEAD
   until: "'\"tiller-deploy\" patched' in tiller_deploy.stdout"
   delay: 60
   retries: 6
 
 - name: 7) Installing openebs using stable charts.
+=======
+  until: "'deployment \"tiller-deploy\" patched' in tiller_deploy.stdout"
+  delay: 20
+  retries: 6
+
+#- name: Adding OpenEBS charts to repo
+#  shell: helm repo add openebs-charts "{{ charts }}"
+#  args:
+#    executable: /bin/bash
+#  register: repos
+#  until: "'\"openebs-charts\" has been added to your repositories' in repos.stdout"
+#  delay: 20
+#  retries: 6
+
+#- name: Update the repo
+#  shell: helm repo update
+#  args:
+#    executable: /bin/bash
+#  register: update
+#  until: "'Update Complete' in update.stdout"
+#  delay: 20
+#  retries: 6
+
+- name: Install openebs
+>>>>>>> 24902556589f6822d183fc625e15f51e020f5618
   shell: helm install stable/openebs --name openebs --namespace openebs
   args:
     executable: /bin/bash
@@ -106,7 +154,11 @@
   delay: 120
   retries: 5
 
+<<<<<<< HEAD
 - name: 8) Checking if the provisioner is up.
+=======
+- name: Check if provisioner is deployed
+>>>>>>> 24902556589f6822d183fc625e15f51e020f5618
   shell: kubectl get pods -n "{{ namespace }}" | grep "openebs-provisioner"
   args:
     executable: /bin/bash
