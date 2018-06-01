@@ -47,4 +47,4 @@ Map that to your local time with this [timezone table](https://www.google.com/se
 
 - Feature requests and current release tasks are captured in this [planning sheet](https://docs.google.com/spreadsheets/d/1bbphUqbxShBhgr1VHaEQUzIGMaJJacPNKc1ckNXU1QE).
 
-Go back to [**Contributing to OpenEBS**](./CONTRIBUTING.md).
+Go back to [**Contributing to OpenEBS**](../CONTRIBUTING.md).
