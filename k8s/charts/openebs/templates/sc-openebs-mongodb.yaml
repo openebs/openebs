@@ -14,3 +14,4 @@ parameters:
   openebs.io/jiva-replica-count: "{{ .Values.jiva.replicas }}"
   openebs.io/volume-monitor: "true"
   openebs.io/capacity: 5G
+  openebs.io/fstype: "xfs"
