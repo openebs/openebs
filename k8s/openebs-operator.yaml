@@ -38,6 +38,9 @@ rules:
 - apiGroups: ["*"]
   resources: ["storagepools"]
   verbs: ["get", "list"]
+- apiGroups: ["volumesnapshot.external-storage.k8s.io"]
+  resources: ["volumesnapshots","volumesnapshotdatas"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
 - nonResourceURLs: ["/metrics"]
   verbs: ["get"]
 ---
@@ -76,7 +79,7 @@ spec:
       containers:
       - name: maya-apiserver
         imagePullPolicy: Always
-        image: openebs/m-apiserver:0.5.4
+        image: openebs/m-apiserver:0.6.0-RC1
         ports:
         - containerPort: 5656
         env:
@@ -91,11 +94,11 @@ spec:
         #- name: OPENEBS_IO_K8S_MASTER
         #  value: "http://172.28.128.3:8080"
         - name: OPENEBS_IO_JIVA_CONTROLLER_IMAGE
-          value: "openebs/jiva:0.5.4"
+          value: "openebs/jiva:0.6.0-RC1"
         - name: OPENEBS_IO_JIVA_REPLICA_IMAGE
-          value: "openebs/jiva:0.5.4"
+          value: "openebs/jiva:0.6.0-RC1"
         - name: OPENEBS_IO_VOLUME_MONITOR_IMAGE
-          value: "openebs/m-exporter:0.5.4"
+          value: "openebs/m-exporter:0.6.0-RC1"
         - name: OPENEBS_IO_JIVA_REPLICA_COUNT
           value: "3"
 ---
@@ -129,7 +132,7 @@ spec:
       containers:
       - name: openebs-provisioner
         imagePullPolicy: Always
-        image: openebs/openebs-k8s-provisioner:0.5.4
+        image: openebs/openebs-k8s-provisioner:0.6.0-RC1
         env:
         # OPENEBS_IO_K8S_MASTER enables openebs provisioner to connect to K8s
         # based on this address. This is ignored if empty.
@@ -158,6 +161,29 @@ spec:
           value: "&var-OpenEBS"
         - name: MAYA_PORTAL_URL
           value: "https://mayaonline.io/"
+---
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: openebs-snapshot-controller
+  namespace: default
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: openebs-snapshot-controller
+    spec:
+      serviceAccountName: openebs-maya-operator
+      containers:
+        - name: snapshot-controller
+          image: openebs/snapshot-controller:0.6.0-RC1
+          imagePullPolicy: Always
+        - name: snapshot-provisioner
+          image: openebs/snapshot-provisioner:0.6.0-RC1
+          imagePullPolicy: Always
 ---
 apiVersion: apiextensions.k8s.io/v1beta1
 kind: CustomResourceDefinition
@@ -215,6 +241,12 @@ parameters:
   openebs.io/jiva-replica-count: "3"
   openebs.io/volume-monitor: "true"
   openebs.io/capacity: 5G
+---
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  name: snapshot-promoter
+provisioner: volumesnapshot.external-storage.k8s.io/snapshot-promoter
 ---
 apiVersion: apiextensions.k8s.io/v1beta1
 kind: CustomResourceDefinition
