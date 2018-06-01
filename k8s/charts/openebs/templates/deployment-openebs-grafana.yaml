@@ -19,7 +19,7 @@ spec:
         release: {{ .Release.Name }}
         component: grafana
     spec:
-      serviceAccountName: {{ template "openebs.serviceAccountName". }}
+      serviceAccountName: {{ template "openebs.serviceAccountName" . }}
       containers:
       - name: {{ template "openebs.name" . }}-grafana
         image: "{{ .Values.grafana.image }}:{{ .Values.grafana.imageTag }}"

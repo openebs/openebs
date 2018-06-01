@@ -17,7 +17,7 @@ spec:
         release: {{ .Release.Name }}
         component: apiserver
     spec:
-      serviceAccountName: {{ template "openebs.serviceAccountName". }}
+      serviceAccountName: {{ template "openebs.serviceAccountName" . }}
       containers:
       - name: {{ template "openebs.name" . }}-apiserver
         image: "{{ .Values.apiserver.image }}:{{ .Values.apiserver.imageTag }}"

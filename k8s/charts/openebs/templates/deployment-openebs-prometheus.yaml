@@ -18,7 +18,7 @@ spec:
         release: {{ .Release.Name }}
         component: prometheus
     spec:
-      serviceAccountName: {{ template "openebs.serviceAccountName". }}
+      serviceAccountName: {{ template "openebs.serviceAccountName" . }}
       containers:
         - name: {{ template "openebs.name" . }}-prometheus
           image: "{{ .Values.prometheus.image }}:{{ .Values.prometheus.imageTag }}"
