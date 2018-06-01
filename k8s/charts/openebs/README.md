@@ -5,7 +5,7 @@ DEPRECATION NOTICE:
 
 The support for this chart will be discontinued soon. Please plan to migrate
 and use stable/openebs chart located at:
- https://github.com/kubernetes/charts/tree/master/stable/openebs
+ [https://github.com/kubernetes/charts/tree/master/stable/openebs](https://github.com/kubernetes/charts/tree/master/stable/openebs)
 
 ------------------------------------------------------------------------------
 
@@ -13,7 +13,7 @@ and use stable/openebs chart located at:
 - Kubernetes 1.7.5+ with RBAC enabled
 - iSCSI PV support in the underlying infrastructure
 - helm is installed and the tiller has admin privileges. To assign admin
-  to tiller, you can use the following instructions:
+  to tiller, login as admin and use the following instructions:
   ```
   kubectl -n kube-system create sa tiller
   kubectl create clusterrolebinding tiller --clusterrole cluster-admin --serviceaccount=kube-system:tiller
