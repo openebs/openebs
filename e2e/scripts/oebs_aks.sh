@@ -13,7 +13,7 @@ sudo apt-get update
 # Installing Azure CLI
 function azure_cli_installed(){
   IS_AZ_INSTALLED=$(which az >> /dev/null 2>&1; echo $?)
-  if [ $IS_AZ_INSTALLED -eq 0 ]; then
+  if [[ $IS_AZ_INSTALLED -eq 0 ]]; then
      echo "Azure CLI already Installed, Skipping"
      az=$(az --version | grep azure-cli | head -1 | cut -d ' ' -f2)
      echo "Installed Azure CLI Version:" ${az}
@@ -33,7 +33,7 @@ function azure_cli_installed(){
 # Login into Azure using Account Credentials
 function azure_login(){
   IS_AZURE_LOGIN=$(az account show >> /dev/null 2>&1; echo $?)
-  if [ $IS_AZURE_LOGIN -eq 0 ]; then
+  if [[ $IS_AZURE_LOGIN -eq 0 ]]; then
      echo "Already Logged in, Skipping"
      a=$(az account show | grep name | awk 'FNR == 2 {print $2}' | cut -d '"' -f2)
      echo "Logged in Account name :" ${a}
@@ -49,7 +49,7 @@ function azure_login(){
 # Install kubernetes newest version >> aks-cluster.log
 function kubectl_installed(){
   IS_KUBECTL_INSTALLED=$(which kubectl >> /dev/null 2>&1; echo $? )
-  if [ $IS_KUBECTL_INSTALLED -eq 0 ]; then
+  if [[ $IS_KUBECTL_INSTALLED -eq 0 ]]; then
      echo "Kubectl already Installed, Skipping"
      sleep 1
   else
