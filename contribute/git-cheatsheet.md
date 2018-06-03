@@ -70,4 +70,4 @@ Though it is important to write unit tests, do not try to achieve 100% code cove
 
 OpenEBS being an OpenSource project will always try to experiment with new ideas and concepts. Hence, writing unit tests will provide the necessary checklist that reduces the scope for errors.
 
-Go back to [**Contributing to OpenEBS**](./CONTRIBUTING.md).
+Go back to [**Contributing to OpenEBS**](../CONTRIBUTING.md).
