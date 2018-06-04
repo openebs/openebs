@@ -16,9 +16,7 @@ snapshot_sc: snapshot-promoter-sc.yml
 snapshot_claim: snapshot-claim.yml
 
 snapshot_files:
-  - snapshot-operator.yml
   - snapshot.yml
-  - snapshot-promoter-sc.yml
   - snapshot-claim.yml
 
 percona: demo-percona-mysql-pvc.yaml

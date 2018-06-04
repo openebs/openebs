@@ -6,16 +6,16 @@
 
 #1. Check if openebs components are running.
 #2. Copy the test artifacts to k8s master.
-#3. Deploy the snapshot controller.
+#3. Check if the snapshot controller is running.
 #4. Deploy Percona application.
 #5. Check if the application pod is up and running
 #6. Create test database inside the percona pod.
 #7. Create volume snapshot.
-#8. Create storage class.
-#9. Restore the snapshot.
-#10. Check if the sync happened successfully between the volumes.
-#11. Deploy the application mapped with new pvc.
-#12. Check if the written table data resides inside the new pod.
+#8. Restore the snapshot.
+#9. Check if the sync happened successfully between the volumes.
+#10. Deploy the application mapped with new pvc.
+#11. Check if the written table data resides inside the new pod.
+#12. Set the test result flag.
 #13. Perform cleanup of test artifacts.
 ###############################################################################################
 
@@ -32,7 +32,7 @@
         - include: prerequisites.yml
 
         - name: 1) Check if openebs-provisioner and maya-apiserver are running
-          shell: source ~/.profile; kubectl get pods | grep Running
+          shell: source ~/.profile; kubectl get pods --all-namespaces | grep Running
           args:
             executable: /bin/bash
           register: pods_list
@@ -48,17 +48,7 @@
           with_items: "{{ snapshot_files }}"
           delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
-        - name: 3) Deploy Snapshot controller
-          shell: source ~/.profile; kubectl create -f "{{ snapshot_operator }}"
-          args:
-            executable: /bin/bash
-          register: operator_output
-          until: "'deployment \"snapshot-controller\" created' in operator_output.stdout"
-          delay: 60
-          retries: 10
-          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-
-        - name: 3a) Check if snapshot-controller is running.
+        - name: 3) Check if snapshot-controller is running.
           shell: source ~/.profile; kubectl get pods --all-namespaces | grep snapshot-controller
           args:
             executable: /bin/bash
@@ -137,17 +127,7 @@
           delay: 60
           retries: 5
 
-        - name: 8) Creating the snapshot-promoter storage class
-          shell: source ~/.profile; kubectl create -f "{{ snapshot_sc }}"
-          args:
-            executable: /bin/bash
-          register: sc
-          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-          until: "'storageclass \"snapshot-promoter\" created' in sc.stdout"
-          delay: 30
-          retries: 5
-
-        - name: 9) Creating PVC from the snapshot
+        - name: 8) Creating PVC from the snapshot
           shell: source ~/.profile; kubectl create -f "{{ snapshot_claim }}"
           args:
             executable: /bin/bash
@@ -157,7 +137,7 @@
           delay: 60
           retries: 5
 
-        - name: 9a) Checking if the pvc is created successfully
+        - name: 8a) Checking if the pvc is created successfully
           shell: source ~/.profile; kubectl get pvc | grep demo-snap-vol-claim
           args:
             executable: /bin/bash
@@ -167,22 +147,29 @@
           delay: 60
           retries: 10
 
-        - name: 10) Obtaining new PV name
+        - name: 9) Obtaining new PV name
           shell: source ~/.profile; kubectl get pv | grep demo-snap-vol-claim | awk {'print $1'}
           args:
             executable: /bin/bash
           register: snap_pv
           delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
-        - name: 10a) Obtaining the new controller pod name
+        - name: 9a) Obtaining the new controller pod name
           shell: source ~/.profile; kubectl get po | grep {{ snap_pv.stdout }} | grep ctrl | awk {'print $1'}
           args:
             executable: /bin/bash
           register: new_ctrl_pod
           delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
-        - name: 10b) Checking if the sync completed
-          shell: source ~/.profile; kubectl logs {{new_ctrl_pod.stdout}}
+        - name: 9b) Obtaining the controller container name
+          shell: source ~/.profile; kubectl get pods {{ new_ctrl_pod.stdout }} -o jsonpath='{.spec.containers[*].name}' | awk '{print $1}'
+          args:
+            executable: /bin/bash
+          register: container_name
+          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+        - name: 9c) Checking if the sync completed
+          shell: source ~/.profile; kubectl logs {{ new_ctrl_pod.stdout }} -c {{ container_name.stdout }}
           args:
             executable: /bin/bash
           register: ctrl_log
@@ -195,7 +182,7 @@
        #   wait_for: timeout=60
        #   delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
-        - name: 10c) Check if the ctrl and replica pods are running
+        - name: 9d) Check if the ctrl and replica pods are running
           shell: kubectl get pods | grep {{snap_pv.stdout}} | grep "{{ item }}"
           args:
             executable: /bin/bash
@@ -208,13 +195,13 @@
             - ctrl
             - rep
 
-        - name: 11) Copy the percona yaml to K8s master
+        - name: 10) Copy the percona yaml to K8s master
           copy:
             src: "{{ percona }}"
             dest: "{{ result_kube_home.stdout }}"
           delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
-        - name: 11a) Deploying the application with the snapped pvc
+        - name: 10a) Deploying the application with the snapped pvc
           shell: source ~/.profile; kubectl create -f "{{ percona }}"
           args:
             executable: /bin/bash
@@ -228,7 +215,7 @@
           wait_for: timeout=120
           delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
-        - name: 11b) Check if new percona pod has been running successfully
+        - name: 10b) Check if new percona pod has been running successfully
           shell: >
             source ~/.profile;
             kubectl get pods -l name=percona-new --no-headers
@@ -240,7 +227,7 @@
           retries: 5
           delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
 
-        - name: 11c) Get new percona pod details
+        - name: 10c) Get new percona pod details
           shell: >
             source ~/.profile;
             kubectl get pods -o wide | grep percona-new
@@ -249,11 +236,11 @@
           register: new_pod
           delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
 
-        - name: 11d) Store new percona pod IP in variable
+        - name: 10d) Store new percona pod IP in variable
           set_fact:
             new_pod_ip: "{{ new_pod.stdout.split()[5] }}"
 
-        - name: 12) Verify successful snapshot restore by db query
+        - name: 11) Verify successful snapshot restore by db query
           shell: |
             sleep 120 # DB init
             kubectl exec -it percona -- mysql -uroot -pk8sDem0 -e "select * from ttbl;" tdb
@@ -264,34 +251,46 @@
           register: db_result
           failed_when: "'tdata' not in db_result.stdout"
 
-        - name: Set the pass flag
+        - name: 12) Set the pass flag
           set_fact:
-            flag: "Pass"
+            flag: "Test Passed"
 
       rescue:
         - name: set the fail flag
           set_fact:
-            flag: "Fail"
+            flag: "Test Failed"
 
       always:
+        - block:
+       
+            - name: Wait few seconds before initiating cleanup
+              wait_for: timeout=60
+              delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
-        - name: Wait few seconds before initiating cleanup
-          wait_for: timeout=60
-          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+            - name: 13) Cleaning the test artifacts
+              include: kubectl-snapshot-cleanup.yml
+ 
+            - name: Setting cleanup flag to passed
+              set_fact:
+                cflag: "Cleanup passed"
 
-        - name: 13) Cleaning the test artifacts
-          include: kubectl-snapshot-cleanup.yml
+          rescue:
+            - name: Setting cleanup tag to failed
+              set_fact:
+                cflag: "Cleanup failed"
 
-        - name: Terminate the log aggregator
-          shell: source ~/.profile; killall stern
-          args:
-            executable: /bin/bash
-          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+          always:
 
-        - name: Send slack notification
-          slack:
-            token: "{{ lookup('env','SLACK_TOKEN') }}"
-            msg: '{{ ansible_date_time.time }} TEST: {{test_name}}, RESULT: {{ flag }}'
-          when: slack_notify | bool and lookup('env','SLACK_TOKEN')
+            - name: Terminate the log aggregator
+              shell: source ~/.profile; killall stern
+              args:
+                executable: /bin/bash
+              delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+            - name: Send slack notification
+              slack:
+                token: "{{ lookup('env','SLACK_TOKEN') }}"
+                msg: '{{ ansible_date_time.time }} TEST: {{test_name}}, RESULT: {{ flag }}, {{ cflag }}'
+              when: slack_notify | bool and lookup('env','SLACK_TOKEN')
 
 
