@@ -70,10 +70,10 @@
 
 #create the storage class 'openebs-test'
         - name: 6) Create the storage class in K8s master
-          shell: source ~/.profile; kubectl apply -f "{{ sc_def }}"
-          args:
-            executable: /bin/bash
-          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+          include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_task.yml"
+          vars:
+           app_yml: "{{ sc_def }}"
+           ns: default
 
 #Copying the create_pvc.yaml to k8s master
         - name: 6a) Copy pvc yaml to K8s master
@@ -83,10 +83,10 @@
           delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
       
         - name: 6b) Create PVC in k8s cluster
-          shell: kubectl apply -f "{{ pvc_def }}" -n "{{ namespace }}"
-          args:
-            executable: /bin/bash
-          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+          include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_task.yml"
+          vars:
+           app_yml: "{{ pvc_def }}"
+           ns: "{{ namespace }}"
 
         - name: Wait for few seconds
           wait_for: timeout=30
@@ -147,10 +147,10 @@
           delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
  
         - name: 9) Delete PVC
-          shell: source ~/.profile; kubectl delete -f "{{ pvc_def }}" -n {{ namespace }}
-          args:
-            executable: /bin/bash
-          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+          include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/delete_deploy.yml"
+          vars:
+           app_yml: "{{ pvc_def }}"
+           ns: "{{ namespace }}"
        
         - name: 10) check if the pods are deleted
           shell: source ~/.profile; kubectl get pods -n {{ namespace }} | grep "{{pv_name.stdout}}" | grep {{item}}  | wc -l
