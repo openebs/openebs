@@ -1,8 +1,8 @@
 # Setting up vim-go on Ubuntu 16.04
 
-## Pre-requisites
+### Pre-requisites
 
-Let us assume that you already have a working Go environment. You to make sure that your $GOPATH/bin is included in your PATH.
+Let us assume that you already have a working Go environment. You to make sure that your `$GOPATH/bin` is included in your PATH.
 
 ### Install vim, if not already done
 ```
@@ -11,7 +11,7 @@ sudo apt-get install vim
 
 ### Install and setup vim-go
 
-The following link has detailed instructions on setting up vim-go on your system and using the shortcuts. 
+The following link has detailed instructions on setting up `vim-go` on your system and using the shortcuts. 
 - https://github.com/fatih/vim-go-tutorial#quick-setup
 
 The following is an extract of the command required to install on Ubuntu.
@@ -23,7 +23,7 @@ git clone https://github.com/fatih/vim-go.git ~/.vim/plugged/vim-go
 
 ### Step 2: Setup vimrc to use the downloaded plugins
 
-Create ~/.vimrc with following content
+Create `~/.vimrc` with following content:
 ```
 call plug#begin()
 Plug 'fatih/vim-go', { 'do': ':GoInstallBinaries' }
@@ -37,16 +37,16 @@ Launch vim. In the vim editor, type the following:
 ```
 The above should show a window that Plugins are installed.
 
-Now run the following in the same vim editor:
+Now, run the following in the same vim editor:
 ```
 :GoInstallBinaries
 ```
 
-You should see the dependent go binaries downloaded and installed in your GOPATH/bin. 
+You should see the dependent go binaries downloaded and installed in your `GOPATH/bin`. 
 
 ### Using vim-go
 
-The vim-go repository provides a large number of additional plugins and shortcuts that can be added to the .vimrc. However, with the default .vimrc use above you can already get going:
-- Initiate the build ":GoBuild"
-- Navigate to the definition "ctrl-{"
-- Navigate back "ctrl-o"
+The `vim-go` repository provides a large number of additional plugins and shortcuts that can be added to the `.vimrc`. However, with the default `.vimrc` use above, you can already get going:
+- Initiate the build `:GoBuild`.
+- Navigate to the definition `ctrl-{`.
+- Navigate back `ctrl-o`.
