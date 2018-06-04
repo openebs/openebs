@@ -17,7 +17,7 @@ While you can run OpenEBS e2e as a standalone suite, the priority is to run them
 
 The following schema illustrates the workflow:
 
-![OpenEBS CI Overview Diagram](../documentation/source/_static/OpenEBS_CI_Workflow.png)
+ ![OpenEBS CI Overview Diagram](../documentation/source/_static/OpenEBS_CI_Workflow.png)
 
 ## CONTRIBUTING TO E2E and OPENEBS CI 
 
