@@ -91,7 +91,7 @@
        - name: Check status of maya-apiserver
          include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
          vars:
-           ns: openebs
+           ns: "{{ operator_ns }}"
            app: maya-apiserver
 
        - name: Deploy cassandra service and statefulset
@@ -110,7 +110,7 @@
          register: result
          until: (node_count)| int-1 == result.stdout|int
          delay: 120
-         retries: 15
+         retries: 30
 
        - name: Scale up Cassandra application pod
          shell: source {{ profile }}; kubectl scale statefulsets cassandra --replicas={{(node_count |int)}}
@@ -130,7 +130,7 @@
          register: result
          until: (node_count)| int == result.stdout|int
          delay: 120
-         retries: 15
+         retries: 30
 
        - name: Start cassandra load generation
          shell: source {{ profile }}; kubectl create -f {{ loadgen_yaml_alias }}
@@ -219,28 +219,12 @@
 
          always:
 
-           - name: Terminate the log aggregator
-             shell: source ~/.profile; killall stern
-             args:
-               executable: /bin/bash
-             delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-
+           - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/stern_task.yml"
+             vars:
+               status: stop
 
            - name: Send slack notification
              slack:
                token: "{{ lookup('env','SLACK_TOKEN') }}"
-               msg: '{{ ansible_date_time.time }} TEST: {{test_name}}, RESULT: {{ flag }}'
+               msg: '{{ ansible_date_time.time }} TEST: {{test_name}}, RESULT: {{ flag }},{{ cflag }}'
              when: slack_notify | bool and lookup('env','SLACK_TOKEN')
-
-
-
-
-
-
-
-
-
-
-
-
-

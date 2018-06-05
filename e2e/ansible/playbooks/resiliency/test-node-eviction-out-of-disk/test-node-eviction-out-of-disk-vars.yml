@@ -7,9 +7,8 @@ utils_path: openebs/e2e/ansible/playbooks/utils
 
 patch_file: replica_patch.yaml
 
-create_sc: storage-class.yaml
-
-percona_link: https://raw.githubusercontent.com/openebs/openebs/master/k8s/demo/percona/demo-percona-mysql-pvc.yaml
+percona_files:
+  - percona.yaml
 
 replace_item:
   - nodename_where_replica_pod_1_got_scheduled
@@ -24,3 +23,5 @@ test_pod_regex: maya*|openebs*|pvc*|percona*
 test_log_path: setup/logs/test-node-eviction-out-of-disk.log
 
 key: node.kubernetes.io/out-of-disk
+
+storage_class_file: nodeeviction-sc.yaml

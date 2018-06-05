@@ -18,7 +18,7 @@ lst.append("con")
 container_name = "-".join(lst)
 used_mem_process = "kubectl exec %s -c %s -n %s -- pmap -x 1 | awk ''/total'/ {print $3}'" %(cntrl_pod_name,container_name,namespace)
 print used_mem_process
-n = 5
+n = 10
 count = 0
 #Obtaining memory consumed by longhorn process from the cntroller pod.
 while count < n:
@@ -27,7 +27,7 @@ while count < n:
     used_mem = out.communicate()
     mem_in_mb = int(used_mem[0])/1024
     print mem_in_mb, "MB"
-    if mem_in_mb < 500:
+    if mem_in_mb < 800:
         time.sleep(20)
     else:
         print "Fail"
@@ -38,7 +38,7 @@ print list
 # A watermark of 500MB has been set based on benchmark runs with the workload 
 # profile chosen in this test
 # TODO: Identify better mem consumption strategies
-if all(i <= 500 for i in list):
+if all(i <= 800 for i in list):
         print "Pass"
 else:
         print "Fail"

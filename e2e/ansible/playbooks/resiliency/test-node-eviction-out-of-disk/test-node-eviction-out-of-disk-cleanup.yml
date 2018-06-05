@@ -1,7 +1,7 @@
 ---
 - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/delete_deploy.yml"
   vars:
-    app_yml: "{{ percona_link }}"
+    app_yml: "{{ percona_files.0 }}"
     ns: "{{ namespace }}"
 
 - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/delete_deploy_check.yml"
@@ -31,7 +31,14 @@
   ignore_errors: true
 
 - name: Remove copied files
-  shell: rm -rf "{{ patch_file }}" "{{ create_sc }}"
+  shell: rm -rf "{{ patch_file }}" "{{ storage_class_file }}"
   args:
     executable: /bin/bash
+
+- name: Remove the nodeeviction-sc storage class
+  shell: source ~/.profile; kubectl delete sc nodeeviction-sc
+  args:
+    executable: /bin/bash
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+  changed_when: true
 
