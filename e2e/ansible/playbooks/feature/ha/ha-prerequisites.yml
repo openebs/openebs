@@ -1,4 +1,12 @@
 ---
+- name: Update apt cache
+  command: apt-get update
+  become: true
+  ignore_errors: true
+  delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+  tags:
+  - skip_ansible_lint
+
 - name: Install mysql-client on K8S-master
   shell: apt-get install -y {{ item }}
   become: true

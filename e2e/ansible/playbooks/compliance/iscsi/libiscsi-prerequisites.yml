@@ -1,11 +1,11 @@
 ---
-- name: Run apt-get update
-  apt: >
-    update_cache=yes
-    cache_valid_time=3600
+- name: Update apt cache
+  command: apt-get update
   become: true
-  delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
   ignore_errors: true
+  delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+  tags:
+  - skip_ansible_lint
 
 - name: Install libiscsi on K8S-minion
   shell: apt-get install -y {{ item }}

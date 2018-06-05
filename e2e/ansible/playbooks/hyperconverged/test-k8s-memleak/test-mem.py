@@ -35,7 +35,7 @@ while count < n:
         quit()
     list.append(mem_in_mb)
 print list
-# A watermark of 500MB has been set based on benchmark runs with the workload 
+# A watermark of 800MB(re-calibrated based on results oberved from latest sanity run) 
 # profile chosen in this test
 # TODO: Identify better mem consumption strategies
 if all(i <= 800 for i in list):
