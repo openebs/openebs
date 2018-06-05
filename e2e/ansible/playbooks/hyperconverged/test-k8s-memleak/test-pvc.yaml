@@ -1,7 +1,7 @@
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
-  name: vut 
+  name: vut
 spec:
   storageClassName: openebs-standard
   accessModes:
