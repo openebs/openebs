@@ -8,7 +8,7 @@ test_pod_regex: maya*|openebs*|pvc*|percona*
 
 profile: ~/.profile
 
-percona_link: https://raw.githubusercontent.com/openebs/openebs/master/k8s/demo/percona/percona-openebs-deployment.yaml 
+percona_link: https://raw.githubusercontent.com/openebs/openebs/master/k8s/demo/percona/percona-openebs-deployment.yaml
 
 patch_file: replica_patch.yaml
 

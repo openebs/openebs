@@ -12,6 +12,7 @@
   until: "'percona' and 'deleted' in del_out.stdout"
   delay: 90
   retries: 5
+  changed_when: true
 
 - name: Remove copied files
   file:
@@ -31,9 +32,10 @@
   until: "'deleted' in ns_delete.stdout"
   delay: 30
   retries: 5
+  changed_when: true
 
 - name: Check whether the namespace is deleted
-  shell: kubectl get ns 
+  shell: kubectl get ns
   args:
     executable: /bin/bash
   register: ns_out
@@ -41,4 +43,4 @@
   until: '"{{ namespace }}" not in ns_out.stdout'
   delay: 60
   retries: 15
-
+  changed_when: true

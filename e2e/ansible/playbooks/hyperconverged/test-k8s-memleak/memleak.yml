@@ -45,6 +45,7 @@
    - name: Create test specific namespace
      command: kubectl create ns {{ namespace }}
      delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+     changed_when: true
 
    - name: 3) Create a storage volume via a pvc
      include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_task.yml"
@@ -64,6 +65,7 @@
        - ctrl
        - rep
      delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+     changed_when: true
 
    - name: 4) Get storage ctrl pod name
      shell: source ~/.profile; kubectl get pods -n {{ namespace }} | grep ctrl
@@ -71,6 +73,7 @@
        executable: /bin/bash
      register: ctrl_name
      delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+     changed_when: true
 
    - name: 4a) Set ctrl pod name to variable
      set_fact:
@@ -82,6 +85,7 @@
        executable: /bin/bash
      register: ctrl_IP
      delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+     changed_when: true
 
    - name: 4c) Set IP of Pod to variable
      set_fact:
@@ -93,6 +97,7 @@
      become: true
      delegate_to: "{{groups['kubernetes-kubeminions'].0}}"
      register: result
+     changed_when: true
 
    - name: 5a) Store target iqn in variable
      set_fact:
@@ -135,6 +140,7 @@
         timeout 200s dd if=/dev/urandom of={{mount_point}}/f2 bs={{block_size[1]}} count={{count_num}} oflag=dsync &
      become: true
      delegate_to: "{{groups['kubernetes-kubeminions'].0}}"
+     changed_when: true
 
    - block:
          - name: 8) Copy the python script to kubeminion
@@ -148,6 +154,7 @@
            delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
            register: result
            failed_when: "'Pass' not in result.stdout"
+           changed_when: true
 
          - name: Test Passed
            set_fact:
