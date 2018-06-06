@@ -54,7 +54,7 @@ Once accepted, the issue can be assigned to interested contributors who can make
 
 ### Create new application YAML
 
-To add new applications to e2e, please consider the points made here, if applicable: 
+To add new applications to e2e, please consider the points made here, if applicable:
 
 - [https://kubernetes.io/docs/concepts/configuration/overview/](https://kubernetes.io/docs/concepts/configuration/overview/)
 - [https://www.mirantis.com/blog/introduction-to-yaml-creating-a-kubernetes-deployment/](https://www.mirantis.com/blog/introduction-to-yaml-creating-a-kubernetes-deployment/)

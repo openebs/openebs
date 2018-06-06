@@ -21,7 +21,7 @@ At a very high level, the process to contributing and improving the code is pret
 - Commit your changes
 - Submit your Pull Request
 
-The following sections describe some guidelines that can come in handy with the above process. 
+The following sections describe some guidelines that can come in handy with the above process.
 *Followed by the guidelines, is a [cheatsheet](./contribute/git-cheatsheet.md) with frequently used git commands.*
 
 ## Submit an issue describing your proposed change
@@ -50,7 +50,7 @@ You can also help with some existing issues under this category available at [de
 
 - Rebase your development branch
 - Submit the PR from the development branch to the openebs/openebs:master
-- Incorporate review comments, if any, in the development branch. 
+- Incorporate review comments, if any, in the development branch.
 - Once the PR is accepted, close the branch.
 - After the PR is merged the development branch in the forked repository can be deleted.
 
