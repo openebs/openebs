@@ -1,6 +1,8 @@
 ---
 test_name: kubectl_snapshot_restore
 
+utils_path: openebs/e2e/ansible/playbooks/utils
+
 test_log_path: setup/logs/snap_create_revert.log
 
 test_pod_regex: maya*|openebs*|pvc*|snapshot*
