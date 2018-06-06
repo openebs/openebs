@@ -1,6 +1,6 @@
 # Git Cheat Sheet
 
-Fork the [openebs/openebs]() repository into your account, referred in the below instructions as $user. 
+Fork the [openebs/openebs](https://github.com/openebs/openebs) repository into your account, referred in the below instructions as $user.
 
 ## Setting up Development Environment for OpenEBS projects
 
