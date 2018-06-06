@@ -98,7 +98,7 @@
   retries: 6
 
 - name: 7) Installing openebs using stable charts.
-  shell: helm install stable/openebs --name openebs --namespace openebs
+  shell: helm install stable/openebs --name "{{ chart_name }}" --namespace "{{ namespace }}"
   args:
     executable: /bin/bash
   register: openebs_out
@@ -107,7 +107,7 @@
   retries: 5
 
 - name: 8) Checking if the provisioner is up.
-  shell: kubectl get pods -n "{{ namespace }}" | grep "openebs-provisioner"
+  shell: kubectl get pods -n "{{ namespace }}" | grep "provisioner"
   args:
     executable: /bin/bash
   register: deployment
@@ -116,7 +116,7 @@
   retries: 15
 
 - name: 8a) Checking if the openebs-apiserver is up.
-  shell: kubectl get pods -n "{{ namespace }}" | grep "openebs-apiserver"
+  shell: kubectl get pods -n "{{ namespace }}" | grep "apiserver"
   args:
     executable: /bin/bash
   register: api_server
