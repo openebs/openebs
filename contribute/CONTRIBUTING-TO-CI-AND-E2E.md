@@ -6,7 +6,7 @@ e2e is mostly written in Ansible, that is, as Ansible playbooks with Docker used
 
 Since the tests are performed in a Kubernetes environment, the test images are typically deployed as "pods" and "jobs". Therefore they are accompanied by the respective YAML specification files.
 
-## Building Blocks og OpenEBS CI
+## Building Blocks of OpenEBS CI
 
 OpenEBS Continuous Integration (CI) has two distinct parts:
 
