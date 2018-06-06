@@ -188,9 +188,9 @@
 
          always:
 
-          # - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/stern_task.yml"
-          #   vars:
-          #     status: stop
+           - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/stern_task.yml"
+             vars:
+               status: stop
 
            - name: Send slack notification
              slack:

@@ -205,13 +205,10 @@
 
          always:
 
-           - name: Terminate the log aggregator
-             shell: source ~/.profile; killall stern
-             args:
-               exedcutable: /bin/bash
-             delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-
-
+           - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/stern_task.yml"
+             vars:
+               status: stop
+           
            - name: Send slack notification
              slack:
                token: "{{ lookup('env','SLACK_TOKEN') }}"
