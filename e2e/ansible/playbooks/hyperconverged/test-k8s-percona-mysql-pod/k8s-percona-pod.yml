@@ -35,7 +35,7 @@
        - name: 3) Check whether maya-apiserver pod is deployed
          include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
          vars:
-            ns: openebs
+            ns: "{{ operator_ns }}"
             app: maya-api
 
        - name: 3a) Replace volume-claim name with test parameters
@@ -136,14 +136,13 @@
 
          always:
 
-           - name: 7) Terminate the log aggregator
-             shell: source ~/.profile; killall stern
-             args:
-               executable: /bin/bash
-             delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+           - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/stern_task.yml"
+             vars:
+               status: stop
 
            - name: Send slack notification
              slack:
                token: "{{ lookup('env','SLACK_TOKEN') }}"
                msg: '{{ ansible_date_time.time }} TEST: {{test_name}}, RESULT: {{ flag }},{{ cflag }}'
+             when: slack_notify | bool and lookup('env','SLACK_TOKEN')
 

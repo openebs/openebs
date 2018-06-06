@@ -29,12 +29,12 @@
        # confirm OpenEBS operator is ready for requests. #
        ###################################################
 
-       - name: Get percona spec and liveness scripts
-         get_url:
-           url: "{{ item }}"
-           dest: "{{ result_kube_home.stdout }}"
-         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
-         with_items: "{{ percona_links }}"
+       - name: Copy the percona specs to kubemaster
+         include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/copy_task.yml"
+         vars:
+           destination_node: "{{groups['kubernetes-kubemasters'].0}}"
+           files_to_copy:
+             - "{{ percona_files }}"
 
        - name: Replace volume-claim name with test parameters
          include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/regex_task.yml"
@@ -58,7 +58,7 @@
        - name: Check status of maya-api server
          include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
          vars:
-            ns: openebs
+            ns: "{{ operator_ns }}"
             app: maya-api
 
        ####################################################
@@ -173,11 +173,9 @@
 
          always:
 
-           - name: 5) Terminate the log aggregator
-             shell: source ~/.profile; killall stern
-             args:
-               executable: /bin/bash
-             delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+           - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/stern_task.yml"
+             vars:
+               status: stop
 
            - name: Send slack notification
              slack:

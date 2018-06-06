@@ -45,7 +45,7 @@
        - name: Check status of maya-api server
          include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
          vars:
-            ns: openebs
+            ns: "{{ operator_ns }}"
             app: maya-api
 
        ####################################################
@@ -53,6 +53,11 @@
        # (Setup pumba deployment with an empty policy,    #
        # deploy percona w/ a liveness check for DB writes)#
        ####################################################
+
+       - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/copy_task.yml"
+         vars:
+           destination_node: "{{groups['kubernetes-kubemasters'].0}}"
+           files_to_copy: "{{ pumba_file }}"
 
        - name: Setup the pumba infrastructure
          include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_task.yml"
@@ -184,11 +189,9 @@
 
          always:
 
-           - name: Terminate the log aggregator
-             shell: source ~/.profile; killall stern
-             args:
-               executable: /bin/bash
-             delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+           - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/stern_task.yml"
+             vars:
+               status: stop
 
            - name: Send slack notification
              slack:

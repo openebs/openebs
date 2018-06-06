@@ -27,7 +27,7 @@
        - name: Check status of maya-apiserver
          include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
          vars:
-           ns: openebs
+           ns: "{{ operator_ns }}"
            app: maya-apiserver
 
        - name: Creating  percona namespace to deploy percona application
@@ -93,6 +93,7 @@
 
        - name: Write a test database into percona mysql
          shell: |
+           sleep 120
            mysql -uroot -pk8sDem0 -h {{pod_ip}} -e "create database tdb;"
            mysql -uroot -pk8sDem0 -h {{pod_ip}} -e "create table ttbl (Data VARCHAR(20));" tdb
            mysql -uroot -pk8sDem0 -h {{pod_ip}} -e "insert into ttbl (Data) VALUES ('tdata');" tdb
@@ -139,17 +140,15 @@
 
          always:
 
-           - name: Terminate the log aggregator
-             shell: source ~/.profile; killall stern
-             args:
-               executable: /bin/bash
-             delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+           - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/stern_task.yml"
+             vars:
+               status: stop
 
 
            - name: Send slack notification
              slack:
                token: "{{ lookup('env','SLACK_TOKEN') }}"
-               msg: '{{ ansible_date_time.time }} TEST: {{test_name}}, RESULT: {{ flag }}'
+               msg: '{{ ansible_date_time.time }} TEST: {{test_name}}, RESULT: {{ flag }},{{ cflag }}'
              when: slack_notify | bool and lookup('env','SLACK_TOKEN')
 
 

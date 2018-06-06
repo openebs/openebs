@@ -72,7 +72,7 @@
        - name: Check whether maya-apiserver pod is deployed
          include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
          vars:
-            ns: openebs
+            ns: "{{ operator_ns }}"
             app: maya-api
 
        - name: 4) Deploy cassandra service
@@ -144,11 +144,9 @@
 
          always:
 
-           - name: 5) Terminate the log aggregator
-             shell: source ~/.profile; killall stern
-             args:
-               executable: /bin/bash
-             delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+           - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/stern_task.yml"
+             vars:
+               status: stop
 
            - name: Send slack notification
              slack:

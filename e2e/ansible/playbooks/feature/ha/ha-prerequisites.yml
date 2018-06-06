@@ -1,11 +1,11 @@
 ---
-- name: Run apt-get update
-  apt: >
-    update_cache=yes
-    cache_valid_time=3600
+- name: Update apt cache
+  command: apt-get update
   become: true
-  delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
   ignore_errors: true
+  delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+  tags:
+  - skip_ansible_lint
 
 - name: Install mysql-client on K8S-master
   shell: apt-get install -y {{ item }}
@@ -22,4 +22,8 @@
   register: result_kube_home
   delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
   changed_when: true
+
+- include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/stern_task.yml"
+  vars:
+    status: start
 

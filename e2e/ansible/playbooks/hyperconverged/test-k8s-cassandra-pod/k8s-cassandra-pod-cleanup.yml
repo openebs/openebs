@@ -62,3 +62,12 @@
   delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
   changed_when: true
 
+- name: Remove test artifacts
+  file:
+    path: "{{ result_kube_home.stdout }}/{{ item }}"
+    state: absent
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+  with_items:
+    - "{{ svc_yaml_alias }}"
+    - "{{ stateful_yaml_alias }}"
+    - "{{ loadgen_yaml_alias }}"

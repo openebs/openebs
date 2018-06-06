@@ -23,8 +23,7 @@ files:
   - Dockerfile
   - MySQLLoadGenerate.sh
 
-deb_packages:
-  - python-pip
+get_pip: get-pip.py
 
 pip_packages:
   - 'docker-py==1.9.0'

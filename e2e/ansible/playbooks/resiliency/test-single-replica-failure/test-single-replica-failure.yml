@@ -7,7 +7,7 @@
 #1. Copy Test artifacts to Kubemaster.
 #2. Deploy Percona application with liveness probe running db queries continuously.
 #3. Setup ChaosKube infrastructure.
-#4. Gather Node,Replica Container and Pumba netem details required for test.
+#4. Gather Node,Replica Container details required for test.
 #5. Initiate single replica failure using ChaosKube.
 #6. Check percona application status to veriy openebs controller can sustain failures.
 #7. Perform cleanup of test artifacts.
@@ -28,12 +28,13 @@
        # confirm OpenEBS operator is ready for requests. #
        ###################################################
 
-       - name: Get percona spec and liveness scripts
-         get_url:
-           url: "{{ item }}"
-           dest: "{{ result_kube_home.stdout }}"
-         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
-         with_items: "{{ percona_links }}"
+       - name: Copy the chaoskube specs to kubemaster
+         include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/copy_task.yml"
+         vars:
+           destination_node: "{{groups['kubernetes-kubemasters'].0}}"
+           files_to_copy: 
+             - "{{ chaoskube_files }}"
+             - "{{ percona_files }}"
 
        - name: Replace volume-claim name with test parameters
          include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/regex_task.yml"
@@ -42,16 +43,10 @@
            regex1: "{{replace_item}}"
            regex2: "{{replace_with}}"
 
-       - name: Copy the chaoskube specs to kubemaster
-         include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/copy_task.yml"
-         vars:
-           destination_node: "{{groups['kubernetes-kubemasters'].0}}"
-           files_to_copy: "{{ chaoskube_files }}"
-
        - name: Check status of maya-api server
          include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
          vars:
-            ns: openebs
+            ns: "{{ operator_ns }}"
             app: maya-api
 
        ####################################################
@@ -254,11 +249,9 @@
 
          always:
 
-           - name: 5) Terminate the log aggregator
-             shell: source ~/.profile; killall stern
-             args:
-               executable: /bin/bash
-             delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+           - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/stern_task.yml"
+             vars:
+               status: stop
 
            - name: Send slack notification
              slack:

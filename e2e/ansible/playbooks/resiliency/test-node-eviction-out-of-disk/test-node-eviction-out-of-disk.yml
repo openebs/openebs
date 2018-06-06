@@ -32,14 +32,16 @@
 
        - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
          vars:
-            ns: openebs
+            ns: "{{ operator_ns }}"
             app: maya-api
 
-       - name: 1b) Obtaining storage classes yaml
-         shell: kubectl get sc openebs-percona -o yaml > "{{ create_sc }}"
-         args:
-           executable: /bin/bash
-         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+       - name: 1b) Copy test artifacts to master
+         include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/copy_task.yml"
+         vars:
+           destination_node: "{{groups['kubernetes-kubemasters'].0}}"
+           files_to_copy: 
+             - "{{ storage_class_file }}"
+             - "{{ percona_files }}"         
 
        - name: 1c) Get the Number of nodes count
          shell: kubectl get nodes | grep 'Ready' | grep 'none' | wc -l
@@ -54,7 +56,7 @@
 
        - name: 1d) Replace the replica count in storage classes yaml
          replace:
-           path: "{{ create_sc }}"
+           path: "{{ storage_class_file }}"
            regexp: 'openebs.io/jiva-replica-count: "3"'
            replace: 'openebs.io/jiva-replica-count: "{{ (node_count) |int-1 }}"'
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
@@ -65,8 +67,8 @@
        # verify replica pods are re-scheduled and running)#
        ####################################################
 
-       - name: 2a) Delete the existing storage class and create new one
-         shell: kubectl delete sc openebs-percona; kubectl apply -f "{{ create_sc }}"
+       - name: 2a) Create test specific storage class
+         shell: kubectl apply -f "{{ storage_class_file }}"
          args:
            executable: /bin/bash
          register: sc_out
@@ -87,7 +89,7 @@
 
        - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_task.yml"
          vars:
-           app_yml: "{{ percona_link }}"
+           app_yml: "{{ percona_files.0 }}"
            ns: "{{ namespace }}"
 
        - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
@@ -96,7 +98,7 @@
             app: percona
 
        - name: 2c) Check specified number of replica pods are created
-         shell: kubectl get pods --all-namespaces | grep rep | grep -i running |wc -l
+         shell: kubectl get pods -n {{ namespace }} | grep rep | grep -i running |wc -l
          args:
            executable: /bin/bash
          register: rep_count
@@ -115,6 +117,7 @@
 
        - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/copy_task.yml"
          vars:
+           destination_node: "{{groups['kubernetes-kubemasters'].0}}"
            files_to_copy: "{{ patch_file }}"
 
        - name: 2e) Gather node details for scheduled replicas
@@ -254,11 +257,9 @@
 
          always:
 
-           - name: 5) Terminate the log aggregator
-             shell: source ~/.profile; killall stern
-             args:
-               executable: /bin/bash
-             delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+           - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/stern_task.yml"
+             vars:
+               status: stop
 
            - name: Send slack notification
              slack:
