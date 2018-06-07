@@ -213,11 +213,9 @@
        
           always:
         
-            - name: 5) Terminate the log aggregator
-              shell: source ~/.profile; killall stern
-              args:
-                executable: /bin/bash
-              delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+            - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/stern_task.yml"
+              vars:
+                status: start
 
             - name: Send slack notification
               slack:
@@ -225,4 +223,3 @@
                 msg: '{{ ansible_date_time.time }} TEST: {{test_name}}, RESULT: {{ flag }},{{ cflag }}'
               when: slack_notify | bool and lookup('env','SLACK_TOKEN'
                                                                                                                                                       212,6         98%
-
