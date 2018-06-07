@@ -1,0 +1,30 @@
+---
+
+- name: Get Current User
+  command: whoami
+  register: user
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+
+- name: Get Log Aggregator
+  get_url:
+    url: "{{k8s_log_aggregator_url}}"
+    dest: "{{ playbook_dir }}/roles/k8s-stern/files/{{k8s_log_aggregator}}"
+    force: yes
+  register: result
+  until: "'OK' in result.msg"
+  delay: 5
+  retries: 3
+
+
+- name: Copy log aggregator to remote
+  copy:
+    src: "{{ k8s_log_aggregator }}"
+    owner: "{{ user.stdout }}"
+    group: "{{ user.stdout }}"
+    dest: /usr/local/bin
+    mode: "u+rwx"
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+  become: true
+
+
