@@ -68,7 +68,9 @@
        ####################################################
 
        - name: Create test specific namespace
-         command: kubectl create ns {{ namespace }}
+         shell: source ~/.profile; kubectl create ns {{ namespace }}
+         args:
+           executable: /bin/bash
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
        - name: Setup the storage class

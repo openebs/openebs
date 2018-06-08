@@ -23,8 +23,10 @@
            dest: "{{ result_kube_home.stdout }}"
          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
 
-       - name: Create test specifi namespace
-         command: kubectl create ns {{ namespace }}
+       - name: Create test specific namespace
+         shell: source ~/.profile; kubectl create ns {{ namespace }}
+         args:
+           executable: /bin/bash
          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
 
        - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_task.yml"

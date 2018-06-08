@@ -53,7 +53,9 @@
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
        - name: 4) Create test specific namespace
-         command: kubectl create ns {{ namespace }}
+         shell: source ~/.profile; kubectl create ns {{ namespace }}
+         args:
+           executable: /bin/bash
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
        - name: 4a) Deploy percona applcation

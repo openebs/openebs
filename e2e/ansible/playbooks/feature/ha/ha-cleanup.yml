@@ -12,7 +12,9 @@
     ns: "{{  namespace }}"
 
 - name: Delete  namespace
-  command: kubectl delete ns {{ namespace }}
+  shell: source ~/.profile;  kubectl delete ns {{ namespace }}
+  args:
+    executable: /bin/bash
   delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
   register: ns_out
   until: "'deleted' in ns_out.stdout"
