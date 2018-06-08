@@ -215,7 +215,7 @@
         
             - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/stern_task.yml"
               vars:
-                status: start
+                status: stop
 
             - name: Send slack notification
               slack:
