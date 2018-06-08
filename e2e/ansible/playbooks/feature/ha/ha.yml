@@ -48,7 +48,9 @@
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
        - name: Create namespace
-         command: kubectl create ns {{ namespace }}
+         shell: source ~/.profile;  kubectl create ns {{ namespace }}
+         args:
+           executable: /bin/bash
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
        - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_task.yml"
@@ -200,7 +202,6 @@
      always:
        - block:
 
-
            - include: ha-cleanup.yml
 
            - name: Test Cleanup Passed
@@ -212,15 +213,11 @@
              set_fact:
                cflag: "Cleanup Failed"
 
-
-
          always:
 
-           - name: Terminate the log aggregator
-             shell: source ~/.profile; killall stern
-             args:
-               exedcutable: /bin/bash
-             delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+           - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/stern_task.yml"
+             vars:
+               status: stop
 
            - name: Send slack notification
              slack:

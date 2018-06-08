@@ -72,9 +72,9 @@
            regex2: "{{replace_with}}"
 
        - name: 5) Create the Namespace
-         command: kubectl create ns {{ namespace }}
+         shell: source ~/.profile; kubectl create ns {{ namespace }}
          args:
-          executable: /bin/bash
+           executable: /bin/bash
          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
 
        - name: 5)Create the storage pool path
@@ -114,7 +114,7 @@
          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
 
        - name: 6a) Create the configmap test
-         command: kubectl create configmap sqltest --from-file=sql-test.sh  -n {{ namespace }}
+         shell: kubectl create configmap sqltest --from-file=sql-test.sh  -n {{ namespace }}
          args:
            executable: /bin/bash
          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
@@ -197,7 +197,7 @@
            ########################################################################
 
        - name: 10a) Delete the replica pod on the specified node
-         command: kubectl delete pod -n {{ namespace }} {{ result_rep.stdout }}
+         shell: kubectl delete pod -n {{ namespace }} {{ result_rep.stdout }}
          args:
            executable: /bin/bash
          become: true
@@ -229,7 +229,7 @@
          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
 
        - name: 11) List the available scsi host
-         command: ls /sys/class/scsi_host/
+         shell: ls /sys/class/scsi_host/
          become: true
          register: result_host
          delegate_to: "{{ groups['kubernetes-kubeminions'].0 }}"
@@ -316,11 +316,9 @@
 
          always:
 
-           - name: 16) Terminate the log aggregator
-             shell: source ~/.profile; killall stern
-             args:
-               executable: /bin/bash
-             delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+           - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/stern_task.yml"
+             vars:
+               status: stop
 
            - name: Send slack notification
              slack:

@@ -179,7 +179,7 @@
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
        - name: 4b) Taint node with Eviction Condition node.kubernetes.io/out-of-disk
-         command: kubectl taint nodes {{ node_name.stdout }} {{ key }}=:NoExecute
+         shell: kubectl taint nodes {{ node_name.stdout }} {{ key }}=:NoExecute
          args:
            executable: /bin/bash
          register: taint_output
@@ -213,7 +213,7 @@
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
        - name: 5b) Untaint node with Eviction Condition node.kubernetes.io/out-of-disk
-         command: kubectl taint nodes {{ node_name.stdout }} {{ key }}:NoExecute-
+         shell: kubectl taint nodes {{ node_name.stdout }} {{ key }}:NoExecute-
          args:
            executable: /bin/bash
          register: untaint_output
