@@ -1,0 +1,7 @@
+ - name: Bring up/down node using vagrant command 
+   shell: vagrant {{vagrant_status}} {{ nodename }}
+   args:
+     chdir: "{{vagrant_path}}"
+     executable: /bin/bash
+
+

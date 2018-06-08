@@ -1,0 +1,223 @@
+# Description: Verify the node failure resilency on OpenEBS volumes.
+# Author: Swarna
+
+########################################################################################
+# Test Steps:
+#1.Check the maya-apiserver is running.
+#2.Download and Copy Test artifacts to kubemaster.
+#3.Replace PVC name with test case name in percona yaml
+#3.Deploy Percona application with liveness probe running db queries continuously
+#4.Get the Replica name and node name where the replica is scheduled
+#5.Kill the node using vagrant halt.
+#6.Check the node state after vagrant halt.
+#7.Check the percona pod status.
+#8.Bring up the node and check all the replicas are up and running.
+#8.perform Cleanup.
+##########################################################################################
+
+- hosts: localhost
+
+  vars_files:
+    - test-node-failure-vars.yml
+
+  tasks:
+
+   - block:
+
+       - include: pre-requisites.yml
+
+
+       - name: Check status of maya-apiserver
+         include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
+         vars:
+           ns: openebs
+           app: maya-apiserver
+
+       - name: Get percona spec and liveness scripts
+         get_url:
+           url: "{{ item }}"
+           dest: "{{ result_kube_home.stdout }}"
+         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+         with_items: "{{ percona_links }}"
+
+       - name: Replace volume-claim name with test parameters
+         include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/regex_task.yml"
+         vars:
+           path: "{{ result_kube_home.stdout }}/percona.yaml"
+           regex1: "{{replace_item}}"
+           regex2: "{{replace_with}}"
+         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+
+
+       - name: Create namespace to deploy application
+         shell: source ~/.profile; kubectl create ns {{ namespace }}
+         args:
+           executable: /bin/bash
+         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+
+       - name: Create a configmap with the liveness sql script
+         shell: source ~/.profile; kubectl create configmap sqltest --from-file={{ percona_files.1 }} -n {{ namespace }}
+         args:
+           executable: /bin/bash
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+         register: result
+         failed_when: "'configmap' and 'created' not in result.stdout"
+
+       - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_task.yml"
+         vars:
+           app_yml: "{{ percona_files.0 }}"
+           ns: "{{ namespace }}"
+
+       - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
+         vars:
+            ns: "{{ namespace }}"
+            app: percona
+
+       - name: Wait for 120s to ensure liveness check starts
+         wait_for:
+           timeout: 120
+
+       - name: Get PV name
+         shell: source ~/.profile; kubectl get pv -n {{ namespace }}| grep openebs-percona | awk '{print $1}'
+         args:
+           executable: /bin/bash
+         register: pv_name
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+
+       - name: Get the node name where replica is scheduled
+         shell: source ~/.profile; kubectl get po -n {{ namespace }} -o wide | grep "{{ pv_name.stdout }}" | grep rep | awk '{print $7}' | awk 'FNR == 1 {print}'
+         args:
+           executable: /bin/bash
+         register: node1
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+
+       - name: Bring down node
+         include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/vagrant-halt-up-task.yml"
+         vars:
+           vagrant_status: halt --force
+           nodename: "{{ node1.stdout }}"
+           vagrant_path: "{{ vagrant_path1 }}"
+
+
+       - name: check the node is down
+         shell: kubectl get nodes | grep {{ node1.stdout }} | awk '{print $2}'
+         args:
+           executable: /bin/bash
+         register: result
+         until: "'NotReady' in result.stdout"
+         delay: 60
+         retries: 5
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+       - name: Wait for 300s to check the pod is still running after killing the node
+         wait_for:
+           timeout: 300
+
+       - name: Confirm liveness checks on percona are successful &  pod is still in running state
+         include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
+         vars:
+            ns: "{{ namespace }}"
+            app: percona
+
+       - name: Bring up node
+         include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/vagrant-halt-up-task.yml"
+         vars:
+           vagrant_status: up
+           nodename: "{{ node1.stdout }}"
+           vagrant_path: "{{ vagrant_path1 }}"
+
+
+       - name: check the node is up
+         shell: kubectl get nodes | grep {{ node1.stdout }} | awk '{print $2}'
+         args:
+           executable: /bin/bash
+         register: result
+         until: "'Ready' in result.stdout"
+         delay: 30
+         retries: 6
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+       - name: Confirm liveness checks on percona are successful &  pod is still in running state
+         include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
+         vars:
+            ns: "{{ namespace }}"
+            app: percona
+
+       - name: Check if the replica pods are created and running
+         shell: source ~/.profile; kubectl get pods -n {{ namespace }} | grep rep | grep -i running |wc -l
+         args:
+           executable: /bin/bash
+         register: rep_count
+         until: "'3' in rep_count.stdout"
+         delay: 60
+         retries: 5
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+       - name: Get Controller SVC IP
+         shell: source ~/.profile; kubectl get svc -n {{ namespace }} | grep ctrl | awk {'print $3'}
+         args:
+           executable: /bin/bash
+         register: SVC
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+         changed_when: true
+
+       - name: Check if replica is rebuilded
+         shell: curl http://{{ SVC.stdout }}:9501/v1/replicas | grep createTypes | jq -r '.data[].mode' | grep 'RW'
+         args:
+           executable: /bin/bash
+         register: result
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+         until: "result.stdout_lines | length  == 3"
+         delay: 60
+         retries: 10
+         changed_when: true
+         tags:
+          - skip_ansible_lint
+
+
+
+
+       - name: Test Passed
+         set_fact:
+           flag: "Test Passed"
+
+     rescue:
+       - name: Test Failed
+         set_fact:
+           flag: "Test Failed"
+
+     always:
+       - block:
+
+           - include: cleanup.yml
+
+           - name: Test Cleanup Passed
+             set_fact:
+               cflag: "Cleanup Passed"
+
+         rescue:
+           - name: Test Cleanup Failed
+             set_fact:
+               cflag: "Cleanup Failed"
+
+         always:
+
+           - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/stern_task.yml"
+             vars:
+               status: stop
+
+
+           - name: Send slack notification
+             slack:
+               token: "{{ lookup('env','SLACK_TOKEN') }}"
+               msg: '{{ ansible_date_time.time }} TEST: {{test_name}}, RESULT: {{ flag }},{{ cflag }}'
+             when: slack_notify | bool and lookup('env','SLACK_TOKEN')
+
+
+
+
+
+
+
