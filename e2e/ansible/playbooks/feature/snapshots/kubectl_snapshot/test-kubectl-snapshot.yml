@@ -37,7 +37,7 @@
             executable: /bin/bash
           register: pods_list
           delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-          until: "'openebs-provisioner' and 'maya-apiserver' in pods_list.stdout"
+          until: "'provisioner' and 'apiserver' in pods_list.stdout"
           delay: 60
           retries: 5
 
