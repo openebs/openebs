@@ -15,7 +15,7 @@ image:
 
 apiserver:
   image: "openebs/m-apiserver"
-  imageTag: "0.5.4"
+  imageTag: "0.6.0-RC1"
   replicas: 1
   ports:
     externalPort: 5656
@@ -26,15 +26,28 @@ apiserver:
 
 provisioner:
   image: "openebs/openebs-k8s-provisioner"
-  imageTag: "0.5.4"
+  imageTag: "0.6.0-RC1"
   replicas: 1
+  nodeSelector: {}
+  tolerations: {}
+  affinity: {}
+
+snapshotOperator:
+  controller:
+    image: "openebs/snapshot-controller"
+    imageTag: "0.6.0-RC1"
+  provisioner:
+    image: "openebs/snapshot-provisioner"
+    imageTag: "0.6.0-RC1"
+  replicas: 1
+  upgradeStrategy: "Recreate"
   nodeSelector: {}
   tolerations: {}
   affinity: {}
 
 jiva:
   image: "openebs/jiva"
-  imageTag: "0.5.4"
+  imageTag: "0.6.0-RC2"
   replicas: 3
 
 grafana:
@@ -57,4 +70,4 @@ policies:
   monitoring:
     enabled: true
     image: "openebs/m-exporter"
-    imageTag: "0.5.4"
+    imageTag: "0.6.0-RC1"
