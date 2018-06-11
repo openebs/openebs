@@ -188,7 +188,7 @@ spec:
 apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
-  name: openebs-snapshot-controller
+  name: openebs-snapshot-operator
   namespace: openebs
 spec:
   replicas: 1
@@ -197,7 +197,7 @@ spec:
   template:
     metadata:
       labels:
-        app: openebs-snapshot-controller
+        app: openebs-snapshot-operator
     spec:
       serviceAccountName: openebs-maya-operator
       containers:
@@ -278,7 +278,7 @@ parameters:
 kind: StorageClass
 apiVersion: storage.k8s.io/v1
 metadata:
-  name: snapshot-promoter
+  name: openebs-snapshot-promoter
 provisioner: volumesnapshot.external-storage.k8s.io/snapshot-promoter
 ---
 apiVersion: apiextensions.k8s.io/v1beta1
