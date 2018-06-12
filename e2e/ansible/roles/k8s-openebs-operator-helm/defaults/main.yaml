@@ -5,4 +5,4 @@ update_deploy_file: update.json
 
 storage_classes: https://raw.githubusercontent.com/openebs/openebs/master/k8s/openebs-storageclasses.yaml
 
-chart_name: openebs-test
+chart_name: storage-mule
