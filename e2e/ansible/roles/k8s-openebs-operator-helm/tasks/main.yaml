@@ -98,7 +98,7 @@
   retries: 6
 
 - name: 7) Installing openebs using stable charts.
-  shell: helm install stable/openebs --name "{{ chart_name }}" --namespace "{{ namespace }}"
+  shell: helm install stable/openebs --namespace "{{ namespace }}"
   args:
     executable: /bin/bash
   register: openebs_out
