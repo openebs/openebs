@@ -5,7 +5,9 @@ sc_def: storage-class.yaml
 
 pvc_def: create_pvc.yaml
 
-namespace: pvc-deletion 
+namespace: pvc-deletion
+
+storage_class: openebs-test 
 
 utils_path: openebs/e2e/ansible/playbooks/utils
 

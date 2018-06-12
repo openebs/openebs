@@ -27,7 +27,7 @@
   
     - block:
 
-        - name: 1) Run pre-requisites
+        - name: 1) Run the pre-requisites
           include: pre-requisites.yml 
      
         - name: 2) Get the number of nodes in the cluster
@@ -51,7 +51,7 @@
 # Attempting to create more replicas than the number of nodes
         - name: 3a) Replace the replica count in storage class file
           replace:
-            path: storage-class.yaml
+            path: "{{ result_kube_home.stdout }}/{{ sc_def }}"
             regexp: 'openebs.io/jiva-replica-count: "3"'
             replace: 'openebs.io/jiva-replica-count: "{{ (node_count) |int+1}}"'
           delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
@@ -60,7 +60,7 @@
           include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
           vars:
              ns: openebs
-             app: openebs-api
+             app: apiserver
 
         - name: 5) Create test specific namespace
           shell: source ~/.profile; kubectl create ns {{ namespace }}
@@ -72,7 +72,7 @@
         - name: 6) Create the storage class in K8s master
           include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_task.yml"
           vars:
-           app_yml: "{{ sc_def }}"
+           app_yml: "{{ result_kube_home.stdout }}/{{ sc_def }}"
            ns: default
 
 #Copying the create_pvc.yaml to k8s master
@@ -85,7 +85,7 @@
         - name: 6b) Create PVC in k8s cluster
           include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_task.yml"
           vars:
-           app_yml: "{{ pvc_def }}"
+           app_yml: "{{result_kube_home.stdout }}/{{ pvc_def }}"
            ns: "{{ namespace }}"
 
         - name: Wait for few seconds
@@ -102,13 +102,13 @@
 
 #Checking pods using the PV name
         - name: 7a) Confirm whether the volume pods are created
-          shell: source ~/.profile; kubectl get pods -n {{ namespace }} | grep "{{ pv_name.stdout }}" | grep {{item}}  | wc -l
+          shell: source ~/.profile; kubectl get pods -n {{ namespace }} | grep "{{ pv_name.stdout }}" | grep {{item}} | grep "Running" | wc -l
           args:
             executable: /bin/bash
           register: result
           until: result.stdout|int >= 1
-          delay: 30
-          retries: 10
+          delay: 60
+          retries: 15
           with_items:
             - ctrl
             - rep
@@ -221,5 +221,4 @@
               slack:
                 token: "{{ lookup('env','SLACK_TOKEN') }}"
                 msg: '{{ ansible_date_time.time }} TEST: {{test_name}}, RESULT: {{ flag }},{{ cflag }}'
-              when: slack_notify | bool and lookup('env','SLACK_TOKEN'
-                                                                                                                                                      212,6         98%
+              when: slack_notify | bool and lookup('env','SLACK_TOKEN')

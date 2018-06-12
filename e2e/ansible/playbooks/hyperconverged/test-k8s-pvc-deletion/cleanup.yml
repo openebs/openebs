@@ -9,6 +9,12 @@
   delay: 60
   retries: 5
 
+- name: Delete the storage class
+  shell: source ~/.profile; kubectl delete sc {{ storage_class }}
+  args:
+    executable: /bin/bash
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
 - name: Remove the test artifacts
   file:
     path: "{{ result_kube_home.stdout }}/{{ item }}"
