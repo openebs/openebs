@@ -1,23 +1,26 @@
+# Create OpenEBS namespace
 # Define the Service Account
 # Define the RBAC rules for the Service Account
 # Launch the maya-apiserver ( deployment )
 # Launch the maya-storagemanager ( deameon set )
 
+# Create the OpenEBS namespace
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: openebs
+---
 # Create Maya Service Account
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: openebs-maya-operator
-  namespace: default
+  namespace: openebs
 ---
 # Define Role that allows operations on K8s pods/deployments
-#  in "default" namespace
-# TODO : change to new namespace, for isolated data network
-# TODO : the rules should be updated with required group/resources/verb
 kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
-  namespace: default
   name: openebs-maya-operator
 rules:
 - apiGroups: ["*"]
@@ -50,11 +53,11 @@ kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
   name: openebs-maya-operator
-  namespace: default
+  namespace: openebs
 subjects:
 - kind: ServiceAccount
   name: openebs-maya-operator
-  namespace: default
+  namespace: openebs
 - kind: User
   name: system:serviceaccount:default:default
   apiGroup: rbac.authorization.k8s.io
@@ -67,7 +70,7 @@ apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
   name: maya-apiserver
-  namespace: default
+  namespace: openebs
 spec:
   replicas: 1
   template:
@@ -106,6 +109,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: maya-apiserver-service
+  namespace: openebs 
 spec:
   ports:
   - name: api
@@ -120,7 +124,7 @@ apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
   name: openebs-provisioner
-  namespace: default
+  namespace: openebs
 spec:
   replicas: 1
   template:
@@ -155,6 +159,10 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: spec.nodeName
+        - name: OPENEBS_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace 
         - name: OPENEBS_MONITOR_URL
           value: "http://127.0.0.1:32515/dashboard/db/openebs-volume-stats?orgId=1"
         - name: OPENEBS_MONITOR_VOLKEY
@@ -166,7 +174,7 @@ apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
   name: openebs-snapshot-controller
-  namespace: default
+  namespace: openebs
 spec:
   replicas: 1
   strategy:
