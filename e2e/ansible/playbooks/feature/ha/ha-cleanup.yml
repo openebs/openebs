@@ -8,8 +8,15 @@
 - name: Confirm percona pod has been deleted
   include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/delete_deploy_check.yml"
   vars:
-    app_yml: "{{ pod_yaml_alias }}"
+    app: "{{ pod_yaml_alias }}"
     ns: "{{  namespace }}"
+
+- name: Make the current ctrl node schedulable
+  shell: source ~/.profile; kubectl uncordon {{ctrl_node}}
+  args:
+    executable: /bin/bash
+  register: result
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
 - name: Delete  namespace
   shell: source ~/.profile;  kubectl delete ns {{ namespace }}

@@ -12,8 +12,6 @@
 
 ##########################################################################################################
 
-
-
 - hosts: localhost
 
   vars_files:
@@ -33,12 +31,16 @@
          set_fact:
            maya_pod: "{{ result.stdout_lines[0].split()[0] }}"
 
-       
        - name: Create namespace
          shell: source ~/.profile; kubectl create ns {{ namespace }}
          args:
            executable: /bin/bash
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+       - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/copy_task.yml"
+         vars:
+           files_to_copy: "{{ volume_def }}"
+           destination_node: "{{ groups['kubernetes-kubemasters'].0 }}"
 
        - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_task.yml"
          vars:
@@ -102,7 +104,7 @@
          shell: >
            source ~/.profile;
            kubectl exec {{maya_pod}} -n openebs -c maya-apiserver
-           -- mayactl snapshot create --volname {{vol_name}}
+           -- mayactl snapshot create --volname {{vol_name}} -n {{ namespace }}
            --snapname {{snap_name}}
          args:
            executable: /bin/bash
@@ -114,7 +116,7 @@
          shell: >
            source ~/.profile;
            kubectl exec {{maya_pod}} -c maya-apiserver
-           -- mayactl snapshot list --volname {{vol_name}}
+           -- mayactl snapshot list --volname {{vol_name}} -n {{namespace}}
          args:
            executable: /bin/bash
          register: result_snap_list
@@ -136,7 +138,7 @@
          shell: >
            source ~/.profile;
            kubectl exec {{maya_pod}} -c maya-apiserver
-           -- mayactl snapshot revert --volname {{vol_name}}
+           -- mayactl snapshot revert --volname {{vol_name}} -n {{namespace}}
            --snapname {{snap_name}}
          args:
            executable: /bin/bash
