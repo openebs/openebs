@@ -2,7 +2,7 @@ apiVersion: volumesnapshot.external-storage.k8s.io/v1
 kind: VolumeSnapshot
 metadata:
   name: snapshot-demo
-  namespace: default
+  namespace: k8s-snapshot
 spec:
   persistentVolumeClaimName: demo-vol1-claim
 

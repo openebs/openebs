@@ -1,6 +1,6 @@
 ---
 - name: Delete percona application deployed with snapped pvc
-  shell: source ~/.profile; kubectl delete -f "{{ percona }}"
+  shell: source ~/.profile; kubectl delete -f "{{ percona }}" -n "{{ namespace }}"
   args:
     executable: /bin/bash
   register: delete_percona
@@ -11,7 +11,7 @@
   changed_when: true
 
 - name: Check if the percona pod has been deleted
-  shell: source ~/.profile; kubectl get pods
+  shell: source ~/.profile; kubectl get pods -n "{{ namespace }}"
   args:
     executable: /bin/bash
   register: pods
@@ -22,7 +22,7 @@
   changed_when: true
 
 - name: Delete the snapshot claim
-  shell: source ~/.profile; kubectl delete -f "{{ snapshot_claim }}"
+  shell: source ~/.profile; kubectl delete -f "{{ snapshot_claim }}" -n "{{ namespace }}"
   args:
     executable: /bin/bash
   register: delete_claim
@@ -33,7 +33,7 @@
   changed_when: true
 
 - name: Delete volume snapshot
-  shell: source ~/.profile; kubectl delete -f "{{ snapshot }}"
+  shell: source ~/.profile; kubectl delete -f "{{ snapshot }}" -n "{{ namespace }}"
   args:
     executable: /bin/bash
   register: delete_sp
@@ -44,7 +44,7 @@
   changed_when: true
 
 - name: Delete the percona pod which was created before capturing snaphshot
-  shell: source ~/.profile; kubectl delete -f "{{ percona_link }}"
+  shell: source ~/.profile; kubectl delete -f "{{ percona_link }}" -n "{{ namespace }}"
   args:
     executable: /bin/bash
   register: delete_percona_out
@@ -55,7 +55,7 @@
   changed_when: true
 
 - name: Check if the pod has been deleted
-  shell: source ~/.profile; kubectl get pods
+  shell: source ~/.profile; kubectl get pods -n "{{ namespace }}"
   args:
     executable: /bin/bash
   register: result
@@ -72,4 +72,10 @@
   with_items:
     - "{{ snapshot_files }}"
     - "{{ percona }}"
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+- name: Delete the namespace
+  shell: kubectl delete ns "{{ namespace }}"
+  args:
+    executable: /bin/bash
   delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
