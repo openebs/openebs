@@ -17,26 +17,28 @@ Vagrant.configure("2") do |config|
   # https://docs.vagrantup.com.
 
   if ((box_Mode.to_i < BOX_MODE_OPENEBS.to_i) || \
-      (box_Mode.to_i > BOX_MODE_KUBERNETES.to_i))
-        puts "Invalid value set for OPENEBS_BUILD_BOX."
-        puts "Usage: OPENEBS_BUILD_BOX=1 for OpenEBS."
-        puts "Usage: OPENEBS_BUILD_BOX=2 for Kubernetes."
-        puts "Defaulting to OpenEBS..." 
-        puts "Do you want to continue?(y/n):"
+    (box_Mode.to_i > BOX_MODE_KUBERNETES.to_i))
 
+    puts "Invalid value set for OPENEBS_BUILD_BOX."
+    puts "Usage: OPENEBS_BUILD_BOX=1 for OpenEBS."
+    puts "Usage: OPENEBS_BUILD_BOX=2 for Kubernetes."
+    puts "Defaulting to OpenEBS..."
+    puts "Do you want to continue?(y/n):"
+
+    input = STDIN.gets.chomp
+    while 1 do
+      if(input == "n")
+        Kernel.exit!(0)
+      elsif(input == "y")
+        break
+      else
+        puts "Invalid input: type 'y' or 'n'"
         input = STDIN.gets.chomp
-        while 1 do
-           if(input == "n")
-             Kernel.exit!(0)
-           elsif(input == "y")
-             break
-           else
-             puts "Invalid input: type 'y' or 'n'"
-             input = STDIN.gets.chomp
-           end
-        end
-        box_Mode = 1
+      end
     end
+
+    box_Mode = 1
+  end
 
   # Every Vagrant development environment requires a box. You can search for
   # boxes at https://atlas.hashicorp.com/search.
@@ -104,13 +106,10 @@ Vagrant.configure("2") do |config|
   #   apt-get install -y apache2
   # SHELL
   if box_Mode.to_i == BOX_MODE_KUBERNETES.to_i
-    
     config.vm.provision :shell, 
     path: "patch_k8s.sh",
     privileged: true
-
   elsif box_Mode.to_i == BOX_MODE_OPENEBS.to_i
-
     config.vm.provision :shell, 
     path: "patch_openebs.sh",
     privileged: true
