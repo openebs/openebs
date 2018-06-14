@@ -26,37 +26,36 @@
   tasks:
 
     - block:
+ 
+        - include: pre-requisites.yml
 
-        - name: Check whether maya-apiserver pod is running
-          shell: source ~/.profile; kubectl get pods --all-namespaces | grep maya-apiserver
-          args:
-            executable: /bin/bash
-          register: result
-          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-          until: "'Running' in result.stdout"
-          delay: 30
-          retries: 5
+        - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
+          vars:
+             ns: openebs
+             app: apiserver
 
-        - name: Get $HOME of K8s master for kubernetes user
-          shell: source ~/.profile; echo $HOME
-          args:
-            executable: /bin/bash
-          register: result_kube_home
-          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+#        - name: Check whether maya-apiserver pod is running
+#          shell: source ~/.profile; kubectl get pods --all-namespaces | grep apiserver
+#          args:
+#            executable: /bin/bash
+#          register: result
+#          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+#          until: "'Running' in result.stdout"
+#          delay: 30
+#          retries: 5
+
+#        - name: Get $HOME of K8s master for kubernetes user
+#          shell: source ~/.profile; echo $HOME
+#          args:
+#            executable: /bin/bash
+#          register: result_kube_home
+#          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
         - name: Copy the percona definition yaml to k8s master
           copy:
             src: "{{ percona_def }}"
             dest: "{{ result_kube_home.stdout }}"
           delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
-
-#        - name: Start the log aggregator to capture test pod logs
-#          shell: >
-#            source ~/.profile;
-#            nohup stern "{{test_pod_regex}}" --since 1m > "{{result_kube_home.stdout}}/{{test_log_path}}" &
-#          args:
-#            executable: /bin/bash
-#          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
         - name: Getting the node name
           shell: kubectl get nodes -o wide  | awk {'print $1'} | awk 'FNR == 4{print}'
@@ -65,7 +64,7 @@
           register: node_name
           delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
 
-# Creating label "app=percona" for a node, so that node selector tage can be used in next task.
+# Creating label "app=percona" for a node, so that node selector tag can be used in next task.
 
         - name: Creating label for the node
           shell: kubectl label nodes {{node_name.stdout}} app=percona
@@ -77,35 +76,41 @@
           delay: 10
           retries: 3
 
+        - name: Creating test specific namespace
+          shell: kubectl create ns "{{ namespace }}"
+          args:
+            executable: /bin/bash
+          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+
         - name: Deploying application
-          shell: source ~/.profile; kubectl apply -f "{{ percona_def }}"
+          shell: source ~/.profile; kubectl apply -f "{{ percona_def }}" -n "{{ namespace }}"
           args:
             executable: /bin/bash
           register: percona_status
           delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-          until: "'deployment \"percona\" created' in percona_status.stdout"
+          until: "'created' in percona_status.stdout"
           delay: 30
           retries: 5
 
         - name: Checking if the application is deployed successfully
-          shell: kubectl get pods --all-namespaces --show-labels | grep "{{ app_label }}"
+          shell: kubectl get pods -n "{{ namespace }}" --show-labels | grep "{{ app_label }}"
           args:
             executable: /bin/bash
           register: app_status
           delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
           until: "'Running' in app_status.stdout"
-          delay: 30
+          delay: 60
           retries: 15
 
         - name: Getting PV name from the pvc
-          shell: kubectl get pvc {{ claim_name }} -o custom-columns=:spec.volumeName --no-headers
+          shell: kubectl get pvc {{ claim_name }} -n "{{ namespace }}" -o custom-columns=:spec.volumeName --no-headers
           args:
             executable: /bin/bash
           register: pv
           delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
 
         - name: Getting the controller service IP address
-          shell: kubectl get svc | grep "{{ pv.stdout }}" | grep ctrl | awk {'print $3'}
+          shell: kubectl get svc -n "{{ namespace }}" | grep "{{ pv.stdout }}" | grep ctrl | awk {'print $3'}
           args:
             executable: /bin/bash
           register: target_IP
@@ -190,7 +195,7 @@
           delegate_to: "{{ groups['kubernetes-kubemasters'].0}}"
 
         - name: Deleting all replica pods at once
-          shell: kubectl delete pod "{{ pods.results[0].stdout }}" "{{pods.results[1].stdout}}" "{{pods.results[2].stdout}}"
+          shell: sleep 30; kubectl delete pod "{{ pods.results[0].stdout }}" "{{pods.results[1].stdout}}" "{{pods.results[2].stdout}}" -n "{{ namespace }}"
           args:
             executable: /bin/bash
           register: delete_pod
@@ -200,7 +205,7 @@
           retries: 5
 
         - name: Checking if the replica pods are created again.
-          shell: kubectl get pods --all-namespaces --show-labels | grep "{{ pv.stdout }}" | grep "{{ replica_label }}" | grep Running | wc -l
+          shell: kubectl get pods -n "{{ namespace }}" --show-labels | grep "{{ pv.stdout }}" | grep "{{ replica_label }}" | grep Running | wc -l
           args:
             executable: /bin/bash
           register: result
@@ -248,19 +253,17 @@
           until: "'Resizing the filesystem on' in resize.stdout"
           delay: 20
           retries: 10
-
-        - name: Mounting the file system
-          mount:
-            path: /dev/{{ new_device.stdout }}
-            src: "{{ item }}"
-            fstype: ext4
-            state: present
+       
+        - name: Mount FS
+          shell: mount /dev/{{ new_device.stdout }} "{{ item }}"
+          args:
+            executable: /bin/bash
           become: true
           with_items:
             - "{{ mount_path.results[0].stdout }}"
             - "{{mount_path.results[1].stdout }}"
           delegate_to: "{{groups['kubernetes-kubeminions'].1}}"
-       
+
         - name: Wait
           wait_for: timeout=120
            
@@ -272,7 +275,7 @@
           delegate_to: "{{ groups['kubernetes-kubemasters'].0}}"
 
         - name: Deleting the application pod
-          shell: kubectl delete pod {{ app.stdout }} --grace-period=0 --force
+          shell: kubectl delete pod {{ app.stdout }} -n "{{ namespace }}" --grace-period=0 --force
           args:
             executable: /bin/bash
           register: delete_app
@@ -282,7 +285,7 @@
           retries: 5
 
         - name: Check if the application pod is running
-          shell: kubectl get pods --all-namespaces --show-labels | grep "{{app_label}}"
+          shell: kubectl get pods -n "{{ namespace }}" --show-labels | grep "{{app_label}}"
           args:
             executable: /bin/bash
           register: app_out
@@ -300,7 +303,7 @@
 
         - name: Setting the Pass flag
           set_fact:
-            flag: "PASS"
+            flag: "TEST PASSED"
 
         - name: Wait
           wait_for: timeout=200
@@ -308,27 +311,40 @@
       rescue:
         - name: Setting the fail flag
           set_fact:
-            flag: "FAIL"
+            flag: "TEST FAILED"
 
       always:
+   
+        - block:
 
-        - name: Remove the node label
-          shell: kubectl label node "{{node_name.stdout}}" app-
-          args:
-            executable: /bin/bash
-          delegate_to: "{{ groups['kubernetes-kubemasters'].0}}"
+            - name: Remove the node label
+              shell: kubectl label node "{{node_name.stdout}}" app-
+              args:
+                executable: /bin/bash
+              delegate_to: "{{ groups['kubernetes-kubemasters'].0}}"
 
-#        - include: resize-cleanup.yml
-#          when: clean | bool
+            - include: resize-cleanup.yml
+              when: clean | bool
 
-        - name: Send slack notification
-          slack:
-            token: "{{ lookup('env','SLACK_TOKEN') }}"
-            msg: '{{ ansible_date_time.time }} TEST: {{test_name}}, RESULT: {{ flag }}'
-          when: slack_notify | bool and lookup('env','SLACK_TOKEN')
+            - name: Setting Cleanup flag to passed
+              set_fact:
+                cflag: "CLEANUP PASSED"
+ 
+          rescue:
+ 
+            - name: Setting cleanup flag to failed
+              set_fact: 
+                cflag: "CLEANUP FAILED"
 
+          always:
 
+            - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/stern_task.yml"
+              vars:
+                status: stop
 
-
-
+            - name: Send slack notification
+              slack:
+                token: "{{ lookup('env','SLACK_TOKEN') }}"
+                msg: '{{ ansible_date_time.time }} TEST: {{test_name}}, RESULT: {{ flag }}, {{ cflag }}'
+              when: slack_notify | bool and lookup('env','SLACK_TOKEN')
 
