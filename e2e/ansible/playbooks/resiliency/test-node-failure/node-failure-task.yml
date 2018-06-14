@@ -90,3 +90,7 @@
          changed_when: true
          tags:
           - skip_ansible_lint
+   
+       - name: sleep for 50 seconds and continue with play
+         wait_for:
+           timeout: "50"
