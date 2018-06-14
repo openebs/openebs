@@ -30,7 +30,7 @@
        - name: Check status of maya-apiserver
          include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
          vars:
-           ns: default
+           ns: openebs 
            app: maya-apiserver
 
        - name: Get percona spec and liveness scripts
