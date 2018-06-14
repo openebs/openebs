@@ -3,6 +3,7 @@
 # Define the RBAC rules for the Service Account
 # Launch the maya-apiserver ( deployment )
 # Launch the maya-storagemanager ( deameon set )
+# NOTE: On GKE, deploy the openebs-operator.yaml in admin context 
 
 # Create the OpenEBS namespace
 apiVersion: v1
