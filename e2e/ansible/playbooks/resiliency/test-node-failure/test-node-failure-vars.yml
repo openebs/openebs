@@ -17,14 +17,10 @@ replace_with:
   - test-node-failure
   - test-node
 
-namespace: node-failure
+namespace: node-failure 
 
 test_pod_regex: maya*|openebs*|pvc*|percona*
 
 test_log_path: setup/logs/node_failure_test.log
 
-utils_path: openebs/e2e/ansible/playbooks/utils
 
-vagrant_path1: /home/devops/openebs/k8s/vagrant/1.8.8/ubuntu/
-
-node_name: kubeminion-01

@@ -1,0 +1,92 @@
+
+       - name: Get node name where {{item}} pod is running
+         shell: source ~/.profile; kubectl get pods -n {{ namespace }} -o wide | grep {{item}} | awk '{print $7}' | awk 'FNR == 1 {print}'
+         args:
+           executable: /bin/bash
+         register: node1
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+         changed_when: True
+
+
+       - name: Bring down node
+         include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/vagrant-halt-up-task.yml"
+         vars:
+           vagrant_op: halt --force
+           nodename: "{{ node1.stdout }}"
+
+
+       - name: check the node is down
+         shell: source ~/.profile; kubectl get nodes | grep {{ node1.stdout }} | awk '{print $2}'
+         args:
+           executable: /bin/bash
+         register: result
+         until: "'NotReady' in result.stdout"
+         delay: 60
+         retries: 5
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+         changed_when: True
+
+       - name: Wait for 300s to check the pod is still running after killing the node
+         wait_for:
+           timeout: 300
+
+       - name: Confirm liveness checks on percona are successful &  pod is still in running state
+         include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
+         vars:
+            ns: "{{ namespace }}"
+            app: percona
+
+       - name: Bring up node
+         include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/vagrant-halt-up-task.yml"
+         vars:
+           vagrant_op: up
+           nodename: "{{ node1.stdout }}"
+
+       - name: check the node is up
+         shell: source ~/.profile; kubectl get nodes | grep {{ node1.stdout }} | awk '{print $2}'
+         args:
+           executable: /bin/bash
+         register: result
+         until: "'Ready' in result.stdout"
+         delay: 30
+         retries: 6
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+         changed_when: True
+
+       - name: Confirm liveness checks on percona are successful &  pod is still in running state
+         include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
+         vars:
+            ns: "{{ namespace }}"
+            app: percona
+
+       - name: Check if the replica pods are created and running
+         shell: source ~/.profile; kubectl get pods -n {{ namespace }} | grep rep | grep -i running |wc -l
+         args:
+           executable: /bin/bash
+         register: rep_count
+         until: "'3' in rep_count.stdout"
+         delay: 60
+         retries: 5
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+         changed_when: True
+
+       - name: Get Controller SVC IP
+         shell: source ~/.profile; kubectl get svc -n {{ namespace }} | grep ctrl | awk {'print $3'}
+         args:
+           executable: /bin/bash
+         register: SVC
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+         changed_when: true
+
+       - name: Check if replica is rebuilded
+         shell: curl http://{{ SVC.stdout }}:9501/v1/replicas | grep createTypes | jq -r '.data[].mode' | grep 'RW'
+         args:
+           executable: /bin/bash
+         register: result
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+         until: "result.stdout_lines | length  == 3"
+         delay: 60
+         retries: 10
+         changed_when: true
+         tags:
+          - skip_ansible_lint
