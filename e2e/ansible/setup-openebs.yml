@@ -1,14 +1,4 @@
 ---
-- hosts: openebs-mayamasters
-  roles:
-    - {role: master, when: deployment_mode == "dedicated"}
-    - {role: vagrant, when: is_vagrant_vm | bool and deployment_mode == "dedicated"}
-
-- hosts: openebs-mayahosts
-  roles:
-    - {role: hosts, when: deployment_mode == "dedicated"}
-    - {role: vagrant, when: is_vagrant_vm | bool and deployment_mode == "dedicated"}
-
 - hosts: kubernetes-kubemasters 
   roles: 
     - {role: k8s-openebs-operator-helm, when: deployment_mode == "hyperconverged" and openebs_deploy == "helm"}

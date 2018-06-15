@@ -137,7 +137,7 @@
            executable: /bin/bash
          register: result
          until: "'Running' in result.stdout_lines[1]"
-         delay: 5
+         delay: 15
          retries: 6
          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
 

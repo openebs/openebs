@@ -97,8 +97,10 @@
   delay: 60
   retries: 6
 
+# Installing openebs using stable chart in openebs namespace. The chart will be created with some random name.
+# We can verify it using "helm ls --all" command.
 - name: 7) Installing openebs using stable charts.
-  shell: helm install stable/openebs --name "{{ chart_name }}" --namespace "{{ namespace }}"
+  shell: helm install stable/openebs --namespace "{{ namespace }}"
   args:
     executable: /bin/bash
   register: openebs_out
