@@ -19,8 +19,11 @@ class Inventory(object):
                 passwd = "\"{{ lookup('env','%s') }}\"" % (i[3])
 
                 try:
-                    if c == 1:
-                        hostaliasname = '%s0%s ansible_ssh_host' % (i[0], c)
+                    if c == 1:                        
+                        if i[1] == "127.0.0.1":
+                            hostaliasname = '%s0%s ansible_connection=local ansible_ssh_host' % (i[0], c)
+                        else:
+                            hostaliasname = '%s0%s ansible_ssh_host' % (i[0], c)
                         config[hostgroupname] = {hostaliasname: i[1]}
                         f = open(path, 'w')
                         config.write(f)
@@ -37,6 +40,9 @@ class Inventory(object):
 
                         eargs = "'-o StrictHostKeyChecking=no'"
                         config[varsgroupname]['ansible_ssh_extra_args'] = eargs
+
+                        sshargs = "\"{{ lookup('env','SSH_KEY_FILE') }}\""
+                        config[varsgroupname]['ansible_ssh_private_key_file'] = sshargs
 
                         f = open(path, 'w')
                         config.write(f)
