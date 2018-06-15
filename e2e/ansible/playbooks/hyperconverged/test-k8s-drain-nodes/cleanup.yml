@@ -35,6 +35,32 @@
   retries: 5
   changed_when: True
 
+- name: Delete storage class 
+  shell: source ~/.profile; kubectl delete -f "{{ create_sc }}"
+  args:
+    executable: /bin/bash
+  register: sc_out
+  until: "'deleted' in sc_out.stdout"
+  delay: 10
+  retries: 5
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+- name: Replace the replica count in openebs-storageclasses yaml
+  replace:
+    path: "{{ create_sc }}"
+    regexp: 'openebs.io/jiva-replica-count: "2"'
+    replace: 'openebs.io/jiva-replica-count: "{{ (node_count |int) }}"'
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+- name:  Apply storage class yaml
+  shell: kubectl apply -f "{{ create_sc }}"
+  args:
+    executable: /bin/bash
+  register: sc_out
+  until: "'created' in sc_out.stdout"
+  delay: 10
+  retries: 5
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
 - name: Remove test artifacts
   file:
