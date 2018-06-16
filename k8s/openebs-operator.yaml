@@ -1,23 +1,23 @@
-# Define the Service Account
-# Define the RBAC rules for the Service Account
-# Launch the maya-apiserver ( deployment )
-# Launch the maya-storagemanager ( deameon set )
+# This manifest deploys the OpenEBS control plane components, with associated CRs & RBAC rules
+# NOTE: On GKE, deploy the openebs-operator.yaml in admin context 
 
+# Create the OpenEBS namespace
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: openebs
+---
 # Create Maya Service Account
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: openebs-maya-operator
-  namespace: default
+  namespace: openebs
 ---
 # Define Role that allows operations on K8s pods/deployments
-#  in "default" namespace
-# TODO : change to new namespace, for isolated data network
-# TODO : the rules should be updated with required group/resources/verb
 kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
-  namespace: default
   name: openebs-maya-operator
 rules:
 - apiGroups: ["*"]
@@ -50,11 +50,11 @@ kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
   name: openebs-maya-operator
-  namespace: default
+  namespace: openebs
 subjects:
 - kind: ServiceAccount
   name: openebs-maya-operator
-  namespace: default
+  namespace: openebs
 - kind: User
   name: system:serviceaccount:default:default
   apiGroup: rbac.authorization.k8s.io
@@ -67,7 +67,7 @@ apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
   name: maya-apiserver
-  namespace: default
+  namespace: openebs
 spec:
   replicas: 1
   template:
@@ -102,20 +102,20 @@ spec:
         - name: OPENEBS_IO_JIVA_REPLICA_COUNT
           value: "3"
         # DEFAULT_CONTROLLER_NODE_SELECTOR allows your to specify the nodes
-        # on which openebs controller have to be scheduled. To use this feature, 
+        # on which openebs controller have to be scheduled. To use this feature,
         # the nodes should already be labeled with the key=value. For example:
         # `kubectl label nodes <node-name> nodetype=storage
-        # Note: It is recommended that node selector for controller be 
+        # Note: It is recommended that node selector for controller be
         # same as that of the stateful apps.
         # This is supported for maya api server version 0.6.0-RC2 onwards
         #- name: DEFAULT_CONTROLLER_NODE_SELECTOR
         #  value: "nodetype=storage"
         # DEFAULT_REPLICA_NODE_SELECTOR allows your to specify the nodes
-        # on which openebs replicas have to be scheduled. To use this feature, 
+        # on which openebs replicas have to be scheduled. To use this feature,
         # the nodes should already be labeled with the key=value. For example:
         # `kubectl label nodes <node-name> nodetype=storage
         # Note: It is recommended that node selector for replica will specify
-        # nodes that have disks/ssds attached to them. 
+        # nodes that have disks/ssds attached to them.
         # This is supported for maya api server version 0.6.0-RC2 onwards
         #- name: DEFAULT_REPLICA_NODE_SELECTOR
         #  value: "nodetype=storage"
@@ -124,6 +124,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: maya-apiserver-service
+  namespace: openebs 
 spec:
   ports:
   - name: api
@@ -138,7 +139,7 @@ apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
   name: openebs-provisioner
-  namespace: default
+  namespace: openebs
 spec:
   replicas: 1
   template:
@@ -173,6 +174,10 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: spec.nodeName
+        - name: OPENEBS_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace 
         - name: OPENEBS_MONITOR_URL
           value: "http://127.0.0.1:32515/dashboard/db/openebs-volume-stats?orgId=1"
         - name: OPENEBS_MONITOR_VOLKEY
@@ -184,7 +189,7 @@ apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
   name: openebs-snapshot-controller
-  namespace: default
+  namespace: openebs
 spec:
   replicas: 1
   strategy:
@@ -199,9 +204,19 @@ spec:
         - name: snapshot-controller
           image: openebs/snapshot-controller:0.6.0-RC2
           imagePullPolicy: Always
+          env:
+          - name: OPENEBS_NAMESPACE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
         - name: snapshot-provisioner
           image: openebs/snapshot-provisioner:0.6.0-RC2
           imagePullPolicy: Always
+          env:
+          - name: OPENEBS_NAMESPACE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
 ---
 apiVersion: apiextensions.k8s.io/v1beta1
 kind: CustomResourceDefinition
