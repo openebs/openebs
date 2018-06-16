@@ -1,5 +1,4 @@
 ---
 k8s_log_aggregator_url: https://github.com/wercker/stern/releases/download/1.6.0/stern_linux_amd64
 k8s_log_aggregator: stern
-
-
+k8s_logs_path: "{{ ansible_env.HOME}}/setup/logs"

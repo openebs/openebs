@@ -6,11 +6,11 @@ Use case:
 > I am a beginner, I want to contribute to OpenEBS project and I am not sure from where to begin?
 
 Answer:
->Start looking into the issues tagged with labels such as `help/small` , `size/XS`, `kind/unit-test` etc. Solve such issues and raise PR.
+> Start looking into the issues tagged with labels such as `help/small` , `size/XS`, `kind/unit-test` etc. Solve such issues and raise PR.
 
 ---
 
-### Kind
+## Kind
 
 Labels prefixed with *kind* indicate the type of issue and PR. Suppose, you want to report a bug then you can tag your issue with `kind/bug` label.
 
@@ -27,7 +27,7 @@ Labels prefixed with *kind* indicate the type of issue and PR. Suppose, you want
 
 ---
 
-### Help
+## Help
 
 Labels prefixed with *help* implies that issue needs some help from community/users. Further, you can adjust the level of help required, by specifying small, medium, large etc.
 
@@ -54,7 +54,7 @@ Labels prefixed with *area* indicates that which area issue or PR belong. Here, 
 
 ---
 
-### Size
+## Size
 
 Labels prefixed with *size* defines the size of change done in particular PR.
 
@@ -67,11 +67,9 @@ Labels prefixed with *size* defines the size of change done in particular PR.
 | size/XS | Size of change is extra small/1 commit probably |
 | size/XXL | Size of change is very large/15 commits probably |
 
-#### NOTE:
+### NOTE
 
-```
 Please do not club major changes into single PR. It'll be difficult for a reviewer to review a big PR. In that case, reviewer may discard your PR and will ask you create multiple PRs.
-```
 
 ---
 

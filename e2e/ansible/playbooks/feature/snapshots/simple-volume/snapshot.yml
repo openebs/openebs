@@ -159,7 +159,7 @@
          shell: >
            source ~/.profile;
            kubectl exec {{maya_pod}} -n openebs -c maya-apiserver
-           -- mayactl snapshot create --volname {{vol_name}}
+           -- mayactl snapshot create --volname {{vol_name}} -n {{namespace}}
            --snapname {{snap_name}}
          args:
            executable: /bin/bash
@@ -171,7 +171,7 @@
          shell: >
            source ~/.profile;
            kubectl exec {{maya_pod}} -n openebs -c maya-apiserver
-           -- mayactl snapshot list --volname {{vol_name}}
+           -- mayactl snapshot list --volname {{vol_name}} -n {{namespace}}
          args:
            executable: /bin/bash
          register: result_snap_list
@@ -206,7 +206,7 @@
          shell: >
            source ~/.profile;
            kubectl exec {{maya_pod}} -c maya-apiserver
-           -- mayactl snapshot revert --volname {{vol_name}}
+           -- mayactl snapshot revert --volname {{vol_name}} -n {{namespace}}
            --snapname {{snap_name}}
          args:
            executable: /bin/bash
@@ -287,8 +287,8 @@
 
         always:
         - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/stern_task.yml"
-             vars:
-               status: stop
+          vars:
+            status: stop
 
         - name: Send slack notification
           slack:
