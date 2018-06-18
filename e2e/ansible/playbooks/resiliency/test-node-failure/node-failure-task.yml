@@ -47,7 +47,7 @@
          args:
            executable: /bin/bash
          register: result
-         until: "'Ready' in result.stdout"
+         until: "'NotReady' not in result.stdout"
          delay: 30
          retries: 6
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
@@ -90,7 +90,3 @@
          changed_when: true
          tags:
           - skip_ansible_lint
-   
-       - name: sleep for 50 seconds and continue with play
-         wait_for:
-           timeout: "50"
