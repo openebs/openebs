@@ -4,7 +4,6 @@
   args:
     executable: /bin/bash
   register: result
-  with_items: "{{ app }}"
   delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
   until: "app  and 'Running' in result.stdout"
   delay: 30
