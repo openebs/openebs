@@ -3,6 +3,8 @@
 
 - include: setup-kubernetes.yml
 
+- include: setup-stern.yml
+
 - include: setup-openebs.yml
 
 - include: load-images.yml

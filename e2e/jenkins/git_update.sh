@@ -37,7 +37,7 @@ ci_trigger_url="curl -f -X POST -H $CRUMB --user $JENKINS_USER:$JENKINS_USER_API
 http://$JENKINS_MASTER_IP:$JENKINS_PORT/job/$JOB_NAME/build?token=$BUILD_TOKEN"
 
 # look for file indicating ongoing CI job, exit if present 
-if [ -f "$file" ]; then
+if [[ -f $file ]]; then
     echo "##### CI RUN IN PROGRESS, WON'T POLL FOR E2E UPDATES #####"
     exit
 fi
@@ -54,12 +54,12 @@ git pull
 content=`git diff master@{1} master --name-only e2e` 
 
 # trigger/schedule a CI run if e2e/Ansible is updated 
-if ! [ -z "$content" ]
+if ! [[ -z $content ]]
 then
     echo $content; echo "Triggering CI..."
     eval $ci_trigger_url > /dev/null 2>&1
     retcode=$? 
-    if [ $retcode -ne 0 ] 
+    if [[ $retcode -ne 0 ]] 
     then
         echo "Failed to trigger CI, found non-zero exit status ($retcode)"
         exit

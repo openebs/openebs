@@ -1,0 +1,21 @@
+test_name: verifiy_kubectl_drain_behaviour
+
+utils_path: openebs/e2e/ansible/playbooks/utils
+
+test_log_path: setup/logs/kubectl-drain-behaviour.log
+
+test_pod_regex: maya*|openebs*|pvc*|percona*
+
+profile: ~/.profile
+
+percona_link: https://raw.githubusercontent.com/openebs/openebs/master/k8s/demo/percona/percona-openebs-deployment.yaml 
+
+patch_file: replica_patch.yaml
+
+create_sc: storage-class.yml
+
+test_artifacts:
+  -  storage-class.yml
+  -  replica_patch.yaml
+
+namespace: drain-node

@@ -8,25 +8,24 @@
 
 http://www.openebs.io/
  
-OpenEBS enables the use of containers for mission critical, persistent workloads.  OpenEBS is containerized storage and related storage services.   
+**OpenEBS** enables the use of containers for mission-critical, persistent workloads. OpenEBS is containerized storage and related storage services.
  
-OpenEBS allows you to treat your persistent workload containers, such as DBs on containers, just like other containers.  OpenEBS itself is deployed as just another container on your host, and enables storage services that can be designated on a per pod, application, cluster or container level, including:   
-- Data persistence across nodes, dramatically reducing time spent rebuilding Cassandra rings for example
-- Synchronization of data across availability zones and cloud providers
-- Use of commodity hardware plus a container engine to deliver seriously scale out block storage
-- Integration with orchestrators, so that developer and application intent flows into OpenEBS configurations automatically
-- Management of tiering to and from S3 and other targets
-- Plus we are bringing our experience from BSD based containerization and delivering QoS for customers from our CloudByte experience over to OpenEBS - expect to see more intelligence and manageability 
+**OpenEBS** allows you to treat your persistent workload containers, such as DBs on containers, just like other containers. OpenEBS itself is deployed as just another container on your host and enables storage services that can be designated on a per pod, application, cluster or container level, including:
+- Data persistence across nodes, dramatically reducing time spent rebuilding Cassandra rings for example.
+- Synchronization of data across availability zones and cloud providers.
+- Use of commodity hardware plus a container engine to deliver so called container attached block storage.
+- Integration with Kubernetes, so  developer and application intent flows into OpenEBS configurations automatically.
+- Management of tiering to and from S3 and other targets.
   
-Our vision is simple: let us let storage and storage services for persistent workloads be so fully integrated into the environment and hence managed automatically that it almost disappears into the background as just yet another infrastructure service that works.  
- 
+**Our vision** is simple: let storage and storage services for persistent workloads be fully integrated into the environment and hence can be managed automatically that it almost disappears into the background as just yet another infrastructure service that just works. 
+
 ## Why OpenEBS Scales
  
-OpenEBS can scale to include an  arbitrarily large number of containerized storage controllers. Thanks in part to some advancements in the metadata management which removes a common bottleneck to scale out storage performance. Again, we learnt the hard way over the years at CloudByte and are extremely happy to see initial scale out performance figures with OpenEBS; much credit goes to the orchestration and containerization as well.
- 
+OpenEBS can scale to include an arbitrarily large number of containerized storage controllers. Thanks in part to some advancements in the metadata management which remove a common bottleneck to scaling out storage performance. 
+
 ## Installation and Getting Started
  
-OpenEBS can be setup in few easy steps.  You can get going on your choice of Kubernetes cluster by having open-iscsi installed on the Kubernetes nodes and running the openebs-operator using kubectl. 
+OpenEBS can be setup in few easy steps. You can get going on your choice of Kubernetes cluster by having open-iscsi installed on the Kubernetes nodes and running the openebs-operator using kubectl. 
 
 **Start the OpenEBS Services using Operator**
 ```
@@ -40,15 +39,14 @@ kubectl apply -f openebs-storageclasses.yaml
 ```
 You could also follow our [QuickStart Guide](https://docs.openebs.io/docs/overview.html).
 
-OpenEBS can be deployed on any Kubernetes cluster - either in cloud, on-premise or developer laptop (minikube). Please follow our [OpenEBS Setup](https://docs.openebs.io/docs/overview.html) documentation. Also, we have a Vagrant environment available that includes a sample Kubernetes deployment and synthetic load that you can use to simulate the performance of OpenEBS. 
+OpenEBS can be deployed on any Kubernetes cluster - either in cloud, on-premise or developer laptop (minikube). Please follow our [OpenEBS Setup](https://docs.openebs.io/docs/overview.html) documentation. Also, we have a Vagrant environment available that includes a sample Kubernetes deployment and synthetic load that you can use to simulate the performance of OpenEBS. You may also find interesting the related project called Litmus (https://www.openebs.io/litmus) which helps with chaos engineering for stateful workloads on Kubernetes.  
 
- 
 ## Status
-We are approaching beta stage with active development underway. See our [Project Tracker](https://github.com/openebs/openebs/wiki/Project-Tracker) for more details.
+We are approaching beta stage with active development underway. See our [Project Tracker](https://github.com/openebs/openebs/wiki/Project-Tracker) for more details.  Please note that as of June 2018 we have cStor which is about to be released for additional funcitons and somewhat improved performance; please contact us on Slack if you are interested in this engine.  
  
 ## Contributing
  
-We welcome your feedback and contributions in any form possible.  
+OpenEBS welcomes your feedback and contributions in any form possible.
  
 - Join us at [Slack](https://openebsslacksignup.herokuapp.com/)
   - Already signed up? Head to our discussions at [#openebs-users](https://openebs-community.slack.com/messages/openebs-users/)
@@ -58,11 +56,12 @@ We welcome your feedback and contributions in any form possible.
 - Want to help with fixes and features?
   - See [open issues](https://github.com/openebs/openebs/labels)
   - See [contributing guide](./CONTRIBUTING.md)
+  - Want to join our community, [check this out](./community/README.md). 
 
 ## Show me the Code
 
-This is a meta-repository for OpenEBS. Here, [openebs/openebs](https://github.com/openebs/openebs), please find various documentation related artifacts, e2e tests and code related to deploying OpenEBS with popular orchestration engines like Kubernetes, Swarm, Mesos, Rancher, and so on. The source code is available at the following locations:
-- The core storage source code is under [openebs/jiva](https://github.com/openebs/jiva).
+This is a meta-repository for OpenEBS. The source code is available at the following locations:
+- The source code for the initial storage engine is under [openebs/jiva](https://github.com/openebs/jiva).
 - The storage orchestration source code is under [openebs/maya](https://github.com/openebs/maya).
 - While *jiva* and *maya* contain significant chunks of source code, some of the orchestration and automation code is also distributed in other repositories under the OpenEBS organization. 
 
@@ -71,6 +70,5 @@ Please start with the pinned repositories or with [OpenEBS Architecture](./contr
 
 ## License
 
-OpenEBS is developed under Apache 2.0 License at the project level. 
-Some components of the project are derived from other opensource projects like Nomad, Longhorn 
-and are distributed under their respective licenses. 
+OpenEBS is developed under Apache 2.0 license at the project level. 
+Some components of the project are derived from other open source projects like Nomad, Longhorn and are distributed under their respective licenses. 

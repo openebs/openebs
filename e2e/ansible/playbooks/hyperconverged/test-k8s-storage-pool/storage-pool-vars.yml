@@ -12,3 +12,16 @@ percona_application: https://raw.githubusercontent.com/openebs/openebs/master/k8
 openbs_storageclass: https://raw.githubusercontent.com/openebs/openebs/master/k8s/openebs-storageclasses.yaml
 
 storage_pool_path_creation: storage-pool-path_creation.yml
+
+volume_claim: storage-pool-test
+
+test_name: Testing storage pool path
+
+test_log_path: setup/logs/hyperconverged_test-storage-pool.log
+
+test_pod_regex: maya*|openebs*|pvc*
+
+
+test_artifacts:
+   - test-pvc.yaml
+   - storage-pool-path_creation.yml

@@ -4,11 +4,10 @@ metadata:
   name: {{ template "openebs.fullname" . }}-provisioner
   labels:
     app: {{ template "openebs.name" . }}
-    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    chart: {{ template "openebs.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
-    component: {{ template "openebs.fullname" . }}
-    role: provisioner
+    component: provisioner
 spec:
   replicas: {{ .Values.provisioner.replicas }}
   template:
@@ -16,10 +15,9 @@ spec:
       labels:
         app: {{ template "openebs.name" . }}
         release: {{ .Release.Name }}
-        component: {{ template "openebs.fullname" . }}
-        role: provisioner
+        component: provisioner
     spec:
-      serviceAccountName: {{ .Values.operator.name }}
+      serviceAccountName: {{ template "openebs.serviceAccountName" . }}
       containers:
       - name: {{ template "openebs.name" . }}-provisioner
         image: "{{ .Values.provisioner.image }}:{{ .Values.provisioner.imageTag }}"
@@ -37,10 +35,8 @@ spec:
         #  value: "/home/ubuntu/.kube/config"
         # OPENEBS_NAMESPACE is the namespace that this provisioner will
         # lookup to find maya api service
-{{- if .Values.rbac.create }}
         - name: OPENEBS_NAMESPACE
           value: "{{ .Release.Namespace }}"
-{{- end }}
         - name: NODE_NAME
           valueFrom:
             fieldRef:
@@ -50,43 +46,24 @@ spec:
         # If not present, "maya-apiserver-service" will be used for lookup.
         # This is supported for openebs provisioner version 0.5.3-RC1 onwards
         - name: OPENEBS_MAYA_SERVICE_NAME
-          value: "{{ template "openebs.fullname" . }}-maya-apiservice"
+          value: "{{ template "openebs.fullname" . }}-apiservice"
         # The following values will be set as annotations to the PV object.
         # Refer : https://github.com/openebs/external-storage/pull/15
         #- name: OPENEBS_MONITOR_URL
-        #  value: "{{ .Values.provisioner.monitorurl }}"
+        #  value: "{{ .Values.provisioner.monitorUrl }}"
         #- name: OPENEBS_MONITOR_VOLKEY
-        #  value: "{{ .Values.provisioner.monitorvolkey }}"
+        #  value: "{{ .Values.provisioner.monitorVolumeKey }}"
         #- name: MAYA_PORTAL_URL
-        #  value: "{{ .Values.provisioner.mayaportalurl }}"
-
+        #  value: "{{ .Values.provisioner.mayaPortalUrl }}"
 {{- if .Values.provisioner.nodeSelector }}
       nodeSelector:
 {{ toYaml .Values.provisioner.nodeSelector | indent 8 }}
 {{- end }}
-
 {{- if .Values.provisioner.tolerations }}
       tolerations:
 {{ toYaml .Values.provisioner.tolerations | indent 8 }}
 {{- end }}
-
-{{- if .Values.provisioner.antiAffinity.enabled }}
-      affinity:
-        podAntiAffinity:
-  {{- $antiAffinityType := .Values.provisioner.antiAffinity.type | lower -}}
-  {{- if eq $antiAffinityType "hard" }}
-          requiredDuringSchedulingIgnoredDuringExecution:
-            - topologyKey: "kubernetes.io/hostname"
-              labelSelector:
-                matchLabels:
-                  name: {{ template "openebs.fullname" . }}-provisioner
-  {{- else if eq $antiAffinityType "soft" }}
-          preferredDuringSchedulingIgnoredDuringExecution:
-            - weight: 1
-              podAffinityTerm:
-                topologyKey: "kubernetes.io/hostname"
-                labelSelector:
-                  matchLabels:
-                    name: {{ template "openebs.fullname" . }}-provisioner
-  {{- end }}
+{{- if .Values.provisioner.affinity }}
+      tolerations:
+{{ toYaml .Values.provisioner.affinity | indent 8 }}
 {{- end }}

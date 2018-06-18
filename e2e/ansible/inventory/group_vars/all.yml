@@ -23,7 +23,10 @@ k8s_version_list:
 weave_version_list:
   - 1.9.4
   - 2.0.4 
+#Option to specify OpenEBS deployment type
+# It can be either kubectl or helm based installation
 
+openebs_deploy: helm
 #########################################
 # OpenEBS Deployment Specifications     #
 #########################################
@@ -32,6 +35,9 @@ weave_version_list:
 #Accepted Entries (dedicated, hyperconverged): default:hyperconverged 
 
 deployment_mode: hyperconverged 
+
+#OpenEBS operator namespace
+operator_ns: openebs
 
 #Option specifically for vagrant VMs
 #Accepted Entries(true, false): default:false
@@ -78,5 +84,6 @@ logging: true
 #Accepted Entries(quick, normal): default:normal
 #quick build uses preconfigured VMs, 
 #normal builds upon vanilla VMs
-
+utils_path: openebs/e2e/ansible/playbooks/utils
+kubeconfig: .kube/config
 build_type: normal

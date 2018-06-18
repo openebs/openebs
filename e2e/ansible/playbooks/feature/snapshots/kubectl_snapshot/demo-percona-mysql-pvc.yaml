@@ -1,0 +1,32 @@
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: percona-new
+  labels:
+    name: percona-new
+spec:
+  containers:
+  - resources:
+      limits:
+        cpu: 0.5
+    name: percona-new
+    image: percona
+    args:
+      - "--ignore-db-dir"
+      - "lost+found"
+    env:
+      - name: MYSQL_ROOT_PASSWORD
+        value: k8sDem0
+    ports:
+      - containerPort: 3306
+        name: percona-new
+    volumeMounts:
+    - mountPath: /var/lib/mysql
+      name: demo-snap-vol1
+  volumes:
+  - name: demo-snap-vol1
+    persistentVolumeClaim:
+      claimName: demo-snap-vol-claim
+---
+

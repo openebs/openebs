@@ -1,5 +1,5 @@
 ---
-openebs_operator_link: https://raw.githubusercontent.com/openebs/openebs/master/k8s/openebs-operator.yaml
+openebs_operator_link: https://raw.githubusercontent.com/openebs/openebs/master/e2e/ansible/playbooks/hyperconverged/percona-openebs-ownnamespace/openebs-operator-ns-openebs.yaml
 
 openebs_operator_alias: openebs-operator.yaml 
 
@@ -9,4 +9,6 @@ openebs_storageclasses_alias: openebs-storageclasses.yaml
 
 # Image tag for openebs containers
 # Accepted entries (ci, latest): Default: latest
-test_tag: latest
+test_tag: ci
+
+namespace: openebs

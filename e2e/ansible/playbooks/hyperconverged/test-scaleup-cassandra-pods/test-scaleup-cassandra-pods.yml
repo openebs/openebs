@@ -1,0 +1,230 @@
+#Description: Scaling up cassandra application pods and verifything the Data distribution across all the pods
+#Author: Swarna
+
+#############################################################################################################
+#Steps:
+#1. Downloading the cassandra service,statefulset and loadgen yaml files.
+#2. Getting the number of nodes in the Cluster.
+#3. Replace the application pod count in Cassandra-statefulset yaml file based on the nodes count.
+#4. Replace the IO duration time in Cassandra-loadgen yaml file.
+#5. Deploy the OpenEBS operatot yaml and check the maya-apiserver status.
+#6. Deploy cassandra Application and check the status.
+#7. Scale up the cassandra application pods.
+#8. Generate the load using cassandra-loadgen yaml.
+#9. Install python-minimal,pip and cqlsh packages.
+#10.Verify the data distribution acorss all the pods.
+#12.Perform Cleanup
+
+#############################################################################################################
+
+
+- hosts: localhost
+
+  vars_files:
+    - scaleup-vars.yml
+
+  tasks:
+   - block:
+
+       - include: pre-requisites.yml
+
+
+       - name: Download YAML for cassandra service
+         get_url:
+           url: "{{ cassandra_service_link }}"
+           dest: "{{ result_kube_home.stdout }}/{{ svc_yaml_alias }}"
+         force: yes
+         register: result
+         until:  "'OK' in result.msg"
+         delay: 5
+         retries: 3
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+       - name: Download YAML for cassandra statefulset
+         get_url:
+           url: "{{ cassandra_stateful_link }}"
+           dest: "{{ result_kube_home.stdout }}/{{ stateful_yaml_alias }}"
+           force: yes
+         register: result
+         until:  "'OK' in result.msg"
+         delay: 5
+         retries: 3
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+       - name: Download YAML for cassandra loadgen
+         get_url:
+           url: "{{ cassandra_loadgen_link }}"
+           dest: "{{ result_kube_home.stdout }}/{{ loadgen_yaml_alias }}"
+           force: yes
+         register: result
+         until:  "'OK' in result.msg"
+         delay: 5
+         retries: 3
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+       - name: Get the number of nodes in the cluster
+         shell: source {{ profile }}; kubectl get nodes | grep 'Ready' | grep 'none' | wc -l
+         args:
+           executable: /bin/bash
+         register: node_out
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+       - name: Fetch the node count from stdout
+         set_fact:
+            node_count: " {{ node_out.stdout}}"
+
+
+       - name: Replace the replica count in cassandra statefulset yaml
+         replace:
+           path: "{{ result_kube_home.stdout }}/{{ stateful_yaml_alias }}"
+           regexp: 'replicas: 3'
+           replace: 'replicas: {{ (node_count) |int-1 }}'
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+       - name: Replace the io_duration in cassandra loadgen yaml
+         replace:
+           path: "{{ result_kube_home.stdout }}/{{ loadgen_yaml_alias }}"
+           regexp: 'duration=5'
+           replace: 'duration={{ io_minutes }}'
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+       - name: Check status of maya-apiserver
+         include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
+         vars:
+           ns: "{{ operator_ns }}"
+           app: maya-apiserver
+
+       - name: Deploy cassandra service and statefulset
+         shell: source {{ profile }}; kubectl apply -f {{ item }}
+         args:
+           executable: /bin/bash
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+         with_items: "{{ cassandra_artifacts }}"
+
+
+       - name: Confirm cassandra pod status is running
+         shell: source {{ profile }}; kubectl get pods | grep cassandra | grep Running | wc -l
+         args:
+           executable: /bin/bash
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+         register: result
+         until: (node_count)| int-1 == result.stdout|int
+         delay: 120
+         retries: 30
+
+       - name: Scale up Cassandra application pod
+         shell: source {{ profile }}; kubectl scale statefulsets cassandra --replicas={{(node_count |int)}}
+         args:
+            executable: /bin/bash
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+         register: result
+         until: "'scaled' in result.stdout"
+         delay: 60
+         retries: 5
+
+       - name: Confirm scaled up cassandra pod status is running
+         shell: source {{ profile }}; kubectl get pods | grep cassandra | grep Running | wc -l
+         args:
+           executable: /bin/bash
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+         register: result
+         until: (node_count)| int == result.stdout|int
+         delay: 120
+         retries: 30
+
+       - name: Start cassandra load generation
+         shell: source {{ profile }}; kubectl create -f {{ loadgen_yaml_alias }}
+         args:
+           executable: /bin/bash
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+       - name: Verify load is running for specified duration
+         shell: source {{ profile }}; kubectl get pods | grep cassandra-loadgen
+         args:
+           executable: /bin/bash
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+         register: result
+         until: "'Running' in result.stdout"
+         delay: 120
+         retries: 15
+
+       - name: Wait for {{ (io_minutes) | int *60 }} secs to run load.
+         wait_for:
+              timeout: "{{ (io_minutes) | int *60 }}"
+
+       - name: Verify load by using describe keyspaces
+         shell: source {{ profile }}; kubectl exec cassandra-0 -- cqlsh --execute "describe keyspaces;"
+         args:
+           executable: /bin/bash
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+         register: result
+         until: "'keyspace1' in result.stdout"
+         delay: 60
+         retries: 5
+         ignore_errors: true
+
+
+       - name: Get Data distribution percentages
+         shell: source {{ profile }}; kubectl exec cassandra-0 -- nodetool status
+         args:
+           executable: /bin/bash
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+         register: result
+
+       - name: Set Data distribution % of pod1 to variable
+         set_fact:
+           cassandra_pod1_percentage: "{{ result.stdout.split()[20] }}"
+
+       - name: Set Data distribution % of pod2 to variable
+         set_fact:
+           cassandra_pod2_percentage: "{{ result.stdout.split()[28] }}"
+
+       - name: Set Data distribution % of pod3 to variable
+         set_fact:
+           cassandra_pod3_percentage: "{{ result.stdout.split()[36] }}"
+
+
+       - name: Verfy the Data distribution percentages
+         command: echo "Verfiy the data distribution on all the cassandra pods"
+         when: cassandra_pod1_percentage != 0 and cassandra_pod2_percentage != 0 and cassandra_pod3_percentage !=0
+         register: result
+       - debug:
+           msg: "Data is distributed on all the cassandra application pods"
+         when: "result.rc == 0"
+
+
+       - name: Test playbook passed
+         set_fact:
+           flag: "Test Passed"
+
+     rescue:
+       - name: Test playbook failed
+         set_fact:
+           flag: "Test Failed"
+
+     always:
+       - block:
+
+           - include: cleanup.yml
+             when: clean | bool
+
+           - name: Test Cleanup Passed
+             set_fact:
+               cflag: "Cleanup Passed"
+
+         rescue:
+           - name: Test Cleanup Failed
+             set_fact:
+               cflag: "Cleanup Failed"
+
+         always:
+
+           - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/stern_task.yml"
+             vars:
+               status: stop
+
+           - name: Send slack notification
+             slack:
+               token: "{{ lookup('env','SLACK_TOKEN') }}"
+               msg: '{{ ansible_date_time.time }} TEST: {{test_name}}, RESULT: {{ flag }},{{ cflag }}'
+             when: slack_notify | bool and lookup('env','SLACK_TOKEN')

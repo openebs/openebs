@@ -1,179 +1,224 @@
+# k8s_delete_pvc.yml
+# Description:  Test if the pvc and corresponding service gets deleted when the number of replicas are more than the nodes.
+
+###############################################################################################
+#Test Steps:
+
+#1. Run pre-requisites which fetches k8s home and start the log aggregator.
+#2. Obtain the number of nodes in cluster and ser the replica count accordingly.
+#3. Copy the test artifacts to k8s master
+#4. Check if the OpenEBS components are deployed
+#5. Create a namespace
+#6. Create storage class and a volume.
+#7. Check if the volume pods are running.
+#8. Check if there is a volume in pending state.
+#9. Delete the volume.
+#10. Check if the volume, pods and service are deleted successfully.
+#11. Perform cleanup of test artifacts.
+###############################################################################################
+
+
 - hosts: localhost
 
   vars_files:
     - k8s-delete-pvc-vars.yml
 
   tasks:
+  
+    - block:
+
+        - name: 1) Run the pre-requisites
+          include: pre-requisites.yml 
      
-       - name: Get the number of nodes in the cluster
-         shell: kubectl get nodes | grep '<none>' | wc -l
-         args:
-           executable: /bin/bash
-         register: node_out
-         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+        - name: 2) Get the number of nodes in the cluster
+          shell: kubectl get nodes | grep '<none>' | wc -l
+          args:
+            executable: /bin/bash
+          register: node_out
+          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
-       - name: Fetch the node count from stdout
-         set_fact:
-            node_count: " {{ node_out.stdout}}"
-
-# Attempting to create more replicas than the number of nodes
-       - name: Replace the replica count in storage class file
-         replace:
-           path: storage-class.yaml 
-           regexp: 'openebs.io/jiva-replica-count: "1"'
-           replace: 'openebs.io/jiva-replica-count: "{{ (node_count) |int+1}}"'
-           backup: yes
-
-       - name: Get $HOME of K8s master for kubernetes user
-         shell: source ~/.profile; echo $HOME
-         args:
-           executable: /bin/bash
-         register: result_kube_home
-         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+        - name: 2a) Fetch the node count from stdout
+          set_fact:
+             node_count: " {{ node_out.stdout}}"
 
 #Copying openebs-test storage class yaml file to k8s master
-       - name: Copy the storage classes yaml to k8s master
-         copy:
-           src: "{{ sc_def }}"
-           dest: "{{ result_kube_home.stdout }}"
-         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+        - name: 3) Copy the storage classes yaml to k8s master
+          copy:
+            src: "{{ sc_def }}"
+            dest: "{{ result_kube_home.stdout }}"
+          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
 
-       - name: Check whether maya-apiserver pod is deployed
-         shell: source ~/.profile; kubectl get pods | grep maya-apiserver
-         args:
-           executable: /bin/bash
-         register: result
-         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-         until: "'Running' in result.stdout"
-         delay: 120
-         retries: 5
+# Attempting to create more replicas than the number of nodes
+        - name: 3a) Replace the replica count in storage class file
+          replace:
+            path: "{{ result_kube_home.stdout }}/{{ sc_def }}"
+            regexp: 'openebs.io/jiva-replica-count: "3"'
+            replace: 'openebs.io/jiva-replica-count: "{{ (node_count) |int+1}}"'
+          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+
+        - name: 4) Check whether maya-apiserver pod is deployed
+          include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
+          vars:
+             ns: openebs
+             app: apiserver
+
+        - name: 5) Create test specific namespace
+          shell: source ~/.profile; kubectl create ns {{ namespace }}
+          args:
+            executable: /bin/bash
+          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
 #create the storage class 'openebs-test'
-       - name: Create the storage class in K8s master
-         shell: kubectl apply -f "{{ sc_def }}"
-         args:
-           executable: /bin/bash
-         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+        - name: 6) Create the storage class in K8s master
+          include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_task.yml"
+          vars:
+           app_yml: "{{ result_kube_home.stdout }}/{{ sc_def }}"
+           ns: default
 
 #Copying the create_pvc.yaml to k8s master
-       - name: Copy pvc yaml to K8s master
-         copy:
-           src: "{{ pvc_def }}"
-           dest: "{{ result_kube_home.stdout }}"
-         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+        - name: 6a) Copy pvc yaml to K8s master
+          copy:
+            src: "{{ pvc_def }}"
+            dest: "{{ result_kube_home.stdout }}"
+          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
       
-       - name: Create PVC in k8s cluster
-         shell: kubectl apply -f "{{ pvc_def }}"
-         args:
-           executable: /bin/bash
-         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
-   
+        - name: 6b) Create PVC in k8s cluster
+          include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_task.yml"
+          vars:
+           app_yml: "{{result_kube_home.stdout }}/{{ pvc_def }}"
+           ns: "{{ namespace }}"
+
+        - name: Wait for few seconds
+          wait_for: timeout=30
+          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+
 #Find the PV name by referring the storage class 'openebs-test'
-       - name: Finding PV name 
-         shell: source ~/.profile; kubectl get pv | grep "openebs-test" | awk {'print $1'}
-         args:
-           executable: /bin/bash
-         register: pv_name
-         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+        - name: 7) Finding PV name 
+          shell: source ~/.profile; kubectl get pv | grep "openebs-test" | awk {'print $1'}
+          args:
+            executable: /bin/bash
+          register: pv_name
+          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
 
 #Checking pods using the PV name
-       - name: Confirm whether the volume pods are created
-         shell: source ~/.profile; kubectl get pods | grep "{{ pv_name.stdout }}" | grep {{item}}  | wc -l
-         args:
-           executable: /bin/bash
-         register: result
-         until: result.stdout|int >= 1
-         delay: 30
-         retries: 10
-         with_items:
-           - ctrl
-           - rep
-         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+        - name: 7a) Confirm whether the volume pods are created
+          shell: source ~/.profile; kubectl get pods -n {{ namespace }} | grep "{{ pv_name.stdout }}" | grep {{item}} | grep "Running" | wc -l
+          args:
+            executable: /bin/bash
+          register: result
+          until: result.stdout|int >= 1
+          delay: 60
+          retries: 15
+          with_items:
+            - ctrl
+            - rep
+          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
 
 #Check if there is one replica in pending state
  
-       - name: Check if one replica is unscheduled
-         shell: kubectl get pods | grep "{{ pv_name.stdout }}" | grep -i "pending" |wc -l
-         args:
-           executable: /bin/bash
-         register: unscheduled_pod
-         until: unscheduled_pod.stdout|int ==1
-         delay: 10
-         retries: 5
-         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+        - name: 8) Check if one replica is unscheduled
+          shell: source ~/.profile; kubectl get pods -n {{ namespace }}| grep "{{ pv_name.stdout }}" | grep -i "pending" |wc -l
+          args:
+            executable: /bin/bash
+          register: unscheduled_pod
+          until: unscheduled_pod.stdout|int ==1
+          delay: 60
+          retries: 5
+          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
 
 #Checking if there is svc created by grepping pv name
       
-       - name: Check if the svc is created
-         shell: kubectl get svc | grep "{{ pv_name.stdout }}" |wc -l
-         args:
-           executable: /bin/bash
-         register: svc
-         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}" 
-         until: svc.stdout|int ==1
-         delay: 10
-         retries: 3
+        - name: 8a) Check if the svc is created
+          shell: source ~/.profile; kubectl get svc -n {{ namespace }} | grep "{{ pv_name.stdout }}" |wc -l
+          args:
+            executable: /bin/bash
+          register: svc
+          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}" 
+          until: svc.stdout|int ==1
+          delay: 10
+          retries: 3
          
 #Getting service name by greping the pv name
-       - name: Getting service name
-         shell: kubectl get svc | grep "{{ pv_name.stdout }}" | awk {'print $1'}
-         args:
-           executable: /bin/bash
-         register: svc_name
-         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+        - name: 8b) Getting service name
+          shell: source ~/.profile; kubectl get svc -n {{ namespace }}| grep "{{ pv_name.stdout }}" | awk {'print $1'}
+          args:
+            executable: /bin/bash
+          register: svc_name
+          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
  
-       - name: Delete PVC
-         shell: kubectl delete -f "{{ pvc_def }}"
-         args:
-           executable: /bin/bash
-         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+        - name: 9) Delete PVC
+          include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/delete_deploy.yml"
+          vars:
+           app_yml: "{{ pvc_def }}"
+           ns: "{{ namespace }}"
        
-       - block:
-             - name: check if the pods are deleted
-               shell: kubectl get pods | grep "{{pv_name.stdout}}" | grep {{item}}  | wc -l
-               args:
-                 executable: /bin/bash
-               register: pods
-               until: pods.stdout|int == 0
-               delay: 30
-               retries: 10
-               with_items:
-                 - ctrl
-                 - rep
-               delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+        - name: 10) check if the pods are deleted
+          shell: source ~/.profile; kubectl get pods -n {{ namespace }} | grep "{{pv_name.stdout}}" | grep {{item}}  | wc -l
+          args:
+            executable: /bin/bash
+          register: pods
+          until: pods.stdout|int == 0
+          delay: 120
+          retries: 10
+          with_items:
+            - ctrl
+            - rep
+          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
   
-             - name: Check if the pv is deleted
-               shell: kubectl get pv 
-               args:
-                 executable: /bin/bash
-               register: pv_out
-               until: "'{{ pv_name.stdout }}' not in pv_out.stdout"
-               delay: 10
-               retries: 3
-               delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+        - name: 10a) Check if the pv is deleted
+          shell: source ~/.profile; kubectl get pv 
+          args:
+            executable: /bin/bash
+          register: pv_out
+          until: "'{{ pv_name.stdout }}' not in pv_out.stdout"
+          delay: 120
+          retries: 5
+          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
                
-             - name: Check if the svc is deleted
-               shell: kubectl get svc | grep "{{ svc_name.stdout }}" | wc -l
-               args:
-               executable: /bin/bash
-               register: delete_svc
-               delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
-               until: delete_svc.stdout|int == 0
-               delay: 20
-               retries: 5
+        - name: 10b) Check if the svc is deleted
+          shell: source ~/.profile; kubectl get svc -n {{ namespace }} | grep "{{ svc_name.stdout }}" | wc -l
+          args:
+            executable: /bin/bash
+          register: delete_svc
+          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+          until: delete_svc.stdout|int == 0
+          delay: 20
+          retries: 5
             
-             - set_fact:
-                   flag: "PASS"
-         rescue:
-             - set_fact:
-                   flag: "FAIL"
+        - name: Setting pass flag
+          set_fact:
+            flag: "TEST PASSED"
+         
+      rescue:
+        - name: Setting failed flag
+          set_fact:
+            flag: "TEST FAILED"
 
-         always:
-           - name: Send slack notification
-             slack:
-               token: "{{ lookup('env','SLACK_TOKEN') }}"
-               msg: '{{ ansible_date_time.time }} TEST: {{test_name}}, RESULT: {{ flag }}'
-             when: slack_notify | bool and lookup('env','SLACK_TOKEN')
- 
+      always:
        
+        - block:
+ 
+            - name: 11) Cleaning up the test artifacts
+              include: cleanup.yml
+ 
+            - name: Setting cleanup flag to passed
+              set_fact: 
+                cflag: "CLEANUP PASSED"
+       
+          rescue:
+        
+            - name: Setting cleanup to failed
+              set_fact:
+                cflag: "CLEANUP FAILED"
+       
+          always:
+        
+            - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/stern_task.yml"
+              vars:
+                status: stop
 
+            - name: Send slack notification
+              slack:
+                token: "{{ lookup('env','SLACK_TOKEN') }}"
+                msg: '{{ ansible_date_time.time }} TEST: {{test_name}}, RESULT: {{ flag }},{{ cflag }}'
+              when: slack_notify | bool and lookup('env','SLACK_TOKEN')

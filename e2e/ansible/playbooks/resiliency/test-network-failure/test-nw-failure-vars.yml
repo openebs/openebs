@@ -1,5 +1,5 @@
 ---
-test_name: test_nw_failure
+test_name: test_nw_failure_ctrl
 
 percona_links:
   - https://raw.githubusercontent.com/openebs/elves/master/e2e/percona-liveness/percona.yaml
@@ -17,6 +17,8 @@ replace_with:
   - test-nw-failure
   - test-nw
 
+namespace: nw-ctrl
+
 utils_path: openebs/e2e/ansible/playbooks/utils
 
 delay_interavals: 
@@ -24,7 +26,7 @@ delay_interavals:
   - 6000
   - 10000
 
-pumba_file: https://raw.githubusercontent.com/openebs/elves/master/chaos/pumba/pumba_kube.yml 
+pumba_file: pumba_kube.yml 
 
 test_pod_regex: maya*|openebs*|pvc*|percona*|pumba*
 

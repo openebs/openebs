@@ -2,5 +2,15 @@
 test_name: Delete_PVC_K8s
 
 sc_def: storage-class.yaml
+
 pvc_def: create_pvc.yaml
- 
+
+namespace: pvc-deletion
+
+storage_class: openebs-test 
+
+utils_path: openebs/e2e/ansible/playbooks/utils
+
+test_pod_regex: maya*|openebs*|pvc*|
+
+test_log_path: setup/logs/delete_pvc.log

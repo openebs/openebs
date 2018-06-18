@@ -1,0 +1,11 @@
+---
+- name: Get $HOME of K8s master for kubernetes user
+  shell: source ~/.profile; echo $HOME
+  args:
+    executable: /bin/bash
+  register: result_kube_home
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+- include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/stern_task.yml"
+  vars:
+    status: start

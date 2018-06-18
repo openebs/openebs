@@ -112,6 +112,7 @@
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
          failed_when: "'Created' not in result_snap.stdout"
 
+
        - name: Confirm successful snapshot creation
          shell: >
            source ~/.profile;

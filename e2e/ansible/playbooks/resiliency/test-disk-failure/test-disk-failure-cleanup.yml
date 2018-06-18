@@ -1,0 +1,35 @@
+---
+- include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/delete_deploy.yml"
+  vars:
+    app_yml: "{{ percona_files.0 }}"
+    ns: "{{ namespace }}"
+
+- include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/delete_deploy_check.yml"
+  vars:
+    ns: "{{ namespace }}"
+    app: percona
+
+- name: Remove the percona liveness check config map
+  shell: source ~/.profile; kubectl delete cm sqltest -n {{ namespace }}
+  args:
+    executable: /bin/bash
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+  register: result
+  failed_when: "'configmap' and 'deleted' not in result.stdout"
+  changed_when: true
+
+- name: Delete namespace
+  shell: source ~/.profile; kubectl delete ns {{ namespace }}
+  args:
+    executable: /bin/bash
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+  changed_when: true
+
+- name: Remove test artifacts
+  file:
+    path: "{{ result_kube_home.stdout }}/{{ item }}"
+    state: absent
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+  with_items:
+    - "{{percona_files}}"
+    - "{{ create_sc }}"

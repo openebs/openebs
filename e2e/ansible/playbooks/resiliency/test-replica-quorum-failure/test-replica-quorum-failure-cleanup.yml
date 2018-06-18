@@ -1,23 +1,26 @@
 ---
 - name: Get pvc name to verify successful pvc deletion
-  shell: source ~/.profile; kubectl get pvc | grep {{ replace_with.0 }} | awk {'print $3'}
+  shell: source ~/.profile; kubectl get pvc -n {{ namespace }} | grep {{ replace_with.0 }} | awk {'print $3'}
   args:
     executable: /bin/bash
   delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
   register: pvc
+  changed_when: true
 
 - name: Delete percona mysql pod
   include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/delete_deploy.yml"
   vars:
+    ns: "{{ namespace }}"
     app_yml: "{{ percona_files.0 }}"
 
 - name: Confirm percona pod deletion
   include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/delete_deploy_check.yml"
   vars:
+    ns: "{{ namespace }}"
     app: percona
 
 - name: Confirm pvc pod has been deleted
-  shell: source ~/.profile; kubectl get pods | grep {{ pvc.stdout }}
+  shell: source ~/.profile; kubectl get pods -n {{ namespace }} | grep {{ pvc.stdout }}
   args:
     executable: /bin/bash
   delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
@@ -25,20 +28,30 @@
   failed_when: "'pvc' and 'Running' in result.stdout"
   delay: 30
   retries: 10
+  changed_when: true
 
-- name: Remove the percona liveness check config map 
-  shell: source ~/.profile; kubectl delete cm sqltest 
+- name: Remove the percona liveness check config map
+  shell: source ~/.profile; kubectl delete cm sqltest -n {{ namespace }}
   args:
     executable: /bin/bash
   delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
   register: result
   failed_when: "'configmap' and 'deleted' not in result.stdout"
+  changed_when: true
 
 - name: Remove the replica-quorum-sc storage class
   shell: source ~/.profile; kubectl delete sc replica-quorum-sc
   args:
     executable: /bin/bash
   delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+  changed_when: true
+
+- name: Delete namespace
+  shell: source ~/.profile; kubectl delete ns {{ namespace }}
+  args:
+    executable: /bin/bash
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+  changed_when: true
 
 - name: Remove test artifacts
   file:
@@ -48,6 +61,6 @@
   with_items:
     - "{{percona_files}}"
 
-  
- 
- 
+
+
+

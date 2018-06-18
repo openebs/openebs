@@ -14,32 +14,27 @@
 ###############################################################################################
 
 - hosts: localhost
- 
-  vars_files: 
-    - test-replica-quorum-failure-vars.yml 
- 
+
+  vars_files:
+    - test-replica-quorum-failure-vars.yml
+
   tasks:
    - block:
 
+       - include: test-replica-quorum-failure-prereq.yml
+
        ###################################################
        #                PREPARE FOR TEST                 #
-       # (Place artifacts in kubemaster, start logger &  # 
+       # (Place artifacts in kubemaster, start logger &  #
        # confirm OpenEBS operator is ready for requests. #
        ###################################################
 
-       - name: Get $HOME of K8s master for kubernetes user
-         shell: source ~/.profile; echo $HOME
-         args: 
-           executable: /bin/bash
-         register: result_kube_home
-         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-
-       - name: Get percona spec and liveness scripts
-         get_url:
-           url: "{{ item }}"
-           dest: "{{ result_kube_home.stdout }}"
-         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
-         with_items: "{{ percona_links }}"
+       - name: Copy the percona specs to kubemaster
+         include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/copy_task.yml"
+         vars:
+           destination_node: "{{groups['kubernetes-kubemasters'].0}}"
+           files_to_copy:
+             - "{{ percona_files }}"
 
        - name: Replace volume-claim name with test parameters
          include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/regex_task.yml"
@@ -48,54 +43,55 @@
            regex1: "{{replace_item}}"
            regex2: "{{replace_with}}"
 
-       - name: Copy the fault injection specs to kubemaster  
+       - name: Copy the fault injection specs to kubemaster
          copy:
            src: "{{ fault_injection_file }}"
            dest: "{{ result_kube_home.stdout }}"
          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
 
-       - name: Copy the storage class specs to kubemaster  
+       - name: Copy the storage class specs to kubemaster
          copy:
            src: "{{ storage_class_file }}"
            dest: "{{ result_kube_home.stdout }}"
          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
 
-       - name: Start the log aggregator to capture test pod logs
-         shell: >
-           source ~/.profile;
-           nohup stern "{{test_pod_regex}}" --since 1m > "{{result_kube_home.stdout}}/{{test_log_path}}" &
-         args:
-           executable: /bin/bash
-         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-
        - name: Check status of maya-api server
          include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
          vars:
+            ns: "{{ operator_ns }}"
             app: maya-api
- 
+
        ####################################################
        #          SETUP FAULT-INJECTION ENV               #
        # (Setup chaoskube deployment with an empty policy,#
-       # deploy percona w/ a liveness check for DB writes)# 
+       # deploy percona w/ a liveness check for DB writes)#
        ####################################################
+
+       - name: Create test specific namespace
+         shell: source ~/.profile; kubectl create ns {{ namespace }}
+         args:
+           executable: /bin/bash
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
        - name: Setup the storage class
          include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_task.yml"
          vars:
            app_yml: "{{ storage_class_file }}"
+           ns: default
 
-       - name: Create a configmap with the liveness sql script 
-         shell: source ~/.profile; kubectl create configmap sqltest --from-file={{ percona_files.1 }} 
-         args: 
+       - name: Create a configmap with the liveness sql script
+         shell: source ~/.profile; kubectl create configmap sqltest --from-file={{ percona_files.1 }} -n {{ namespace }}
+         args:
            executable: /bin/bash
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-         register: result 
+         register: result
          failed_when: "'configmap' and 'created' not in result.stdout"
 
        - name: Create percona deployment with OpenEBS storage
          include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_task.yml"
          vars:
            app_yml: "{{ percona_files.0 }}"
+           ns: "{{ namespace }}"
 
        - name: Wait for 120s to ensure liveness check starts
          wait_for:
@@ -104,25 +100,26 @@
        - name: Check whether percona application is running
          include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
          vars:
+            ns: "{{ namespace }}"
             app: percona
 
-       - name: Get the name of the volume replica deployment 
-         shell: > 
-           source ~/.profile; kubectl get deployments 
+       - name: Get the name of the volume replica deployment
+         shell: >
+           source ~/.profile; kubectl get deployments -n {{ namespace }}
            -l openebs/replica=jiva-replica --no-headers
          args:
            executable: /bin/bash
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
          register: result_deploy
 
-       - name: Set the replica deployment name to variable 
-         set_fact: 
+       - name: Set the replica deployment name to variable
+         set_fact:
            replica_deploy: "{{ result_deploy.stdout_lines[0].split()[0] }}"
 
        ########################################################
        #        INJECT FAULTS FOR SPECIFIED PERIOD            #
-       # (Obtain begin marker before fault-inject(FI),do ctrl # 
-       # failures, verify successful FI via end marker)       # 
+       # (Obtain begin marker before fault-inject(FI),do ctrl #
+       # failures, verify successful FI via end marker)       #
        ########################################################
 
        - name: Populate the iterator with the values to loop
@@ -142,37 +139,49 @@
        ########################################################
 
        - name: Confirm percona pod is still running
-         include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/status_running.yml"
+         include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
          vars:
+            ns: "{{ namespace }}"
             app: percona
 
        ########################################################
-       #                        CLEANUP                       #			      
+       #                        CLEANUP                       #
        # (Tear down application, liveness configmap as well as#
-       # the FI (chaoskube) infrastructure. Also stop logger) # 
+       # the FI (chaoskube) infrastructure. Also stop logger) #
        ########################################################
 
-       - name: Terminate the log aggregator
-         shell: source ~/.profile; killall stern
-         args:
-           executable: /bin/bash 
-         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"  
+       - name: Test Passed
+         set_fact:
+           flag: "Test Passed"
 
-       - set_fact:
-           flag: "Pass"
-
-     rescue: 
-       - set_fact: 
-           flag: "Fail"
+     rescue:
+       - name: Test Failed
+         set_fact:
+           flag: "Test Failed"
 
      always:
-  
-       - include: test-replica-quorum-failure-cleanup.yml
-         when: clean | bool
+       - block:
 
-       - name: Send slack notification
-         slack: 
-           token: "{{ lookup('env','SLACK_TOKEN') }}"
-           msg: '{{ ansible_date_time.time }} TEST: {{test_name}}, RESULT: {{ flag }}'
-         when: slack_notify | bool and lookup('env','SLACK_TOKEN')
+           - include: test-replica-quorum-failure-cleanup.yml
+
+           - name: Test Cleanup Passed
+             set_fact:
+               cflag: "Cleanup Passed"
+
+         rescue:
+           - name: Test Cleanup Failed
+             set_fact:
+               cflag: "Cleanup Failed"
+
+         always:
+
+           - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/stern_task.yml"
+             vars:
+               status: stop
+
+           - name: Send slack notification
+             slack:
+               token: "{{ lookup('env','SLACK_TOKEN') }}"
+               msg: '{{ ansible_date_time.time }} TEST: {{test_name}}, RESULT: {{ flag }},{{ cflag }}'
+             when: slack_notify | bool and lookup('env','SLACK_TOKEN')
 

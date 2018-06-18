@@ -1,5 +1,5 @@
 ---
-test_name: test_nw_failure
+test_name: test_nw_failure_rep
 
 utils_path: openebs/e2e/ansible/playbooks/utils
 
@@ -24,7 +24,9 @@ delay_interavals:
   - 6000
   - 10000
 
-pumba_file: https://raw.githubusercontent.com/openebs/elves/master/chaos/pumba/pumba_kube.yml 
+namespace: nw-rep
+
+pumba_file: pumba_kube.yml
 
 test_pod_regex: maya*|openebs*|pvc*|percona*|pumba*
 

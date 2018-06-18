@@ -1,19 +1,30 @@
 ---
 - name: Delete percona mysql pod
-  shell: source ~/.profile; kubectl delete -f {{ pod_yaml_alias }}
-  args:
-    executable: /bin/bash
-  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+  include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/delete_deploy.yml"
+  vars:
+    app_yml: "{{ pod_yaml_alias }}"
+    ns: "{{ namespace }}"
 
 - name: Confirm percona pod has been deleted
-  shell: source ~/.profile; kubectl get pods
+  include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/delete_deploy_check.yml"
+  vars:
+    app: "{{ pod_yaml_alias }}"
+    ns: "{{  namespace }}"
+
+- name: Make the current ctrl node schedulable
+  shell: source ~/.profile; kubectl uncordon {{ctrl_node}}
+  args:
+    executable: /bin/bash
+  register: result
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+- name: Delete  namespace
+  shell: source ~/.profile;  kubectl delete ns {{ namespace }}
   args:
     executable: /bin/bash
   delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-  register: result
-  until: "'percona' not in result.stdout"
-  delay: 120
-  retries: 6
-
-
-
+  register: ns_out
+  until: "'deleted' in ns_out.stdout"
+  delay: 10
+  retries: 5
+  changed_when: true

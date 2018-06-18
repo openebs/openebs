@@ -1,0 +1,27 @@
+---
+test_name: test-node-eviction-out-of-disk
+
+namespace: nodeeviction
+
+utils_path: openebs/e2e/ansible/playbooks/utils
+
+patch_file: replica_patch.yaml
+
+percona_files:
+  - percona.yaml
+
+replace_item:
+  - nodename_where_replica_pod_1_got_scheduled
+  - nodename_where_replica_pod_2_got_scheduled
+
+replace_with:
+  - "{{node_details.stdout_lines[0]}}"
+  - "{{node_details.stdout_lines[1]}}"
+
+test_pod_regex: maya*|openebs*|pvc*|percona*
+
+test_log_path: setup/logs/test-node-eviction-out-of-disk.log
+
+key: node.kubernetes.io/out-of-disk
+
+storage_class_file: nodeeviction-sc.yaml

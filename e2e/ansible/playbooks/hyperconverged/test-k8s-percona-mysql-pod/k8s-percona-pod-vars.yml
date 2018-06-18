@@ -5,7 +5,7 @@ test_log_path: setup/logs/hyperconverged_percona_db_on_k8s.log
 
 test_pod_regex: maya*|openebs*|pvc*|percona*
 
-percona_mysql_plugin_link: https://raw.githubusercontent.com/openebs/openebs/master/k8s/demo/percona/demo-percona-mysql-pvc.yaml 
+percona_mysql_plugin_link: https://raw.githubusercontent.com/openebs/openebs/master/k8s/demo/percona/demo-percona-mysql-pvc.yaml
 
 pod_yaml_alias: demo-percona-mysql-pvc.yaml
 
@@ -19,14 +19,17 @@ replace_with:
   - percona-db-claim
   - percona-db
 
-files: 
+files:
   - Dockerfile
   - MySQLLoadGenerate.sh
 
-deb_packages:
-  - python-pip
-  
+get_pip: get-pip.py
+
 pip_packages:
   - 'docker-py==1.9.0'
 
 mysql_load_duration: 120
+
+namespace: percona-mysql-test
+
+utils_path: openebs/e2e/ansible/playbooks/utils

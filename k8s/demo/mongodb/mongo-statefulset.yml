@@ -36,6 +36,7 @@ spec:
            - rs0
            - "--smallfiles"
            - "--noprealloc"
+           - "--bind_ip_all"
          ports:
            - containerPort: 27017
          volumeMounts:
@@ -43,7 +44,7 @@ spec:
              mountPath: /data/db
        - name: mongo-sidecar
          image: cvallance/mongo-k8s-sidecar
-         env: 
+         env:
            - name: MONGO_SIDECAR_POD_LABELS
              value: "role=mongo,environment=test"
  volumeClaimTemplates:

@@ -1,6 +1,6 @@
 ---
 - name: Deploy application files
-  shell: source ~/.profile; kubectl apply -f {{ item }}
+  shell: source ~/.profile; kubectl apply -f "{{result_kube_home.stdout}}/{{ item }}" -n {{ ns }}
   args:
     executable: /bin/bash
   delegate_to: "{{groups['kubernetes-kubemasters'].0}}"

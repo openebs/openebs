@@ -1,36 +1,71 @@
+# Descrption: Testing the storage pool path
+# Author: Swarna
+
+#############################################################
+# Test steps:
+#1. Creating the storage pool path /mnt/openebs.
+#2. Test storage pool path with the following conditions.
+#2(a). When Openebs in default and pvc is in percona namespace.
+#2(b). When openebs in openebs and pvc is in default namespace.
+#2(c).When openebs is openebs and pvc is in percona namespace.
+#3. Perform cleanup.
+###############################################################
+
+
+
+
+
 - hosts: localhost
 
   vars_files:
     - storage-pool-vars.yml
 
   tasks:
-   
-    #Deploying operator in default and pvc in percona namespace
-    - include: deploy-openebs-pvc.yml 
-        operator_namespace=default
-        namespace=percona
 
-    - include: cleanup.yml
-        operator_namespace=default
-        namespace=percona
-    
-    #Deploying operator in openebs and pvc in default namespace
-    - include: deploy-openebs-pvc.yml
-        operator_namespace=openebs
-        namespace=default
-
-    - include: cleanup.yml
-        operator_namespace=openebs
-        namespace=default
-
-    #Deploying operator in openebs and pvc in openebs namespace
-    - include: deploy-openebs-pvc.yml
-        operator_namespace=openebs
-        namespace=percona
-
-    - include: cleanup.yml
-        operator_namespace=openebs
-        namespace=percona
+   - block:
 
 
+       #Deploying operator in default and pvc in percona namespace
+       - include: deploy-openebs-pvc.yml
+           operator_namespace=default
+           namespace=percona
+
+       - include: cleanup.yml
+           operator_namespace=default
+           namespace=percona
+
+       #Deploying operator in openebs and pvc in default namespace
+       - include: deploy-openebs-pvc.yml
+           operator_namespace=openebs
+           namespace=default
+
+       - include: cleanup.yml
+           operator_namespace=openebs
+           namespace=default
+
+       #Deploying operator in openebs and pvc in percona namespace
+       - include: deploy-openebs-pvc.yml
+           operator_namespace=openebs
+           namespace=percona
+
+       - include: cleanup.yml
+           operator_namespace=openebs
+           namespace=percona
+
+       - name: Set flag to pass if test case is passed
+         set_fact:
+           flag: "Pass"
+
+     rescue:
+       - name: Set flag to fail if test case is failed
+         set_fact:
+           flag: "Fail"
+
+     always:
+
+       - name: Send slack notification
+         slack:
+           token: "{{ lookup('env','SLACK_TOKEN') }}"
+           msg: '{{ ansible_date_time.time }} TEST: {{test_name}}, RESULT: {{ flag }}'
+         when: slack_notify | bool and lookup('env','SLACK_TOKEN')
 

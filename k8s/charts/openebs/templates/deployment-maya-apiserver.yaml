@@ -1,14 +1,13 @@
 apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
-  name: {{ template "openebs.fullname" . }}-maya-apiserver
+  name: {{ template "openebs.fullname" . }}-apiserver
   labels:
     app: {{ template "openebs.name" . }}
-    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    chart: {{ template "openebs.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
-    component: {{ template "openebs.fullname" . }}
-    role: apiserver
+    component: apiserver
 spec:
   replicas: {{ .Values.apiserver.replicas }}
   template:
@@ -16,12 +15,11 @@ spec:
       labels:
         app: {{ template "openebs.name" . }}
         release: {{ .Release.Name }}
-        component: {{ template "openebs.fullname" . }}
-        role: apiserver
+        component: apiserver
     spec:
-      serviceAccountName: {{ .Values.operator.name }}
+      serviceAccountName: {{ template "openebs.serviceAccountName" . }}
       containers:
-      - name: {{ template "openebs.name" . }}-maya-apiserver
+      - name: {{ template "openebs.name" . }}-apiserver
         image: "{{ .Values.apiserver.image }}:{{ .Values.apiserver.imageTag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         ports:
@@ -45,34 +43,15 @@ spec:
           value: "{{ .Values.policies.monitoring.image }}:{{ .Values.policies.monitoring.imageTag }}"
         - name: OPENEBS_IO_JIVA_REPLICA_COUNT
           value: "{{ .Values.jiva.replicas }}"
-
 {{- if .Values.apiserver.nodeSelector }}
       nodeSelector:
 {{ toYaml .Values.apiserver.nodeSelector | indent 8 }}
 {{- end }}
-
 {{- if .Values.apiserver.tolerations }}
       tolerations:
 {{ toYaml .Values.apiserver.tolerations | indent 8 }}
 {{- end }}
-
-{{- if .Values.apiserver.antiAffinity.enabled }}
+{{- if .Values.apiserver.affinity }}
       affinity:
-        podAntiAffinity:
-  {{- $antiAffinityType := .Values.apiserver.antiAffinity.type | lower -}}
-  {{- if eq $antiAffinityType "hard" }}
-          requiredDuringSchedulingIgnoredDuringExecution:
-            - topologyKey: "kubernetes.io/hostname"
-              labelSelector:
-                matchLabels:
-                  name: {{ template "openebs.fullname" . }}-maya-apiserver
-  {{- else if eq $antiAffinityType "soft" }}
-          preferredDuringSchedulingIgnoredDuringExecution:
-            - weight: 1
-              podAffinityTerm:
-                topologyKey: "kubernetes.io/hostname"
-                labelSelector:
-                  matchLabels:
-                    name: {{ template "openebs.fullname" . }}-maya-apiserver
-  {{- end }}
+{{ toYaml .Values.apiserver.affinity | indent 8 }}
 {{- end }}

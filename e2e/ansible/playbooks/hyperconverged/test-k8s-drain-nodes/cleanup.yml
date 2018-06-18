@@ -1,0 +1,46 @@
+---
+
+- name: Delete percona deployment
+  include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/delete_deploy.yml"
+  vars:
+    app_yml: "{{ percona_link }}"
+    ns: "{{namespace}}"
+
+- name: Confirm percona pod has been deleted
+  include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/delete_deploy_check.yml"
+  vars:
+    ns: "{{namespace}}"
+    app: percona
+
+
+- name: uncordon the node which is drained
+  shell: source ~/.profile; kubectl uncordon {{ node1.stdout }}
+  args:
+    executable: /bin/bash
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+  register: result
+  until: "'uncordoned' in result.stdout"
+  delay: 5
+  retries: 10
+  changed_when: True
+
+- name: Delete namespace
+  shell: source ~/.profile; kubectl delete ns {{ namespace }}
+  args:
+    executable: /bin/bash
+  delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+  register: result
+  until: "'deleted' in result.stdout"
+  delay: 10
+  retries: 5
+  changed_when: True
+
+
+- name: Remove test artifacts
+  file:
+    path: "{{ result_kube_home.stdout }}/{{ item }}"
+    state: absent
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+  with_items:
+     - "{{test_artifacts}}"
+

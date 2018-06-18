@@ -26,7 +26,7 @@ error_msg="##### ERRORS DURING PLAYBOOK RUN, CHECK ARA LOGS #####"
 success_msg="##### PLAYBOOK COMPLETED SUCCESSFULLY #####"
 
 # look for file indicating ongoing CI job, exit if present
-if [ -f "$file" ]; then
+if [[ -f $file ]]; then
     echo $no_run_msg | awk '{ print strftime("%c:"),$0; fflush();}' >> $log
     exit
 fi
@@ -38,7 +38,7 @@ cd ~/openebs/e2e/ansible && ansible-playbook setup-images.yml 2>&1 >> $log
 # log failed playbook runs
 retcode=$?
 
-if [ $retcode -ne 0 ]
+if [[ $retcode -ne 0 ]]
 then
     echo $error_msg | awk '{ print strftime("%c:"),$0; fflush();}' >> $log
     echo $retcode >> $log

@@ -7,3 +7,7 @@ py_file: test-mem.py
 count_num: 10000
 mount_point: /mnt/jiva
 volume_claim: memleak-test
+namespace: memleak-test
+utils_path: openebs/e2e/ansible/playbooks/utils
+test_pod_regex: maya*|openebs*|pvc*
+test_log_path: setup/logs/memleak_test.log
