@@ -9,6 +9,8 @@ crunchy_pg_git_dir: https://github.com/openebs/openebs/tree/master/k8s/demo/crun
 
 postgres_vol_size: 5G
 
+utils_path: openebs/e2e/ansible/playbooks/utils
+
 deb_packages:
   - subversion
 
