@@ -67,20 +67,12 @@
          set_fact:
            replicas: "{{(jsonfile.stdout | from_json).spec.replicas}}"
 
-       - name: 4d) Comment the cleanup step in the run.sh with
+       - name: 5) Comment the cleanup step in the run.sh with
          lineinfile:
            path: "{{ result_kube_home.stdout }}/crunchy-postgres/run.sh"
            regexp: 'cleanup.sh'
            line: '#$DIR/cleanup.sh'
            backup: yes
-         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-
-       - name: 5) Start the log aggregator to capture test pod logs
-         shell: >
-           source ~/.profile;
-           nohup stern "{{test_pod_regex}}" --since 1m > "{{result_kube_home.stdout}}/{{test_log_path}}" &
-         args:
-           executable: /bin/bash
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
        - name: 6) Run the shell script to setup postgres cluster
