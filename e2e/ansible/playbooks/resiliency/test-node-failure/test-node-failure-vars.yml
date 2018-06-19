@@ -1,0 +1,26 @@
+---
+test_name: test_node_failure
+
+percona_links:
+  - https://raw.githubusercontent.com/openebs/elves/master/e2e/percona-liveness/percona.yaml
+  - https://raw.githubusercontent.com/openebs/elves/master/e2e/percona-liveness/sql-test.sh
+
+percona_files:
+  - percona.yaml
+  - sql-test.sh
+
+replace_item:
+  - demo-vol1-claim
+  - demo-vol1
+
+replace_with:
+  - test-node-failure
+  - test-node
+
+namespace: node-failure 
+
+test_pod_regex: maya*|openebs*|pvc*|percona*
+
+test_log_path: setup/logs/node_failure_test.log
+
+
