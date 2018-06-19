@@ -1,6 +1,6 @@
 ---
 - name: Check {{ app }} pod status
-  shell: source ~/.profile; kubectl get pods -n {{ ns }} | grep {{ item }}
+  shell: source ~/.profile; kubectl get pods -n {{ ns }} | grep {{ app }}
   args:
     executable: /bin/bash
   register: result
