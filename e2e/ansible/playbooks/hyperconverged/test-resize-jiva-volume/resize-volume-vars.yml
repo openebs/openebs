@@ -1,0 +1,16 @@
+---
+test_pod_regex: maya*|openebs*|pvc*|percona*
+
+test_log_path: setup/logs/resize_volume.log
+
+test_name: test-resize-jiva-volume
+
+percona_def: percona-openebs-deployment.yaml
+
+claim_name: percona-claim
+
+app_label: "name=percona"
+
+replica_label: "openebs/replica=jiva-replica"
+
+namespace: resize-volume
