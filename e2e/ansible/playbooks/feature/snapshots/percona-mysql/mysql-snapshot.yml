@@ -110,12 +110,13 @@
            executable: /bin/bash
          register: result_snap
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-         failed_when: "'Created Snapshot is:' not in result_snap.stdout"
+         failed_when: "'Created' not in result_snap.stdout"
+
 
        - name: Confirm successful snapshot creation
          shell: >
            source ~/.profile;
-           kubectl exec {{maya_pod}} -c maya-apiserver
+           kubectl exec {{maya_pod}} -n openebs -c maya-apiserver
            -- mayactl snapshot list --volname {{vol_name}} -n {{namespace}}
          args:
            executable: /bin/bash
@@ -137,14 +138,14 @@
        - name: Revert volume snapshot
          shell: >
            source ~/.profile;
-           kubectl exec {{maya_pod}} -c maya-apiserver
+           kubectl exec {{maya_pod}} -n openebs -c maya-apiserver
            -- mayactl snapshot revert --volname {{vol_name}} -n {{namespace}}
            --snapname {{snap_name}}
          args:
            executable: /bin/bash
          register: result_snap
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-         failed_when: "'Snapshot reverted:' not in result_snap.stdout"
+         failed_when: "'Reverting to snapshot' not in result_snap.stdout"
 
        - name: Delete percona pod to force vol remount on reschedule
          shell: >

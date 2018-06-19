@@ -15,7 +15,7 @@
 
        - name: Store maya-apiserver pod name in variable
          set_fact:
-           maya_pod: "{{ result.stdout_lines[0].split()[0] }}"
+           maya_pod: "{{ result.stdout.split()[0] }}"
 
        - name: Copy the volume claim to kube master
          copy:
@@ -129,7 +129,7 @@
        - name: Place test data into volume
          command: >
            dd if=/dev/urandom of={{mount_point}}/f1
-           bs=1M count={{test_data_size | int * 1024}}
+           bs=512 count={{test_data_size | int * 1024}}
          args:
            creates: "{{mount_point}}/f1"
          become: true
@@ -165,7 +165,7 @@
            executable: /bin/bash
          register: result_snap
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-         failed_when: "'Created Snapshot is:' not in result_snap.stdout"
+         failed_when: "'Created' not in result_snap.stdout"
 
        - name: Confirm successful snapshot creation
          shell: >
@@ -205,14 +205,14 @@
        - name: Revert volume snapshot
          shell: >
            source ~/.profile;
-           kubectl exec {{maya_pod}} -c maya-apiserver
+           kubectl exec {{maya_pod}} -n openebs -c maya-apiserver
            -- mayactl snapshot revert --volname {{vol_name}} -n {{namespace}}
            --snapname {{snap_name}}
          args:
            executable: /bin/bash
          register: result_snap
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-         failed_when: "'Snapshot reverted:' not in result_snap.stdout"
+         failed_when: "'Reverting to snapshot' not in result_snap.stdout"
 
        - name: Remount the volume
          mount:
