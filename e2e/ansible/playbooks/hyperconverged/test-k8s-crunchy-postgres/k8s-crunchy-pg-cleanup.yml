@@ -41,8 +41,6 @@
 
 - name: Remove test artifacts
   file:
-    path: "{{ result_kube_home.stdout }}/{{ item }}"
+    path: "{{ result_kube_home.stdout }}/crunchy-postgres"
     state: absent
   delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-  with_items:
-    - crunchy-postgres
