@@ -31,14 +31,12 @@
 
         - include: prerequisites.yml
 
-        - name: 1) Check if openebs-provisioner and maya-apiserver are running
+        - name: 1) Check if maya-apiserver is running.
           include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
           vars:
             ns: openebs
-            app:
-              - apiserver
-              - provisioner
-
+            app: apiserver
+        
         - name: 2) Copy the snapshot specific files to K8s master
           copy:
             src: "{{ item }}"
@@ -59,10 +57,10 @@
           delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
         - name: 4) Deploy percona mysql pod
-          include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_task.yml"
-          vars:
-           app_yml: "{{ percona_link }}"
-           ns: "{{ namespace }}"
+          shell: kubectl apply -f "{{ percona_link }}" -n "{{ namespace }}"
+          args:
+            executable: /bin/bash
+          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
         - name: 5) Confirm pod status is running
           include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
@@ -193,7 +191,7 @@
         - name: 10a) Deploying the application with the snapped pvc
           include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_task.yml"
           vars:
-           app_yml: "{{ result_kube_home.stdout }}/{{ percona }}"
+           app_yml: "{{ percona }}"
            ns: "{{ namespace }}"
 
         - name: Wait few seconds
