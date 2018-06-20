@@ -1,0 +1,40 @@
+- hosts: localhost
+
+  vars:
+    list: ["default", "kube-public", "kube-system", "openebs"]
+
+  tasks:
+    - name: Cleanup /var/openebs
+      shell: rm -rf /var/openebs/*
+      args:
+        executable: /bin/bash
+      become: true
+      delegate_to: "{{ item }}"
+      with_items: "{{groups['kubernetes-kubeminions']}}"
+
+    - name: List available namespaces
+      shell: source ~/.profile; kubectl get ns --no-headers | awk {'print $1'}
+      args:
+        executable: /bin/bash
+      delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+      register: result
+
+    - name: Delete namespaces which are not required
+      shell: source ~/.profile; kubectl delete ns {{ item }} --grace-period=0 --force
+      args:
+        executable: /bin/bash
+      delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+      with_items: "{{ result.stdout_lines }}"
+      when: item != 'kube-system' and item != 'openebs' and item != 'kube-public' and item != 'default'
+      ignore_errors: true
+
+    - name: List namespaces after deletion
+      shell: source ~/.profile; kubectl get ns --no-headers | awk {'print $1'}
+      args:
+        executable: /bin/bash
+      delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+      register: result
+      until: result.stdout_lines == list 
+      delay: 30
+      retries: 15
+
