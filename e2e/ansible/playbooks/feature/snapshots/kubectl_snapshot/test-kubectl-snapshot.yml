@@ -120,7 +120,6 @@
           until: "'Snapshot created successfully' in sp_out.stdout"
           delay: 60
           retries: 5
-          ignore_errors: true
 
         - name: 8) Creating PVC from the snapshot
           include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_task.yml"
