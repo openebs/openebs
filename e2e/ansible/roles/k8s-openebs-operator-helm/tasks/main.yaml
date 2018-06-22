@@ -10,12 +10,28 @@
 # 8) Check if the installation is successful
 # 9) Create the default storage classes
 
-- name: 1) Install helm.
-  shell: curl -Lo /tmp/helm-linux-amd64.tar.gz https://kubernetes-helm.storage.googleapis.com/helm-v2.6.2-linux-amd64.tar.gz; tar -xvf /tmp/helm-linux-amd64.tar.gz -C /tmp/; chmod +x  /tmp/linux-amd64/helm && sudo mv /tmp/linux-amd64/helm /usr/local/bin/
+#- name: 1) Install helm.
+#  shell: curl -Lo /tmp/helm-linux-amd64.tar.gz https://kubernetes-helm.storage.googleapis.com/helm-v2.6.2-linux-amd64.tar.gz; tar -xvf /tmp/helm-linux-amd64.tar.gz -C /tmp/; chmod +x  /tmp/linux-amd64/helm && sudo mv /tmp/linux-amd64/helm /usr/local/bin/
+#  args:
+#    executable: /bin/bash
+
+- name: 1) Getting the home directory of kubernetes master.
+  shell: source ~/.profile; echo $HOME
   args:
     executable: /bin/bash
+  register: result_kube_home
 
-- name: 2) Tiller setup.
+#- name: 1a) Copying the helm installer script to kubernetes master.
+#  copy:
+#    src: "{{ helm_installer }}"
+#    dest: "{{ result_kube_home.stdout }}"
+
+- name: 2) Download and install helm.
+  script: "{{ helm_installer }}"
+
+- wait_for: timeout=30
+
+- name: 2a) Tiller setup.
   shell: helm init
   args:
     executable: /bin/bash
@@ -30,8 +46,8 @@
     executable: /bin/bash
   register: tiller_version
   until: "'Server: &version.Version' in tiller_version.stdout"
-  delay: 120
-  retries: 10
+  delay: 60
+  retries: 15
 
 - block:
 
@@ -77,18 +93,12 @@
        delay: 60
        retries: 5
 
-- name: 6) Getting the home directory of kubernetes master.
-  shell: source ~/.profile; echo $HOME
-  args:
-    executable: /bin/bash
-  register: result_kube_home
-
-- name: 6a) Copying the patch yaml file to kubernetes master.
+- name: 6) Copying the patch yaml file to kubernetes master.
   copy:
     src: "{{ update_deploy_file }}"
     dest: "{{ result_kube_home.stdout }}"
 
-- name : 6b) Updating the tiller-deploy deployment with the service account.
+- name : 6a) Updating the tiller-deploy deployment with the service account.
   shell: kubectl -n kube-system patch deploy/tiller-deploy -p "$(cat {{result_kube_home.stdout}}/{{ update_deploy_file }})"
   args:
     executable: /bin/bash
@@ -100,7 +110,7 @@
 # Installing openebs using stable chart in openebs namespace. The chart will be created with some random name.
 # We can verify it using "helm ls --all" command.
 - name: 7) Installing openebs using stable charts.
-  shell: helm install stable/openebs --namespace "{{ namespace }}"
+  shell: helm install stable/openebs --set apiserver.imageTag={{ apiserver_version }} --set provisioner.imageTag={{ provisioner_version }} --namespace {{ namespace }}
   args:
     executable: /bin/bash
   register: openebs_out
