@@ -74,7 +74,9 @@ To create/modify service accounts and grant previleges, kubectl needs to be run 
 
 ```bash
 gcloud container clusters list
-gcloud container clusters get-credentials demo-openebs03 --zone us-central1-a
+root@ubuntu:~$ gcloud container clusters get-credentials mycluster_223 --zone us-central1-a --project strong-eon-153112
+Fetching cluster endpoint and auth data.
+kubeconfig entry generated for mycluster_223.
 ```
 
 #### Step 2 : Setup the admin context
@@ -83,14 +85,18 @@ Create a admin config context from the config shell:
 
 ```bash
 gcloud container clusters list
-kubectl config set-context demo-openebs03 --cluster=gke_strong-eon-153112_us-central1-a_demo-openebs03 --user=cluster-admin
+root@ubuntu:~$ kubectl config set-context test-admin --cluster=gke_strong-eon-153112_us-central1-a_mycluster_223 --user=cluster-admin
+Context "test-admin" modified.
 ```
 
 The below command will prompt for username/password. Provide username as "admin" and password for the admin can be obtained from : Google Cloud Platform -> Container Engine -> (cluster) -> Show Credentials:
 
 ```bash
-kubectl config use-context demo-openebs03
-kubectl config use-context gke_strong-eon-153112_us-central1-a_demo-openebs03
+root@ubuntu:~$ kubectl config use-context test-admin
+Switched to context "test-admin".
+
+root@ubuntu:~$ kubectl config use-context gke_strong-eon-153112_us-central1-a_mycluster_223
+Switched to context "gke_strong-eon-153112_us-central1-a_mycluster_223".
 ```
 **To get the admin priviledge to your cluster(cluster-role admin)**
  get current google identity
@@ -98,10 +104,9 @@ kubectl config use-context gke_strong-eon-153112_us-central1-a_demo-openebs03
 Account: [myname@example.org]
 
  grant cluster-admin to your current identity
-`$ kubectl create clusterrolebinding myname-cluster-admin-binding --clusterrole=cluster-admin --user=myname@example.org`
-Clusterrolebinding "myname-cluster-admin-binding" created
-
-
+`$ root@ubuntu:~$ kubectl create clusterrolebinding mycluster_223-cluster-admin-binding --clusterrole=cluster-admin --user=ranjith.raveendran@cloudbyte.com
+clusterrolebinding.rbac.authorization.k8s.io "mycluster_223-cluster-admin-binding" created
+`
 Download the latest OpenEBS Operator Files:
 
 ```bash
@@ -112,10 +117,39 @@ cd openebs/k8s
 Apply OpenEBS Operator and add related OpenEBS Storage Classes, that can then be used by developers/apps:
 
 ```bash
-kubectl apply -f openebs-operator.yaml
-kubectl apply -f openebs-storageclasses.yaml
-```
+root@ubuntu:~/demo_k8/openebs/k8s$ kubectl apply -f openebs-operator.yaml
+namespace "openebs" created
+serviceaccount "openebs-maya-operator" created
+clusterrole.rbac.authorization.k8s.io "openebs-maya-operator" created
+clusterrolebinding.rbac.authorization.k8s.io "openebs-maya-operator" created
+deployment.apps "maya-apiserver" created
+service "maya-apiserver-service" created
+deployment.apps "openebs-provisioner" created
+deployment.apps "openebs-snapshot-controller" created
+customresourcedefinition.apiextensions.k8s.io "storagepoolclaims.openebs.io" created
+customresourcedefinition.apiextensions.k8s.io "storagepools.openebs.io" created
+storageclass.storage.k8s.io "openebs-standard" created
+storageclass.storage.k8s.io "snapshot-promoter" created
+customresourcedefinition.apiextensions.k8s.io "volumepolicies.openebs.io" created
 
+root@ubuntu:~/demo_k8/openebs/k8s$ kubectl get pods -n openebs
+NAME                                           READY     STATUS    RESTARTS   AGE
+maya-apiserver-84fd4f776d-w5g9j                1/1       Running   0          47s
+openebs-provisioner-74cb999586-v7jjm           1/1       Running   0          45s
+openebs-snapshot-controller-6449b4cdbb-t7m29   2/2       Running   0          44s
+```
+```
+root@ubuntu:~/demo_k8/openebs/k8s$ kubectl apply -f openebs-storageclasses.yaml
+storageclass.storage.k8s.io "openebs-standalone" created
+storageclass.storage.k8s.io "openebs-percona" created
+storageclass.storage.k8s.io "openebs-jupyter" created
+storageclass.storage.k8s.io "openebs-mongodb" created
+storageclass.storage.k8s.io "openebs-cassandra" created
+storageclass.storage.k8s.io "openebs-redis" created
+storageclass.storage.k8s.io "openebs-kafka" created
+storageclass.storage.k8s.io "openebs-zk" created
+storageclass.storage.k8s.io "openebs-es-data-sc" created
+```
 Note: The persistent storage is carved out from the space available on the nodes (default host directory : /var/openebs). There are efforts underway to provide administrator with additional options of consuming the storage (as outlined in "openebs-config.yaml"). These are slated to work hand-in-hand with the local storage manager of the kubernetes that is due in Kubernetes 1.7/1.8.
 
 ## Step 3 : Running Stateful workloads with OpenEBS Storage
@@ -125,26 +159,69 @@ All you need to do, to use OpenEBS as persistent storage for your Stateful workl
 Get the list of storage classes using the below command. Choose the storage class that best suits your application.
 
 ```bash
-kubectl get sc
+root@ubuntu:~/demo_k8/openebs/k8s$ kubectl get sc
+NAME                 PROVISIONER                                                AGE
+openebs-cassandra    openebs.io/provisioner-iscsi                               1m
+openebs-es-data-sc   openebs.io/provisioner-iscsi                               1m
+openebs-jupyter      openebs.io/provisioner-iscsi                               1m
+openebs-kafka        openebs.io/provisioner-iscsi                               1m
+openebs-mongodb      openebs.io/provisioner-iscsi                               1m
+openebs-percona      openebs.io/provisioner-iscsi                               1m
+openebs-redis        openebs.io/provisioner-iscsi                               1m
+openebs-standalone   openebs.io/provisioner-iscsi                               1m
+openebs-standard     openebs.io/provisioner-iscsi                               5m
+openebs-zk           openebs.io/provisioner-iscsi                               1m
+snapshot-promoter    volumesnapshot.external-storage.k8s.io/snapshot-promoter   5m
+standard (default)   kubernetes.io/gce-pd    
 ```
 
 Some sample yaml files for stateful workoads using OpenEBS are provided in the [openebs/k8s/demo](https://github.com/openebs/openebs/tree/master/k8s/demo)
 
 ```bash
-kubectl apply -f demo/jupyter/demo-jupyter-openebs.yaml
+root@ubuntu:~/demo_k8/openebs/k8s$ kubectl apply -f demo/jupyter/demo-jupyter-openebs.yaml
+deployment.apps "jupyter-server" created
+persistentvolumeclaim "jupyter-data-vol-claim" created
+service "jupyter-service" created
 ```
 
 The above command will create the following, which can be verified using the corresponding kubectl commands:
 
 - Launch a Jupyter Server, with the specified notebook file from github
-  (kubectl get deployments)
+  ```
+  root@ubuntu:~/demo_k8/openebs/k8s$  kubectl get deployments
+  NAME                                            DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE
+  jupyter-server                                  1         1         1            1           2m
+  pvc-41964ed3-790a-11e8-a986-42010a80017b-ctrl   1         1         1            1           2m
+  pvc-41964ed3-790a-11e8-a986-42010a80017b-rep    3         3         3            3           2m
+  ```
 - Create an OpenEBS Volume and mounts to the Jupyter Server Pod (/mnt/data)
-  (kubectl get pvc)
-  (kubectl get pv)
-  (kubectl get pods)
-- Expose the Jupyter Server to external world via the http://NodeIP:32424 (NodeIP is any of the minion nodes external IP)
-  (kubectl get pods)
-
+  ```
+  root@ubuntu:~/demo_k8/openebs/k8s$ kubectl get pvc
+  NAME                     STATUS    VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS      AGE
+  jupyter-data-vol-claim   Bound     pvc-1827892f-7909-11e8-a986-42010a80017b   5G         RWO            openebs-jupyter   43s
+  ```
+  ```
+  root@ubuntu:~/demo_k8/openebs/k8s$ kubectl get pv
+  NAME                                       CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS    CLAIM                                   STORAGECLASS      REASON    AGE
+  pvc-1827892f-7909-11e8-a986-42010a80017b   5G         RWO            Delete           Bound     default/jupyter-data-vol-claim           openebs-jupyter     
+  ```
+  ```
+  root@ubuntu:~/demo_k8/openebs/k8s$ kubectl get pods
+  NAME                                                             READY     STATUS              RESTARTS   AGE
+  jupyter-server-68d4ddc48-mml47                                   1/1       Running		       	   0          2m
+  pvc-41964ed3-790a-11e8-a986-42010a80017b-ctrl-6877d997fb-msnxk   2/2       Running             0          2m
+  pvc-41964ed3-790a-11e8-a986-42010a80017b-rep-8f94c7b48-gdxbb     1/1       Running             0          2m
+  pvc-41964ed3-790a-11e8-a986-42010a80017b-rep-8f94c7b48-h5d9p     1/1       Running             0          2m
+  pvc-41964ed3-790a-11e8-a986-42010a80017b-rep-8f94c7b48-skssw     1/1       Running             0          2m
+  ```
+- Expose the Jupyter Server to external world via the http://NodeIP:32424 (NodeIP is any of the worker nodes external IP where application Pod is running)
+  ```
+  root@ubuntu:~/demo_k8/openebs/k8s$ kubectl get nodes -o wide
+  NAME                                        STATUS    ROLES     AGE       VERSION        EXTERNAL-IP      OS-IMAGE             KERNEL-   VERSION    CONTAINER-RUNTIME
+  gke-ranjith223-default-pool-314af41d-fk18   Ready     <none>    24m        v1.9.7-gke.3   35.224.182.169   Ubuntu 16.04.4 LTS           4.13.0-1015-gcp   docker://17.3.2
+  gke-ranjith223-default-pool-314af41d-hc03   Ready     <none>    24m        v1.9.7-gke.3   35.188.50.11     Ubuntu 16.04.4 LTS           4.13.0-1015-gcp   docker://17.3.2
+  gke-ranjith223-default-pool-314af41d-lgzf   Ready     <none>    24m       v1.9.7-gke.3   35.192.216.68    Ubuntu 16.04.4 LTS   4.13.0-   1015-gcp   docker://17.3.2
+  ```
 Note:To access the Jupyter Server over the internet, set the firewall rules to allow traffic on port 32424 in you GCP / Networking / Firewalls
 
 [Compute VMs]: ../../documentation/source/_static/compute_engine_vms.png
