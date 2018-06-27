@@ -100,7 +100,7 @@
 # Installing openebs using stable chart in openebs namespace. The chart will be created with some random name.
 # We can verify it using "helm ls --all" command.
 - name: 7) Installing openebs using stable charts.
-  shell: helm install stable/openebs --set apiserver.imageTag={{ apiserver_version }} --set provisioner.imageTag={{ provisioner_version }} --namespace {{ namespace }}
+  shell: helm install stable/openebs --set apiserver.imageTag={{ apiserver_version }} --set provisioner.imageTag={{ provisioner_version }} --set jiva.imageTag={{ jiva_version}} --namespace {{ namespace }}
   args:
     executable: /bin/bash
   register: openebs_out
