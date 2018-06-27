@@ -5,8 +5,7 @@ jenkins_link: https://raw.githubusercontent.com/openebs/openebs/master/k8s/demo/
 
 pod_yaml_alias: jenkins.yml
 
-#volume_claim: 
-
+ 
 jenkinsold: 2.124 
 
 jenkinsnew: 2.125 
