@@ -16,8 +16,14 @@
     executable: /bin/bash
   register: result_kube_home
 
-- name: 2) Download and install helm.
-  script: "{{ helm_installer }}"
+- name: Install helm client
+  shell: curl https://raw.githubusercontent.com/kubernetes/helm/master/scripts/get | bash
+  args:
+    executable: /bin/bash
+  register: output
+  until: "'installed' in output.stdout"
+  delay: 30
+  retries: 5
 
 - wait_for: timeout=30
 

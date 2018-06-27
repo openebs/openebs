@@ -11,6 +11,5 @@ provisioner_version: ci
 
 jiva_version: ci
 
-helm_installer: get_helm.sh
 
 
