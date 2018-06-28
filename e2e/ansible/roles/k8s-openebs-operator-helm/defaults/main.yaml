@@ -5,3 +5,11 @@ update_deploy_file: update.json
 
 storage_classes: https://raw.githubusercontent.com/openebs/openebs/master/k8s/openebs-storageclasses.yaml
 
+apiserver_version: ci
+
+provisioner_version: ci
+
+jiva_version: ci
+
+
+
