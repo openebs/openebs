@@ -87,7 +87,7 @@
        args:
          executable: /bin/bash
        delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-       untill: "'saved' in  result.stdout"
+       until: "'saved' in  result.stdout"
        delay: 80
        retries: 8
 
@@ -146,7 +146,7 @@
        shell: >
           source ~/.profile; kubectl exec {{ jenkins_pod_name.stdout }} -n {{ namespace }}
           -- bash -c "java -jar /var/jenkins_home/jenkins-cli.jar -s http://localhost:8080 console sample"
-       arge:
+       args:
          executable: /bin/bash
        delegate_to: "{{groups['kubernetes-kubemasters'].0}}" 
        register: First_Build
