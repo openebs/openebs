@@ -6,7 +6,7 @@
 
 #1. Check if openebs components are running.
 #2. Copy the test artifacts to k8s master.
-#3. Check if the snapshot controller is running.
+#3. Check if the snapshot operator is running.
 #4. Create namespace and deploy Percona application.
 #5. Check if the application pod is up and running
 #6. Create test database inside the percona pod.
@@ -44,11 +44,11 @@
           with_items: "{{ snapshot_files }}"
           delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
-        - name: 3) Check if snapshot-controller is running.
+        - name: 3) Check if snapshot-operator is running.
           include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
           vars:
             ns: openebs
-            app: openebs-snapshot-controller
+            app: openebs-snapshot-operator 
 
         - name: 4) Create test specific namespace
           shell: source ~/.profile; kubectl create ns {{ namespace }}
