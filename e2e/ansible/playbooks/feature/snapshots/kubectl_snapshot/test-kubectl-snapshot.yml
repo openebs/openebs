@@ -68,20 +68,9 @@
             ns: "{{ namespace }}"
             app: percona
 
-        - name: 5a) Get IP address of percona mysql pod
-          shell: source ~/.profile; kubectl describe pod percona -n "{{ namespace }}"
-          args:
-            executable: /bin/bash
-          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-          register: result_IP
-
-        - name: 5b) Set IP of Pod to variable
-          set_fact:
-            pod_ip: "{{ result_IP.stdout_lines[7].split()[1] }}"
-
         - name: 6) Write a test database into percona mysql
           shell: |
-            sleep 120 #db init time
+            sleep 180 #db init time
             kubectl exec -it percona -n {{ namespace }} -- mysql -uroot -pk8sDem0 -e "create database tdb;"
             kubectl exec -it percona -n {{ namespace }} -- mysql -uroot -pk8sDem0 -e "create table ttbl (Data VARCHAR(20));" tdb
             kubectl exec -it percona -n {{ namespace }} -- mysql -uroot -pk8sDem0 -e "insert into ttbl (Data) VALUES ('tdata');" tdb
@@ -209,23 +198,10 @@
           retries: 5
           delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
 
-        - name: 10c) Get new percona pod details
-          shell: >
-            source ~/.profile;
-            kubectl get pods -n "{{ namespace }}" -o wide | grep percona-new
-          args:
-            executable: /bin/bash
-          register: new_pod
-          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
-
-        - name: 10d) Store new percona pod IP in variable
-          set_fact:
-            new_pod_ip: "{{ new_pod.stdout.split()[5] }}"
-
         - name: 11) Verify successful snapshot restore by db query
           shell: |
             sleep 120 # DB init
-            kubectl exec -it percona -n {{ namespace }} -- mysql -uroot -pk8sDem0 -e "select * from ttbl;" tdb
+            kubectl exec -it percona-new -n {{ namespace }} -- mysql -uroot -pk8sDem0 -e "select * from ttbl;" tdb
           args:
             executable: /bin/bash
           delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
