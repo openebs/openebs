@@ -28,7 +28,7 @@
 
        - name: Verfy the replicas access mode
          command: echo "Verfiy the replicas access mode"
-         when: vol_accessmode_count == "3"
+         when: vol_accessmode_count|int == (node_count)| int
          register: result
        - debug:
            msg: "All the PVCs are in sync"
