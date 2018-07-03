@@ -30,7 +30,7 @@
        - include: pre-requisites.yml
 
 
-       - name: Check status of maya-apiserver
+       - name: Check status of apiserver
          include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
          vars:
            ns: openebs
