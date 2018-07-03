@@ -1,5 +1,19 @@
+
+       - name: Get the pv name
+         shell: source ~/.profile; kubectl get pvc -n {{ ns }}
+         args:
+           executable: /bin/bash
+         register: pv_name
+         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+         changed_when: True
+
+       - name: Set PV name to a variable
+         set_fact:
+           pvname: "{{pv_name.stdout.split()[10] }}"
+
+
        - name: Get the maya-apiser pod name
-         shell: source ~/.profile; kubectl get pods -n openebs | grep maya-apiserver | awk '{print $1}'
+         shell: source ~/.profile; kubectl get pods -n openebs | grep apiserver | awk '{print $1}'
          args:
            executable: /bin/bash
          register: mayapod
@@ -13,8 +27,10 @@
          register: volname
          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
          changed_when: True
+         failed_when: "pvname not in volname.stdout"
 
-       - name: Get the volumes access mode
+
+       - name: Get the replicas access mode
          shell: source ~/.profile; kubectl exec -it {{ mayapod.stdout }} -n openebs -- mayactl volume info --volname {{ volname.stdout.split()[2] }} -n {{ ns }}
          args:
            executable: /bin/bash
@@ -26,11 +42,11 @@
          set_fact:
            vol_accessmode_count: "{{ result.stdout.count('RW') }}"
 
-       - name: Verfy the replicas access mode
+       - name: Verify the replicas access mode
          command: echo "Verfiy the replicas access mode"
          when: vol_accessmode_count|int == (node_count)| int
          register: result
        - debug:
-           msg: "All the PVCs are in sync"
+           msg: "All the replicas are in sync"
          when: "result.rc == 0"
 
