@@ -72,7 +72,7 @@
         - name: 6) Create the storage class in K8s master
           include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_task.yml"
           vars:
-           app_yml: "{{ result_kube_home.stdout }}/{{ sc_def }}"
+           app_yml: "{{ sc_def }}"
            ns: default
 
 #Copying the create_pvc.yaml to k8s master
@@ -85,11 +85,11 @@
         - name: 6b) Create PVC in k8s cluster
           include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_task.yml"
           vars:
-           app_yml: "{{result_kube_home.stdout }}/{{ pvc_def }}"
+           app_yml: "{{ pvc_def }}"
            ns: "{{ namespace }}"
 
         - name: Wait for few seconds
-          wait_for: timeout=30
+          wait_for: timeout=90
           delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
 
 #Find the PV name by referring the storage class 'openebs-test'
@@ -187,12 +187,12 @@
             
         - name: Setting pass flag
           set_fact:
-            flag: "TEST PASSED"
+            flag: "Test Passed"
          
       rescue:
         - name: Setting failed flag
           set_fact:
-            flag: "TEST FAILED"
+            flag: "Test Failed"
 
       always:
        
@@ -203,13 +203,13 @@
  
             - name: Setting cleanup flag to passed
               set_fact: 
-                cflag: "CLEANUP PASSED"
+                cflag: "Cleanup Passed"
        
           rescue:
         
             - name: Setting cleanup to failed
               set_fact:
-                cflag: "CLEANUP FAILED"
+                cflag: "Cleanup Failed"
        
           always:
         

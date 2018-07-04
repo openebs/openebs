@@ -1,4 +1,5 @@
 ---
+
 - name: Wait some time
   wait_for:
     timeout: 50
@@ -12,15 +13,6 @@
   until: "'percona' and 'deleted' in del_out.stdout"
   delay: 90
   retries: 5
-
-- name: Remove copied files
-  file:
-    path: "{{ item }}"
-    state: absent
-  with_items:
-    - "{{ patch_file }}"
-    - "{{ create_sc }}"
-  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
 - name: Delete the namespace
   shell: kubectl delete ns "{{ namespace }}"
@@ -41,4 +33,42 @@
   until: '"{{ namespace }}" not in ns_out.stdout'
   delay: 60
   retries: 15
+
+- name: Delete storage class
+  shell: source ~/.profile; kubectl delete -f "{{ create_sc }}"
+  args:
+    executable: /bin/bash
+  register: sc_out
+  until: "'deleted' in sc_out.stdout"
+  delay: 10
+  retries: 5
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+  changed_when: True
+
+- name: Replace the replica count in openebs-storageclasses yaml
+  replace:
+    path: "{{ create_sc }}"
+    regexp: 'openebs.io/jiva-replica-count: "{{ (node_count) |int-1 }}"'
+    replace: 'openebs.io/jiva-replica-count: "{{ (node_count |int) }}"'
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+- name: Apply storage class yaml
+  shell: source ~/.profile; kubectl apply -f "{{ create_sc }}"
+  args:
+    executable: /bin/bash
+  register: sc_out
+  until: "'created' in sc_out.stdout"
+  delay: 10
+  retries: 5
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+  changed_when: True
+
+- name: Remove copied files
+  file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+    - "{{ patch_file }}"
+    - "{{ create_sc }}"
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
