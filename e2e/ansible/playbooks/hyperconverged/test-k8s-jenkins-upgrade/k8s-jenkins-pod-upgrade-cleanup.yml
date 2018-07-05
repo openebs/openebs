@@ -1,6 +1,6 @@
 ---
 
-- name: Get pvc name to verify successful pvc deletion
+- name: Get the pvc name.
   shell: source ~/.profile; kubectl get pvc -n {{ namespace }}
   args:
     executable: /bin/bash

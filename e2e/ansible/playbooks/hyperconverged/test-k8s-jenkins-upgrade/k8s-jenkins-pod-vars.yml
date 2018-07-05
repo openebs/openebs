@@ -5,10 +5,21 @@ jenkins_link: https://raw.githubusercontent.com/openebs/openebs/master/k8s/demo/
 
 pod_yaml_alias: jenkins.yml
 
- 
-jenkinsold: 2.124 
+operator_ns: openebs
 
-jenkinsnew: 2.125 
+
+replace_item: 
+
+  - lts
+
+  - 2.124 
+
+replace_with: 
+  
+  - 2.124
+
+  - 2.125
+
 
 namespace: jenkins-upgrade
 
@@ -16,8 +27,6 @@ job_config_files:
   - template.xml
   - config_change.sh
 
-
-utils_path: openebs/e2e/ansible/playbooks/utils
 
 test_pod_regex: maya*|openebs*|pvc*|jenkins*
 
