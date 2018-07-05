@@ -124,6 +124,12 @@
          wait_for:
            timeout: 300
 
+       - name: Confirm liveness checks on percona are successful &  pod is still in running state
+         include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
+         vars:
+            ns: "{{ namespace }}"
+            app: percona
+
        - name: Start kubelet service
          shell: source ~/.profile; systemctl start kubelet.service
          args:
