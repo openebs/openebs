@@ -82,6 +82,3 @@
          with_items:
            - "{{percona_files}}"
 
-       - name: sleep for 50 seconds and continue with play
-         wait_for:
-           timeout: "50"
