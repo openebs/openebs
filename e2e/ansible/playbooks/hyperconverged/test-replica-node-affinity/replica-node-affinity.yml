@@ -38,7 +38,7 @@
          include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
          vars:
             ns: openebs
-            app: openebs-apiserver
+            app: apiserver
 
        - name: 2) Obtaining storage classes yaml
          shell: kubectl get sc openebs-percona -o yaml > "{{ create_sc }}"
@@ -214,7 +214,7 @@
      rescue:
        - name: Setting fail flag
          set_fact:
-           flag: "Test failed"
+           flag: "Test Failed"
 
      always:
 
