@@ -110,7 +110,7 @@
 
 
        - name: check the node is in NotReady state after kubelet service is stopped
-         shell: source ~/.profile; kubectl get nodes | grep NotReady | wc -l
+         shell: source ~/.profile; kubectl get nodes {{node_name}} | grep NotReady | wc -l
          args:
            executable: /bin/bash
          register: result
@@ -140,8 +140,8 @@
          changed_when: True
 
 
-       - name: check the node is in Ready state after kubelet service restart
-         shell: source ~/.profile; kubectl get nodes | grep 'NotReady' | grep 'none' | wc -l
+       - name: check the node is in Ready state after kubelet service start
+         shell: source ~/.profile; kubectl get nodes {{node_name}} | grep 'NotReady' | grep 'none' | wc -l
          args:
            executable: /bin/bash
          register: result
@@ -153,7 +153,7 @@
 
 
 
-       - name: Confirm liveness checks on percona are successful &  pod is still in running state
+       - name: Confirm liveness checks on percona are successful & pod is still in running state
          include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
          vars:
             ns: "{{ namespace }}"

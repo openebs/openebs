@@ -19,4 +19,4 @@ test_pod_regex: maya*|openebs*|pvc*|percona*
 
 test_log_path: setup/logs/kubelet_service_restart_test.log
 
-
+node_name: kubeminion-01
