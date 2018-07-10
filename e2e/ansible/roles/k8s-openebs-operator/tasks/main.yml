@@ -18,6 +18,8 @@
     - m-apiserver
     - jiva
     - openebs-k8s-provisioner
+    - snapshot-controller
+    - snapshot-provisioner
 
 - block:
 
