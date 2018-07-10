@@ -171,8 +171,8 @@
        include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/regex_task.yml"
        vars:
          path: "{{ result_kube_home.stdout }}/jenkins.yml"
-         regex1: "{{replace_item}}"
-         regex2: "{{replace_with}}"
+         regex1: "{{replace_item1}}"
+         regex2: "{{replace_with1}}"
        delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
 
 
