@@ -1,0 +1,233 @@
+# Description: Verify the behaviour of OpenEBS volumes when kubelet service is stopped on one of the nodes.
+# Author: Swarna
+
+########################################################################################
+# Test Steps:
+#1.Check the maya-apiserver is running.
+#2.Download and Copy Test artifacts to kubemaster.
+#3.Replace PVC name with test case name in percona yaml
+#3.Deploy Percona application with liveness probe running db queries continuously
+#4.Get the Replica name and node name where the replica is scheduled
+#5.Stop the kubelet service on the node where replica is running
+#6.Check the node state after stopping kubectl service
+#7.Check the percona pod status.
+#8.Start the kubelet service on node and check percona pod and replicas are up and running.
+#8.perform Cleanup.
+##########################################################################################
+
+- hosts: localhost
+
+  vars_files:
+    - test-kubelet-service-stop-vars.yml
+
+  tasks:
+
+   - block:
+
+       - include: pre-requisites.yml
+
+
+       - name: Check status of maya-apiserver
+         include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
+         vars:
+           ns: openebs
+           app: apiserver
+
+
+       - name: Copy the percona files to kube-master
+         copy:
+           src: "{{ item }}"
+           dest: "{{ result_kube_home.stdout }}"
+         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+         with_items: "{{ percona_files }}"
+
+       - name: Replace volume-claim name with test parameters
+         include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/regex_task.yml"
+         vars:
+           path: "{{ result_kube_home.stdout }}/percona.yaml"
+           regex1: "{{replace_item}}"
+           regex2: "{{replace_with}}"
+         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+
+
+       - name: Create namespace to deploy application
+         shell: source ~/.profile; kubectl create ns {{ namespace }}
+         args:
+           executable: /bin/bash
+         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+
+       - name: Create a configmap with the liveness sql script
+         shell: source ~/.profile; kubectl create configmap sqltest --from-file={{result_kube_home.stdout}}/{{ percona_files.1 }} -n {{ namespace }}
+         args:
+           executable: /bin/bash
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+         register: result
+         failed_when: "'configmap' and 'created' not in result.stdout"
+
+       - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_task.yml"
+         vars:
+           app_yml: "{{ percona_files.0 }}"
+           ns: "{{ namespace }}"
+
+       - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
+         vars:
+            ns: "{{ namespace }}"
+            app: percona
+
+       - name: Wait for 120s to ensure liveness check starts
+         wait_for:
+           timeout: 120
+
+       - name: Get the number of nodes in the cluster
+         shell: kubectl get nodes | grep '<none>' | wc -l
+         args:
+           executable: /bin/bash
+         register: node_out
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+       - name: Fetch the node count from stdout
+         set_fact:
+            node_count: " {{ node_out.stdout}}"
+
+       - name: Get the number of nodes that are in ready state
+         shell: source ~/.profile; kubectl get nodes | grep 'Ready' | grep 'none' | wc -l
+         args:
+           executable: /bin/bash
+         register: ready_node_cout
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+       - debug:
+           msg: "All the nodes are in ready state"
+         when: (node_count)| int == (ready_node_cout.stdout)| int
+
+       - name: Stop kubelet service in one of the node
+         shell: source ~/.profile; systemctl stop kubelet.service
+         args:
+           executable: /bin/bash
+         register: result
+         become: True
+         delegate_to: "{{groups['kubernetes-kubeminions'].0}}"
+         changed_when: True
+
+
+       - name: check the node is in NotReady state after kubelet service is stopped
+         shell: source ~/.profile; kubectl get nodes {{node_name}} | grep NotReady | wc -l
+         args:
+           executable: /bin/bash
+         register: result
+         until: "'1' in result.stdout"
+         delay: 60
+         retries: 5
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+         changed_when: True
+
+       - name: Wait for 300s to check the pods are still running after kubelet service stop
+         wait_for:
+           timeout: 300
+
+       - name: Confirm liveness checks on percona are successful &  pod is still in running state
+         include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
+         vars:
+            ns: "{{ namespace }}"
+            app: percona
+
+       - name: Start kubelet service
+         shell: source ~/.profile; systemctl start kubelet.service
+         args:
+           executable: /bin/bash
+         register: result
+         become: True
+         delegate_to: "{{groups['kubernetes-kubeminions'].0}}"
+         changed_when: True
+
+
+       - name: check the node is in Ready state after kubelet service start
+         shell: source ~/.profile; kubectl get nodes {{node_name}} | grep 'NotReady' | grep 'none' | wc -l
+         args:
+           executable: /bin/bash
+         register: result
+         until: "'0' in result.stdout"
+         delay: 60
+         retries: 5
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+         changed_when: True
+
+
+
+       - name: Confirm liveness checks on percona are successful & pod is still in running state
+         include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
+         vars:
+            ns: "{{ namespace }}"
+            app: percona
+
+       - name: Check if the replica pods are scheduled again and running
+         shell: source ~/.profile; kubectl get pods -n {{ namespace }} | grep rep | grep -i running |wc -l
+         args:
+           executable: /bin/bash
+         register: rep_count
+         until: "'3' in rep_count.stdout"
+         delay: 60
+         retries: 5
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+         changed_when: True
+
+       - name: Get Controller SVC IP
+         shell: source ~/.profile; kubectl get svc -n {{ namespace }} | grep ctrl | awk {'print $3'}
+         args:
+           executable: /bin/bash
+         register: SVC
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+         changed_when: true
+
+       - name: Wait for 180s to ensure volume access mode
+         wait_for:
+           timeout: 180
+
+
+       - name: Check if the replica is rebuilded using mayactl commands
+         include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/access-mode-check.yml"
+         vars:
+           ns: "{{ namespace }}"
+
+
+       - name: Test Passed
+         set_fact:
+           flag: "Test Passed"
+
+     rescue:
+       - name: Test Failed
+         set_fact:
+           flag: "Test Failed"
+
+     always:
+       - block:
+
+           - include: cleanup.yml
+
+           - name: Test Cleanup Passed
+             set_fact:
+               cflag: "Cleanup Passed"
+
+         rescue:
+           - name: Test Cleanup Failed
+             set_fact:
+               cflag: "Cleanup Failed"
+
+         always:
+
+           - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/stern_task.yml"
+             vars:
+               status: stop
+
+
+           - name: Send slack notification
+             slack:
+               token: "{{ lookup('env','SLACK_TOKEN') }}"
+               msg: '{{ ansible_date_time.time }} TEST: {{test_name}}, RESULT: {{ flag }},{{ cflag }}'
+             when: slack_notify | bool and lookup('env','SLACK_TOKEN')
+
+
+
+
+
+
+

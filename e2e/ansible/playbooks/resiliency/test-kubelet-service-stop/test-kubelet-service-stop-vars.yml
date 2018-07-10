@@ -1,0 +1,22 @@
+
+test_name: test_kubelet_service_restart
+
+percona_files:
+  - percona.yaml
+  - sql-test.sh
+
+replace_item:
+  - demo-vol1-claim
+  - demo-vol1
+
+replace_with:
+  - test-kubelet-service
+  - test-kubelet
+
+namespace: kubelet-service
+
+test_pod_regex: maya*|openebs*|pvc*|percona*
+
+test_log_path: setup/logs/kubelet_service_restart_test.log
+
+node_name: kubeminion-01
