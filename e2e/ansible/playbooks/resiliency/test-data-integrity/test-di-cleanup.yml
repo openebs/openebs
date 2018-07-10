@@ -1,0 +1,70 @@
+---
+- name: Delete the snapshot claim
+  shell: source ~/.profile; kubectl delete -f "{{ snapshot_claim }}" -n "{{ namespace }}"
+  args:
+    executable: /bin/bash
+  register: delete_claim
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+  until: "'deleted' in delete_claim.stdout"
+  delay: 20
+  retries: 5
+  changed_when: true
+
+- name: Delete volume snapshot
+  shell: source ~/.profile; kubectl delete -f "{{ snapshot }}" -n "{{ namespace }}"
+  args:
+    executable: /bin/bash
+  register: delete_sp
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+  until: "'deleted' in delete_sp.stdout"
+  delay: 20
+  retries: 5
+  changed_when: true
+
+- include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/delete_deploy.yml"
+  vars:
+    app_yml: "{{ fio_read }}"
+    ns: "{{ namespace }}"
+
+- name: Check if the pod has been deleted
+  shell: source ~/.profile; kubectl get pods -n "{{ namespace }}"
+  args:
+    executable: /bin/bash
+  register: result
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+  until: "'fio-read' not in result.stdout"
+  delay: 30
+  retries: 15
+  changed_when: true
+
+- include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/delete_deploy.yml"
+  vars:
+    app_yml: "{{ fio_write }}"
+    ns: "{{ namespace }}"
+
+- name: Check if the pod has been deleted
+  shell: source ~/.profile; kubectl get pods -n "{{ namespace }}"
+  args:
+    executable: /bin/bash
+  register: result_write
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+  until: "'fio' not in result_write.stdout"
+  delay: 30
+  retries: 15
+  changed_when: true
+
+- name: Remove snapshot specific files
+  file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+    - "{{ snapshot_files }}"
+    - "{{ fio_files}}"
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+- name: Delete the namespace
+  shell: source ~/.profile; kubectl delete ns "{{ namespace }}"
+  args:
+    executable: /bin/bash
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+  changed_when: true
