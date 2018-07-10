@@ -87,8 +87,6 @@
        register: jenkins_pod_name
 
 
-     
-
      - name: 4) Download Jenkins-cli.jar file inside /var/jenkins_home of pod.
        shell: >
           source ~/.profile; kubectl exec {{ jenkins_pod_name.stdout }} -n {{namespace}} 
@@ -108,8 +106,9 @@
          files_to_copy: "{{ job_config_files }}"
 
      - name: 4b) Copy job configuration files to jenkins-pod from master.
-       shell: |
-         source ~/.profile; kubectl cp {{result_kube_home.stdout}}/{{item}}  {{namespace}}/{{ jenkins_pod_name.stdout }}:/var/jenkins_home/   
+       shell: >
+         source ~/.profile; kubectl cp {{result_kube_home.stdout}}/{{item}} 
+         {{namespace}}/{{ jenkins_pod_name.stdout }}:/var/jenkins_home/   
        args:
          executable: /bin/bash
        delegate_to: "{{groups['kubernetes-kubemasters'].0}}" 
@@ -117,7 +116,8 @@
    
      - name: 5) Run the config_change.sh file for required changes inside pod.
        shell: > 
-          source ~/.profile; kubectl exec {{  jenkins_pod_name.stdout }} -n {{namespace}} -- bash -c "sh /var/jenkins_home/config_change.sh"
+          source ~/.profile; kubectl exec {{  jenkins_pod_name.stdout }} -n {{namespace}} 
+          -- bash -c "sh /var/jenkins_home/config_change.sh"
        args:
          executable: /bin/bash
        delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
