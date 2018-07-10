@@ -18,31 +18,37 @@
     - m-apiserver
     - jiva
     - openebs-k8s-provisioner
+    - snapshot-controller
+    - snapshot-provisioner
 
-- name: Get kubernetes master name
-  shell: hostname
-  args:
-    executable: /bin/bash
-  register: result
+- block:
 
-- name: Get kubernetes master status
-  shell: source ~/.profile; kubectl get nodes | grep {{ result.stdout.lower()}} | awk '{print $2}'
-  args:
-    executable: /bin/bash
-  register: result
-  until:  result.stdout == 'Ready'
-  delay: 60
-  retries: 10 
-  ignore_errors: true  
+    - name: Get kubernetes master name
+      shell: hostname
+      args:
+        executable: /bin/bash
+      register: result
 
-- name: 
-  debug: 
-    msg: "Ending play, K8S Master NOT READY"
-  when: result.stdout != "Ready"
+    - name: Get kubernetes master status
+      shell: source ~/.profile; kubectl get nodes | grep {{ result.stdout.lower()}} | awk '{print $2}'
+      args:
+        executable: /bin/bash
+      register: result
+      until:  result.stdout == 'Ready'
+      delay: 60
+      retries: 10 
+      ignore_errors: true  
 
-- name: Ending Playbook Run - K8S master is NOT READY
-  meta: end_play
-  when: result.stdout != "Ready"
+    - name: 
+      debug: 
+        msg: "Ending play, K8S Master NOT READY"
+      when: result.stdout != "Ready"
+
+    - name: Ending Playbook Run - K8S master is NOT READY
+      meta: end_play
+      when: result.stdout != "Ready"
+
+  when: cluster_type == "hosted"
 
 - name: Start the log aggregator to capture operator logs
   shell: source ~/.profile; nohup stern "maya*|openebs*" --since 1m >"{{ ansible_env.HOME }}/setup/logs/operator.log" &

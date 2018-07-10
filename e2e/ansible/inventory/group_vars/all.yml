@@ -26,7 +26,7 @@ weave_version_list:
 #Option to specify OpenEBS deployment type
 # It can be either kubectl or helm based installation
 
-openebs_deploy: helm
+openebs_deploy: kubectl
 #########################################
 # OpenEBS Deployment Specifications     #
 #########################################
@@ -88,3 +88,6 @@ vagrant_path: openebs/k8s/vagrant/1.8.8/ubuntu/
 utils_path: openebs/e2e/ansible/playbooks/utils
 kubeconfig: .kube/config
 build_type: normal
+
+# In case , if you want to deploy openebs in the cluster in managed kubernetes services, specify "cluster_type= managed". By default specifying the cluster_type to local.
+cluster_type: hosted
