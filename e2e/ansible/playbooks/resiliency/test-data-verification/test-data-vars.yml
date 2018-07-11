@@ -1,0 +1,15 @@
+---
+test_name: data_integrity_check
+
+test_log_path: setup/logs/data_integrity.log
+
+test_pod_regex: maya*|openebs*|pvc*|snapshot*|fio*
+
+namespace: fio
+
+fio: demo-fio-openebs.yml
+
+fio_files:
+  - demo-fio-openebs.yml
+
+mount_point: /datadir

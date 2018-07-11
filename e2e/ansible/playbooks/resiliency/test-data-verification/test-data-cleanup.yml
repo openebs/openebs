@@ -1,0 +1,31 @@
+---
+- include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/delete_deploy.yml"
+  vars:
+    app_yml: "{{ fio }}"
+    ns: "{{ namespace }}"
+
+- name: Check if the pod has been deleted
+  shell: source ~/.profile; kubectl get pods -n "{{ namespace }}"
+  args:
+    executable: /bin/bash
+  register: result_write
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+  until: "'fio' not in result_write.stdout"
+  delay: 30
+  retries: 15
+  changed_when: true
+
+- name: Remove fio job specific files
+  file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+    - "{{ fio_files}}"
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+- name: Delete the namespace
+  shell: source ~/.profile; kubectl delete ns "{{ namespace }}"
+  args:
+    executable: /bin/bash
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+  changed_when: true
