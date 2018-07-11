@@ -1,5 +1,5 @@
-#test-data-integrity.yml
-# Description: Verify the Data Integrity of cloned volumes using FIO
+#test-data-verification.yml
+# Description: Fill the OpenEBS volume and perform data verification scan
 # Author: nsathyaseelan
 
 ###############################################################################################

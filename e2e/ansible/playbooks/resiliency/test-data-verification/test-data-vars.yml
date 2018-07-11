@@ -1,11 +1,11 @@
 ---
-test_name: data_integrity_check
+test_name: data_verification_scan
 
-test_log_path: setup/logs/data_integrity.log
+test_log_path: setup/logs/data_verification.log
 
-test_pod_regex: maya*|openebs*|pvc*|snapshot*|fio*
+test_pod_regex: maya*|openebs*|pvc*|vol*|fio*
 
-namespace: fio
+namespace: vol
 
 fio: demo-fio-openebs.yml
 
