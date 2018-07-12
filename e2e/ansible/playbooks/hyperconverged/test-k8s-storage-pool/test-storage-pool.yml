@@ -4,16 +4,10 @@
 #############################################################
 # Test steps:
 #1. Creating the storage pool path /mnt/openebs.
-#2. Test storage pool path with the following conditions.
-#2(a). When Openebs in default and pvc is in percona namespace.
-#2(b). When openebs in openebs and pvc is in default namespace.
-#2(c).When openebs is openebs and pvc is in percona namespace.
+#2. Test storage pool path with the following condition.
+#2(a).When openebs is openebs and pvc is in non-default namespace.
 #3. Perform cleanup.
 ###############################################################
-
-
-
-
 
 - hosts: localhost
 
@@ -25,47 +19,129 @@
    - block:
 
 
-       #Deploying operator in default and pvc in percona namespace
-       - include: deploy-openebs-pvc.yml
-           operator_namespace=default
-           namespace=percona
 
-       - include: cleanup.yml
-           operator_namespace=default
-           namespace=percona
+       - include:  pre-requisites.yml
 
-       #Deploying operator in openebs and pvc in default namespace
-       - include: deploy-openebs-pvc.yml
-           operator_namespace=openebs
-           namespace=default
+       - name: Check status of apiserver
+         include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
+         vars:
+           ns: openebs
+           app: apiserver
 
-       - include: cleanup.yml
-           operator_namespace=openebs
-           namespace=default
+       - name: Copy the storage pool creation yaml to kube master
+         copy:
+           src: "{{ storage_pool_path_creation }}"
+           dest: "{{ result_kube_home.stdout }}"
+         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
 
-       #Deploying operator in openebs and pvc in percona namespace
-       - include: deploy-openebs-pvc.yml
-           operator_namespace=openebs
-           namespace=percona
+       - name: Create storage pool path /mnt/openebs
+         shell: source ~/.profile; kubectl apply -f "{{ storage_pool_path_creation }}"
+         args:
+           executable: /bin/bash
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+         changed_when: True
 
-       - include: cleanup.yml
-           operator_namespace=openebs
-           namespace=percona
 
-       - name: Set flag to pass if test case is passed
+       - name: Create namespace for PVC
+         shell: source ~/.profile; kubectl create ns "{{namespace}}"
+         args:
+             executable: /bin/bash
+         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+         changed_when: True
+         register: result
+
+       - name: Copy test-pvc yaml to kubemaster
+         copy:
+           src: "{{ openebs_pvc }}"
+           dest: "{{ result_kube_home.stdout }}"
+         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+
+
+       - name: Replace volume-claim name with test parameters
+         replace:
+           path: "{{ result_kube_home.stdout }}/{{ openebs_pvc }}"
+           regexp: 'vut'
+           replace: '{{ volume_claim }}'
+         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+
+       - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_task.yml"
+         vars:
+           app_yml: "{{ openebs_pvc }}"
+           ns: "{{ namespace }}"
+
+       - name: Confirm volume container is running
+         shell: source ~/.profile; kubectl get pods -n {{namespace}} | grep pvc | grep {{item}} | grep Running | wc -l
+         args:
+           executable: /bin/bash
+         register: result
+         until: result.stdout|int >= 1
+         delay: 60
+         retries: 20
+         with_items:
+           - ctrl
+           - rep
+         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+         changed_when: True
+
+       - name: Get storage replica pod name
+         shell: source ~/.profile; kubectl get pods -n {{namespace}} | grep rep  | awk {'print $1'}
+         args:
+           executable: /bin/bash
+         register: rep_name
+         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+         changed_when: True
+
+       - name: Set replica pod name to variable
          set_fact:
-           flag: "Pass"
+           rep_pod_name: "{{ rep_name.stdout.split('-rep-')[0] }}"
+
+       - name: Find the pvc inside the /mnt/openebs
+         stat:
+          path: /mnt/openebs/{{ rep_pod_name }}
+         register: stat_result
+         become: true
+         delegate_to: "{{groups['kubernetes-kubeminions'].0}}"
+       - debug:
+           msg: "File exists..."
+         when: stat_result.stat.exists
+
+       - name: Test Playbook Passed
+         set_fact:
+           flag: "Test Passed"
 
      rescue:
-       - name: Set flag to fail if test case is failed
+       - name: Test playbook Failed
          set_fact:
-           flag: "Fail"
+           flag: "Test Failed"
 
      always:
 
-       - name: Send slack notification
-         slack:
-           token: "{{ lookup('env','SLACK_TOKEN') }}"
-           msg: '{{ ansible_date_time.time }} TEST: {{test_name}}, RESULT: {{ flag }}'
-         when: slack_notify | bool and lookup('env','SLACK_TOKEN')
+       - block:
+
+           - include: cleanup.yml
+
+           - name: Test Cleanup Passed
+             set_fact:
+               cflag: "Cleanup Passed"
+
+         rescue:
+           - name: Test Cleanup Failed
+             set_fact:
+               cflag: "Cleanup Failed"
+
+
+         always:
+
+           - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/stern_task.yml"
+             vars:
+               status: stop
+
+
+           - name: Send slack notification
+             slack:
+               token: "{{ lookup('env','SLACK_TOKEN') }}"
+               msg: '{{ ansible_date_time.time }} TEST: {{test_name}}, RESULT: {{ flag }},{{ cflag }}'
+             when: slack_notify | bool and lookup('env','SLACK_TOKEN')
+
+
 

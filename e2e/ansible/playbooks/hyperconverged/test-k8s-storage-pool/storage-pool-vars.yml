@@ -2,13 +2,6 @@
 
 openebs_pvc: test-pvc.yaml
 
-
-openebs_ns_operator: https://raw.githubusercontent.com/openebs/openebs/master/e2e/ansible/playbooks/hyperconverged/percona-openebs-ownnamespace/openebs-operator-ns-openebs.yaml 
-
-openebs_operator_link: https://raw.githubusercontent.com/openebs/openebs/master/k8s/openebs-operator.yaml
-
-percona_application: https://raw.githubusercontent.com/openebs/openebs/master/k8s/demo/percona/demo-percona-mysql-pvc.yaml
-
 openbs_storageclass: https://raw.githubusercontent.com/openebs/openebs/master/k8s/openebs-storageclasses.yaml
 
 storage_pool_path_creation: storage-pool-path_creation.yml
@@ -21,7 +14,8 @@ test_log_path: setup/logs/hyperconverged_test-storage-pool.log
 
 test_pod_regex: maya*|openebs*|pvc*
 
-
 test_artifacts:
    - test-pvc.yaml
    - storage-pool-path_creation.yml
+
+namespace: storage-pool
