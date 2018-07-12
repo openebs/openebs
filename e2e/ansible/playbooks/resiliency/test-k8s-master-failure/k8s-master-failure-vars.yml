@@ -1,0 +1,20 @@
+---
+
+test_name: hyperconverged_jenkins_upgrade_on_k8s
+
+jenkins_link: https://raw.githubusercontent.com/openebs/openebs/master/k8s/demo/jenkins/jenkins.yml
+
+pod_yaml_alias: jenkins.yml
+
+
+namespace: k8s-master-failure
+
+job_config_files:
+  - template.xml
+  - config_change.sh
+
+
+test_pod_regex: maya*|openebs*|pvc*|jenkins*
+
+test_log_path: setup/logs/master_failure_test.log
+
