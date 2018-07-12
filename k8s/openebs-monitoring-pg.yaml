@@ -170,7 +170,7 @@ spec:
         app: openebs-grafana
     spec:
       containers:
-      - image: grafana/grafana:5.2.0
+      - image: grafana/grafana:5.1.3
         name: grafana
         ports:
         - containerPort: 3000
