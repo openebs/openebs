@@ -1,0 +1,30 @@
+---
+test_name: hyperconverged_jenkins_upgrade_on_k8s
+
+jenkins_link: https://raw.githubusercontent.com/openebs/openebs/master/k8s/demo/jenkins/jenkins.yml
+
+pod_yaml_alias: jenkins.yml
+
+operator_ns: openebs
+
+
+replace_item: 
+   - lts
+   - 2.124
+
+
+replace_with: 
+   - 2.124
+   - 2.125
+
+
+namespace: jenkins-upgrade
+
+job_config_files: 
+  - template.xml
+  - config_change.sh
+
+
+test_pod_regex: maya*|openebs*|pvc*|jenkins*
+
+test_log_path: setup/logs/jenkins_test.log
