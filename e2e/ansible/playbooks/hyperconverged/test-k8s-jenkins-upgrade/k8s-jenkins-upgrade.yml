@@ -45,13 +45,16 @@
 
 
      - name: 2a) Replace jenkins pod version
-       include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/regex_task.yml"
-       vars:
-         path: "{{ result_kube_home.stdout }}/jenkins.yml"
-         regex1: "{{replace_item}}"
-         regex2: "{{replace_with}}"
+       replace:
+        path: "{{ result_kube_home.stdout }}/{{ pod_yaml_alias }}"
+        regexp: '{{ item.0 }}'
+        replace: '{{ item.1 }}'
        delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
-    
+       with_together:
+         - "{{replace_item.0}}"
+         - "{{replace_with.0}}"
+
+          
      - name: Create namespace for deployment.
        shell: source ~/.profile; kubectl create ns {{namespace}}
        args:
@@ -108,8 +111,9 @@
          files_to_copy: "{{ job_config_files }}"
 
      - name: 4b) Copy job configuration files to jenkins-pod from master.
-       shell: |
-         source ~/.profile; kubectl cp {{result_kube_home.stdout}}/{{item}}  {{namespace}}/{{ jenkins_pod_name.stdout }}:/var/jenkins_home/   
+       shell: >
+         source ~/.profile; kubectl cp {{result_kube_home.stdout}}/{{item}} 
+         {{namespace}}/{{ jenkins_pod_name.stdout }}:/var/jenkins_home/   
        args:
          executable: /bin/bash
        delegate_to: "{{groups['kubernetes-kubemasters'].0}}" 
@@ -117,7 +121,8 @@
    
      - name: 5) Run the config_change.sh file for required changes inside pod.
        shell: > 
-          source ~/.profile; kubectl exec {{  jenkins_pod_name.stdout }} -n {{namespace}} -- bash -c "sh /var/jenkins_home/config_change.sh"
+          source ~/.profile; kubectl exec {{  jenkins_pod_name.stdout }} -n {{namespace}}
+          -- bash -c "sh /var/jenkins_home/config_change.sh"
        args:
          executable: /bin/bash
        delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
@@ -154,7 +159,8 @@
      - name: 6)  Create and Build one sample job inside pod.
        shell: >
          source ~/.profile; kubectl exec {{ jenkins_pod_name.stdout }} -n {{ namespace }} 
-         -- bash -c "java -jar /var/jenkins_home/jenkins-cli.jar -s http://localhost:8080 create-job sample < /var/jenkins_home/template.xml";
+         -- bash -c "java -jar /var/jenkins_home/jenkins-cli.jar -s http://localhost:8080 
+         create-job sample < /var/jenkins_home/template.xml";
          source ~/.profile; kubectl exec {{ jenkins_pod_name.stdout }} -n {{ namespace  }} 
          -- bash -c "java -jar /var/jenkins_home/jenkins-cli.jar -s http://localhost:8080 build sample" 
        args:
@@ -171,13 +177,14 @@
        register: First_Build
   
      - name: 7)  Replace jenkins pod version 
-       include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/regex_task.yml"
-       vars:
-         path: "{{ result_kube_home.stdout }}/jenkins.yml"
-         regex1: "{{replace_item1}}"
-         regex2: "{{replace_with1}}"
+       replace:
+        path: "{{ result_kube_home.stdout }}/{{ pod_yaml_alias }}"
+        regexp: '{{ item.0 }}'
+        replace: '{{ item.1 }}'
        delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
-
+       with_together:
+         - "{{replace_item.1}}"
+         - "{{replace_with.1}}"  
 
      - name: 7a)  Deploy jenkins pod Again
        include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_task.yml"
@@ -213,6 +220,12 @@
        delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
        register: version
        failed_when: "'jenkins/jenkins:2.125' not in version.stdout"
+
+     
+
+     - name: wait for some time to jenkins save changes.
+       wait_for:
+           timeout: 60
        
          
      - name: 8b) Create a new build from existing  job inside pod.

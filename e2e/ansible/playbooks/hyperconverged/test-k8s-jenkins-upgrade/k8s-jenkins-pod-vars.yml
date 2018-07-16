@@ -9,19 +9,13 @@ operator_ns: openebs
 
 
 replace_item: 
+   - lts
+   - 2.124
 
-  - lts
-
-replace_item1:
-
-  - 2.124 
 
 replace_with: 
-  
-  - 2.124
-replace_with1:
-
-  - 2.125
+   - 2.124
+   - 2.125
 
 
 namespace: jenkins-upgrade
