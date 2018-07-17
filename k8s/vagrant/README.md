@@ -123,13 +123,14 @@ Starting to serve on 127.0.0.1:8001
 ### Verify 
 
 Launch the URL http://127.0.0.1:8001/ui
-While accessing above URL if you see following Error.
+
+While accessing the above URL, if you see the following error, launch the URL http://127.0.0.1:8001/api/v1/namespaces/kube-system/services/http:kubernetes-dashboard:/proxy/#!/overview?namespace=default
+
 ```
 Error: 'tls: oversized record received with length 20527'
 Trying to reach: 'https://10.244.4.2:9090/'
 ```
-Launch the below URL 
-http://127.0.0.1:8001/api/v1/namespaces/kube-system/services/http:kubernetes-dashboard:/proxy/#!/overview?namespace=default
+
 
 **Your local Kubernetes cluster with the dashboard is ready. The below steps are required only if you would like to run stateful applications with OpenEBS**
 
