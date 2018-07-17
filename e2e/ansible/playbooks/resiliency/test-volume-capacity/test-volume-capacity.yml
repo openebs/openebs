@@ -1,5 +1,5 @@
-#test-data-verification.yml
-# Description: Fill the OpenEBS volume and perform data verification scan
+#test-volume-capacity.yml
+# Description: Fill the OpenEBS volume and test the volume capacity
 # Author: nsathyaseelan
 
 ###############################################################################################
@@ -22,13 +22,13 @@
 - hosts: localhost
 
   vars_files:
-    - test-data-vars.yml
+    - test-volume-vars.yml
 
   tasks:
 
     - block:
 
-        - include: test-data-prereq.yml
+        - include: test-volume-prereq.yml
 
         - name: 1) Check if maya-apiserver is running.
           include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
@@ -76,18 +76,24 @@
             executable: /bin/bash
           register: result_pod
           delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-
-        - name: Wait for 240s to ensure fio pod starts
-          wait_for:
-            timeout: 240
-
+     
         - name: 5c) Check if fio job created successfully
-          shell: source ~/.profile; kubectl get jobs -n "{{ namespace }}"
+          shell: source ~/.profile; kubectl get jobs -n "{{ namespace }}" | grep fio | awk {'print $1'}
           args:
             executable: /bin/bash
           register: result_job
           failed_when: "'fio' not in result_job.stdout"
           delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+        - name: 5d) Check if fio jobs is completed
+          shell: source ~/.profile; kubectl describe job "{{ result_job.stdout }}" -n "{{ namespace }}"  | grep Succeeded
+          args:
+            executable: /bin/bash
+          register: result_status
+          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+          until: "'1 Succeeded' in result_status.stdout"
+          delay: 60
+          retries: 15
 
         - name: 6) Verify the fio logs to check if run is complete w/o errors
           shell: >
@@ -192,7 +198,7 @@
       always:
         - block:
             - name: 14) Cleaning the test artifacts
-              include: test-data-cleanup.yml
+              include: test-volume-cleanup.yml
 
             - name: Setting cleanup flag to passed
               set_fact:

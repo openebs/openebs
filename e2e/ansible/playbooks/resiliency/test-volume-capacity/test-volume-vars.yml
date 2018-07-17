@@ -1,11 +1,11 @@
 ---
-test_name: data_verification_scan
+test_name: test-volume-capacity
 
-test_log_path: setup/logs/data_verification.log
+test_log_path: setup/logs/volume_capacity.log
 
 test_pod_regex: maya*|openebs*|pvc*|vol*|fio*
 
-namespace: vol
+namespace: volume
 
 fio: demo-fio-openebs.yml
 
