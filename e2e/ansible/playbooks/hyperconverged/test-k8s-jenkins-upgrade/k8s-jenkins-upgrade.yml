@@ -14,7 +14,7 @@
 #6.Upgraded application pod with newer version(here version=2.125).
 #7.Downloading jenkins-cli.jar file inside var/jenkins_home mounted path of jenkins application creation and building of jobs.
 #8.Perform build operation with the existing created job.
-#9.Compare both the jobs buil.
+#9.Compare both the jobs build.
 #(Way to Check for data persitency inside application pod.)
 
 ###############################################################################################
@@ -82,14 +82,13 @@
        register: result_service
        failed_when: "'jenkins-svc' not in result_service.stdout"
 
+
      - name: 3c) Get the name of the pod.
        shell: source ~/.profile; kubectl get pods -n {{namespace}} | grep jenkins | awk {'print $1'}
        args: 
          executable: /bin/bash
        delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
        register: jenkins_pod_name
-
-
      
 
      - name: 4) Download Jenkins-cli.jar file inside /var/jenkins_home of pod.
@@ -104,11 +103,13 @@
        retries: 2
        failed_when: false       
 
+
      - name: 4a)  Copy job configuration files to master.
        include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/copy_task.yml"
        vars:
          destination_node: "{{groups['kubernetes-kubemasters'].0}}"
          files_to_copy: "{{ job_config_files }}"
+
 
      - name: 4b) Copy job configuration files to jenkins-pod from master.
        shell: >
@@ -118,6 +119,7 @@
          executable: /bin/bash
        delegate_to: "{{groups['kubernetes-kubemasters'].0}}" 
        with_items: "{{ job_config_files }}"
+
    
      - name: 5) Run the config_change.sh file for required changes inside pod.
        shell: > 
@@ -127,6 +129,7 @@
          executable: /bin/bash
        delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
+
      - name: 5a)  Retrieve Password of jenkins running pods.
        shell: >
           source ~/.profile; kubectl exec  {{ jenkins_pod_name.stdout }} -n {{namespace}}
@@ -135,6 +138,7 @@
          executable: /bin/bash
        delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
        register: jenkins_password
+
   
      - name: 5b) Restart the jenkins pod for running jenkins actions.
        shell: >
@@ -144,6 +148,7 @@
        args:
          executable: /bin/bash
        delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
 
      - name:  Confirm pod status is running
        include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
@@ -166,6 +171,7 @@
        args:
          executable: /bin/bash
        delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
     
      - name: 6a)  Running a build job
        shell: >
@@ -175,6 +181,7 @@
          executable: /bin/bash
        delegate_to: "{{groups['kubernetes-kubemasters'].0}}" 
        register: First_Build
+
   
      - name: 7)  Replace jenkins pod version 
        replace:
@@ -186,17 +193,20 @@
          - "{{replace_item.1}}"
          - "{{replace_with.1}}"  
 
+
      - name: 7a)  Deploy jenkins pod Again
        include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_task.yml"
        vars:
           app_yml: "{{ pod_yaml_alias }}"
           ns: "{{ namespace }}"
 
+
      - name: 7b)  Confirm pod status is running
        include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
        vars:
           ns: "{{namespace}}"
-          app: jenkins     
+          app: jenkins    
+ 
        
      - name: 7c)  Verify that the jenkins is a cluster service
        shell: source ~/.profile; kubectl get svc -n {{ namespace }}
@@ -206,12 +216,14 @@
        register: result_service_2
        failed_when: "'jenkins-svc' not in result_service.stdout"
 
+
      - name: 8) Get the name of the pod.
        shell: source ~/.profile; kubectl get pods -n {{ namespace }} | grep jenkins | awk {'print $1'}
        args:
          executable: /bin/bash
        delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
        register: jenkins_pod_name_2
+
 
      - name: Verify jenkins-version post upgrade.
        shell: source ~/.profile; kubectl describe pod {{jenkins_pod_name_2.stdout }} -n {{ namespace }}  | grep Image | awk {'print $2'} 
@@ -236,11 +248,13 @@
          executable: /bin/bash
        delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
        register: Second_Build
+
  
      - name: Compare between two builds
        set_fact:
          flag: "Test Passed"
        when: "'Hello World!' in Second_Build.stdout"
+
     
      rescue:
        - name: Test Failed
