@@ -151,7 +151,7 @@
        delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
  
-     - name: wait for 20 seconds.
+     - name: wait for 60 seconds.
        wait_for:
           timeout: 60
 
@@ -178,20 +178,20 @@
        register: First_Build
 
 
-     - name: Bring down the node
+     - name: Bring down the kubemaster.
        include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/vagrant-halt-up-task.yml"
        vars:
          vagrant_op: halt --force
          nodename: kubemaster-01
 
 
-     - name: wait for 100 seconds.
+     - name: wait for 120 seconds.
        wait_for:
           timeout: 120
 
 
 
-     - name: 7) Checking the status of kubemaster.
+     - name: 7) Checking the status of kubemaster after kubemaseter halt.
        shell: vagrant status kubemaster-01 | grep kubemaster-01 |  awk '{ $1="";print}' | cut -d '(' -f1
        args:
          chdir: "{{ansible_env.HOME}}/{{vagrant_path}}"
@@ -200,13 +200,13 @@
        until: "'poweroff'  in VDown.stdout"
 
 
-     - name: Bring up the node
+     - name: Bring up the kubemaster.
        include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/vagrant-halt-up-task.yml"
        vars:
          vagrant_op: up 
          nodename: kubemaster-01
 
-     - name: wait for 100 seconds.
+     - name: wait for 120 seconds.
        wait_for:
           timeout: 120
 
@@ -219,7 +219,7 @@
        until: "' running '  in Vup.stdout"
 
 
-     - name:  Confirm pod status is running
+     - name:  Confirm pod status is running after kubemaster up.
        include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
        vars:
           ns: "{{ namespace }}"
