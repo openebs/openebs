@@ -98,6 +98,14 @@
        - debug:
            msg: "All the nodes are in ready state"
          when: (node_count)| int == (ready_node_cout.stdout)| int
+ 
+       - name: Get the node name 
+         shell: source ~/.profile; kubectl get nodes | awk {'print $1'} | awk 'FNR == 2 {print}'
+         args:
+           executable: /bin/bash
+         register: node_name
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
 
        - name: Stop kubelet service in one of the node
          shell: source ~/.profile; systemctl stop kubelet.service
@@ -110,7 +118,7 @@
 
 
        - name: check the node is in NotReady state after kubelet service is stopped
-         shell: source ~/.profile; kubectl get nodes {{node_name}} | grep NotReady | wc -l
+         shell: source ~/.profile; kubectl get nodes {{node_name.stdout}} | grep NotReady | wc -l
          args:
            executable: /bin/bash
          register: result
@@ -141,7 +149,7 @@
 
 
        - name: check the node is in Ready state after kubelet service start
-         shell: source ~/.profile; kubectl get nodes {{node_name}} | grep 'NotReady' | grep 'none' | wc -l
+         shell: source ~/.profile; kubectl get nodes {{node_name.stdout}} | grep 'NotReady' | grep 'none' | wc -l
          args:
            executable: /bin/bash
          register: result
