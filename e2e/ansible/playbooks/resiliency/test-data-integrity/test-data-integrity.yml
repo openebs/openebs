@@ -265,4 +265,3 @@
                 token: "{{ lookup('env','SLACK_TOKEN') }}"
                 msg: '{{ ansible_date_time.time }} TEST: {{test_name}}, RESULT: {{ flag }}, {{ cflag }}'
               when: slack_notify | bool and lookup('env','SLACK_TOKEN')
-

@@ -1,4 +1,5 @@
-me: Delete the snapshot claim
+---
+- name: Delete the snapshot claim
   shell: source ~/.profile; kubectl delete -f "{{ ressult_kube_home.stdout}}/{{ snapshot_claim }}" -n "{{ namespace }}"
   args:
     executable: /bin/bash
@@ -67,4 +68,3 @@ me: Delete the snapshot claim
     executable: /bin/bash
   delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
   changed_when: true
-

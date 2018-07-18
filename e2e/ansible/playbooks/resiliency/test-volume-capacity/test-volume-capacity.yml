@@ -85,15 +85,15 @@
           failed_when: "'fio' not in result_job.stdout"
           delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
-        - name: 5d) Check if fio jobs is completed
-          shell: source ~/.profile; kubectl describe job "{{ result_job.stdout }}" -n "{{ namespace }}"  | grep Succeeded
+        - name: 5d) Check if fio write job is completed
+          shell: source ~/.profile; kubectl get pods -a -n "{{ namespace }}" | grep fio
           args:
             executable: /bin/bash
-          register: result_status
+          register: result_fio_pod
           delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-          until: "'1 Succeeded' in result_status.stdout"
+          until: "'Completed' in result_fio_pod.stdout"
           delay: 60
-          retries: 15
+          retries: 10
 
         - name: 6) Verify the fio logs to check if run is complete w/o errors
           shell: >
@@ -186,28 +186,28 @@
           with_items:
              - '{{ files.files }}'
 
-        - name: Set the pass flag
+        - name: Test Passed
           set_fact:
-            flag: "Pass"
+            flag: "Test Passed"
 
       rescue:
-        - name: set the fail flag
+        - name: Test Failed
           set_fact:
-            flag: "Fail"
+            flag: "Test Failed"
 
       always:
         - block:
             - name: 14) Cleaning the test artifacts
               include: test-volume-cleanup.yml
 
-            - name: Setting cleanup flag to passed
+            - name: Test Cleanup Passed
               set_fact:
-                cflag: "Cleanup passed"
+                cflag: "Cleanup Passed"
 
           rescue:
-            - name: Setting cleanup tag to failed
+            - name: Test Cleanup Failed
               set_fact:
-                cflag: "Cleanup failed"
+                cflag: "Cleanup Failed"
 
           always:
 
