@@ -1,6 +1,6 @@
 ---
 - name: Delete the snapshot claim
-  shell: source ~/.profile; kubectl delete -f "{{ snapshot_claim }}" -n "{{ namespace }}"
+  shell: source ~/.profile; kubectl delete -f "{{ ressult_kube_home.stdout}}/{{ snapshot_claim }}" -n "{{ namespace }}"
   args:
     executable: /bin/bash
   register: delete_claim
@@ -11,7 +11,7 @@
   changed_when: true
 
 - name: Delete volume snapshot
-  shell: source ~/.profile; kubectl delete -f "{{ snapshot }}" -n "{{ namespace }}"
+  shell: source ~/.profile; kubectl delete -f "{{result_kube_home.stdout}}/{{ snapshot }}" -n "{{ namespace }}"
   args:
     executable: /bin/bash
   register: delete_sp
