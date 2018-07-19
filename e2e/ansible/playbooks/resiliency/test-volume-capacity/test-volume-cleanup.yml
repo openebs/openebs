@@ -1,8 +1,35 @@
 ---
+- name: Logout to iSCSI target
+  open_iscsi:
+    show_nodes: yes
+    login: no
+    target: "{{iqn}}"
+  become: true
+  delegate_to: "{{groups['kubernetes-kubeminions'].0}}"
+  register: result
+
+- name: Unmount the ext4 filesystem
+  mount:
+     name: "{{ mount_point }}"
+     state: absent
+  become: true
+  delegate_to: "{{groups['kubernetes-kubeminions'].0}}"
+
 - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/delete_deploy.yml"
   vars:
     app_yml: "{{ fio }}"
     ns: "{{ namespace }}"
+
+- name: Confirm the iSCSI target has been deleted
+  shell: source ~/.profile; kubectl get pvc -n {{ namespace }}
+  args:
+     executable: /bin/bash
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+  register: result
+  until: "'pvc' not in result.stdout"
+  delay: 120
+  retries: 6
+  changed_when: true
 
 - name: Check if the pod has been deleted
   shell: source ~/.profile; kubectl get pods -n "{{ namespace }}"
@@ -17,7 +44,7 @@
 
 - name: Remove fio job specific files
   file:
-    path: "{{ item }}"
+    path: "{{ result_kube_home.stdout }}/{{ item }}"
     state: absent
   with_items:
     - "{{ fio_files}}"
