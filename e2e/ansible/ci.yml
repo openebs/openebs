@@ -7,13 +7,5 @@
 
 - include: setup-openebs.yml
 
-- include: load-images.yml
-
-#- include: run-dedicated-tests.yml
-#  when: deployment_mode == "dedicated"
-
-- include: run-hyperconverged-tests.yml
-  when: deployment_mode == "hyperconverged"
-
- 
+- include: run-tests.yml 
 
