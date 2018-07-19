@@ -3,6 +3,7 @@
 test_name: test-k8s-master-failure
 
 
+operator_ns: openebs
 
 pod_yaml_alias:
   - jenkins.yml

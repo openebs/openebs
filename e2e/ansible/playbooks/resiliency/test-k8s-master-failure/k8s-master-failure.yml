@@ -219,39 +219,43 @@
        until: "' running '  in Vup.stdout"
 
 
-     - name:  Confirm pod status is running after kubemaster up.
+     - name: Get jenkins  PV name
+       shell: source ~/.profile; kubectl get pv -n {{ namespace }}| grep {{namespace}}/jenkins-claim | awk '{print $1}'
+       args:
+         executable: /bin/bash
+       register: pv_name
+       delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+ 
+ 
+     - name: Check the number of  available replicas in deployment
+       shell: kubectl get deploy -n {{ namespace }} | grep "{{ pv_name.stdout }}" | grep rep | awk '{print $2}'
+       args:
+         executable: /bin/bash
+       register: available_pods
+       until: "'3' in available_pods.stdout"
+       delay: 30
+       retries: 5
+       delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+       ignore_errors: true
+
+
+     - name: Confirm pod status is running after kubemaster up.
        include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
        vars:
           ns: "{{ namespace }}"
           app: jenkins
 
-      
- 
-     - name: 8) Confirm volume container is running
-       shell: source ~/.profile; kubectl get pods -n {{ namespace }} | grep pvc | grep {{item}} | grep Running | wc -l
-       args:
-        executable: /bin/bash
-       register: result
-       until: result.stdout|int >= 1
-       delay: 30
-       retries: 20
-       with_items:
-        - ctrl
-        - rep
-       delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
-
-
-
      - name: 8a)  Check if the replica is rebuilded using mayactl commands
        include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/access-mode-check.yml"
        vars:
          ns: "{{ namespace }}"
-     
+
+   
  
      - name: 9)  Get a job configuration from previous build( get,create and build the job )
        shell: >
          source ~/.profile; kubectl exec {{ jenkins_pod_name.stdout }} -n {{ namespace }}
-         -- bash -c "java -jar /var/jenkins_home/jenkins-cli.jar -s 
+         -- bash -c "java -jar /var/jenkins_home/jenkins-cli.jar -s
          http://localhost:8080 get-job sample > /var/jenkins_home/template.xml";
          source ~/.profile; kubectl exec {{ jenkins_pod_name.stdout }} -n {{ namespace }}
          -- bash -c "java -jar /var/jenkins_home/jenkins-cli.jar -s 
