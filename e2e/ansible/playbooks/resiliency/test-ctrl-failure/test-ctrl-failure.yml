@@ -82,7 +82,7 @@
            chaospod: "{{ result.stdout_lines[0].split()[0] }}"
 
        - name: Create a configmap with the liveness sql script
-         shell: source ~/.profile; kubectl create configmap sqltest --from-file={{ percona_files.1 }} -n {{ namespace }}
+         shell: source ~/.profile; kubectl create configmap sqltest --from-file={{result_kube_home.stdout}}/{{ percona_files.1 }} -n {{ namespace }}
          args:
            executable: /bin/bash
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
