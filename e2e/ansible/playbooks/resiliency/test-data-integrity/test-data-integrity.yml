@@ -79,7 +79,7 @@
           delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
         - name: 6a) Check if fio write job is completed
-          shell: source ~/.profile; kubectl get pods -n "{{ namespace }}" | grep fio
+          shell: source ~/.profile; kubectl get pods -a -n "{{ namespace }}" | grep fio
           args:
             executable: /bin/bash
           register: result_fio_pod
@@ -193,15 +193,13 @@
            app_yml: "{{ fio_read }}"
            ns: "{{ namespace }}"
 
-        - name: 11a) Check if fio read job is completed
-          shell: source ~/.profile; kubectl get pods -n "{{ namespace }}" | grep read
+        - name: 11a) Check if fio job created successfully
+          shell: source ~/.profile; kubectl get jobs -n "{{ namespace }}" | grep read | awk '{print $1}'
           args:
             executable: /bin/bash
-          register: result_fio_read
+          register: result_read_job
+          failed_when: "'fio-read' not in result_read_job.stdout"
           delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-          until: "'Completed' in result_fio_read.stdout"
-          delay: 60
-          retries: 10
 
         - name: 11b) Obtaining the fio read job pod name
           shell: >
@@ -211,6 +209,16 @@
             executable: /bin/bash
           register: result_read_pod
           delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+        - name: 11c) Check if fio read job is completed
+          shell: source ~/.profile; kubectl get pods -a -n "{{ namespace }}" | grep read
+          args:
+            executable: /bin/bash
+          register: result_fio_read
+          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+          until: "'Completed' in result_fio_read.stdout"
+          delay: 60
+          retries: 10
 
         - name: 12) Verify the data integrity check
           shell: >
@@ -223,14 +231,14 @@
           failed_when: result_di.stdout != " 0,"
           delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
-        - name: Set the pass flag
+        - name: Test Passed
           set_fact:
-            flag: "Pass"
+            flag: "Test Passed"
 
       rescue:
-        - name: set the fail flag
+        - name: Test Failed
           set_fact:
-            flag: "Fail"
+            flag: "Test Failed"
 
       always:
         - block:
@@ -238,14 +246,14 @@
             - name: 13) Cleaning the test artifacts
               include: test-di-cleanup.yml
 
-            - name: Setting cleanup flag to passed
+            - name: Test Cleanup Passed
               set_fact:
-                cflag: "Cleanup passed"
+                cflag: "Cleanup Passed"
 
           rescue:
-            - name: Setting cleanup tag to failed
+            - name: Test Cleanup Failed
               set_fact:
-                cflag: "Cleanup failed"
+                cflag: "Cleanup Failed"
 
           always:
 
