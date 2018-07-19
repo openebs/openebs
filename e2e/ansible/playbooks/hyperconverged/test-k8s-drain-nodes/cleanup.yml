@@ -3,7 +3,7 @@
 - name: Delete percona deployment
   include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/delete_deploy.yml"
   vars:
-    app_yml: "{{ percona_link }}"
+    app_yml: "{{ percona_file }}"
     ns: "{{namespace}}"
 
 - name: Confirm percona pod has been deleted
