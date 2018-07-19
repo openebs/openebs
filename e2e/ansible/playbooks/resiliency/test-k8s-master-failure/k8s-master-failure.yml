@@ -14,7 +14,7 @@
 #6.Bring down the master node and wait for some time.
 #7.Perform build operation with the existing created job.
 #8.Check if the data is persisting or not by comparing the build first result to build second result.
-#(Way to Check for data persitency inside application pod.)
+#9 (Way to Check for data persitency inside application pod.)
 
 ###############################################################################################
 
