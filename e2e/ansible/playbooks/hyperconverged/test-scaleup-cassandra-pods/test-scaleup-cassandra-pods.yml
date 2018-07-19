@@ -95,7 +95,7 @@
            app: maya-apiserver
 
        - name: Deploy cassandra service and statefulset
-         shell: source {{ profile }}; kubectl apply -f {{ item }}
+         shell: source {{ profile }}; kubectl apply -f {{ result_kube_home.stdout }}/{{ item }}
          args:
            executable: /bin/bash
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
@@ -133,7 +133,7 @@
          retries: 30
 
        - name: Start cassandra load generation
-         shell: source {{ profile }}; kubectl create -f {{ loadgen_yaml_alias }}
+         shell: source {{ profile }}; kubectl create -f {{ result_kube_home.stdout }}/{{ loadgen_yaml_alias }}
          args:
            executable: /bin/bash
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
