@@ -15,7 +15,7 @@ image:
 
 apiserver:
   image: "openebs/m-apiserver"
-  imageTag: "0.6.0-RC4"
+  imageTag: "0.6.0"
   replicas: 1
   ports:
     externalPort: 5656
@@ -24,9 +24,10 @@ apiserver:
   tolerations: {}
   affinity: {}
 
+
 provisioner:
   image: "openebs/openebs-k8s-provisioner"
-  imageTag: "0.6.0-RC5"
+  imageTag: "0.6.0"
   replicas: 1
   nodeSelector: {}
   tolerations: {}
@@ -35,10 +36,10 @@ provisioner:
 snapshotOperator:
   controller:
     image: "openebs/snapshot-controller"
-    imageTag: "0.6.0-RC5"
+    imageTag: "0.6.0"
   provisioner:
     image: "openebs/snapshot-provisioner"
-    imageTag: "0.6.0-RC5"
+    imageTag: "0.6.0"
   replicas: 1
   upgradeStrategy: "Recreate"
   nodeSelector: {}
@@ -47,8 +48,16 @@ snapshotOperator:
 
 jiva:
   image: "openebs/jiva"
-  imageTag: "0.6.0-RC5"
+  imageTag: "0.6.0"
   replicas: 3
+  replicaNodeSelector:
+    #Enable this option and specify the node label that will be used to 
+    #select the nodes where replica pods are scheduled. To use this feature,
+    #the nodes should already be labeled with the key=value. For example:
+    # `kubectl label nodes <node-name> nodetype=storage
+    enabled: false
+    value: "nodetype=storage"
+
 
 grafana:
   image: "grafana/grafana"
@@ -70,4 +79,4 @@ policies:
   monitoring:
     enabled: true
     image: "openebs/m-exporter"
-    imageTag: "0.6.0-RC4"
+    imageTag: "0.6.0"
