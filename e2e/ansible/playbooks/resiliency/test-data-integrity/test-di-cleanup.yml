@@ -55,7 +55,7 @@
 
 - name: Remove snapshot specific files
   file:
-    path: "{{ item }}"
+    path: "{{ result_kube_home.stdout }}/{{ item }}"
     state: absent
   with_items:
     - "{{ snapshot_files }}"
