@@ -72,7 +72,7 @@
          args:
            executable: /bin/bash
          register: sc_out
-         until: "'created' in sc_out.stdout"
+         until: "'configured' in sc_out.stdout"
          delay: 10
          retries: 5
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
@@ -145,7 +145,7 @@
            timeout: 120
 
        - name: 3b) Set replica deployment with node affinity policy
-         shell: kubectl patch deployment "{{ deploy_name.stdout }}" -n {{ namespace }} -p "$(cat replica_patch.yaml)"
+         shell: kubectl patch deployment "{{ deploy_name.stdout }}" -n {{ namespace }} -p "$(cat {{ result_kube_home.stdout }}/replica_patch.yaml)"
          args:
            executable: /bin/bash
          register: patch_out
