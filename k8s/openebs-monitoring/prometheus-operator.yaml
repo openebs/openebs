@@ -12,6 +12,8 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: prometheus
+  labels:
+    k8s-app: prometheus
   namespace: default
 ---
 # RBAC, Role-based access control, is an an authorization mechanism for managing
@@ -29,14 +31,16 @@ apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRole
 metadata:
   name: prometheus
+  labels:
+    k8s-app: prometheus
 # These are the rules to determine whether a request is allowed or denied
 rules:
   # You can use the Kubernetes API to read and write Kubernetes resource objects
-  # via a Kubernetes API endpoint. The API group being accessed (for resource 
+  # via a Kubernetes API endpoint. The API group being accessed (for resource
   # requests only). An empty string designates the core API group.
 - apiGroups: [""]
   # The ID or name of the resource that is being accessed (for resource requests
-  # only) –* For resource requests using get, update, patch, and delete verbs, 
+  # only) –* For resource requests using get, update, patch, and delete verbs,
   # you must provide the resource name.
   resources:
     # A Node may be a VM or physical machine
@@ -44,26 +48,26 @@ rules:
     # nodes/proxy connect POST requests to proxy of a Node for the given HTTP req
     # POST /api/v1/nodes/{name}/proxy
   - nodes/proxy
-    # Services are to load balance traffic across all Pods.and it Exposes an 
+    # Services are to load balance traffic across all Pods.and it Exposes an
     # externally accessible endpoint. In simple words they are the medium through
     # which pods communicate.
   - services
     # An endpoint is a URL pattern used to communicate with an API. For exp:
     # <ip>:<port>/metrics
   - endpoints
-    # A pod is a group of one or more containers (Exp: Docker containers),with 
+    # A pod is a group of one or more containers (Exp: Docker containers),with
     # shared storage/network, and a specification for how to run the containers.
   - pods
   verbs: ["get", "list", "watch"]
-  # nonResourceURLs are endpoints that don’t map to a traditional resource. 
+  # nonResourceURLs are endpoints that don’t map to a traditional resource.
   # Things like /ui/ or /apis or /swagger.json that are used for redirects
   # Prometheus by default look for /metrics endpoint for the differnet IP's.
 - nonResourceURLs: ["/metrics"]
   verbs: ["get"]
 ---
-# A RoleBinding maps a Role to a user or set of users, granting that Role's 
+# A RoleBinding maps a Role to a user or set of users, granting that Role's
 # permissions to those users for resources in that namespace. A ClusterRole-
-# Binding allows users to be granted a ClusterRole for authorization across the 
+# Binding allows users to be granted a ClusterRole for authorization across the
 # entire cluster.
 #
 # TODO: Check if default account also needs to be there
@@ -85,6 +89,8 @@ apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   name: prometheus-deployment
+  labels:
+    k8s-app: prometheus
 spec:
   replicas: 1
   template:
@@ -102,12 +108,27 @@ spec:
             # exists as long as the Pod is running on that Node.
             # The data in an emptyDir volume is safe across container crashes.
             - "--storage.tsdb.path=/prometheus"
-            # How long to retain samples in the local storage. 
+            # How long to retain samples in the local storage.
             - "--storage.tsdb.retention=$(STORAGE_RETENTION)"
+            - "--web.console.libraries=/etc/prometheus/console_libraries"
+            - "--web.console.templates=/etc/prometheus/consoles"
+            - "--web.enable-lifecycle"
           ports:
             - containerPort: 9090
+          readinessProbe:
+            httpGet:
+              path: /-/ready
+              port: 9090
+            initialDelaySeconds: 30
+            timeoutSeconds: 30
+          livenessProbe:
+            httpGet:
+              path: /-/healthy
+              port: 9090
+            initialDelaySeconds: 30
+            timeoutSeconds: 30
           env:
-            # environment vars are stored in prometheus-env configmap. 
+            # environment vars are stored in prometheus-env configmap.
             - name: STORAGE_RETENTION
               valueFrom:
                 configMapKeyRef:
@@ -125,7 +146,6 @@ spec:
             limits:
               memory: "700M"
               cpu: "500m"
-          
           volumeMounts:
             # prometheus config file stored in the given mountpath
             - name: prometheus-server-volume
@@ -137,14 +157,14 @@ spec:
             - name: rules-volume
               mountPath: /etc/prometheus-rules
       volumes:
-        # Prometheus Config file will be stored in this volume 
+        # Prometheus Config file will be stored in this volume
         - name: prometheus-server-volume
           configMap:
             name: prometheus-config
         # All the time series stored in this volume in form of .db file.
         - name: prometheus-storage-volume
           # containers in the Pod can all read and write the same files here.
-          emptyDir: {} 
+          emptyDir: {}
         # Rules defined in configmap will be stored in this volume
         - name: rules-volume
           configMap:
@@ -156,6 +176,8 @@ apiVersion: v1
 kind: Service
 metadata:
   name: prometheus-service
+  labels:
+    k8s-app: prometheus
 spec:
   selector: # exposes any pods with the following labels as a service
     name: prometheus-server
@@ -176,6 +198,8 @@ apiVersion: extensions/v1beta1
 kind: DaemonSet
 metadata:
   name: node-exporter
+  labels:
+    k8s-app: node-exporter
 spec:
   template:
     metadata:
@@ -212,32 +236,32 @@ spec:
           mountPath: /root-disk
           readOnly: true
       # The Kubernetes scheduler’s default behavior works well for most cases
-      # -- for example, it ensures that pods are only placed on nodes that have 
-      # sufficient free resources, it ties to spread pods from the same set 
-      # (ReplicaSet, StatefulSet, etc.) across nodes, it tries to balance out 
+      # -- for example, it ensures that pods are only placed on nodes that have
+      # sufficient free resources, it ties to spread pods from the same set
+      # (ReplicaSet, StatefulSet, etc.) across nodes, it tries to balance out
       # the resource utilization of nodes, etc.
       #
       # But sometimes you want to control how your pods are scheduled. For example,
-      # perhaps you want to ensure that certain pods only schedule on nodes with 
-      # specialized hardware, or you want to co-locate services that communicate 
-      # frequently, or you want to dedicate a set of nodes to a particular set of 
+      # perhaps you want to ensure that certain pods only schedule on nodes with
+      # specialized hardware, or you want to co-locate services that communicate
+      # frequently, or you want to dedicate a set of nodes to a particular set of
       # users. Ultimately, you know much more about how your applications should be
       # scheduled and deployed than Kubernetes ever will.
       #
-      # “taints and tolerations,” allows you to mark (“taint”) a node so that no 
+      # “taints and tolerations,” allows you to mark (“taint”) a node so that no
       # pods can schedule onto it unless a pod explicitly “tolerates” the taint.
-      # toleration  is particularly useful for situations where most pods in 
+      # toleration  is particularly useful for situations where most pods in
       # the cluster should avoid scheduling onto the node. In our case we want
-      # node-exporter to run on master node also i.e, we want to collect metrics 
+      # node-exporter to run on master node also i.e, we want to collect metrics
       # from master node. That's why tolerations added.
       # if removed master's node metrics can't be scrapped by prometheus.
       tolerations:
       - effect: NoSchedule
         operator: Exists
       volumes:
-        # A hostPath volume mounts a file or directory from the host node’s 
+        # A hostPath volume mounts a file or directory from the host node’s
         # filesystem.For example, some uses for a hostPath are:
-        # running a container that needs access to Docker internals; use a hostPath 
+        # running a container that needs access to Docker internals; use a hostPath
         # of /var/lib/docker
         # running cAdvisor in a container; use a hostPath of /dev/cgroups
         - name: data-disk

@@ -26,7 +26,7 @@ spec:
         app: grafana
     spec:
       containers:
-      - image: grafana/grafana:5.0.0-beta4
+      - image: grafana/grafana:5.2.0
         name: grafana
         imagePullPolicy: Always
         ports:
