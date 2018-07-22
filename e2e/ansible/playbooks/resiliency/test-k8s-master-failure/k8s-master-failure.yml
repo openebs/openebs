@@ -245,37 +245,31 @@
           ns: "{{ namespace }}"
           app: jenkins
 
+
      - name: 8a)  Check if the replica is rebuilded using mayactl commands
        include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/access-mode-check.yml"
        vars:
          ns: "{{ namespace }}"
 
-   
- 
-     - name: 9)  Get a job configuration from previous build( get,create and build the job )
-       shell: >
-         source ~/.profile; kubectl exec {{ jenkins_pod_name.stdout }} -n {{ namespace }}
-         -- bash -c "java -jar /var/jenkins_home/jenkins-cli.jar -s
-         http://localhost:8080 get-job sample > /var/jenkins_home/template.xml";
-         source ~/.profile; kubectl exec {{ jenkins_pod_name.stdout }} -n {{ namespace }}
-         -- bash -c "java -jar /var/jenkins_home/jenkins-cli.jar -s 
-         http://localhost:8080 create-job sample2 < /var/jenkins_home/template.xml";
-         source ~/.profile; kubectl exec {{ jenkins_pod_name.stdout }} -n {{ namespace }}
-         -- bash -c "java -jar /var/jenkins_home/jenkins-cli.jar -s 
-         http://localhost:8080 build sample2 "
+     - name: 9)  Run  the Build command script file inside jenkins pod.
+       shell:  >
+          source ~/.profile; kubectl exec {{  jenkins_pod_name.stdout }} -n {{ namespace }}
+          -- bash -c "sh /var/jenkins_home/Build_config.sh"
        args:
          executable: /bin/bash
        delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
+         
 
      - name: 9a)  Running a build job and building the job.
        shell: >
           source ~/.profile; kubectl exec {{ jenkins_pod_name.stdout }} -n {{ namespace }}
-          -- bash -c "java -jar /var/jenkins_home/jenkins-cli.jar -s http://localhost:8080 console sample2"
+          -- bash -c "java -jar /var/jenkins_home/jenkins-cli.jar -s http://localhost:8080 console Test"
        args:
          executable: /bin/bash
        delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
        register: Second_Build
+
 
      - name: Check for result build from previous job config file.
        set_fact:

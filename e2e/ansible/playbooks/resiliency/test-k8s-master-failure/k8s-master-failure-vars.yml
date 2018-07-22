@@ -13,6 +13,7 @@ namespace: k8s-master-failure
 job_config_files:
   - template.xml
   - config_change.sh
+  - Build_config.sh
 
 
 test_pod_regex: maya*|openebs*|pvc*|jenkins*
