@@ -9,6 +9,11 @@
   delay: 5
   retries: 3
 
+- name: Change snapshot label to name from app
+  shell: "sed -i 's/app: openebs-snapshot-controller/name: openebs-snapshot-controller/g' {{ ansible_env.HOME }}/{{ openebs_operator_alias }}"
+  args:
+    executable: /bin/bash
+
 - name: Change m-apiserver image to desired tag in operator YAML
   replace:
     path: "{{ ansible_env.HOME }}/{{ openebs_operator_alias }}" 
@@ -58,7 +63,7 @@
 - name: Deploy the openebs operator yml
   shell: >
     source ~/.profile; 
-    kubectl apply -f {{ openebs_operator_alias }} 
+    kubectl apply -f {{ ansible_env.HOME }}/{{ openebs_operator_alias }} 
     | grep deployment | awk '{print $2}'
     | tr -d '"'
   args:
@@ -103,7 +108,7 @@
   retries: 3
 
 - name: Deploy the openebs storageclasses yml
-  shell: source ~/.profile; kubectl apply -f {{ openebs_storageclasses_alias }}
+  shell: source ~/.profile; kubectl apply -f {{ ansible_env.HOME }}/{{ openebs_storageclasses_alias }}
   args:
     executable: /bin/bash
 

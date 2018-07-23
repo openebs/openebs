@@ -170,7 +170,7 @@
           args:
             executable: /bin/bash
           register: pv_out
-          until: "'{{ pv_name.stdout }}' not in pv_out.stdout"
+          until: " 'pv_name.stdout' not in pv_out.stdout"
           delay: 120
           retries: 5
           delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"

@@ -14,6 +14,8 @@ patch_file: replica_patch.yaml
 
 create_sc: storage-class.yml
 
+percona_file: percona-openebs-deployment.yaml
+
 test_artifacts:
   -  storage-class.yml
   -  replica_patch.yaml
