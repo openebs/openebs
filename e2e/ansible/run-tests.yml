@@ -159,6 +159,14 @@
   roles:
     - {role: logging, when: logging | bool and deployment_mode == "hyperconverged"}
 ###########################################################################################
+# TC NAME: test-k8s-master-failure
+# TC DETAILS: Test openebs behaviour when master nodes undergoes ungraceful shutdown
+# TC NOTES:
+#
+- include: playbooks/resiliency/test-k8s-master-failure/k8s-master-failure.yml 
+  when: is_vagrant_vm == "true"
+##########################################################################################
+
 - hosts: localhost
   tasks:
     - slack: 
