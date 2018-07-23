@@ -53,7 +53,7 @@
   delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
 - name:  Apply storage class yaml
-  shell: kubectl apply -f "{{ create_sc }}"
+  shell: source ~/.profile; kubectl apply -f "{{ create_sc }}"
   args:
     executable: /bin/bash
   register: sc_out
