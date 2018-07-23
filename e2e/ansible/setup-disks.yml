@@ -1,0 +1,4 @@
+---
+- hosts: localhost
+  roles:
+    - {role: k8s-gke, when: cloud_provider == "GCP"} 

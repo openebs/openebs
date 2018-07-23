@@ -1,0 +1,26 @@
+---
+- name: Get the details of the available nodes
+  shell: kubectl get nodes | grep gke | awk {'print $1'}
+  args:
+    executable: /bin/bash
+  register: result_node
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+- name: Creating random name for the disks
+  shell: echo $(mktemp)| tr '[:upper:]' '[:lower:]' | cut -d '.' -f 2
+  args:
+    executable: /bin/bash
+  register: name
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+- name: Creating the required number of disk 
+  shell: >
+    for ((i=0; i< "{{ disk_count }}"; i++));do
+      gcloud compute disks create {{ item }}-{{ name.stdout }}-${i}  --size "{{ disk_size }}" --type "{{ disk_type }}" --zone "{{ cluster_zone }}" &&
+      gcloud compute instances attach-disk {{ item }} --disk {{ item }}-{{ name.stdout }}-${i} --zone "{{ cluster_zone }}"
+    done
+  args:
+    executable: /bin/bash 
+  register: result_disk
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+  with_items: "{{ result_node.stdout_lines }}"

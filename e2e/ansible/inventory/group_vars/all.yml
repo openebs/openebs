@@ -91,3 +91,7 @@ build_type: normal
 
 # In case , if you want to deploy openebs in the cluster in managed kubernetes services, specify "cluster_type= managed". By default specifying the cluster_type to local.
 cluster_type: hosted
+
+# This allows us to select the tool to create the disks based on the cloud the disks are being created on:
+# Accepted Entries: GCP, AWS
+cloud_provider: GCP
