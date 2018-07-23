@@ -10,7 +10,7 @@
     app: percona
 
 - name: Delete nodeeviction ns
-  shell: kubectl delete ns {{ namespace }}
+  shell: source ~/.profile; kubectl delete ns {{ namespace }}
   args:
     executable: /bin/bash
   register: ns_out
