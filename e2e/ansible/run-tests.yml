@@ -8,6 +8,12 @@
         msg: "{{ ansible_date_time.time }} OPENEBS TESTSUITE: STARTED"
       when: slack_notify | bool and lookup('env','SLACK_TOKEN')
 ##########################################################################################
+# TC NAME: pre-check
+# TC DETAILS: Delete residue of playbooks before running the run-tests again
+# TC NOTES:
+#
+- include: pre-check.yml
+##########################################################################################
 # TC NAME: test-node-failure
 # TC DETAILS: Test openebs behaviour when one of the nodes undergoes ungraceful shutdown
 # TC NOTES:
@@ -19,13 +25,13 @@
 # TC DETAILS: Test openebs behaviour when kubelet service is not running on one of the node
 # TC NOTES:
 #
-- include: playbooks/resiliency/test-kubelet-service-stop/test-kubelet-service-stop.yml
+#- include: playbooks/resiliency/test-kubelet-service-stop/test-kubelet-service-stop.yml
 ##########################################################################################
 # TC NAME: test-kubectl-snapshot
 # TC DETAILS: Test to perform basic snapshot/clones using k8s api's
 # TC NOTES:
 #
-- include: playbooks/feature/snapshots/kubectl_snapshot/test-kubectl-snapshot.yml
+#- include: playbooks/feature/snapshots/kubectl_snapshot/test-kubectl-snapshot.yml
 ###########################################################################################
 # TC NAME: test-k8s-memleak
 # TC DETAILS: Test memory consumption on k8s cluster with openebs storage
@@ -73,7 +79,7 @@
 # TC DETAILS: Creates a mysql application snapshot on openebs volume and restore database 
 # TC NOTES:           
 #    
-- include: playbooks/feature/snapshots/percona-mysql/mysql-snapshot.yml
+#- include: playbooks/feature/snapshots/percona-mysql/mysql-snapshot.yml
 #
 ###########################################################################################
 # TC NAME: basic-ha-pod-reschedule  
@@ -94,6 +100,7 @@
 #
 - include: playbooks/resiliency/test-ctrl-failure/test-ctrl-failure.yml
 - include: pre-check.yml
+  when: is_vagrant_vm == "true"
 ##########################################################################################
 # TC NAME: volume_single_replica_pod_kill
 # TC DETAILS: Tests resiliency upon random openebs replica failures (single) caused by chaoskube
@@ -139,6 +146,7 @@
 # TC NOTES:
 - include: playbooks/hyperconverged/test-scaleup-cassandra-pods/test-scaleup-cassandra-pods.yml
 - include: pre-check.yml
+  when: is_vagrant_vm == "true"
 ##########################################################################################
 # TC NAME: Application-upgrade-test
 # TC DETAILS: Verify data availability post application rolling upgrade.
@@ -154,6 +162,12 @@
 # TC DETAILS: Verify scaledup openebs replicas has data sync.
 # TC NOTES:
 - include: playbooks/hyperconverged/test-scaleup-storage-replicas/test-scaleup-storage-replicas.yml
+##########################################################################################
+# TC NAME: pre-check
+# TC DETAILS: Delete residue of playbooks before running the run-tests again
+# TC NOTES:
+#
+- include: pre-check.yml
 ##########################################################################################
 - hosts: localhost
   roles:
