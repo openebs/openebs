@@ -179,7 +179,11 @@
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
        - name: Check the available replicas in deployment
+<<<<<<< HEAD
          shell: source ~/.profile; kubectl get deploy -n {{ namespace }} | grep "{{ pv_name.stdout }}" | grep rep | awk '{print $2}'
+=======
+         shell: kubectl get deploy -n {{ namespace }} | grep "{{ pv_name.stdout }}" | grep rep | awk '{print $2}'
+>>>>>>> 3a7448fe5e141b4761d9e5f788cecb77abca4caf
          args:
            executable: /bin/bash
          register: available_pods

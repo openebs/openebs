@@ -2,7 +2,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: demo-snap-vol-claim
-  namespace: k8s-snapshot
+  namespace: default
   annotations:
     snapshot.alpha.kubernetes.io/snapshot: snapshot-demo
 spec:
@@ -11,4 +11,3 @@ spec:
   resources:
     requests:
       storage: 5Gi
-

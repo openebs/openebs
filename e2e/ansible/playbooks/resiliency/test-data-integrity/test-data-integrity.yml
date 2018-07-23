@@ -51,11 +51,11 @@
           with_items: "{{ fio_files }}"
           delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
-        - name: 3) Check if snapshot-controller is running.
+        - name: 3) Check if snapshot-operator is running.
           include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
           vars:
             ns: openebs
-            app: openebs-snapshot-controller
+            app: openebs-snapshot-operator
 
         - name: 4) Create test specific namespace
           shell: source ~/.profile; kubectl create ns {{ namespace }}

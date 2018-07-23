@@ -114,7 +114,7 @@
 
        - name: 5c) Copy replica_patch.yaml to master
          copy:
-           src: "{{ patch_file }}"
+           src: "{{ result_kube_home.stdout }}/{{ patch_file }}"
            dest: "{{ result_kube_home.stdout }}"
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
@@ -134,14 +134,14 @@
 
        - name: 6b) Update first node name in replica_patch file
          replace:
-           path: "{{ patch_file }}"
+           path: "{{ result_kube_home.stdout }}/{{ patch_file }}"
            regexp: 'nodename_where_replica_pod_1_got_scheduled'
            replace: '{{ node1.stdout }}'
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
        - name: 6c) Update second node name in replica_patch file
          replace:
-           path: "{{ patch_file }}"
+           path: "{{ result_kube_home.stdout }}/{{ patch_file }}"
            regexp: 'nodename_where_replica_pod_2_got_scheduled'
            replace: '{{ node2.stdout }}'
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
@@ -154,7 +154,11 @@
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
        - name: 7a) Update the replica deployment with node affinity property
+<<<<<<< HEAD
          shell: source ~/.profile; kubectl patch deployment "{{ deploy_name.stdout }}" -n "{{namespace}}" -p "$(cat replica_patch.yml)"
+=======
+         shell: kubectl patch deployment "{{ deploy_name.stdout }}" -n "{{namespace}}" -p "$(cat {{ result_kube_home.stdout }}/replica_patch.yml)"
+>>>>>>> 3a7448fe5e141b4761d9e5f788cecb77abca4caf
          args:
            executable: /bin/bash
          register: patch_out

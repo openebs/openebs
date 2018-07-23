@@ -79,7 +79,7 @@ spec:
       containers:
       - name: maya-apiserver
         imagePullPolicy: Always
-        image: openebs/m-apiserver:0.6.0-RC2
+        image: openebs/m-apiserver:0.6.0
         ports:
         - containerPort: 5656
         env:
@@ -94,11 +94,11 @@ spec:
         #- name: OPENEBS_IO_K8S_MASTER
         #  value: "http://172.28.128.3:8080"
         - name: OPENEBS_IO_JIVA_CONTROLLER_IMAGE
-          value: "openebs/jiva:0.6.0-RC2"
+          value: "openebs/jiva:0.6.0"
         - name: OPENEBS_IO_JIVA_REPLICA_IMAGE
-          value: "openebs/jiva:0.6.0-RC2"
+          value: "openebs/jiva:0.6.0"
         - name: OPENEBS_IO_VOLUME_MONITOR_IMAGE
-          value: "openebs/m-exporter:0.6.0-RC2"
+          value: "openebs/m-exporter:0.6.0"
         - name: OPENEBS_IO_JIVA_REPLICA_COUNT
           value: "3"
         # DEFAULT_CONTROLLER_NODE_SELECTOR allows your to specify the nodes
@@ -151,7 +151,7 @@ spec:
       containers:
       - name: openebs-provisioner
         imagePullPolicy: Always
-        image: openebs/openebs-k8s-provisioner:0.6.0-RC2
+        image: openebs/openebs-k8s-provisioner:0.6.0
         env:
         # OPENEBS_IO_K8S_MASTER enables openebs provisioner to connect to K8s
         # based on this address. This is ignored if empty.
@@ -188,7 +188,7 @@ spec:
 apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
-  name: openebs-snapshot-controller
+  name: openebs-snapshot-operator
   namespace: openebs
 spec:
   replicas: 1
@@ -197,12 +197,12 @@ spec:
   template:
     metadata:
       labels:
-        app: openebs-snapshot-controller
+        name: openebs-snapshot-operator
     spec:
       serviceAccountName: openebs-maya-operator
       containers:
         - name: snapshot-controller
-          image: openebs/snapshot-controller:0.6.0-RC2
+          image: openebs/snapshot-controller:0.6.0
           imagePullPolicy: Always
           env:
           - name: OPENEBS_NAMESPACE
@@ -210,7 +210,7 @@ spec:
               fieldRef:
                 fieldPath: metadata.namespace
         - name: snapshot-provisioner
-          image: openebs/snapshot-provisioner:0.6.0-RC2
+          image: openebs/snapshot-provisioner:0.6.0
           imagePullPolicy: Always
           env:
           - name: OPENEBS_NAMESPACE
@@ -278,7 +278,7 @@ parameters:
 kind: StorageClass
 apiVersion: storage.k8s.io/v1
 metadata:
-  name: snapshot-promoter
+  name: openebs-snapshot-promoter
 provisioner: volumesnapshot.external-storage.k8s.io/snapshot-promoter
 ---
 apiVersion: apiextensions.k8s.io/v1beta1
