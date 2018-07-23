@@ -163,7 +163,7 @@
         #### Delete the replica which is scheduled before scale up to check newly crated replica is in sync"
 
        - name: Delete the replica which is scheduled before scale up
-         shell: kubectl delete pod {{ old_replica_name.stdout }} -n "{{ namespace }}"
+         shell: source ~/.profile; kubectl delete pod {{ old_replica_name.stdout }} -n "{{ namespace }}"
          args:
            executable: /bin/bash
          register: pod_delete
