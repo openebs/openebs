@@ -12,7 +12,7 @@ Vagrant.configure("2") do |config|
 
   # Every Vagrant development environment requires a box. You can search for
   # boxes at https://atlas.hashicorp.com/search.
-  config.vm.box = "ubuntu/xenial64"
+config.vm.box = "openebs/k8s-1.8.8-ubuntu"
 
   # Disable automatic box update checking. If you disable this, then
   # boxes will only be checked for updates when the user runs
@@ -77,36 +77,36 @@ Vagrant.configure("2") do |config|
   # SHELL
 
  # Machines for HyperConverged(HC) setup 
-  config.vm.define "HCMaster" do |vmCfg|
+  config.vm.define "hcmaster" do |vmCfg|
     vmCfg.vm.network "private_network", ip: "172.28.128.31"
-    vmCfg.vm.hostname = "HCMaster"
+    vmCfg.vm.hostname = "hcmaster"
 
     vmCfg.vm.provision :shell,
     inline: "sudo apt-get install -y python-minimal",
     privileged: true
   end
 
-  config.vm.define "HCHost-01" do |vmCfg|
+  config.vm.define "hchost-01" do |vmCfg|
     vmCfg.vm.network "private_network", ip: "172.28.128.32"
-    vmCfg.vm.hostname = "HCHost-01"
+    vmCfg.vm.hostname = "hchost-01"
 
     vmCfg.vm.provision :shell,
     inline: "sudo apt-get install -y python-minimal",
     privileged: true        
   end
 
-  config.vm.define "HCHost-02" do |vmCfg|
+  config.vm.define "hchost-02" do |vmCfg|
     vmCfg.vm.network "private_network", ip: "172.28.128.33"
-    vmCfg.vm.hostname = "HCHost-02"
+    vmCfg.vm.hostname = "hchost-02"
 
     vmCfg.vm.provision :shell,
     inline: "sudo apt-get install -y python-minimal",
     privileged: true    
   end
  
-  config.vm.define "HCHost-03" do |vmCfg|
+  config.vm.define "hchost-03" do |vmCfg|
     vmCfg.vm.network "private_network", ip: "172.28.128.34"
-    vmCfg.vm.hostname = "HCHost-03"
+    vmCfg.vm.hostname = "hchost-03"
 
     vmCfg.vm.provision :shell,
     inline: "sudo apt-get install -y python-minimal",
