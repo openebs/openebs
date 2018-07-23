@@ -66,7 +66,7 @@
        vars:
           app_yml: "{{ pod_yaml_alias }}"
           ns: "{{ namespace }}"
-    
+
      - name: 3a) Confirm jenkins pod status.
        include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
        vars:
@@ -113,7 +113,7 @@
 
      - name: 4b) Copy job configuration files to jenkins-pod from master.
        shell: >
-         source ~/.profile; kubectl cp {{result_kube_home.stdout}}/{{item}} 
+         source ~/.profile; kubectl cp {{result_kube_home.stdout}}/{{item}}
          {{namespace}}/{{ jenkins_pod_name.stdout }}:/var/jenkins_home/
        args:
          executable: /bin/bash
@@ -150,7 +150,7 @@
          executable: /bin/bash
        delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
- 
+
      - name: wait for 60 seconds.
        wait_for:
           timeout: 60
@@ -158,17 +158,17 @@
 
      - name: 6)  Create and Build one sample job (Hello World)  inside pod.
        shell: >
-         source ~/.profile; kubectl exec {{ jenkins_pod_name.stdout }} -n {{ namespace }} 
+         source ~/.profile; kubectl exec {{ jenkins_pod_name.stdout }} -n {{ namespace }}
          -- bash -c "java -jar /var/jenkins_home/jenkins-cli.jar -s
          http://localhost:8080 create-job sample < /var/jenkins_home/template.xml";
-         source ~/.profile; kubectl exec {{ jenkins_pod_name.stdout }} -n {{ namespace  }} 
+         source ~/.profile; kubectl exec {{ jenkins_pod_name.stdout }} -n {{ namespace  }}
          -- bash -c "java -jar /var/jenkins_home/jenkins-cli.jar -s http://localhost:8080 build sample"
        args:
          executable: /bin/bash
        delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
 
-     - name: 6a)  Running a build job. 
+     - name: 6a)  Running a build job.
        shell: >
           source ~/.profile; kubectl exec {{ jenkins_pod_name.stdout }} -n {{ namespace }}
           -- bash -c "java -jar /var/jenkins_home/jenkins-cli.jar -s http://localhost:8080 console sample"
@@ -203,7 +203,7 @@
      - name: Bring up the kubemaster.
        include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/vagrant-halt-up-task.yml"
        vars:
-         vagrant_op: up 
+         vagrant_op: up
          nodename: kubemaster-01
 
      - name: wait for 120 seconds.
@@ -225,8 +225,8 @@
          executable: /bin/bash
        register: pv_name
        delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
- 
- 
+
+
      - name: Check the number of  available replicas in deployment
        shell: kubectl get deploy -n {{ namespace }} | grep "{{ pv_name.stdout }}" | grep rep | awk '{print $2}'
        args:
@@ -259,7 +259,7 @@
          executable: /bin/bash
        delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
-         
+
 
      - name: 9a)  Running a build job and building the job.
        shell: >
@@ -274,7 +274,7 @@
      - name: Check for result build from previous job config file.
        set_fact:
          flag: "Test Passed"
-       when: "'Hello World!' in Second_Build.stdout" 
+       when: "'Hello World!' in Second_Build.stdout"
 
 
 
