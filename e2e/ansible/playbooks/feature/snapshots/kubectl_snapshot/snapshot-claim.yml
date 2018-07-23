@@ -6,7 +6,7 @@ metadata:
   annotations:
     snapshot.alpha.kubernetes.io/snapshot: snapshot-demo
 spec:
-  storageClassName: snapshot-promoter
+  storageClassName: openebs-snapshot-promoter
   accessModes: [ "ReadWriteOnce" ]
   resources:
     requests:
