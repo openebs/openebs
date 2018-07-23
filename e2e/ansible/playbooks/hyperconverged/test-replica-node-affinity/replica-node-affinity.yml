@@ -164,7 +164,7 @@
          retries: 5
 
        - name: 8) Get pod name
-         shell: kubectl get pods -n "{{ namespace }}" -o wide | grep rep | grep "{{ node1.stdout }}" | awk '{print $1}'
+         shell: kubectl get pods -n "{{ namespace }}" -o wide | grep "{{ pv_name.stdout }}" | grep rep | grep "{{ node1.stdout }}" | awk '{print $1}'
          args:
            executable: /bin/bash
          register: pod_name
