@@ -8,7 +8,8 @@ import subprocess
 import time, os, sys
 list = []
 namespace = sys.argv[1]
-cmd_cntrl_name = "kubectl get pod -n %s -l openebs/controller=jiva-controller --no-headers | awk '{print $1}'" %(namespace)
+cmd_cntrl_name = "source ~/.profile; kubectl get pod -n %s -l openebs/controller=jiva-controller --no-headers | awk '{print $1}'" %(namespace)
+print cmd_cntrl_name
 out = subprocess.Popen(cmd_cntrl_name,stdout=subprocess.PIPE,shell=True)
 cntrl_name = out.communicate()
 cntrl_pod_name = cntrl_name[0].strip('\n')
@@ -16,7 +17,8 @@ n = cntrl_pod_name.split('-')
 lst = n[:len(n)-2]
 lst.append("con")
 container_name = "-".join(lst)
-used_mem_process = "kubectl exec %s -c %s -n %s -- pmap -x 1 | awk ''/total'/ {print $3}'" %(cntrl_pod_name,container_name,namespace)
+print container_name
+used_mem_process = "source ~/.profile; kubectl exec %s -c %s -n %s -- pmap -x 1 | awk ''/total'/ {print $3}'" %(cntrl_pod_name,container_name,namespace)
 print used_mem_process
 n = 10
 count = 0

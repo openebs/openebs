@@ -43,7 +43,7 @@ k8s_images:
 
 k8s_master_scripts: 
   - https://raw.githubusercontent.com/openebs/openebs/master/k8s/lib/scripts/configure_k8s_master.sh
-  - https://raw.githubusercontent.com/openebs/openebs/master/k8s/lib/scripts/configure_k8s_weave.sh
+  - https://raw.githubusercontent.com/openebs/openebs/master/k8s/lib/scripts/configure_k8s_cni.sh
 
 # Container images that needs to be placed in K8s-master box
 # These images will be downloaded, tar'ed and pushed into K8s-master role's .files 
