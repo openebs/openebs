@@ -48,7 +48,7 @@
 - block:
 
     - name: 4) Checking if the tiller service account already exists.
-      shell: kubectl get sa -n kube-system | grep tiller
+      shell: source ~/.profile; kubectl get sa -n kube-system | grep tiller
       args:
         executable: /bin/bash
       register: sa
@@ -59,7 +59,7 @@
   rescue:
      
     - name: 4a) Creating the service account
-      shell: kubectl -n kube-system create sa tiller
+      shell: source ~/.profile; kubectl -n kube-system create sa tiller
       args:
         executable: /bin/bash
       register: tiller
@@ -70,7 +70,7 @@
 - block:
 
      - name: 5) Checking if the tiller cluster role binding already exists.
-       shell: kubectl get clusterrolebinding | grep tiller
+       shell: source ~/.profile; kubectl get clusterrolebinding | grep tiller
        args:
          executable: /bin/bash
        register: cr
@@ -81,7 +81,7 @@
   rescue:
 
      - name: 5a) Creating the cluster rolebinding.
-       shell: kubectl create clusterrolebinding tiller --clusterrole cluster-admin --serviceaccount=kube-system:tiller
+       shell: source ~/.profile; kubectl create clusterrolebinding tiller --clusterrole cluster-admin --serviceaccount=kube-system:tiller
        args:
          executable: /bin/bash
        register: crb
@@ -95,7 +95,7 @@
     dest: "{{ result_kube_home.stdout }}"
 
 - name : 6a) Updating the tiller-deploy deployment with the service account.
-  shell: kubectl -n kube-system patch deploy/tiller-deploy -p "$(cat {{result_kube_home.stdout}}/{{ update_deploy_file }})"
+  shell: source ~/.profile; kubectl -n kube-system patch deploy/tiller-deploy -p "$(cat {{result_kube_home.stdout}}/{{ update_deploy_file }})"
   args:
     executable: /bin/bash
   register: tiller_deploy
@@ -106,7 +106,9 @@
 # Installing openebs using stable chart in openebs namespace. The chart will be created with some random name.
 # We can verify it using "helm ls --all" command.
 - name: 7) Installing openebs using stable charts.
-  shell: helm install stable/openebs --set apiserver.imageTag={{ apiserver_version }} --set provisioner.imageTag={{ provisioner_version }} --set jiva.imageTag={{ jiva_version}} --namespace {{ namespace }}
+  shell: >
+    helm install stable/openebs --set apiserver.imageTag={{ apiserver_version }} --set provisioner.imageTag={{ provisioner_version }} --set jiva.imageTag={{ jiva_version}} 
+    --set snapshotOperator.provisioner.imageTag={{ snapshot_provisioner_version }} --set snapshotOperator.controller.imageTag={{ snapshot_controller_version }} --namespace {{ namespace }}
   args:
     executable: /bin/bash
   register: openebs_out
@@ -114,8 +116,10 @@
   delay: 120
   retries: 5
 
+# Checking if the OpenEBS components such as provisioner, apiserver and snapshot operator are up and running.
+
 - name: 8) Checking if the provisioner is up.
-  shell: kubectl get pods -n "{{ namespace }}" | grep "provisioner"
+  shell: source ~/.profile; kubectl get pods -n "{{ namespace }}" | grep "provisioner"
   args:
     executable: /bin/bash
   register: deployment
@@ -124,7 +128,7 @@
   retries: 15
 
 - name: 8a) Checking if the openebs-apiserver is up.
-  shell: kubectl get pods -n "{{ namespace }}" | grep "apiserver"
+  shell: source ~/.profile; kubectl get pods -n "{{ namespace }}" | grep "apiserver"
   args:
     executable: /bin/bash
   register: api_server
@@ -132,8 +136,17 @@
   delay: 60
   retries: 15
 
+- name: 8b) Checking of the snapshot-operator is up.
+  shell: source ~/.profile; kubectl get pods -n {{ namespace }} | grep "snapshot-operator"
+  args:
+    executable: /bin/bash
+  register: operator
+  until: "'Running' in operator.stdout"
+  delay: 60
+  retries: 15 
+
 - name: 9) Creating the default storage classes
-  shell: kubectl apply -f "{{ storage_classes }}"
+  shell: source ~/.profile; kubectl apply -f "{{ storage_classes }}"
   args:
     executable: /bin/bash
 

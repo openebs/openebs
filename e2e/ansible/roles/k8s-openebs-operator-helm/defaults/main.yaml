@@ -11,5 +11,7 @@ provisioner_version: ci
 
 jiva_version: ci
 
+snapshot_provisioner_version: ci
 
+snapshot_controller_version: ci
 
