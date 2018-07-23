@@ -41,7 +41,7 @@
           delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
 
         - name: Getting the node name
-          shell: kubectl get nodes -o wide  | awk {'print $1'} | awk 'FNR == 4{print}'
+          shell: source ~/.profile; kubectl get nodes -o wide  | awk {'print $1'} | awk 'FNR == 4{print}'
           args:
             executable: /bin/bash
           register: node_name
@@ -50,7 +50,7 @@
 # Creating label "app=percona" for a node, so that node selector tag can be used in next task.
 
         - name: Creating label for the node
-          shell: kubectl label nodes {{node_name.stdout}} app=percona
+          shell: source ~/.profile; kubectl label nodes {{node_name.stdout}} app=percona
           args:
             executable: /bin/bash
           register: label
@@ -60,7 +60,7 @@
           retries: 3
 
         - name: Creating test specific namespace
-          shell: kubectl create ns "{{ namespace }}"
+          shell: source ~/.profile; kubectl create ns "{{ namespace }}"
           args:
             executable: /bin/bash
           delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
@@ -76,7 +76,7 @@
           retries: 5
 
         - name: Checking if the application is deployed successfully
-          shell: kubectl get pods -n "{{ namespace }}" --show-labels | grep "{{ app_label }}"
+          shell: source ~/.profile; kubectl get pods -n "{{ namespace }}" --show-labels | grep "{{ app_label }}"
           args:
             executable: /bin/bash
           register: app_status
@@ -86,14 +86,14 @@
           retries: 15
 
         - name: Getting PV name from the pvc
-          shell: kubectl get pvc {{ claim_name }} -n "{{ namespace }}" -o custom-columns=:spec.volumeName --no-headers
+          shell: source ~/.profile; kubectl get pvc {{ claim_name }} -n "{{ namespace }}" -o custom-columns=:spec.volumeName --no-headers
           args:
             executable: /bin/bash
           register: pv
           delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
 
         - name: Getting the controller service IP address
-          shell: kubectl get svc -n "{{ namespace }}" | grep "{{ pv.stdout }}" | grep ctrl | awk {'print $3'}
+          shell: source ~/.profile; kubectl get svc -n "{{ namespace }}" | grep "{{ pv.stdout }}" | grep ctrl | awk {'print $3'}
           args:
             executable: /bin/bash
           register: target_IP
@@ -167,7 +167,7 @@
           delegate_to: "{{ groups['kubernetes-kubemasters'].0}}"
 
         - name: Getting the replica pod names
-          shell:  kubectl get pods --all-namespaces --show-labels | grep openebs/replica=jiva-replica | awk {'print $2'} | awk 'FNR == {{ item }} {print}'
+          shell: source ~/.profile; kubectl get pods --all-namespaces --show-labels | grep openebs/replica=jiva-replica | awk {'print $2'} | awk 'FNR == {{ item }} {print}'
           args:
             executable: /bin/bash
           register: pods
@@ -178,7 +178,7 @@
           delegate_to: "{{ groups['kubernetes-kubemasters'].0}}"
 
         - name: Deleting all replica pods at once
-          shell: sleep 30; kubectl delete pod "{{ pods.results[0].stdout }}" "{{pods.results[1].stdout}}" "{{pods.results[2].stdout}}" -n "{{ namespace }}"
+          shell: sleep 30; source ~/.profile; kubectl delete pod "{{ pods.results[0].stdout }}" "{{pods.results[1].stdout}}" "{{pods.results[2].stdout}}" -n "{{ namespace }}"
           args:
             executable: /bin/bash
           register: delete_pod
@@ -188,7 +188,7 @@
           retries: 5
 
         - name: Checking if the replica pods are created again.
-          shell: kubectl get pods -n "{{ namespace }}" --show-labels | grep "{{ pv.stdout }}" | grep "{{ replica_label }}" | grep Running | wc -l
+          shell: source ~/.profile; kubectl get pods -n "{{ namespace }}" --show-labels | grep "{{ pv.stdout }}" | grep "{{ replica_label }}" | grep Running | wc -l
           args:
             executable: /bin/bash
           register: result
@@ -251,14 +251,14 @@
           wait_for: timeout=120
 
         - name: Getting application pod
-          shell: kubectl get pods --all-namespaces --show-labels | grep {{ app_label }} | awk {'print $2'}
+          shell: source ~/.profile; kubectl get pods --all-namespaces --show-labels | grep {{ app_label }} | awk {'print $2'}
           args:
             executable: /bin/bash
           register: app
           delegate_to: "{{ groups['kubernetes-kubemasters'].0}}"
 
         - name: Deleting the application pod
-          shell: kubectl delete pod {{ app.stdout }} -n "{{ namespace }}" --grace-period=0 --force
+          shell: source ~/.profile; kubectl delete pod {{ app.stdout }} -n "{{ namespace }}" --grace-period=0 --force
           args:
             executable: /bin/bash
           register: delete_app
@@ -268,7 +268,7 @@
           retries: 5
 
         - name: Check if the application pod is running
-          shell: kubectl get pods -n "{{ namespace }}" --show-labels | grep "{{app_label}}"
+          shell: source ~/.profile; kubectl get pods -n "{{ namespace }}" --show-labels | grep "{{app_label}}"
           args:
             executable: /bin/bash
           register: app_out
