@@ -152,6 +152,7 @@
 
         - name: 8d) Obtaining the controller container name
           shell: >
+           source ~/.profile;
            kubectl get pods {{ result_new_ctrl.stdout }} -n {{ namespace}}
            -o jsonpath='{.spec.containers[*].name}' | awk '{print $1}'
           args:
@@ -173,6 +174,7 @@
 
         - name: 10) Check if the ctrl and replica pods are running
           shell: >
+           source ~/.profile;
            kubectl get pods -n "{{ namespace }}"
            | grep {{result_snap_pv.stdout}} | grep "{{ item }}"
           args:
@@ -221,7 +223,7 @@
 
         - name: 12) Verify the data integrity check
           shell: >
-            kubectl logs "{{ result_read_pod.stdout }}" -n "{{ namespace }}"
+            source ~/.profile; kubectl logs "{{ result_read_pod.stdout }}" -n "{{ namespace }}"
             | grep -i error | cut -d ":" -f 2
             | sort | uniq
           args:

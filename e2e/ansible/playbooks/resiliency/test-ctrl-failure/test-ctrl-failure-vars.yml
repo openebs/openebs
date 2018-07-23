@@ -23,8 +23,6 @@ replace_with:
 
 namespace: ctrl-failure
 
-utils_path: openebs/e2e/ansible/playbooks/utils
-
 chaos_duration: 120
 
 chaos_interval: 20
