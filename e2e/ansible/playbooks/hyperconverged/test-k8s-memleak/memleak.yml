@@ -102,7 +102,7 @@
        become: true
        delegate_to: "{{groups['kubernetes-kubeminions'].0}}"
        register: result
-       util: "result.rc == 0"
+       util: "'0' in result.rc"
        delay: 30
        retries: 15
 
