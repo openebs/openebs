@@ -1,8 +1,6 @@
 ---
 test_name: mysql_snap_create_revert 
 
-utils_path: openebs/e2e/ansible/playbooks/utils
-
 test_log_path: setup/logs/mysql_snap_create_revert.log
 
 test_pod_regex: maya*|openebs*|pvc*|percona*
