@@ -85,7 +85,7 @@
          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
 
        - name: 5a) Obtaining storage classes yaml
-         shell: kubectl get sc openebs-percona -o yaml > "{{ create_sc }}"
+         shell: source ~/.profile; kubectl get sc openebs-percona -o yaml > "{{ create_sc }}"
          args:
            executable: /bin/bash
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
@@ -98,7 +98,7 @@
          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
 
        - name:  5c) Delete the existing storage class and create new one
-         shell: kubectl delete sc openebs-percona; kubectl apply -f "{{ create_sc }}"
+         shell: source ~/.profile; kubectl delete sc openebs-percona; kubectl apply -f "{{ create_sc }}"
          args:
            executable: /bin/bash
          register: result_sc_out
@@ -114,7 +114,7 @@
          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
 
        - name: 6a) Create the configmap test
-         shell: kubectl create configmap sqltest --from-file=sql-test.sh  -n {{ namespace }}
+         shell: source ~/.profile; kubectl create configmap sqltest --from-file=sql-test.sh  -n {{ namespace }}
          args:
            executable: /bin/bash
          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
@@ -145,7 +145,7 @@
 
        - name: 8) Obtaining the replica pods running on specified node
          shell: >
-            kubectl get pods -o wide -n {{ namespace }}
+            source ~/.profile; kubectl get pods -o wide -n {{ namespace }}
             | grep newos2 | grep rep | awk '{ print $1 }'
          args:
            executable: /bin/bash
@@ -155,7 +155,7 @@
 
        - name: 8a) Check Replica pods running on specified storage pool path
          shell: >
-           kubectl describe pod  -n {{ namespace }} "{{ result_path.stdout }}"
+           source ~/.profile; kubectl describe pod  -n {{ namespace }} "{{ result_path.stdout }}"
            | grep "{{ result_mountpoint.stdout }}" | awk '{print $2}'
          args:
            executable: /bin/bash
@@ -182,7 +182,7 @@
 
        - name: 10) Check the replica pod on the specified node
          shell: >
-          kubectl get pods -o wide -n {{ namespace }}
+          source ~/.profile; kubectl get pods -o wide -n {{ namespace }}
           | grep "{{ groups['kubernetes-kubeminions'].0 }}" | grep rep | awk '{ print $1 }'
          args:
            executable: /bin/bash
@@ -197,7 +197,7 @@
            ########################################################################
 
        - name: 10a) Delete the replica pod on the specified node
-         shell: kubectl delete pod -n {{ namespace }} {{ result_rep.stdout }}
+         shell: source ~/.profile; kubectl delete pod -n {{ namespace }} {{ result_rep.stdout }}
          args:
            executable: /bin/bash
          become: true
@@ -209,7 +209,7 @@
 
        - name: 10b) Check the replica pod status scheduled on the specified node
          shell: >
-           kubectl get pods -o wide -n {{ namespace }}
+           source ~/.profile; kubectl get pods -o wide -n {{ namespace }}
            | grep "{{ groups['kubernetes-kubeminions'].0 }}" | grep rep | awk '{ print $3 }'
          args:
            executable: /bin/bash
@@ -220,7 +220,7 @@
 
        - name: 10c) Check the percona application pod status
          shell: >
-           kubectl get pods -o wide -n {{ namespace }} | grep percona | awk '{ print $3 }'
+           source ~/.profile; kubectl get pods -o wide -n {{ namespace }} | grep percona | awk '{ print $3 }'
          args:
            executable: /bin/bash
          register: result_pod_status
