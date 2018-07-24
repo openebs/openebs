@@ -158,7 +158,7 @@
           retries: 10
 
         - name: 9d) Check if the ctrl and replica pods are running
-	shell: source ~/.profile; kubectl get pods -n "{{ namespace }}" | grep {{snap_pv.stdout}} | grep "{{ item }}"
+          shell: source ~/.profile; kubectl get pods -n "{{ namespace }}" | grep {{snap_pv.stdout}} | grep "{{ item }}"
           args:
             executable: /bin/bash
           register: pod_status
@@ -190,9 +190,9 @@
           shell: >
             source ~/.profile;
             kubectl get pods -n "{{ namespace }}" -l name=percona-new --no-headers
-         failed_when: "'pvc' and 'Running' in result.stdout"
           args:
             executable: /bin/bash
+          failed_when: "'pvc' and 'Running' in result.stdout"
           register: app_pod
           until: "'Running' in app_pod.stdout"
           delay: 120
