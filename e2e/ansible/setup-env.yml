@@ -4,16 +4,17 @@
 # Updates inventory/group_vars/all.yml based on the extra vars
 
 - hosts: localhost
+  gather_facts: True
   tasks:
    - block:
        - name: Copy the machines.in template to inventory dir
          copy:
-           src: "{{ playbook_dir }}/templates/{{ platform }}/{{ ci_mode }}/machines.{{ ci_mode }}"
-           dest: "{{ inventory_dir }}/machines.in"
+           src: "{{ playbook_dir }}/templates/{{ ci_mode }}/{{ platform }}/machines.{{ ci_mode }}"
+           dest: "{{ playbook_dir }}/inventory/machines.in"
 
        - name: Copy the Vagrantfile template to ansible dir  
          copy: 
-           src: "{{ playbook_dir }}/templates/{{ platform }}/{{ ci_mode }}/Vagrantfile.{{ ci_mode }}"
+           src: "{{ playbook_dir }}/templates/{{ ci_mode }}/{{ platform }}/Vagrantfile.{{ ci_mode }}"
            dest: "{{ playbook_dir }}/Vagrantfile"
        
        - name: For a build of type 'quick' change the box in Vagrantfile
@@ -25,21 +26,21 @@
 
        - name: Change OpenEBS mode in all.yml
          lineinfile: 
-           path: "{{ inventory_dir }}/group_vars/all.yml"
+           path: "{{ playbook_dir }}/inventory/group_vars/all.yml"
            regexp: "deployment_mode:"
            line: "deployment_mode: {{ ci_mode }}"
            backup: yes
        
        - name: Change the version of Kubernetes, if defined in the env
          lineinfile:
-           path: "{{ inventory_dir }}/group_vars/all.yml"
+           path: "{{ playbook_dir }}/inventory/group_vars/all.yml"
            regexp: "k8s_version:"
            line: "k8s_version: {{lookup('env','K8S_VERSION')}}"
          when: lookup('env','K8S_VERSION') in k8s_version_list
 
        - name: Change the version of Weave, if defined in the env
          lineinfile:
-           path: "{{ inventory_dir }}/group_vars/all.yml"
+           path: "{{ playbook_dir }}/inventory/group_vars/all.yml"
            regexp: "weave_version:"
            line: "k8s_version: {{lookup('env','WEAVE_VERSION')}}"
            backup: yes
@@ -50,8 +51,3 @@
            msg: "Env setup failed, please pass a valid ci_mode as argument"
 
      when: run_ci == "yes" and ci_mode is defined
-
-
-              
-
-
