@@ -154,11 +154,7 @@
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
        - name: 7a) Update the replica deployment with node affinity property
-<<<<<<< HEAD
-         shell: source ~/.profile; kubectl patch deployment "{{ deploy_name.stdout }}" -n "{{namespace}}" -p "$(cat replica_patch.yml)"
-=======
-         shell: kubectl patch deployment "{{ deploy_name.stdout }}" -n "{{namespace}}" -p "$(cat {{ result_kube_home.stdout }}/replica_patch.yml)"
->>>>>>> 3a7448fe5e141b4761d9e5f788cecb77abca4caf
+         shell: source ~/.profile; kubectl patch deployment "{{ deploy_name.stdout }}" -n "{{namespace}}" -p "$(cat {{ result_kube_home.stdout }}/replica_patch.yml)"
          args:
            executable: /bin/bash
          register: patch_out
