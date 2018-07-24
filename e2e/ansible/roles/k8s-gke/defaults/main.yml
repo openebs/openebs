@@ -1,7 +1,7 @@
 ---
 
 ansible_connection: local
-cluster_zone: "{{ lookup ('env','CLUSTER_ZONE') }}"
+cluster_zone: "{{ lookup ('env','ZONE') }}"
 disk_size: 100
 disk_type: pd-standard
 disk_count: 2 
