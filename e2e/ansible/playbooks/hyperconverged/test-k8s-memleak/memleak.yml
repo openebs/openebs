@@ -148,7 +148,7 @@
        become: true
        delegate_to: "{{groups['kubernetes-kubeminions'].0}}"
 
-     - name: 8) Copy the python script to kubeminion
+     - name: 8) Copy the python script to kubemaster
        copy:
          src: "{{ py_file }}"
          dest: "{{ result_kube_home.stdout }}"
