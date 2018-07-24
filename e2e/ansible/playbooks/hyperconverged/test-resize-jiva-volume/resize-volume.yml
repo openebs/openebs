@@ -288,6 +288,10 @@
           set_fact:
             flag: "TEST PASSED"
 
+        - name: Set Status
+          set_fact:
+            status: "good"
+
         - name: Wait
           wait_for: timeout=200
 
@@ -295,6 +299,10 @@
         - name: Setting the fail flag
           set_fact:
             flag: "TEST FAILED"
+
+        - name: Set Status
+          set_fact:
+            status: "danger"
 
       always:
 
@@ -329,5 +337,6 @@
               slack:
                 token: "{{ lookup('env','SLACK_TOKEN') }}"
                 msg: '{{ ansible_date_time.time }} TEST: {{test_name}}, RESULT: {{ flag }}, {{ cflag }}'
+                color: "{{status}}"
               when: slack_notify | bool and lookup('env','SLACK_TOKEN')
 
