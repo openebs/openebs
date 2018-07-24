@@ -27,39 +27,6 @@
   become: true
   when: status.stat.isdir is defined and status.stat.isdir
 
-- stat:
-    path: "{{ k8s_logs_path }}"
-  register: status
-
-- name: Create Directory
-  file:
-    path: "{{ k8s_logs_path }}"
-    state: directory
-  become: true
-  when: status.stat.isdir is not defined
-
-- stat:
-    path: "{{ k8s_logs_path }}"
-  register: status
-
-- name: Change Folder Permissions
-  file:
-    path: "{{ k8s_logs_path }}"
-    owner: "{{ user.stdout }}"
-    group: "{{ user.stdout }}"
-    recurse: true
-  become: true
-  when: status.stat.isdir is defined and status.stat.isdir
-
-- name: Copy log aggregator to remote
-  copy:
-    src: "{{ k8s_log_aggregator }}"
-    owner: "{{ user.stdout }}"
-    group: "{{ user.stdout }}"
-    dest: /usr/local/bin
-    mode: "u+rwx"
-  become: true
-
 - block:
    - name: Copy Pod YAML to remote
      copy:

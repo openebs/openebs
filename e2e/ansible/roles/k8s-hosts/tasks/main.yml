@@ -61,6 +61,17 @@
   register: result_cluster
   delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
+- name: Get Token-sha from Master
+  shell: >
+    openssl x509 -pubkey -in /etc/kubernetes/pki/ca.crt
+    | openssl rsa -pubin -outform der 2>/dev/null
+    | openssl dgst -sha256 -hex
+    | sed "s/^.* //"
+  args:
+    executable: /bin/bash
+  register: result_token_sha
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
 - name: Save Token and Cluster IP
   set_fact:
     cluster_ip: "{{ result_cluster.stdout }}"
@@ -103,7 +114,8 @@
      script: "{{configure_scripts}} 
              --masterip={{hostvars[groups['kubernetes-kubemasters'][0]]['ansible_ssh_host']}} 
              --token={{result_token_name.stdout}}.{{result_token.stdout}} 
-             --clusterip={{result_cluster.stdout}}"
+             --clusterip={{result_cluster.stdout}}
+             --token-sha={{result_token_sha.stdout}}"
      become: true  
      notify: 
        - Reload systemd
@@ -124,6 +136,7 @@
        --masterip="{{hostvars[groups['kubernetes-kubemasters'][0]]['ansible_ssh_host']}}"
        --token="{{result_token_name.stdout}}.{{result_token.stdout}}"
        --clusterip="{{result_cluster.stdout}}"
+       --token-sha="{{result_token_sha.stdout}}"
      args:
        executable: /bin/bash
      become: true

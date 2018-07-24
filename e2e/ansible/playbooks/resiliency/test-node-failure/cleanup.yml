@@ -77,7 +77,9 @@
          changed_when: true
 
        - name: Delete namespace
-         command: kubectl delete ns {{ namespace }}
+         shell: source ~/.profile; kubectl delete ns {{ namespace }}
+         args:
+           executable: /bin/bash
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
          changed_when: true
 
