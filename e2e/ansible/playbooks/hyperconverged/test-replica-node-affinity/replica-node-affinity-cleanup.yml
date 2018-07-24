@@ -5,7 +5,7 @@
     timeout: 50
 
 - name: Delete Percona deployment
-  shell: kubectl delete -f "{{ percona_link }}" -n "{{namespace}}"
+  shell: source ~/.profile; kubectl delete -f "{{ percona_link }}" -n "{{namespace}}"
   args:
     executable: /bin/bash
   register: del_out
@@ -15,7 +15,7 @@
   retries: 5
 
 - name: Delete the namespace
-  shell: kubectl delete ns "{{ namespace }}"
+  shell: source ~/.profile; kubectl delete ns "{{ namespace }}"
   args:
     executable: /bin/bash
   register: ns_delete

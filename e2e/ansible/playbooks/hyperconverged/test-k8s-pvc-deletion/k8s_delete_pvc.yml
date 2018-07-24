@@ -31,7 +31,7 @@
           include: pre-requisites.yml 
      
         - name: 2) Get the number of nodes in the cluster
-          shell: kubectl get nodes | grep '<none>' | wc -l
+          shell: source ~/.profile; kubectl get nodes | grep '<none>' | wc -l
           args:
             executable: /bin/bash
           register: node_out

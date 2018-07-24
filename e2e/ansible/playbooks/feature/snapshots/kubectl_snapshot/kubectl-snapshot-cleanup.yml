@@ -75,7 +75,7 @@
   delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
 - name: Delete the namespace
-  shell: kubectl delete ns "{{ namespace }}"
+  shell: source ~/.profile; kubectl delete ns "{{ namespace }}"
   args:
     executable: /bin/bash
   delegate_to: "{{groups['kubernetes-kubemasters'].0}}"

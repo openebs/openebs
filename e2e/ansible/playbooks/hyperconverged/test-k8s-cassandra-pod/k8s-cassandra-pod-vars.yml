@@ -22,5 +22,3 @@ io_minutes: 3
 profile: ~/.bash_profile
 
 namespace: cassandra-test
-
-utils_path: openebs/e2e/ansible/playbooks/utils
