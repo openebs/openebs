@@ -34,5 +34,3 @@ test_artifacts:
   -  cassandra-statefulset.yaml
   -  cassandra-loadgen.yaml
 
-utils_path: openebs/e2e/ansible/playbooks/utils
-

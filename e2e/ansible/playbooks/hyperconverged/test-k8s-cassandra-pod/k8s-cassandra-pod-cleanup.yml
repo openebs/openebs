@@ -18,7 +18,7 @@
     app_yml: "{{ loadgen_yaml_alias }}"
 
 - name: Get cassandra pvcs
-  shell: kubectl get pvc -o custom-columns=:metadata.name --no-headers | grep cassandra-data
+  shell: source ~/.profile; kubectl get pvc -o custom-columns=:metadata.name --no-headers | grep cassandra-data
   args:
     executable: /bin/bash
   register: result
