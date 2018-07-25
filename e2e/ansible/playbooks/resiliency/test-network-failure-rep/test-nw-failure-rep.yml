@@ -102,21 +102,21 @@
             app: percona
 
        - name: Get the node details on which pvc-rep is scheduled
-         shell: kubectl get pods -n {{ namespace }} -o wide | grep rep | awk 'FNR == 1 {print}' | awk {'print $7'}
+         shell: source ~/.profile; kubectl get pods -n {{ namespace }} -o wide | grep rep | awk 'FNR == 1 {print}' | awk {'print $7'}
          args:
            executable: /bin/bash
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
          register: node_rep
 
        - name: Get the pvc-rep name
-         shell: kubectl get pods -n {{ namespace }} | grep rep | awk 'FNR == 1 {print}' | awk {'print $1'}
+         shell: source ~/.profile; kubectl get pods -n {{ namespace }} | grep rep | awk 'FNR == 1 {print}' | awk {'print $1'}
          args:
            executable: /bin/bash
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
          register: pvc_rep_name
 
        - name: Get the rep container name
-         shell: kubectl describe pod {{ pvc_rep_name.stdout }} -n {{ namespace }} | grep rep-con | awk {'print $1'}
+         shell: source ~/.profile; kubectl describe pod {{ pvc_rep_name.stdout }} -n {{ namespace }} | grep rep-con | awk {'print $1'}
          args:
            executable: /bin/bash
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
@@ -133,7 +133,7 @@
        ########################################################
 
        - name: Get pumba container name
-         shell: kubectl get pods -o wide | grep {{ node_rep.stdout }} | grep pumba | awk {'print $1'}
+         shell: source ~/.profile; kubectl get pods -o wide | grep {{ node_rep.stdout }} | grep pumba | awk {'print $1'}
          args:
            executable: /bin/bash
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
@@ -141,7 +141,7 @@
 
        - name: Initiate periodic network failures from pumba
          shell: >
-           kubectl exec {{ pumba_name.stdout }} -- pumba netem --interface eth0
+           source ~/.profile; kubectl exec {{ pumba_name.stdout }} -- pumba netem --interface eth0
            --duration 1m delay --time {{ item }} re2:k8s_{{ container[:-1] }}; sleep 10
          args:
            executable: /bin/bash
@@ -170,10 +170,20 @@
          set_fact:
            flag: "Test Passed"
 
+
+       - name: Set Status
+         set_fact:
+           status: "good"
+
      rescue:
        - name: Test Failed
          set_fact:
            flag: "Test Failed"
+
+
+       - name: Set Status
+         set_fact:
+           status: "danger"
 
      always:
        - block:
@@ -199,5 +209,6 @@
              slack:
                token: "{{ lookup('env','SLACK_TOKEN') }}"
                msg: '{{ ansible_date_time.time }} TEST: {{test_name}}, RESULT: {{ flag }},{{ cflag }}'
+               color: "{{status}}"
              when: slack_notify | bool and lookup('env','SLACK_TOKEN')
 

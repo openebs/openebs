@@ -1,8 +1,6 @@
 ---
 test_name: test-disk-failure
 
-utils_path: openebs/e2e/ansible/playbooks/utils
-
 create_sc: storage-class.yaml
 
 storage_pool_link: https://raw.githubusercontent.com/openebs/openebs/master/e2e/ansible/playbooks/hyperconverged/test-k8s-storage-pool/storage-pool-path_creation.yml
