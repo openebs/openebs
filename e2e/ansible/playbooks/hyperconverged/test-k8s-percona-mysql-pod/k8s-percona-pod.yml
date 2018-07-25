@@ -71,7 +71,7 @@
             app: percona
 
        - name: 6) Get $HOME of K8s minion for kubernetes user
-         shell: source ~/.profile; echo $HOME
+         shell: source ~/.profile; echo "/tmp"
          args:
            executable: /bin/bash
          register: result_kube_home
