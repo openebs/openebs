@@ -234,7 +234,7 @@
 
         - name: Test Passed
           set_fact:
-            flag: "Test Passedi"
+            flag: "Test Passed"
 
 
         - name: Set Status
