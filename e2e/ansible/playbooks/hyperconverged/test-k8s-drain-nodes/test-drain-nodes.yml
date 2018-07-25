@@ -213,9 +213,9 @@
          set_fact:
            flag: "Test Failed"
 
-         - name: Set Status
-           set_fact:
-             status: "danger"
+       - name: Set Status
+         set_fact:
+           status: "danger"
 
      always:
        - block:
