@@ -1,6 +1,6 @@
 ---
 
-test_name: hyperconverged_jenkins_upgrade_on_k8s
+test_name: test-k8s-master-failure
 
 jenkins_link: https://raw.githubusercontent.com/openebs/openebs/master/k8s/demo/jenkins/jenkins.yml
 
