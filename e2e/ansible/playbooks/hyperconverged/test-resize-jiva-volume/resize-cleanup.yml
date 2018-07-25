@@ -1,19 +1,19 @@
 ---
 - name: Getting PV name from the pvc
-  shell: kubectl get pvc {{ claim_name }} -n "{{ namespace }}" -o custom-columns=:spec.volumeName --no-headers
+  shell: source ~/.profile; kubectl get pvc {{ claim_name }} -n "{{ namespace }}" -o custom-columns=:spec.volumeName --no-headers
   args:
     executable: /bin/bash
   register: pv
   delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
 
 - name: Deleting percona deployment
-  shell: kubectl delete -f "{{ percona_def }}" -n "{{ namespace }}"
+  shell: source ~/.profile; kubectl delete -f "{{ percona_def }}" -n "{{ namespace }}"
   args:
     executable: /bin/bash
   delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
 - name: Checking if the application pod is deleted.
-  shell: kubectl get pods --all-namespaces --show-labels | grep {{ app_label }} | awk {'print $2'} | wc -l
+  shell: source ~/.profile; kubectl get pods --all-namespaces --show-labels | grep {{ app_label }} | awk {'print $2'} | wc -l
   args:
     executable: /bin/bash
   register: app_count
@@ -23,7 +23,7 @@
   retries: 15
 
 - name: Checking if the replica pods are deleted
-  shell: kubectl get pods --all-namespaces --show-labels |  grep openebs/replica=jiva-replica | awk {'print$2'} | wc -l
+  shell: source ~/.profile; kubectl get pods --all-namespaces --show-labels |  grep openebs/replica=jiva-replica | awk {'print$2'} | wc -l
   args:
     executable: /bin/bash
   register: rep_count
@@ -33,7 +33,7 @@
   retries: 15
 
 - name: Checking if the corresponding svc is deleted
-  shell: kubectl get svc -n "{{ namespace }}" | grep {{ pv.stdout }} | wc -l
+  shell: source ~/.profile; kubectl get svc -n "{{ namespace }}" | grep {{ pv.stdout }} | wc -l
   args:
     executable: /bin/bash
   delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
