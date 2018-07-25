@@ -1,12 +1,11 @@
 ---
 
-test_name: test-k8s-master-failure
+test_name: hyperconverged_jenkins_upgrade_on_k8s
 
+jenkins_link: https://raw.githubusercontent.com/openebs/openebs/master/k8s/demo/jenkins/jenkins.yml
 
-operator_ns: openebs
+pod_yaml_alias: jenkins.yml
 
-pod_yaml_alias:
-  - jenkins.yml
 
 namespace: k8s-master-failure
 

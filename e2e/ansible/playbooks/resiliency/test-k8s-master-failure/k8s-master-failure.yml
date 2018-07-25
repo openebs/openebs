@@ -44,7 +44,7 @@
 
 
      - name: 2a)  Get the number of nodes in the cluster
-       shell: source ~/.profile; kubectl get nodes | grep '<none>' | wc -l
+       shell: kubectl get nodes | grep '<none>' | wc -l
        args:
          executable: /bin/bash
        register: node_out
@@ -98,10 +98,11 @@
        args:
          executable: /bin/bash
        delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-       until: "'saved' in result.stdout"
-       retries: 5
+       register: result
+       retries: 2
        delay: 30
-       failed_when: false
+       until: result.rc == 0
+
 
 
      - name: 4a)  Copy job configuration files to master.
@@ -178,11 +179,11 @@
        register: First_Build
 
 
+          
      - name: Bring down the kubemaster.
-       include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/vagrant-halt-up-task.yml"
+       include: vagrant-up-down.yml
        vars:
-         vagrant_op: halt --force
-         nodename: kubemaster-01
+         status: down
 
 
      - name: wait for 120 seconds.
@@ -200,11 +201,12 @@
        until: "'poweroff'  in VDown.stdout"
 
 
+
      - name: Bring up the kubemaster.
-       include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/vagrant-halt-up-task.yml"
+       include: vagrant-up-down.yml
        vars:
-         vagrant_op: up
-         nodename: kubemaster-01
+         status: up
+
 
      - name: wait for 120 seconds.
        wait_for:
@@ -228,7 +230,7 @@
 
 
      - name: Check the number of  available replicas in deployment
-       shell: source ~/.profile; kubectl get deploy -n {{ namespace }} | grep "{{ pv_name.stdout }}" | grep rep | awk '{print $2}'
+       shell: kubectl get deploy -n {{ namespace }} | grep "{{ pv_name.stdout }}" | grep rep | awk '{print $2}'
        args:
          executable: /bin/bash
        register: available_pods
@@ -250,6 +252,7 @@
        include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/access-mode-check.yml"
        vars:
          ns: "{{ namespace }}"
+
 
      - name: 9)  Run  the Build command script file inside jenkins pod.
        shell:  >
