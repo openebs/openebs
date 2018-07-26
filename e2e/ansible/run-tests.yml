@@ -8,6 +8,7 @@
         msg: "{{ ansible_date_time.time }} OPENEBS TESTSUITE: STARTED"
       when: slack_notify | bool and lookup('env','SLACK_TOKEN')
 ##########################################################################################
+# TC ID: 1
 # TC NAME: test-node-failure
 # TC DETAILS: Test openebs behaviour when one of the nodes undergoes ungraceful shutdown
 # TC NOTES:
@@ -15,18 +16,21 @@
 - include: playbooks/resiliency/test-node-failure/test-node-failure.yml
   when: is_vagrant_vm == "true"
 ##########################################################################################
+# TC ID: 2
 # TC NAME: test-kubelet-service-stop
 # TC DETAILS: Test openebs behaviour when kubelet service is not running on one of the node
 # TC NOTES:
 #
 - include: playbooks/resiliency/test-kubelet-service-stop/test-kubelet-service-stop.yml
 ##########################################################################################
+# TC ID: 3
 # TC NAME: test-kubectl-snapshot
 # TC DETAILS: Test to perform basic snapshot/clones using k8s api's
 # TC NOTES:
 #
 - include: playbooks/feature/snapshots/kubectl_snapshot/test-kubectl-snapshot.yml
 ###########################################################################################
+# TC ID: 4
 # TC NAME: test-k8s-memleak
 # TC DETAILS: Test memory consumption on k8s cluster with openebs storage
 # TC NOTES:
@@ -34,6 +38,7 @@
 - include: playbooks/hyperconverged/test-k8s-memleak/memleak.yml
 #
 ###########################################################################################
+# TC ID: 5
 # TC NAME: test-k8s-percona-mysql-pod
 # TC DETAILS: Deploys percona pod on k8s cluster with openebs storage
 # TC NOTES:           
@@ -41,6 +46,7 @@
 - include: playbooks/hyperconverged/test-k8s-percona-mysql-pod/k8s-percona-pod.yml
 #
 ###########################################################################################
+# TC ID: 6
 # TC NAME: test-k8s-jupyter-server-pod 
 # TC DETAILS: Deploys jupyet notebook server on k8s cluster with openebs storage
 # TC NOTES:           
@@ -48,13 +54,16 @@
 - include: playbooks/hyperconverged/test-k8s-jupyter-server-pod/k8s-jupyter-pod.yml
 #
 ###########################################################################################
+# TC ID: 7
 # TC NAME: test-k8s-crunchy-postgres
 # TC DETAILS: Deploys a postgresql cluster on k8s cluster with openebs storage
 # TC NOTES:           
 #    
 - include: playbooks/hyperconverged/test-k8s-crunchy-postgres/k8s-crunchy-pg.yml
+- include: pre-check.yml
 #
 ###########################################################################################
+# TC ID: 8
 # TC NAME: libiscsi-compliance-test-suite
 # TC DETAILS: Runs the libiscsi iSCSI compliance suite on openebs storage
 # TC NOTES:           
@@ -62,6 +71,7 @@
 - include: playbooks/compliance/iscsi/libiscsi.yml
 #
 ###########################################################################################
+# TC ID: 9
 # TC NAME: snap-create-revert
 # TC DETAILS: Creates a snapshot create and restore test on a simple openebs volume 
 # TC NOTES:           
@@ -69,6 +79,7 @@
 - include: playbooks/feature/snapshots/simple-volume/snapshot.yml
 #
 ###########################################################################################
+# TC ID: 10
 # TC NAME: mysql-snap-create-revert  
 # TC DETAILS: Creates a mysql application snapshot on openebs volume and restore database 
 # TC NOTES:           
@@ -76,18 +87,21 @@
 - include: playbooks/feature/snapshots/percona-mysql/mysql-snapshot.yml
 #
 ###########################################################################################
+# TC ID: 11
 # TC NAME: basic-ha-pod-reschedule  
 # TC DETAILS: Tests basic ha upon openebs ctrl failures triggered by pod delete
 # TC NOTES:           
 #    
 - include: playbooks/feature/ha/ha.yml 
 ###########################################################################################
+# TC ID: 12
 # TC NAME: deploy-application-in-own-ns
 # TC DETAILS: Tests behaviour of openebs when application is running on its own ns
 # TC NOTES:
 #
 - include: playbooks/hyperconverged/percona-openebs-ownnamespace/openebs-percona-diffns-pod.yml
 ###########################################################################################
+# TC ID: 13
 # TC NAME: volume_controller_pod_kill
 # TC DETAILS: Tests resiliency upon random openebs ctrl failures caused by chaoskube
 # TC NOTES:
@@ -95,65 +109,82 @@
 - include: playbooks/resiliency/test-ctrl-failure/test-ctrl-failure.yml
 - include: pre-check.yml
 ##########################################################################################
+# TC ID: 14
 # TC NAME: volume_single_replica_pod_kill
 # TC DETAILS: Tests resiliency upon random openebs replica failures (single) caused by chaoskube
 # TC NOTES:
 #
 - include: playbooks/resiliency/test-single-replica-failure/test-single-replica-failure.yml
 ##########################################################################################
+# TC ID: 15
 # TC NAME: volume_replica_failure_with_quorum
 # TC DETAILS: Tests resiliency upon random openebs replica failures (with quorum)
 # TC NOTES:
 #
 - include: playbooks/resiliency/test-replica-quorum-failure/test-replica-quorum-failure.yml
 ##########################################################################################
+# TC ID: 16
 # TC NAME: volume_controller_lossy_network
 # TC DETAILS: Tests resiliency upon lossy connectivity to openebs ctrl caused by pumba
 # TC NOTES:
 #
 - include: playbooks/resiliency/test-network-failure/test-nw-failure.yml
 ##########################################################################################
+# TC ID: 17
 # TC NAME: volume_replica_lossy_network_with_quorum
 # TC DETAILS: Tests resiliency upon lossy connectivity to openebs replica caused by pumba
 # TC NOTES:
 #
 - include: playbooks/resiliency/test-network-failure-rep/test-nw-failure-rep.yml
 ##########################################################################################
+# TC ID: 18
 # TC NAME: node_loss_simulation_via_eviction_taint
 # TC DETAILS: Simulates node loss by applying disk pressure taints to evict all pods
 # TC NOTES:
 - include: playbooks/resiliency/test-node-eviction-out-of-disk/test-node-eviction-out-of-disk.yml
 ##########################################################################################
+# TC ID: 19
 # TC NAME: cassandra load-gen test
 # TC DETAILS: Tests cassandra deployment with load-generation
 # TC NOTES:
 - include: playbooks/hyperconverged/test-k8s-cassandra-pod/k8s-cassandra-pod.yml
 ##########################################################################################
+# TC ID: 20
 # TC NAME: test-k8s-drain-nodes
 # TC DETAILS: Verify openebs behaviour when one of the node is drained.
 # TC NOTES:
 - include: playbooks/hyperconverged/test-k8s-drain-nodes/test-drain-nodes.yml
 ##########################################################################################
+# TC ID: 21
 # TC NAME: scaleup-cassandra-deployments
 # TC DETAILS: Verify scaledup cassandra deployment has data sync.
 # TC NOTES:
 - include: playbooks/hyperconverged/test-scaleup-cassandra-pods/test-scaleup-cassandra-pods.yml
 - include: pre-check.yml
 ##########################################################################################
+# TC ID: 22
 # TC NAME: Application-upgrade-test
 # TC DETAILS: Verify data availability post application rolling upgrade.
 # TC NOTES:
 - include: playbooks/hyperconverged/test-k8s-jenkins-upgrade/k8s-jenkins-upgrade.yml
 ##########################################################################################
+# TC ID: 23
 # TC NAME: pvc-svc-deletion-check
 # TC DETAILS: Test to verify successful deletion of svc and pvc
 # TC NOTES:
 - include: playbooks/hyperconverged/test-k8s-pvc-deletion/k8s_delete_pvc.yml
 ##########################################################################################
+# TC ID: 24
 # TC NAME: scaleup-openebs-replicas
 # TC DETAILS: Verify scaledup openebs replicas has data sync.
 # TC NOTES:
 - include: playbooks/hyperconverged/test-scaleup-storage-replicas/test-scaleup-storage-replicas.yml
+##########################################################################################
+# TC ID: 25
+# TC NAME: Checking node affinity
+# TC DETAILS: Verify the pod stickiness to a node.
+# TC NOTES:
+- include: playbooks/hyperconverged/test-replica-node-affinity/replica-node-affinity.yml
 ##########################################################################################
 - hosts: localhost
   roles:

@@ -146,7 +146,7 @@
      always:
        - block:
 
-           - include: libiscsi-cleanup.yml
+#           - include: libiscsi-cleanup.yml
 
            - name: Test Cleanup Passed
              set_fact:
