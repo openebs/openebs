@@ -14,7 +14,7 @@
 #6.Upgraded application pod with newer version(here version=2.125).
 #7.Downloading jenkins-cli.jar file inside var/jenkins_home mounted path of jenkins application creation and building of jobs.
 #8.Perform build operation with the existing created job.
-#9.Compare both the jobs buil.
+#9.Compare both the jobs build.
 #(Way to Check for data persitency inside application pod.)
 
 ###############################################################################################
