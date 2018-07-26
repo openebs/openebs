@@ -3,7 +3,7 @@
   command: apt-get update
   become: true
   ignore_errors: true
-  delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+  delegate_to: "{{ groups['kubernetes-kubeminions'].0 }}"
   tags:
   - skip_ansible_lint
 
