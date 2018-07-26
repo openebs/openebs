@@ -117,11 +117,19 @@
        - name: Test playbook passed
          set_fact:
            flag: "Test Passed"
+        
+       - name: Set Status
+         set_fact:
+           status: "good"
 
      rescue:
        - name: Test playbook failed
          set_fact:
            flag: "Test Failed"
+
+       - name: Set Status
+         set_fact:
+           status: "danger"
 
      always:
        - block:
@@ -149,6 +157,7 @@
              slack:
                token: "{{ lookup('env','SLACK_TOKEN') }}"
                msg: '{{ ansible_date_time.time }} TEST: {{test_name}}, RESULT: {{ flag }},{{ cflag }}'
+               color: "{{status}}"
              when: slack_notify | bool and lookup('env','SLACK_TOKEN')
 
 

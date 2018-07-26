@@ -1,7 +1,5 @@
 test_name: verifiy_kubectl_drain_behaviour
 
-utils_path: openebs/e2e/ansible/playbooks/utils
-
 test_log_path: setup/logs/kubectl-drain-behaviour.log
 
 test_pod_regex: maya*|openebs*|pvc*|percona*

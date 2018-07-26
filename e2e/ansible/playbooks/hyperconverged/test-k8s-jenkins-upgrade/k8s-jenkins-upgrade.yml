@@ -255,11 +255,22 @@
          flag: "Test Passed"
        when: "'Hello World!' in Second_Build.stdout"
 
+<<<<<<< HEAD
     
+=======
+     - name: Set Status
+       set_fact:
+         status: "good"
+
+>>>>>>> 81e0c7b806db325bb869df7511d84e7fec4b97e6
      rescue:
        - name: Test Failed
          set_fact:
            flag: "Test Failed"
+
+       - name: Set Status
+         set_fact:
+           status: "danger"
 
      always:
        - block:
@@ -285,5 +296,6 @@
              slack:
                token: "{{ lookup('env','SLACK_TOKEN') }}"
                msg: '{{ ansible_date_time.time }} TEST: {{test_name}}, RESULT: {{ flag }},{{ cflag }}'
+               color: "{{status}}"
              when: slack_notify | bool and lookup('env','SLACK_TOKEN')
  

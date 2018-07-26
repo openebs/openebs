@@ -32,4 +32,3 @@ mysql_load_duration: 120
 
 namespace: percona-mysql-test
 
-utils_path: openebs/e2e/ansible/playbooks/utils

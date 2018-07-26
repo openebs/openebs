@@ -3,8 +3,6 @@ test_name: test-node-eviction-out-of-disk
 
 namespace: nodeeviction
 
-utils_path: openebs/e2e/ansible/playbooks/utils
-
 patch_file: replica_patch.yaml
 
 percona_files:

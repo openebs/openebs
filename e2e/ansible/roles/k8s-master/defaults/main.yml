@@ -4,7 +4,7 @@
 
 configure_scripts:
   - configure_k8s_master.sh
-  - configure_k8s_weave.sh
+  - configure_k8s_cni.sh
 
 weave_depends:
   - weave_images_{{ weave_version }}.tar

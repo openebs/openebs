@@ -27,8 +27,6 @@ chaos_interval: 20
 
 namespace: single-replica
 
-utils_path: openebs/e2e/ansible/playbooks/utils
-
 test_pod_regex: maya*|openebs*|pvc*|percona*|chaos*
 
 test_log_path: setup/logs/single_replica_failure_test.log

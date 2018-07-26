@@ -71,7 +71,7 @@
             app: percona
 
        - name: 6) Get $HOME of K8s minion for kubernetes user
-         shell: source ~/.profile; echo $HOME
+         shell: source ~/.profile; echo "/tmp"
          args:
            executable: /bin/bash
          register: result_kube_home
@@ -116,11 +116,19 @@
        - name: Test Passed
          set_fact:
            flag: "Test Passed"
+ 
+       - name: Set Status
+         set_fact:
+           status: "good"
 
      rescue:
        - name: Test Failed
          set_fact:
            flag: "Test Failed"
+
+       - name: Set Status
+         set_fact:
+           status: "danger"
 
      always:
        - block:
@@ -146,5 +154,6 @@
              slack:
                token: "{{ lookup('env','SLACK_TOKEN') }}"
                msg: '{{ ansible_date_time.time }} TEST: {{test_name}}, RESULT: {{ flag }},{{ cflag }}'
+               color: "{{status}}"
              when: slack_notify | bool and lookup('env','SLACK_TOKEN')
 

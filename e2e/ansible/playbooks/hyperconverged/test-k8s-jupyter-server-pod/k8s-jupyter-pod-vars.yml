@@ -11,8 +11,6 @@ jupyter_server_vol_size: 5G
 
 namespace: jupyter-test
 
-utils_path: openebs/e2e/ansible/playbooks/utils
-
 test_pod_regex: maya*|openebs*|pvc*|jupyter*
 
 test_log_path: setup/logs/jupyter_test.log

@@ -19,8 +19,6 @@ replace_with:
 
 namespace: nw-ctrl
 
-utils_path: openebs/e2e/ansible/playbooks/utils
-
 delay_interavals: 
   - 3000
   - 6000
