@@ -98,10 +98,10 @@
        args:
          executable: /bin/bash
        delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-       until: "'saved' in result.stdout"
-       delay: 60
+       register: result
        retries: 2
-       failed_when: false       
+       delay: 30
+       until: result.rc == 0
 
 
      - name: 4a)  Copy job configuration files to master.
