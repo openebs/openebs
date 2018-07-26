@@ -48,7 +48,7 @@
 ###########################################################################################
 # TC ID: 6
 # TC NAME: test-k8s-jupyter-server-pod 
-# TC DETAILS: Deploys jupyet notebook server on k8s cluster with openebs storage
+# TC DETAILS: Deploys jupyter notebook server on k8s cluster with openebs storage
 # TC NOTES:           
 #    
 - include: playbooks/hyperconverged/test-k8s-jupyter-server-pod/k8s-jupyter-pod.yml
