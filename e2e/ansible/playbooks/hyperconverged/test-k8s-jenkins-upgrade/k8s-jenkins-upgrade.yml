@@ -47,14 +47,10 @@
      - name: 2a) Replace jenkins pod version
        replace:
         path: "{{ result_kube_home.stdout }}/{{ pod_yaml_alias }}"
-        regexp: '{{ item.0 }}'
-        replace: '{{ item.1 }}'
+        replace_item: "{{ver_lts}}"
+        replace_with: "{{ver_2_124}}"
        delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
-       with_together:
-         - "{{replace_item.0}}"
-         - "{{replace_with.0}}"
 
-          
      - name: Create namespace for deployment.
        shell: source ~/.profile; kubectl create ns {{namespace}}
        args:
@@ -186,12 +182,9 @@
      - name: 7)  Replace jenkins pod version 
        replace:
         path: "{{ result_kube_home.stdout }}/{{ pod_yaml_alias }}"
-        regexp: '{{ item.0 }}'
-        replace: '{{ item.1 }}'
+        replace_item: "{{ver_2_124}}"
+        replace_with: "{{ver_2_125}}"
        delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
-       with_together:
-         - "{{replace_item.1}}"
-         - "{{replace_with.1}}"  
 
 
      - name: 7a)  Deploy jenkins pod Again

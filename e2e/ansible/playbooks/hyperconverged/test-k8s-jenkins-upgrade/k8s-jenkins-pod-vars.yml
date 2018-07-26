@@ -7,15 +7,11 @@ pod_yaml_alias: jenkins.yml
 
 operator_ns: openebs
 
+ver_lts: lts
 
-replace_item: 
-   - lts
-   - 2.124
+ver_2_124: 2.124
 
-
-replace_with: 
-   - 2.124
-   - 2.125
+ver_2_125: 2.125
 
 
 namespace: jenkins-upgrade
