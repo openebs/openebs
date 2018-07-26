@@ -168,7 +168,20 @@
 # TC DETAILS: Verify the replica stickiness with the node.
 # TC NOTES:
 - include: playbooks/hyperconverged/test-replica-node-affinity/replica-node-affinity.yml
-######################################################################################### 
+#########################################################################################
+# TC NAME: 26) test-k8s-master-failure
+# TC DETAILS: Test openebs behaviour when master nodes undergoes ungraceful shutdown
+# TC NOTES:
+#
+- include: playbooks/resiliency/test-k8s-master-failure/k8s-master-failure.yml
+  when: is_vagrant_vm == "true"
+########################################################################################## 
+# TC NAME: 27) test-storage-pool
+# TC DETAILS: Testing the storage pool path.
+# TC NOTES:
+#
+- include: playbooks/hyperconverged/test-k8s-storage-pool/test-storage-pool.yml
+##########################################################################################
 
 # TC NAME: pre-check
 # TC DETAILS: Delete residue of playbooks before running the run-tests again
@@ -180,13 +193,6 @@
   roles:
     - {role: logging, when: logging | bool and deployment_mode == "hyperconverged"}
 ###########################################################################################
-# TC NAME: test-k8s-master-failure
-# TC DETAILS: Test openebs behaviour when master nodes undergoes ungraceful shutdown
-# TC NOTES:
-#
-- include: playbooks/resiliency/test-k8s-master-failure/k8s-master-failure.yml 
-  when: is_vagrant_vm == "true"
-##########################################################################################
 
 - hosts: localhost
   tasks:
