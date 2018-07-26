@@ -19,7 +19,7 @@
 # TC NOTES:
 #
 - include: playbooks/resiliency/test-node-failure/test-node-failure.yml
-  when: is_vagrant_vm == "true"
+  when: is_vagrant_vm == true
 ##########################################################################################
 # TC NAME: 2) test-kubelet-service-stop
 # TC DETAILS: Test openebs behaviour when kubelet service is not running on one of the node
@@ -101,7 +101,7 @@
 #
 - include: playbooks/resiliency/test-ctrl-failure/test-ctrl-failure.yml
 - include: pre-check.yml
-  when: is_vagrant_vm == "true"
+  when: is_vagrant_vm == true
 ##########################################################################################
 # TC NAME: 14) volume_single_replica_pod_kill
 # TC DETAILS: Tests resiliency upon random openebs replica failures (single) caused by chaoskube
@@ -147,7 +147,7 @@
 # TC NOTES:
 - include: playbooks/hyperconverged/test-scaleup-cassandra-pods/test-scaleup-cassandra-pods.yml
 - include: pre-check.yml
-  when: is_vagrant_vm == "true"
+  when: is_vagrant_vm == true
 ##########################################################################################
 # TC NAME: 22) Application-upgrade-test
 # TC DETAILS: Verify data availability post application rolling upgrade.
@@ -174,7 +174,7 @@
 # TC NOTES:
 #
 - include: playbooks/resiliency/test-k8s-master-failure/k8s-master-failure.yml
-  when: is_vagrant_vm == "true"
+  when: is_vagrant_vm == true
 ########################################################################################## 
 # TC NAME: 27) test-storage-pool
 # TC DETAILS: Testing the storage pool path.
