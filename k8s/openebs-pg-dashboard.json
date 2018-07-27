@@ -1,8 +1,8 @@
 {
   "__inputs": [
     {
-      "name": "DS_PROMDASH",
-      "label": "Promdash",
+      "name": "DS_OPENEBS_PROMETHEUS",
+      "label": "OpenEBS Prometheus",
       "description": "",
       "type": "datasource",
       "pluginId": "prometheus",
@@ -45,7 +45,7 @@
     "list": [
       {
         "builtIn": 1,
-        "datasource": "${DS_PROMDASH}",
+        "datasource": "${DS_OPENEBS_PROMETHEUS}",
         "enable": true,
         "hide": true,
         "iconColor": "rgba(0, 211, 255, 1)",
@@ -60,7 +60,7 @@
   "gnetId": null,
   "graphTooltip": 0,
   "id": null,
-  "iteration": 1531390236560,
+  "iteration": 1532616818599,
   "links": [
     {
       "icon": "info",
@@ -82,7 +82,7 @@
         "rgba(237, 129, 40, 0.89)",
         "rgba(50, 172, 45, 0.97)"
       ],
-      "datasource": "${DS_PROMDASH}",
+      "datasource": "${DS_OPENEBS_PROMETHEUS}",
       "description": "Elapsed time since Volume was provisioned",
       "format": "m",
       "gauge": {
@@ -135,7 +135,7 @@
       "tableColumn": "",
       "targets": [
         {
-          "expr": "OpenEBS_jiva_volume_uptime{job=\"openebs-volumes\", openebs_pv=~\"$OpenEBS\"}/60",
+          "expr": "openebs_volume_uptime{job=\"openebs-volumes\", openebs_pv=~\"$OpenEBS\"}/60",
           "format": "time_series",
           "hide": false,
           "intervalFactor": 2,
@@ -165,7 +165,7 @@
         "rgba(237, 81, 40, 0.89)",
         "rgba(245, 54, 54, 0.9)"
       ],
-      "datasource": "${DS_PROMDASH}",
+      "datasource": "${DS_OPENEBS_PROMETHEUS}",
       "description": "Capacity Used by the Volume",
       "format": "decgbytes",
       "gauge": {
@@ -218,7 +218,7 @@
       "tableColumn": "__name__",
       "targets": [
         {
-          "expr": "OpenEBS_jiva_size_of_volume{openebs_pv=~\"$OpenEBS\"}",
+          "expr": "openebs_size_of_volume{openebs_pv=~\"$OpenEBS\"}",
           "format": "time_series",
           "hide": false,
           "intervalFactor": 2,
@@ -249,7 +249,7 @@
         "rgba(237, 129, 40, 0.89)",
         "rgba(50, 172, 45, 0.97)"
       ],
-      "datasource": "${DS_PROMDASH}",
+      "datasource": "${DS_OPENEBS_PROMETHEUS}",
       "format": "decgbytes",
       "gauge": {
         "maxValue": 100,
@@ -302,7 +302,7 @@
       "tableColumn": "",
       "targets": [
         {
-          "expr": "OpenEBS_jiva_actual_used{openebs_pv=~\"$OpenEBS\"}",
+          "expr": "openebs_actual_used{openebs_pv=~\"$OpenEBS\"}",
           "format": "time_series",
           "intervalFactor": 1,
           "refId": "A",
@@ -344,7 +344,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "${DS_PROMDASH}",
+      "datasource": "${DS_OPENEBS_PROMETHEUS}",
       "description": "IOPS",
       "fill": 1,
       "gridPos": {
@@ -380,7 +380,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "increase(OpenEBS_jiva_reads{job=\"openebs-volumes\", openebs_pv=~\"$OpenEBS\"}[1m])/60",
+          "expr": "increase(openebs_reads{job=\"openebs-volumes\", openebs_pv=~\"$OpenEBS\"}[1m])/60",
           "format": "time_series",
           "hide": false,
           "intervalFactor": 2,
@@ -389,7 +389,7 @@
           "step": 2
         },
         {
-          "expr": "increase(OpenEBS_jiva_writes{job=\"openebs-volumes\", openebs_pv=~\"$OpenEBS\"}[1m])/60",
+          "expr": "increase(openebs_writes{job=\"openebs-volumes\", openebs_pv=~\"$OpenEBS\"}[1m])/60",
           "format": "time_series",
           "intervalFactor": 2,
           "legendFormat": "{{Writes}}",
@@ -442,7 +442,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "${DS_PROMDASH}",
+      "datasource": "${DS_OPENEBS_PROMETHEUS}",
       "description": "Throughput",
       "fill": 1,
       "gridPos": {
@@ -478,7 +478,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "increase(OpenEBS_jiva_read_block_count{job=\"openebs-volumes\", openebs_pv=~\"$OpenEBS\"}[1m])/(1024*1024*60)",
+          "expr": "increase(openebs_read_block_count{job=\"openebs-volumes\", openebs_pv=~\"$OpenEBS\"}[1m])/(1024*1024*60)",
           "format": "time_series",
           "hide": false,
           "intervalFactor": 2,
@@ -487,7 +487,7 @@
           "step": 2
         },
         {
-          "expr": "increase(OpenEBS_jiva_write_block_count{job=\"openebs-volumes\", openebs_pv=~\"$OpenEBS\"}[1m])/(1024*1024*60)",
+          "expr": "increase(openebs_write_block_count{job=\"openebs-volumes\", openebs_pv=~\"$OpenEBS\"}[1m])/(1024*1024*60)",
           "format": "time_series",
           "hide": false,
           "intervalFactor": 2,
@@ -541,7 +541,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "${DS_PROMDASH}",
+      "datasource": "${DS_OPENEBS_PROMETHEUS}",
       "description": "Latency",
       "fill": 1,
       "gridPos": {
@@ -577,7 +577,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "((increase(OpenEBS_jiva_read_time{job=\"openebs-volumes\", openebs_pv=~\"$OpenEBS\"}[1m]))/(increase(OpenEBS_jiva_reads{job=\"openebs-volumes\", openebs_pv=~\"$OpenEBS\"}[1m])))/1000000",
+          "expr": "((increase(openebs_read_time{job=\"openebs-volumes\", openebs_pv=~\"$OpenEBS\"}[1m]))/(increase(openebs_reads{job=\"openebs-volumes\", openebs_pv=~\"$OpenEBS\"}[1m])))/1000000",
           "format": "time_series",
           "hide": false,
           "intervalFactor": 2,
@@ -586,7 +586,7 @@
           "step": 2
         },
         {
-          "expr": "((increase(OpenEBS_jiva_write_time{job=\"openebs-volumes\", openebs_pv=~\"$OpenEBS\"}[1m]))/(increase(OpenEBS_jiva_writes{job=\"openebs-volumes\", openebs_pv=~\"$OpenEBS\"}[1m])))/1000000",
+          "expr": "((increase(openebs_write_time{job=\"openebs-volumes\", openebs_pv=~\"$OpenEBS\"}[1m]))/(increase(openebs_writes{job=\"openebs-volumes\", openebs_pv=~\"$OpenEBS\"}[1m])))/1000000",
           "format": "time_series",
           "hide": false,
           "intervalFactor": 2,
@@ -645,14 +645,14 @@
       {
         "allValue": null,
         "current": {},
-        "datasource": "${DS_PROMDASH}",
+        "datasource": "${DS_OPENEBS_PROMETHEUS}",
         "hide": 0,
         "includeAll": false,
         "label": "OpenEBS Volume",
         "multi": false,
         "name": "OpenEBS",
         "options": [],
-        "query": "label_values(OpenEBS_jiva_size_of_volume, openebs_pv)",
+        "query": "label_values(openebs_size_of_volume, openebs_pv)",
         "refresh": 1,
         "regex": "",
         "sort": 0,
@@ -697,4 +697,4 @@
   "title": "OpenEBS Volume Stats",
   "uid": "JOHe1vdiz",
   "version": 2
-} 
+}
