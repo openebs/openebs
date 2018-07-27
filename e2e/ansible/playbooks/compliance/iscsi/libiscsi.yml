@@ -94,6 +94,9 @@
          shell: iscsi-ls iscsi://{{ ctrl_ip }}
          register: target
          delegate_to: "{{ groups['kubernetes-kubeminions'].0 }}"
+         until: "result.rc == 0"
+         delay: 10 
+         retries: 12
          tags:
            - skip_ansible_lint
 
