@@ -45,11 +45,10 @@
 
 
      - name: 2a) Replace jenkins pod version
-       include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/regex_task.yml"
-       vars:
+       replace:
          path: "{{ result_kube_home.stdout }}/jenkins.yml"
-         replace_item: "{{ver_lts}}"
-         replace_with: "{{ver_2_124}}"
+         regexp: "{{ver_lts}}"
+         replace: "{{ver_2_124}}"
        delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
     
      - name: Create namespace for deployment.
@@ -171,11 +170,10 @@
        register: First_Build
   
      - name: 7)  Replace jenkins pod version
-       include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/regex_task.yml"
-       vars:
+       replace:
          path: "{{ result_kube_home.stdout }}/jenkins.yml"
-         replace_item: "{{ver_2_124}}"
-         replace_with: "{{ver_2_125}}"
+         regexp: "{{ver_2_124}}"
+         replace: "{{ver_2_125}}"
        delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
 
 
