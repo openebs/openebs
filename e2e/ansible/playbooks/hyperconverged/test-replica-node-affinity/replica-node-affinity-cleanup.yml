@@ -58,7 +58,7 @@
     path: "{{ item }}"
     state: absent
   with_items:
-    - "{{ patch_file }}"
-    - "{{ create_sc }}"
+    - "{{ result_kube_home.stdout }}/{{ patch_file }}"
+    - "{{ result_kube_home.stdout }}/{{ create_sc }}"
   delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
