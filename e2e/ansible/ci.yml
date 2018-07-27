@@ -1,9 +1,6 @@
 ---
 - include: pre-requisites.yml
 
-- include: setup-disks.yml
-  when: cluster_type == "managed"
-
 - include: setup-kubernetes.yml
 
 - include: setup-stern.yml
