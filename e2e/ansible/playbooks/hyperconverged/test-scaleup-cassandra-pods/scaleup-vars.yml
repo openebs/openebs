@@ -34,3 +34,6 @@ test_artifacts:
   -  cassandra-statefulset.yaml
   -  cassandra-loadgen.yaml
 
+test_suite_id: 826
+
+test_case_id: 166364

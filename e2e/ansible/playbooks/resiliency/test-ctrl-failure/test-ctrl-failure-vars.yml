@@ -31,4 +31,6 @@ test_pod_regex: maya*|openebs*|pvc*|percona*|chaos*
 
 test_log_path: setup/logs/controller_failure_test.log
 
+test_suite_id: 826
 
+test_case_id: 166357

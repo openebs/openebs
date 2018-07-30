@@ -95,3 +95,7 @@ cluster_type: hosted
 # This allows us to select the tool to create the disks based on the cloud the disks are being created on:
 # Accepted Entries: GCP, AWS
 cloud_provider: GCP
+
+#Testrail Credentials
+testrail_user: "{{ lookup('env','TESTRAIL_USER') }}"
+testrail_password: "{{ lookup('env','TESTRAIL_PASS') }}"

@@ -23,3 +23,6 @@ profile: ~/.bash_profile
 
 namespace: cassandra-test
 
+test_suite_id: 826
+
+test_case_id: 166362

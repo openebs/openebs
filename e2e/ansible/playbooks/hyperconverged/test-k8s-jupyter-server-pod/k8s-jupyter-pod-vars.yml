@@ -15,3 +15,6 @@ test_pod_regex: maya*|openebs*|pvc*|jupyter*
 
 test_log_path: setup/logs/jupyter_test.log
 
+test_suite_id: 826
+
+test_case_id: 166351
