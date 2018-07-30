@@ -218,6 +218,14 @@
      always:
        - block:
 
+           - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/find_regex.yml"
+             vars:
+               string:
+                 - 'panic'
+                 - 'Read-only'
+               path: "{{result_kube_home.stdout}}/{{test_log_path}}"
+               destination_node: "{{groups['kubernetes-kubemasters'].0}}"
+
            - include: cleanup.yml
 
            - name: Test Cleanup Passed
