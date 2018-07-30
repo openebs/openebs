@@ -28,7 +28,7 @@
            executable: /bin/bash
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
          register: result
-         failed_when: "'pvc' and 'Running' in result.stdout"
+         until: "'pvc' and 'Running' not in result.stdout"
          delay: 30
          retries: 10
          changed_when: True
