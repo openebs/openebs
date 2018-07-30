@@ -1,0 +1,6 @@
+TestRailProjectID: 1
+Platform:
+- GKE:
+    Description: A short description for GCP 
+    Test Suite:
+     - 826:
