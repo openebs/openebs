@@ -67,7 +67,7 @@ $ yum -y install docker
 ```
 
 -Functional DNS server, with all hosts configured by appropriate domain names (Ensure nslookup of the hostnames is successful in 
- resolving the machine's IP addresses).The detail steps can be found [here]
+ resolving the machine's IP addresses).The detail steps can be found in below mentioned link.
  (https://medium.com/@fromprasath/adding-centos-to-windows-domain-298977008f6c)
  
  ```
