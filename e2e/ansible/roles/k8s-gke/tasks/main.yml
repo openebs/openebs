@@ -17,7 +17,7 @@
   shell: >
     for ((i=0; i< "{{ disk_count }}"; i++));do
       gcloud compute disks create {{ item }}-{{ name.stdout }}-${i}  --size "{{ disk_size }}" --type "{{ disk_type }}" --zone "{{ cluster_zone }}" &&
-      gcloud compute instances attach-disk {{ item }} --disk {{ item }}-{{ name.stdout }}-${i} --zone "{{ cluster_zone }}"
+      gcloud compute instances attach-disk {{ item }} --disk {{ item }}-{{ name.stdout }}-${i} --device-name {{ item }}-{{ name.stdout }}-${i} --zone "{{ cluster_zone }}"
     done
   args:
     executable: /bin/bash 
