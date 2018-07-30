@@ -3,38 +3,38 @@
 This tutorial provides detailed instructions on how to setup a multi-node BYO (Bring-Your-Own-Host) OpenShift Containerized cluster on 
 RHEL 7.5 and run applications on it with OpenEBS storage.
 
-### PRE-REQUISITES
+### Prerequisites
 
--At least 2 or more RHEL 7.5 hosts (virtual-machines/baremetal/cloud instances) with 3 vCPUs, 16G RAM and 60GB Hard disk.
+-At least 2 or more RHEL 7.5 hosts (virtual-machines/baremetal/cloud instances) with 3 vCPUs, 16GB RAM and 60GB hard disk.
 -A valid Red Hat subscription
 
 ### Attach OpenShift Container Platform Subscription
 
-1.As root on the target machines (both master and node), use subscription-manager to register the systems with Red Hat.
+1. As root on the target machines (both master and node), use subscription-manager to register the systems with Red Hat.
 
 ```
 $ subscription-manager register
 ```
 
-2.Pull the latest subscription data from RHSM:
+2. Pull the latest subscription data from RHSM:
 
 ```
 $ subscription-manager refresh
 ```
 
-3.List the available subscriptions.
+3. List the available subscriptions.
 
 ```
 $ subscription-manager list --available
 ```
 
-4.Find the pool ID that provides OpenShift Container Platform subscription and attach it.
+4. Find the pool ID that provides OpenShift Container Platform subscription and attach it.
 
 ```
 $ subscription-manager attach --pool=<pool_id>
 ```
 
-5.Replace the string <pool_id> with the pool ID of the pool that provides OpenShift Container Platform. The pool ID is a long alphanumeric string.
+5. Replace the string <pool_id> with the pool ID of the pool that provides OpenShift Container Platform. The pool ID is a long alphanumeric string.
 
 These RHEL systems are now authorized to install OpenShift Container Platform. Now you need to tell the systems from where to get 
 OpenShift Container Platform.
@@ -67,7 +67,7 @@ $ yum -y install docker
 ```
 
 -Functional DNS server, with all hosts configured by appropriate domain names (Ensure nslookup of the hostnames is successful in 
- resolving the machine's IP addresses).The detail steps can be found in below mentioned link.
+ resolving the machine's IP addresses).The detailed steps can be found by going to the following link..
  (https://medium.com/@fromprasath/adding-centos-to-windows-domain-298977008f6c)
  
  ```
@@ -94,35 +94,35 @@ Address: 20.10.31.6
  $ atomic-openshift-installer install
  ```
  
- This is an interactive install process that guides you through the various steps. In most cases, you want the default options. When it 
+ This is an interactive installation process that guides you through the various steps. In most cases, you may want the default options. When it 
  starts, select the option for OpenShift Container Platform. You are installing one master and one node.
  
  
- Note: The Openshift deploy cluster playbook performs a health-check prior to execution of the install roles to verify system
+  **Note**:The Openshift deploy cluster playbook performs a health-check prior to executing the install roles to verify system
 readiness. Typically, the following pitfalls may be observed: 
 
-- Memory_availability & storage_availability 
+- Memory_availability and storage_availability 
 
-  - Issue: Checks fail if we don't adhere to production standards. 
+  - Issue: Checks fail if we do not adhere to production standards. 
   - Workaround: Disable check by adding into openshift_disable_check inventory variable.
   
 - Docker image availability 
 
-  - Issue: Checks fail if there are DNS issues/flaky networks due to which the docker.io registry cannot.
-    be accessed. Sometimes, this fails even when a manual inspection show they are available and accessible to the machine.
+  - Issue: Checks fail if there are DNS issues/flaky networks due to which the docker.io registry cannot
+    be accessed. Sometimes, this fails even when a manual inspection shows that they are available and accessible to the machine.
   - Workaround: If manual Skopeo inspect is successful, disable check by adding into openshift_disable_check inventory variable.
   
     Skopeo inspect example : ```skopeo inspect --tls-verify=false docker://docker.io/cockpit/kubernetes:latest```
   
 - Docker storage availability 
 
-  - Issue: Can fail if the Docker service is not running. The daemon doesn't automatically run post yum install.
-  - Workaround: Restart Docker daemon.
+  - Issue: Can fail if the Docker service is not running. The daemon does not automatically run post yum install.
+  - Workaround: Restart the Docker.
  
 - Docker_image_availability
 
-If the above pitfall is observerd during containerzied OpenShift installation, then you need to copy the hosts  from 
-/root/.config/openshift/hosts and paste the same in /etc/ansible/hosts and add the Openshift_disable_check in hosts file.
+If the above pitfall is observerd during containerzied OpenShift installation, you must copy the hosts from 
+/root/.config/openshift/hosts and paste the same in /etc/ansible/hosts and add the Openshift_disable_check in the hosts file.
 
 ```
 [root@osnode1 ansible]# cat hosts
@@ -155,7 +155,7 @@ openshift_disable_check=disk_availability,memory_availability,docker_storage,doc
 20.10.45.111  openshift_public_ip=20.10.45.111 openshift_ip=20.10.45.111 openshift_public_hostname=osnode1.mdataqa.in openshift_hostname=osnode1.mdataqa.in containerized=True connect_to=20.10.45.111 ansible_connection=local
 ```
 
--While Installation if you get following error, then use docker pull command to download the package on both master and nodes.
+-While installing, if you get following error, use docker pull command to download the package on both master and nodes.
 
 ```
 
@@ -197,13 +197,13 @@ openshift_disable_check=disk_availability,memory_availability,docker_storage,doc
                Failed connecting to: registry.access.redhat.com
 ```
 
-The following command can be used to download the required package(master and node).
+The following command can be used to download the required package (master and node).
 
 ```
 docker pull openshift3/node:v3.9.33
 ```
 
--While installation if you get error "Currently, NetworkManager must be installed and enabled prior to installation" then follow the below mentioned steps to make it active(master and node).
+-While installing, if you get the error "Currently, NetworkManager must be installed and enabled prior to installation", you must follow the steps mentioned below to make it active (master and node).
 
 ```
 [root@ocp-node-3 ~]# systemctl show NetworkManager | grep ActiveState
@@ -211,7 +211,7 @@ ActiveState=inactive
 $systemctl enable NetworkManager; systemctl start NetworkManager
 ```
 
-Once the installation is done, you can see the following output.
+After installing, you will see the following output.
 
 ```
   PLAY RECAP *********************************************************************
@@ -228,22 +228,22 @@ Once the installation is done, you can see the following output.
  Node Install               : complete (0:03:20)
 ```
 
--The install process takes approximately 10-15 minutes.
+-Installation takes approximately 10-15 minutes.
 
 ### Start OpenShift Container Platform
-After a successful install, use the following command to start OpenShift Container Platform.
+After successful installation, use the following command to start OpenShift Container Platform.
 
 ```
 systemctl restart atomic-openshift-master-api atomic-openshift-master-controllers
 ```
 
--Before you do anything else, log in at least one time with the default system:admin user, on the master run the following command.
+-Before you do anything more, log in at least one time with the default system:admin user and on the master run the following command.
 
 ```
 $ oc login -u system:admin
 ```
 
--Run the following command to verify that OpenShift Container Platform was installed and started successfully
+-Run the following command to verify that OpenShift Container Platform was installed and started successfully.
 ```
 $ oc get nodes
 ```
@@ -252,12 +252,12 @@ $ oc get nodes
 The default behavior of a freshly installed OpenShift Container Platform instance is to deny any user from logging in. To change the 
 authentication method to HTPasswd:
 
-1.Open the /etc/origin/master/master-config.yaml file in edit mode.
-2.Find the identityProviders section.
-3.Change DenyAllPasswordIdentityProvider to HTPasswdPasswordIdentityProvider provider.
-4.Change the value of the name label to htpasswd_auth and add a new line file: /etc/origin/openshift-passwd in the provider section.
+1. Open the /etc/origin/master/master-config.yaml file in edit mode.
+2. Find the identityProviders section.
+3. Change DenyAllPasswordIdentityProvider to HTPasswdPasswordIdentityProvider.
+4. Change the value of the name label to htpasswd_auth and add a new line file: /etc/origin/openshift-passwd in the provider section.
 
-An example identityProviders section with HTPasswdPasswordIdentityProvider would look like the following.
+An example identityProviders section with HTPasswdPasswordIdentityProvider will look like the following.
 
 ```
 oauthConfig:
@@ -272,42 +272,42 @@ oauthConfig:
       file: /etc/origin/openshift-passwd
 ```
 
-5.Save the file.
+5. Save the file.
 
 ### Create User Accounts
-1.You can use the httpd-tools package to obtain the htpasswd binary that can generate these accounts.
+1. You can use the httpd-tools package to obtain the htpasswd binary that can generate these accounts.
 
 ```
 # yum -y install httpd-tools
 ```
 
-2.Create a user account.
+2. Create a user account.
 
 ```
 # touch /etc/origin/openshift-passwd
 # htpasswd -b /etc/origin/openshift-passwd admin redhat
 ```
-You have created a user, admin, with the password, redhat.
+You have created a user with admin role and password as redhat.
 
-3.Restart OpenShift before going forward.
+3. Restart OpenShift before going forward.
 
 ```
 # systemctl restart atomic-openshift-master-api atomic-openshift-master-controllers
 ```
 
-4.Give this user account cluster-admin privileges, which allows it to do everything.
+4. Give this user account cluster-admin privileges, which allows it to do everything.
 
 ```
 oc adm policy add-cluster-role-to-user cluster-admin admin --as=system:admin
 ```
 
-5.You can use this username/password combination to log in via the web console or the command line. To test this, run the following command.
+5. You can use this username/password combination to log in via the web console or the command line. To test this, run the following command.
 
 ```
 $ oc login -u admin
 ```
 
-6.Provide access to the host-volumes (which are needed by the OpenEBS volume replicas) by updating the default security context (scc).
+6. Provide access to the host-volumes (which are needed by the OpenEBS volume replicas) by updating the default security context (scc).
 
 ```
 oc edit scc restricted
@@ -315,13 +315,12 @@ oc edit scc restricted
 
 -Add ```allowHostDirVolumePlugin: true```, ```runAsUser: type: RunAsAny``` and save changes.
 
-7.Allow the containers in the project to run as root.
+7. Allow the containers in the project to run as root.
 
 ```
 oc adm policy add-scc-to-user anyuid -z default --as=system:admin 
 ```
-Note: While the above procedures may be sufficient to enable host access to the containers, you may also need to disable selinux (via 
-setenforce 0) to ensure the same.
+**Note**: While the above procedures may be sufficient to enable host access to the containers, you may also need to disable selinux (via setenforce 0) to ensure the same.
 
 
 ### Setup OpenEBS Control Plane
@@ -338,8 +337,7 @@ oc apply -f openebs-operator
 oc apply -f openebs-storageclasses.yaml
 ```
 
--After applying the operator yaml, if you see pod status is in pending state and on describing the maya-apiserver pod the below error 
-message is found. 
+-After applying the operator yaml, if you see pod status is in pending state and on describing the maya-apiserver pod the the following error message is found.
 
 ```
 [root@osnode1 ~]# oc get pods -n openebs
@@ -357,7 +355,7 @@ Events:
 ```
 
 - You need to have Node-Selectors label set for the nodes that you want to use for compute. i.e. oc edit node osnode1.mdataqa.in and  
-  insert this label node-role.kubernetes.io/compute: "true". That should make your pods scheduled.
+  insert this label node-role.kubernetes.io/compute: "true". That will schedule your pods.
 
 ```
  labels:
@@ -435,10 +433,10 @@ openebs-zk                  openebs.io/provisioner-iscsi                        
 
 #### Deploy a sample application with OpenEBS storage
 
-- Use OpenEBS as persistent storage for a percona deployment by selecting the openebs-percona storageclass in the persistent 
+- Use OpenEBS as persistent storage for a Percona deployment by selecting the openebs-Percona storageclass in the persistent 
 volume claim. 
 
-Apply this percona deployment yaml.
+Apply this Percona deployment yaml.
 
 ```
 cd demo/percona
