@@ -10,3 +10,5 @@ volume_claim: memleak-test
 namespace: memleak-test
 test_pod_regex: maya*|openebs*|pvc*
 test_log_path: setup/logs/memleak_test.log
+test_suite_id: 826
+test_case_id: 166349

@@ -21,3 +21,7 @@ checksum: sha1
 #ns: openebs
 
 snap_name: quicksnap
+
+test_suite_id: 826
+
+test_case_id: 166354

@@ -19,3 +19,7 @@ test_artifacts:
   -  replica_patch.yaml
 
 namespace: drain-node
+
+test_suite_id: 826
+
+test_case_id: 166363

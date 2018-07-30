@@ -30,3 +30,6 @@ test_pod_regex: maya*|openebs*|pvc*|percona*|pumba*
 
 test_log_path: setup/logs/network_failure_test.log
 
+test_suite_id: 826
+
+test_case_id: 166360

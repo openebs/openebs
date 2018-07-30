@@ -32,3 +32,6 @@ mysql_load_duration: 120
 
 namespace: percona-mysql-test
 
+test_suite_id: 826
+
+test_case_id: 166350

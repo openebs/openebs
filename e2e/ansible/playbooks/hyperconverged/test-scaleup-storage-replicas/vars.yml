@@ -24,3 +24,7 @@ namespace: scaleup-storage
 test_pod_regex: maya*|openebs*|pvc*|percona*
 
 test_log_path: setup/logs/scaleup_storage_replicas_test.log
+
+test_suite_id: 826
+
+test_case_id: 166366

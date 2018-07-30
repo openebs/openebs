@@ -12,3 +12,6 @@ postgres_vol_size: 5G
 deb_packages:
   - subversion
 
+test_suite_id: 826
+
+test_case_id: 166352

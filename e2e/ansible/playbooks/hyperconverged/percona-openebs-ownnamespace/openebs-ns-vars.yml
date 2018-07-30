@@ -43,3 +43,7 @@ test_artifacts:
    - openebs-operator-ns-openebs.yaml
 
 namespace: percona-app
+
+test_suite_id: 826
+
+test_case_id: 166356

@@ -16,3 +16,6 @@ namespace: libiscsi-test
 
 utils_path: openebs/e2e/ansible/playbooks/utils
 
+test_suite_id: 826
+
+test_case_id: 166353
