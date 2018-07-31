@@ -65,10 +65,11 @@ NAME                                       CAPACITY   ACCESS MODES   RECLAIM POL
 pvc-48fb36a2-947f-11e8-b1f3-42010a800004   5G         RWO            Delete           Bound     percona-test/demo-vol1-claim   openebs-percona             8m
 ```
 
+Repeat the following on all nodes where replica's are scheduled.
 ```
-kubectl label nodes gke-kmova-helm-default-pool-d8b227cc-6wqr "openebs-pv"="pvc-48fb36a2-947f-11e8-b1f3-42010a800004"
+kubectl label nodes gke-kmova-helm-default-pool-d8b227cc-6wqr "openebs-pv"="openebs-storage"
 ```
 
 ```
-./oebs_update.sh pvc-48fb36a2-947f-11e8-b1f3-42010a800004
+./oebs_update.sh pvc-48fb36a2-947f-11e8-b1f3-42010a800004 openebs-storage
 ```
