@@ -27,7 +27,7 @@
                 "env":[
                   {
                     "name": "REPLICATION_FACTOR",
-                    "value": "1"
+                    "value": "@rep_count"
                   }
                 ]
               },
