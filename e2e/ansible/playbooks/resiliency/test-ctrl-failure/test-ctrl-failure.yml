@@ -216,19 +216,20 @@
              vars:
                status: stop
 
-           - name: Update Testrail
-             shell: source ~/.profile; python3 {{ inventory_dir | dirname }}/files/updater.py -tuser {{ testrail_user }} -tpass {{ testrail_password }} -sid {{ test_suite_id }} -cid {{ test_case_id }} -stid {{ status_id }}
-             args:
-               executable: /bin/bash
+           - block:
+               - name: Update Testrail
+                 shell: source ~/.profile; python3 {{ inventory_dir | dirname }}/files/updater.py -tuser {{ testrail_user }} -tpass {{ testrail_password }} -sid {{ test_suite_id }} -cid {{ test_case_id }} -stid {{ status_id }}
+                 args:
+                   executable: /bin/bash
 
-           - name: Testrail Updated
-             set_fact:
-               tflag: "Testrail Updated"
+               - name: Testrail Updated
+                 set_fact:
+                   tflag: "Testrail Updated"
 
-         rescue:
-           - name: Testrail Update failed
-             set_fact:
-               tflag: "Testrail Update Failed"
+             rescue:
+               - name: Testrail Update failed
+                 set_fact:
+                   tflag: "Testrail Update Failed"
 
            - name: Send slack notification
              slack:
