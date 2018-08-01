@@ -4,3 +4,4 @@ Platform:
     Description: A short description for GKE 
     Test Suite:
      - 826:
+        Exclude:
