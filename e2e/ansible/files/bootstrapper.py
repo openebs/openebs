@@ -36,7 +36,7 @@ def create_test_plan(client, args, project_id):
 
 def add_suites(plan_id, suite_id, client, suite_info, project_id):
     description = ""
-    if suite_info is not None and 'Exclude' in suite_info:
+    if suite_info is not None and 'Exclude' in suite_info and suite_info['Exclude'] is not None:
         ids = []
         paths = []
         cases = client.send_get('get_cases/'+str(project_id)+'&suite_id=' + str(suite_id))
