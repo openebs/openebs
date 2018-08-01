@@ -8,7 +8,7 @@ from datetime import datetime
 
 
 def get_client(args):
-    client = testrail.APIClient("https://cloudbyte.testrail.com")
+    client = testrail.APIClient("https://cloudbyte.testrail.io")
     client.user, client.password = args['testrail_username'], args["testrail_password"]
     return client
 
@@ -24,22 +24,22 @@ def write_file(path, content):
     return path, 0
 
 
-def create_test_plan(client, args):
+def create_test_plan(client, args, project_id):
     plan_name = "BUILD_" + args['build_number'] + "_" + str(datetime.now())[:10]
     description = "A description"
-    plan = client.send_post('add_plan/5', {'name': plan_name, 'description': description})
+    plan = client.send_post('add_plan/'+str(project_id), {'name': plan_name, 'description': description})
     if plan['id'] is None:
         print("Plan creation failed")
         exit(-1)
     return plan['id']
 
 
-def add_suites(plan_id, suite_id, client, suite_info):
+def add_suites(plan_id, suite_id, client, suite_info, project_id):
     description = ""
     if 'Exclude' in suite_info:
         ids = []
         paths = []
-        cases = client.send_get('get_cases/5&suite_id=' + str(suite_id))
+        cases = client.send_get('get_cases/'+str(project_id)+'&suite_id=' + str(suite_id))
         for case in cases:
             if case['id'] in suite_info['Exclude']:
                 continue
@@ -54,7 +54,7 @@ def add_suites(plan_id, suite_id, client, suite_info):
             exit(-1)
         return suite['runs'][0]['id'], paths
     else:
-        cases = client.send_get('get_cases/5&suite_id=' + str(suite_id))
+        cases = client.send_get('get_cases/'+str(project_id)+'&suite_id=' + str(suite_id))
         paths = []
         for case in cases:
             paths.append(case['refs'])
@@ -82,14 +82,15 @@ def create_plan_resources(args):
     paths = []
     run_id = 0
     yaml_info = parse_yaml(get_file_data("../playbooks/test_suites.yml"))
+    project_id= yaml_info['TestRailProjectID']
     for platforms in yaml_info['Platform']:
         for platform_name, platform_info in platforms.items():
-            plan_run_id = create_test_plan(client, args)
+            plan_run_id = create_test_plan(client, args, project_id)
             map_src_id["plan_run_id"] = plan_run_id
             map_src_id["platforms"][platform_name] = {'suites': {}}
             for suites in platform_info['Test Suite']:
                 for suite_name, suite_info in suites.items():
-                    suite_run_id, tpaths = add_suites(plan_run_id, suite_name, client, suite_info)
+                    suite_run_id, tpaths = add_suites(plan_run_id, suite_name, client, suite_info, project_id)
                     map_src_id["platforms"][platform_name]["suites"][suite_name] = suite_run_id
                     paths = paths + tpaths
                     run_id = suite_run_id
