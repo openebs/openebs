@@ -8,7 +8,7 @@ from datetime import datetime
 
 
 def get_client(args):
-    client = testrail.APIClient("https://cloudbyte.testrail.io")
+    client = testrail.APIClient("https://cloudbyte.testrail.com")
     client.user, client.password = args['testrail_username'], args["testrail_password"]
     return client
 
@@ -36,7 +36,7 @@ def create_test_plan(client, args, project_id):
 
 def add_suites(plan_id, suite_id, client, suite_info, project_id):
     description = ""
-    if 'Exclude' in suite_info:
+    if suite_info is not None and 'Exclude' in suite_info:
         ids = []
         paths = []
         cases = client.send_get('get_cases/'+str(project_id)+'&suite_id=' + str(suite_id))
