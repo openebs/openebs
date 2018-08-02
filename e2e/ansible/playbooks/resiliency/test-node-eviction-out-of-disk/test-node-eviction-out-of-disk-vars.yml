@@ -3,18 +3,21 @@ test_name: test-node-eviction-out-of-disk
 
 namespace: nodeeviction
 
-patch_file: replica_patch.yaml
+percona_links:
+  - https://raw.githubusercontent.com/openebs/elves/master/e2e/percona-liveness/percona.yaml
+  - https://raw.githubusercontent.com/openebs/elves/master/e2e/percona-liveness/sql-test.sh
 
 percona_files:
   - percona.yaml
+  - sql-test.sh
 
 replace_item:
-  - nodename_where_replica_pod_1_got_scheduled
-  - nodename_where_replica_pod_2_got_scheduled
+  - demo-vol1-claim
+  - demo-vol1
 
 replace_with:
-  - "{{node_details.stdout_lines[0]}}"
-  - "{{node_details.stdout_lines[1]}}"
+  - test-node-eviction
+  - test-nodeeviction
 
 test_pod_regex: maya*|openebs*|pvc*|percona*
 
@@ -22,4 +25,3 @@ test_log_path: setup/logs/test-node-eviction-out-of-disk.log
 
 key: node.kubernetes.io/out-of-disk
 
-storage_class_file: nodeeviction-sc.yaml
