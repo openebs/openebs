@@ -2,34 +2,53 @@ apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   name: alertmanager
+  labels:
+    k8s-app: alertmanager
+    kubernetes.io/cluster-service: "true"
+    addonmanager.kubernetes.io/mode: Reconcile
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: alertmanager
+      k8s-app: alertmanager
   template:
     metadata:
-      name: alertmanager
       labels:
-        app: alertmanager
+        k8s-app: alertmanager
+      annotations:
+        scheduler.alpha.kubernetes.io/critical-pod: ''
     spec:
       serviceAccountName: prometheus
       containers:
-      - name: alertmanager
-        image: prom/alertmanager:v0.9.1
+      - name: prometheus-alertmanager
+        image: prom/alertmanager:v0.15.0
         args:
-          - '-config.file=/etc/alertmanager/config.yml'
-          - '-storage.path=/alertmanager'
+          - '--config.file=/etc/config/alertmanager.yml'
+          - '--storage.path=/data'
+          - '--web.external-url=/'
         ports:
-        - name: alertmanager
-          containerPort: 9093
+        - containerPort: 9093
+        readinessProbe:
+          httpGet:
+            path: /#/status
+            port: 9093
+          initialDelaySeconds: 30
+          timeoutSeconds: 30
         volumeMounts:
         - name: config-volume
-          mountPath: /etc/alertmanager
+          mountPath: /etc/config
         - name: templates-volume
           mountPath: /alertmanager/template/
-        - name: alertmanager
-          mountPath: /alertmanager
+        - name: storage-volume
+          mountPath: "/data"
+          subPath: ""
+        resources:
+          limits:
+            cpu: 10m
+            memory: 50Mi
+          requests:
+            cpu: 10m
+            memory: 50Mi
       volumes:
       - name: config-volume
         configMap:
@@ -37,25 +56,22 @@ spec:
       - name: templates-volume
         configMap:
           name: alertmanager-templates
-      - name: alertmanager
+      - name: storage-volume
         emptyDir: {}
-
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  annotations:
-    prometheus.io/scrape: 'true'
-    prometheus.io/path: '/alertmanager/metrics'
-  labels:
-    name: alertmanager
   name: alertmanager
+  labels:
+    kubernetes.io/cluster-service: "true"
+    addonmanager.kubernetes.io/mode: Reconcile
+    kubernetes.io/name: "Alertmanager"
 spec:
   selector:
-    app: alertmanager
+    k8s-app: alertmanager
   type: NodePort
   ports:
-  - name: alertmanager
-    protocol: TCP
+  - protocol: TCP
     port: 9093
     targetPort: 9093
