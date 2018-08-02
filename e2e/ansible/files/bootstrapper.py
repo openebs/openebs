@@ -134,14 +134,14 @@ def create_plan_resources(args):
                 {
                     "when": "slack_notify | bool and lookup('env','SLACK_TOKEN')",
                     "slack": {
-                        "msg": "{{ ansible_date_time.time }} OPENEBS TESTSUITE: ENDED",
+                        "msg": "TestRail Results : <https://cloudbyte.testrail.com/index.php?/runs/view/"+str(run_id)+"|"+str(run_id)+">",
                         "token": "{{ lookup('env','SLACK_TOKEN') }}"
                     }
                 },
                 {
                     "when": "slack_notify | bool and lookup('env','SLACK_TOKEN')",
                     "slack": {
-                        "msg": "Results Updated:https://cloudbyte.testrail.com/index.php?/runs/view/"+str(run_id),
+                        "msg": "{{ ansible_date_time.time }} OPENEBS TESTSUITE: ENDED",
                         "token": "{{ lookup('env','SLACK_TOKEN') }}"
                     }
                 }
