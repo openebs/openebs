@@ -50,7 +50,7 @@ You can use the following as references to know about the changes in 0.6:
 
 After updating the YAML or helm chart or helm chart values, you can use the above procedures to upgrade the OpenEBS Operator
 
-## Step 2: Upgrade the OpenEBS Volumes (WIP)
+## Step 2: Upgrade the OpenEBS Volumes
 
 Even after the OpenEBS Operator has been upgraded to 0.6, the volumes will continue to work with 0.5.3 or 0.5.4. Each of the volumes should be upgraded (one at a time) to 0.6, using the steps provided below. 
 
@@ -62,18 +62,22 @@ So as part of upgrade, we recommend that you label the nodes where the replica p
 ```
 kubectl label nodes gke-kmova-helm-default-pool-d8b227cc-6wqr "openebs-pv"="openebs-storage"
 ```
-Repeat the above step of labellilng the node for all the nodes where replica's are scheduled. The assumption is that all the PV replica's are scheduled on the same set of 3 nodes. 
-
-Note:
-- need to handle cases where there are a mix of PVs with 1 and 3 replicas or 
-- scenario like PV1 replicas are on nodes - n1, n2, n3, where as PV2 replicas are on nodes - n2, n3, n4
-
 Note that the key `openebs-pv` is fixed, however you can use any value in place of `openebs-storage`. This value will be taken as a parameters in the upgrade script below. 
 
+Repeat the above step of labellilng the node for all the nodes where replica's are scheduled. The assumption is that all the PV replica's are scheduled on the same set of 3 nodes. 
+
+Limitations:
+- need to handle cases where there are a mix of PVs with 1 and 3 replicas or 
+- scenario like PV1 replicas are on nodes - n1, n2, n3, where as PV2 replicas are on nodes - n2, n3, n4
+- this is a preliminary script only intended for using on volumes where data has been backed-up.
+- please have the following link handy in case the volume gets into read-only during upgrade 
+  https://docs.openebs.io/docs/next/readonlyvolumes.html
+- in the process of running the below steps, if you run into issues, you can always reach us on slack
 
 ### Download the upgrade scripts
 
 Either `git clone` or download the following files to your work directory. 
+https://github.com/openebs/openebs/tree/master/k8s/upgrades/0.5.x-0.6.0
 - `patch-strategy-recreate.json`
 - `replica.patch.tpl.yml`
 - `controller.patch.tpl.yml`
@@ -95,3 +99,4 @@ pvc-48fb36a2-947f-11e8-b1f3-42010a800004   5G         RWO            Delete     
 ```
 ./oebs_update.sh pvc-48fb36a2-947f-11e8-b1f3-42010a800004 openebs-storage
 ```
+
