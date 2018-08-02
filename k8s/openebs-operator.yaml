@@ -22,12 +22,12 @@ metadata:
 rules:
 - apiGroups: ["*"]
   resources: ["nodes","nodes/proxy"]
-  verbs: ["get","list","watch","create","update"]
+  verbs: ["get", "list", "watch"]
 - apiGroups: ["*"]
-  resources: ["namespaces","services","pods","deployments", "events", "endpoints"]
+  resources: ["namespaces", "services", "pods", "deployments", "events", "endpoints", "configmaps"]
   verbs: ["*"]
 - apiGroups: ["*"]
-  resources: ["persistentvolumes","persistentvolumeclaims"]
+  resources: ["persistentvolumes","persistentvolumeclaims","storagepoolclaims","disks","storagepools"]
   verbs: ["*"]
 - apiGroups: ["storage.k8s.io"]
   resources: ["storageclasses"]
@@ -36,7 +36,10 @@ rules:
   resources: ["customresourcedefinitions"]
   verbs: [ "get", "list", "create" ]
 - apiGroups: ["*"]
-  resources: ["storagepools"]
+  resources: [ "cstorpools","cstorvolumereplicas","cstorvolumes" ]
+  verbs: ["*" ]
+- apiGroups: ["*"]
+  resources: ["castemplates"]
   verbs: ["get", "list"]
 - apiGroups: ["volumesnapshot.external-storage.k8s.io"]
   resources: ["volumesnapshots","volumesnapshotdatas"]
@@ -79,10 +82,18 @@ spec:
       containers:
       - name: maya-apiserver
         imagePullPolicy: Always
-        image: openebs/m-apiserver:0.6.0
+        image: openebs/m-apiserver:ci
         ports:
         - containerPort: 5656
         env:
+        # OPENEBS_IO_CAS_TEMPLATE_FEATURE_GATE enables cas template feature;
+        # valid values are 'on' and 'off'. This feature is disabled by default.
+        - name: OPENEBS_IO_CAS_TEMPLATE_FEATURE_GATE
+          value: "true"
+        # OPENEBS_IO_CAS_TEMPLATE_TO_LIST_VOLUME sets the cas template name to
+        # list volumes. This is a mandatory env variable.
+        - name: OPENEBS_IO_CAS_TEMPLATE_TO_LIST_VOLUME
+          value: "jiva-volume-list-default-0.7.0"
         # OPENEBS_IO_KUBE_CONFIG enables maya api service to connect to K8s
         # based on this config. This is ignored if empty.
         # This is supported for maya api server version 0.5.2 onwards
@@ -151,8 +162,12 @@ spec:
       containers:
       - name: openebs-provisioner
         imagePullPolicy: Always
-        image: openebs/openebs-k8s-provisioner:0.6.0
+        image: openebs/openebs-k8s-provisioner:ci
         env:
+        # OPENEBS_IO_CAS_TEMPLATE_FEATURE_GATE enables cas template feature;
+        # valid values are 'on' and 'off'. This feature is disabled by default.
+        - name: OPENEBS_IO_CAS_TEMPLATE_FEATURE_GATE
+          value: "true"
         # OPENEBS_IO_K8S_MASTER enables openebs provisioner to connect to K8s
         # based on this address. This is ignored if empty.
         # This is supported for openebs provisioner version 0.5.2 onwards
@@ -202,7 +217,7 @@ spec:
       serviceAccountName: openebs-maya-operator
       containers:
         - name: snapshot-controller
-          image: openebs/snapshot-controller:0.6.0
+          image: openebs/snapshot-controller:ci
           imagePullPolicy: Always
           env:
           - name: OPENEBS_NAMESPACE
@@ -210,7 +225,7 @@ spec:
               fieldRef:
                 fieldPath: metadata.namespace
         - name: snapshot-provisioner
-          image: openebs/snapshot-provisioner:0.6.0
+          image: openebs/snapshot-provisioner:ci
           imagePullPolicy: Always
           env:
           - name: OPENEBS_NAMESPACE
@@ -264,6 +279,106 @@ spec:
     shortNames:
     - sp
 ---
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  # name must match the spec fields below, and be in the form: <plural>.<group>
+  name: cstorpools.openebs.io
+spec:
+  # group name to use for REST API: /apis/<group>/<version>
+  group: openebs.io
+  # version name to use for REST API: /apis/<group>/<version>
+  version: v1alpha1
+  # either Namespaced or Cluster
+  scope: Cluster
+  names:
+    # plural name to be used in the URL: /apis/<group>/<version>/<plural>
+    plural: cstorpools
+    # singular name to be used as an alias on the CLI and for display
+    singular: cstorpool
+    # kind is normally the CamelCased singular type. Your resource manifests use this.
+    kind: CStorPool
+    # shortNames allow shorter string to match your resource on the CLI
+    shortNames:
+    - csp
+---
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  # name must match the spec fields below, and be in the form: <plural>.<group>
+  name: castemplates.openebs.io
+spec:
+  # group name to use for REST API: /apis/<group>/<version>
+  group: openebs.io
+  # version name to use for REST API: /apis/<group>/<version>
+  version: v1alpha1
+  # either Namespaced or Cluster
+  scope: Cluster
+  names:
+    # plural name to be used in the URL: /apis/<group>/<version>/<plural>
+    plural: castemplates
+    # singular name to be used as an alias on the CLI and for display
+    singular: castemplate
+    # kind is normally the CamelCased singular type. Your resource manifests use this.
+    kind: CASTemplate
+    # shortNames allow shorter string to match your resource on the CLI
+    shortNames:
+    - cast
+---
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  name: cstorvolumereplicas.openebs.io
+spec:
+  group: openebs.io
+  names:
+    kind: CStorVolumeReplica
+    listKind: CStorVolumeReplicaList
+    plural: cstorvolumereplicas
+    shortNames:
+    - cvr
+    singular: cstorvolumereplica
+  scope: Namespaced
+  version: v1alpha1
+---
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  # name must match the spec fields below, and be in the form: <plural>.<group>
+  name: disks.openebs.io
+spec:
+  # group name to use for REST API: /apis/<group>/<version>
+  group: openebs.io
+  # version name to use for REST API: /apis/<group>/<version>
+  version: v1alpha1
+  scope: Cluster
+  names:
+    # plural name to be used in the URL: /apis/<group>/<version>/<plural>
+    plural: disks
+    # singular name to be used as an alias on the CLI and for display
+    singular: disk
+    # kind is normally the CamelCased singular type. Your resource manifests use this.
+    kind: Disk
+    # shortNames allow shorter string to match your resource on the CLI
+    shortNames:
+    - disk
+---
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  name: cstorvolumes.openebs.io
+spec:
+  group: openebs.io
+  names:
+    kind: CStorVolume
+    listKind: CStorVolumeList
+    plural: cstorvolumes
+    shortNames:
+    - cstorvolume
+    singular: cstorvolume
+  scope: Namespaced
+  version: v1alpha1
+---
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
@@ -281,25 +396,48 @@ metadata:
   name: openebs-snapshot-promoter
 provisioner: volumesnapshot.external-storage.k8s.io/snapshot-promoter
 ---
-apiVersion: apiextensions.k8s.io/v1beta1
-kind: CustomResourceDefinition
+apiVersion: extensions/v1beta1
+kind: DaemonSet
 metadata:
-  # name must match the spec fields below, and be in the form: <plural>.<group>
-  name: volumepolicies.openebs.io
+  name: node-disk-manager
+  namespace: openebs
 spec:
-  # group name to use for REST API: /apis/<group>/<version>
-  group: openebs.io
-  # version name to use for REST API: /apis/<group>/<version>
-  version: v1alpha1
-  # either Namespaced or Cluster
-  scope: Cluster
-  names:
-    # plural name to be used in the URL: /apis/<group>/<version>/<plural>
-    plural: volumepolicies
-    # singular name to be used as an alias on the CLI and for display
-    singular: volumepolicy
-    # kind is normally the CamelCased singular type. Your resource manifests use this.
-    kind: VolumePolicy
-    # shortNames allow shorter string to match your resource on the CLI
-    shortNames:
-    - vp
+  template:
+    metadata:
+      labels:
+        app: node-disk-manager
+    spec:
+      # By default the node-disk-manager will be run on all kubernetes nodes
+      # If you would like to limit this to only some nodes, say the nodes
+      # that have storage attached, you could label those node and use nodeSelector.
+      # Example: Label the storage nodes with - "openebs.io/nodegroup"="storage-node"
+      # kubectl label node <node-name> "openebs.io/nodegroup"="storage-node"
+      #nodeSelector:
+      #  "openebs.io/nodegroup": "storage-node"
+      serviceAccountName: openebs-maya-operator
+      hostNetwork: true
+      containers:
+      - name: node-disk-manager
+        command:
+        - /usr/sbin/ndm
+        - start
+        image: openebs/node-disk-manager-amd64:ci
+        imagePullPolicy: Always
+        securityContext:
+          privileged: true
+        # make udev database available inside container
+        volumeMounts:
+        - name: udev
+          mountPath: /run/udev
+        env:
+        # pass hostname as env variable using downward API to the NDM container
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+      volumes:
+      - name: udev
+        hostPath:
+          path: /run/udev
+          type: Directory
+---
