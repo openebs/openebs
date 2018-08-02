@@ -1,10 +1,10 @@
 ---
-- name: Get pvc name to verify successful pvc deletion
+- name: Get pv name to verify successful pvc deletion
   shell: source ~/.profile; kubectl get pvc -n {{ namespace }} | grep {{ replace_with.0 }} | awk {'print $3'}
   args:
     executable: /bin/bash
   delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-  register: pvc
+  register: pv
   changed_when: true
 
 - name: Delete pumba infrastructure
@@ -27,12 +27,12 @@
     app: percona
 
 - name: Confirm pvc pod has been deleted
-  shell: source ~/.profile; kubectl get pods -n {{ namespace }} | grep {{ pvc.stdout }}
+  shell: source ~/.profile; kubectl get pods -n {{ namespace }} 
   args:
     executable: /bin/bash
   delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
   register: result
-  until: "'pvc' and 'Running' not in result.stdout"
+  until: "pv.stdout not in result.stdout"
   delay: 30
   retries: 10
   changed_when: true
