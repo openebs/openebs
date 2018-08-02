@@ -44,7 +44,6 @@
      retries: 5
      changed_when: True
 
-
    - name: untaint the nodes
      shell: source ~/.profile; kubectl taint nodes {{ node1 }} {{ operator_key }}:NoSchedule-; kubectl taint nodes {{ node_names[0] }} {{ pvc_key }}:NoSchedule-; kubectl taint nodes {{ node_names[1] }} {{ pvc_key }}:NoSchedule-
      args:
