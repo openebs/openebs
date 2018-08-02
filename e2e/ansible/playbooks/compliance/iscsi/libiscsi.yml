@@ -33,7 +33,9 @@
          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
 
        - name: 3) Create test specific namespace
-         command: kubectl create ns {{ namespace }}
+         shell: kubectl create ns {{ namespace }}
+         args:
+           executable: /bin/bash
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
        - name: 3a) Create a storage volume via a pvc
@@ -94,7 +96,7 @@
          shell: iscsi-ls iscsi://{{ ctrl_ip }}
          register: target
          delegate_to: "{{ groups['kubernetes-kubeminions'].0 }}"
-         until: "result.rc == 0"
+         until: "target.rc == 0"
          delay: 10 
          retries: 12
          tags:
@@ -175,6 +177,13 @@
            - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/stern_task.yml"
              vars:
                status: stop
+
+           - name: Delete namespace
+             shell: source ~/.profile; kubectl delete ns {{ namespace }}
+             args:
+               executable: /bin/bash
+             delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+             changed_when: true
 
            - block:
                - name: Update Testrail
