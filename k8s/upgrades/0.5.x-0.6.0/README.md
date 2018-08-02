@@ -52,9 +52,34 @@ After updating the YAML or helm chart or helm chart values, you can use the abov
 
 ## Step 2: Upgrade the OpenEBS Volumes (WIP)
 
-Even after the OpenEBS has been upgraded to 0.6, the volumes will continue to work with 0.5.3. However, with 0.6 - there are good fixes w.r.t volume stability in the event of node failures that are good to consume. The upgrades of the volumes have to be planned by scheduling an application downtime. 
+Even after the OpenEBS Operator has been upgraded to 0.6, the volumes will continue to work with 0.5.3 or 0.5.4. Each of the volumes should be upgraded (one at a time) to 0.6, using the steps provided below. 
+
+*Note: There has been a change in the way OpenEBS Controller Pods communicate with the Replica Pods. So, it is recommended to schedule a downtime for the application using the OpenEBS PV while performing this upgrade. Also, make sure you have taken a backup of the data before starting the below upgrade procedure.*
+
+In 0.5.x releases, when a replica is shutdown, it will get rescheduled to another availble node in the cluster and start copying the data from the other replicas. This is not a desired behaviour during upgrades, which will create new replica's as part of the rolling-upgrade. To pin the replicas or force them to the nodes where the data is already present, starting with 0.6 - we use the concept of nodeSelector and Tolerations that will make sure replica's are not moved on node or pod delete operations.
+
+So as part of upgrade, we recommend that you label the nodes where the replica pods are scheduled as follows:
+```
+kubectl label nodes gke-kmova-helm-default-pool-d8b227cc-6wqr "openebs-pv"="openebs-storage"
+```
+Repeat the above step of labellilng the node for all the nodes where replica's are scheduled. The assumption is that all the PV replica's are scheduled on the same set of 3 nodes. 
+
+Note:
+- need to handle cases where there are a mix of PVs with 1 and 3 replicas or 
+- scenario like PV1 replicas are on nodes - n1, n2, n3, where as PV2 replicas are on nodes - n2, n3, n4
+
+Note that the key `openebs-pv` is fixed, however you can use any value in place of `openebs-storage`. This value will be taken as a parameters in the upgrade script below. 
 
 
+### Download the upgrade scripts
+
+Either `git clone` or download the following files to your work directory. 
+- `patch-strategy-recreate.json`
+- `replica.patch.tpl.yml`
+- `controller.patch.tpl.yml`
+- `oebs_update.sh`
+
+### Select the PV that needs to be upgraded. 
 
 ```
 kubectl get pv
@@ -65,10 +90,7 @@ NAME                                       CAPACITY   ACCESS MODES   RECLAIM POL
 pvc-48fb36a2-947f-11e8-b1f3-42010a800004   5G         RWO            Delete           Bound     percona-test/demo-vol1-claim   openebs-percona             8m
 ```
 
-Repeat the following on all nodes where replica's are scheduled.
-```
-kubectl label nodes gke-kmova-helm-default-pool-d8b227cc-6wqr "openebs-pv"="openebs-storage"
-```
+### Upgrade the PV that needs to be upgraded. 
 
 ```
 ./oebs_update.sh pvc-48fb36a2-947f-11e8-b1f3-42010a800004 openebs-storage
