@@ -25,8 +25,8 @@ c_dep=$(echo $pv-ctrl); c_name=$(echo $c_dep-con)
 r_dep=$(echo $pv-rep); r_name=$(echo $r_dep-con)
 rep_count=`kubectl get deploy $r_dep --namespace $ns -o jsonpath="{.spec.replicas}"`
 
-#kubectl patch deployment --namespace $ns --type json $r_dep -p "$(cat patch-strategy-recreate.json)"
-#kubectl patch deployment --namespace $ns --type json $c_dep -p "$(cat patch-strategy-recreate.json)"
+kubectl patch deployment --namespace $ns --type json $r_dep -p "$(cat patch-strategy-recreate.json)"
+kubectl patch deployment --namespace $ns --type json $c_dep -p "$(cat patch-strategy-recreate.json)"
 
 c_rs=$(kubectl get rs -o name --namespace $ns | grep $c_dep | cut -d '/' -f 2)
 r_rs=$(kubectl get rs -o name --namespace $ns | grep $r_dep | cut -d '/' -f 2)
