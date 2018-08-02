@@ -215,6 +215,13 @@
               vars:
                 status: stop
 
+            - name: Delete the namespace
+              shell: source ~/.profile; kubectl delete ns "{{ namespace }}"
+              args:
+                executable: /bin/bash
+              delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+              changed_when: true
+
             - name: Send slack notification
               slack:
                 token: "{{ lookup('env','SLACK_TOKEN') }}"

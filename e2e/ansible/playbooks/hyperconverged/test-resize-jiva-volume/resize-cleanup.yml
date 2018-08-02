@@ -49,9 +49,4 @@
     state: absent
   delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
-- name: Delete the test specific namespace
-  shell: source ~/.profile; kubectl delete ns "{{ namespace }}"
-  args:
-    executable: /bin/bash
-  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 

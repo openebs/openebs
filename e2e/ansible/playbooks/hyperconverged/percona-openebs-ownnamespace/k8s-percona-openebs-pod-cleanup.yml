@@ -1,55 +1,43 @@
 
 
-       - name: Get pv name to verify successful pvc deletion
-         shell: source ~/.profile; kubectl get pvc -n {{ namespace }} | grep {{ replace_with.0 }} | awk {'print $3'}
-         args:
-           executable: /bin/bash
-         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-         register: pv
-         changed_when: True
+ - name: Get pv name to verify successful pvc deletion
+   shell: source ~/.profile; kubectl get pvc -n {{ namespace }} | grep {{ replace_with.0 }} | awk {'print $3'}
+   args:
+     executable: /bin/bash
+   delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+   register: pv
+   changed_when: True
 
 
-       - name: Delete percona deployment
-         include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/delete_deploy.yml"
-         vars:
-           app_yml: "{{ percona_file }}"
-           ns: "{{namespace}}"
+ - name: Delete percona deployment
+   include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/delete_deploy.yml"
+   vars:
+     app_yml: "{{ percona_file }}"
+     ns: "{{namespace}}"
 
-       - name: Confirm percona pod has been deleted
-         include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/delete_deploy_check.yml"
-         vars:
-           ns: "{{namespace}}"
-           app: percona
-
-
-       - name: Confirm percona pvc pod has been deleted
-         shell: source ~/.profile; kubectl get pods -n {{ namespace }}
-         args:
-           executable: /bin/bash
-         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-         register: result
-         until: "pv.stdout not in result.stdout"
-         delay: 30
-         retries: 10
-         changed_when: True
-
-       - name: Delete namespace
-         shell: source ~/.profile; kubectl delete ns {{ namespace }}
-         args:
-           executable: /bin/bash
-         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
-         register: result
-         until: "'deleted' in result.stdout"
-         delay: 10
-         retries: 5
-         changed_when: True
+ - name: Confirm percona pod has been deleted
+   include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/delete_deploy_check.yml"
+   vars:
+     ns: "{{namespace}}"
+     app: percona
 
 
-       - name: Remove test artifacts
-         file:
-           path: "{{ result_kube_home.stdout }}/{{ item }}"
-           state: absent
-         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-         with_items:
-             - "{{test_artifacts}}"
+ - name: Confirm percona pvc pod has been deleted
+   shell: source ~/.profile; kubectl get pods -n {{ namespace }}
+   args:
+     executable: /bin/bash
+   delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+   register: result
+   until: "pv.stdout not in result.stdout"
+   delay: 30
+   retries: 10
+   changed_when: True
+
+ - name: Remove test artifacts
+   file:
+     path: "{{ result_kube_home.stdout }}/{{ item }}"
+     state: absent
+   delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+   with_items:
+       - "{{test_artifacts}}"
 
