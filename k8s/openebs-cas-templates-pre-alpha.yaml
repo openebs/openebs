@@ -12,7 +12,7 @@ spec:
   # CstorPoolMgmtImage runs cstor pool and cstor volume replica related CRUD 
   # operations
   - name: CstorPoolMgmtImage
-    value: openebs/cstor-pool-mgmt:cstor-feature-integration-ci
+    value: openebs/cstor-pool-mgmt:ci
   # HostPathType is a hostPath volume i.e. mounts a file or directory from the 
   # host node’s filesystem into a Pod. 'DirectoryOrCreate' value  ensures 
   # nothing exists at the given path i.e. an empty directory will be created.
@@ -397,7 +397,6 @@ metadata:
 spec:
   defaultConfig:
   - name: VolumeControllerImage
-    #value: openebs/cstor-volume-mgmt:cstor-feature-integration-ci
     value: openebs/cstor-volume-mgmt:ci
   - name: VolumeTargetImage
     value: openebs/cstor-istgt:ci
