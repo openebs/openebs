@@ -196,14 +196,14 @@
                cflag: "Cleanup Failed"
 
          always:
-           
-           - name: Delete namespace
-             shell: source ~/.profile; kubectl delete ns {{ namespace }}
-             args:
-               executable: /bin/bash
-             delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+          
+           - name: Delete namespace	
+             shell: source ~/.profile; kubectl delete ns {{ namespace }}	
+             args:	
+               executable: /bin/bash	
+             delegate_to: "{{groups['kubernetes-kubemasters'].0}}"	
              ignore_errors: true
- 
+
            - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/stern_task.yml"
              vars:
                status: stop
