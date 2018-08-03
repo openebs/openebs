@@ -421,7 +421,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: node-disk-manager-config-default-0.1.0
-  namespace: default
+  namespace: openebs
 data:
   # udev-probe is default or primary probe it should be enabled to run ndm
   # filterconfigs contails configs of filters. To provide a group of include
