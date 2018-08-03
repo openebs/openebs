@@ -103,6 +103,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: maya-apiserver-service
+  namespace: default
 spec:
   ports:
   - name: api
@@ -164,6 +165,7 @@ kind: CustomResourceDefinition
 metadata:
   # name must match the spec fields below, and be in the form: <plural>.<group>
   name: storagepoolclaims.openebs.io
+  namespace: default
 spec:
   # group name to use for REST API: /apis/<group>/<version>
   group: openebs.io
@@ -187,6 +189,7 @@ kind: CustomResourceDefinition
 metadata:
   # name must match the spec fields below, and be in the form: <plural>.<group>
   name: storagepools.openebs.io
+  namespace: default
 spec:
   # group name to use for REST API: /apis/<group>/<version>
   group: openebs.io
@@ -209,6 +212,7 @@ apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
    name: openebs-standard
+   namespace: default
 provisioner: openebs.io/provisioner-iscsi
 parameters:
   openebs.io/storage-pool: "default"
@@ -221,6 +225,7 @@ kind: CustomResourceDefinition
 metadata:
   # name must match the spec fields below, and be in the form: <plural>.<group>
   name: volumepolicies.openebs.io
+  namespace: default
 spec:
   # group name to use for REST API: /apis/<group>/<version>
   group: openebs.io
