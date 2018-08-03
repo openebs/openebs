@@ -250,11 +250,9 @@
               vars:
                 status: stop
 
-            - name: Deletion of namespace
-              shell: source ~/.profile; kubectl delete ns "{{ namespace }}"
-              args:
-                executable: /bin/bash
-              delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+            - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/delete_namespaces.yml"
+
 
             - name: Send slack notification
               slack:

@@ -233,11 +233,7 @@
              vars:
                status: stop
 
-           - name: Deleting namespaces
-             shell: source ~/.profile; kubectl delete ns {{ namespaces }}
-             args:
-               executable: /bin/bash
-             deletegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+           - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/delete_namespaces.yml" 
 
            - block:
                - name: Update Testrail

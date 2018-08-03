@@ -130,13 +130,7 @@
              vars:
                status: stop
 
-           - name: Delete namespace
-             shell: source ~/.profile; kubectl delete ns {{ namespace }}
-             args:
-               executable: /bin/bash
-             delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-             changed_when: true
-
+           - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/delete_namespaces.yml"
 
            - name: Send slack notification
              slack:
@@ -145,7 +139,7 @@
                color: "{{status}}"
              when: slack_notify | bool and lookup('env','SLACK_TOKEN')
 
-
+   
 
 
 

@@ -226,17 +226,9 @@
             - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/stern_task.yml"
               vars:
                 status: stop
-
-            - name: Delete the namespace
-              shell: source ~/.profile; kubectl delete ns {{ namespace }}
-              args:
-                executable: /bin/bash
-              register: result
-              delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-              until: "'deleted' in result.stdout"
-              delay: 60
-              retries: 5
-
+              
+           - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/delete_namespaces.yml"
+ 
             - block:
                 - name: Update Testrail
                   shell: source ~/.profile; python3 {{ inventory_dir | dirname }}/files/updater.py -tuser {{ testrail_user }} -tpass {{ testrail_password }} -sid {{ test_suite_id }} -cid {{ test_case_id }} -stid {{ status_id }}

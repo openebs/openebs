@@ -244,15 +244,7 @@
              vars:
                status: stop
 
-           - name: Delete the namespace
-             shell: source ~/.profile; kubectl delete ns "{{ namespace }}"
-             args:
-               executable: /bin/bash
-             register: ns_delete
-             delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-             until: "'deleted' in ns_delete.stdout"
-             delay: 30
-             retries: 5
+           - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/delete_namespaces.yml"
 
            - block:
                - name: Update Testrail
