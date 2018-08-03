@@ -2,7 +2,7 @@
   "metadata": {
      "labels": {
        "openebs/volume-provisioner": "jiva",
-       "pvce": "@pvc-name"
+       "pvc": "@pvc-name"
      }
   },
   "spec": {

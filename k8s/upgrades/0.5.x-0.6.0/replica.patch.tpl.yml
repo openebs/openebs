@@ -27,7 +27,7 @@
               }
            ],
           "nodeSelector": {
-              "openebs-pv": "@replica_node_label"
+              "openebs-pv-@pv-name": "@replica_node_label"
           },
           "tolerations": [
             {

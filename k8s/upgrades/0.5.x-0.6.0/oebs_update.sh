@@ -38,6 +38,22 @@ c_dep=$(echo $pv-ctrl); c_name=$(echo $c_dep-con)
 r_dep=$(echo $pv-rep); r_name=$(echo $r_dep-con)
 rep_count=`kubectl get deploy $r_dep --namespace $ns -o jsonpath="{.spec.replicas}"`
 
+rep_nodenames=`kubectl get pods -n $ns $rep_labels \
+ -l "vsm=$pv" -l "openebs/replica=jiva-replica" \
+ -o jsonpath="{range .items[*]}{@.spec.nodeName}:{end}"`
+
+echo "Checking if the node with replica pod has been labeled with $replica_node_label"
+for rep_node in `echo $rep_nodenames | tr ":" " "`; do
+    nl="";nl=`kubectl get nodes $rep_node -o jsonpath="{.metadata.labels.openebs-pv-$pv}"`
+    if [  -z "$nl" ];
+    then
+       echo "Labeling $rep_node";
+       kubectl label node $rep_node "openebs-pv-${pv}=$replica_node_label"
+    fi
+done
+
+
+
 echo "Patching Replica Deployment upgrade strategy as recreate"
 kubectl patch deployment --namespace $ns --type json $r_dep -p "$(cat patch-strategy-recreate.json)"
 rc=$?; if [ $rc -ne 0 ]; then echo "ERROR: $rc"; exit; fi
@@ -59,7 +75,8 @@ r_rs=$(kubectl get rs -o name --namespace $ns | grep $r_dep | cut -d '/' -f 2)
 
 sed "s/@pvc-name[^ \"]*/$pvc/g" replica.patch.tpl.yml > replica.patch.tpl.yml.0
 sed "s/@replica_node_label[^ \"]*/$replica_node_label/g" replica.patch.tpl.yml.0 > replica.patch.tpl.yml.1
-sed "s/@r_name[^ \"]*/$r_name/g" replica.patch.tpl.yml.1 > replica.patch.yml
+sed "s/@pv-name[^ \"]*/$pv/g" replica.patch.tpl.yml.1 > replica.patch.tpl.yml.2
+sed "s/@r_name[^ \"]*/$r_name/g" replica.patch.tpl.yml.2 > replica.patch.yml
 
 sed "s/@pvc-name[^ \"]*/$pvc/g" controller.patch.tpl.yml > controller.patch.tpl.yml.0
 sed "s/@c_name[^ \"]*/$c_name/g" controller.patch.tpl.yml.0 > controller.patch.tpl.yml.1
@@ -77,6 +94,8 @@ echo "Upgrading Replica Deployment to 0.6"
 kubectl patch deployment --namespace $ns $r_dep -p "$(cat replica.patch.yml)"
 rc=$?; if [ $rc -ne 0 ]; then echo "ERROR: $rc"; exit; fi
 
+kubectl delete rs $r_rs --namespace $ns
+
 rollout_status=$(kubectl rollout status --namespace $ns deployment/$r_dep)
 rc=$?; if [[ ($rc -ne 0) || !($rollout_status =~ "successfully rolled out") ]];
 then echo "ERROR: $rc"; exit; fi
@@ -85,6 +104,8 @@ then echo "ERROR: $rc"; exit; fi
 echo "Upgrading Controller Deployment to 0.6"
 kubectl patch deployment  --namespace $ns $c_dep -p "$(cat controller.patch.yml)"
 rc=$?; if [ $rc -ne 0 ]; then echo "ERROR: $rc"; exit; fi
+
+kubectl delete rs $c_rs --namespace $ns
 
 rollout_status=$(kubectl rollout status --namespace $ns  deployment/$c_dep)
 rc=$?; if [[ ($rc -ne 0) || !($rollout_status =~ "successfully rolled out") ]];
@@ -96,13 +117,11 @@ then echo "ERROR: $rc"; exit; fi
 # NOTES: This step is applicable upon label selector updates,  #
 # where the deployment creates orphaned replicasets            #
 ################################################################
-echo "Clearing older Replica Sets"
-kubectl delete rs $r_rs --namespace $ns
-kubectl delete rs $c_rs --namespace $ns
 
 echo "Clearing temporary files"
 rm replica.patch.tpl.yml.0
 rm replica.patch.tpl.yml.1
+rm replica.patch.tpl.yml.2
 rm replica.patch.yml
 rm controller.patch.tpl.yml.0
 rm controller.patch.tpl.yml.1
