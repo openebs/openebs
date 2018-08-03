@@ -4,13 +4,11 @@
 ###############################################################################################
 #Test Steps:
 #1. Copy/Gather Test artifacts to Kubemaster.
-#2. Deploy Percona application with one replica less than available nodes.
-#3. Patch NodeAffinity to stick replica to a specific node.
-#4. Configure Eviction taint on sticky node with node.kubernetes.io/out-of-disk condition.
-#5. Verify evicted replica pod stays in 'Pending' state adhering NodeAffinity policy.
-#6. Re-Configure/Remove Eviction taint on sticky node.
-#7. Verify replica pod is scheduled and Running on the sticky node adhering NodeAffinity policy.
-#8. Perform cleanup of test artifacts.
+#2. Deploy Percona application with liveness probe.
+#3. Once the application is up and running.
+#4. Apply eviction taint node.kubernetes.io/out-of-disk on the node on which application pod is scheduled.
+#5. Verify that application pod is up and running after it gets scheduled on another node. 
+#6. Perform cleanup of test artifacts.
 ###############################################################################################
 
 - hosts: localhost
