@@ -22,7 +22,7 @@ metadata:
 rules:
 - apiGroups: ["*"]
   resources: ["nodes","nodes/proxy"]
-  verbs: ["get", "list", "watch"]
+  verbs: ["*"]
 - apiGroups: ["*"]
   resources: ["namespaces","services","pods","deployments","events","endpoints","configmaps"]
   verbs: ["*"]
