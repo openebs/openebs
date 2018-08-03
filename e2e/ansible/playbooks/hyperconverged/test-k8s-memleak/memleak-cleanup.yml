@@ -38,3 +38,8 @@
     state: absent
   delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
+- name: Remove test artifacts
+  file:
+    path: "{{ result_kube_home.stdout }}/{{ py_file }}"
+    state: absent
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
