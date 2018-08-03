@@ -23,3 +23,7 @@ test_log_path: setup/logs/test-node-eviction-out-of-disk.log
 key: node.kubernetes.io/out-of-disk
 
 storage_class_file: nodeeviction-sc.yaml
+
+test_suite_id: 826
+
+test_case_id: 166368
