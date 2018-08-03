@@ -9,8 +9,8 @@
 #4. Apply eviction taint node.kubernetes.io/out-of-disk on the node on which application pod is scheduled.
 #5. Verify that application pod is up and running after it gets scheduled on another node. 
 #6. Perform cleanup of test artifacts.
-#Note: Cleanup Expectation if the test fails at any task, is that the taint and namespace is removed.
-###############################################################################################
+#Note: Cleanup of removing taint and deleting namespace will be done, even if the test fails at any task.
+##########################################################################################################
 
 - hosts: localhost
 
