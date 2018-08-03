@@ -72,24 +72,16 @@
          set_fact:
            ctrl_ip: "{{ ctrl_IP.stdout_lines[0].split()[1]}}"
 
-       #- name: Establish iSCSI session with volume
-       #  open_iscsi:
-       #    show_nodes: yes
-       #    portal: "{{ ctrl_ip }}"
-       #    discover: true
-       #    login: true
-       #  register: result
-       #  until: "'iqn' in result.nodes[0]"
-       #  retries: 6
-       #  delay: 10
-       #  become: true
-       #  delegate_to: "{{groups['kubernetes-kubeminions'].0}}"
-
        - name: Establish iSCSI session with volume
          shell: iscsiadm -m discovery -t st -p {{ ctrl_ip }}:3260
+         args:
+           executable: /bin/bash
          become: true
          delegate_to: "{{groups['kubernetes-kubeminions'].0}}"
          register: result
+         until: "result.rc == 0"
+         delay: 30
+         retries: 15
 
        - name: Store target iqn in variable
          set_fact:
@@ -285,7 +277,6 @@
       - block:
         - include: snapshot-cleanup.yml
 
-
         - name: Test Cleanup Pass
           set_fact:
             cflag: "Cleanup Passed"
@@ -300,6 +291,14 @@
          - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/stern_task.yml"
            vars:
              status: stop
+
+         - name: Delete namespace
+           shell: source ~/.profile; kubectl delete ns {{namespace}}
+           args:
+             executable: /bin/bash
+           delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+         - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/delete_namespaces.yml"
 
          - block:
              - name: Update Testrail
