@@ -14,6 +14,10 @@ spec:
     poolType: striped
     cacheFile: /tmp/pool1.cache
     overProvisioning: false
+  # NOTE - Appropriate disks need to be fetched using `kubectl get disks`
+  #
+  # `Disk` is a custom resource supported by OpenEBS with `node-disk-manager` 
+  # as the disk operator
   disks:
     diskList:
       - 

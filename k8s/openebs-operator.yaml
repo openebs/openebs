@@ -24,26 +24,20 @@ rules:
   resources: ["nodes","nodes/proxy"]
   verbs: ["get", "list", "watch"]
 - apiGroups: ["*"]
-  resources: ["namespaces", "services", "pods", "deployments", "events", "endpoints", "configmaps"]
+  resources: ["namespaces","services","pods","deployments","events","endpoints","configmaps"]
   verbs: ["*"]
 - apiGroups: ["*"]
-  resources: ["persistentvolumes","persistentvolumeclaims","storagepoolclaims","disks","storagepools"]
+  resources: ["storageclasses","persistentvolumeclaims","persistentvolumes"]
   verbs: ["*"]
-- apiGroups: ["storage.k8s.io"]
-  resources: ["storageclasses"]
-  verbs: ["*"]
+- apiGroups: ["volumesnapshot.external-storage.k8s.io"]
+  resources: ["volumesnapshots","volumesnapshotdatas"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
 - apiGroups: ["apiextensions.k8s.io"]
   resources: ["customresourcedefinitions"]
   verbs: [ "get", "list", "create" ]
 - apiGroups: ["*"]
-  resources: [ "cstorpools","cstorvolumereplicas","cstorvolumes" ]
+  resources: [ "disks","storagepoolclaims","storagepools","cstorpools","cstorvolumereplicas","cstorvolumes","castemplates"]
   verbs: ["*" ]
-- apiGroups: ["*"]
-  resources: ["castemplates"]
-  verbs: ["get", "list"]
-- apiGroups: ["volumesnapshot.external-storage.k8s.io"]
-  resources: ["volumesnapshots","volumesnapshotdatas"]
-  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
 - nonResourceURLs: ["/metrics"]
   verbs: ["get"]
 ---
@@ -396,6 +390,72 @@ metadata:
   name: openebs-snapshot-promoter
 provisioner: volumesnapshot.external-storage.k8s.io/snapshot-promoter
 ---
+# Define a storage classes supported by OpenEBS
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: openebs-jiva-default-0.7.0
+  annotations:
+    cas.openebs.io/create-volume-template: jiva-volume-create-default-0.7.0
+    cas.openebs.io/delete-volume-template: jiva-volume-delete-default-0.7.0
+    cas.openebs.io/read-volume-template: jiva-volume-read-default-0.7.0
+provisioner: openebs.io/provisioner-iscsi
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: openebs-cstor-default-0.7.0
+  annotations:
+    cas.openebs.io/create-volume-template: cstor-volume-create-default-0.7.0
+    cas.openebs.io/delete-volume-template: cstor-volume-delete-default-0.7.0
+    cas.openebs.io/read-volume-template: cstor-volume-read-default-0.7.0
+    cas.openebs.io/config: |
+      - name: StoragePoolClaim
+        value: "cstor-pool-default-0.7.0"
+provisioner: openebs.io/provisioner-iscsi
+---
+# node-disk-manager-config-default-0.1.0 contains config of available probes 
+# and filters. Probes and filters will initialize with default values if config 
+# for that filter or probe not present in configmap.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: node-disk-manager-config-default-0.1.0
+  namespace: default
+data:
+  # udev-probe is default or primary probe it should be enabled to run ndm
+  # filterconfigs contails configs of filters. To provide a group of include
+  # and exclude values add it as , separated string
+  node-disk-manager.config: |
+    {
+      "probeconfigs": [
+        {
+          "key": "udev-probe",
+          "name": "udev probe",
+          "state": "true"
+        },
+        {
+          "key": "smart-probe",
+          "name": "smart probe",
+          "state": "true"
+        }
+      ],
+      "filterconfigs": [
+        {
+          "key": "os-disk-exclude-filter",
+          "name": "os disk exclude filter",
+          "state": "true"
+        },
+        {
+          "key": "vendor-filter",
+          "name": "vendor filter",
+          "state": "true",
+          "include":"",
+          "exclude":""
+        }
+      ]
+    }
+---
 apiVersion: extensions/v1beta1
 kind: DaemonSet
 metadata:
@@ -409,8 +469,10 @@ spec:
     spec:
       # By default the node-disk-manager will be run on all kubernetes nodes
       # If you would like to limit this to only some nodes, say the nodes
-      # that have storage attached, you could label those node and use nodeSelector.
-      # Example: Label the storage nodes with - "openebs.io/nodegroup"="storage-node"
+      # that have storage attached, you could label those node and use 
+      # nodeSelector.
+      #
+      # e.g. label the storage nodes with - "openebs.io/nodegroup"="storage-node"
       # kubectl label node <node-name> "openebs.io/nodegroup"="storage-node"
       #nodeSelector:
       #  "openebs.io/nodegroup": "storage-node"
@@ -425,10 +487,15 @@ spec:
         imagePullPolicy: Always
         securityContext:
           privileged: true
-        # make udev database available inside container
         volumeMounts:
+        - name: config
+          mountPath: /host/node-disk-manager.config
+          subPath: node-disk-manager.config
+          readOnly: true
         - name: udev
           mountPath: /run/udev
+        - name: procmount
+          mountPath: /host/mounts
         env:
         # pass hostname as env variable using downward API to the NDM container
         - name: NODE_NAME
@@ -436,8 +503,16 @@ spec:
             fieldRef:
               fieldPath: spec.nodeName
       volumes:
+      - name: config
+        configMap:
+          name: node-disk-manager-config-default-0.1.0
       - name: udev
         hostPath:
           path: /run/udev
           type: Directory
+      # mount /proc/1/mounts (mount file of process 1 of host) inside container
+      # to read which partition is mounted on / path
+      - name: procmount
+        hostPath:
+          path: /proc/1/mounts
 ---
