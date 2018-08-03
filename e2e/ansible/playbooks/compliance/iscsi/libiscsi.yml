@@ -79,14 +79,7 @@
          set_fact:
            ctrl_ip: "{{ ctrl_IP.stdout_lines[0].split()[1]}}"
 
-           #- name: 5) Get $HOME of K8s minion for kubernetes user
-           # shell: source ~/.profile; echo $HOME
-           #args:
-           #executable: /bin/bash
-           #register: result_kube_home
-           #delegate_to: "{{groups['kubernetes-kubeminions'].0}}"
-
-       - name: 5a) Copy libiscsi test list into kube minion
+       - name: 5) Copy libiscsi test list into kube minion
          copy:
            src: "{{ test_list }}"
            dest: /tmp
