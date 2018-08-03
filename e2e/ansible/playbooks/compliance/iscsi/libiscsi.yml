@@ -79,17 +79,17 @@
          set_fact:
            ctrl_ip: "{{ ctrl_IP.stdout_lines[0].split()[1]}}"
 
-       - name: 5) Get $HOME of K8s minion for kubernetes user
-         shell: source ~/.profile; echo $HOME
-         args:
-           executable: /bin/bash
-         register: result_kube_home
-         delegate_to: "{{groups['kubernetes-kubeminions'].0}}"
+           #- name: 5) Get $HOME of K8s minion for kubernetes user
+           # shell: source ~/.profile; echo $HOME
+           #args:
+           #executable: /bin/bash
+           #register: result_kube_home
+           #delegate_to: "{{groups['kubernetes-kubeminions'].0}}"
 
        - name: 5a) Copy libiscsi test list into kube minion
          copy:
            src: "{{ test_list }}"
-           dest: "{{ result_kube_home.stdout }}"
+           dest: /tmp
          delegate_to: "{{ groups['kubernetes-kubeminions'].0 }}"
 
        - name: 6) Discover the iSCSI target using iscsi-ls
@@ -108,12 +108,12 @@
 
        - name: 6b) Create log directory for libiscsi test run
          file:
-           path: "{{ result_kube_home.stdout }}/libiscsi_suite_logs"
+           path: /tmp/libiscsi_suite_logs
            state: directory
          delegate_to: "{{ groups['kubernetes-kubeminions'].0 }}"
 
        - name: 6c) Get test list from test file
-         command: cat {{ result_kube_home.stdout }}/{{ test_list }}
+         command: cat /tmp/{{ test_list }}
          register: tests
          delegate_to: "{{ groups['kubernetes-kubeminions'].0 }}"
 
@@ -122,7 +122,7 @@
            iscsi-test-cu --test={{ item }}
            iscsi://{{ ctrl_ip }}/{{ iqn }}/0
            --dataloss --allow-sanitize
-           > {{ result_kube_home.stdout }}/libiscsi_suite_logs/{{ item }}.log
+           > /tmp/libiscsi_suite_logs/{{ item }}.log
            2>&1
          args:
            executable: /bin/bash
@@ -131,7 +131,7 @@
          ignore_errors: true
 
        - name: 8) Generate test summary
-         script: parse.sh {{ result_kube_home.stdout }}/libiscsi_suite_logs
+         script: parse.sh /tmp/libiscsi_suite_logs
          delegate_to: "{{ groups['kubernetes-kubeminions'].0 }}"
          register: summary
 
