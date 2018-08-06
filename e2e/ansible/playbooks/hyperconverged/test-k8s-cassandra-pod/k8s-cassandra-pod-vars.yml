@@ -19,9 +19,9 @@ loadgen_yaml_alias: cassandra-loadgen.yaml
 
 io_minutes: 3
 
-profile: ~/.bash_profile
+profile: ~/.profile
 
-namespace: cassandra-test
+namespace: cassandra
 
 test_suite_id: 826
 
