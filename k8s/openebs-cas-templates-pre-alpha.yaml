@@ -1509,24 +1509,6 @@ data:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: volume-create-get-pvc-0.6.0
-  namespace: openebs
-data:
-  meta: |
-    id: creategetpvc
-    runNamespace: {{ .Volume.runNamespace }}
-    apiVersion: v1
-    kind: PersistentVolumeClaim
-    objectName: {{ .Volume.pvc }}
-    action: get
-  post: |
-    {{- jsonpath .JsonResult `{.metadata.annotations.controller\.openebs\.io/affinity}` | trim | saveAs "creategetpvc.affinity" .TaskResult | noop -}}
-    {{- jsonpath .JsonResult `{.metadata.annotations.controller\.openebs\.io/affinity-topology}` | trim | saveAs "creategetpvc.affinityTopology" .TaskResult | noop -}}
-    {{- jsonpath .JsonResult `{.metadata.annotations.controller\.openebs\.io/affinity-type}` | trim | saveAs "creategetpvc.affinityType" .TaskResult | noop -}}
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
   name: jiva-volume-create-listreplicapod-default-0.7.0
   namespace: openebs
 data:

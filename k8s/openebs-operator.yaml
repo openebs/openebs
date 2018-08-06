@@ -451,7 +451,7 @@ data:
           "name": "vendor filter",
           "state": "true",
           "include":"",
-          "exclude":""
+          "exclude":"CLOUDBYT,OpenEBS"
         }
       ]
     }
