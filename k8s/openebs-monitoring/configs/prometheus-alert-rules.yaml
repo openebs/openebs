@@ -1,7 +1,9 @@
+apiVersion: v1
 kind: ConfigMap
 metadata:
   name: prometheus-alert-rules
-apiVersion: v1
+  labels:
+    k8s-app: prometheus
 data:
   alert.rules.yml: |-
     groups:

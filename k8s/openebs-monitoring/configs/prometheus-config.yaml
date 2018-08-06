@@ -16,11 +16,12 @@
 #
 # If you are using Kubernetes 1.7.2 or earlier, please take note of the comments
 # for the kubernetes-cadvisor job; you will need to edit or remove this job.
-
+apiVersion: v1
 kind: ConfigMap
 metadata:
   name: prometheus-config
-apiVersion: v1
+  labels:
+    k8s-app: prometheus
 data:
   prometheus.yml: |-
     global:
@@ -30,7 +31,7 @@ data:
       evaluation_interval: 5s
     rule_files:
     # alert rules passed as argument in prometheus-deployment at given path
-    - '/etc/prometheus-rules/alert.rules.yaml'
+    - '/etc/prometheus-rules/alert.rules.yml'
     # scrape config for maya-apiserver pods
     #
     # The relabeling allows the actual pod scrape endpoint to be configured via
@@ -48,7 +49,7 @@ data:
           ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
         bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
         relabel_configs:
-        - source_labels: [__meta_kubernetes_pod_label_name]
+        - source_labels: [__meta_kubernetes_pod_label_k8s_app]
           regex: alertmanager
           action: keep
         - source_labels: [__meta_kubernetes_namespace]

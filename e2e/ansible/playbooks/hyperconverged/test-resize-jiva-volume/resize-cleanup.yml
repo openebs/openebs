@@ -22,15 +22,16 @@
   delay: 20
   retries: 15
 
-- name: Checking if the replica pods are deleted
-  shell: source ~/.profile; kubectl get pods --all-namespaces --show-labels |  grep openebs/replica=jiva-replica | awk {'print$2'} | wc -l
+- name: Confirm PVC pod has been deleted
+  shell: source ~/.profile; kubectl get pods -n {{namespace}}
   args:
     executable: /bin/bash
-  register: rep_count
   delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-  until: rep_count.stdout |int == 0
-  delay: 20
-  retries: 15
+  register: result
+  until: "pv.stdout not in result.stdout"
+  delay: 30
+  retries: 10
+  changed_when: True
 
 - name: Checking if the corresponding svc is deleted
   shell: source ~/.profile; kubectl get svc -n "{{ namespace }}" | grep {{ pv.stdout }} | wc -l

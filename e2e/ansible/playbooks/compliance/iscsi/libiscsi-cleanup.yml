@@ -15,11 +15,18 @@
   retries: 6
   changed_when: true
 
-- name: Delete namespace
-  command: kubectl delete ns {{ namespace }}
+- name: Remove test artifacts
+  file:
+    path: "{{ result_kube_home.stdout }}/{{ item }}"
+    state: absent
   delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-  changed_when: true
+  with_items:
+    - "{{volume_def}}"
 
-
-
-
+- name: Remove test artifacts
+  file:
+    path: /tmp/{{ item }}
+    state: absent
+  delegate_to: "{{groups['kubernetes-kubeminions'].0}}"
+  with_items:
+    - "{{test_list}}"
