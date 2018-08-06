@@ -32,7 +32,7 @@
          include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/copy_task.yml"
          vars:
            destination_node: "{{groups['kubernetes-kubemasters'].0}}"
-           files_to_copy: 
+           files_to_copy:
              - "{{ chaoskube_files }}"
              - "{{ percona_files }}"
 
@@ -218,13 +218,6 @@
        # (Tear down application, liveness configmap as well as#
        # the FI (chaoskube) infrastructure. Also stop logger) #
        ########################################################
-       - name: Uncordon the nodes
-         shell: >
-           source ~/.profile; kubectl uncordon {{ item }}
-         args:
-           executable: /bin/bash
-         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-         with_items: "{{ result_nodes.stdout_lines }}"
 
        - name: Test Passed
          set_fact:
@@ -250,6 +243,23 @@
 
            - include: test-single-replica-failure-cleanup.yml
 
+           - name: Uncordon the nodes
+             shell: >
+               source ~/.profile; kubectl uncordon {{ item }}
+             args:
+               executable: /bin/bash
+             delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+             with_items: "{{ result_nodes.stdout_lines }}"
+
+           - name: Check if the nodes are uncordoned
+             shell: >
+               source ~/.profile; kubectl get nodes
+             args:
+               executable: /bin/bash
+             delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+             register: result
+             failed_when: "'SchedulingDisabled' in result.stdout"
+
            - name: Test Cleanup Passed
              set_fact:
                cflag: "Cleanup Passed"
@@ -261,11 +271,19 @@
 
          always:
 
+           - name: Delete namespace
+             shell: source ~/.profile; kubectl delete ns {{ namespace }}
+             args:
+               executable: /bin/bash
+             delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+             ignore_errors: true
+
            - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/stern_task.yml"
              vars:
                status: stop
 
            - block:
+
                - name: Update Testrail
                  shell: source ~/.profile; python3 {{ inventory_dir | dirname }}/files/updater.py -tuser {{ testrail_user }} -tpass {{ testrail_password }} -sid {{ test_suite_id }} -cid {{ test_case_id }} -stid {{ status_id }}
                  args:
