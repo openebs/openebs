@@ -36,8 +36,13 @@ ns=`kubectl get pv $pv -o jsonpath="{.spec.claimRef.namespace}"`
 
 c_dep=$(echo $pv-ctrl); c_name=$(echo $c_dep-con)
 r_dep=$(echo $pv-rep); r_name=$(echo $r_dep-con)
+
+# Get the number of replicas configured. 
+# This field is currently not used, but can add additional validations
+# based on the nodes and expected number of replicas
 rep_count=`kubectl get deploy $r_dep --namespace $ns -o jsonpath="{.spec.replicas}"`
 
+# Get the list of nodes where replica pods are running, delimited by ':'
 rep_nodenames=`kubectl get pods -n $ns $rep_labels \
  -l "vsm=$pv" -l "openebs/replica=jiva-replica" \
  -o jsonpath="{range .items[*]}{@.spec.nodeName}:{end}"`
@@ -53,7 +58,6 @@ for rep_node in `echo $rep_nodenames | tr ":" " "`; do
 done
 
 
-
 echo "Patching Replica Deployment upgrade strategy as recreate"
 kubectl patch deployment --namespace $ns --type json $r_dep -p "$(cat patch-strategy-recreate.json)"
 rc=$?; if [ $rc -ne 0 ]; then echo "ERROR: $rc"; exit; fi
@@ -62,6 +66,9 @@ echo "Patching Controller Deployment upgrade strategy as recreate"
 kubectl patch deployment --namespace $ns --type json $c_dep -p "$(cat patch-strategy-recreate.json)"
 rc=$?; if [ $rc -ne 0 ]; then echo "ERROR: $rc"; exit; fi
 
+# Fetch the older controller and replica - ReplicaSet objects which need to be 
+# deleted before upgrading. If not deleted, the new pods will be stuck in 
+# creating state - due to affinity rules. 
 c_rs=$(kubectl get rs -o name --namespace $ns | grep $c_dep | cut -d '/' -f 2)
 r_rs=$(kubectl get rs -o name --namespace $ns | grep $r_dep | cut -d '/' -f 2)
 
