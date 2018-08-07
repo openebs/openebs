@@ -1,0 +1,87 @@
+{
+  "metadata": {
+     "labels": {
+       "openebs/volume-provisioner": "jiva",
+       "pvc": "@pvc-name"
+     }
+  },
+  "spec": {
+     "selector": {
+        "matchLabels": {
+           "openebs/volume-provisioner": "jiva",
+           "pvc": "@pvc-name"
+        }
+     },
+     "template": {
+        "metadata": {
+           "labels": {
+              "openebs/volume-provisioner": "jiva",
+              "pvc": "@pvc-name"
+           }
+        },
+        "spec": {
+           "containers":[
+              {
+                "name": "@r_name",
+                "image": "openebs/jiva:0.6.0"
+              }
+           ],
+          "nodeSelector": {
+              "openebs-pv-@pv-name": "@replica_node_label"
+          },
+          "tolerations": [
+            {
+              "effect": "NoExecute",
+              "key": "node.alpha.kubernetes.io/notReady",
+              "operator": "Exists"
+            },
+            {
+              "effect": "NoExecute",
+              "key": "node.alpha.kubernetes.io/unreachable",
+              "operator": "Exists"
+            },
+            {
+              "effect": "NoExecute",
+              "key": "node.kubernetes.io/not-ready",
+              "operator": "Exists"
+            },
+            {
+              "effect": "NoExecute",
+              "key": "node.kubernetes.io/unreachable",
+              "operator": "Exists"
+            },
+            {
+              "effect": "NoExecute",
+              "key": "node.kubernetes.io/out-of-disk",
+              "operator": "Exists"
+            },
+            {
+              "effect": "NoExecute",
+              "key": "node.kubernetes.io/memory-pressure",
+              "operator": "Exists"
+            },
+            {
+              "effect": "NoExecute",
+              "key": "node.kubernetes.io/disk-pressure",
+              "operator": "Exists"
+            },
+            {
+              "effect": "NoExecute",
+              "key": "node.kubernetes.io/network-unavailable",
+              "operator": "Exists"
+            },
+            {
+              "effect": "NoExecute",
+              "key": "node.kubernetes.io/unschedulable",
+              "operator": "Exists"
+            },
+            {
+              "effect": "NoExecute",
+              "key": "node.cloudprovider.kubernetes.io/uninitialized",
+              "operator": "Exists"
+            }
+          ]
+        }
+     }
+  }
+} 
