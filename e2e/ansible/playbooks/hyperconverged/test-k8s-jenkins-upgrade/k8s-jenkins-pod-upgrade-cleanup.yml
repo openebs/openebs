@@ -29,15 +29,6 @@
   retries: 10
   changed_when: true
 
-
-- name: Delete namespace
-  shell: source ~/.profile; kubectl delete ns {{ namespace }}
-  args:
-    executable: /bin/bash
-  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-  changed_when: true
-
-
 - name: Remove test artifacts
   file:
     path: "{{ result_kube_home.stdout }}/{{ item }}"

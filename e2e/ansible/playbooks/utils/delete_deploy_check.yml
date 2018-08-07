@@ -8,4 +8,4 @@
   failed_when: "app and 'Running' in result.stdout"
   delay: 30
   retries: 15
-  ignore_erros: true
+  ignore_errors: true
