@@ -32,11 +32,31 @@ OpenEBS can be setup in few easy steps. You can get going on your choice of Kube
 wget https://raw.githubusercontent.com/openebs/openebs/master/k8s/openebs-operator.yaml
 kubectl apply -f openebs-operator.yaml
 ```
-**Customize or use the Default storageclasses**
+
+**Define the StoragePoolClaims**
+```bash
+# download the storage pool claims yaml
+wget https://raw.githubusercontent.com/openebs/openebs/master/k8s/openebs-storagepoolclaims.yaml
+
+# fetch the disks found in the kubernetes cluster
+kubectl get disks
+
+# edit openebs-storagepoolclaims.yaml by adding the disks found from above command
+# <<manual operation>>
+
+# apply the storage pool claims
+kubectl apply -f openebs-storagepoolclaims.yaml
 ```
-wget https://raw.githubusercontent.com/openebs/openebs/master/k8s/openebs-storageclasses.yaml
-kubectl apply -f openebs-storageclasses.yaml
+
+**Apply the CAS Templates**
+```bash
+# download the CAS templates
+wget https://raw.githubusercontent.com/openebs/openebs/master/k8s/openebs-cas-templates-pre-alpha.yaml
+
+# apply the CAS templates
+kubectl apply -f openebs-cas-templates-pre-alpha.yaml
 ```
+
 You could also follow our [QuickStart Guide](https://docs.openebs.io/docs/overview.html).
 
 OpenEBS can be deployed on any Kubernetes cluster - either in cloud, on-premise or developer laptop (minikube). Please follow our [OpenEBS Setup](https://docs.openebs.io/docs/overview.html) documentation. Also, we have a Vagrant environment available that includes a sample Kubernetes deployment and synthetic load that you can use to simulate the performance of OpenEBS. You may also find interesting the related project called Litmus (https://www.openebs.io/litmus) which helps with chaos engineering for stateful workloads on Kubernetes.  
