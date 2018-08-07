@@ -25,7 +25,7 @@
 
 - name: Remove test artifacts
   file:
-    path: /tmp/{{ item }}
+    path: "{{ result_kube_home.stdout }}/{{ item }}"
     state: absent
   delegate_to: "{{groups['kubernetes-kubeminions'].0}}"
   with_items:

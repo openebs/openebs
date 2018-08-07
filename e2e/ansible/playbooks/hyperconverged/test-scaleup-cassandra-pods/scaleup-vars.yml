@@ -17,7 +17,7 @@ loadgen_yaml_alias: cassandra-loadgen.yaml
 
 io_minutes: 3
 
-namespace: scaleup-cassandra
+namespace: scaleup-pods
 
 profile: ~/.profile
 

@@ -32,11 +32,11 @@
            dest: "{{ result_kube_home.stdout }}"
          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
 
-       - name: 3) Create test specific namespace
-         shell: kubectl create ns {{ namespace }}
-         args:
-           executable: /bin/bash
-         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+       - name: 3) Create namespace.       
+         include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/namespace_task.yml"
+         vars:
+           status: create
+           ns: "{{ namespace }}"
 
        - name: 3a) Create a storage volume via a pvc
          shell: source ~/.profile; kubectl apply -f "{{ volume_def }}" -n {{ namespace }}
@@ -171,12 +171,11 @@
              vars:
                status: stop
 
-           - name: Delete namespace
-             shell: source ~/.profile; kubectl delete ns {{ namespace }}
-             args:
-               executable: /bin/bash
-             delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-             changed_when: true
+           - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/namespace_task.yml"
+             vars:
+               status: delete
+               ns: "{{ namespace }}"
+
 
            - block:
                - name: Update Testrail

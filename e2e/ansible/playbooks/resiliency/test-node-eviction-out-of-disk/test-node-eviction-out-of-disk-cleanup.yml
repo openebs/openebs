@@ -17,6 +17,16 @@
     ns: "{{ namespace }}"
     app: percona
 
+- name: Delete nodeeviction ns
+  shell: source ~/.profile; kubectl delete ns {{ namespace }}
+  args:
+    executable: /bin/bash
+  register: ns_out
+  until: "'deleted' in ns_out.stdout"
+  delay: 10
+  retries: 5
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
 - name: Confirm pvc pod has been deleted
   shell: source ~/.profile; kubectl get pods -n {{ namespace }} 
   args:
@@ -28,4 +38,15 @@
   retries: 10
   changed_when: true
 
+- name: Remove copied files
+  shell: rm -rf "{{ patch_file }}" "{{ storage_class_file }}"
+  args:
+    executable: /bin/bash
+
+- name: Remove the nodeeviction-sc storage class
+  shell: source ~/.profile; kubectl delete sc nodeeviction-sc
+  args:
+    executable: /bin/bash
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+  changed_when: true
 
