@@ -1,0 +1,81 @@
+---
+- name: Get list of disks attached
+  shell: source ~/.profile; kubectl get disks --no-headers | awk {'print $1'}
+  args:
+    executable: /bin/bash
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+  register: diskList
+
+- name: Download spc.yaml
+  get_url:
+    url: "{{ item }}"
+    dest: "{{ result_kube_home.stdout }}"
+  delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+  with_items:
+    - "{{ spc_yaml }}"
+    - "{{ cas_yaml }}"
+
+- name: Create a testspc.yaml file to update diskList
+  shell: source ~/.profile; sed '$ d' '{{ result_kube_home.stdout }}/openebs-storagepoolclaims.yaml' > '{{ result_kube_home.stdout }}/testspc.yaml'
+  args:
+    executable: /bin/bash
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+- name: Replace volume-claim name with test parameters
+  lineinfile:
+    path: "{{ result_kube_home.stdout }}/testspc.yaml"
+    insertafter: 'diskList:'
+    line: '     - {{ item }}'
+  delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+  with_items: "{{ diskList.stdout_lines }}"
+
+- name: Update pool name
+  replace:
+    path: "{{ result_kube_home.stdout }}/testspc.yaml"
+    regexp: 'name: cstor-pool-default-0.7.0'
+    replace: 'name: {{ poolname }}'
+  delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+ 
+- name: Raid type selected
+  replace:
+    path: "{{ result_kube_home.stdout }}/testspc.yaml"
+    regexp: 'poolType: striped'
+    replace: 'poolType: {{ pooltype }}'
+  delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+  
+- name: Get number of nodes
+  shell: source ~/.profile; kubectl get nodes | grep 'Ready' | grep 'none' | wc -l
+  args:
+    executable: /bin/bash
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+  register: node_count
+
+- name: Apply cas_yaml
+  shell: source ~/.profile; kubectl apply -f {{ result_kube_home.stdout }}/openebs-cas-templates-pre-alpha.yaml
+  args:
+    executable: /bin/bash
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+- name: Create cStorPool
+  shell: source ~/.profile; kubectl apply -f {{ result_kube_home.stdout }}/testspc.yaml
+  args:
+    executable: /bin/bash
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+- name: Get number of pools created
+  shell: source ~/.profile; kubectl get pods -n openebs | grep {{poolname}} | grep 'Running' | wc -l
+  args:
+    executable: /bin/bash
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+  register: pool_count
+  until: "node_count.stdout == pool_count.stdout"
+  delay: 10
+  retries: 20
+
+  #- name: Verify cStorPool created for each node
+  #debug:
+  #  msg: "cStorPool is created on all the nodes available"
+  #when: "node_count.stdout  == pool_count.stdout "
+
+
+
