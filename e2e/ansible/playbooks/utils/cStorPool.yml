@@ -72,10 +72,6 @@
   delay: 10
   retries: 20
 
-  #- name: Verify cStorPool created for each node
-  #debug:
-  #  msg: "cStorPool is created on all the nodes available"
-  #when: "node_count.stdout  == pool_count.stdout "
 
 
 
