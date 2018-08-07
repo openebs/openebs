@@ -50,11 +50,11 @@
             ns: openebs
             app: openebs-snapshot-operator 
 
-        - name: 4) Create test specific namespace
-          shell: source ~/.profile; kubectl create ns {{ namespace }}
-          args:
-            executable: /bin/bash
-          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+        - name: 4) Create  namespace
+          include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/namespace_task.yml"
+          vars:
+            status: create
+            ns: "{{ namespace }}" 
 
         - name: 4) Deploy percona mysql pod
           shell: kubectl apply -f "{{ percona_link }}" -n "{{ namespace }}"
@@ -250,9 +250,10 @@
               vars:
                 status: stop
 
-
-            - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/delete_namespaces.yml"
-
+            - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/namespace_task.yml"
+              vars:
+                status: delete
+                ns: "{{ namespace }}"
 
             - name: Send slack notification
               slack:

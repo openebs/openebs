@@ -58,10 +58,10 @@
             app: openebs-snapshot-operator
 
         - name: 4) Create test specific namespace
-          shell: source ~/.profile; kubectl create ns {{ namespace }}
-          args:
-            executable: /bin/bash
-          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+          include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/namespace_task.yml"
+          vars:
+             status: create
+             ns: "{{ namespace }}"
 
         - name: 5) Deploy fio write job yaml
           include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_task.yml"
@@ -272,8 +272,11 @@
             - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/stern_task.yml"
               vars:
                 status: stop
-            
-            - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/delete_namespaces.yml"
+
+            - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/namespace_task.yml"
+              vars:
+                status: delete
+                ns: "{{ namespace }}" 
 
             - name: Send slack notification
               slack:
