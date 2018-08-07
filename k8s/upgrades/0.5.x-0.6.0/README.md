@@ -72,6 +72,7 @@ Limitations:
 - this is a preliminary script only intended for using on volumes where data has been backed-up.
 - please have the following link handy in case the volume gets into read-only during upgrade 
   https://docs.openebs.io/docs/next/readonlyvolumes.html
+- automatic rollback option is not provided. To rollback, you need to update the controller, exporter and replica pod images to the previous version
 - in the process of running the below steps, if you run into issues, you can always reach us on slack
 
 ### Download the upgrade scripts

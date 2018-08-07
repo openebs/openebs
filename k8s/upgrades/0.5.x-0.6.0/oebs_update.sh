@@ -73,14 +73,14 @@ r_rs=$(kubectl get rs -o name --namespace $ns | grep $r_dep | cut -d '/' -f 2)
 # the PV in the previous step                                  #  
 ################################################################
 
-sed "s/@pvc-name[^ \"]*/$pvc/g" replica.patch.tpl.yml > replica.patch.tpl.yml.0
-sed "s/@replica_node_label[^ \"]*/$replica_node_label/g" replica.patch.tpl.yml.0 > replica.patch.tpl.yml.1
-sed "s/@pv-name[^ \"]*/$pv/g" replica.patch.tpl.yml.1 > replica.patch.tpl.yml.2
-sed "s/@r_name[^ \"]*/$r_name/g" replica.patch.tpl.yml.2 > replica.patch.yml
+sed "s/@pvc-name[^ \"]*/$pvc/g" replica.patch.tpl.json > replica.patch.tpl.json.0
+sed "s/@replica_node_label[^ \"]*/$replica_node_label/g" replica.patch.tpl.json.0 > replica.patch.tpl.json.1
+sed "s/@pv-name[^ \"]*/$pv/g" replica.patch.tpl.json.1 > replica.patch.tpl.json.2
+sed "s/@r_name[^ \"]*/$r_name/g" replica.patch.tpl.json.2 > replica.patch.json
 
-sed "s/@pvc-name[^ \"]*/$pvc/g" controller.patch.tpl.yml > controller.patch.tpl.yml.0
-sed "s/@c_name[^ \"]*/$c_name/g" controller.patch.tpl.yml.0 > controller.patch.tpl.yml.1
-sed "s/@rep_count[^ \"]*/$rep_count/g" controller.patch.tpl.yml.1 > controller.patch.yml
+sed "s/@pvc-name[^ \"]*/$pvc/g" controller.patch.tpl.json > controller.patch.tpl.json.0
+sed "s/@c_name[^ \"]*/$c_name/g" controller.patch.tpl.json.0 > controller.patch.tpl.json.1
+sed "s/@rep_count[^ \"]*/$rep_count/g" controller.patch.tpl.json.1 > controller.patch.json
 
 ################################################################
 # STEP: Patch OpenEBS volume deployments (controller, replica) #  
@@ -91,7 +91,7 @@ sed "s/@rep_count[^ \"]*/$rep_count/g" controller.patch.tpl.yml.1 > controller.p
 
 # PATCH JIVA REPLICA DEPLOYMENT ####
 echo "Upgrading Replica Deployment to 0.6"
-kubectl patch deployment --namespace $ns $r_dep -p "$(cat replica.patch.yml)"
+kubectl patch deployment --namespace $ns $r_dep -p "$(cat replica.patch.json)"
 rc=$?; if [ $rc -ne 0 ]; then echo "ERROR: $rc"; exit; fi
 
 kubectl delete rs $r_rs --namespace $ns
@@ -102,7 +102,7 @@ then echo "ERROR: $rc"; exit; fi
 
 #### PATCH CONTROLLER DEPLOYMENT ####
 echo "Upgrading Controller Deployment to 0.6"
-kubectl patch deployment  --namespace $ns $c_dep -p "$(cat controller.patch.yml)"
+kubectl patch deployment  --namespace $ns $c_dep -p "$(cat controller.patch.json)"
 rc=$?; if [ $rc -ne 0 ]; then echo "ERROR: $rc"; exit; fi
 
 kubectl delete rs $c_rs --namespace $ns
@@ -119,13 +119,13 @@ then echo "ERROR: $rc"; exit; fi
 ################################################################
 
 echo "Clearing temporary files"
-rm replica.patch.tpl.yml.0
-rm replica.patch.tpl.yml.1
-rm replica.patch.tpl.yml.2
-rm replica.patch.yml
-rm controller.patch.tpl.yml.0
-rm controller.patch.tpl.yml.1
-rm controller.patch.yml
+rm replica.patch.tpl.json.0
+rm replica.patch.tpl.json.1
+rm replica.patch.tpl.json.2
+rm replica.patch.json
+rm controller.patch.tpl.json.0
+rm controller.patch.tpl.json.1
+rm controller.patch.json
 
 echo "Successfully upgraded $pv to 0.6. Please run your application checks."
 exit 0
