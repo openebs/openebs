@@ -218,6 +218,7 @@
             - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/namespace_task.yml"
               vars:
                 status: delete
+                ns: "{{ namespace }}"
 
             - name: Send slack notification
               slack:
