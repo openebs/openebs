@@ -13,7 +13,6 @@
   delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
   with_items:
     - "{{ spc_yaml }}"
-    - "{{ cas_yaml }}"
 
 - name: Create a testspc.yaml file to update diskList
   shell: source ~/.profile; sed '$ d' '{{ result_kube_home.stdout }}/openebs-storagepoolclaims.yaml' > '{{ result_kube_home.stdout }}/testspc.yaml'
@@ -49,12 +48,6 @@
     executable: /bin/bash
   delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
   register: node_count
-
-- name: Apply cas_yaml
-  shell: source ~/.profile; kubectl apply -f {{ result_kube_home.stdout }}/openebs-cas-templates-pre-alpha.yaml
-  args:
-    executable: /bin/bash
-  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
 - name: Create cStorPool
   shell: source ~/.profile; kubectl apply -f {{ result_kube_home.stdout }}/testspc.yaml

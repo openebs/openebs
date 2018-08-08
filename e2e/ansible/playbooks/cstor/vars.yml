@@ -2,8 +2,7 @@
 test_name: cstor_pool_provisioning
 test_pod_regex: maya*|openebs*|cstor*
 test_log_path: setup/logs/cstor_pool_provisioning.log
-spc_yaml: https://raw.githubusercontent.com/AmitKumarDas/openebs/2891b35c5f381151ad870342d2674a810bb87f54/k8s/openebs-storagepoolclaims.yaml
-cas_yaml: https://raw.githubusercontent.com/AmitKumarDas/openebs/2891b35c5f381151ad870342d2674a810bb87f54/k8s/openebs-cas-templates-pre-alpha.yaml
+spc_yaml: https://raw.githubusercontent.com/openebs/openebs/master/k8s/openebs-storagepoolclaims.yaml
 poolname: pool1
 pooltype: striped
 storage_engine: cStor
