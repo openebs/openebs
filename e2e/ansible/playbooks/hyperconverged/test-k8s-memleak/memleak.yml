@@ -205,6 +205,7 @@
            - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/namespace_task.yml"
              vars:
                status: delete
+               ns: "{{ namespace }}"
 
            - block:
                - name: Update Testrail
