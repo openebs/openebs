@@ -1,0 +1,59 @@
+# create-cStorPool.yml
+# Author: Sudarshan
+# Description: Test playbook to provision cstor pool deployment.
+###############################################################################################
+#Pre-requisites to start this test:
+#Deploy openebs operator and verify ndm is running.
+#Before starting this tests run setupdisks.yml to add disks to each node of the cluster.
+#Update vars.yml file with details like poolname,pooltype,etc.
+#Run this playbook to provision cStorPool on your cluster
+#Test steps:
+#1. Updates the storagepoolclaim.yml file with the disk details from `kubectl get disks` list.
+#2. Creates the CAS templates required to provision cStor Pool
+#3. Deploys storagepoolclaim.yml to provision cStor Pool
+#4. Verifies successful creation of cstor pools on each node.
+###############################################################################################
+- hosts: localhost
+
+  vars_files:
+    - vars.yml
+
+  tasks:
+    - block:
+
+        - include: pre-requisites.yml
+
+        - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/cStorPool.yml"
+          when: storage_engine == 'cStor'
+
+        - name: Test Passed
+          set_fact:
+            flag: "Test Passed"
+            status_id: 1
+
+        - name: Set Status
+          set_fact:
+            status: "good"
+
+      rescue:
+        - name: Test Failed
+          set_fact:
+            flag: "Test Failed"
+            status_id: 5
+
+        - name: Set Status
+          set_fact:
+            status: "danger"
+
+      always:
+
+        - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/stern_task.yml"
+          vars:
+            status: stop
+
+        - name: Send slack notification
+          slack:
+            token: "{{ lookup('env','SLACK_TOKEN') }}"
+            msg: '{{ ansible_date_time.time }} TEST: {{test_name}}, RESULT: {{ flag }},{{ cflag }}'
+            color: "{{status}}"
+          when: slack_notify | bool and lookup('env','SLACK_TOKEN')

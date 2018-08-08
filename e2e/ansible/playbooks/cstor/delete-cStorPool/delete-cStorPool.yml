@@ -1,17 +1,10 @@
-# create-cStorPool.yml
+# delete-cStorPool.yml
 # Author: Sudarshan
-# Description: Test playbook to provision cstor pool deployment.
+# Description: Test playbook to de-provision cstor pool deployment.
 ###############################################################################################
-#Pre-requisites to start this test: 
-#Deploy openebs operator and verify ndm is running.
-#Before starting this tests run setupdisks.yml to add disks to each node of the cluster.
-#Update vars.yml file with details like poolname,pooltype,etc.
-#Run this playbook to provision cStorPool on your cluster
 #Test steps:
-#1. Updates the storagepoolclaim.yml file with the disk details from `kubectl get disks` list.
-#2. Creates the CAS templates required to provision cStor Pool
-#3. Deploys storagepoolclaim.yml to provision cStor Pool
-#4. Verifies successful creation of cstor pools on each node.
+#1. Delete cstor pool deployment
+#4. Verifies successful deletion of cstor pool pods and deployments
 ###############################################################################################
 - hosts: localhost
 
@@ -23,9 +16,9 @@
 
         - include: pre-requisites.yml
 
-        - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/cStorPool.yml"
+        - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/delete_cStorPool.yml"
           when: storage_engine == 'cStor'
-    
+
         - name: Test Passed
           set_fact:
             flag: "Test Passed"
