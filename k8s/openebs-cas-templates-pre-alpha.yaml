@@ -1447,6 +1447,9 @@ data:
         vsm.openebs.io/targetportals: {{ .TaskResult.readlistsvc.clusterIP }}:3260
     spec:
       capacity: {{ $capacity }}
+      targetPortal: {{ .TaskResult.readlistsvc.clusterIP }}:3260
+      iqn: iqn.2016-09.com.openebs.jiva:{{ .Volume.owner }}
+      replicas: {{ .TaskResult.readlistrep.podIP | default "" | splitList " " | len }}
 ---
 apiVersion: v1
 kind: ConfigMap
