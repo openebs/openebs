@@ -69,6 +69,14 @@
          register: result
          failed_when: "'configmap' and 'created' not in result.stdout"
 
+       - name: Create a configmap with the liveness sql script
+         shell: source ~/.profile; kubectl create configmap sqltest --from-file={{ result_kube_home.stdout }}/{{ percona_files.1 }} -n {{ namespace }}
+         args:
+           executable: /bin/bash
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+         register: result
+         failed_when: "'configmap' and 'created' not in result.stdout"
+
        - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_task.yml"
          vars:
            app_yml: "{{ percona_files.0 }}"
@@ -146,6 +154,7 @@
        - name: Test Passed     
          set_fact:
            flag: "Test Passed"
+           status_id: 1
 
        - name: Set Status
          set_fact:
@@ -155,6 +164,7 @@
        - name: Test Failed
          set_fact:
            flag: "Test Failed"
+           status_id: 5
 
        - name: Set Status
          set_fact:
@@ -179,6 +189,38 @@
            - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/stern_task.yml"
              vars:
                status: stop
+          
+           - name: Delete nodeeviction ns
+             shell: source ~/.profile; kubectl delete ns {{ namespace }}
+             args:
+               executable: /bin/bash
+             register: ns_out
+             until: "'deleted' in ns_out.stdout"
+             delay: 10
+             retries: 5
+             delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+           - name: Untaint node with Eviction Condition node.kubernetes.io/out-of-disk
+             shell: source ~/.profile; kubectl taint nodes {{ node_name.stdout }} {{ key }}:NoExecute-
+             args:
+               executable: /bin/bash
+             register: untaint_output
+             delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+           - block:
+               - name: Update Testrail
+                 shell: source ~/.profile; python3 {{ inventory_dir | dirname }}/files/updater.py -tuser {{ testrail_user }} -tpass {{ testrail_password }} -sid {{ test_suite_id }} -cid {{ test_case_id }} -stid {{ status_id }}
+                 args:
+                   executable: /bin/bash
+
+               - name: Testrail Updated
+                 set_fact:
+                   tflag: "Testrail Updated"
+
+             rescue:
+               - name: Testrail Update failed
+                 set_fact:
+                   tflag: "Testrail Update Failed"
 
            - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/namespace_task.yml"
              vars:
@@ -196,7 +238,7 @@
            - name: Send slack notification
              slack:
                token: "{{ lookup('env','SLACK_TOKEN') }}"
-               msg: '{{ ansible_date_time.time }} TEST: {{test_name}}, RESULT: {{ flag }},{{ cflag }}'
+               msg: '{{ ansible_date_time.time }} TEST: {{test_name}}, RESULT: {{ flag }},{{ cflag }},{{tflag}}'
                color: "{{status}}"
              when: slack_notify | bool and lookup('env','SLACK_TOKEN')
 

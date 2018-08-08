@@ -66,6 +66,7 @@
   changed_when: true
   ignore_errors: true
 
+
 - name: Remove test artifacts
   file:
     path: "{{ result_kube_home.stdout }}/{{ item }}"
