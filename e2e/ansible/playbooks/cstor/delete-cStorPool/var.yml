@@ -1,4 +1,0 @@
-test_name: cstor_pool_deprovisioning
-test_pod_regex: maya*|openebs*|cstor*
-test_log_path: setup/logs/cstor_pool_deprovisioning.log
-poolname: pool1
