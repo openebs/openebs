@@ -37,7 +37,7 @@
       executable: /bin/bash
      register: npdel
      delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-     until: "'ns' not in npdel.stdout"
+     until: " ns not in npdel.stdout"
      delay: 30
      retries: 15
 

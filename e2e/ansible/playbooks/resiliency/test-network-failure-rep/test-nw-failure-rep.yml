@@ -73,7 +73,7 @@
 
        - name: Create test specific namespace
          include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/namespace_task.yml"
-          vars:
+         vars:
              status: create
              ns: "{{ namespace }}"
 
