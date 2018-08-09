@@ -20,19 +20,44 @@
       delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
       register: result
 
-    - name: Get list of pv's for all namespaces
+    - name: Delete the PVCs if there are any...
+      shell: source ~/.profile; kubectl delete pvc --all -n {{ item }} --grace-period=0 --force
+      args:
+        executable: /bin/bash
+      delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+      with_items: "{{ result.stdout_lines }}"
+      when: item != 'kube-system' and item != 'openebs' and item != 'kube-public'
+
+    - name: Delete the deployments if there are any...
+      shell: source ~/.profile; kubectl delete deployments --all -n {{ item }} --grace-period=0 --force
+      args:
+        executable: /bin/bash
+      delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+      with_items: "{{ result.stdout_lines }}"
+      when: item != 'kube-system' and item != 'openebs' and item != 'kube-public'
+
+    - name: Delete the pods if there are any...
+      shell: source ~/.profile; kubectl delete pods --all -n {{ item }} --grace-period=0 --force
+      args:
+        executable: /bin/bash
+      delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+      with_items: "{{ result.stdout_lines }}"
+      when: item != 'kube-system' and item != 'openebs' and item != 'kube-public'
+
+    - name: Get list of pvs in all namespaces
       shell: source ~/.profile; kubectl get pv --no-headers | awk {'print $1'}
       args:
         executable: /bin/bash
       delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
       register: list_pv
 
-    - name: Delete pv's 
+    - name: Delete pvs if there are any...
       shell: source ~/.profile; kubectl delete pv {{ item }} 
       args:
         executable: /bin/bash
       delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
       with_items: "{{ list_pv.stdout_lines }}"
+      ignore_errors: true
     
     - name: Delete namespaces which are not required
       shell: source ~/.profile; kubectl delete ns {{ item }} --grace-period=0 --force
