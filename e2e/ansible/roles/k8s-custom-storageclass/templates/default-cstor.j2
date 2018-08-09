@@ -1,0 +1,13 @@
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: {{ cstor_sc }}
+  annotations:
+    cas.openebs.io/create-volume-template: cstor-volume-create-default-0.7.0
+    cas.openebs.io/delete-volume-template: cstor-volume-delete-default-0.7.0
+    cas.openebs.io/read-volume-template: cstor-volume-read-default-0.7.0
+    cas.openebs.io/config: |
+      - name: StoragePoolClaim
+        value: {{ pool_name }}
+provisioner: openebs.io/provisioner-iscsi

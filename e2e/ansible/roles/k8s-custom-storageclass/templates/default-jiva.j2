@@ -1,0 +1,18 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: {{jiva_sc}}
+  annotations:
+    cas.openebs.io/create-volume-template: jiva-volume-create-default-0.7.0
+    cas.openebs.io/delete-volume-template: jiva-volume-delete-default-0.7.0
+    cas.openebs.io/read-volume-template: jiva-volume-read-default-0.7.0
+    cas.openebs.io/config: |
+      - name: ControllerImage
+        value: openebs/jiva:{{tag}}
+      - name: ReplicaImage
+        value: openebs/jiva:{{tag}}
+      - name: ReplicaCount
+        value: "{{replica_count}}"
+      - name: StoragePool
+        value: {{pool_name}}
+provisioner: openebs.io/provisioner-iscsi
