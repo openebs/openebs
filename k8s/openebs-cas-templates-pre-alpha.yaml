@@ -580,7 +580,7 @@ data:
     apiVersion: apps/v1beta1
     Kind: Deployment
     metadata:
-      name: {{ .Volume.owner }}
+      name: {{ .Volume.owner }}-target
       labels:
         app: cstor-volume-manager
         openebs.io/storage-engine-type: cstor
@@ -1164,13 +1164,13 @@ spec:
   - name: VolumeMonitor
     enabled: "true"
   - name: ControllerImage
-    value: openebs/jiva:0.5.0
+    value: openebs/jiva:0.6.0
   - name: ReplicaImage
-    value: openebs/jiva:0.5.0
+    value: openebs/jiva:0.6.0
   - name: ReplicaCount
-    value: "1"
+    value: "3"
   - name: StoragePool
-    value: ssd
+    value: jiva-pool-path-default-0.7.0
   - name: TaintTolerations
     value: |-
       t1:
@@ -1447,6 +1447,9 @@ data:
         vsm.openebs.io/targetportals: {{ .TaskResult.readlistsvc.clusterIP }}:3260
     spec:
       capacity: {{ $capacity }}
+      targetPortal: {{ .TaskResult.readlistsvc.clusterIP }}:3260
+      iqn: iqn.2016-09.com.openebs.jiva:{{ .Volume.owner }}
+      replicas: {{ .TaskResult.readlistrep.podIP | default "" | splitList " " | len }}
 ---
 apiVersion: v1
 kind: ConfigMap
