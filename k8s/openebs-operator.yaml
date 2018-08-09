@@ -376,25 +376,7 @@ spec:
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
-   name: openebs-standard
-provisioner: openebs.io/provisioner-iscsi
-parameters:
-  openebs.io/storage-pool: "default"
-  openebs.io/jiva-replica-count: "3"
-  openebs.io/volume-monitor: "true"
-  openebs.io/capacity: 5G
----
-kind: StorageClass
-apiVersion: storage.k8s.io/v1
-metadata:
-  name: openebs-snapshot-promoter
-provisioner: volumesnapshot.external-storage.k8s.io/snapshot-promoter
----
-# Define a storage classes supported by OpenEBS
-apiVersion: storage.k8s.io/v1
-kind: StorageClass
-metadata:
-  name: openebs-jiva-default-0.7.0
+  name: openebs-standard
   annotations:
     cas.openebs.io/create-volume-template: jiva-volume-create-default-0.7.0
     cas.openebs.io/delete-volume-template: jiva-volume-delete-default-0.7.0
@@ -407,21 +389,19 @@ metadata:
       - name: ReplicaCount
         value: "3"
       - name: StoragePool
-        value: jiva-pool-path-default-0.7.0
+        value: default
 provisioner: openebs.io/provisioner-iscsi
+parameters:
+  openebs.io/storage-pool: "default"
+  openebs.io/jiva-replica-count: "3"
+  openebs.io/volume-monitor: "true"
+  openebs.io/capacity: 5G
 ---
-apiVersion: storage.k8s.io/v1
 kind: StorageClass
+apiVersion: storage.k8s.io/v1
 metadata:
-  name: openebs-cstor-default-0.7.0
-  annotations:
-    cas.openebs.io/create-volume-template: cstor-volume-create-default-0.7.0
-    cas.openebs.io/delete-volume-template: cstor-volume-delete-default-0.7.0
-    cas.openebs.io/read-volume-template: cstor-volume-read-default-0.7.0
-    cas.openebs.io/config: |
-      - name: StoragePoolClaim
-        value: "cstor-pool-default-0.7.0"
-provisioner: openebs.io/provisioner-iscsi
+  name: openebs-snapshot-promoter
+provisioner: volumesnapshot.external-storage.k8s.io/snapshot-promoter
 ---
 # node-disk-manager-config-default-0.1.0 contains config of available probes 
 # and filters. Probes and filters will initialize with default values if config 

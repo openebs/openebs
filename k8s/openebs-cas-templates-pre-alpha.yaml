@@ -1161,20 +1161,18 @@ metadata:
   name: jiva-volume-create-default-0.7.0
 spec:
   defaultConfig:
+  - name: ControllerImage
+    value: openebs/jiva:0.6.0
+  - name: ReplicaImage
+    value: openebs/jiva:0.6.0
+  - name: ExporterImage
+    value: openebs/m-exporter:ci
+  - name: ReplicaCount
+    value: "3"
+  - name: StoragePool
+    value: default
   - name: VolumeMonitor
     enabled: "true"
-  - name: TaintTolerations
-    value: |-
-      t1:
-        key: node.openebs.io/disktype
-        operator: Equal
-        value: ssd
-        effect: NoSchedule
-      t2:
-        key: node.openebs.io/disktype
-        operator: Equal
-        value: ssd
-        effect: NoExecute
   - name: EvictionTolerations
     value: |-
       t1:
@@ -1184,6 +1182,38 @@ spec:
       t2:
         effect: NoExecute
         key: node.alpha.kubernetes.io/unreachable
+        operator: Exists
+      t3:
+        effect: NoExecute
+        key: node.kubernetes.io/not-ready
+        operator: Exists
+      t4:
+        effect: NoExecute
+        key: node.kubernetes.io/unreachable
+        operator: Exists
+      t5:
+        effect: NoExecute
+        key: node.kubernetes.io/out-of-disk
+        operator: Exists
+      t6:
+        effect: NoExecute
+        key: node.kubernetes.io/memory-pressure
+        operator: Exists
+      t7:
+        effect: NoExecute
+        key: node.kubernetes.io/disk-pressure
+        operator: Exists
+      t8:
+        effect: NoExecute
+        key: node.kubernetes.io/network-unavailable
+        operator: Exists
+      t9:
+        effect: NoExecute
+        key: node.kubernetes.io/unschedulable
+        operator: Exists
+      t10:
+        effect: NoExecute
+        key: node.cloudprovider.kubernetes.io/uninitialized
         operator: Exists
   - name: NodeAffinityRequiredSchedIgnoredExec
     value: |-
@@ -1597,7 +1627,6 @@ data:
     {{- jsonpath .JsonResult "{.metadata.name}" | trim | saveAs "createputctrl.objectName" .TaskResult | noop -}}
   task: |
     {{- $isMonitor := .Config.VolumeMonitor.enabled | default "true" | lower -}}
-    {{- $monitorVal := .Config.VolumeMonitor.value | default "openebs/m-exporter:0.5.0" -}}
     apiVersion: extensions/v1beta1
     Kind: Deployment
     metadata:
@@ -1648,6 +1677,9 @@ data:
             - launch
             image: {{ .Config.ControllerImage.value }}
             name: {{ .Volume.owner }}-ctrl-con
+            env:
+            - name: "REPLICATION_FACTOR"
+              value: {{ .Config.ReplicaCount.value }}
             ports:
             - containerPort: 3260
               protocol: TCP
@@ -1657,8 +1689,8 @@ data:
           - args:
             - -c=http://127.0.0.1:9501
             command:
-            - maya-volume-exporter
-            image: {{ $monitorVal }}
+            - maya-exporter
+            image: {{ .Config.ExporterImage.value }}
             name: maya-volume-exporter
             ports:
             - containerPort: 9500
@@ -1671,6 +1703,14 @@ data:
             tolerationSeconds: 0
           - effect: NoExecute
             key: node.alpha.kubernetes.io/unreachable
+            operator: Exists
+            tolerationSeconds: 0
+          - effect: NoExecute
+            key: node.kubernetes.io/not-ready
+            operator: Exists
+            tolerationSeconds: 0
+          - effect: NoExecute
+            key: node.kubernetes.io/unreachable
             operator: Exists
             tolerationSeconds: 0
 ---
@@ -1689,8 +1729,6 @@ data:
   post: |
     {{- jsonpath .JsonResult "{.metadata.name}" | trim | saveAs "createputrep.objectName" .TaskResult | noop -}}
   task: |
-    {{- $isTaintTolerations := .Config.TaintTolerations.value | default "false" -}}
-    {{- $taintTolerationsVal := fromYaml .Config.TaintTolerations.value -}}
     {{- $isEvictionTolerations := .Config.EvictionTolerations.value | default "false" -}}
     {{- $evictionTolerationsVal := fromYaml .Config.EvictionTolerations.value -}}
     {{- $isNodeAffinityRSIE := .Config.NodeAffinityRequiredSchedIgnoredExec.value | default "false" -}}
@@ -1783,14 +1821,6 @@ data:
             - name: openebs
               mountPath: /openebs
           tolerations:
-          {{- if ne $isTaintTolerations "false" }}
-          {{- range $k, $v := $taintTolerationsVal }}
-          - 
-          {{- range $kk, $vv := $v }}
-            {{ $kk }}: {{ $vv }}
-          {{- end }}
-          {{- end }}
-          {{- end }}
           {{- if ne $isEvictionTolerations "false" }}
           {{- range $k, $v := $evictionTolerationsVal }}
           - 
@@ -1943,4 +1973,12 @@ data:
     apiVersion: v1alpha1
     metadata:
       name: {{ .Volume.owner }}
+---
+apiVersion: openebs.io/v1alpha1
+kind: StoragePool
+metadata:
+  name: default
+  type: hostdir
+spec:
+  path: "/var/openebs"
 ---

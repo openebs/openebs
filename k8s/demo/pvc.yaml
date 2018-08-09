@@ -3,7 +3,7 @@ apiVersion: v1
 metadata:
   name: demo-vol1-claim
 spec:
-  storageClassName: openebs-standalone
+  storageClassName: openebs-standard
   accessModes:
     - ReadWriteOnce
   resources:

@@ -13,13 +13,12 @@ If this is your first time to Kubernetes, please go through these introductory t
 kubectl apply -f openebs-operator.yaml
 ```
 
-### Creating Default Storage Pools and Storage Classes
-With 0.7, node-disk-manager is installed that discovers and create Disk CRs for each non OS disk attached to the nodes. Get the list of disks using `kubectl get disks --show-labels` and update the Disk CR Names in the `openebs-storagepoolclaims.yaml`. It is recommended to specify one Disk CR per storage node.
+### (Optional) Configuring CStor Pools or customizing Jiva Pools
+With 0.7, node-disk-manager is installed that discovers and create Disk CRs for each non OS disk attached to the nodes. Get the list of disks using `kubectl get disks --show-labels` and update the Disk CR Names in the `openebs-config.yaml`. It is recommended to specify one Disk CR per storage node.
 
 ```
 kubectl apply -f openebs-cas-templates-pre-alpha.yaml
-kubectl apply -f openebs-storagepools.yaml
-kubectl apply -f openebs-storagepoolclaims.yaml
+kubectl apply -f openebs-config.yaml
 ```
 
 Note: This step will be optional in the near future and needs to be performed only if non-default settings are required. 

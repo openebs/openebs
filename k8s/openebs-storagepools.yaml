@@ -1,8 +1,0 @@
-apiVersion: openebs.io/v1alpha1
-kind: StoragePool
-metadata:
-  name: jiva-pool-path-default-0.7.0
-  type: hostdir
-spec:
-  path: "/var/openebs"
----
