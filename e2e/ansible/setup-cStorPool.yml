@@ -1,0 +1,33 @@
+---
+
+- hosts: kubernetes-kubemasters
+  roles:
+   - {role: k8s-cStorPool, when: storage_engine == "cStor"}
+
+  tasks:
+    
+    - name: Get Storage Class yaml
+      shell: source ~/.profile; kubectl get sc openebs-cstor-default-0.7.0 -o yaml > '{{ result_kube_home.stdout }}/openebs-e2e.yaml'
+      args:
+        executable: /bin/bash
+
+    - name: Update pool name in SC
+      replace:
+        path: "{{ result_kube_home.stdout }}/openebs-e2e.yaml"
+        regexp: 'cstor-pool-default-0.7.0'
+        replace: '{{ poolname }}'
+  
+    - name: Update SC name
+      replace:
+        path: "{{ result_kube_home.stdout }}/openebs-e2e.yaml"
+        regexp: 'name: openebs-cstor-default-0.7.0'
+        replace: 'name: openebs-e2e'
+
+    - name: create new sc
+      shell: source ~/.profile; kubectl apply -f '{{ result_kube_home.stdout }}/openebs-e2e.yaml'
+      args:
+        executable: /bin/bash
+      register: sc
+      until: 'created' in sc.stdout
+      delay: 10
+      retries: 5
