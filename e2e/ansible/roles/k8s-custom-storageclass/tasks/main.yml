@@ -37,7 +37,7 @@
       until: "'created' in sc.stdout"
       delay: 15
       retries: 5
-  when: storage_engine == 'cstor'
+  when: storage_engine == 'cStor'
 
 - name: Remove the copied templates
   file:
