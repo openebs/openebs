@@ -23,11 +23,11 @@
            dest: "{{ result_kube_home.stdout }}"
          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
 
-       - name: Create test specific namespace
-         shell: source ~/.profile; kubectl create ns {{ namespace }}
-         args:
-           executable: /bin/bash
-         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+       - name: Create  namespace
+         include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/namespace_task.yml"
+         vars:
+           status: create
+           ns: "{{ namespace }}"  
 
        - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_task.yml"
          vars:
@@ -291,6 +291,12 @@
          - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/stern_task.yml"
            vars:
              status: stop
+
+         - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/namespace_task.yml"
+           vars:
+               status: delete
+               ns: "{{ namespace  }}"
+
 
          - block:
              - name: Update Testrail
