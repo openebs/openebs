@@ -29,20 +29,14 @@ OpenEBS can be setup in few easy steps. You can get going on your choice of Kube
 
 **Start the OpenEBS Services using operator**
 ```bash
-# download the yaml
-wget https://openebs.github.io/charts/openebs-operator.yaml
-
 # apply this yaml
-kubectl apply -f openebs-operator.yaml
+kubectl apply -f https://openebs.github.io/charts/openebs-operator.yaml
 ```
 
 **Apply OpenEBS StorageClasses**
 ```bash
-# download the yaml
-wget https://openebs.github.io/charts/openebs-storageclasses.yaml
-
 # apply this yaml
-kubectl apply -f openebs-storageclasses.yaml
+kubectl apply -f https://openebs.github.io/charts/openebs-storageclasses.yaml
 ```
 
 You could also follow our [QuickStart Guide](https://docs.openebs.io/docs/overview.html).
