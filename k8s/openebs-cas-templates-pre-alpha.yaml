@@ -1164,9 +1164,9 @@ spec:
   - name: VolumeMonitor
     enabled: "true"
   - name: ControllerImage
-    value: openebs/jiva:0.5.0
+    value: openebs/jiva:0.6.0
   - name: ReplicaImage
-    value: openebs/jiva:0.5.0
+    value: openebs/jiva:0.6.0
   - name: ReplicaCount
     value: "3"
   - name: StoragePool
