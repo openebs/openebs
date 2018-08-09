@@ -20,4 +20,7 @@ spec:
   # as the disk operator
   disks:
     diskList:
-      - 
+# Replace the following with actual disk CRs from your cluster `kubectl get disks`
+#      - disk-0c84c169ab2f398b92914f56dad41f81
+#      - disk-66a74896b61c60dcdaf7c7a76fde0ebb
+#      - disk-b34b3f97840872da9aa0bac1edc9578a

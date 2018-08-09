@@ -1163,14 +1163,6 @@ spec:
   defaultConfig:
   - name: VolumeMonitor
     enabled: "true"
-  - name: ControllerImage
-    value: openebs/jiva:0.6.0
-  - name: ReplicaImage
-    value: openebs/jiva:0.6.0
-  - name: ReplicaCount
-    value: "3"
-  - name: StoragePool
-    value: jiva-pool-path-default-0.7.0
   - name: TaintTolerations
     value: |-
       t1:

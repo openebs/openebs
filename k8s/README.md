@@ -1,6 +1,6 @@
 # Using OpenEBS with K8s
 
-This folder contains the software components (plugins, scripts, drivers etc.,), usage instructions and application examples of using OpenEBS with K8s. 
+This folder contains the artifacts (YAMLS, plugins, scripts, drivers etc.,), usage instructions and application examples of using OpenEBS with K8s. The artifiacts in this repository contain unreleased changes. If you are looking at deploying from a stable release, please follow the instructions at [Quick Start Guide](https://docs.openebs.io/docs/next/quickstartguide.html)
 
 If this is your first time to Kubernetes, please go through these introductory tutorials: 
 - https://www.udacity.com/course/scalable-microservices-with-kubernetes--ud615
@@ -8,27 +8,21 @@ If this is your first time to Kubernetes, please go through these introductory t
 
 ## Usage
 
-### Enable OpenEBS on K8s
+### Installing OpenEBS on K8s
 ```
 kubectl apply -f openebs-operator.yaml
 ```
 
-### Customize OpenEBS
-```
-kubectl apply -f openebs-config.yaml
-kubectl apply -f openebs-storageclasses.yaml
-```
-
-### (Optional) Run customized kubernetes dashboard
-
-This step is required till a newer version of kubernetes dashboard is released, that contains fixes from openebs team to PV/PVC links. 
+### Creating Default Storage Pools and Storage Classes
+With 0.7, node-disk-manager is installed that discovers and create Disk CRs for each non OS disk attached to the nodes. Get the list of disks using `kubectl get disks --show-labels` and update the Disk CR Names in the `openebs-storagepoolclaims.yaml`. It is recommended to specify one Disk CR per storage node.
 
 ```
-kubectl apply -f openebs-kubernetes-dashboard.yaml
+kubectl apply -f openebs-cas-templates-pre-alpha.yaml
+kubectl apply -f openebs-storagepools.yaml
+kubectl apply -f openebs-storagepoolclaims.yaml
 ```
 
-If you running in minikube, you can access the openebs-dashboard via the proxy url:
-http://127.0.0.1:8001/api/v1/namespaces/kube-system/services/https:openebs-kubernetes-dashboard:/proxy/#!/persistentvolume?namespace=default
+Note: This step will be optional in the near future and needs to be performed only if non-default settings are required. 
 
 ### (Optional) Enable monitoring using prometheus and grafana
 

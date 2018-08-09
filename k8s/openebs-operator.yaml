@@ -399,6 +399,15 @@ metadata:
     cas.openebs.io/create-volume-template: jiva-volume-create-default-0.7.0
     cas.openebs.io/delete-volume-template: jiva-volume-delete-default-0.7.0
     cas.openebs.io/read-volume-template: jiva-volume-read-default-0.7.0
+    cas.openebs.io/config: |
+      - name: ControllerImage
+        value: openebs/jiva:0.6.0
+      - name: ReplicaImage
+        value: openebs/jiva:0.6.0
+      - name: ReplicaCount
+        value: "3"
+      - name: StoragePool
+        value: jiva-pool-path-default-0.7.0
 provisioner: openebs.io/provisioner-iscsi
 ---
 apiVersion: storage.k8s.io/v1
