@@ -1236,8 +1236,6 @@ spec:
     - jiva-volume-create-getstoragepoolcr-default-0.7.0
     - jiva-volume-create-puttargetdeployment-default-0.7.0
     - jiva-volume-create-putreplicadeployment-default-0.7.0
-    - jiva-volume-create-listreplicapod-default-0.7.0
-    - jiva-volume-create-patchreplicadeployment-default-0.7.0
   output: jiva-volume-create-output-default-0.7.0
 ---
 apiVersion: openebs.io/v1alpha1
@@ -1631,12 +1629,17 @@ data:
     Kind: Deployment
     metadata:
       labels:
-        openebs.io/storage-engine-type: jiva
         openebs/volume-provisioner: jiva
         openebs/controller: jiva-controller
-        openebs.io/controller: jiva-controller
         vsm: {{ .Volume.owner }}
+        pvc: {{ .Volume.pvc }}
+        {{- if eq $isMonitor "true" }}
+        monitoring: "volume_exporter_prometheus"
+        {{- end}}
+        openebs.io/storage-engine-type: jiva
+        openebs.io/controller: jiva-controller
         openebs.io/pv: {{ .Volume.owner }}
+        openebs.io/pvc: {{ .Volume.pvc }}
       annotations:
         {{- if eq $isMonitor "true" }}
         openebs.io/volume-monitor: "true"
@@ -1647,23 +1650,28 @@ data:
       replicas: 1
       selector:
         matchLabels:
+          openebs/volume-provisioner: jiva
+          openebs/controller: jiva-controller
+          vsm: {{ .Volume.owner }}
+          pvc: {{ .Volume.pvc }}
           {{- if eq $isMonitor "true" }}
           monitoring: volume_exporter_prometheus
           {{- end}}
           openebs.io/controller: jiva-controller
-          openebs/controller: jiva-controller
           openebs.io/pv: {{ .Volume.owner }}
-          vsm: {{ .Volume.owner }}
       template:
         metadata:
           labels:
+            openebs/volume-provisioner: jiva
+            openebs/controller: jiva-controller
+            vsm: {{ .Volume.owner }}
+            pvc: {{ .Volume.pvc }}
             {{- if eq $isMonitor "true" }}
             monitoring: volume_exporter_prometheus
             {{- end}}
             openebs.io/controller: jiva-controller
-            openebs/controller: jiva-controller
             openebs.io/pv: {{ .Volume.owner }}
-            vsm: {{ .Volume.owner }}
+            openebs.io/pvc: {{ .Volume.pvc }}
         spec:
           containers:
           - args:
@@ -1731,38 +1739,41 @@ data:
   task: |
     {{- $isEvictionTolerations := .Config.EvictionTolerations.value | default "false" -}}
     {{- $evictionTolerationsVal := fromYaml .Config.EvictionTolerations.value -}}
-    {{- $isNodeAffinityRSIE := .Config.NodeAffinityRequiredSchedIgnoredExec.value | default "false" -}}
-    {{- $nodeAffinityRSIEVal := fromYaml .Config.NodeAffinityRequiredSchedIgnoredExec.value -}}
-    {{- $isNodeAffinityPSIE := .Config.NodeAffinityPreferredSchedIgnoredExec.value | default "false" -}}
-    {{- $nodeAffinityPSIEVal := fromYaml .Config.NodeAffinityPreferredSchedIgnoredExec.value -}}
     apiVersion: extensions/v1beta1
     kind: Deployment
     metadata:
       labels:
-        openebs.io/storage-engine-type: jiva
-        openebs/volume-provisioner: jiva
         openebs/replica: jiva-replica
-        openebs.io/replica: jiva-replica
+        openebs/volume-provisioner: jiva
         vsm: {{ .Volume.owner }}
+        pvc: {{ .Volume.pvc }}
+        openebs.io/storage-engine-type: jiva
+        openebs.io/replica: jiva-replica
         openebs.io/pv: {{ .Volume.owner }}
+        openebs.io/pvc: {{ .Volume.pvc }}
+      annotations:
         openebs.io/capacity: {{ .Volume.capacity }}
+        openebs.io/storage-pool: {{ .Config.StoragePool.value }}
       name: {{ .Volume.owner }}-rep
     spec:
       replicas: {{ .Config.ReplicaCount.value }}
       selector:
         matchLabels:
           openebs/replica: jiva-replica
-          openebs.io/replica: jiva-replica
+          openebs/volume-provisioner: jiva
           vsm: {{ .Volume.owner }}
+          pvc: {{ .Volume.pvc }}
           openebs.io/pv: {{ .Volume.owner }}
+          openebs.io/replica: jiva-replica
       template:
         metadata:
           labels:
             openebs/replica: jiva-replica
-            openebs.io/replica: jiva-replica
+            openebs/volume-provisioner: jiva
             vsm: {{ .Volume.owner }}
+            pvc: {{ .Volume.pvc }}
+            openebs.io/replica: jiva-replica
             openebs.io/pv: {{ .Volume.owner }}
-            openebs.io/capacity: {{ .Volume.capacity }}
         spec:
           affinity:
             podAntiAffinity:
@@ -1774,30 +1785,6 @@ data:
                     vsm: {{ .Volume.owner }}
                     openebs.io/pv: {{ .Volume.owner }}
                 topologyKey: kubernetes.io/hostname
-            nodeAffinity:
-              {{- if ne $isNodeAffinityRSIE "false" }}
-              requiredDuringSchedulingIgnoredDuringExecution:
-                nodeSelectorTerms:
-                - matchExpressions:
-                  {{- range $k, $v := $nodeAffinityRSIEVal }}
-                  - 
-                  {{- range $kk, $vv := $v }}
-                    {{ $kk }}: {{ $vv }}
-                  {{- end }}
-                  {{- end }}
-              {{- end }}
-              {{- if ne $isNodeAffinityPSIE "false" }}
-              preferredDuringSchedulingIgnoredDuringExecution:
-              - weight: 1
-                preference:
-                  matchExpressions:
-                  {{- range $k, $v := $nodeAffinityPSIEVal }}
-                  - 
-                  {{- range $kk, $vv := $v }}
-                    {{ $kk }}: {{ $vv }}
-                  {{- end }}
-                  {{- end }}
-              {{- end }}
           containers:
           - args:
             - replica
