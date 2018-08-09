@@ -34,6 +34,7 @@
       shell: source ~/.profile; kubectl apply -f {{result_kube_home.stdout}}/default-cstor.j2
       args:
         executable: /bin/bash
+      register: sc
       until: "'created' in sc.stdout"
       delay: 15
       retries: 5
