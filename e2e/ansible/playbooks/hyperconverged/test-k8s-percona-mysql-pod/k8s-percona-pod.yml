@@ -52,6 +52,22 @@
            line: "      storage: \"{{percona_mysql_vol_size}}\""
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
+       - name: 2c) Replace storage-class to use cstor storage engine
+         replace:
+           path: "{{ result_kube_home.stdout }}/{{ pod_yaml_alias }}"
+           regexp: 'openebs-percona'
+           replace: '{{ cstor_sc }}'
+         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+         when:  storage_engine  == 'cStor'
+
+       - name: 2c) Replace storage-class to use cstor storage engine
+         replace:
+           path: "{{ result_kube_home.stdout }}/{{ pod_yaml_alias }}"
+           regexp: 'openebs-percona'
+           replace: '{{ jiva_sc }}'
+         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+         when:  storage_engine  == 'jiva'
+
        - name: 4) Create test specific namespace
          include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/namespace_task.yml"
          vars:

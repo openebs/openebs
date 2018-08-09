@@ -49,7 +49,22 @@
            path: "{{ result_kube_home.stdout }}/{{ stateful_yaml_alias }}"
            regexp: 'cassandra-0.cassandra.default.svc.cluster.local'
            replace: 'cassandra-0.cassandra.{{ namespace }}.svc.cluster.local'
+  
+       - name: 2d) Replace storage-class to use cstor storage engine
+         replace:
+           path: "{{ result_kube_home.stdout }}/{{ stateful_yaml_alias }}"
+           regexp: 'openebs-cassandra'
+           replace: '{{ cstor_sc }}'
+         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+         when:  storage_engine  == 'cStor'
 
+       - name: 2d) Replace storage-class to use cstor storage engine
+         replace:
+           path: "{{ result_kube_home.stdout }}/{{ stateful_yaml_alias }}"
+           regexp: 'openebs-cassandra'
+           replace: '{{ jiva_sc }}'
+         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+         when:  storage_engine  == 'jiva'
 
        - name: Creating namespace for cassandra
          shell: source ~/.profile; kubectl create ns {{ namespace }}

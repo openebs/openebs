@@ -41,6 +41,22 @@
            line: "      storage: \"{{jupyter_server_vol_size}}\""
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
+       - name: 2d) Replace storage-class to use cstor storage engine
+         replace:
+           path: "{{ result_kube_home.stdout }}/{{ pod_yaml_alias }}"
+           regexp: 'openebs-jupyter'
+           replace: '{{ cstor_sc }}'
+         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+         when:  storage_engine  == 'cStor'
+
+       - name: 2d) Replace storage-class to use cstor storage engine
+         replace:
+           path: "{{ result_kube_home.stdout }}/{{ pod_yaml_alias }}"
+           regexp: 'openebs-jupyter'
+           replace: '{{ jiva_sc }}'
+         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+         when:  storage_engine  == 'jiva'
+
        - name: 3) Deploy jupyter notebook server pod
          include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_task.yml"
          vars:
