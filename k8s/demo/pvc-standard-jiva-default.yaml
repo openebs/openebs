@@ -3,7 +3,7 @@ apiVersion: v1
 metadata:
   name: demo-vol1-claim
 spec:
-  storageClassName: openebs-jiva-default-0.7.0
+  storageClassName: openebs-standard
   accessModes:
     - ReadWriteOnce
   resources:
