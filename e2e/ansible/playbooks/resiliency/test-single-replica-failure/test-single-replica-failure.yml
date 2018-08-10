@@ -32,7 +32,7 @@
          include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/copy_task.yml"
          vars:
            destination_node: "{{groups['kubernetes-kubemasters'].0}}"
-           files_to_copy: 
+           files_to_copy:
              - "{{ chaoskube_files }}"
              - "{{ percona_files }}"
 
@@ -276,7 +276,7 @@
            - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/namespace_task.yml"
              vars:
                status: delete
-               ns: "{{ namespace }}" 
+               ns: "{{ namespace }}"
 
            - block:
                - name: Update Testrail
