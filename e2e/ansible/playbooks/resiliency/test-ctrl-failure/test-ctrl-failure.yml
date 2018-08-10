@@ -51,7 +51,7 @@
 
        - name: Replace volume-claim name with test parameters
          replace:
-           path: "{{ result_kube_home.stdout }}//rbac.yaml"
+           path: "{{ result_kube_home.stdout }}/rbac.yaml"
            regexp: 'namespace: default'
            replace: 'namespace: {{ namespace }}'
          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
