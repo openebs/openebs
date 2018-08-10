@@ -37,13 +37,12 @@
          set_fact:
             node_count: " {{ node_out.stdout}}"
 
-
        - name: Check status of maya-apiserver
-         include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
+         include_tasks: "{{utils_path}}/deploy_check.yml"
          vars:
            ns: "{{ operator_ns }}"
-           app: maya-apiserver
-
+           lkey: name
+           lvalue: maya-apiserver
 
        - name: Obtaining storage classes yaml
          shell: source ~/.profile; kubectl get sc openebs-percona -o yaml > "{{ create_sc }}"
@@ -69,7 +68,7 @@
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
        - name: Create namespace to deploy application
-         include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/namespace_task.yml"
+         include_tasks: "{{utils_path}}/namespace_task.yml"
          vars:
             status: create
             ns: "{{ namespace }}"
@@ -87,11 +86,11 @@
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
        - name: Check percona pod is running
-         include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
+         include_tasks: "{{utils_path}}/deploy_check.yml"
          vars:
            ns: "{{namespace}}"
-           app: percona
-
+           lkey: name
+           lvalue: percona
 
        - name: Check if the replica pods are created and running
          shell: source ~/.profile; kubectl get pods -n {{ namespace }} | grep rep | grep -i running |wc -l
@@ -104,14 +103,12 @@
          ignore_errors: true
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
-
        - name: Get PV name
          shell: source ~/.profile; kubectl get pv -n {{ namespace }}| grep openebs-percona | awk '{print $1}'
          args:
            executable: /bin/bash
          register: pv_name
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-
 
        - name: Copy replica_patch.yaml to master
          copy:
@@ -126,14 +123,12 @@
          register: node1
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
-
        - name: Get the node name where replica2 is scheduled
          shell: source ~/.profile; kubectl get po -n {{ namespace }} -o wide | grep "{{ pv_name.stdout }}" | grep rep | awk '{print $7}' | awk 'FNR == 2 {print}'
          args:
            executable: /bin/bash
          register: node2
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-
 
        - name: Update replica1 node name in replica_patch file
          replace:
@@ -142,7 +137,6 @@
            replace: '{{ node1.stdout }}'
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
-
        - name: Update replica2 node name in replica_patch file
          replace:
            path: "{{ result_kube_home.stdout }}/{{ patch_file }}"
@@ -150,14 +144,12 @@
            replace: '{{ node2.stdout }}'
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
-
        - name: Get the deployment name
          shell: source ~/.profile; kubectl get deploy -n {{ namespace }} |grep "{{ pv_name.stdout }}" | grep rep |awk '{print $1}'
          args:
            executable: /bin/bash
          register: deploy_name
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-
 
        - name: Apply the node affinity property
          shell: source ~/.profile; kubectl patch deployment "{{ deploy_name.stdout }}" -n {{ namespace }} -p "$(cat replica_patch.yaml)"
@@ -168,7 +160,6 @@
          delay: 20
          retries: 5
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-
 
        - name: Drain the node where replica is scheduled
          shell: source ~/.profile; kubectl drain {{ node1.stdout }} --ignore-daemonsets --force
@@ -187,7 +178,6 @@
          retries: 5
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
          ignore_errors: true
-
 
        - name: Check if the replica is in pending state after node drain
          shell: source ~/.profile; kubectl get pods -n {{ namespace }} -o wide | grep "{{ pv_name.stdout }}" | grep rep | grep Pending
@@ -235,11 +225,11 @@
 
          always:
 
-           - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/stern_task.yml"
+           - include_tasks: "{{utils_path}}/stern_task.yml"
              vars:
                status: stop
 
-           - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/namespace_task.yml"
+           - include_tasks: "{{utils_path}}/namespace_task.yml"
              vars:
                status: delete
                ns: "{{ namespace }}"

@@ -1,17 +1,17 @@
 ---
 
 - name: Delete percona deployment
-  include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/delete_deploy.yml"
+  include_tasks: "{{utils_path}}/delete_deploy.yml"
   vars:
     app_yml: "{{ percona_file }}"
     ns: "{{namespace}}"
 
 - name: Confirm percona pod has been deleted
-  include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/delete_deploy_check.yml"
+  include_tasks: "{{utils_path}}/delete_deploy_check.yml"
   vars:
     ns: "{{namespace}}"
-    app: percona
-
+    lkey: name
+    lvalue: percona
 
 - name: uncordon the node which is drained
   shell: source ~/.profile; kubectl uncordon {{ node1.stdout }}
