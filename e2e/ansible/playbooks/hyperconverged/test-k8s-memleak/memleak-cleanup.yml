@@ -9,7 +9,7 @@
   register: result
 
 - name: Obtain the pvc name
-  shell: source ~/.profile; kubectl get pvc -n {{ namespace }} | awk '{print $1}'
+  shell: source ~/.profile; kubectl get pvc -n {{ namespace }} --no-headers | awk '{print $1}'
   args:
     executable: /bin/bash
   register: pvc
