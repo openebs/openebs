@@ -16,8 +16,8 @@
 - name: Creating the required number of disk 
   shell: >
     for ((i=0; i< "{{ disk_count }}"; i++));do
-      gcloud compute disks create {{ item }}-{{ name.stdout }}-${i}  --size "{{ disk_size }}" --type "{{ disk_type }}" --zone "{{ cluster_zone }}" &&
-      gcloud compute instances attach-disk {{ item }} --disk {{ item }}-{{ name.stdout }}-${i} --device-name {{ item }}-{{ name.stdout }}-${i} --zone "{{ cluster_zone }}"
+      gcloud compute disks create {{ item }}-{{ name.stdout }}-disk${i}  --size "{{ disk_size }}" --type "{{ disk_type }}" --zone "{{ cluster_zone }}" &&
+      gcloud compute instances attach-disk {{ item }} --disk {{ item }}-{{ name.stdout }}-disk${i} --device-name {{ item }}-{{ name.stdout }}-disk${i} --zone "{{ cluster_zone }}"
     done
   args:
     executable: /bin/bash 

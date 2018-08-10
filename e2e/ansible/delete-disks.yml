@@ -1,0 +1,4 @@
+---
+- hosts: localhost
+  roles:
+    - {role: k8s-gke-detach, when: cloud_provider == "GCP"}
