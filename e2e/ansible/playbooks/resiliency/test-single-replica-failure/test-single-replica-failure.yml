@@ -83,13 +83,6 @@
          set_fact:
            chaospod: "{{ result.stdout_lines[0].split()[0] }}"
 
-       - name: Check whether chaoskube infrastructure is created
-         include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
-         vars:
-            app: chaoskube
-            ns: "{{ namespace }}"
-
-
        - name: Create a configmap with the liveness sql script
          shell: source ~/.profile; kubectl create configmap sqltest --from-file={{ percona_files.1 }} -n {{ namespace }}
          args:

@@ -1,5 +1,5 @@
 ---
-- name: Copy the chaoskube specs to kubemaster
+- name: Copy the test specs files to kubemaster
   copy:
     src: "{{ item }}"
     dest: "{{ result_kube_home.stdout }}"
