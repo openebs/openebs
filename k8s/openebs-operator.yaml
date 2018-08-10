@@ -75,7 +75,7 @@ spec:
       serviceAccountName: openebs-maya-operator
       containers:
       - name: maya-apiserver
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         image: openebs/m-apiserver:ci
         ports:
         - containerPort: 5656
@@ -103,7 +103,7 @@ spec:
         - name: OPENEBS_IO_JIVA_REPLICA_IMAGE
           value: "openebs/jiva:0.6.0"
         - name: OPENEBS_IO_VOLUME_MONITOR_IMAGE
-          value: "openebs/m-exporter:0.6.0"
+          value: "openebs/m-exporter:ci"
         - name: OPENEBS_IO_JIVA_REPLICA_COUNT
           value: "3"
         # DEFAULT_CONTROLLER_NODE_SELECTOR allows your to specify the nodes
@@ -155,7 +155,7 @@ spec:
       serviceAccountName: openebs-maya-operator
       containers:
       - name: openebs-provisioner
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         image: openebs/openebs-k8s-provisioner:ci
         env:
         # OPENEBS_IO_CAS_TEMPLATE_FEATURE_GATE enables cas template feature;
@@ -212,7 +212,7 @@ spec:
       containers:
         - name: snapshot-controller
           image: openebs/snapshot-controller:ci
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
           env:
           - name: OPENEBS_NAMESPACE
             valueFrom:
@@ -220,7 +220,7 @@ spec:
                 fieldPath: metadata.namespace
         - name: snapshot-provisioner
           image: openebs/snapshot-provisioner:ci
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
           env:
           - name: OPENEBS_NAMESPACE
             valueFrom:
@@ -376,7 +376,22 @@ spec:
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
-   name: openebs-standard
+  name: openebs-standard
+  annotations:
+    cas.openebs.io/create-volume-template: jiva-volume-create-default-0.7.0
+    cas.openebs.io/delete-volume-template: jiva-volume-delete-default-0.7.0
+    cas.openebs.io/read-volume-template: jiva-volume-read-default-0.7.0
+    cas.openebs.io/config: |
+      - name: ControllerImage
+        value: openebs/jiva:0.6.0
+      - name: ReplicaImage
+        value: openebs/jiva:0.6.0
+      - name: VolumeMonitorImage
+        value: openebs/m-exporter:ci
+      - name: ReplicaCount
+        value: "3"
+      - name: StoragePool
+        value: default
 provisioner: openebs.io/provisioner-iscsi
 parameters:
   openebs.io/storage-pool: "default"
@@ -389,30 +404,6 @@ apiVersion: storage.k8s.io/v1
 metadata:
   name: openebs-snapshot-promoter
 provisioner: volumesnapshot.external-storage.k8s.io/snapshot-promoter
----
-# Define a storage classes supported by OpenEBS
-apiVersion: storage.k8s.io/v1
-kind: StorageClass
-metadata:
-  name: openebs-jiva-default-0.7.0
-  annotations:
-    cas.openebs.io/create-volume-template: jiva-volume-create-default-0.7.0
-    cas.openebs.io/delete-volume-template: jiva-volume-delete-default-0.7.0
-    cas.openebs.io/read-volume-template: jiva-volume-read-default-0.7.0
-provisioner: openebs.io/provisioner-iscsi
----
-apiVersion: storage.k8s.io/v1
-kind: StorageClass
-metadata:
-  name: openebs-cstor-default-0.7.0
-  annotations:
-    cas.openebs.io/create-volume-template: cstor-volume-create-default-0.7.0
-    cas.openebs.io/delete-volume-template: cstor-volume-delete-default-0.7.0
-    cas.openebs.io/read-volume-template: cstor-volume-read-default-0.7.0
-    cas.openebs.io/config: |
-      - name: StoragePoolClaim
-        value: "cstor-pool-default-0.7.0"
-provisioner: openebs.io/provisioner-iscsi
 ---
 # node-disk-manager-config-default-0.1.0 contains config of available probes 
 # and filters. Probes and filters will initialize with default values if config 
@@ -484,7 +475,7 @@ spec:
         - /usr/sbin/ndm
         - start
         image: openebs/node-disk-manager-amd64:ci
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         securityContext:
           privileged: true
         volumeMounts:

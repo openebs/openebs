@@ -8,4 +8,4 @@
   until: "'Running' not in result.stdout"
   delay: 30
   retries: 15
-  ignore_errors: true
+

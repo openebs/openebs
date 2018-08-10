@@ -49,6 +49,13 @@
            destination_node: "{{groups['kubernetes-kubemasters'].0}}"
            files_to_copy: "{{ chaoskube_files }}"
 
+       - name: Replace volume-claim name with test parameters
+         replace:
+           path: "{{ result_kube_home.stdout }}/rbac.yaml"
+           regexp: 'namespace: default'
+           replace: 'namespace: {{ namespace }}'
+         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+
        - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
          vars:
             ns: "{{ operator_ns }}"
@@ -66,16 +73,15 @@
             status: create
             ns: "{{ namespace }}"
 
-
        - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_task.yml"
          vars:
            app_yml: "{{ chaoskube_files }}"
-           ns: default
+           ns: "{{ namespace }}"
 
        - name: Check whether chaoskube infrastructure is created
          include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
          vars:
-            ns: default
+            ns: "{{ namespace }}"
             app: chaoskube
 
        - name: Set chaoskube pod name to variable
@@ -135,11 +141,12 @@
 
        - name: Initiate periodic controller failures from chaoskube
          shell: >
-           source ~/.profile; kubectl exec {{ chaospod }}
+           source ~/.profile; kubectl exec {{ chaospod }} -n {{ namespace }}
            -- timeout -t {{ chaos_duration }} chaoskube
            --labels 'openebs/controller=jiva-controller'
            --no-dry-run --interval={{ chaos_interval }}s
            --debug
+           --namespaces={{ namespace }}
          args:
            executable: /bin/bash
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
@@ -178,24 +185,19 @@
        # the FI (chaoskube) infrastructure. Also stop logger) #
        ########################################################
 
-       - name: Test Passed
-         set_fact:
-           flag: "Test Passed"
-           status_id: 1
 
-       - name: Set Status
+       - name: Setting pass flag
          set_fact:
-           status: "good"
+            flag: "Test Passed"
+            status: "good"
+            status_id: 1
 
      rescue:
-       - name: Test Failed
+       - name: Setting fail flag
          set_fact:
            flag: "Test Failed"
-           status_id: 5
-
-       - name: Set Status
-         set_fact:
            status: "danger"
+           status_id: 5
 
      always:
        - block:
@@ -222,20 +224,13 @@
                status: delete
                ns: "{{ namespace }}"
 
-           - block:
-               - name: Update Testrail
-                 shell: source ~/.profile; python3 {{ inventory_dir | dirname }}/files/updater.py -tuser {{ testrail_user }} -tpass {{ testrail_password }} -sid {{ test_suite_id }} -cid {{ test_case_id }} -stid {{ status_id }}
-                 args:
-                   executable: /bin/bash
-
-               - name: Testrail Updated
-                 set_fact:
-                   tflag: "Testrail Updated"
-
-             rescue:
-               - name: Testrail Update failed
-                 set_fact:
-                   tflag: "Testrail Update Failed"
+           - include_tasks: "{{ inventory_dir | dirname }}/playbooks/utils/update-testrail.yml"
+             vars:
+               user: "{{ testrail_user }}"
+               password: "{{ testrail_password }}"
+               suite_id: "{{ test_suite_id }}"
+               case_id: "{{ test_case_id }}"
+               st_id: "{{ status_id }}"
 
            - name: Send slack notification
              slack:
