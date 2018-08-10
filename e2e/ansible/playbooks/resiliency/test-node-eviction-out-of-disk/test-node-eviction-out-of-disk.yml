@@ -29,10 +29,11 @@
        # confirm OpenEBS operator is ready for requests. #
        ###################################################
 
-       - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
+       - include_tasks: "{{utils_path}}/deploy_check.yml"
          vars:
             ns: "{{ operator_ns }}"
-            app: maya-api
+            lkey: name
+            lvalue: maya-apiserver
 
        - name: Get percona spec and liveness scripts
          get_url:
@@ -42,7 +43,7 @@
          with_items: "{{ percona_links }}"
 
        - name: Replace volume-claim name with test parameters
-         include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/regex_task.yml"
+         include_tasks: "{{utils_path}}/regex_task.yml"
          vars:
            path: "{{ result_kube_home.stdout }}/percona.yaml"
            regex1: "{{replace_item}}"
@@ -56,7 +57,7 @@
        ####################################################
 
        - name: Create nodeeviction namespace
-         include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/namespace_task.yml"
+         include_tasks: "{{utils_path}}/namespace_task.yml"
          vars:
             status: create
             ns: "{{ namespace }}"
@@ -77,15 +78,16 @@
          register: result
          failed_when: "'configmap' and 'created' not in result.stdout"
 
-       - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_task.yml"
+       - include_tasks: "{{utils_path}}/deploy_task.yml"
          vars:
            app_yml: "{{ percona_files.0 }}"
            ns: "{{ namespace }}"
 
-       - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
+       - include_tasks: "{{utils_path}}/deploy_check.yml"
          vars:
             ns: "{{ namespace }}"
-            app: percona
+            lkey: name
+            lvalue: percona
 
        ####################################################
        # Set out-of-disk eviction taint condition on one  #
@@ -146,10 +148,11 @@
 
          when: storage_engine == 'jiva'
 
-       - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
+       - include_tasks: "{{utils_path}}/deploy_check.yml"
          vars:
             ns: "{{ namespace }}"
-            app: percona
+            lkey: name
+            lvalue: percona
          
        - name: Test Passed     
          set_fact:
@@ -186,7 +189,7 @@
 
          always:
 
-           - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/stern_task.yml"
+           - include_tasks: "{{utils_path}}/stern_task.yml"
              vars:
                status: stop
           
@@ -222,19 +225,11 @@
                  set_fact:
                    tflag: "Testrail Update Failed"
 
-           - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/namespace_task.yml"
+           - include_tasks: "{{utils_path}}/namespace_task.yml"
              vars:
                status: delete
                ns: "{{ namespace }}"
           
-
-           - name: Untaint node with Eviction Condition node.kubernetes.io/out-of-disk
-             shell: source ~/.profile; kubectl taint nodes {{ node_name.stdout }} {{ key }}:NoExecute-
-             args:
-               executable: /bin/bash
-             register: untaint_output
-             delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-
            - name: Send slack notification
              slack:
                token: "{{ lookup('env','SLACK_TOKEN') }}"

@@ -9,7 +9,7 @@
 
 
        - name: Bring down node
-         include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/vagrant-halt-up-task.yml"
+         include_tasks: "{{utils_path}}/vagrant-halt-up-task.yml"
          vars:
            vagrant_op: halt --force
            nodename: "{{ node1.stdout }}"
@@ -31,13 +31,14 @@
            timeout: 300
 
        - name: Confirm liveness checks on percona are successful &  pod is still in running state
-         include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
+         include_tasks: "{{utils_path}}/deploy_check.yml"
          vars:
             ns: "{{ namespace }}"
-            app: percona
+            lkey: name
+            lvalue: percona
 
        - name: Bring up node
-         include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/vagrant-halt-up-task.yml"
+         include_tasks: "{{utils_path}}/vagrant-halt-up-task.yml"
          vars:
            vagrant_op: up
            nodename: "{{ node1.stdout }}"
@@ -54,10 +55,11 @@
          changed_when: True
 
        - name: Confirm liveness checks on percona are successful &  pod is still in running state
-         include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
+         include_tasks: "{{utils_path}}/deploy_check.yml"
          vars:
             ns: "{{ namespace }}"
-            app: percona
+            lkey: name
+            lvalue: percona
 
        - name: Check if the replica pods are created and running
          shell: source ~/.profile; kubectl get pods -n {{ namespace }} | grep rep | grep -i running |wc -l
