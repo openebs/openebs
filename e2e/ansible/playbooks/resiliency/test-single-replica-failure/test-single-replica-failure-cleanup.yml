@@ -20,7 +20,7 @@
     app: percona
 
 - name: Confirm pvc pod has been deleted
-  shell: source ~/.profile; kubectl get pods -n {{ namespace }}
+  shell: source ~/.profile; kubectl get pods -n {{ namespace }} 
   args:
     executable: /bin/bash
   delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
@@ -43,10 +43,10 @@
   include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/delete_deploy.yml"
   vars:
     app_yml: "{{ chaoskube_files }}"
-    ns: default
+    ns: "{{ namespace }}"
 
 - name: Confirm that the chaoskube pod has been deleted
-  shell: source ~/.profile; kubectl get pods -l app=chaoskube
+  shell: source ~/.profile; kubectl get pods -n {{ namespace }} -l app=chaoskube
   args:
     executable: /bin/bash
   delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
@@ -57,7 +57,7 @@
 - name: Confirm the chaoskube sa has been deleted
   shell: >
     source ~/.profile;
-    kubectl get sa --no-headers -o custom-columns=:metadata.name
+    kubectl get sa --no-headers -o custom-columns=:metadata.name -n {{ namespace }}
   args:
     executable: /bin/bash
   delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
@@ -68,7 +68,7 @@
 - name: Confirm the chaoskube clusterrolebinding has been deleted
   shell: >
     source ~/.profile;
-    kubectl get clusterrolebinding --no-headers -o custom-columns=:metadata.name
+    kubectl get clusterrolebinding --no-headers -o custom-columns=:metadata.name -n {{ namespace }}
   args:
     executable: /bin/bash
   delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
@@ -83,11 +83,5 @@
   delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
   with_items:
     - "{{percona_files}}"
-
-- name: Remove chaoskube test artifacts
-  file:
-    path: "{{ result_kube_home.stdout }}/{{ item }}"
-    state: absent
-  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-  with_items:
     - "{{chaoskube_files}}"
+
