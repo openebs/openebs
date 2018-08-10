@@ -1,11 +1,11 @@
 
 ---
 
-pool_name: pool1
+cstor_pool_name: pool1
 
+jiva_pool_name: default
 
 replica_count: 3
-
 
 tag: ci
 
