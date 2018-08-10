@@ -1,6 +1,8 @@
 # Using OpenEBS with K8s
 
-This folder contains the software components (plugins, scripts, drivers etc.,), usage instructions and application examples of using OpenEBS with K8s. 
+**_The artifiacts in this repository contain unreleased changes._**
+
+If you are looking at deploying from a stable release, please follow the instructions at [Quick Start Guide](https://docs.openebs.io/docs/next/quickstartguide.html)
 
 If this is your first time to Kubernetes, please go through these introductory tutorials: 
 - https://www.udacity.com/course/scalable-microservices-with-kubernetes--ud615
@@ -8,27 +10,23 @@ If this is your first time to Kubernetes, please go through these introductory t
 
 ## Usage
 
-### Enable OpenEBS on K8s
+### Installing OpenEBS on K8s
 ```
 kubectl apply -f openebs-operator.yaml
 ```
 
-### Customize OpenEBS
+The following YAML contains configuration that is required by the pre-release-features, that are currently under developement. As we progress towards the release, the content in this will be either moved to openebs-operator.yaml or installed/configured via the code.
+```
+kubectl apply -f openebs-pre-release-features.yaml
+```
+
+
+### (Optional) Configuring CStor Pools and Storage Class
+With 0.7, node-disk-manager is installed that discovers and create Disk CRs for each non OS disk attached to the nodes. Get the list of disks using `kubectl get disks --show-labels` and update the Disk CR Names in the `openebs-config.yaml`. It is recommended to specify one Disk CR per storage node.
+
 ```
 kubectl apply -f openebs-config.yaml
-kubectl apply -f openebs-storageclasses.yaml
 ```
-
-### (Optional) Run customized kubernetes dashboard
-
-This step is required till a newer version of kubernetes dashboard is released, that contains fixes from openebs team to PV/PVC links. 
-
-```
-kubectl apply -f openebs-kubernetes-dashboard.yaml
-```
-
-If you running in minikube, you can access the openebs-dashboard via the proxy url:
-http://127.0.0.1:8001/api/v1/namespaces/kube-system/services/https:openebs-kubernetes-dashboard:/proxy/#!/persistentvolume?namespace=default
 
 ### (Optional) Enable monitoring using prometheus and grafana
 

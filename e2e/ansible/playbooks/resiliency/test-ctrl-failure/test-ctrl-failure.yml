@@ -86,6 +86,7 @@
             lkey: app
             lvalue: chaoskube
 
+
        - name: Set chaoskube pod name to variable
          set_fact:
            chaospod: "{{ result.stdout_lines[0].split()[0] }}"

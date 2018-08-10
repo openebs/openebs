@@ -1,5 +1,4 @@
 ---
-
 - block:
 
    - name: Create test specific namespace.
@@ -20,10 +19,7 @@
 
   when: status == "create"
 
-
-
 - block:
-
 
    - name: Deletion of test specific  namespace.
      shell: source ~/.profile; kubectl delete ns {{ ns }}
@@ -40,5 +36,11 @@
      until: " ns not in npdel.stdout"
      delay: 30
      retries: 15
+
+  rescue:
+
+   - name: Test Cleanup Failed
+     set_fact:
+        cflag: "Cleanup Failed"
 
   when: status == "delete"

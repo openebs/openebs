@@ -1,11 +1,11 @@
 ---
 - name: Check pod status
-  shell: source ~/.profile; kubectl get pods -n {{ ns }} | grep {{ app }}
+  shell: source ~/.profile; kubectl get pods -n {{ ns }} -l {{ lkey }}={{ lvalue }}
   args:
     executable: /bin/bash
   register: result
   delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-  failed_when: "app and 'Running' in result.stdout"
+  until: "'Running' not in result.stdout"
   delay: 30
   retries: 15
-  ignore_errors: true
+

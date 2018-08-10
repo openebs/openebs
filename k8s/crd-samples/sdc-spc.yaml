@@ -1,8 +1,0 @@
-apiVersion: openebs.io/v1alpha1
-kind: StoragePoolClaim
-metadata:
-  name: sdc
-spec:
-  name : sdc
-  format : ext4
-  mountpoint : /mnt/sdc
