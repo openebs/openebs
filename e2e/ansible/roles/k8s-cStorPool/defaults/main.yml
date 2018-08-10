@@ -1,5 +1,4 @@
 ---
-spc_yaml: https://raw.githubusercontent.com/openebs/openebs/master/k8s/openebs-storagepoolclaims.yaml
 
 poolname: pool1
 
