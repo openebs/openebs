@@ -19,3 +19,6 @@ test_artifacts:
    - storage-pool-path-creation.yml
 
 namespace: storage-pool
+
+test_suite_id: 826
+test_case_id: 166369
