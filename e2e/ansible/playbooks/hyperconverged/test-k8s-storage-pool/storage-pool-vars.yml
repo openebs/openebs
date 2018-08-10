@@ -4,7 +4,7 @@ openebs_pvc: test-pvc.yaml
 
 openbs_storageclass: https://raw.githubusercontent.com/openebs/openebs/master/k8s/openebs-storageclasses.yaml
 
-storage_pool_path_creation: storage-pool-path_creation.yml
+storage_pool_path_creation: storage-pool-path-creation.yml
 
 volume_claim: storage-pool-test
 
@@ -16,6 +16,9 @@ test_pod_regex: maya*|openebs*|pvc*
 
 test_artifacts:
    - test-pvc.yaml
-   - storage-pool-path_creation.yml
+   - storage-pool-path-creation.yml
 
 namespace: storage-pool
+
+test_suite_id: 826
+test_case_id: 166369

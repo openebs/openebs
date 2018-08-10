@@ -1,0 +1,11 @@
+---
+- name: Update Testrail
+  shell: source ~/.profile; python3 {{ inventory_dir | dirname }}/files/updater.py -tuser {{ user }} -tpass {{ password }} -sid {{ suite_id }} -cid {{ case_id }} -stid {{ st_id }}
+  args:
+    executable: /bin/bash
+  register: result
+  ignore_errors: yes
+
+- name: Testrail Updated
+  set_fact:
+    tflag: "{{ result.stdout }}"
