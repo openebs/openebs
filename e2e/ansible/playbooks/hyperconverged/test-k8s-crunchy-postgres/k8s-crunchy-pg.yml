@@ -54,6 +54,22 @@
            line: "              \"storage\": \"{{postgres_vol_size}}\""
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
+       - name: Replace storage-class to use cstor storage engine
+         replace:
+           path: "{{ result_kube_home.stdout }}/crunchy-postgres/set.json"
+           regexp: 'openebs-standard'
+           replace: '{{ cstor_sc }}'
+         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+         when:  storage_engine  == 'cStor'
+
+       - name:  Replace storage-class to use cstor storage engine
+         replace:
+           path: "{{ result_kube_home.stdout }}/crunchy-postgres/set.json"
+           regexp: 'openebs-standard'
+           replace: '{{ jiva_sc }}'
+         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+         when:  storage_engine  == 'jiva'
+
        - name: 4a) Get the number of statefulset details from set.json
          command: cat {{ result_kube_home.stdout }}/crunchy-postgres/set.json
          register: jsonfile
