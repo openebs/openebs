@@ -37,14 +37,14 @@
          with_items: "{{ percona_links }}"
 
        - name: Replace volume-claim name with test parameters
-         include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/regex_task.yml"
+         include_tasks: "{{utils_path}}/regex_task.yml"
          vars:
            path: "{{ result_kube_home.stdout }}/percona.yaml"
            regex1: "{{replace_item}}"
            regex2: "{{replace_with}}"
 
        - name: Copy the chaoskube specs to kubemaster
-         include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/copy_task.yml"
+         include_tasks: "{{utils_path}}/copy_task.yml"
          vars:
            destination_node: "{{groups['kubernetes-kubemasters'].0}}"
            files_to_copy: "{{ chaoskube_files }}"
@@ -56,10 +56,11 @@
            replace: 'namespace: {{ namespace }}'
          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
 
-       - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
+       - include_tasks: "{{utils_path}}/deploy_check.yml"
          vars:
-            ns: "{{ operator_ns }}"
-            app: maya-api
+           ns: openebs
+           lkey: name
+           lvalue: maya-apiserver
 
        ####################################################
        #          SETUP FAULT-INJECTION ENV               #
@@ -68,21 +69,23 @@
        ####################################################
 
        - name: Create test specific namespace
-         include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/namespace_task.yml"
+         include_tasks: "{{utils_path}}/namespace_task.yml"
          vars:
             status: create
             ns: "{{ namespace }}"
 
-       - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_task.yml"
+       - include_tasks: "{{utils_path}}/deploy_task.yml"
          vars:
            app_yml: "{{ chaoskube_files }}"
            ns: "{{ namespace }}"
 
        - name: Check whether chaoskube infrastructure is created
-         include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
+         include_tasks: "{{utils_path}}/deploy_check.yml"
          vars:
             ns: "{{ namespace }}"
-            app: chaoskube
+            lkey: app
+            lvalue: chaoskube
+
 
        - name: Set chaoskube pod name to variable
          set_fact:
@@ -96,15 +99,16 @@
          register: result
          failed_when: "'configmap' and 'created' not in result.stdout"
 
-       - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_task.yml"
+       - include_tasks: "{{utils_path}}/deploy_task.yml"
          vars:
            app_yml: "{{ percona_files.0 }}"
            ns: "{{ namespace }}"
 
-       - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
+       - include_tasks: "{{utils_path}}/deploy_check.yml"
          vars:
             ns: "{{ namespace }}"
-            app: percona
+            lkey: name
+            lvalue: percona
 
        - name: Wait for 120s to ensure liveness check starts
          wait_for:
@@ -174,10 +178,11 @@
        # pod is still in running state)                       #
        ########################################################
 
-       - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
+       - include_tasks: "{{utils_path}}/deploy_check.yml"
          vars:
             ns: "{{ namespace }}"
-            app: percona
+            lkey: name
+            lvalue: percona
 
        ########################################################
        #                        CLEANUP                       #
@@ -215,11 +220,11 @@
 
          always:
 
-           - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/stern_task.yml"
+           - include_tasks: "{{utils_path}}/stern_task.yml"
              vars:
                status: stop
 
-           - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/namespace_task.yml"
+           - include_tasks: "{{utils_path}}/namespace_task.yml"
              vars:
                status: delete
                ns: "{{ namespace }}"

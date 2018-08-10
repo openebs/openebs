@@ -7,6 +7,8 @@ spec:
   template:
     metadata:
       name: cassandra-loadgen
+      labels:
+        app: cassandra-loadgen
     spec:
       restartPolicy: Never
       containers:

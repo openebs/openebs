@@ -220,13 +220,6 @@
                status: delete
                ns: "{{ namespace }}"
 
-           - name: Untaint node with Eviction Condition node.kubernetes.io/out-of-disk
-             shell: source ~/.profile; kubectl taint nodes {{ node_name.stdout }} {{ key }}:NoExecute-
-             args:
-               executable: /bin/bash
-             register: untaint_output
-             delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-
            - name: Send slack notification
              slack:
                token: "{{ lookup('env','SLACK_TOKEN') }}"
