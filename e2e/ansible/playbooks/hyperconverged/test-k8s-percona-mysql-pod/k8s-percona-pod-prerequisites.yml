@@ -8,7 +8,7 @@
   changed_when: true
 
 - name: Copy the pip binary to kubeminion
-  include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/copy_task.yml"
+  include_tasks: "{{utils_path}}/copy_task.yml"
   vars:
     destination_node: "{{ groups['kubernetes-kubeminions'].0 }}"
     files_to_copy: "{{ get_pip }}"
@@ -29,6 +29,6 @@
   delegate_to: "{{ groups['kubernetes-kubeminions'].0 }}"
   become: true
 
-- include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/stern_task.yml"
+- include_tasks: "{{utils_path}}/stern_task.yml"
   vars:
     status: start

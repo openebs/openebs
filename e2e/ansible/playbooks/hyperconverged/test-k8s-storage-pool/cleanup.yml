@@ -7,7 +7,7 @@
          register: pv
          changed_when: True
 
-       - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/delete_deploy.yml"
+       - include_tasks: "{{utils_path}}/delete_deploy.yml"
          vars:
            ns: "{{ namespace }}"
            app_yml: "{{ openebs_pvc }}"

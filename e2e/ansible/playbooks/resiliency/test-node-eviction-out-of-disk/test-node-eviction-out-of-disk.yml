@@ -192,16 +192,6 @@
            - include_tasks: "{{utils_path}}/stern_task.yml"
              vars:
                status: stop
-          
-           - name: Delete nodeeviction ns
-             shell: source ~/.profile; kubectl delete ns {{ namespace }}
-             args:
-               executable: /bin/bash
-             register: ns_out
-             until: "'deleted' in ns_out.stdout"
-             delay: 10
-             retries: 5
-             delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
            - name: Untaint node with Eviction Condition node.kubernetes.io/out-of-disk
              shell: source ~/.profile; kubectl taint nodes {{ node_name.stdout }} {{ key }}:NoExecute-
@@ -229,7 +219,7 @@
              vars:
                status: delete
                ns: "{{ namespace }}"
-          
+
            - name: Send slack notification
              slack:
                token: "{{ lookup('env','SLACK_TOKEN') }}"

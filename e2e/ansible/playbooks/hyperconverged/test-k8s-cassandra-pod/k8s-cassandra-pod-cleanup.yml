@@ -1,18 +1,18 @@
 ---
 - name: Delete cassandra service pod
-  include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/delete_deploy.yml"
+  include_tasks: "{{utils_path}}/delete_deploy.yml"
   vars:
     ns: "{{ namespace }}"
     app_yml: "{{ svc_yaml_alias }}"
 
 - name: Delete cassandra statefulset pod
-  include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/delete_deploy.yml"
+  include_tasks: "{{utils_path}}/delete_deploy.yml"
   vars:
     ns: "{{ namespace }}"
     app_yml: "{{ stateful_yaml_alias }}"
 
 - name: Delete cassandra loadgen pod
-  include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/delete_deploy.yml"
+  include_tasks: "{{utils_path}}/delete_deploy.yml"
   vars:
     ns: "{{ namespace }}"
     app_yml: "{{ loadgen_yaml_alias }}"

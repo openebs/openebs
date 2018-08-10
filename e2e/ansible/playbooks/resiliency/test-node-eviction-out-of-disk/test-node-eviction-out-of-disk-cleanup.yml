@@ -15,7 +15,8 @@
 - include_tasks: "{{utils_path}}/delete_deploy_check.yml"
   vars:
     ns: "{{ namespace }}"
-    app: percona
+    lkey: name
+    lvalue: percona
 
 - name: Confirm pvc pod has been deleted
   shell: source ~/.profile; kubectl get pods -n {{ namespace }} 
