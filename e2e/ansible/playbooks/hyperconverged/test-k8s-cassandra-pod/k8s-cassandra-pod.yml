@@ -24,21 +24,21 @@
        - include: k8s-cassandra-pod-prereq.yml
 
        - name: 1a) Download YAML for cassandra service
-         include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/get_url.yml"
+         include_tasks: "{{utils_path}}/get_url.yml"
          vars:
            url: "{{ cassandra_service_link }}"
            dest: "{{ result_kube_home.stdout }}/{{ svc_yaml_alias }}"
            delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
        - name: 2a) Download YAML for cassandra statefulset
-         include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/get_url.yml"
+         include_tasks: "{{utils_path}}/get_url.yml"
          vars:
            url: "{{ cassandra_stateful_link }}"
            dest: "{{ result_kube_home.stdout }}/{{ stateful_yaml_alias }}"
            delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
        - name: 2b) Download YAML for cassandra loadgen
-         include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/get_url.yml"
+         include_tasks: "{{utils_path}}/get_url.yml"
          vars:
            url: "{{ cassandra_loadgen_link }}"
            dest: "{{ result_kube_home.stdout }}/{{ loadgen_yaml_alias }}"
@@ -98,40 +98,43 @@
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
        - name: Check whether maya-apiserver pod is deployed
-         include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
+         include_tasks: "{{utils_path}}/deploy_check.yml"
          vars:
             ns: "{{ operator_ns }}"
-            app: maya-api
+            lkey: name
+            lvalue: maya-apiserver
 
        - name: 4) Deploy cassandra service
-         include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_task.yml"
+         include_tasks: "{{utils_path}}/deploy_task.yml"
          vars:
            app_yml: "{{ svc_yaml_alias }}"
            ns: "{{ namespace }}"
 
        - name: 4a) Deploy cassandra statefulset
-         include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_task.yml"
+         include_tasks: "{{utils_path}}/deploy_task.yml"
          vars:
            app_yml: "{{ stateful_yaml_alias }}"
            ns: "{{ namespace }}"
 
        - name: 5) Confirm cassandra pod status is running
-         include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
+         include_tasks: "{{utils_path}}/deploy_check.yml"
          vars:
             ns: "{{ namespace }}"
-            app: cassandra-0
+            lkey: app
+            lvalue: cassandra
 
        - name: 6) Start cassandra load generation
-         include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_task.yml"
+         include_tasks: "{{utils_path}}/deploy_task.yml"
          vars:
            app_yml: "{{ loadgen_yaml_alias }}"
            ns: "{{ namespace }}"
 
        - name: 6a) Verify load is running for specified duration
-         include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
+         include_tasks: "{{utils_path}}/deploy_check.yml"
          vars:
             ns: "{{ namespace }}"
-            app: cassandra-loadgen
+            lkey: app
+            lvalue: cassandra-loadgen
 
        - name: Wait for {{ (io_minutes) | int *60 }} secs to run load.
          wait_for:
@@ -186,7 +189,7 @@
 
          always:
 
-           - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/stern_task.yml"
+           - include_tasks: "{{utils_path}}/stern_task.yml"
              vars:
                status: stop
 

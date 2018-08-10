@@ -26,20 +26,21 @@
          include: k8s-percona-pod-prerequisites.yml
 
        - name: 2) Download YAML for percona mysql plugin
-         include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/get_url.yml"
+         include_tasks: "{{utils_path}}/get_url.yml"
          vars:
            url: "{{ percona_mysql_plugin_link }}"
            dest: "{{ result_kube_home.stdout }}/{{ pod_yaml_alias }}"
            delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
        - name: 3) Check whether maya-apiserver pod is deployed
-         include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
+         include_tasks: "{{utils_path}}/deploy_check.yml"
          vars:
             ns: "{{ operator_ns }}"
-            app: maya-api
+            lkey: name
+            lvalue: maya-apiserver
 
        - name: 3a) Replace volume-claim name with test parameters
-         include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/regex_task.yml"
+         include_tasks: "{{utils_path}}/regex_task.yml"
          vars:
            path: "{{ result_kube_home.stdout }}/{{ pod_yaml_alias }}"
            regex1: "{{replace_item}}"
@@ -69,22 +70,23 @@
          when:  storage_engine  == 'jiva'
 
        - name: 4) Create test specific namespace
-         include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/namespace_task.yml"
+         include_tasks: "{{utils_path}}/namespace_task.yml"
          vars:
             status: create
             ns: "{{ namespace }}"
 
        - name: 4a) Deploy percona applcation
-         include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_task.yml"
+         include_tasks: "{{utils_path}}/deploy_task.yml"
          vars:
            app_yml: "{{ pod_yaml_alias }}"
            ns: "{{ namespace }}"
 
        - name: 5) Check application status
-         include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
+         include_tasks: "{{utils_path}}/deploy_check.yml"
          vars:
             ns: "{{ namespace }}"
-            app: percona
+            lkey: name
+            lvalue: percona
 
        - name: 6) Get $HOME of K8s minion for kubernetes user
          shell: source ~/.profile; echo "/tmp"
@@ -164,11 +166,11 @@
 
          always:
 
-           - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/stern_task.yml"
+           - include_tasks: "{{utils_path}}/stern_task.yml"
              vars:
                status: stop
  
-           - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/namespace_task.yml"
+           - include_tasks: "{{utils_path}}/namespace_task.yml"
              vars:
                status: delete
                ns: "{{ namespace }}"

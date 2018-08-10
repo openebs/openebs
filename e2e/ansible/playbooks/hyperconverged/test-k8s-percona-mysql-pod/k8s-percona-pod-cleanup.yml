@@ -12,15 +12,16 @@
     timeout: "{{ mysql_load_duration }}"
 
 - name: Delete percona mysql pod
-  include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/delete_deploy.yml"
+  include_tasks: "{{utils_path}}/delete_deploy.yml"
   vars:
     ns: "{{ namespace }}"
     app_yml: "{{ pod_yaml_alias }}"
 
-- include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/delete_deploy_check.yml"
+- include_tasks: "{{utils_path}}/delete_deploy_check.yml"
   vars:
     ns: "{{ namespace }}"
-    app: percona
+    lkey: name
+    lvalue: percona
 
 - name: Confirm pvc pod has been deleted
   shell: source ~/.profile; kubectl get pods
