@@ -1165,7 +1165,7 @@ spec:
     value: openebs/jiva:0.6.0
   - name: ReplicaImage
     value: openebs/jiva:0.6.0
-  - name: VolumeMonitorImage:ci
+  - name: VolumeMonitorImage
     value: openebs/m-exporter:ci
   - name: ReplicaCount
     value: "3"
