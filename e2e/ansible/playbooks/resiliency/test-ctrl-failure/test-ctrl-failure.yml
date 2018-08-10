@@ -48,7 +48,7 @@
          vars:
            destination_node: "{{groups['kubernetes-kubemasters'].0}}"
            files_to_copy: "{{ chaoskube_files }}"
-      
+
        - name: Replace volume-claim name with test parameters
          replace:
            path: "{{ result_kube_home.stdout }}//rbac.yaml"
@@ -145,7 +145,7 @@
            -- timeout -t {{ chaos_duration }} chaoskube
            --labels 'openebs/controller=jiva-controller'
            --no-dry-run --interval={{ chaos_interval }}s
-           --debug 
+           --debug
            --namespaces={{ namespace }}
          args:
            executable: /bin/bash
