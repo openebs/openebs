@@ -19,7 +19,7 @@
         src: default-cstorpool.j2
         dest: "{{ result_kube_home.stdout }}"
     
-    - name: Replace volume-claim name with test parameters
+    - name: Add the discovered disks to the pool specs file.
       lineinfile:
         path: "{{ result_kube_home.stdout }}/default-cstorpool.j2"
         insertafter: 'diskList:'
