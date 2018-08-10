@@ -33,17 +33,6 @@
      delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
      changed_when: True
 
-   - name: Delete namespace
-     shell: source ~/.profile; kubectl delete ns {{ namespace }}
-     args:
-       executable: /bin/bash
-     delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
-     register: result
-     until: "'deleted' in result.stdout"
-     delay: 10
-     retries: 5
-     changed_when: True
-
    - name: untaint the nodes
      shell: source ~/.profile; kubectl taint nodes {{ node1 }} {{ operator_key }}:NoSchedule-; kubectl taint nodes {{ node_names[0] }} {{ pvc_key }}:NoSchedule-; kubectl taint nodes {{ node_names[1] }} {{ pvc_key }}:NoSchedule-
      args:

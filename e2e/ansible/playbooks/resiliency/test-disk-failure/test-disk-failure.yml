@@ -72,10 +72,11 @@
            regex2: "{{replace_with}}"
 
        - name: 5) Create the Namespace
-         shell: source ~/.profile; kubectl create ns {{ namespace }}
-         args:
-           executable: /bin/bash
-         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+         include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/namespace_task.yml"
+         vars:
+           status: create
+           ns: "{{ namespace }}"
+
 
        - name: 5)Create the storage pool path
          shell: source ~/.profile; kubectl apply -f storage-pool-path_creation.yml  -n {{ namespace }}
@@ -327,6 +328,11 @@
            - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/stern_task.yml"
              vars:
                status: stop
+
+           - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/namespace_task.yml"
+             vars:
+               status: delete
+               ns: "{{ namespace }}"
 
            - name: Send slack notification
              slack:

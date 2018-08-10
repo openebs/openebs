@@ -5,7 +5,6 @@
 
 ###############################################################################################
 #Test Steps:
-
 #1.Check whether the OpenEBS components are deployed.
 #2.Deployed jenkins application pod with any version (Here version=2.124).
 #3.Download the test artifacts to k8s master.(jenkins-cli.war , change_onfig.sh, config.xml file for job creation).
@@ -43,20 +42,34 @@
          url: "{{ jenkins_link }}"
          dest: "{{ result_kube_home.stdout }}/{{ pod_yaml_alias }}"
 
-
      - name: 2a) Replace jenkins pod version
        replace:
          path: "{{ result_kube_home.stdout }}/jenkins.yml"
          regexp: "{{ver_lts}}"
          replace: "{{ver_2_124}}"
        delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
-    
-     - name: Create namespace for deployment.
-       shell: source ~/.profile; kubectl create ns {{namespace}}
-       args:
-         executable: /bin/bash
-       delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
+     - name: 2c) Replace storage-class to use cstor storage engine
+       replace:
+         path: "{{ result_kube_home.stdout }}/{{ pod_yaml_alias }}"
+         regexp: 'openebs-standard'
+         replace: '{{ cstor_sc }}'
+       delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+       when:  storage_engine  == 'cStor'    
+
+     - name: 2c) Replace storage-class to use cstor storage engine
+       replace:
+         path: "{{ result_kube_home.stdout }}/{{ pod_yaml_alias }}"
+         regexp: 'openebs-standard'
+         replace: '{{ jiva_sc }}'
+       delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+       when:  storage_engine  == 'jiva'   
+
+     - name: Create namespace for deployment.
+       include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/namespace_task.yml"
+       vars:
+          status: create
+          ns: "{{ namespace }}" 
       
      - name: 3) Deploy jenkins pod 
        include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_task.yml"
@@ -85,9 +98,6 @@
        delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
        register: jenkins_pod_name
 
-
-     
-
      - name: 4) Download Jenkins-cli.jar file inside /var/jenkins_home of pod.
        shell: >
           source ~/.profile; kubectl exec {{ jenkins_pod_name.stdout }} -n {{namespace}} 
@@ -98,7 +108,6 @@
        register: result
        delay: 30
        until: result.rc == 0
-
 
      - name: 4a)  Copy job configuration files to master.
        include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/copy_task.yml"
@@ -149,7 +158,6 @@
        wait_for:
            timeout: 60
 
- 
      - name: 6)  Create and Build one sample job inside pod.
        shell: >
          source ~/.profile; kubectl exec {{ jenkins_pod_name.stdout }} -n {{ namespace }} 
@@ -175,7 +183,6 @@
          regexp: "{{ver_2_124}}"
          replace: "{{ver_2_125}}"
        delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
-
 
      - name: 7a)  Deploy jenkins pod Again
        include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_task.yml"
@@ -211,7 +218,6 @@
        delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
        register: version
        failed_when: "'jenkins/jenkins:2.125' not in version.stdout"
-       
          
      - name: 8b) Create a new build from existing  job inside pod.
        shell: > 
@@ -259,6 +265,11 @@
            - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/stern_task.yml"
              vars:
                status: stop
+ 
+           - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/namespace_task.yml"
+             vars:
+               status: delete
+               ns: "{{ namespace }}"
 
            - name: Send slack notification
              slack:

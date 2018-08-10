@@ -1,0 +1,97 @@
+---
+- block:
+    - name: Get $HOME of K8s master for kubernetes user
+      shell: source ~/.profile; echo $HOME
+      args:
+        executable: /bin/bash
+      register: result_kube_home
+      delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+    - name: Get list of disks attached
+      shell: source ~/.profile; kubectl get disks --no-headers | awk {'print $1'}
+      args:
+        executable: /bin/bash
+      delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+      register: diskList
+    
+
+    - template:
+        src: default-cstorpool.j2
+        dest: "{{ result_kube_home.stdout }}"
+    
+    - name: Add the discovered disks to the pool specs file.
+      lineinfile:
+        path: "{{ result_kube_home.stdout }}/default-cstorpool.j2"
+        insertafter: 'diskList:'
+        line: '     - {{ item }}'
+      delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+      with_items: "{{ diskList.stdout_lines }}"
+    
+      
+    - name: Get number of nodes
+      shell: source ~/.profile; kubectl get nodes | grep 'Ready' | grep 'none' | wc -l
+      args:
+        executable: /bin/bash
+      delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+      register: node_count
+    
+    - name: Create cStorPool
+      shell: source ~/.profile; kubectl apply -f {{ result_kube_home.stdout }}/default-cstorpool.j2
+      args:
+        executable: /bin/bash
+      delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+    
+    - name: Get number of pools created
+      shell: source ~/.profile; kubectl get pods -n openebs | grep {{poolname}} | grep 'Running' | wc -l
+      args:
+        executable: /bin/bash
+      delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+      register: pool_count
+      until: (node_count.stdout)|int == (pool_count.stdout)|int
+      delay: 10
+      retries: 20
+
+  when: action == 'create'
+    
+- block:  
+
+    - name: Get $HOME of K8s master for kubernetes user
+      shell: source ~/.profile; echo $HOME
+      args:
+        executable: /bin/bash
+      register: result_kube_home
+      delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+    - template:
+        src: default-cstorpool.j2
+        dest: "{{ result_kube_home.stdout }}"
+
+    - name: Delete cStorPool
+      shell: source ~/.profile; kubectl delete -f {{ result_kube_home.stdout }}/default-cstorpool.j2
+      args:
+        executable: /bin/bash
+      delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+    - name: Verify deployments are deleted
+      shell: source ~/.profile; kubectl get deploy -n openebs
+      args:
+        executable: /bin/bash
+      delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+      register: deploy_list
+      until: "{{poolname}} not in deploy_list.stdout"
+      delay: 20
+      retries: 10
+
+    - name: Verify cStor Pool pods are deleted
+      shell: source ~/.profile; kubectl get pods -n openebs
+      args:
+        executable: /bin/bash
+      delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+      register: cstorpool_pods
+      until: "{{poolname}} not in cstorpool_pods.stdout"
+      delay: 10
+      retries: 20
+
+
+  when: action == 'delete'
+

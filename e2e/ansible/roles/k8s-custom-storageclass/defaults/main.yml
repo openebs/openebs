@@ -1,0 +1,14 @@
+
+---
+
+pool_name: pool1
+
+
+replica_count: 3
+
+
+tag: ci
+
+
+
+

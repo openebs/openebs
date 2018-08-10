@@ -27,22 +27,24 @@ OpenEBS can scale to include an arbitrarily large number of containerized storag
  
 OpenEBS can be setup in few easy steps. You can get going on your choice of Kubernetes cluster by having open-iscsi installed on the Kubernetes nodes and running the openebs-operator using kubectl. 
 
-**Start the OpenEBS Services using Operator**
+**Start the OpenEBS Services using operator**
+```bash
+# apply this yaml
+kubectl apply -f https://openebs.github.io/charts/openebs-operator.yaml
 ```
-wget https://raw.githubusercontent.com/openebs/openebs/master/k8s/openebs-operator.yaml
-kubectl apply -f openebs-operator.yaml
+
+**Apply OpenEBS StorageClasses**
+```bash
+# apply this yaml
+kubectl apply -f https://openebs.github.io/charts/openebs-storageclasses.yaml
 ```
-**Customize or use the Default storageclasses**
-```
-wget https://raw.githubusercontent.com/openebs/openebs/master/k8s/openebs-storageclasses.yaml
-kubectl apply -f openebs-storageclasses.yaml
-```
+
 You could also follow our [QuickStart Guide](https://docs.openebs.io/docs/overview.html).
 
-OpenEBS can be deployed on any Kubernetes cluster - either in cloud, on-premise or developer laptop (minikube). Please follow our [OpenEBS Setup](https://docs.openebs.io/docs/overview.html) documentation. Also, we have a Vagrant environment available that includes a sample Kubernetes deployment and synthetic load that you can use to simulate the performance of OpenEBS. You may also find interesting the related project called Litmus (https://www.openebs.io/litmus) which helps with chaos engineering for stateful workloads on Kubernetes.  
+OpenEBS can be deployed on any Kubernetes cluster - either in cloud, on-premise or developer laptop (minikube). Please follow our [OpenEBS Setup](https://docs.openebs.io/docs/overview.html) documentation. Also, we have a Vagrant environment available that includes a sample Kubernetes deployment and synthetic load that you can use to simulate the performance of OpenEBS. You may also find interesting the related project called Litmus (https://www.openebs.io/litmus) which helps with chaos engineering for stateful workloads on Kubernetes.
 
 ## Status
-We are approaching beta stage with active development underway. See our [Project Tracker](https://github.com/openebs/openebs/wiki/Project-Tracker) for more details.  Please note that as of June 2018 we have cStor which is about to be released for additional funcitons and somewhat improved performance; please contact us on Slack if you are interested in this engine.  
+We are approaching beta stage with active development underway. See our [Project Tracker](https://github.com/openebs/openebs/wiki/Project-Tracker) for more details.  Please note that as of June 2018 we have cStor which is about to be released for additional funcitons and somewhat improved performance; please contact us on Slack if you are interested in this engine.
  
 ## Contributing
  

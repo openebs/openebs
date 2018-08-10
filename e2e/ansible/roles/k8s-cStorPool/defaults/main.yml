@@ -1,0 +1,7 @@
+---
+
+poolname: pool1
+
+pooltype: striped
+
+storage_engine: cStor

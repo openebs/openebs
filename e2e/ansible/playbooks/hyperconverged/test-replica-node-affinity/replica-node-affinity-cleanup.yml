@@ -14,16 +14,6 @@
   delay: 90
   retries: 5
 
-- name: Delete the namespace
-  shell: source ~/.profile; kubectl delete ns "{{ namespace }}"
-  args:
-    executable: /bin/bash
-  register: ns_delete
-  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-  until: "'deleted' in ns_delete.stdout"
-  delay: 30
-  retries: 5
-
 - name: Delete storage class
   shell: source ~/.profile; kubectl delete -f "{{ create_sc }}"
   args:

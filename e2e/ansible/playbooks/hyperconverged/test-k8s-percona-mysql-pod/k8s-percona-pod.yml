@@ -52,11 +52,27 @@
            line: "      storage: \"{{percona_mysql_vol_size}}\""
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
+       - name: 2c) Replace storage-class to use cstor storage engine
+         replace:
+           path: "{{ result_kube_home.stdout }}/{{ pod_yaml_alias }}"
+           regexp: 'openebs-percona'
+           replace: '{{ cstor_sc }}'
+         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+         when:  storage_engine  == 'cStor'
+
+       - name: 2c) Replace storage-class to use cstor storage engine
+         replace:
+           path: "{{ result_kube_home.stdout }}/{{ pod_yaml_alias }}"
+           regexp: 'openebs-percona'
+           replace: '{{ jiva_sc }}'
+         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+         when:  storage_engine  == 'jiva'
+
        - name: 4) Create test specific namespace
-         shell: source ~/.profile; kubectl create ns {{ namespace }}
-         args:
-           executable: /bin/bash
-         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+         include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/namespace_task.yml"
+         vars:
+            status: create
+            ns: "{{ namespace }}"
 
        - name: 4a) Deploy percona applcation
          include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_task.yml"
@@ -151,6 +167,12 @@
            - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/stern_task.yml"
              vars:
                status: stop
+ 
+           - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/namespace_task.yml"
+             vars:
+               status: delete
+               ns: "{{ namespace }}"
+
 
            - block:
                - name: Update Testrail

@@ -1,0 +1,12 @@
+---
+- name: Get the details of the available nodes
+  shell: kubectl get nodes | grep gke | awk {'print $1'}
+  args:
+    executable: /bin/bash
+  register: result_node
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+- include: detach-delete.yml
+  with_items: "{{ result_node.stdout_lines }}"
+  loop_control:
+    loop_var: outer_item

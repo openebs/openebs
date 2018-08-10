@@ -1,0 +1,53 @@
+---
+- name: Download YAML for openebs CAS Templates
+  get_url:
+    url: "{{ openebs_cast_link }}"
+    dest: "{{ ansible_env.HOME }}/{{ openebs_cast_alias }}"
+    force: yes
+  register: result
+  until:  "'OK' in result.msg"
+  delay: 5
+  retries: 3
+
+- block:
+
+    - name: Get kubernetes master name
+      shell: hostname
+      args:
+        executable: /bin/bash
+      register: result
+
+    - name: Get kubernetes master status
+      shell: source ~/.profile; kubectl get nodes | grep {{ result.stdout.lower()}} | awk '{print $2}'
+      args:
+        executable: /bin/bash
+      register: result
+      until:  result.stdout == 'Ready'
+      delay: 60
+      retries: 10 
+      ignore_errors: true  
+
+    - name: 
+      debug: 
+        msg: "Ending play, K8S Master NOT READY"
+      when: result.stdout != "Ready"
+
+    - name: Ending Playbook Run - K8S master is NOT READY
+      meta: end_play
+      when: result.stdout != "Ready"
+
+  when: cluster_type == "hosted"
+
+- name: Deploy the openebs CAS Templates
+  shell: >
+    source ~/.profile; 
+    kubectl apply -f {{ ansible_env.HOME }}/{{ openebs_cast_alias }}
+  args:
+    executable: /bin/bash  
+
+- name: Confirm CAS Templates are deployed
+  shell: source ~/.profile; kubectl get cast -n openebs
+  args:
+    executable: /bin/bash
+  register: result
+  failed_when: '"No resources found." in result.stdout'
