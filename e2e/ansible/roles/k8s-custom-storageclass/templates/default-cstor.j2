@@ -9,5 +9,5 @@ metadata:
     cas.openebs.io/read-volume-template: cstor-volume-read-default-0.7.0
     cas.openebs.io/config: |
       - name: StoragePoolClaim
-        value: {{ pool_name }}
+        value: {{ cstor_pool_name }}
 provisioner: openebs.io/provisioner-iscsi

@@ -1,7 +1,4 @@
 ---
-
-poolname: pool1
-
+poolname: cstor-default-pool
 pooltype: striped
-
 storage_engine: cStor
