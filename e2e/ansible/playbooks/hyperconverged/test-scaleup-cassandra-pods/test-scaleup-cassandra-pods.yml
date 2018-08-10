@@ -80,7 +80,7 @@
          replace:
            path: "{{ result_kube_home.stdout }}/{{ stateful_yaml_alias }}"
            regexp: 'openebs-cassandra'
-           replace: '{{ jiva_sc }}"
+           replace: '{{ jiva_sc }}'
          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
          when:  storage_engine  == 'jiva'
 
