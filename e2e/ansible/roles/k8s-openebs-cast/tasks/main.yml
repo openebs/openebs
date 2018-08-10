@@ -1,8 +1,8 @@
 ---
 - name: Download YAML for openebs CAS Templates
   get_url:
-    url: "{{ openebs_cast_link }}"
-    dest: "{{ ansible_env.HOME }}/{{ openebs_cast_alias }}"
+    url: "{{ openebs_pre_release_link }}"
+    dest: "{{ ansible_env.HOME }}/{{ openebs_pre_release_alias }}"
     force: yes
   register: result
   until:  "'OK' in result.msg"
@@ -38,10 +38,16 @@
 
   when: cluster_type == "hosted"
 
+- name: Change the ImagePullPolicy of the openebs images to "Always" from "IfNotPresent"
+  replace:
+    path: "{{ ansible_env.HOME }}/{{ openebs_pre_release_alias }}" 
+    regexp: 'IfNotPresent'
+    replace: 'Always'  
+
 - name: Deploy the openebs CAS Templates
   shell: >
     source ~/.profile; 
-    kubectl apply -f {{ ansible_env.HOME }}/{{ openebs_cast_alias }}
+    kubectl apply -f {{ ansible_env.HOME }}/{{ openebs_pre_release_alias }}
   args:
     executable: /bin/bash  
 
