@@ -18,8 +18,6 @@
 
    - block:
 
-
-
        - include:  pre-requisites.yml
 
        - name: Check status of apiserver
@@ -157,5 +155,3 @@
                msg: '{{ ansible_date_time.time }} TEST: {{test_name}}, RESULT: {{ flag }},{{ cflag }},{{ tflag }}'
                color: "{{ status }}"
              when: slack_notify | bool and lookup('env','SLACK_TOKEN')
-
-
