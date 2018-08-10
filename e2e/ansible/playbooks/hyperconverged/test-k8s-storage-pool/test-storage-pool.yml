@@ -145,11 +145,11 @@
 
            - include_tasks: "{{ inventory_dir | dirname }}/playbooks/utils/update-testrail.yml"
              vars:
-               testrail_user: "{{ testrail_user }}"
-               testrail_password: "{{ testrail_password }}"
-               test_suite_id: "{{ test_suite_id }}"
-               test_case_id: "{{ test_case_id }}"
-               status_id: "{{ status_id }}"
+               user: "{{ testrail_user }}"
+               password: "{{ testrail_password }}"
+               suite_id: "{{ test_suite_id }}"
+               case_id: "{{ test_case_id }}"
+               st_id: "{{ status_id }}"
 
            - name: Send slack notification
              slack:
