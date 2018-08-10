@@ -107,18 +107,13 @@
        - name: Test Playbook Passed
          set_fact:
            flag: "Test Passed"
-
-       - name: Set Status
-         set_fact:
            status: "good"
+           status_id: 1
 
      rescue:
        - name: Test playbook Failed
          set_fact:
            flag: "Test Failed"
-  
-       - name: Set Status
-         set_fact:
            status: "danger"
 
      always:
@@ -148,13 +143,19 @@
                status: delete
                ns: "{{ namespace }}"
 
+           - include_tasks: "{{ inventory_dir | dirname }}/playbooks/utils/update-testrail.yml"
+             vars:
+               testrail_user: "{{ testrail_user }}"
+               testrail_password: "{{ testrail_password }}"
+               test_suite_id: "{{ test_suite_id }}"
+               test_case_id: "{{ test_case_id }}"
+               status_id: "{{ status_id }}"
 
            - name: Send slack notification
              slack:
                token: "{{ lookup('env','SLACK_TOKEN') }}"
-               msg: '{{ ansible_date_time.time }} TEST: {{test_name}}, RESULT: {{ flag }},{{ cflag }}'
-               color: "{{status}}"
+               msg: '{{ ansible_date_time.time }} TEST: {{test_name}}, RESULT: {{ flag }},{{ cflag }},{{ tflag }}'
+               color: "{{ status }}"
              when: slack_notify | bool and lookup('env','SLACK_TOKEN')
-
 
 

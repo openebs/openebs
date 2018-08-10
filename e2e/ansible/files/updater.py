@@ -37,13 +37,16 @@ def update_testrail_with_status(args):
                                             'status_id': args['status_id']
                                         }
                                     )
-        print('Successfully updated case_id - %s' % args['case_id'])
+        #print('Successfully updated case_id - %s' % args['case_id'])
+        print('TestRail Updated.')
         return None
     except testrail.APIError as e:
-        print('failed due to api error, error - %s' % e)
+        #print('failed due to api error, error - %s' % e)
+        print('TestRail Update Failed.')
         return e
     except KeyError as e:
-        print('Key not found, error - %s' % e)
+        #print('Key not found, error - %s' % e)
+        print('TestRail Update Failed.')
         return e
 
 
