@@ -14,41 +14,19 @@
       delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
       register: diskList
     
-    - name: Download spc.yaml
-      get_url:
-        url: "{{ item }}"
+
+    - template:
+        src: default-cstorpool.j2
         dest: "{{ result_kube_home.stdout }}"
-      delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
-      with_items:
-        - "{{ spc_yaml }}"
     
-    - name: Create a testspc.yaml file to update diskList
-      shell: source ~/.profile; sed '$ d' '{{ result_kube_home.stdout }}/openebs-storagepoolclaims.yaml' > '{{ result_kube_home.stdout }}/testspc.yaml'
-      args:
-        executable: /bin/bash
-      delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-    
-    - name: Replace volume-claim name with test parameters
+    - name: Add the discovered disks to the pool specs file.
       lineinfile:
-        path: "{{ result_kube_home.stdout }}/testspc.yaml"
+        path: "{{ result_kube_home.stdout }}/default-cstorpool.j2"
         insertafter: 'diskList:'
         line: '     - {{ item }}'
       delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
       with_items: "{{ diskList.stdout_lines }}"
     
-    - name: Update pool name
-      replace:
-        path: "{{ result_kube_home.stdout }}/testspc.yaml"
-        regexp: 'name: cstor-pool-default-0.7.0'
-        replace: 'name: {{ poolname }}'
-      delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
-     
-    - name: Raid type selected
-      replace:
-        path: "{{ result_kube_home.stdout }}/testspc.yaml"
-        regexp: 'poolType: striped'
-        replace: 'poolType: {{ pooltype }}'
-      delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
       
     - name: Get number of nodes
       shell: source ~/.profile; kubectl get nodes | grep 'Ready' | grep 'none' | wc -l
@@ -58,7 +36,7 @@
       register: node_count
     
     - name: Create cStorPool
-      shell: source ~/.profile; kubectl apply -f {{ result_kube_home.stdout }}/testspc.yaml
+      shell: source ~/.profile; kubectl apply -f {{ result_kube_home.stdout }}/default-cstorpool.j2
       args:
         executable: /bin/bash
       delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
@@ -84,8 +62,12 @@
       register: result_kube_home
       delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
+    - template:
+        src: default-cstorpool.j2
+        dest: "{{ result_kube_home.stdout }}"
+
     - name: Delete cStorPool
-      shell: source ~/.profile; kubectl delete -f {{ result_kube_home.stdout }}/testspc.yaml
+      shell: source ~/.profile; kubectl delete -f {{ result_kube_home.stdout }}/default-cstorpool.j2
       args:
         executable: /bin/bash
       delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
@@ -97,6 +79,8 @@
       delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
       register: deploy_list
       until: "{{poolname}} not in deploy_list.stdout"
+      delay: 20
+      retries: 10
 
     - name: Verify cStor Pool pods are deleted
       shell: source ~/.profile; kubectl get pods -n openebs
@@ -105,5 +89,9 @@
       delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
       register: cstorpool_pods
       until: "{{poolname}} not in cstorpool_pods.stdout"
+      delay: 10
+      retries: 20
+
 
   when: action == 'delete'
+

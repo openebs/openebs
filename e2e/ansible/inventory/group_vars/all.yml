@@ -84,8 +84,10 @@ logging: true
 #Accepted Entries(quick, normal): default:normal
 #quick build uses preconfigured VMs, 
 #normal builds upon vanilla VMs
-vagrant_path: openebs/k8s/vagrant/1.8.8/ubuntu/
+
+vagrant_path: openebs/e2e/ansible
 utils_path: '{{ inventory_dir | dirname }}/playbooks/utils'
+
 kubeconfig: .kube/config
 build_type: normal
 
