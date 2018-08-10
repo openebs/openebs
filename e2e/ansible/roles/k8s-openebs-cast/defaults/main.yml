@@ -1,4 +1,4 @@
 ---
-openebs_cast_link: https://raw.githubusercontent.com/openebs/openebs/master/k8s/openebs-cas-templates-pre-alpha.yaml
+openebs_pre_release_link: https://raw.githubusercontent.com/openebs/openebs/master/k8s/openebs-pre-release-features.yaml
 
-openebs_cast_alias: openebs-cas-templates-pre-alpha.yaml
+openebs_pre_release_alias: openebs-pre-release-features.yaml
