@@ -25,10 +25,12 @@
        - include: k8s-crunchy-pg-prerequisites.yml
 
        - name: 1) Check whether maya-apiserver pod is deployed
-         include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
+         include_tasks: "{{utils_path}}/deploy_check.yml"
          vars:
            ns: "{{ operator_ns }}"
-           app: maya-api
+           lvalue: maya-apiserver
+           lkey: name
+
  
        - name: 2) Replace 'tree/master' with 'trunk' in the crunchy-postgres link
          debug:
@@ -99,15 +101,12 @@
          register: result
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
-       - name: 7) Confirm the postgres statefulset is running
-         shell: source ~/.profile; kubectl get pods --selector=app={{ label }} | grep Running | wc -l
-         args:
-           executable: /bin/bash
-         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-         register: setup
-         until: "replicas in setup.stdout"
-         delay: 120
-         retries: 15
+       - include_tasks: "{{utils_path}}/deploy_check.yml"
+         vars:
+           ns: default
+           lkey: app
+           lvalue: pgset
+
 
        - name: 8) Verify that the postgres master and replica are available as cluster services
          shell: source ~/.profile; kubectl get svc
@@ -152,7 +151,7 @@
 
          always:
 
-           - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/stern_task.yml"
+           - include_tasks: "{{utils_path}}/stern_task.yml"
              vars:
                status: stop
 
