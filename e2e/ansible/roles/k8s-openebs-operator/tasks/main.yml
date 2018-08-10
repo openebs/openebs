@@ -9,6 +9,12 @@
   delay: 5
   retries: 3
 
+- name: Change the ImagePullPolicy of openebs resources to Always in operator YAML
+  replace:
+    path: "{{ ansible_env.HOME }}/{{ openebs_operator_alias }}" 
+    regexp: 'IfNotPresent'
+    replace: 'Always'
+
 - name: Change the images of openebs resources to desired tag in operator YAML
   replace:
     path: "{{ ansible_env.HOME }}/{{ openebs_operator_alias }}" 
