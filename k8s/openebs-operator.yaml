@@ -75,7 +75,7 @@ spec:
       serviceAccountName: openebs-maya-operator
       containers:
       - name: maya-apiserver
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         image: openebs/m-apiserver:ci
         ports:
         - containerPort: 5656
@@ -103,7 +103,7 @@ spec:
         - name: OPENEBS_IO_JIVA_REPLICA_IMAGE
           value: "openebs/jiva:0.6.0"
         - name: OPENEBS_IO_VOLUME_MONITOR_IMAGE
-          value: "openebs/m-exporter:0.6.0"
+          value: "openebs/m-exporter:ci"
         - name: OPENEBS_IO_JIVA_REPLICA_COUNT
           value: "3"
         # DEFAULT_CONTROLLER_NODE_SELECTOR allows your to specify the nodes
@@ -155,7 +155,7 @@ spec:
       serviceAccountName: openebs-maya-operator
       containers:
       - name: openebs-provisioner
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         image: openebs/openebs-k8s-provisioner:ci
         env:
         # OPENEBS_IO_CAS_TEMPLATE_FEATURE_GATE enables cas template feature;
@@ -212,7 +212,7 @@ spec:
       containers:
         - name: snapshot-controller
           image: openebs/snapshot-controller:ci
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
           env:
           - name: OPENEBS_NAMESPACE
             valueFrom:
@@ -220,7 +220,7 @@ spec:
                 fieldPath: metadata.namespace
         - name: snapshot-provisioner
           image: openebs/snapshot-provisioner:ci
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
           env:
           - name: OPENEBS_NAMESPACE
             valueFrom:
@@ -386,6 +386,8 @@ metadata:
         value: openebs/jiva:0.6.0
       - name: ReplicaImage
         value: openebs/jiva:0.6.0
+      - name: VolumeMonitorImage
+        value: openebs/m-exporter:ci
       - name: ReplicaCount
         value: "3"
       - name: StoragePool
@@ -473,7 +475,7 @@ spec:
         - /usr/sbin/ndm
         - start
         image: openebs/node-disk-manager-amd64:ci
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         securityContext:
           privileged: true
         volumeMounts:

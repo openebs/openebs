@@ -400,7 +400,7 @@ spec:
     value: openebs/cstor-volume-mgmt:ci
   - name: VolumeTargetImage
     value: openebs/cstor-istgt:ci
-  - name: VolumeExporterImage
+  - name: VolumeMonitorImage
     value: openebs/m-exporter:ci
   - name: ReplicaCount
     value: "3"
@@ -618,7 +618,7 @@ data:
           containers:
           - image: {{ .Config.VolumeTargetImage.value }}
             name: cstor-istgt
-            imagePullPolicy: Always
+            imagePullPolicy: IfNotPresent
             ports:
             - containerPort: 3260
               protocol: TCP
@@ -632,7 +632,7 @@ data:
             - name: dummyfile
               mountPath: /tmp/cstor
           {{- if eq $isMonitor "true" }}
-          - image: {{ .Config.VolumeExporterImage.value }}
+          - image: {{ .Config.VolumeMonitorImage.value }}
             name: maya-volume-exporter
             args:
             - "-e=cstor"
@@ -646,7 +646,7 @@ data:
           {{- end}}
           - name: cstor-volume-mgmt
             image: {{ .Config.VolumeControllerImage.value }}
-            imagePullPolicy: Always
+            imagePullPolicy: IfNotPresent
             ports:
             - containerPort: 80
             env:
@@ -1165,7 +1165,7 @@ spec:
     value: openebs/jiva:0.6.0
   - name: ReplicaImage
     value: openebs/jiva:0.6.0
-  - name: ExporterImage
+  - name: VolumeMonitorImage:ci
     value: openebs/m-exporter:ci
   - name: ReplicaCount
     value: "3"
@@ -1391,7 +1391,7 @@ data:
     kind: Service
     action: list
     options: |-
-      labelSelector: openebs.io/controller-service=jiva-controller-svc,openebs.io/persistentvolume={{ .Volume.owner }}
+      labelSelector: openebs.io/controller-service=jiva-controller-svc,openebs.io/persistent-volume={{ .Volume.owner }}
   post: |
     {{- jsonpath .JsonResult "{.items[*].metadata.name}" | trim | saveAs "readlistsvc.items" .TaskResult | noop -}}
     {{- .TaskResult.readlistsvc.items | notFoundErr "controller service not found" | saveIf "readlistsvc.notFoundErr" .TaskResult | noop -}}
@@ -1410,7 +1410,7 @@ data:
     kind: Pod
     action: list
     options: |-
-      labelSelector: openebs.io/controller=jiva-controller,openebs.io/persistentvolume={{ .Volume.owner }}
+      labelSelector: openebs.io/controller=jiva-controller,openebs.io/persistent-volume={{ .Volume.owner }}
   post: |
     {{- jsonpath .JsonResult "{.items[*].metadata.name}" | trim | saveAs "readlistctrl.items" .TaskResult | noop -}}
     {{- .TaskResult.readlistctrl.items | notFoundErr "controller pod not found" | saveIf "readlistctrl.notFoundErr" .TaskResult | noop -}}
@@ -1430,7 +1430,7 @@ data:
     kind: Pod
     action: list
     options: |-
-      labelSelector: openebs.io/replica=jiva-replica,openebs.io/persistentvolume={{ .Volume.owner }}
+      labelSelector: openebs.io/replica=jiva-replica,openebs.io/persistent-volume={{ .Volume.owner }}
   post: |
     {{- jsonpath .JsonResult "{.items[*].metadata.name}" | trim | saveAs "readlistrep.items" .TaskResult | noop -}}
     {{- .TaskResult.readlistrep.items | notFoundErr "replica pod(s) not found" | saveIf "readlistrep.notFoundErr" .TaskResult | noop -}}
@@ -1497,8 +1497,8 @@ data:
         pvc: {{ .Volume.pvc }}
         openebs.io/storage-engine-type: jiva
         openebs.io/controller-service: jiva-controller-svc
-        openebs.io/persistentvolume: {{ .Volume.owner }}
-        openebs.io/persistentvolumeclaim: {{ .Volume.pvc }}
+        openebs.io/persistent-volume: {{ .Volume.owner }}
+        openebs.io/persistent-volume-claim: {{ .Volume.pvc }}
       name: {{ .Volume.owner }}-ctrl-svc
     spec:
       ports:
@@ -1514,7 +1514,7 @@ data:
         openebs/controller: jiva-controller
         vsm: {{ .Volume.owner }}
         openebs.io/controller: jiva-controller
-        openebs.io/persistentvolume: {{ .Volume.owner }}
+        openebs.io/persistent-volume: {{ .Volume.owner }}
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -1544,7 +1544,7 @@ data:
     kind: Pod
     action: list
     options: |-
-      labelSelector: openebs.io/replica=jiva-replica,openebs.io/persistentvolume={{ .Volume.owner }}
+      labelSelector: openebs.io/replica=jiva-replica,openebs.io/persistent-volume={{ .Volume.owner }}
     retry: "12,10s"
   post: |
     {{- jsonpath .JsonResult "{.items[*].metadata.name}" | trim | saveAs "createlistrep.items" .TaskResult | noop -}}
@@ -1640,8 +1640,8 @@ data:
         {{- end}}
         openebs.io/storage-engine-type: jiva
         openebs.io/controller: jiva-controller
-        openebs.io/persistentvolume: {{ .Volume.owner }}
-        openebs.io/persistentvolumeclaim: {{ .Volume.pvc }}
+        openebs.io/persistent-volume: {{ .Volume.owner }}
+        openebs.io/persistent-volume-claim: {{ .Volume.pvc }}
       annotations:
         {{- if eq $isMonitor "true" }}
         openebs.io/volume-monitor: "true"
@@ -1660,7 +1660,7 @@ data:
           monitoring: volume_exporter_prometheus
           {{- end}}
           openebs.io/controller: jiva-controller
-          openebs.io/persistentvolume: {{ .Volume.owner }}
+          openebs.io/persistent-volume: {{ .Volume.owner }}
       template:
         metadata:
           labels:
@@ -1672,8 +1672,8 @@ data:
             monitoring: volume_exporter_prometheus
             {{- end}}
             openebs.io/controller: jiva-controller
-            openebs.io/persistentvolume: {{ .Volume.owner }}
-            openebs.io/persistentvolumeclaim: {{ .Volume.pvc }}
+            openebs.io/persistent-volume: {{ .Volume.owner }}
+            openebs.io/persistent-volume-claim: {{ .Volume.pvc }}
         spec:
           containers:
           - args:
@@ -1700,7 +1700,7 @@ data:
             - -c=http://127.0.0.1:9501
             command:
             - maya-exporter
-            image: {{ .Config.ExporterImage.value }}
+            image: {{ .Config.VolumeMonitorImage.value }}
             name: maya-volume-exporter
             ports:
             - containerPort: 9500
@@ -1751,8 +1751,8 @@ data:
         pvc: {{ .Volume.pvc }}
         openebs.io/storage-engine-type: jiva
         openebs.io/replica: jiva-replica
-        openebs.io/persistentvolume: {{ .Volume.owner }}
-        openebs.io/persistentvolumeclaim: {{ .Volume.pvc }}
+        openebs.io/persistent-volume: {{ .Volume.owner }}
+        openebs.io/persistent-volume-claim: {{ .Volume.pvc }}
       annotations:
         openebs.io/capacity: {{ .Volume.capacity }}
         openebs.io/storage-pool: {{ .Config.StoragePool.value }}
@@ -1766,7 +1766,7 @@ data:
           vsm: {{ .Volume.owner }}
           pvc: {{ .Volume.pvc }}
           openebs.io/replica: jiva-replica
-          openebs.io/persistentvolume: {{ .Volume.owner }}
+          openebs.io/persistent-volume: {{ .Volume.owner }}
       template:
         metadata:
           labels:
@@ -1775,8 +1775,8 @@ data:
             vsm: {{ .Volume.owner }}
             pvc: {{ .Volume.pvc }}
             openebs.io/replica: jiva-replica
-            openebs.io/persistentvolume: {{ .Volume.owner }}
-            openebs.io/persistentvolumeclaim: {{ .Volume.pvc }}
+            openebs.io/persistent-volume: {{ .Volume.owner }}
+            openebs.io/persistent-volume-claim: {{ .Volume.pvc }}
         spec:
           affinity:
             podAntiAffinity:
@@ -1786,7 +1786,7 @@ data:
                     openebs/replica: jiva-replica
                     openebs.io/replica: jiva-replica
                     vsm: {{ .Volume.owner }}
-                    openebs.io/persistentvolume: {{ .Volume.owner }}
+                    openebs.io/persistent-volume: {{ .Volume.owner }}
                 topologyKey: kubernetes.io/hostname
           containers:
           - args:
@@ -1861,7 +1861,7 @@ data:
     kind: Service
     action: list
     options: |-
-      labelSelector: openebs.io/controller-service=jiva-controller-svc,openebs.io/persistentvolume={{ .Volume.owner }}
+      labelSelector: openebs.io/controller-service=jiva-controller-svc,openebs.io/persistent-volume={{ .Volume.owner }}
   post: |
     {{- jsonpath .JsonResult "{.items[*].metadata.name}" | trim | saveAs "deletelistsvc.names" .TaskResult | noop -}}
     {{- .TaskResult.deletelistsvc.names | notFoundErr "controller service not found" | saveIf "deletelistsvc.notFoundErr" .TaskResult | noop -}}
@@ -1880,7 +1880,7 @@ data:
     kind: Deployment
     action: list
     options: |-
-      labelSelector: openebs.io/controller=jiva-controller,openebs.io/persistentvolume={{ .Volume.owner }}
+      labelSelector: openebs.io/controller=jiva-controller,openebs.io/persistent-volume={{ .Volume.owner }}
   post: |
     {{- jsonpath .JsonResult "{.items[*].metadata.name}" | trim | saveAs "deletelistctrl.names" .TaskResult | noop -}}
     {{- .TaskResult.deletelistctrl.names | notFoundErr "controller deployment not found" | saveIf "deletelistctrl.notFoundErr" .TaskResult | noop -}}
@@ -1899,7 +1899,7 @@ data:
     kind: Deployment
     action: list
     options: |-
-      labelSelector: openebs.io/replica=jiva-replica,openebs.io/persistentvolume={{ .Volume.owner }}
+      labelSelector: openebs.io/replica=jiva-replica,openebs.io/persistent-volume={{ .Volume.owner }}
   post: |
     {{- jsonpath .JsonResult "{.items[*].metadata.name}" | trim | saveAs "deletelistrep.names" .TaskResult | noop -}}
     {{- .TaskResult.deletelistrep.names | notFoundErr "replica deployment not found" | saveIf "deletelistrep.notFoundErr" .TaskResult | noop -}}

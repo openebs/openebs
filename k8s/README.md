@@ -1,6 +1,8 @@
 # Using OpenEBS with K8s
 
-This folder contains the artifacts (YAMLS, plugins, scripts, drivers etc.,), usage instructions and application examples of using OpenEBS with K8s. The artifiacts in this repository contain unreleased changes. If you are looking at deploying from a stable release, please follow the instructions at [Quick Start Guide](https://docs.openebs.io/docs/next/quickstartguide.html)
+**_The artifiacts in this repository contain unreleased changes._**
+
+If you are looking at deploying from a stable release, please follow the instructions at [Quick Start Guide](https://docs.openebs.io/docs/next/quickstartguide.html)
 
 If this is your first time to Kubernetes, please go through these introductory tutorials: 
 - https://www.udacity.com/course/scalable-microservices-with-kubernetes--ud615
@@ -13,9 +15,9 @@ If this is your first time to Kubernetes, please go through these introductory t
 kubectl apply -f openebs-operator.yaml
 ```
 
-There is work under way to install/load the cas templates by maya-apiserver on startup. Till then, need to manually load the cas templates. 
+The following YAML contains configuration that is required by the pre-release-features, that are currently under developement. As we progress towards the release, the content in this will be either moved to openebs-operator.yaml or installed/configured via the code.
 ```
-kubectl apply -f openebs-cas-templates-pre-alpha.yaml
+kubectl apply -f openebs-pre-release-features.yaml
 ```
 
 
