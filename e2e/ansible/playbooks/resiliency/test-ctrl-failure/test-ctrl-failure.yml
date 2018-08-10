@@ -48,6 +48,13 @@
          vars:
            destination_node: "{{groups['kubernetes-kubemasters'].0}}"
            files_to_copy: "{{ chaoskube_files }}"
+      
+       - name: Replace volume-claim name with test parameters
+         replace:
+           path: "{{ result_kube_home.stdout }}//rbac.yaml"
+           regexp: 'namespace: default'
+           replace: 'namespace: {{ namespace }}'
+         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
 
        - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
          vars:
@@ -66,16 +73,15 @@
             status: create
             ns: "{{ namespace }}"
 
-
        - include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_task.yml"
          vars:
            app_yml: "{{ chaoskube_files }}"
-           ns: default
+           ns: "{{ namespace }}"
 
        - name: Check whether chaoskube infrastructure is created
          include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
          vars:
-            ns: default
+            ns: "{{ namespace }}"
             app: chaoskube
 
        - name: Set chaoskube pod name to variable
@@ -135,11 +141,12 @@
 
        - name: Initiate periodic controller failures from chaoskube
          shell: >
-           source ~/.profile; kubectl exec {{ chaospod }}
+           source ~/.profile; kubectl exec {{ chaospod }} -n {{ namespace }}
            -- timeout -t {{ chaos_duration }} chaoskube
            --labels 'openebs/controller=jiva-controller'
            --no-dry-run --interval={{ chaos_interval }}s
-           --debug
+           --debug 
+           --namespaces={{ namespace }}
          args:
            executable: /bin/bash
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
