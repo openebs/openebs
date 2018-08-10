@@ -13,15 +13,18 @@ If this is your first time to Kubernetes, please go through these introductory t
 kubectl apply -f openebs-operator.yaml
 ```
 
-### (Optional) Configuring CStor Pools or customizing Jiva Pools
+There is work under way to install/load the cas templates by maya-apiserver on startup. Till then, need to manually load the cas templates. 
+```
+kubectl apply -f openebs-cas-templates-pre-alpha.yaml
+```
+
+
+### (Optional) Configuring CStor Pools and Storage Class
 With 0.7, node-disk-manager is installed that discovers and create Disk CRs for each non OS disk attached to the nodes. Get the list of disks using `kubectl get disks --show-labels` and update the Disk CR Names in the `openebs-config.yaml`. It is recommended to specify one Disk CR per storage node.
 
 ```
-kubectl apply -f openebs-cas-templates-pre-alpha.yaml
 kubectl apply -f openebs-config.yaml
 ```
-
-Note: This step will be optional in the near future and needs to be performed only if non-default settings are required. 
 
 ### (Optional) Enable monitoring using prometheus and grafana
 
