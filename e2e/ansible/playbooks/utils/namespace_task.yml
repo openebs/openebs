@@ -41,4 +41,14 @@
      delay: 30
      retries: 15
 
+   - name: Test Cleanup Passed
+     set_fact:
+        cflag: "Cleanup Passed"
+
+  rescue:
+
+   - name: Test Cleanup Failed
+     set_fact:
+        cflag: "Cleanup Failed"
+
   when: status == "delete"
