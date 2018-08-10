@@ -1,8 +1,0 @@
-apiVersion: openebs.io/v1alpha1
-kind: StoragePoolClaim
-metadata:
-  name: sdd
-spec:
-  name : sdd
-  format : ext3
-  mountpoint : /mnt/sdd
