@@ -1232,6 +1232,7 @@ spec:
   taskNamespace: openebs
   run:
     tasks:
+    - jiva-volume-create-getstorageclass-default-0.7.0
     - jiva-volume-create-puttargetservice-default-0.7.0
     - jiva-volume-create-getstoragepoolcr-default-0.7.0
     - jiva-volume-create-puttargetdeployment-default-0.7.0
@@ -1530,6 +1531,22 @@ data:
     action: get
   post: |
     {{- jsonpath .JsonResult "{.spec.path}" | trim | saveAs "creategetpath.storagePoolPath" .TaskResult | noop -}}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: jiva-volume-create-getstorageclass-default-0.7.0
+  namespace: openebs
+data:
+  meta: |
+    id: creategetsc
+    apiVersion: storage.k8s.io/v1
+    kind: StorageClass
+    objectName: {{ .Volume.storageclass }}
+    action: get
+  post: |
+    {{- $resourceVer := jsonpath .JsonResult "{.metadata.resourceVersion}" -}}
+    {{- trim $resourceVer | saveAs "creategetsc.storageClassVersion" .TaskResult | noop -}}
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -1841,12 +1858,12 @@ data:
     metadata:
       name: {{ .Volume.owner }}
       annotations:
-        vsm.openebs.io/iqn: iqn.2016-09.com.openebs.jiva:{{ .Volume.owner }}
-        vsm.openebs.io/replica-count: {{ .Config.ReplicaCount.value }}
-        vsm.openebs.io/volume-size: {{ .Volume.capacity }}
-        vsm.openebs.io/targetportals: {{ .TaskResult.createputsvc.clusterIP }}:3260
+        openebs.io/storageclass-version: {{ .TaskResult.creategetsc.storageClassVersion }}
     spec:
       capacity: {{ .Volume.capacity }}
+      targetPortal: {{ .TaskResult.createputsvc.clusterIP }}:3260
+      iqn: iqn.2016-09.com.openebs.jiva:{{ .Volume.owner }}
+      replicas: {{ .Config.ReplicaCount.value }}
 ---
 apiVersion: v1
 kind: ConfigMap
