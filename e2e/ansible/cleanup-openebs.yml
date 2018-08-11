@@ -2,5 +2,5 @@
 - hosts: kubernetes-kubemasters
   roles:
     - {role: k8s-openebs-uninstall-helm, when: deployment_mode == "hyperconverged" and openebs_deploy == "helm"}
-    - {role: k8s-openebs-cleanup}
+    - {role: k8s-openebs-cleanup, when: openebs_deploy == "kubectl"}
 
