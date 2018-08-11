@@ -7,4 +7,6 @@
 
 - include: setup-openebs.yml
 
-- include: run-tests.yml 
+- include: run-tests.yml
+
+- include: cleanup-openebs.yml
