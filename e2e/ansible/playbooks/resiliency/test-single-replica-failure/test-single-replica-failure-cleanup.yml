@@ -41,7 +41,7 @@
   changed_when: true
 
 - name: Delete the chaoskube infrastructure
-  include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/delete_deploy.yml"
+  include_tasks: "{{utils_path}}/delete_deploy.yml"
   vars:
     app_yml: "{{ chaoskube_files }}"
     ns: "{{ namespace }}"

@@ -1,5 +1,5 @@
 ---
-- include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/delete_deploy.yml"
+- include_tasks: "{{utils_path}}/delete_deploy.yml"
   vars:
     ns: "{{ namespace }}"
     app_yml: "{{ volume_def }}"

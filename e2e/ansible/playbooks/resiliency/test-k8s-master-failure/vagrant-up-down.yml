@@ -1,13 +1,13 @@
 ---
  - name: Bring down the kubemaster.
-   include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/vagrant-halt-up-task.yml"
+   include_tasks: "{{utils_path}}/vagrant-halt-up-task.yml"
    vars:
      vagrant_op: halt --force
      nodename: kubemaster-01
    when: status == "down"
 
  - name: Bring up the kubemaster.
-   include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/vagrant-halt-up-task.yml"
+   include_tasks: "{{utils_path}}/vagrant-halt-up-task.yml"
    vars:
      vagrant_op: up
      nodename: kubemaster-01
