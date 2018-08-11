@@ -35,7 +35,7 @@
   args:
     executable: /bin/bash
   register: result
-  until: "'maya-apiserver' or 'openebs-provisioner or 'openebs-snapshot-operator' not in result.stdout"
+  until: "'maya-apiserver' or 'openebs-provisioner' or 'openebs-snapshot-operator' not in result.stdout"
   delay: 10
   retries: 6
 
