@@ -1,12 +1,12 @@
 ---
 - name: Delete percona mysql pod
-  include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/delete_deploy.yml"
+  include_tasks: "{{utils_path}}/delete_deploy.yml"
   vars:
     app_yml: "{{ pod_yaml_alias }}"
     ns: "{{ namespace }}"
 
 - name: Confirm percona pod has been deleted
-  include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/delete_deploy_check.yml"
+  include_tasks: "{{utils_path}}/delete_deploy_check.yml"
   vars:
     app: "{{ pod_yaml_alias }}"
     ns: "{{  namespace }}"

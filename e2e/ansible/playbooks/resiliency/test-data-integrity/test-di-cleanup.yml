@@ -21,7 +21,7 @@
   retries: 5
   changed_when: true
 
-- include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/delete_deploy.yml"
+- include_tasks: "{{utils_path}}/delete_deploy.yml"
   vars:
     app_yml: "{{ fio_read }}"
     ns: "{{ namespace }}"
@@ -37,7 +37,7 @@
   retries: 15
   changed_when: true
 
-- include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/delete_deploy.yml"
+- include_tasks: "{{utils_path}}/delete_deploy.yml"
   vars:
     app_yml: "{{ fio_write }}"
     ns: "{{ namespace }}"

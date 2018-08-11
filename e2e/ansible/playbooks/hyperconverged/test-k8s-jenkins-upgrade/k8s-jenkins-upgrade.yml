@@ -38,7 +38,7 @@
 
       
      - name: 2)  Download YAML for jenkins 
-       include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/get_url.yml"
+       include_tasks: "{{utils_path}}/get_url.yml"
        vars:
          url: "{{ jenkins_link }}"
          dest: "{{ result_kube_home.stdout }}/{{ pod_yaml_alias }}"
@@ -151,7 +151,7 @@
        delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
      - name:  Confirm pod status is running
-       include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
+       include_tasks: "{{utils_path}}/deploy_check.yml"
        vars:
           ns: "{{ namespace }}"
           app: jenkins    
@@ -193,7 +193,7 @@
           ns: "{{ namespace }}"
 
      - name: 7b)  Confirm pod status is running
-       include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
+       include_tasks: "{{utils_path}}/deploy_check.yml"
        vars:
           ns: "{{namespace}}"
           lkey: app

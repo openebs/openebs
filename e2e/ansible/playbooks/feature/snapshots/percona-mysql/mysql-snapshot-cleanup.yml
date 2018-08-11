@@ -7,12 +7,12 @@
   register: pv
   changed_when: true
 
-- include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/delete_deploy.yml"
+- include_tasks: "{{utils_path}}/delete_deploy.yml"
   vars:
     app_yml: "{{ volume_def }}"
     ns: "{{ namespace }}"
 
-- include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/delete_deploy_check.yml"
+- include_tasks: "{{utils_path}}/delete_deploy_check.yml"
   vars:
     ns: "{{ namespace }}"
     app: percona

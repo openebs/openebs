@@ -21,7 +21,7 @@
     app_yml: "{{ percona_files.0 }}"
 
 - name: Confirm percona pod deletion
-  include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/delete_deploy_check.yml"
+  include_tasks: "{{utils_path}}/delete_deploy_check.yml"
   vars:
     ns: "{{ namespace }}"
     lkey: name
