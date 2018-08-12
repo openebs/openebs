@@ -2,3 +2,5 @@
 openebs_operator_alias: openebs-operator.yaml 
 
 openebs_storageclasses_alias: openebs-storageclasses.yaml
+
+openebs_pre_release_alias: openebs-pre-release-features.yaml
