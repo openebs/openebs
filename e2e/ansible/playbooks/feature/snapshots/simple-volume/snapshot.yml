@@ -11,7 +11,8 @@
        - include_tasks: "{{utils_path}}/deploy_check.yml"
          vars:
             ns: "{{ operator_ns }}"
-            app: maya-api
+            lkey: name
+            lvalue: maya-apiserver
 
        - name: Store maya-apiserver pod name in variable
          set_fact:

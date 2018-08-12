@@ -154,7 +154,8 @@
        include_tasks: "{{utils_path}}/deploy_check.yml"
        vars:
           ns: "{{ namespace }}"
-          app: jenkins    
+          lkey: app
+          lvalue: jenkins-app    
 
      - name: wait for some time to jenkins save changes.
        wait_for:
