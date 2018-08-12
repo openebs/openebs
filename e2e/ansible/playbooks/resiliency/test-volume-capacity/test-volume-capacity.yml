@@ -34,7 +34,8 @@
           include_tasks: "{{utils_path}}/deploy_check.yml"
           vars:
             ns: openebs
-            app: apiserver
+            lkey: name
+            lvalue: maya-apiserver
 
         - name: 2) Copy the fio job specific file to K8s master
           copy:

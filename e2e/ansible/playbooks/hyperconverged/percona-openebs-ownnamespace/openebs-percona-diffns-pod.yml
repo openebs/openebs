@@ -65,7 +65,6 @@
            lkey: name
            lvalue: percona
 
-
        - name: Get IP address of percona mysql pod
          shell: source ~/.profile; kubectl get pod percona -n {{ namespace }} -o wide --no-headers
          args:

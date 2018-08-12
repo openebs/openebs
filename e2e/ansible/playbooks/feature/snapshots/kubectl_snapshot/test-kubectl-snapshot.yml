@@ -35,7 +35,8 @@
           include_tasks: "{{utils_path}}/deploy_check.yml"
           vars:
             ns: openebs
-            app: apiserver
+            lkey: name
+            lvalue: maya-apiserver
         
         - name: 2) Copy the snapshot specific files to K8s master
           copy:
@@ -48,7 +49,8 @@
           include_tasks: "{{utils_path}}/deploy_check.yml"
           vars:
             ns: openebs
-            app: openebs-snapshot-operator 
+            lkey: name
+            lvalue: openebs-snapshot-operator 
 
         - name: 4) Create  namespace
           include_tasks: "{{utils_path}}/namespace_task.yml"
@@ -66,7 +68,8 @@
           include_tasks: "{{utils_path}}/deploy_check.yml"
           vars:
             ns: "{{ namespace }}"
-            app: percona
+            lkey: name
+            lvalue: percona
 
         - name: 6) Write a test database into percona mysql
           shell: |

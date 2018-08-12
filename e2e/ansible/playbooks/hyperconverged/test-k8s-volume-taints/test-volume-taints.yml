@@ -63,7 +63,8 @@
          include_tasks: "{{utils_path}}/deploy_check.yml"
          vars:
            ns: openebs
-           app: maya-apiserver
+           lkey: name
+           lvalue: maya-apiserver
 
        - name: Copy the storage-pool creation  yaml to kube master
          copy:

@@ -32,7 +32,8 @@
         - include_tasks: "{{utils_path}}/deploy_check.yml"
           vars:
              ns: openebs
-             app: apiserver
+             lkey: name
+             lvalue: maya-apiserver             
 
         - name: Copy the percona definition yaml to k8s master
           copy:

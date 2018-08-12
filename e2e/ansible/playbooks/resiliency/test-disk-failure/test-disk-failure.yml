@@ -37,7 +37,8 @@
          include_tasks: "{{utils_path}}/deploy_check.yml"
          vars:
            ns: openebs
-           app: openebs-api
+           lkey: name
+           lvalue: maya-apiserver
 
        - name: 3) Get the disk name by using UUID
          shell: >
@@ -134,15 +135,17 @@
 
        - name: 7c) Check whether percona application is running
          include_tasks: "{{utils_path}}/deploy_check.yml"
-         vars:
-           app: percona
+         vars:           
            ns: "{{ namespace }}"
+           lkey: name
+           lvalue: percona
 
        - name: 7d) Check Replica pod status
          include_tasks: "{{utils_path}}/deploy_check.yml"
          vars:
-           app: pvc
            ns: "{{ namespace }}"
+           lkey: openebs/replica
+           lvalue: jiva-replica           
 
        - name: 8) Obtaining the replica pods running on specified node
          shell: >
@@ -265,8 +268,9 @@
        - name: 13) Check Replica pod status
          include_tasks: "{{utils_path}}/deploy_check.yml"
          vars:
-           app: pvc
            ns: "{{ namespace }}"
+           lkey: openebs/replica
+           lvalue: jiva-replica
 
        - name: 14) Get Controller SVC IP
          shell: >

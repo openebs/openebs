@@ -34,7 +34,8 @@
        - include_tasks: "{{utils_path}}/deploy_check.yml"
          vars:
             ns: "{{ operator_ns }}"
-            app: maya-api
+            lkey: name
+            lvalue: maya-apiserver
 
        - name: Download YAML for percona mysql plugin
          get_url:
@@ -63,8 +64,8 @@
          include_tasks: "{{utils_path}}/deploy_check.yml"
          vars:
           ns: "{{ namespace }}"
-          app: percona
-
+          lkey: name
+          lvalue: percona
        ###################################################################
        # PREPARE FOR FAULT-INJECTION                                     #
        # (Includes identifying objects to fail, simulating infra changes)#

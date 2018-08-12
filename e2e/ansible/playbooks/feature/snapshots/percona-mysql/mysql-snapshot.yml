@@ -25,7 +25,8 @@
        - include_tasks: "{{utils_path}}/deploy_check.yml"
          vars:
             ns: "{{ operator_ns }}"
-            app: maya-api
+            lkey: name
+            lvalue: maya-apiserver
 
        - name: Store maya-apiserver pod name in variable
          set_fact:
@@ -50,7 +51,8 @@
        - include_tasks: "{{utils_path}}/deploy_check.yml"
          vars:
             ns: "{{ namespace }}"
-            app: percona
+            lkey: name
+            lvalue: percona
 
        - name: Get openebs storage ctrl pod name
          shell: source ~/.profile; kubectl get pods -n {{ namespace }} | grep ctrl
@@ -159,7 +161,8 @@
        - include_tasks: "{{utils_path}}/deploy_check.yml"
          vars:
             ns: "{{ namespace }}"
-            app: percona
+            lkey: name
+            lvalue: percona
 
        - name: Get percona pod details after restart
          shell: >
