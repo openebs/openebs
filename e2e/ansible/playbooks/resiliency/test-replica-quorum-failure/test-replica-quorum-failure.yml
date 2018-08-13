@@ -49,12 +49,6 @@
            dest: "{{ result_kube_home.stdout }}"
          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
 
-       - name: Copy the storage class specs to kubemaster
-         copy:
-           src: "{{ storage_class_file }}"
-           dest: "{{ result_kube_home.stdout }}"
-         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
-
        - name: Check status of maya-api server
          include_tasks: "{{utils_path}}/deploy_check.yml"
          vars:
@@ -73,13 +67,6 @@
          vars:
             status: create
             ns: "{{ namespace }}"
-
-
-       - name: Setup the storage class
-         include_tasks: "{{utils_path}}/deploy_task.yml"
-         vars:
-           app_yml: "{{ storage_class_file }}"
-           ns: default
 
        - name: Create a configmap with the liveness sql script
          shell: source ~/.profile; kubectl create configmap sqltest --from-file={{ percona_files.1 }} -n {{ namespace }}

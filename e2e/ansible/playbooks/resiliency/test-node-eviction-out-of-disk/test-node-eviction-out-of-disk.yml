@@ -144,7 +144,7 @@
              delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
              until: "'Running' in result.stdout"
              delay: 30
-             retried: 3
+             retries: 3
 
          when: storage_engine == 'jiva'
 

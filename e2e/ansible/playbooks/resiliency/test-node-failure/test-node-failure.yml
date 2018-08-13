@@ -145,6 +145,7 @@
                color: "{{status}}"
              when: slack_notify | bool and lookup('env','SLACK_TOKEN')
 
+     when: is_vagrant_vm == true 
 
 
 

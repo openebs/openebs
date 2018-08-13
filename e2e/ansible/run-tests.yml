@@ -19,7 +19,6 @@
 # TC NOTES:
 #
 - include: playbooks/resiliency/test-node-failure/test-node-failure.yml
-  when: is_vagrant_vm == true
 ##########################################################################################
 # TC NAME: 2) test-kubelet-service-stop
 # TC DETAILS: Test openebs behaviour when kubelet service is not running on one of the node
@@ -174,7 +173,6 @@
 # TC NOTES:
 #
 - include: playbooks/resiliency/test-k8s-master-failure/k8s-master-failure.yml
-  when: is_vagrant_vm == true
 ########################################################################################## 
 # TC NAME: 27) test-storage-pool
 # TC DETAILS: Testing the storage pool path.

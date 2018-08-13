@@ -12,6 +12,7 @@ percona_files:
 chaoskube_files:
   - rbac.yaml
   - chaoskube.yaml
+  - single-replica-sc.yaml
 
 replace_item:
   - demo-vol1-claim

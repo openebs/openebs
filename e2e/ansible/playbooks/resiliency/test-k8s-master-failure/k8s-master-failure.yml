@@ -181,7 +181,7 @@
        register: VDown
        until: "'poweroff'  in VDown.stdout"
 
-    - name: Bring up the kubemaster.
+     - name: Bring up the kubemaster.
        include: vagrant-up-down.yml
        vars:
          status: up
@@ -280,7 +280,7 @@
                token: "{{ lookup('env','SLACK_TOKEN') }}"
                msg: '{{ ansible_date_time.time }} TEST: {{test_name}}, RESULT: {{ flag }},{{ cflag }}'
              when: slack_notify | bool and lookup('env','SLACK_TOKEN')
-
+     when: is_vagrant_vm == true 
 
 
 
