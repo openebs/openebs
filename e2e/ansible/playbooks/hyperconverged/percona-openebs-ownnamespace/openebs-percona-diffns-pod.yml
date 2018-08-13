@@ -23,7 +23,6 @@
 
        - include: pre-requisites.yml
 
-
        - name: Check status of maya-apiserver
          include_tasks: "{{utils_path}}/deploy_check.yml"
          vars:
@@ -43,14 +42,12 @@
            dest: "{{ result_kube_home.stdout }}"
          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
 
-
        - name: Replace volume-claim name with test parameters
          include_tasks: "{{utils_path}}/regex_task.yml"
          vars:
            path: "{{ result_kube_home.stdout }}/demo-percona-mysql-pvc.yaml"
            regex1: "{{replace_item}}"
            regex2: "{{replace_with}}"
-
 
        - name: Create percona deployment with OpenEBS storage
          include_tasks: "{{utils_path}}/deploy_task.yml"
@@ -91,7 +88,6 @@
          tags:
            - skip_ansible_lint
 
-
        - name: Write a test database into percona mysql
          shell: |
            sleep 120
@@ -115,24 +111,18 @@
          failed_when: "result.rc != 0"
 
 
-       - name: Test playbook passed
+       - name: Setting pass flag
          set_fact:
-           flag: "Test Passed"
-           status_id: 1
-
-       - name: Set Status
-         set_fact:
-           status: "good"
+            flag: "Test Passed"
+            status: "good"
+            status_id: 1
 
      rescue:
-       - name: Test playbook failed
+       - name: Setting fail flag
          set_fact:
            flag: "Test Failed"
-           status_id: 5
-
-       - name: Set Status
-         set_fact:
            status: "danger"
+           status_id: 5
 
      always:
        - block:
@@ -160,20 +150,13 @@
                status: delete
                ns: "{{ namespace }}"
 
-           - block:
-               - name: Update Testrail
-                 shell: source ~/.profile; python3 {{ inventory_dir | dirname }}/files/updater.py -tuser {{ testrail_user }} -tpass {{ testrail_password }} -sid {{ test_suite_id }} -cid {{ test_case_id }} -stid {{ status_id }}
-                 args:
-                   executable: /bin/bash
-
-               - name: Testrail Updated
-                 set_fact:
-                   tflag: "Testrail Updated"
-
-             rescue:
-                - name: Testrail Update failed
-                  set_fact:
-                    tflag: "Testrail Update Failed"
+           - include_tasks: "{{utils_path}}/update-testrail.yml"
+             vars:
+               user: "{{ testrail_user }}"
+               password: "{{ testrail_password }}"
+               suite_id: "{{ test_suite_id }}"
+               case_id: "{{ test_case_id }}"
+               st_id: "{{ status_id }}"
 
            - name: Send slack notification
              slack:
@@ -181,8 +164,3 @@
                msg: '{{ ansible_date_time.time }} TEST: {{test_name}}, RESULT: {{ flag }},{{ cflag }},{{tflag}}'
                color: "{{status}}"
              when: slack_notify | bool and lookup('env','SLACK_TOKEN')
-
-
-
-
-
