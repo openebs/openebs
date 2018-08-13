@@ -186,7 +186,7 @@
              register: untaint_output
              delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
-           - include_tasks: "{{ inventory_dir | dirname }}/playbooks/utils/update-testrail.yml"
+           - include_tasks: "{{utils_path}}/update-testrail.yml"
              vars:
                user: "{{ testrail_user }}"
                password: "{{ testrail_password }}"
