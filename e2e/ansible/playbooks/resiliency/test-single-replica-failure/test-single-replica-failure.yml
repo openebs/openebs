@@ -36,6 +36,12 @@
              - "{{ chaoskube_files }}"
              - "{{ percona_files }}"
 
+       - name: Copy SC template to master
+         template: 
+           src: single-replica-sc.j2
+           dest: "{{ result_kube_home.stdout }}"
+         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+
        - name: Replace volume-claim name with test parameters
          include_tasks: "{{utils_path}}/regex_task.yml"
          vars:
@@ -56,6 +62,12 @@
             ns: "{{ operator_ns }}"
             lkey: name
             lvalue: maya-apiserver
+
+       - name: Create test specific storage class
+         shell: source ~/.profile; kubectl apply -f '{{ result_kube_home.stdout }}/single-replica-sc.j2'
+         args:
+           executable: /bin/bash
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
        - name: Create test specific namespace
          include_tasks: "{{utils_path}}/namespace_task.yml"
@@ -83,7 +95,7 @@
 
        - name: Set chaoskube pod name to variable
          set_fact:
-           chaospod: "{{ result.stdout_lines[0].split()[0] }}"
+           chaospod: "{{ result.stdout_lines[1].split()[0] }}"
 
        - name: Create a configmap with the liveness sql script
          shell: source ~/.profile; kubectl create configmap sqltest --from-file={{ percona_files.1 }} -n {{ namespace }}

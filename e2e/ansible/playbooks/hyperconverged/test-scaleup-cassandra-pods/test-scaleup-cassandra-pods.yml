@@ -33,7 +33,7 @@
          get_url:
            url: "{{ cassandra_service_link }}"
            dest: "{{ result_kube_home.stdout }}/{{ svc_yaml_alias }}"
-         force: yes
+           force: yes
          register: result
          until:  "'OK' in result.msg"
          delay: 5

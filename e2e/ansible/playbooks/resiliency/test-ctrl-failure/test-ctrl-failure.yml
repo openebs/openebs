@@ -89,7 +89,7 @@
 
        - name: Set chaoskube pod name to variable
          set_fact:
-           chaospod: "{{ result.stdout_lines[0].split()[0] }}"
+           chaospod: "{{ result.stdout_lines[1].split()[0] }}"
 
        - name: Create a configmap with the liveness sql script
          shell: source ~/.profile; kubectl create configmap sqltest --from-file={{result_kube_home.stdout}}/{{ percona_files.1 }} -n {{ namespace }}
