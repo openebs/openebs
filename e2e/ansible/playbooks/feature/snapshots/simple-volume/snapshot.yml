@@ -16,7 +16,7 @@
 
        - name: Store maya-apiserver pod name in variable
          set_fact:
-           maya_pod: "{{ result.stdout.split()[0] }}"
+           maya_pod: "{{ result.stdout_lines[1].split()[0] }}"
 
        - name: Copy the volume claim to kube master
          copy:
