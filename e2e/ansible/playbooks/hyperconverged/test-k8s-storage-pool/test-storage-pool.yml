@@ -100,17 +100,18 @@
            msg: "File exists..."
          when: stat_result.stat.exists
 
-       - name: Test Playbook Passed
+       - name: Setting pass flag
          set_fact:
            flag: "Test Passed"
            status: "good"
            status_id: 1
 
      rescue:
-       - name: Test playbook Failed
+       - name: Setting fail flag
          set_fact:
            flag: "Test Failed"
            status: "danger"
+           status_id: 5
 
      always:
 
@@ -139,7 +140,7 @@
                status: delete
                ns: "{{ namespace }}"
 
-           - include_tasks: "{{ inventory_dir | dirname }}/playbooks/utils/update-testrail.yml"
+           - include_tasks: "{{utils_path}}/update-testrail.yml"
              vars:
                user: "{{ testrail_user }}"
                password: "{{ testrail_password }}"
