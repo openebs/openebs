@@ -32,7 +32,7 @@ apiVersion: v1
 metadata:
   name: jupyter-data-vol-claim
 spec:
-  storageClassName: openebs-jupyter
+  storageClassName: openebs-standard
   accessModes:
     - ReadWriteOnce
   resources:

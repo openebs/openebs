@@ -67,7 +67,7 @@ spec:
   - metadata:
       name: data
     spec:
-      storageClassName: openebs-kafka
+      storageClassName: openebs-standard
       accessModes: [ "ReadWriteOnce" ]
       resources:
         requests:

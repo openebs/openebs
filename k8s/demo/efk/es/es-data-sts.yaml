@@ -60,7 +60,7 @@ spec:
   - metadata:
       name: openebs-es-data
       annotations:
-        volume.beta.kubernetes.io/storage-class: openebs-es-data-sc
+        volume.beta.kubernetes.io/storage-class: openebs-standard
     spec:
       accessModes: [ "ReadWriteOnce" ]
       resources:

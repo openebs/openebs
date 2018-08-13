@@ -42,7 +42,7 @@ apiVersion: v1
 metadata:
   name: demo-vol2-claim
 spec:
-  storageClassName: openebs-percona
+  storageClassName: openebs-standard
   accessModes:
     - ReadWriteOnce
   resources:
