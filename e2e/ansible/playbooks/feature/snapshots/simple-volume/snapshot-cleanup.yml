@@ -4,14 +4,22 @@
     app_yml: "{{volume_def }}"
     ns: "{{ namespace }}"
 
+- name: Obtain the pvc name
+  shell: source ~/.profile; kubectl get pvc -n {{ namespace }} --no-headers | awk '{print $1}'
+  args:
+    executable: /bin/bash
+  register: pvc
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+
 - name: Confirm that the storage volume is deleted
   shell: source ~/.profile; kubectl get pvc -n {{namespace}}
   args:
     executable: /bin/bash
   delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
   register: result
-  until: "'pvc' not in result.stdout"
-  delay: 120
-  retries: 6
+  until: " pvc.stdout not in result.stdout"
+  delay: 30
+  retries: 15
   changed_when: true
 

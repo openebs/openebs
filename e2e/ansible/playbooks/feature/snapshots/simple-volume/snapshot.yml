@@ -38,7 +38,7 @@
        - name: Confirm volume container is running
          shell: >
            source ~/.profile;
-           kubectl get pods -n {{namespace}} | grep pvc | grep {{item}} | grep Running | wc -l
+           kubectl get pods -n {{namespace}} | grep {{item}} | grep Running | wc -l
          args:
            executable: /bin/bash
          register: result
