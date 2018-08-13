@@ -8,8 +8,9 @@
 - name: Confirm percona pod has been deleted
   include_tasks: "{{utils_path}}/delete_deploy_check.yml"
   vars:
-    app: "{{ pod_yaml_alias }}"
     ns: "{{  namespace }}"
+    lkey: name
+    lvalue: percona
 
 - name: Make the current ctrl node schedulable
   shell: source ~/.profile; kubectl uncordon {{ctrl_node}}
