@@ -9,9 +9,9 @@ metadata:
     cas.openebs.io/read-volume-template: jiva-volume-read-default-0.7.0
     cas.openebs.io/config: |
       - name: ControllerImage
-        value: openebs/jiva:0.6.0
+        value: openebs/jiva:{{ tag }}
       - name: ReplicaImage
-        value: openebs/jiva:0.6.0
+        value: openebs/jiva:{{ tag }}
       - name: VolumeMonitorImage
         value: openebs/m-exporter:ci
       - name: ReplicaCount

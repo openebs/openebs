@@ -36,6 +36,12 @@
              - "{{ chaoskube_files }}"
              - "{{ percona_files }}"
 
+       - name: Copy SC template to master
+         template: 
+           src: single-replica-sc.j2
+           dest: "{{ result_kube_home.stdout }}"
+         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+
        - name: Replace volume-claim name with test parameters
          include_tasks: "{{utils_path}}/regex_task.yml"
          vars:
@@ -58,7 +64,7 @@
             lvalue: maya-apiserver
 
        - name: Create test specific storage class
-         shell: source ~/.profile; kubectl apply -f '{{ result_kube_home.stdout }}/single-replica-sc.yaml'
+         shell: source ~/.profile; kubectl apply -f '{{ result_kube_home.stdout }}/single-replica-sc.j2'
          args:
            executable: /bin/bash
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"

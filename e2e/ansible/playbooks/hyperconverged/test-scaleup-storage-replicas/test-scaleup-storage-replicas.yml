@@ -136,7 +136,6 @@
          shell: source ~/.profile; kubectl scale deployment {{ rep_deployment_name.stdout }} --replicas={{(node_count |int)}} -n {{ namespace }}
          args:
            executable: /bin/bash
-         result: result
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
        - name: Confirm scaled up replica  pod status is running
