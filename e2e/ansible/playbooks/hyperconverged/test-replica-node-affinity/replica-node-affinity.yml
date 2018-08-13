@@ -108,15 +108,15 @@
          ignore_errors: true
 
        # Getting PV name
-       
+
        - name: 5b) Obtaining the PV name.
          shell: source ~/.profile; kubectl get pvc -n {{ namespace }} --no-headers | awk {'print $3'}
          args:
            executable: /bin/bash
          register: pv_name
-         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"  
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
-       
+
        - name: 5c) Copy replica_patch.yaml to master
          copy:
            src: "{{ patch_file }}"
@@ -211,22 +211,16 @@
 
        - name: Setting pass flag
          set_fact:
-            flag: "Test Passed"
-            status_id: 1
-
-       - name: Set Status
-         set_fact:
+           flag: "Test Passed"
            status: "good"
+           status_id: 1
 
      rescue:
        - name: Setting fail flag
          set_fact:
            flag: "Test Failed"
-           status_id: 5
-
-       - name: Set Status
-         set_fact:
            status: "danger"
+           status_id: 5
 
      always:
 
@@ -252,23 +246,16 @@
            - include_tasks: "{{utils_path}}/namespace_task.yml"
              vars:
                 status: delete
-                ns: "{{ namespace }}" 
+                ns: "{{ namespace }}"
 
-           - block:
-               - name: Update Testrail
-                 shell: source ~/.profile; python3 {{ inventory_dir | dirname }}/files/updater.py -tuser {{ testrail_user }} -tpass {{ testrail_password }} -sid {{ test_suite_id }} -cid {{ test_case_id }} -stid {{ status_id }}
-                 args:
-                   executable: /bin/bash
+           - include_tasks: "{{utils_path}}/update-testrail.yml"
+             vars:
+               user: "{{ testrail_user }}"
+               password: "{{ testrail_password }}"
+               suite_id: "{{ test_suite_id }}"
+               case_id: "{{ test_case_id }}"
+               st_id: "{{ status_id }}"
 
-               - name: Testrail Updated
-                 set_fact:
-                   tflag: "Testrail Updated"
-
-             rescue:
-               - name: Testrail Update failed
-                 set_fact:
-                   tflag: "Testrail Update Failed"
-           
            - name: Send slack notification
              slack:
                token: "{{ lookup('env','SLACK_TOKEN') }}"
