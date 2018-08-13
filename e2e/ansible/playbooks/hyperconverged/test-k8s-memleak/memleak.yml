@@ -185,11 +185,11 @@
        register: result
        failed_when: "'Pass' not in result.stdout"
 
-       - name: Setting pass flag
-         set_fact:
-            flag: "Test Passed"
-            status: "good"
-            status_id: 1
+     - name: Setting pass flag
+       set_fact:
+         flag: "Test Passed"
+         status: "good"
+         status_id: 1
 
      rescue:
        - name: Setting fail flag
