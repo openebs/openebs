@@ -70,7 +70,7 @@ apiVersion: v1
 metadata:
   name: datadir-claim-1
 spec:
-  storageClassName: openebs-percona
+  storageClassName: openebs-standard
   accessModes:
     - ReadWriteOnce
   resources:

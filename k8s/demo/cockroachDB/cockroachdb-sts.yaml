@@ -110,7 +110,7 @@ spec:
   - metadata:
       name: datadir
     spec:
-      storageClassName: openebs-cockroachdb
+      storageClassName: openebs-standard
       accessModes:
         - "ReadWriteOnce"
       resources:
