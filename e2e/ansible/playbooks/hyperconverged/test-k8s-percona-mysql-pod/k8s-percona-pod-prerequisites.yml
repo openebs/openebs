@@ -12,7 +12,7 @@
     src: "{{ item }}"
     dest: "/tmp"
   delegate_to: "{{ groups['kubernetes-kubeminions'].0 }}"
-  with_items: "{{ files_to_copy }}"
+  with_items: "{{ get_pip }}"
 
 - name: Install python-pip on K8S-minion
   shell: source ~/.profile; python {{result_kube_home.stdout}}/get-pip.py
