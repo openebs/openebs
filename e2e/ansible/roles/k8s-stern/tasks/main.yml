@@ -3,7 +3,6 @@
 - name: Get Current User
   command: whoami
   register: user
-  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
 - name: Get $HOME of K8s master for kubernetes user
   shell: source ~/.profile; echo $HOME
@@ -15,20 +14,13 @@
 - name: Get Log Aggregator
   get_url:
     url: "{{k8s_log_aggregator_url}}"
-    dest: "{{result_kube_home.stdout}}"
+    dest: "/usr/local/bin/{{ k8s_log_aggregator }}"
+    mode: "u+rwx"
     force: yes
   register: result
   until: "'OK' in result.msg"
   delay: 5
   retries: 3
-
-- name: Copy log aggregator to remote
-  copy:
-    src: "{{ k8s_log_aggregator }}"
-    owner: "{{ user.stdout }}"
-    group: "{{ user.stdout }}"
-    dest: /usr/local/bin
-    mode: "u+rwx"
   become: true
 
 - stat:
