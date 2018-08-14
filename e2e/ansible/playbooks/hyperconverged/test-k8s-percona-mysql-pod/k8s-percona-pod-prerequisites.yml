@@ -1,6 +1,6 @@
 ---
 - name: Get $HOME of K8s master for kubernetes user
-  shell: source ~/.profile; echo "/tmp"
+  shell: source ~/.profile; echo $HOME
   args:
     executable: /bin/bash
   register: result_kube_home
@@ -8,13 +8,14 @@
   changed_when: true
 
 - name: Copy the pip binary to kubeminion
-  include_tasks: "{{utils_path}}/copy_task.yml"
-  vars:
-    destination_node: "{{ groups['kubernetes-kubeminions'].0 }}"
-    files_to_copy: "{{ get_pip }}"
+  copy:
+    src: "{{ item }}"
+    dest: "/tmp"
+  delegate_to: "{{ groups['kubernetes-kubeminions'].0 }}"
+  with_items: "{{ get_pip }}"
 
 - name: Install python-pip on K8S-minion
-  shell: source ~/.profile; python {{result_kube_home.stdout}}/get-pip.py
+  shell: source ~/.profile; python /tmp/get-pip.py
   args:
     executable: /bin/bash
   become: true
