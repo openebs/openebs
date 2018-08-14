@@ -25,20 +25,6 @@
   delay: 10
   retries: 6
 
-- name: Delete the openebs operator
-  shell: source ~/.profile; kubectl delete -f {{ ansible_env.HOME }}/{{ openebs_operator_alias }}
-  args:
-    executable: /bin/bash
-
-- name: Confirm pod has been deleted
-  shell: source ~/.profile; kubectl get pods -n openebs
-  args:
-    executable: /bin/bash
-  register: result
-  until: "'maya-apiserver' or 'openebs-provisioner' or 'openebs-snapshot-operator' not in result.stdout"
-  delay: 10
-  retries: 6
-
 - name: Delete the openebs pre-release features
   shell: source ~/.profile; kubectl delete -f {{ ansible_env.HOME }}/{{ openebs_pre_release_alias }}
   args:
@@ -50,6 +36,20 @@
     executable: /bin/bash
   register: result
   until: "'No resources found.' in result.stdout"
+  delay: 10
+  retries: 6
+
+- name: Delete the openebs operator
+  shell: source ~/.profile; kubectl delete -f {{ ansible_env.HOME }}/{{ openebs_operator_alias }}
+  args:
+    executable: /bin/bash
+
+- name: Confirm pod has been deleted
+  shell: source ~/.profile; kubectl get pods -n openebs
+  args:
+    executable: /bin/bash
+  register: result
+  until: "'maya-apiserver' and 'openebs-provisioner' and 'openebs-snapshot-operator' not in result.stdout"
   delay: 10
   retries: 6
 
