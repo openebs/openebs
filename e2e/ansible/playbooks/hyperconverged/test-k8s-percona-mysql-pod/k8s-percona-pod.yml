@@ -88,13 +88,6 @@
             lkey: name
             lvalue: percona
 
-       - name: 6) Get $HOME of K8s minion for kubernetes user
-         shell: source ~/.profile; echo "/tmp"
-         args:
-           executable: /bin/bash
-         register: result_kube_home
-         delegate_to: "{{groups['kubernetes-kubeminions'].0}}"
-
        - name: 6a) Get IP address of percona mysql pod
          shell: source ~/.profile; kubectl describe pod percona -n {{ namespace }}
          args:
@@ -109,7 +102,7 @@
        - name: 7) Copy files into kube minion
          copy:
            src: "{{ item }}"
-           dest: "{{ result_kube_home.stdout }}"
+           dest: "/tmp"
          with_items: "{{ files }}"
          delegate_to: "{{ groups['kubernetes-kubeminions'].0 }}"
 

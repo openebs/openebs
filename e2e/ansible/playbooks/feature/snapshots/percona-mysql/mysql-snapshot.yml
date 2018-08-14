@@ -30,7 +30,7 @@
 
        - name: Store maya-apiserver pod name in variable
          set_fact:
-           maya_pod: "{{ result.stdout_lines[0].split()[0] }}"
+           maya_pod: "{{ result.stdout_lines[1].split()[0] }}"
 
        - name: Create namespace
          include_tasks: "{{utils_path}}/namespace_task.yml"
