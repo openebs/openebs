@@ -24,7 +24,7 @@
 # TC DETAILS: Test openebs behaviour when kubelet service is not running on one of the node
 # TC NOTES:
 #
-#- include: playbooks/resiliency/test-kubelet-service-stop/test-kubelet-service-stop.yml
+- include: playbooks/resiliency/test-kubelet-service-stop/test-kubelet-service-stop.yml
 ##########################################################################################
 # TC NAME: 3) test-kubectl-snapshot
 # TC DETAILS: Test to perform basic snapshot/clones using k8s api's
@@ -79,7 +79,7 @@
 # TC DETAILS: Creates a mysql application snapshot on openebs volume and restore database 
 # TC NOTES:           
 #    
-#- include: playbooks/feature/snapshots/percona-mysql/mysql-snapshot.yml
+- include: playbooks/feature/snapshots/percona-mysql/mysql-snapshot.yml
 #
 ###########################################################################################
 # TC NAME: 11) basic-ha-pod-reschedule  
@@ -124,7 +124,7 @@
 # TC DETAILS: Tests resiliency upon lossy connectivity to openebs replica caused by pumba
 # TC NOTES:
 #
-- include: playbooks/resiliency/test-network-failure-rep/test-nw-failure-rep.yml
+#- include: playbooks/resiliency/test-network-failure-rep/test-nw-failure-rep.yml
 ##########################################################################################
 # TC NAME: 18) node_loss_simulation_via_eviction_taint
 # TC DETAILS: Simulates node loss by applying disk pressure taints to evict all pods
@@ -151,7 +151,7 @@
 # TC NAME: 22) Application-upgrade-test
 # TC DETAILS: Verify data availability post application rolling upgrade.
 # TC NOTES:
-- include: playbooks/hyperconverged/test-k8s-jenkins-upgrade/k8s-jenkins-upgrade.yml
+#- include: playbooks/hyperconverged/test-k8s-jenkins-upgrade/k8s-jenkins-upgrade.yml
 ##########################################################################################
 # TC NAME: 23) pvc-svc-deletion-check
 # TC DETAILS: Test to verify successful deletion of svc and pvc
@@ -180,7 +180,17 @@
 #
 - include: playbooks/hyperconverged/test-k8s-storage-pool/test-storage-pool.yml
 ##########################################################################################
-
+# TC NAME: 17) volume_replica_lossy_network_with_quorum
+# TC DETAILS: Tests resiliency upon lossy connectivity to openebs replica caused by pumba
+# TC NOTES:
+#
+- include: playbooks/resiliency/test-network-failure-rep/test-nw-failure-rep.yml
+##########################################################################################
+# TC NAME: 22) Application-upgrade-test
+# TC DETAILS: Verify data availability post application rolling upgrade.
+# TC NOTES:
+- include: playbooks/hyperconverged/test-k8s-jenkins-upgrade/k8s-jenkins-upgrade.yml
+##########################################################################################
 # TC NAME: pre-check
 # TC DETAILS: Delete residue of playbooks before running the run-tests again
 # TC NOTES:

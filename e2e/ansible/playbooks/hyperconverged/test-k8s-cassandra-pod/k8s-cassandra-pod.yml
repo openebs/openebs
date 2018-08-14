@@ -28,27 +28,25 @@
          vars:
            url: "{{ cassandra_service_link }}"
            dest: "{{ result_kube_home.stdout }}/{{ svc_yaml_alias }}"
-           delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
        - name: 2a) Download YAML for cassandra statefulset
          include_tasks: "{{utils_path}}/get_url.yml"
          vars:
            url: "{{ cassandra_stateful_link }}"
            dest: "{{ result_kube_home.stdout }}/{{ stateful_yaml_alias }}"
-           delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
        - name: 2b) Download YAML for cassandra loadgen
          include_tasks: "{{utils_path}}/get_url.yml"
          vars:
            url: "{{ cassandra_loadgen_link }}"
            dest: "{{ result_kube_home.stdout }}/{{ loadgen_yaml_alias }}"
-           delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
        - name: 2c) Replace the default namespace in cassandra statefulset yaml
          replace:
            path: "{{ result_kube_home.stdout }}/{{ stateful_yaml_alias }}"
            regexp: 'cassandra-0.cassandra.default.svc.cluster.local'
            replace: 'cassandra-0.cassandra.{{ namespace }}.svc.cluster.local'
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
   
        - name: 2d) Replace storage-class to use cstor storage engine
          replace:
@@ -58,7 +56,7 @@
          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
          when:  storage_engine  == 'cStor'
 
-       - name: 2d) Replace storage-class to use cstor storage engine
+       - name: 2d) Replace storage-class to use jiva storage engine
          replace:
            path: "{{ result_kube_home.stdout }}/{{ stateful_yaml_alias }}"
            regexp: 'openebs-standard'
