@@ -15,7 +15,7 @@
   with_items: "{{ get_pip }}"
 
 - name: Install python-pip on K8S-minion
-  shell: source ~/.profile; python {{result_kube_home.stdout}}/get-pip.py
+  shell: source ~/.profile; python /tmp/get-pip.py
   args:
     executable: /bin/bash
   become: true
