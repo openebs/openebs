@@ -102,7 +102,7 @@
 
 #Find the PV name by using the above pvc name
         - name: 7) Finding PV name 
-          shell: source ~/.profile; kubectl get pv --no-header | grep {{ pvc.stdout }} | awk {'print $1'}
+          shell: source ~/.profile; kubectl get pv | grep {{ pvc.stdout }} | awk {'print $1'}
           args:
             executable: /bin/bash
           register: pv_name
