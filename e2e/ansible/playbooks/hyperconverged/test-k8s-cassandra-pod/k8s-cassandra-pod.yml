@@ -28,21 +28,18 @@
          vars:
            url: "{{ cassandra_service_link }}"
            dest: "{{ result_kube_home.stdout }}/{{ svc_yaml_alias }}"
-           delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
        - name: 2a) Download YAML for cassandra statefulset
          include_tasks: "{{utils_path}}/get_url.yml"
          vars:
            url: "{{ cassandra_stateful_link }}"
            dest: "{{ result_kube_home.stdout }}/{{ stateful_yaml_alias }}"
-           delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
        - name: 2b) Download YAML for cassandra loadgen
          include_tasks: "{{utils_path}}/get_url.yml"
          vars:
            url: "{{ cassandra_loadgen_link }}"
            dest: "{{ result_kube_home.stdout }}/{{ loadgen_yaml_alias }}"
-           delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
        - name: 2c) Replace the default namespace in cassandra statefulset yaml
          replace:

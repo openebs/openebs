@@ -17,7 +17,6 @@
 
 #############################################################################################################
 
-
 - hosts: localhost
 
   vars_files:
@@ -150,7 +149,7 @@
          retries: 5
 
        - name: Confirm scaled up cassandra pod status is running
-         shell: source {{ profile }}; kubectl get pods -n {{ namespace }} | grep cassandra | grep Running | wc -l
+         shell: source {{ profile }}; kubectl get pods -n {{ namespace }} -l app=cassandra | grep Running | wc -l
          args:
            executable: /bin/bash
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
