@@ -1334,7 +1334,7 @@ data:
     options: |-
       labelSelector: openebs.io/replica=jiva-replica
   post: |
-    {{- $replicaPairs := jsonpath .JsonResult `{range .items[*]}pkey={@.metadata.namespace}/{@.metadata.labels.openebs\.io/persistent-volume},replicaIP={@.status.podIP},replicaStatus={@.status.containerStatuses[*].ready},capacity={@.metadata.labels.openebs\.io/capacity};{end}` | trim | default "" | splitList ";" -}}
+    {{- $replicaPairs := jsonpath .JsonResult `{range .items[*]}pkey={@.metadata.namespace}/{@.metadata.labels.openebs\.io/persistent-volume},replicaIP={@.status.podIP},replicaStatus={@.status.containerStatuses[*].ready},capacity={@.metadata.annotations.openebs\.io/capacity};{end}` | trim | default "" | splitList ";" -}}
     {{- $replicaPairs | keyMap "volumeList" .ListItems | noop -}}
 ---
 apiVersion: v1
@@ -1437,7 +1437,7 @@ data:
     {{- .TaskResult.readlistrep.items | notFoundErr "replica pod(s) not found" | saveIf "readlistrep.notFoundErr" .TaskResult | noop -}}
     {{- jsonpath .JsonResult "{.items[*].status.podIP}" | trim | saveAs "readlistrep.podIP" .TaskResult | noop -}}
     {{- jsonpath .JsonResult "{.items[*].status.containerStatuses[*].ready}" | trim | saveAs "readlistrep.status" .TaskResult | noop -}}
-    {{- jsonpath .JsonResult `{.items[*].metadata.labels.openebs\.io/capacity}` | trim | saveAs "readlistrep.capacity" .TaskResult | noop -}}
+    {{- jsonpath .JsonResult `{.items[*].metadata.annotations.openebs\.io/capacity}` | trim | saveAs "readlistrep.capacity" .TaskResult | noop -}}
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -1794,6 +1794,9 @@ data:
             openebs.io/replica: jiva-replica
             openebs.io/persistent-volume: {{ .Volume.owner }}
             openebs.io/persistent-volume-claim: {{ .Volume.pvc }}
+          annotations:
+            openebs.io/capacity: {{ .Volume.capacity }}
+            openebs.io/storage-pool: {{ .Config.StoragePool.value }}
         spec:
           affinity:
             podAntiAffinity:
