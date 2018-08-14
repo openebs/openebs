@@ -36,7 +36,16 @@ rules:
   resources: ["customresourcedefinitions"]
   verbs: [ "get", "list", "create" ]
 - apiGroups: ["*"]
-  resources: [ "disks","storagepoolclaims","storagepools","cstorpools","cstorvolumereplicas","cstorvolumes","castemplates"]
+  resources: [ "disks"]
+  verbs: ["*" ]
+- apiGroups: ["*"]
+  resources: [ "storagepoolclaims","storagepools"]
+  verbs: ["*" ]
+- apiGroups: ["*"]
+  resources: [ "castemplates","runtasks"]
+  verbs: ["*" ]
+- apiGroups: ["*"]
+  resources: [ "cstorpools","cstorvolumereplicas","cstorvolumes"]
   verbs: ["*" ]
 - nonResourceURLs: ["/metrics"]
   verbs: ["get"]
@@ -318,6 +327,29 @@ spec:
     # shortNames allow shorter string to match your resource on the CLI
     shortNames:
     - cast
+---
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  # name must match the spec fields below, and be in the form: <plural>.<group>
+  name: runtasks.openebs.io
+spec:
+  # group name to use for REST API: /apis/<group>/<version>
+  group: openebs.io
+  # version name to use for REST API: /apis/<group>/<version>
+  version: v1alpha1
+  # either Namespaced or Cluster
+  scope: Namespaced
+  names:
+    # plural name to be used in the URL: /apis/<group>/<version>/<plural>
+    plural: runtasks
+    # singular name to be used as an alias on the CLI and for display
+    singular: runtask
+    # kind is normally the CamelCased singular type. Your resource manifests use this.
+    kind: RunTask
+    # shortNames allow shorter string to match your resource on the CLI
+    shortNames:
+    - rtask
 ---
 apiVersion: apiextensions.k8s.io/v1beta1
 kind: CustomResourceDefinition
