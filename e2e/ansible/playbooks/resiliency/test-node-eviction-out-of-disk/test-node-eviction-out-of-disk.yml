@@ -100,7 +100,7 @@
            timeout: 120
 
        - name:  Get node on which application pod is scheduled
-         shell: source ~/.profile; kubectl get pods -n {{ namespace }} -o wide | grep percona | awk {'print $7'}
+         shell: source ~/.profile; kubectl get pods -n {{ namespace }} -o wide -l name=percona --no-headers | awk {'print $7'}
          args:
            executable: /bin/bash
          register: node_name

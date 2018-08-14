@@ -28,7 +28,6 @@
 
        - include: pre-requisites.yml
 
-
        - name: Download YAML for cassandra service
          get_url:
            url: "{{ cassandra_service_link }}"
@@ -67,6 +66,7 @@
            path: "{{ result_kube_home.stdout }}/{{ stateful_yaml_alias }}"
            regexp: 'cassandra-0.cassandra.default.svc.cluster.local'
            replace: 'cassandra-0.cassandra.{{ namespace }}.svc.cluster.local'
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
        - name: Replace storage-class to use cstor storage engine
          replace:
@@ -101,7 +101,6 @@
          set_fact:
             node_count: " {{ node_out.stdout}}"
 
-
        - name: Replace the replica count in cassandra statefulset yaml
          replace:
            path: "{{ result_kube_home.stdout }}/{{ stateful_yaml_alias }}"
@@ -130,9 +129,8 @@
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
          with_items: "{{ cassandra_artifacts }}"
 
-
        - name: Confirm cassandra pod status is running
-         shell: source {{ profile }}; kubectl get pods -n {{ namespace }} | grep cassandra | grep Running | wc -l
+         shell: source {{ profile }}; kubectl get pods -n {{ namespace }} -l app=cassandra | grep Running | wc -l
          args:
            executable: /bin/bash
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"

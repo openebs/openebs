@@ -35,7 +35,6 @@
           ns: "{{ operator_ns }}"
           lkey: name
           lvalue: maya-apiserver 
-
       
      - name: 2)  Download YAML for jenkins 
        include_tasks: "{{utils_path}}/get_url.yml"
@@ -67,7 +66,7 @@
        when:  storage_engine  == 'jiva'   
 
      - name: Create namespace for deployment.
-       include_tasks: "{utils_path}}/namespace_task.yml"
+       include_tasks: "{{utils_path}}/namespace_task.yml"
        vars:
           status: create
           ns: "{{ namespace }}" 

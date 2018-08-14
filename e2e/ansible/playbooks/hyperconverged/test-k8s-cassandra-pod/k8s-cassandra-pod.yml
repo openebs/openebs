@@ -49,6 +49,7 @@
            path: "{{ result_kube_home.stdout }}/{{ stateful_yaml_alias }}"
            regexp: 'cassandra-0.cassandra.default.svc.cluster.local'
            replace: 'cassandra-0.cassandra.{{ namespace }}.svc.cluster.local'
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
   
        - name: 2d) Replace storage-class to use cstor storage engine
          replace:
