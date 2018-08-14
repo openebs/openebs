@@ -9,7 +9,7 @@
 - name: Detaching the disk from the nodes
   shell: >
     gcloud compute instances detach-disk {{ outer_item }} --disk {{ item }} --zone "{{ cluster_zone }}" &&
-    gcloud compute disks delete --disk "{{ item }}" --zone "{{ cluster_zone }}"
+    gcloud compute disks delete "{{ item }}" --zone "{{ cluster_zone }}"
   args:
     executable: /bin/bash
   register: result_disk

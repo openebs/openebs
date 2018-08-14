@@ -86,14 +86,6 @@
          register: result
          failed_when: "'configmap' and 'created' not in result.stdout"
 
-       - name: Create a configmap with the liveness sql script
-         shell: source ~/.profile; kubectl create configmap sqltest --from-file={{ result_kube_home.stdout }}/{{ percona_files.1 }} -n {{ namespace }}
-         args:
-           executable: /bin/bash
-         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-         register: result
-         failed_when: "'configmap' and 'created' not in result.stdout"
-
        - include_tasks: "{{utils_path}}/deploy_task.yml"
          vars:
            app_yml: "{{ percona_files.0 }}"
@@ -170,24 +162,18 @@
             lkey: name
             lvalue: percona
          
-       - name: Test Passed     
+       - name: Test Passed
          set_fact:
            flag: "Test Passed"
-           status_id: 1
-
-       - name: Set Status
-         set_fact:
            status: "good"
+           status_id: 1
 
      rescue:
        - name: Test Failed
          set_fact:
            flag: "Test Failed"
-           status_id: 5
-
-       - name: Set Status
-         set_fact:
            status: "danger"
+           status_id: 5
 
      always:
        - block:
@@ -216,21 +202,14 @@
              register: untaint_output
              delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
-           - block:
-               - name: Update Testrail
-                 shell: source ~/.profile; python3 {{ inventory_dir | dirname }}/files/updater.py -tuser {{ testrail_user }} -tpass {{ testrail_password }} -sid {{ test_suite_id }} -cid {{ test_case_id }} -stid {{ status_id }}
-                 args:
-                   executable: /bin/bash
-
-               - name: Testrail Updated
-                 set_fact:
-                   tflag: "Testrail Updated"
-
-             rescue:
-               - name: Testrail Update failed
-                 set_fact:
-                   tflag: "Testrail Update Failed"
-
+           - include_tasks: "{{utils_path}}/update-testrail.yml"
+             vars:
+               user: "{{ testrail_user }}"
+               password: "{{ testrail_password }}"
+               suite_id: "{{ test_suite_id }}"
+               case_id: "{{ test_case_id }}"
+               st_id: "{{ status_id }}"
+           
            - include_tasks: "{{utils_path}}/namespace_task.yml"
              vars:
                status: delete
