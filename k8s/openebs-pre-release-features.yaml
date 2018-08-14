@@ -1287,7 +1287,7 @@ data:
     options: |-
       labelSelector: openebs.io/controller-service=jiva-controller-svc
   post: |
-    {{- $servicePairs := jsonpath .JsonResult `{range .items[*]}pkey={@.metadata.namespace}/{@.metadata.labels.openebs\.io/pv},clusterIP={@.spec.clusterIP};{end}` | trim | default "" | splitList ";" -}}
+    {{- $servicePairs := jsonpath .JsonResult `{range .items[*]}pkey={@.metadata.namespace}/{@.metadata.labels.openebs\.io/persistent-volume},clusterIP={@.spec.clusterIP};{end}` | trim | default "" | splitList ";" -}}
     {{- $servicePairs | keyMap "volumeList" .ListItems | noop -}}
 ---
 apiVersion: v1
@@ -1310,7 +1310,7 @@ data:
     options: |-
       labelSelector: openebs.io/controller=jiva-controller
   post: |
-    {{- $controllerPairs := jsonpath .JsonResult `{range .items[*]}pkey={@.metadata.namespace}/{@.metadata.labels.openebs\.io/pv},controllerIP={@.status.podIP},controllerStatus={@.status.containerStatuses[*].ready};{end}` | trim | default "" | splitList ";" -}}
+    {{- $controllerPairs := jsonpath .JsonResult `{range .items[*]}pkey={@.metadata.namespace}/{@.metadata.labels.openebs\.io/persistent-volume},controllerIP={@.status.podIP},controllerStatus={@.status.containerStatuses[*].ready};{end}` | trim | default "" | splitList ";" -}}
     {{- $controllerPairs | keyMap "volumeList" .ListItems | noop -}}
 ---
 apiVersion: v1
@@ -1333,7 +1333,7 @@ data:
     options: |-
       labelSelector: openebs.io/replica=jiva-replica
   post: |
-    {{- $replicaPairs := jsonpath .JsonResult `{range .items[*]}pkey={@.metadata.namespace}/{@.metadata.labels.openebs\.io/pv},replicaIP={@.status.podIP},replicaStatus={@.status.containerStatuses[*].ready},capacity={@.metadata.labels.openebs\.io/capacity};{end}` | trim | default "" | splitList ";" -}}
+    {{- $replicaPairs := jsonpath .JsonResult `{range .items[*]}pkey={@.metadata.namespace}/{@.metadata.labels.openebs\.io/persistent-volume},replicaIP={@.status.podIP},replicaStatus={@.status.containerStatuses[*].ready},capacity={@.metadata.labels.openebs\.io/capacity};{end}` | trim | default "" | splitList ";" -}}
     {{- $replicaPairs | keyMap "volumeList" .ListItems | noop -}}
 ---
 apiVersion: v1
