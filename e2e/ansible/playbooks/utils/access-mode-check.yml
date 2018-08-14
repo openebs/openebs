@@ -7,12 +7,19 @@
          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
          changed_when: True
 
+       - name: Get the nodes count
+         shell: source ~/.profile;  kubectl get nodes | grep '<none>' | wc -l
+         args:
+           executable: /bin/bash
+         register: node_count
+         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+
        - name: Set PV name to a variable
          set_fact:
            pvname: "{{pv_name.stdout.split()[10] }}"
 
        - name: Get the maya-apiserver pod name
-         shell: source ~/.profile; kubectl get pods -n openebs -l name=maya-apiserver | awk '{print $1}'
+         shell: source ~/.profile; kubectl get pods -n openebs -l name=maya-apiserver --no-headers | awk '{print $1}'
          args:
            executable: /bin/bash
          register: mayapod
@@ -29,21 +36,16 @@
          failed_when: "pvname not in volname.stdout"
 
        - name: Get the replicas access mode
-         shell: source ~/.profile; kubectl exec -it {{ mayapod.stdout }} -n openebs -- mayactl volume info --volname {{ volname.stdout.split()[2] }} -n {{ ns }}
+         shell: source ~/.profile;  kubectl exec -it {{ mayapod.stdout }} -n openebs -- mayactl volume info --volname {{ volname.stdout.split()[2] }} -n {{ ns }} | grep 'RW' | wc -l
          args:
            executable: /bin/bash
          register: result
          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+         until: result.stdout| int == node_count.stdout | int
+         delay: 30
+         retries: 15
          changed_when: True
 
-       - name: Set RW count to a variable
-         set_fact:
-           vol_accessmode_count: "{{ result.stdout.count('RW') }}"
-
-       - name: Verify the replicas access mode
-         command: echo "Verfiy the replicas access mode"
-         when: vol_accessmode_count|int == (node_count)| int
-         register: result
        - debug:
            msg: "All the replicas are in sync"
          when: "result.rc == 0"
