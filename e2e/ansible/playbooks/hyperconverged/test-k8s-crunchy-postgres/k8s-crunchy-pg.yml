@@ -30,7 +30,6 @@
            ns: "{{ operator_ns }}"
            lvalue: maya-apiserver
            lkey: name
-
  
        - name: 2) Replace 'tree/master' with 'trunk' in the crunchy-postgres link
          debug:
@@ -64,7 +63,7 @@
          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
          when:  storage_engine  == 'cStor'
 
-       - name:  Replace storage-class to use cstor storage engine
+       - name:  Replace storage-class to use jiva storage engine
          replace:
            path: "{{ result_kube_home.stdout }}/crunchy-postgres/set.json"
            regexp: 'openebs-standard'

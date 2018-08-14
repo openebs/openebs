@@ -58,7 +58,7 @@
          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
          when:  storage_engine  == 'cStor'
 
-       - name: Replace storage-class to use cstor storage engine
+       - name: Replace storage-class to use jiva storage engine
          replace:
            path: "{{ result_kube_home.stdout }}/percona.yaml"
            regexp: 'openebs-standard'
