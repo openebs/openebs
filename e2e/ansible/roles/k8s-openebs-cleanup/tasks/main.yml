@@ -37,7 +37,7 @@
   args:
     executable: /bin/bash
   register: result
-  until: "'No resources found.' in result.stderr"
+  until: "result.rc == 0 and 'No resources found.' in result.stderr"
   delay: 20
   retries: 10
 
