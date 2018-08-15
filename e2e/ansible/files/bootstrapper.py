@@ -6,12 +6,10 @@ import json
 from pprint import pprint
 from datetime import datetime
 
-
 def get_client(args):
     client = testrail.APIClient("https://cloudbyte.testrail.com")
     client.user, client.password = args['testrail_username'], args["testrail_password"]
     return client
-
 
 def write_file(path, content):
     try:
@@ -23,9 +21,8 @@ def write_file(path, content):
         return "", -1
     return path, 0
 
-
-def create_test_plan(client, args, project_id):
-    plan_name = "BUILD_" + args['build_number'] + "_" + str(datetime.now())[:10]
+def create_test_plan(client, args, storage_engine_type, project_id):
+    plan_name = "BUILD_"+ storage_engine_type + "_" + args['build_number'] + "_" + str(datetime.now())[:10]
     description = "A description"
     plan = client.send_post('add_plan/'+str(project_id), {'name': plan_name, 'description': description})
     if plan['id'] is None:
@@ -33,12 +30,10 @@ def create_test_plan(client, args, project_id):
         exit(-1)
     return plan['id']
 
-
 def add_suites(plan_id, suite_id, client, suite_info, project_id):
     description = ""
     if suite_info is not None and 'Exclude' in suite_info and suite_info['Exclude'] is not None:
-        ids = []
-        paths = []
+        ids, paths = [], []
         cases = client.send_get('get_cases/'+str(project_id)+'&suite_id=' + str(suite_id))
         for case in cases:
             if case['id'] in suite_info['Exclude']:
@@ -75,30 +70,11 @@ def get_file_data(path):
         exit(-1)
     return data
 
-
 def create_plan_resources(args):
-    client = get_client(args)
-    map_src_id = {"platforms": {}}
-    paths = []
-    run_id = 0
-    yaml_info = parse_yaml(get_file_data("../playbooks/test_suites.yml"))
-    project_id= yaml_info['TestRailProjectID']
-    for platforms in yaml_info['Platform']:
-        for platform_name, platform_info in platforms.items():
-            plan_run_id = create_test_plan(client, args, project_id)
-            map_src_id["plan_run_id"] = plan_run_id
-            map_src_id["platforms"][platform_name] = {'suites': {}}
-            for suites in platform_info['Test Suite']:
-                for suite_name, suite_info in suites.items():
-                    suite_run_id, tpaths = add_suites(plan_run_id, suite_name, client, suite_info, project_id)
-                    map_src_id["platforms"][platform_name]["suites"][suite_name] = suite_run_id
-                    paths = paths + tpaths
-                    run_id = suite_run_id
-    _, err = write_file(os.path.expanduser('~') + "/mapping.json", json.dumps(map_src_id))
-    if err == -1:
-        exit(err)
+    client, yaml_info  = get_client(args), parse_yaml(get_file_data("../playbooks/test_suites.yml"))
+    map_src_id, run_id, project_id, cstor_plan_resources, jiva_plan_resources = {'cstor':{},'jiva':{}}, 0, yaml_info['TestRailProjectID'], [], []
 
-    test_yaml = [{
+    yaml_header = [{
             "tasks": [
                 {
                     "when": "slack_notify | bool and lookup('env','SLACK_TOKEN')",
@@ -112,12 +88,9 @@ def create_plan_resources(args):
         },
         {
             "include": "pre-check.yml"
-        }]
-
-    for path in paths:
-        test_yaml.append({'include': path})
-
-    test_yaml = test_yaml + [{
+        }
+    ]
+    yaml_footer = [{
         "include": "pre-check.yml"
     },
         {
@@ -149,10 +122,63 @@ def create_plan_resources(args):
             "hosts": "localhost"
         },
     ]
-    _, err = write_file("../run-tests.yml", yaml.dump(test_yaml, default_flow_style=False))
-    if err == -1:
-        exit(-1)
+ 
+    if yaml_info['CstorTestSuite'] is not None:
+        cstor_plan_resources+=yaml_info['CstorTestSuite']
+    if yaml_info['JivaTestSuite'] is not None:
+        jiva_plan_resources+=yaml_info['JivaTestSuite']
+    if yaml_info['CommonTestSuite'] is not None:
+        cstor_plan_resources+=yaml_info['CommonTestSuite']
+        jiva_plan_resources+=yaml_info['CommonTestSuite']
+    
+    print("Creating test plans")
 
+    if len(cstor_plan_resources)>0:
+        map_src_id["cstor_plan_run_id"], paths, cstor_test_yaml = create_test_plan(client, args, "CSTOR", project_id), [], []
+        for suites in cstor_plan_resources:
+            for suite_name, suite_info in suites.items():
+                suite_run_id, tpaths = add_suites(map_src_id["cstor_plan_run_id"], suite_name, client, suite_info, project_id)
+                map_src_id['cstor'][suite_name]=suite_run_id
+                paths+=tpaths
+
+        cstor_test_yaml += yaml_header
+        
+        for path in paths:
+            cstor_test_yaml.append({'include': path})
+
+        cstor_test_yaml += yaml_footer
+        
+        _, err = write_file("../cstor-run-tests.yml", yaml.dump(cstor_test_yaml, default_flow_style=False))
+        if err == -1:
+            exit(err)
+
+        print("Cstor plan created")
+
+    if len(jiva_plan_resources)>0:
+        map_src_id['jiva_plan_run_id'], paths, jiva_test_yaml = create_test_plan(client, args, "JIVA", project_id), [], []
+        
+        for suites in jiva_plan_resources:
+            for suite_name, suite_info in suites.items():
+                suite_run_id, tpaths = add_suites(map_src_id["jiva_plan_run_id"], suite_name, client, suite_info, project_id)
+                map_src_id['jiva'][suite_name]=suite_run_id
+                paths += tpaths
+        
+        jiva_test_yaml += yaml_header
+        
+        for path in paths:
+            jiva_test_yaml.append({'include': path})
+
+        jiva_test_yaml += yaml_footer
+        
+        _, err = write_file("../jiva-run-tests.yml", yaml.dump(jiva_test_yaml, default_flow_style=False))
+        if err == -1:
+            exit(err)
+
+        print("Jiva plan created")
+    
+    _, err = write_file(os.path.expanduser('~') + "/mapping.json", json.dumps(map_src_id))
+    if err == -1:
+        exit(err)
 
 def parse_yaml(content):
     try:
