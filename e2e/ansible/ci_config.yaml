@@ -1,0 +1,8 @@
+---
+include_before:
+ - pre-requisites.yml
+ - setup-kubernetes.yml
+ - setup-stern.yml
+ - setup-openebs.yml
+include_after:
+ - cleanup-openebs.yml

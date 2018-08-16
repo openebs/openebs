@@ -1,7 +1,11 @@
-TestRailProjectID: 5
-Platform:
-- GKE:
-    Description: A short description for GKE 
-    Test Suite:
-     - 826:
+TestRailProjectID: 1
+CommonTestSuite:
+    - 21:
+    - 22:
+JivaTestSuite:
+    - 18:
+        Exclude:
+            - 7
+CstorTestSuite:
+    - 18:
         Exclude:

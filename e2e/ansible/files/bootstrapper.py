@@ -8,6 +8,7 @@ from datetime import datetime
 
 def get_client(args):
     client = testrail.APIClient("https://cloudbyte.testrail.com")
+    # client = testrail.APIClient("https://openebs.testrail.io")
     client.user, client.password = args['testrail_username'], args["testrail_password"]
     return client
 
@@ -72,7 +73,7 @@ def get_file_data(path):
 
 def create_plan_resources(args):
     client, yaml_info  = get_client(args), parse_yaml(get_file_data("../playbooks/test_suites.yml"))
-    map_src_id, run_id, project_id, cstor_plan_resources, jiva_plan_resources = {'cstor':{},'jiva':{}}, 0, yaml_info['TestRailProjectID'], [], []
+    map_src_id, run_id, project_id, cstor_plan_resources, jiva_plan_resources = {'cStor':{},'jiva':{}}, 0, yaml_info['TestRailProjectID'], [], []
 
     yaml_header = [{
             "tasks": [
@@ -138,13 +139,14 @@ def create_plan_resources(args):
         for suites in cstor_plan_resources:
             for suite_name, suite_info in suites.items():
                 suite_run_id, tpaths = add_suites(map_src_id["cstor_plan_run_id"], suite_name, client, suite_info, project_id)
-                map_src_id['cstor'][suite_name]=suite_run_id
+                map_src_id['cStor'][suite_name]=suite_run_id
                 paths+=tpaths
 
         cstor_test_yaml += yaml_header
         
         for path in paths:
-            cstor_test_yaml.append({'include': path})
+            cstor_test_yaml.append({'include': path, 'vars': {'storage_engine': 'cStor'}}
+            )
 
         cstor_test_yaml += yaml_footer
         
@@ -166,7 +168,7 @@ def create_plan_resources(args):
         jiva_test_yaml += yaml_header
         
         for path in paths:
-            jiva_test_yaml.append({'include': path})
+            jiva_test_yaml.append({'include': path,  'vars': {'storage_engine': 'jiva'}})
 
         jiva_test_yaml += yaml_footer
         
@@ -176,6 +178,18 @@ def create_plan_resources(args):
 
         print("Jiva plan created")
     
+    ci_info = parse_yaml(get_file_data('../ci_config.yaml'))
+    ci_yaml=[]
+    for item in ci_info['include_before']:
+        ci_yaml.append({'include': item})
+    ci_yaml.append({'include': 'cstor-run-tests.yml'})
+    ci_yaml.append({'include': 'jiva-run-tests.yml'})
+    for item in ci_info['include_after']:
+        ci_yaml.append({'include': item})
+    _, err = write_file("../ci.yml", yaml.dump(ci_yaml, default_flow_style=False))
+    if err == -1:
+        exit(err)
+
     _, err = write_file(os.path.expanduser('~') + "/mapping.json", json.dumps(map_src_id))
     if err == -1:
         exit(err)
