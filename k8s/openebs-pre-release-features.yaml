@@ -120,7 +120,7 @@ data:
     metadata:
       name: {{.Storagepool.owner}}-{{randAlphaNum 4 |lower }}
       labels:
-        openebs.io/storagepoolclaim: {{.Storagepool.owner}}
+        openebs.io/storage-pool-claim: {{.Storagepool.owner}}
         kubernetes.io/hostname: {{ .ListItems.currentRepeatResource }}
     spec:
       disks:
@@ -159,8 +159,8 @@ data:
     metadata:
       name: {{ pluck .ListItems.currentRepeatResource .ListItems.cstorNodeUidList.nodesUid |first | splitList " " | last}}
       labels:
-        openebs.io/storagepoolclaim: {{.Storagepool.owner}}
-        openebs.io/cstorPool: {{ pluck .ListItems.currentRepeatResource .ListItems.cstorNodeUidList.nodesUid |first | splitList " " | last}}
+        openebs.io/storage-pool-claim: {{.Storagepool.owner}}
+        openebs.io/cstor-pool: {{ pluck .ListItems.currentRepeatResource .ListItems.cstorNodeUidList.nodesUid |first | splitList " " | last}}
         app: cstor-pool
     spec:
       replicas: 1
@@ -260,8 +260,8 @@ data:
     metadata:
       name: {{ pluck .ListItems.currentRepeatResource .ListItems.cstorNodeUidList.nodesUid |first | splitList " " | last }}
       labels:
-        openebs.io/storagepoolclaim: {{.Storagepool.owner}}
-        openebs.io/cstorpool: {{ pluck .ListItems.currentRepeatResource .ListItems.cstorNodeUidList.nodesUid |first | splitList " " | last}}
+        openebs.io/storage-pool-claim: {{.Storagepool.owner}}
+        openebs.io/cstor-pool: {{ pluck .ListItems.currentRepeatResource .ListItems.cstorNodeUidList.nodesUid |first | splitList " " | last}}
         kubernetes.io/hostname: {{ .ListItems.currentRepeatResource }}
     spec:
       disks:
@@ -302,7 +302,7 @@ data:
     kind: CStorPool
     action: list
     options: |-
-      labelSelector: openebs.io/storagepoolclaim={{.Storagepool.owner}}
+      labelSelector: openebs.io/storage-pool-claim={{.Storagepool.owner}}
   post: |
     {{- $csps := jsonpath .JsonResult `{range .items[*]}pkey=csps,{@.metadata.name}=;{end}` | trim | default "" | splitList ";" -}}
     {{- $csps | notFoundErr "cstor pool cr not found" | saveIf "deletelistcsp.notFoundErr" .TaskResult | noop -}}
@@ -336,7 +336,7 @@ data:
     kind: Deployment
     action: list
     options: |-
-      labelSelector: openebs.io/storagepoolclaim={{.Storagepool.owner}}
+      labelSelector: openebs.io/storage-pool-claim={{.Storagepool.owner}}
   post: |
     {{- $csds := jsonpath .JsonResult `{range .items[*]}pkey=csds,{@.metadata.name}=;{end}` | trim | default "" | splitList ";" -}}
     {{- $csds | notFoundErr "cstor pool deployment not found" | saveIf "cstorpoollistdeploy.notFoundErr" .TaskResult | noop -}}
@@ -370,7 +370,7 @@ data:
     kind: StoragePool
     action: list
     options: |-
-      labelSelector: openebs.io/storagepoolclaim={{.Storagepool.owner}}
+      labelSelector: openebs.io/storage-pool-claim={{.Storagepool.owner}}
   post: |
     {{- $sps := jsonpath .JsonResult `{range .items[*]}pkey=sps,{@.metadata.name}="";{end}` | trim | default "" | splitList ";" -}}
     {{- $sps | notFoundErr "storge pool cr not found" | saveIf "deletelistcsp.notFoundErr" .TaskResult | noop -}}
@@ -472,7 +472,7 @@ data:
     kind: CStorPool
     action: list
     options: |-
-      labelSelector: openebs.io/storagepoolclaim={{ .Config.StoragePoolClaim.value }}
+      labelSelector: openebs.io/storage-pool-claim={{ .Config.StoragePoolClaim.value }}
   post: |
     {{/*
     Check if enough online pools are present to create replicas.
@@ -509,6 +509,7 @@ data:
         openebs.io/controller-service: cstor-controller-svc
         openebs.io/storage-engine-type: cstor
         openebs.io/pv: {{ .Volume.owner }}
+        openebs.io/persistent-volume: {{ .Volume.owner }}
       name: {{ .Volume.owner }}
     spec:
       ports:
@@ -523,6 +524,7 @@ data:
       selector:
         openebs.io/controller: cstor-controller
         openebs.io/pv: {{ .Volume.owner }}
+        openebs.io/persistent-volume: {{ .Volume.owner }}
         app: cstor-volume-manager
 ---
 # runTask to create cStorVolume
@@ -549,6 +551,7 @@ data:
       name: {{ .Volume.owner }}
       labels:
         openebs.io/pv: {{ .Volume.owner }}
+        openebs.io/persistent-volume: {{ .Volume.owner }}
     spec:
       targetIP: {{ .TaskResult.cvolcreateputsvc.clusterIP }}
       capacity: {{ .Volume.capacity }}
@@ -587,7 +590,9 @@ data:
         openebs.io/controller: cstor-controller
         openebs/controller: cstor-controller
         openebs.io/pv: {{ .Volume.owner }}
+        openebs.io/persistent-volume: {{ .Volume.owner }}
         openebs.io/pvc: {{ .Volume.pvc }}
+        openebs.io/persistent-volume-claim: {{ .Volume.pvc }}
       annotations:
         {{- if eq $isMonitor "true" }}
         openebs.io/volume-monitor: "true"
@@ -602,6 +607,7 @@ data:
           {{- end}}
           openebs.io/controller: cstor-controller
           openebs.io/pv: {{ .Volume.owner }}
+          openebs.io/persistent-volume: {{ .Volume.owner }}
           app: cstor-volume-manager
       template:
         metadata:
@@ -611,7 +617,7 @@ data:
             {{- end}}
             openebs.io/controller: cstor-controller
             openebs.io/pv: {{ .Volume.owner }}
-            k8s.io/pvc: {{ .Volume.pvc }}
+            openebs.io/persistent-volume: {{ .Volume.owner }}
             app: cstor-volume-manager
         spec:
           serviceAccountName: openebs-maya-operator
@@ -711,8 +717,8 @@ data:
         cstorpool.openebs.io/name: {{ pluck .ListItems.currentRepeatResource .ListItems.cvolPoolList.pools | first }}
         cstorpool.openebs.io/uid: {{ .ListItems.currentRepeatResource }}
         cstorvolume.openebs.io/name: {{ .Volume.owner }}
-        cstorvolumereplica.openebs.io/pvc-name: {{ .Volume.pvc }}
         openebs.io/pv: {{ .Volume.owner }}
+        openebs.io/persistent-volume: {{ .Volume.owner }}
       finalizers: ["cstorvolumereplica.openebs.io/finalizer"]
     spec:
       capacity: {{ .Volume.capacity }}
@@ -892,7 +898,7 @@ data:
     kind: Service
     action: list
     options: |-
-      labelSelector: openebs.io/controller-service=cstor-controller-svc,openebs.io/pv={{ .Volume.owner }}
+      labelSelector: openebs.io/controller-service=cstor-controller-svc,openebs.io/persistent-volume={{ .Volume.owner }}
   post: |
     {{- jsonpath .JsonResult `{.items[*].metadata.name}` | trim | saveAs "readlistsvc.items" .TaskResult | noop -}}
     {{- .TaskResult.readlistsvc.items | notFoundErr "controller service not found" | saveIf "readlistsvc.notFoundErr" .TaskResult | noop -}}
@@ -912,7 +918,7 @@ data:
     kind: CStorVolumeReplica
     action: list
     options: |-
-      labelSelector: openebs.io/pv={{ .Volume.owner }}
+      labelSelector: openebs.io/persistent-volume={{ .Volume.owner }}
   post: |
     {{- jsonpath .JsonResult `{.items[*].metadata.name}` | trim | saveAs "readlistrep.items" .TaskResult | noop -}}
     {{- .TaskResult.readlistrep.items | notFoundErr "replicas not found" | saveIf "readlistrep.notFoundErr" .TaskResult | noop -}}
@@ -932,7 +938,7 @@ data:
     action: list
     id: readlistctrl
     options: |-
-      labelSelector: openebs.io/controller=cstor-controller,openebs.io/pv={{ .Volume.owner }}
+      labelSelector: openebs.io/controller=cstor-controller,openebs.io/persistent-volume={{ .Volume.owner }}
   post: |
     {{- jsonpath .JsonResult `{.items[*].metadata.name}` | trim | saveAs "readlistctrl.items" .TaskResult | noop -}}
     {{- .TaskResult.readlistctrl.items | notFoundErr "controller pod not found" | saveIf "readlistctrl.notFoundErr" .TaskResult | noop -}}
@@ -989,7 +995,7 @@ data:
     kind: CStorVolume
     action: list
     options: |-
-      labelSelector: openebs.io/pv={{ .Volume.owner }}
+      labelSelector: openebs.io/persistent-volume={{ .Volume.owner }}
   post: |
     {{- jsonpath .JsonResult `{.items[*].metadata.name}` | trim | saveAs "deletelistcsv.names" .TaskResult | noop -}}
     {{- .TaskResult.deletelistcsv.names | notFoundErr "cstor volume not found" | saveIf "deletelistcsv.notFoundErr" .TaskResult | noop -}}
@@ -1009,7 +1015,7 @@ data:
     kind: Service
     action: list
     options: |-
-      labelSelector: openebs.io/controller-service=cstor-controller-svc,openebs.io/pv={{ .Volume.owner }}
+      labelSelector: openebs.io/controller-service=cstor-controller-svc,openebs.io/persistent-volume={{ .Volume.owner }}
   post: |
     {{/*
     Save the name of the service. Error if service is missing or more
@@ -1033,7 +1039,7 @@ data:
     kind: Deployment
     action: list
     options: |-
-      labelSelector: openebs.io/controller=cstor-controller,openebs.io/pv={{ .Volume.owner }}
+      labelSelector: openebs.io/controller=cstor-controller,openebs.io/persistent-volume={{ .Volume.owner }}
   post: |
     {{- jsonpath .JsonResult `{.items[*].metadata.name}` | trim | saveAs "deletelistctrl.names" .TaskResult | noop -}}
     {{- .TaskResult.deletelistctrl.names | notFoundErr "controller deployment not found" | saveIf "deletelistctrl.notFoundErr" .TaskResult | noop -}}
@@ -1053,7 +1059,7 @@ data:
     kind: CStorVolumeReplica
     action: list
     options: |-
-      labelSelector: openebs.io/pv={{ .Volume.owner }}
+      labelSelector: openebs.io/persistent-volume={{ .Volume.owner }}
   post: |
     {{/*
     List the names of the cstorvolumereplicas. Error if
