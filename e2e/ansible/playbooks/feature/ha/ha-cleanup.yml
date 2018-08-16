@@ -19,3 +19,10 @@
   register: result
   delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
+- name: Remove test artifacts
+  file:
+    path: "{{ result_kube_home.stdout }}/{{ item }}"
+    state: absent
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+  with_items:
+    - "{{ pod_yaml_alias }}"
