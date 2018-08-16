@@ -588,7 +588,6 @@ data:
         app: cstor-volume-manager
         openebs.io/storage-engine-type: cstor
         openebs.io/controller: cstor-controller
-        openebs/controller: cstor-controller
         openebs.io/pv: {{ .Volume.owner }}
         openebs.io/persistent-volume: {{ .Volume.owner }}
         openebs.io/pvc: {{ .Volume.pvc }}
