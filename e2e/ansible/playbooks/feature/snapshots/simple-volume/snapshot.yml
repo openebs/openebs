@@ -158,7 +158,7 @@
            executable: /bin/bash
          register: result_snap
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-         failed_when: "'Created' not in result_snap.stdout"
+         failed_when: "'created' not in result_snap.stdout"
 
        - name: Confirm successful snapshot creation
          shell: >
