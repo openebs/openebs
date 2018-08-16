@@ -64,8 +64,8 @@
        - name: 3) Replace the replica count in storage classes yaml
          replace:
            path: "{{ create_sc }}"
-           regexp: 'openebs.io/jiva-replica-count: "3"'
-           replace: 'openebs.io/jiva-replica-count: "{{ (node_count) |int-1}}"'
+           regexp: '      - name: ReplicaCount\n        value: "3"'
+           replace: '      - name: ReplicaCount\n        value: "{{ (node_count) |int-1 }}"'
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
        - name: 3a) Delete the existing storage class and create new one

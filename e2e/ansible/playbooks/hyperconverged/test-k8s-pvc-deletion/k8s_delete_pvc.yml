@@ -52,8 +52,8 @@
         - name: 3a) Replace the replica count in storage class file
           replace:
             path: "{{ result_kube_home.stdout }}/{{ sc_def }}"
-            regexp: 'openebs.io/jiva-replica-count: "3"'
-            replace: 'openebs.io/jiva-replica-count: "{{ (node_count) |int+1}}"'
+            regexp: '      - name: ReplicaCount\n        value: "3"'
+            replace: '      - name: ReplicaCount\n        value: "{{ (node_count) |int+1 }}"'
           delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
 
         - name: 4) Check whether maya-apiserver pod is deployed
@@ -166,7 +166,7 @@
             executable: /bin/bash
           register: pods
           until: pods.stdout|int == 0
-          delay: 120
+          delay: 30
           retries: 10
           with_items:
             - ctrl
