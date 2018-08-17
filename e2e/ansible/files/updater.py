@@ -7,7 +7,6 @@ def get_testrail_client(args):
     testrail_username = args['testrail_username']
     testrail_password = args['testrail_password']
     client = testrail.APIClient('https://cloudbyte.testrail.com')
-    # client = testrail.APIClient("https://openebs.testrail.io")
     client.user = testrail_username
     client.password = testrail_password
     return client

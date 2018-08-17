@@ -10,7 +10,6 @@ import sys
 
 def get_client(args):
     client = testrail.APIClient("https://cloudbyte.testrail.com")
-    # client = testrail.APIClient("https://openebs.testrail.io")
     client.user, client.password = args['testrail_username'], args["testrail_password"]
     return client
 
@@ -127,6 +126,11 @@ def create_plan_resources(args):
             "hosts": "localhost"
         },
     ]
+
+    ci_info = parse_yaml(get_file_data('../ci_config.yaml'))
+    ci_yaml=[]
+    for item in ci_info['include_before']:
+        ci_yaml.append({'include': item})
  
     if 'CstorProductionTestSuite' in yaml_info and yaml_info['CstorProductionTestSuite'] is not None:
         cstor_plan_resources+=yaml_info['CstorProductionTestSuite']
@@ -154,28 +158,30 @@ def create_plan_resources(args):
                 suite_run_id, case_resource = add_suites(map_src_id["cstor_plan_run_id"], suite_name, client, suite_info, project_id)
                 map_src_id['cStor'][suite_name]=suite_run_id
                 case_resources+=case_resource
+        
+        if len(case_resources)>0:
+            cstor_test_yaml += yaml_header
 
-        cstor_test_yaml += yaml_header
+            for case_resource in case_resources:
+                if case_resource['path'] is None or len(case_resource['path'])<=0:
+                    continue
+                cstor_test_yaml.append({'include': case_resource['path'], 'vars': {'status_id':S(''),'testname':S(''),'flag':S(''),'cflag':S(''),'storage_engine': S('cStor'),'status': S('')}})
+                cstor_test_yaml.append({'hosts': 'localhost',
+                    'tasks': [{'include_tasks': S('{{utils_path}}/update-status.yml'),
+                    'vars': {'c_status': S('{{ cflag }}'),
+                        'case_id': case_resource['case_id'],
+                        'st_id': S('{{ status_id }}'),
+                        'suite_id': case_resource['suite_id'],
+                        't_status': S('{{ flag }}'),
+                        't_name': S('{{ testname }}'),
+                        'storage_engine': S('cStor'),
+                        'color': S('{{ status }}')
+                        }}]})
 
-        for case_resource in case_resources:
-            if case_resource['path'] is None or len(case_resource['path'])<=0:
-                continue
-            cstor_test_yaml.append({'include': case_resource['path'], 'vars': {'status_id':S(''),'testname':S(''),'flag':S(''),'cflag':S(''),'storage_engine': S('cStor'),'status': S('')}})
-            cstor_test_yaml.append({'hosts': 'localhost',
-                'tasks': [{'include_tasks': S('{{utils_path}}/update-status.yml'),
-                'vars': {'c_status': S('{{ cflag }}'),
-                      'case_id': case_resource['case_id'],
-                      'st_id': S('{{ status_id }}'),
-                      'suite_id': case_resource['suite_id'],
-                      't_status': S('{{ flag }}'),
-                      't_name': S('{{ testname }}'),
-                      'storage_engine': S('cStor'),
-                      'color': S('{{ status }}')
-                      }}]})
-
-        cstor_test_yaml += yaml_footer
-        tyaml= ruamel.yaml.YAML()
-        tyaml.dump(cstor_test_yaml,stream=open("../cstor-run-tests.yml",'w+'))
+            cstor_test_yaml += yaml_footer
+            tyaml= ruamel.yaml.YAML()
+            tyaml.dump(cstor_test_yaml,stream=open("../cstor-run-tests.yml",'w+'))
+            ci_yaml.append({'include': 'cstor-run-tests.yml'})
         # _, err = write_file("../cstor-run-tests.yml", tyaml.dump(cstor_test_yaml, sys.stdout.write))
         # if err == -1:
         #     exit(err)
@@ -192,43 +198,41 @@ def create_plan_resources(args):
                 suite_run_id, case_resource = add_suites(map_src_id["jiva_plan_run_id"], suite_name, client, suite_info, project_id)
                 map_src_id['jiva'][suite_name]=suite_run_id
                 case_resources += case_resource
-        
-        jiva_test_yaml += yaml_header
-        
-        for case_resource in case_resources:
-            if case_resource['path'] is None or len(case_resource['path'])<=0:
-                continue
-            jiva_test_yaml.append({'include': case_resource['path'],  'vars': {'status_id':S(''),'testname':S(''),'flag':S(''),'cflag':S(''),'storage_engine': S('jiva'),'status': S('')}})
-            jiva_test_yaml.append({'hosts': 'localhost',
-                'tasks': [{'include_tasks': S('{{utils_path}}/update-status.yml'),
-                'vars': {'c_status': S('{{ cflag }}'),
-                      'case_id': case_resource['case_id'],
-                      'st_id': S('{{ status_id }}'),
-                      'suite_id': case_resource['suite_id'],
-                      't_status': S('{{ flag }}'),
-                      't_name': S('{{ testname }}'),
-                      'storage_engine': S('jiva'),
-                      'color': S('{{ status }}')
-                      }}]})
 
-        jiva_test_yaml += yaml_footer
+        if len(case_resources)>0:
+            jiva_test_yaml += yaml_header
+            
+            for case_resource in case_resources:
+                if case_resource['path'] is None or len(case_resource['path'])<=0:
+                    continue
+                jiva_test_yaml.append({'include': case_resource['path'],  'vars': {'status_id':S(''),'testname':S(''),'flag':S(''),'cflag':S(''),'storage_engine': S('jiva'),'status': S('')}})
+                jiva_test_yaml.append({'hosts': 'localhost',
+                    'tasks': [{'include_tasks': S('{{utils_path}}/update-status.yml'),
+                    'vars': {'c_status': S('{{ cflag }}'),
+                        'case_id': case_resource['case_id'],
+                        'st_id': S('{{ status_id }}'),
+                        'suite_id': case_resource['suite_id'],
+                        't_status': S('{{ flag }}'),
+                        't_name': S('{{ testname }}'),
+                        'storage_engine': S('jiva'),
+                        'color': S('{{ status }}')
+                        }}]})
 
-        tyaml= ruamel.yaml.YAML()
-        tyaml.dump(cstor_test_yaml,stream=open("../jiva-run-tests.yml",'w+'))
-        # _, err = write_file("../jiva-run-tests.yml", yaml.dump(jiva_test_yaml, default_flow_style=False))
-        # if err == -1:
-        #     exit(err)
+            jiva_test_yaml += yaml_footer
+
+            tyaml= ruamel.yaml.YAML()
+            tyaml.dump(jiva_test_yaml,stream=open("../jiva-run-tests.yml",'w+'))
+            ci_yaml.append({'include': 'jiva-run-tests.yml'})
+            # _, err = write_file("../jiva-run-tests.yml", yaml.dump(jiva_test_yaml, default_flow_style=False))
+            # if err == -1:
+            #     exit(err)
 
         print("Jiva plan created")
     else:
         print("Jiva plan creation failed")
     
-    ci_info = parse_yaml(get_file_data('../ci_config.yaml'))
-    ci_yaml=[]
-    for item in ci_info['include_before']:
-        ci_yaml.append({'include': item})
-    ci_yaml.append({'include': 'jiva-run-tests.yml'})
-    ci_yaml.append({'include': 'cstor-run-tests.yml'})
+
+    
     for item in ci_info['include_after']:
         ci_yaml.append({'include': item})
     _, err = write_file("../ci.yml", yaml.dump(ci_yaml, default_flow_style=False))
