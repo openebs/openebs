@@ -15,7 +15,7 @@
   retries: 5
 
 - name: Delete storage class
-  shell: source ~/.profile; kubectl delete -f "{{ create_sc }}"
+  shell: source ~/.profile; kubectl delete -f "{{ result_kube_home.stdout }}/{{ create_sc }}"
   args:
     executable: /bin/bash
   register: sc_out
@@ -27,13 +27,15 @@
 
 - name: Replace the replica count in openebs-storageclasses yaml
   replace:
-    path: "{{ create_sc }}"
+    path: "{{ result_kube_home.stdout }}/{{ create_sc }}"
     regexp: '      - name: ReplicaCount\n        value: "{{ (node_count) |int-1 }}"'
-    replace: '      - name: ReplicaCount\n        value: "{{ (node_count |int) }}"'
+    replace: '      - name: ReplicaCount\n        value: "3"'
   delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
+# Creating openebs-standard storage class with default replica count.
+
 - name: Apply storage class yaml
-  shell: source ~/.profile; kubectl apply -f "{{ create_sc }}"
+  shell: source ~/.profile; kubectl apply -f "{{ result_kube_home.stdout }}/{{ create_sc }}"
   args:
     executable: /bin/bash
   register: sc_out
