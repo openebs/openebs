@@ -1,6 +1,6 @@
 ---
 - name: Update Testrail
-  shell: source ~/.profile; python3 {{ inventory_dir | dirname }}/files/updater.py -tuser {{ testrail_user }} -tpass {{ testrail_password }} -sid {{ suite_id }} -cid {{ case_id }} -stid {{ st_id }}
+  shell: source ~/.profile; python3 {{ inventory_dir | dirname }}/files/updater.py -tuser {{ testrail_user }} -tpass {{ testrail_password }} -sid {{ suite_id }} -cid {{ case_id }} -stid {{ st_id }} -et {{ storage_engine }}
   args:
     executable: /bin/bash
   register: result
