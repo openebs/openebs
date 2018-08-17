@@ -1,11 +1,7 @@
-TestRailProjectID: 1
-CommonTestSuite:
-    - 21:
-    - 22:
-JivaTestSuite:
-    - 18:
-        Exclude:
-            - 7
-CstorTestSuite:
-    - 18:
-        Exclude:
+TestRailProjectID: 5
+JivaDevelopmentTestSuite:
+JivaProductionTestSuite:
+    - 826:
+CstorDevelopmentTestSuite:
+    - 826:
+CstorProductionTestSuite:

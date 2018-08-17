@@ -5,6 +5,8 @@ import os
 import json
 from pprint import pprint
 from datetime import datetime
+import ruamel.yaml
+import sys
 
 def get_client(args):
     client = testrail.APIClient("https://cloudbyte.testrail.com")
@@ -24,7 +26,7 @@ def write_file(path, content):
 
 def create_test_plan(client, args, storage_engine_type, project_id):
     plan_name = "BUILD_"+ storage_engine_type + "_" + args['build_number'] + "_" + str(datetime.now())[:10]
-    description = "A description"
+    description = "Jenkins logs: http://104.197.185.168:8080/blue/organizations/jenkins/Jiva/detail/Jiva/"+str(args['build_number'])+"/pipeline/\nUsername: test\nPassword:"
     plan = client.send_post('add_plan/'+str(project_id), {'name': plan_name, 'description': description})
     if plan['id'] is None:
         print("Plan creation failed")
@@ -34,13 +36,14 @@ def create_test_plan(client, args, storage_engine_type, project_id):
 def add_suites(plan_id, suite_id, client, suite_info, project_id):
     description = ""
     if suite_info is not None and 'Exclude' in suite_info and suite_info['Exclude'] is not None:
-        ids, paths = [], []
+        ids, case_resources = [], []
         cases = client.send_get('get_cases/'+str(project_id)+'&suite_id=' + str(suite_id))
+        pprint(cases)
         for case in cases:
             if case['id'] in suite_info['Exclude']:
                 continue
             else:
-                paths.append(case['refs'])
+                case_resources.append({'path':case['refs'], 'suite_id':case['suite_id'], 'case_id':case['id']})
                 ids.append(case['id'])
         suite = client.send_post('add_plan_entry/' + str(plan_id),
                                  {'suite_id': suite_id, 'description': description, 'include_all': False,
@@ -48,17 +51,18 @@ def add_suites(plan_id, suite_id, client, suite_info, project_id):
         if suite['id'] is None:
             print("Adding suite failed")
             exit(-1)
-        return suite['runs'][0]['id'], paths
+        return suite['runs'][0]['id'], case_resources
     else:
         cases = client.send_get('get_cases/'+str(project_id)+'&suite_id=' + str(suite_id))
-        paths = []
+        case_resources=[]
         for case in cases:
-            paths.append(case['refs'])
+            case_resources.append({'path':case['refs'], 'suite_id':case['suite_id'], 'case_id':case['id']})
+            
         suite = client.send_post('add_plan_entry/' + str(plan_id), {'suite_id': suite_id, 'description': description})
         if suite['id'] is None:
             print("Adding suite failed")
             exit(-1)
-        return suite['runs'][0]['id'], paths
+        return suite['runs'][0]['id'], case_resources
 
 
 def get_file_data(path):
@@ -108,7 +112,7 @@ def create_plan_resources(args):
                 {
                     "when": "slack_notify | bool and lookup('env','SLACK_TOKEN')",
                     "slack": {
-                        "msg": "TestRail Results : <https://cloudbyte.testrail.com/index.php?/runs/view/"+str(run_id)+"|"+str(run_id)+">",
+                        "msg": "TestRail Results : <https://cloudbyte.testrail.com/index.php?/runs/view/"+str(run_id)+"|"+str(run_id)+">\\nUsername: test@openebs.io\\nPassword: openebs",
                         "token": "{{ lookup('env','SLACK_TOKEN') }}"
                     }
                 },
@@ -124,59 +128,100 @@ def create_plan_resources(args):
         },
     ]
  
-    if yaml_info['CstorTestSuite'] is not None:
-        cstor_plan_resources+=yaml_info['CstorTestSuite']
-    if yaml_info['JivaTestSuite'] is not None:
-        jiva_plan_resources+=yaml_info['JivaTestSuite']
-    if yaml_info['CommonTestSuite'] is not None:
-        cstor_plan_resources+=yaml_info['CommonTestSuite']
-        jiva_plan_resources+=yaml_info['CommonTestSuite']
-    
+    if 'CstorProductionTestSuite' in yaml_info and yaml_info['CstorProductionTestSuite'] is not None:
+        cstor_plan_resources+=yaml_info['CstorProductionTestSuite']
+    else:
+        print('Key: CstorProductionTestSuite not provided. Moving on...')
+    if 'CstorDevelopmentTestSuite' in yaml_info and yaml_info['CstorDevelopmentTestSuite'] is not None:
+        cstor_plan_resources+=yaml_info['CstorDevelopmentTestSuite']
+    else:
+        print('Key: CstorDevelopmentTestSuite not provided. Moving on...')
+    if 'JivaProductionTestSuite' in yaml_info and yaml_info['JivaProductionTestSuite'] is not None:
+        jiva_plan_resources+=yaml_info['JivaProductionTestSuite']
+    else:
+        print('Key: JivaProductionTestSuite not provided. Moving on...')
+    if 'JivaDevelopmentTestSuite' in yaml_info and yaml_info['JivaDevelopmentTestSuite'] is not None:
+        jiva_plan_resources+=yaml_info['JivaDevelopmentTestSuite']
+    else:
+        print('Key: JivaDevelopmentTestSuite not provided. Moving on...')
     print("Creating test plans")
 
     if len(cstor_plan_resources)>0:
-        map_src_id["cstor_plan_run_id"], paths, cstor_test_yaml = create_test_plan(client, args, "CSTOR", project_id), [], []
+        S = ruamel.yaml.scalarstring.DoubleQuotedScalarString
+        map_src_id["cstor_plan_run_id"], case_resources, cstor_test_yaml = create_test_plan(client, args, "CSTOR", project_id), [], []
         for suites in cstor_plan_resources:
             for suite_name, suite_info in suites.items():
-                suite_run_id, tpaths = add_suites(map_src_id["cstor_plan_run_id"], suite_name, client, suite_info, project_id)
+                suite_run_id, case_resource = add_suites(map_src_id["cstor_plan_run_id"], suite_name, client, suite_info, project_id)
                 map_src_id['cStor'][suite_name]=suite_run_id
-                paths+=tpaths
+                case_resources+=case_resource
 
         cstor_test_yaml += yaml_header
-        
-        for path in paths:
-            cstor_test_yaml.append({'include': path, 'vars': {'storage_engine': 'cStor'}}
-            )
+
+        for case_resource in case_resources:
+            if case_resource['path'] is None or len(case_resource['path'])<=0:
+                continue
+            cstor_test_yaml.append({'include': case_resource['path'], 'vars': {'status_id':S(''),'testname':S(''),'flag':S(''),'cflag':S(''),'storage_engine': S('cStor'),'status': S('')}})
+            cstor_test_yaml.append({'hosts': 'localhost',
+                'tasks': [{'include_tasks': S('{{utils_path}}/update-status.yml'),
+                'vars': {'c_status': S('{{ cflag }}'),
+                      'case_id': case_resource['case_id'],
+                      'st_id': S('{{ status_id }}'),
+                      'suite_id': case_resource['suite_id'],
+                      't_status': S('{{ flag }}'),
+                      't_name': S('{{ testname }}'),
+                      'storage_engine': S('cStor'),
+                      'color': S('{{ status }}')
+                      }}]})
 
         cstor_test_yaml += yaml_footer
-        
-        _, err = write_file("../cstor-run-tests.yml", yaml.dump(cstor_test_yaml, default_flow_style=False))
-        if err == -1:
-            exit(err)
+        tyaml= ruamel.yaml.YAML()
+        tyaml.dump(cstor_test_yaml,stream=open("../cstor-run-tests.yml",'w+'))
+        # _, err = write_file("../cstor-run-tests.yml", tyaml.dump(cstor_test_yaml, sys.stdout.write))
+        # if err == -1:
+        #     exit(err)
 
         print("Cstor plan created")
-
+    else:
+        print("Cstor plan creation failed")
     if len(jiva_plan_resources)>0:
-        map_src_id['jiva_plan_run_id'], paths, jiva_test_yaml = create_test_plan(client, args, "JIVA", project_id), [], []
+        S = ruamel.yaml.scalarstring.DoubleQuotedScalarString
+        map_src_id['jiva_plan_run_id'], case_resources, jiva_test_yaml = create_test_plan(client, args, "JIVA", project_id), [], []
         
         for suites in jiva_plan_resources:
             for suite_name, suite_info in suites.items():
-                suite_run_id, tpaths = add_suites(map_src_id["jiva_plan_run_id"], suite_name, client, suite_info, project_id)
+                suite_run_id, case_resource = add_suites(map_src_id["jiva_plan_run_id"], suite_name, client, suite_info, project_id)
                 map_src_id['jiva'][suite_name]=suite_run_id
-                paths += tpaths
+                case_resources += case_resource
         
         jiva_test_yaml += yaml_header
         
-        for path in paths:
-            jiva_test_yaml.append({'include': path,  'vars': {'storage_engine': 'jiva'}})
+        for case_resource in case_resources:
+            if case_resource['path'] is None or len(case_resource['path'])<=0:
+                continue
+            jiva_test_yaml.append({'include': case_resource['path'],  'vars': {'status_id':S(''),'testname':S(''),'flag':S(''),'cflag':S(''),'storage_engine': S('jiva'),'status': S('')}})
+            jiva_test_yaml.append({'hosts': 'localhost',
+                'tasks': [{'include_tasks': S('{{utils_path}}/update-status.yml'),
+                'vars': {'c_status': S('{{ cflag }}'),
+                      'case_id': case_resource['case_id'],
+                      'st_id': S('{{ status_id }}'),
+                      'suite_id': case_resource['suite_id'],
+                      't_status': S('{{ flag }}'),
+                      't_name': S('{{ testname }}'),
+                      'storage_engine': S('jiva'),
+                      'color': S('{{ status }}')
+                      }}]})
 
         jiva_test_yaml += yaml_footer
-        
-        _, err = write_file("../jiva-run-tests.yml", yaml.dump(jiva_test_yaml, default_flow_style=False))
-        if err == -1:
-            exit(err)
+
+        tyaml= ruamel.yaml.YAML()
+        tyaml.dump(cstor_test_yaml,stream=open("../jiva-run-tests.yml",'w+'))
+        # _, err = write_file("../jiva-run-tests.yml", yaml.dump(jiva_test_yaml, default_flow_style=False))
+        # if err == -1:
+        #     exit(err)
 
         print("Jiva plan created")
+    else:
+        print("Jiva plan creation failed")
     
     ci_info = parse_yaml(get_file_data('../ci_config.yaml'))
     ci_yaml=[]
