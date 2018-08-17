@@ -4,5 +4,9 @@ include_before:
  - setup-kubernetes.yml
  - setup-stern.yml
  - setup-openebs.yml
+ - setup-disks.yml
+ - setup-cStorPool.yml
 include_after:
+ - playbooks/deprovision-cvr/deprovision-cvr.yml
+ - delete-disks.yml
  - cleanup-openebs.yml

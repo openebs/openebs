@@ -227,8 +227,8 @@ def create_plan_resources(args):
     ci_yaml=[]
     for item in ci_info['include_before']:
         ci_yaml.append({'include': item})
-    ci_yaml.append({'include': 'cstor-run-tests.yml'})
     ci_yaml.append({'include': 'jiva-run-tests.yml'})
+    ci_yaml.append({'include': 'cstor-run-tests.yml'})
     for item in ci_info['include_after']:
         ci_yaml.append({'include': item})
     _, err = write_file("../ci.yml", yaml.dump(ci_yaml, default_flow_style=False))
