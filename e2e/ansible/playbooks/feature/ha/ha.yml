@@ -229,17 +229,6 @@
                status: delete
                ns: "{{ namespace }}"
 
-           - include_tasks: "{{utils_path}}/update-testrail.yml"
-             vars:
-               user: "{{ testrail_user }}"
-               password: "{{ testrail_password }}"
-               suite_id: "{{ test_suite_id }}"
-               case_id: "{{ test_case_id }}"
-               st_id: "{{ status_id }}"
-
-           - name: Send slack notification
-             slack:
-              token: "{{ lookup('env','SLACK_TOKEN') }}"
-              msg: '{{ ansible_date_time.time }} TEST: {{test_name}}, RESULT: {{ flag }},{{cflag}},{{tflag}}'
-              color: "{{status}}"
-             when: slack_notify | bool and lookup('env','SLACK_TOKEN')
+           - name: Set Test Name as Fact
+             set_fact:
+               testname: "{{ test_name }}"

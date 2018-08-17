@@ -40,7 +40,7 @@
          changed_when: true
 
        - name: Delete storage class
-         shell: source ~/.profile; kubectl delete -f "{{ create_sc }}"
+         shell: source ~/.profile; kubectl delete -f "{{ result_kube_home.stdout }}/{{ create_sc }}"
          args:
            executable: /bin/bash
          register: sc_out
@@ -52,13 +52,13 @@
 
        - name: Replace the replica count in openebs-storageclasses yaml
          replace:
-           path: "{{ create_sc }}"
-           regexp: 'openebs.io/jiva-replica-count: "{{ (node_count) |int-1 }}"'
-           replace: 'openebs.io/jiva-replica-count: "{{ (node_count |int) }}"'
+           path: "{{ result_kube_home.stdout }}/{{ create_sc }}"
+           regexp: '      - name: ReplicaCount\n        value: "2"'
+           replace: '      - name: ReplicaCount\n        value: "{{ node_count }}"'
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
        - name: Apply storage class yaml
-         shell: source ~/.profile; kubectl apply -f "{{ create_sc }}"
+         shell: source ~/.profile; kubectl apply -f "{{ result_kube_home.stdout }}/{{ create_sc }}"
          args:
            executable: /bin/bash
          register: sc_out
@@ -75,4 +75,5 @@
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
          with_items:
            - "{{percona_files}}"
+           - "{{ create_sc }}"
 

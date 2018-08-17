@@ -5,11 +5,21 @@ metadata:
   annotations:
     cas.openebs.io/create-volume-template: jiva-volume-create-default-0.7.0
     cas.openebs.io/delete-volume-template: jiva-volume-delete-default-0.7.0
-    cas.openebs.io/read-volume-template: jiva-volume-read-default-0.7.0  
+    cas.openebs.io/read-volume-template: jiva-volume-read-default-0.7.0
+    cas.openebs.io/config: |
+      - name: ControllerImage
+        value: openebs/jiva:0.6.0
+      - name: ReplicaImage
+        value: openebs/jiva:0.6.0
+      - name: VolumeMonitorImage
+        value: openebs/m-exporter:ci
+      - name: ReplicaCount
+        value: "3"
+      - name: StoragePool
+        value: default
 provisioner: openebs.io/provisioner-iscsi
 parameters:
   openebs.io/storage-pool: "default"
   openebs.io/jiva-replica-count: "3"
   openebs.io/volume-monitor: "true"
   openebs.io/capacity: 5G
-
