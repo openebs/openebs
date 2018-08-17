@@ -5,27 +5,27 @@ metadata:
   name: cstor-pool-create-default-0.7.0
 spec:
   defaultConfig:
-  # CstorPoolImage is the container image that executes zpool replication and 
+  # CstorPoolImage is the container image that executes zpool replication and
   # communicates with cstor iscsi target
   - name: CstorPoolImage
     value: openebs/cstor-pool:ci
-  # CstorPoolMgmtImage runs cstor pool and cstor volume replica related CRUD 
+  # CstorPoolMgmtImage runs cstor pool and cstor volume replica related CRUD
   # operations
   - name: CstorPoolMgmtImage
     value: openebs/cstor-pool-mgmt:ci
-  # HostPathType is a hostPath volume i.e. mounts a file or directory from the 
-  # host node’s filesystem into a Pod. 'DirectoryOrCreate' value  ensures 
+  # HostPathType is a hostPath volume i.e. mounts a file or directory from the
+  # host node’s filesystem into a Pod. 'DirectoryOrCreate' value  ensures
   # nothing exists at the given path i.e. an empty directory will be created.
   - name: HostPathType
     value: DirectoryOrCreate
-  # RunNamespace is the namespace where namespaced resources related to pool 
+  # RunNamespace is the namespace where namespaced resources related to pool
   # will be placed
   - name: RunNamespace
     value: openebs
   taskNamespace: openebs
   run:
     tasks:
-    # Following are the list of run tasks executed in this order to 
+    # Following are the list of run tasks executed in this order to
     # create a cstor storage pool
     - cstor-pool-create-listdisk-default-0.7.0
     - cstor-pool-create-listnode-default-0.7.0
@@ -194,7 +194,7 @@ data:
               mountPath: /tmp
             - name: udev
               mountPath: /run/udev
-              # To avoid clash between terminating and restarting pod 
+              # To avoid clash between terminating and restarting pod
               # in case older zrepl gets deleted faster, we keep initial delay
             lifecycle:
               postStart:
@@ -1277,9 +1277,9 @@ data:
   meta: |
     {{- $nss := .Volume.runNamespace | default "" | splitList ", " -}}
     id: listlistsvc
-    repeatWith: 
+    repeatWith:
       metas:
-      {{- range $k, $ns := $nss }} 
+      {{- range $k, $ns := $nss }}
       - runNamespace: {{ $ns }}
       {{- end }}
     apiVersion: v1
@@ -1300,9 +1300,9 @@ data:
   meta: |
     {{- $nss := .Volume.runNamespace | default "" | splitList ", " -}}
     id: listlistctrl
-    repeatWith: 
-      metas: 
-      {{- range $k, $ns := $nss }} 
+    repeatWith:
+      metas:
+      {{- range $k, $ns := $nss }}
       - runNamespace: {{ $ns }}
       {{- end }}
     apiVersion: v1
@@ -1323,9 +1323,9 @@ data:
   meta: |
     {{- $nss := .Volume.runNamespace | default "" | splitList ", " -}}
     id: listlistrep
-    repeatWith: 
-      metas: 
-      {{- range $k, $ns := $nss }} 
+    repeatWith:
+      metas:
+      {{- range $k, $ns := $nss }}
       - runNamespace: {{ $ns }}
       {{- end }}
     apiVersion: v1
@@ -1358,6 +1358,7 @@ data:
     {{- $controllerStatus := pluck "controllerStatus" $map | first }}
     {{- $replicaIP := pluck "replicaIP" $map | first }}
     {{- $replicaStatus := pluck "replicaStatus" $map | first }}
+    {{- $replicaName := pluck "replicaName" $map | first }}
     {{- $name := $pkey | splitList "/" | last }}
     {{- $ns := $pkey | splitList "/" | first }}
       - kind: CASVolume
@@ -1366,17 +1367,22 @@ data:
           name: {{ $name }}
           namespace: {{ $ns }}
           annotations:
-            vsm.openebs.io/controller-ips: {{ $controllerIP }}
-            vsm.openebs.io/cluster-ips: {{ $clusterIP }}
-            vsm.openebs.io/iqn: iqn.2016-09.com.openebs.jiva:{{ $name }}
-            vsm.openebs.io/replica-count: {{ $replicaIP | default "" | splitList ", " | len }}
-            vsm.openebs.io/volume-size: {{ $capacity }}
-            vsm.openebs.io/replica-ips: {{ $replicaIP }}
-            vsm.openebs.io/replica-status: {{ $replicaStatus | replace "true" "running" | replace "false" "notready" }}
-            vsm.openebs.io/controller-status: {{ $controllerStatus | replace "true" "running" | replace "false" "notready" | replace " " "," }}
-            vsm.openebs.io/targetportals: {{ $clusterIP }}:3260
+            openebs.io/controller-ips: {{ $controllerIP }}
+            openebs.io/cluster-ips: {{ $clusterIP }}
+            openebs.io/iqn: iqn.2016-09.com.openebs.jiva:{{ $name }}
+            openebs.io/replica-count: {{ $replicaIP | default "" | splitList ", " | len }}
+            openebs.io/volume-size: {{ $capacity }}
+            openebs.io/replica-ips: {{ $replicaIP }}
+            openebs.io/replica-status: {{ $replicaStatus | replace "true" "running" | replace "false" "notready" }}
+            openebs.io/controller-status: {{ $controllerStatus | replace "true" "running" | replace "false" "notready" | replace " " "," }}
+            openebs.io/targetportals: {{ $clusterIP }}:3260
         spec:
           capacity: {{ $capacity }}
+          iqn: iqn.2016-09.com.openebs.cstor:{{ $name }}
+          targetPortal: {{ $clusterIP }}:3260
+          targetIP: {{ $clusterIP }}
+          targetPort: 3260
+          replicas: {{ $replicaName | default "" | splitList ", " | len }}
     {{- end -}}
 ---
 apiVersion: v1
@@ -1457,20 +1463,22 @@ data:
     metadata:
       name: {{ .Volume.owner }}
       annotations:
-        vsm.openebs.io/controller-ips: {{ .TaskResult.readlistctrl.podIP | default "" | splitList " " | first }}
-        vsm.openebs.io/cluster-ips: {{ .TaskResult.readlistsvc.clusterIP }}
-        vsm.openebs.io/iqn: iqn.2016-09.com.openebs.jiva:{{ .Volume.owner }}
-        vsm.openebs.io/replica-count: {{ .TaskResult.readlistrep.podIP | default "" | splitList " " | len }}
-        vsm.openebs.io/volume-size: {{ $capacity }}
-        vsm.openebs.io/replica-ips: {{ .TaskResult.readlistrep.podIP | default "" | splitList " " | join "," }}
-        vsm.openebs.io/replica-status: {{ .TaskResult.readlistrep.status | default "" | splitList " " | join "," | replace "true" "running" | replace "false" "notready" }}
-        vsm.openebs.io/controller-status: {{ .TaskResult.readlistctrl.status | default "" | splitList " " | join "," | replace "true" "running" | replace "false" "notready" }}
-        vsm.openebs.io/targetportals: {{ .TaskResult.readlistsvc.clusterIP }}:3260
+        openebs.io/controller-ips: {{ .TaskResult.readlistctrl.podIP | default "" | splitList " " | first }}
+        openebs.io/cluster-ips: {{ .TaskResult.readlistsvc.clusterIP }}
+        openebs.io/iqn: iqn.2016-09.com.openebs.jiva:{{ .Volume.owner }}
+        openebs.io/replica-count: {{ .TaskResult.readlistrep.podIP | default "" | splitList " " | len }}
+        openebs.io/volume-size: {{ $capacity }}
+        openebs.io/replica-ips: {{ .TaskResult.readlistrep.podIP | default "" | splitList " " | join "," }}
+        openebs.io/replica-status: {{ .TaskResult.readlistrep.status | default "" | splitList " " | join "," | replace "true" "running" | replace "false" "notready" }}
+        openebs.io/controller-status: {{ .TaskResult.readlistctrl.status | default "" | splitList " " | join "," | replace "true" "running" | replace "false" "notready" }}
+        openebs.io/targetportals: {{ .TaskResult.readlistsvc.clusterIP }}:3260
     spec:
       capacity: {{ $capacity }}
       targetPortal: {{ .TaskResult.readlistsvc.clusterIP }}:3260
       iqn: iqn.2016-09.com.openebs.jiva:{{ .Volume.owner }}
       replicas: {{ .TaskResult.readlistrep.podIP | default "" | splitList " " | len }}
+      targetIP: {{ .TaskResult.readlistsvc.clusterIP }}
+      targetPort: 3260
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -1599,7 +1607,7 @@ data:
                     nodeSelectorTerms:
                     - matchExpressions:
                       {{- range $k, $v := $nodeAffinityRSIEVal }}
-                      - 
+                      -
                       {{- range $kk, $vv := $v }}
                         {{ $kk }}: {{ $vv }}
                       {{- end }}
@@ -1833,7 +1841,7 @@ data:
           tolerations:
           {{- if ne $isEvictionTolerations "false" }}
           {{- range $k, $v := $evictionTolerationsVal }}
-          - 
+          -
           {{- range $kk, $vv := $v }}
             {{ $kk }}: {{ $vv }}
           {{- end }}
