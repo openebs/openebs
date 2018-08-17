@@ -150,45 +150,6 @@ def create_plan_resources(args):
         print('Key: JivaDevelopmentTestSuite not provided. Moving on...')
     print("Creating test plans")
 
-    if len(cstor_plan_resources)>0:
-        S = ruamel.yaml.scalarstring.DoubleQuotedScalarString
-        map_src_id["cstor_plan_run_id"], case_resources, cstor_test_yaml = create_test_plan(client, args, "CSTOR", project_id), [], []
-        for suites in cstor_plan_resources:
-            for suite_name, suite_info in suites.items():
-                suite_run_id, case_resource = add_suites(map_src_id["cstor_plan_run_id"], suite_name, client, suite_info, project_id)
-                map_src_id['cStor'][suite_name]=suite_run_id
-                case_resources+=case_resource
-        
-        if len(case_resources)>0:
-            cstor_test_yaml += yaml_header
-
-            for case_resource in case_resources:
-                if case_resource['path'] is None or len(case_resource['path'])<=0:
-                    continue
-                cstor_test_yaml.append({'include': case_resource['path'], 'vars': {'status_id':S(''),'testname':S(''),'flag':S(''),'cflag':S(''),'storage_engine': S('cStor'),'status': S('')}})
-                cstor_test_yaml.append({'hosts': 'localhost',
-                    'tasks': [{'include_tasks': S('{{utils_path}}/update-status.yml'),
-                    'vars': {'c_status': S('{{ cflag }}'),
-                        'case_id': case_resource['case_id'],
-                        'st_id': S('{{ status_id }}'),
-                        'suite_id': case_resource['suite_id'],
-                        't_status': S('{{ flag }}'),
-                        't_name': S('{{ testname }}'),
-                        'storage_engine': S('cStor'),
-                        'color': S('{{ status }}')
-                        }}]})
-
-            cstor_test_yaml += yaml_footer
-            tyaml= ruamel.yaml.YAML()
-            tyaml.dump(cstor_test_yaml,stream=open("../cstor-run-tests.yml",'w+'))
-            ci_yaml.append({'include': 'cstor-run-tests.yml'})
-        # _, err = write_file("../cstor-run-tests.yml", tyaml.dump(cstor_test_yaml, sys.stdout.write))
-        # if err == -1:
-        #     exit(err)
-
-        print("Cstor plan created")
-    else:
-        print("Cstor plan creation failed")
     if len(jiva_plan_resources)>0:
         S = ruamel.yaml.scalarstring.DoubleQuotedScalarString
         map_src_id['jiva_plan_run_id'], case_resources, jiva_test_yaml = create_test_plan(client, args, "JIVA", project_id), [], []
@@ -230,8 +191,46 @@ def create_plan_resources(args):
         print("Jiva plan created")
     else:
         print("Jiva plan creation failed")
-    
 
+    if len(cstor_plan_resources)>0:
+        S = ruamel.yaml.scalarstring.DoubleQuotedScalarString
+        map_src_id["cstor_plan_run_id"], case_resources, cstor_test_yaml = create_test_plan(client, args, "CSTOR", project_id), [], []
+        for suites in cstor_plan_resources:
+            for suite_name, suite_info in suites.items():
+                suite_run_id, case_resource = add_suites(map_src_id["cstor_plan_run_id"], suite_name, client, suite_info, project_id)
+                map_src_id['cStor'][suite_name]=suite_run_id
+                case_resources+=case_resource
+        
+        if len(case_resources)>0:
+            cstor_test_yaml += yaml_header
+
+            for case_resource in case_resources:
+                if case_resource['path'] is None or len(case_resource['path'])<=0:
+                    continue
+                cstor_test_yaml.append({'include': case_resource['path'], 'vars': {'status_id':S(''),'testname':S(''),'flag':S(''),'cflag':S(''),'storage_engine': S('cStor'),'status': S('')}})
+                cstor_test_yaml.append({'hosts': 'localhost',
+                    'tasks': [{'include_tasks': S('{{utils_path}}/update-status.yml'),
+                    'vars': {'c_status': S('{{ cflag }}'),
+                        'case_id': case_resource['case_id'],
+                        'st_id': S('{{ status_id }}'),
+                        'suite_id': case_resource['suite_id'],
+                        't_status': S('{{ flag }}'),
+                        't_name': S('{{ testname }}'),
+                        'storage_engine': S('cStor'),
+                        'color': S('{{ status }}')
+                        }}]})
+
+            cstor_test_yaml += yaml_footer
+            tyaml= ruamel.yaml.YAML()
+            tyaml.dump(cstor_test_yaml,stream=open("../cstor-run-tests.yml",'w+'))
+            ci_yaml.append({'include': 'cstor-run-tests.yml'})
+        # _, err = write_file("../cstor-run-tests.yml", tyaml.dump(cstor_test_yaml, sys.stdout.write))
+        # if err == -1:
+        #     exit(err)
+
+        print("Cstor plan created")
+    else:
+        print("Cstor plan creation failed")
     
     for item in ci_info['include_after']:
         ci_yaml.append({'include': item})
