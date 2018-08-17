@@ -7,7 +7,7 @@
   delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
 - name: Creating random name for the disks
-  shell: test=(echo $(mktemp)| tr '[:upper:]' '[:lower:]' | cut -d '.' -f 2) && echo ${test::-4}
+  shell: test=$(echo $(mktemp)| tr '[:upper:]' '[:lower:]' | cut -d '.' -f 2) && echo ${test::-4}
   args:
     executable: /bin/bash
   register: name
