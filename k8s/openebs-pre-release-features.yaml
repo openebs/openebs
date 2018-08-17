@@ -508,7 +508,6 @@ data:
       labels:
         openebs.io/target-service: cstor-target-svc
         openebs.io/storage-engine-type: cstor
-        openebs.io/pv: {{ .Volume.owner }}
         openebs.io/persistent-volume: {{ .Volume.owner }}
       name: {{ .Volume.owner }}
     spec:
@@ -523,7 +522,6 @@ data:
         protocol: TCP
       selector:
         openebs.io/target: cstor-target
-        openebs.io/pv: {{ .Volume.owner }}
         openebs.io/persistent-volume: {{ .Volume.owner }}
         app: cstor-volume-manager
 ---
@@ -550,7 +548,6 @@ data:
     metadata:
       name: {{ .Volume.owner }}
       labels:
-        openebs.io/pv: {{ .Volume.owner }}
         openebs.io/persistent-volume: {{ .Volume.owner }}
     spec:
       targetIP: {{ .TaskResult.cvolcreateputsvc.clusterIP }}
@@ -588,9 +585,7 @@ data:
         app: cstor-volume-manager
         openebs.io/storage-engine-type: cstor
         openebs.io/target: cstor-target
-        openebs.io/pv: {{ .Volume.owner }}
         openebs.io/persistent-volume: {{ .Volume.owner }}
-        openebs.io/pvc: {{ .Volume.pvc }}
         openebs.io/persistent-volume-claim: {{ .Volume.pvc }}
       annotations:
         {{- if eq $isMonitor "true" }}
@@ -605,7 +600,6 @@ data:
           monitoring: volume_exporter_prometheus
           {{- end}}
           openebs.io/target: cstor-target
-          openebs.io/pv: {{ .Volume.owner }}
           openebs.io/persistent-volume: {{ .Volume.owner }}
           app: cstor-volume-manager
       template:
@@ -615,7 +609,6 @@ data:
             monitoring: volume_exporter_prometheus
             {{- end}}
             openebs.io/target: cstor-target
-            openebs.io/pv: {{ .Volume.owner }}
             openebs.io/persistent-volume: {{ .Volume.owner }}
             app: cstor-volume-manager
         spec:
@@ -716,7 +709,6 @@ data:
         cstorpool.openebs.io/name: {{ pluck .ListItems.currentRepeatResource .ListItems.cvolPoolList.pools | first }}
         cstorpool.openebs.io/uid: {{ .ListItems.currentRepeatResource }}
         cstorvolume.openebs.io/name: {{ .Volume.owner }}
-        openebs.io/pv: {{ .Volume.owner }}
         openebs.io/persistent-volume: {{ .Volume.owner }}
       finalizers: ["cstorvolumereplica.openebs.io/finalizer"]
     spec:
