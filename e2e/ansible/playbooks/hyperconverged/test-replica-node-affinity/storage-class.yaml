@@ -1,0 +1,32 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  annotations:
+    cas.openebs.io/config: |
+      - name: ControllerImage
+        value: openebs/jiva:ci
+      - name: ReplicaImage
+        value: openebs/jiva:ci
+      - name: VolumeMonitorImage
+        value: openebs/m-exporter:ci
+      - name: ReplicaCount
+        value: "3"
+      - name: StoragePool
+        value: default
+    cas.openebs.io/create-volume-template: jiva-volume-create-default-0.7.0
+    cas.openebs.io/delete-volume-template: jiva-volume-delete-default-0.7.0
+    cas.openebs.io/read-volume-template: jiva-volume-read-default-0.7.0
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"storage.k8s.io/v1","kind":"StorageClass","metadata":{"annotations":{"cas.openebs.io/config":"- name: ControllerImage\n  value: openebs/jiva:ci\n- name: ReplicaImage\n  value: openebs/jiva:ci\n- name: VolumeMonitorImage\n  value: openebs/m-exporter:ci\n- name: ReplicaCount\n  value: \"3\"\n- name: StoragePool\n  value: default\n","cas.openebs.io/create-volume-template":"jiva-volume-create-default-0.7.0","cas.openebs.io/delete-volume-template":"jiva-volume-delete-default-0.7.0","cas.openebs.io/read-volume-template":"jiva-volume-read-default-0.7.0"},"creationTimestamp":"2018-08-17T05:20:19Z","name":"openebs-standard","namespace":"","resourceVersion":"279938","selfLink":"/apis/storage.k8s.io/v1/storageclasses/openebs-standard","uid":"3b8d834d-a1dd-11e8-8267-42010a800feb"},"parameters":{"openebs.io/capacity":"5G","openebs.io/jiva-replica-count":"3","openebs.io/storage-pool":"default","openebs.io/volume-monitor":"true"},"provisioner":"openebs.io/provisioner-iscsi","reclaimPolicy":"Delete"}
+  creationTimestamp: 2018-08-17T06:00:56Z
+  name: openebs-affinity
+  resourceVersion: "283412"
+  selfLink: /apis/storage.k8s.io/v1/storageclasses/openebs-standard
+  uid: e8246f83-a1e2-11e8-8267-42010a800feb
+parameters:
+  openebs.io/capacity: 5G
+  openebs.io/jiva-replica-count: "3"
+  openebs.io/storage-pool: default
+  openebs.io/volume-monitor: "true"
+provisioner: openebs.io/provisioner-iscsi
+reclaimPolicy: Delete

@@ -5,7 +5,7 @@ patch_file: replica_patch.yml
 
 create_sc: storage-class.yaml
 
-percona_link: https://raw.githubusercontent.com/openebs/openebs/master/k8s/demo/percona/demo-percona-mysql-pvc.yaml
+percona: percona.yaml
 
 test_pod_regex: maya*|openebs*|pvc*|percona*|
 
