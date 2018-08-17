@@ -740,11 +740,6 @@ data:
     apiVersion: v1alpha1
     metadata:
       name: {{ .Volume.owner }}
-      annotations:
-        vsm.openebs.io/iqn: iqn.2016-09.com.openebs.cstor:{{ .Volume.owner }}
-        vsm.openebs.io/replica-count: {{ .ListItems.replicaList.replicas | len }}
-        vsm.openebs.io/volume-size: {{ .Volume.capacity }}
-        vsm.openebs.io/targetportals: {{ .TaskResult.cvolcreateputsvc.clusterIP }}:3260
     spec:
       capacity: {{ .Volume.capacity }}
       iqn: iqn.2016-09.com.openebs.cstor:{{ .Volume.owner }}
@@ -860,12 +855,9 @@ data:
         metadata:
           name: {{ $name }}
           annotations:
-            vsm.openebs.io/cluster-ips: {{ $clusterIP }}
-            vsm.openebs.io/iqn: iqn.2016-09.com.openebs.cstor:{{ $name }}
-            vsm.openebs.io/volume-size: {{ $capacity }}
-            vsm.openebs.io/controller-status: {{ $targetStatus | replace "true" "running" | replace "false" "notready" }}
-            vsm.openebs.io/targetportals: {{ $clusterIP }}:3260
-            vsm.openebs.io/replica-count: {{ $replicaName | default "" | splitList ", " | len }}
+            openebs.io/cluster-ips: {{ $clusterIP }}
+            openebs.io/volume-size: {{ $capacity }}
+            openebs.io/controller-status: {{ $targetStatus | replace "true" "running" | replace "false" "notready" }}
         spec:
           capacity: {{ $capacity }}
           iqn: iqn.2016-09.com.openebs.cstor:{{ $name }}
@@ -957,13 +949,8 @@ data:
       name: {{ .Volume.owner }}
       {{/* Render other values into annotation */}}
       annotations:
-        vsm.openebs.io/controller-ips: {{ .TaskResult.readlistctrl.podIP | default "" | splitList " " | first }}
-        vsm.openebs.io/cluster-ips: {{ .TaskResult.readlistsvc.clusterIP }}
-        vsm.openebs.io/iqn: iqn.2016-09.com.openebs.cstor:{{ .Volume.owner }}
-        vsm.openebs.io/replica-count: {{ .TaskResult.readlistrep.capacity | default "" | splitList " " | len }}
-        vsm.openebs.io/volume-size: {{ $capacity }}
-        vsm.openebs.io/controller-status: {{ .TaskResult.readlistctrl.status | default "" | splitList " " | join "," | replace "true" "running" | replace "false" "notready" }}
-        vsm.openebs.io/targetportals: {{ .TaskResult.readlistsvc.clusterIP }}:3260
+        openebs.io/controller-ips: {{ .TaskResult.readlistctrl.podIP | default "" | splitList " " | first }}
+        openebs.io/controller-status: {{ .TaskResult.readlistctrl.status | default "" | splitList " " | join "," | replace "true" "running" | replace "false" "notready" }}
     spec:
       capacity: {{ $capacity }}
       iqn: iqn.2016-09.com.openebs.cstor:{{ .Volume.owner }}
