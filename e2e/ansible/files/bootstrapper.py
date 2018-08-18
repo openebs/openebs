@@ -78,55 +78,6 @@ def create_plan_resources(args):
     client, yaml_info  = get_client(args), parse_yaml(get_file_data("../playbooks/test_suites.yml"))
     map_src_id, run_id, project_id, cstor_plan_resources, jiva_plan_resources = {'cStor':{},'jiva':{}}, 0, yaml_info['TestRailProjectID'], [], []
 
-    yaml_header = [{
-            "tasks": [
-                {
-                    "when": "slack_notify | bool and lookup('env','SLACK_TOKEN')",
-                    "slack": {
-                        "msg": "{{ ansible_date_time.time }} OPENEBS TESTSUITE: STARTED",
-                        "token": "{{ lookup('env','SLACK_TOKEN') }}"
-                    }
-                }
-            ],
-            "hosts": "localhost"
-        },
-        {
-            "include": "pre-check.yml"
-        }
-    ]
-    yaml_footer = [{
-        "include": "pre-check.yml"
-    },
-        {
-            "hosts": "localhost",
-            "roles": [
-                {
-                    "role": "logging",
-                    "when": "logging | bool and deployment_mode == \"hyperconverged\""
-                }
-            ]
-        },
-        {
-            "tasks": [
-                {
-                    "when": "slack_notify | bool and lookup('env','SLACK_TOKEN')",
-                    "slack": {
-                        "msg": "TestRail Results : <https://cloudbyte.testrail.com/index.php?/runs/view/"+str(run_id)+"|"+str(run_id)+">\\nUsername: test@openebs.io\\nPassword: openebs",
-                        "token": "{{ lookup('env','SLACK_TOKEN') }}"
-                    }
-                },
-                {
-                    "when": "slack_notify | bool and lookup('env','SLACK_TOKEN')",
-                    "slack": {
-                        "msg": "{{ ansible_date_time.time }} OPENEBS TESTSUITE: ENDED",
-                        "token": "{{ lookup('env','SLACK_TOKEN') }}"
-                    }
-                }
-            ],
-            "hosts": "localhost"
-        },
-    ]
-
     ci_info = parse_yaml(get_file_data('../ci_config.yaml'))
     ci_yaml=[]
     for item in ci_info['include_before']:
@@ -161,8 +112,23 @@ def create_plan_resources(args):
                 case_resources += case_resource
 
         if len(case_resources)>0:
-            jiva_test_yaml += yaml_header
-            
+            jiva_test_yaml+=[
+                {
+                    "tasks": [
+                        {
+                            "when": "slack_notify | bool and lookup('env','SLACK_TOKEN')",
+                            "slack": {
+                                "msg": "{{ ansible_date_time.time }} OPENEBS TESTSUITE STARTED - JIVA",
+                                "token": "{{ lookup('env','SLACK_TOKEN') }}"
+                            }
+                        }
+                    ],
+                    "hosts": "localhost"
+                },
+                {
+                    "include": "pre-check.yml"
+                }
+            ]
             for case_resource in case_resources:
                 if case_resource['path'] is None or len(case_resource['path'])<=0:
                     continue
@@ -179,7 +145,47 @@ def create_plan_resources(args):
                         'color': S('{{ status }}')
                         }}]})
 
-            jiva_test_yaml += yaml_footer
+            jiva_test_yaml += [
+                    {
+                        "include": "pre-check.yml"
+                    },
+                    {
+                        "hosts": "localhost",
+                        "roles": [
+                            {
+                                "role": "logging",
+                                "when": "logging | bool and deployment_mode == \"hyperconverged\""
+                            }
+                        ]
+                    },
+                    {
+                        "tasks": [
+                            {
+                                "when": "slack_notify | bool and lookup('env','SLACK_TOKEN')",
+                                "slack": {
+                                        "attachments": [
+                                            {
+                                                "title": "JIVA Build #" +str(args['build_number'])+" completed",
+                                                "title_link": "https://cloudbyte.testrail.com/index.php?/runs/view/"+str(map_src_id['jiva_plan_run_id']),
+                                                "text": "*Username:* username\n*Password:* Password",
+                                                "color": "#439FE0",
+                                                "mrkdwn_in": ["text"]
+                                            }
+                                        ],
+                                    "token": "{{ lookup('env','SLACK_TOKEN') }}"
+                                }
+                            },
+                            {
+                                "when": "slack_notify | bool and lookup('env','SLACK_TOKEN')",
+                                "slack": {
+                                    "msg": "{{ ansible_date_time.time }} OPENEBS TESTSUITE: ENDED",
+                                    "token": "{{ lookup('env','SLACK_TOKEN') }}"
+                                }
+                            }
+                        ],
+                        "hosts": "localhost"
+                    }
+                ]
 
             tyaml= ruamel.yaml.YAML()
             tyaml.dump(jiva_test_yaml,stream=open("../jiva-run-tests.yml",'w+'))
@@ -202,7 +208,23 @@ def create_plan_resources(args):
                 case_resources+=case_resource
         
         if len(case_resources)>0:
-            cstor_test_yaml += yaml_header
+            cstor_test_yaml += [
+                {
+                    "tasks": [
+                        {
+                            "when": "slack_notify | bool and lookup('env','SLACK_TOKEN')",
+                            "slack": {
+                                "msg": "{{ ansible_date_time.time }} OPENEBS TESTSUITE STARTED - CSTOR",
+                                "token": "{{ lookup('env','SLACK_TOKEN') }}"
+                            }
+                        }
+                    ],
+                    "hosts": "localhost"
+                },
+                {
+                    "include": "pre-check.yml"
+                }
+            ]
 
             for case_resource in case_resources:
                 if case_resource['path'] is None or len(case_resource['path'])<=0:
@@ -220,7 +242,47 @@ def create_plan_resources(args):
                         'color': S('{{ status }}')
                         }}]})
 
-            cstor_test_yaml += yaml_footer
+            cstor_test_yaml += [
+                    {
+                        "include": "pre-check.yml"
+                    },
+                    {
+                        "hosts": "localhost",
+                        "roles": [
+                            {
+                                "role": "logging",
+                                "when": "logging | bool and deployment_mode == \"hyperconverged\""
+                            }
+                        ]
+                    },
+                    {
+                        "tasks": [
+                            {
+                                "when": "slack_notify | bool and lookup('env','SLACK_TOKEN')",
+                                "slack": {
+                                        "attachments": [
+                                            {
+                                                "title": "CSTOR Build #" +str(args['build_number'])+" completed",
+                                                "title_link": "https://cloudbyte.testrail.com/index.php?/runs/view/"+str(map_src_id['cstor_plan_run_id']),
+                                                "text": "*Username:* test@openebs.io\n*Password:* openebs",
+                                                "color": "#439FE0",
+                                                "mrkdwn_in": ["text"]
+                                            }
+                                        ],
+                                    "token": "{{ lookup('env','SLACK_TOKEN') }}"
+                                }
+                            },
+                            {
+                                "when": "slack_notify | bool and lookup('env','SLACK_TOKEN')",
+                                "slack": {
+                                    "msg": "{{ ansible_date_time.time }} OPENEBS TESTSUITE: ENDED",
+                                    "token": "{{ lookup('env','SLACK_TOKEN') }}"
+                                }
+                            }
+                        ],
+                        "hosts": "localhost"
+                    }
+                ]
             tyaml= ruamel.yaml.YAML()
             tyaml.dump(cstor_test_yaml,stream=open("../cstor-run-tests.yml",'w+'))
             ci_yaml.append({'include': 'cstor-run-tests.yml'})
