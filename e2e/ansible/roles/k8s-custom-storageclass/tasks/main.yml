@@ -15,42 +15,35 @@
     src: default-cstor.j2
     dest: "{{ result_kube_home.stdout }}"
 
-- block:
-     
-    - name: Delete if the StorageClass Already Exists
-      shell: source ~/.profile; kubectl delete -f {{result_kube_home.stdout}}/default-jiva.j2
-      args:
-        executable: /bin/bash
-      ignore_errors: yes
+- name: Delete if the StorageClass Already Exists
+  shell: source ~/.profile; kubectl delete -f {{result_kube_home.stdout}}/default-jiva.j2
+  args:
+    executable: /bin/bash
+  ignore_errors: yes
 
-    - name: Create storage class
-      shell: source ~/.profile; kubectl apply -f {{result_kube_home.stdout}}/default-jiva.j2
-      args:
-        executable: /bin/bash
-      register: sc
-      until: "'created' in sc.stdout"
-      delay: 15
-      retries: 5
+- name: Create storage class
+  shell: source ~/.profile; kubectl apply -f {{result_kube_home.stdout}}/default-jiva.j2
+  args:
+    executable: /bin/bash
+  register: sc
+  until: "'created' in sc.stdout"
+  delay: 15
+  retries: 5
 
-  when: storage_engine == 'jiva'
+- name: Delete if the StorageClass Already Exists
+  shell: source ~/.profile; kubectl delete -f {{result_kube_home.stdout}}/default-cstor.j2
+  args:
+    executable: /bin/bash
+  ignore_errors: yes
 
-- block:
-
-    - name: Delete if the StorageClass Already Exists
-      shell: source ~/.profile; kubectl delete -f {{result_kube_home.stdout}}/default-cstor.j2
-      args:
-        executable: /bin/bash
-      ignore_errors: yes
-
-    - name: Create storage class
-      shell: source ~/.profile; kubectl apply -f {{result_kube_home.stdout}}/default-cstor.j2
-      args:
-        executable: /bin/bash
-      register: sc
-      until: "'created' in sc.stdout"
-      delay: 15
-      retries: 5
-  when: storage_engine == 'cStor'
+- name: Create storage class
+  shell: source ~/.profile; kubectl apply -f {{result_kube_home.stdout}}/default-cstor.j2
+  args:
+    executable: /bin/bash
+  register: sc
+  until: "'created' in sc.stdout"
+  delay: 15
+  retries: 5
 
 - name: Remove the copied templates
   file:
