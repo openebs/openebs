@@ -1,0 +1,33 @@
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  annotations:
+    cas.openebs.io/config: |
+      - name: ControllerImage
+        value: openebs/jiva:ci
+      - name: ReplicaImage
+        value: openebs/jiva:ci
+      - name: VolumeMonitorImage
+        value: openebs/m-exporter:ci
+      - name: ReplicaCount
+        value: "3"
+      - name: StoragePool
+        value: custom-sp
+    cas.openebs.io/create-volume-template: jiva-volume-create-default-0.7.0
+    cas.openebs.io/delete-volume-template: jiva-volume-delete-default-0.7.0
+    cas.openebs.io/read-volume-template: jiva-volume-read-default-0.7.0
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"storage.k8s.io/v1","kind":"StorageClass","metadata":{"annotations":{"cas.openebs.io/config":"- name: ControllerImage\n  value: openebs/jiva:ci\n- name: ReplicaImage\n  value: openebs/jiva:ci\n- name: VolumeMonitorImage\n  value: openebs/m-exporter:ci\n- name: ReplicaCount\n  value: \"3\"\n- name: StoragePool\n  value: default\n","cas.openebs.io/create-volume-template":"jiva-volume-create-default-0.7.0","cas.openebs.io/delete-volume-template":"jiva-volume-delete-default-0.7.0","cas.openebs.io/read-volume-template":"jiva-volume-read-default-0.7.0"},"name":"openebs-standard","namespace":""},"parameters":{"openebs.io/capacity":"5G","openebs.io/jiva-replica-count":"3","openebs.io/storage-pool":"default","openebs.io/volume-monitor":"true"},"provisioner":"openebs.io/provisioner-iscsi"}
+  creationTimestamp: 2018-08-19T06:02:18Z
+  name: storage-pool-sc
+  resourceVersion: "662717"
+  selfLink: /apis/storage.k8s.io/v1/storageclasses/storage-pool-sc
+  uid: 6daeb715-a375-11e8-bdf3-42010a80009b
+parameters:
+  openebs.io/capacity: 5G
+  openebs.io/jiva-replica-count: "3"
+  openebs.io/storage-pool: custom-sp
+  openebs.io/volume-monitor: "true"
+provisioner: openebs.io/provisioner-iscsi
+reclaimPolicy: Delete
