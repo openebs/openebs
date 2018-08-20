@@ -52,8 +52,8 @@
            dest: "{{ result_kube_home.stdout }}"
          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
 
-       - name: Copy custom sorage-class to kubemaster
-         copy:
+       - name: Copy custom storage class template to master
+         template:
            src: "{{ sc }}"
            dest: "{{ result_kube_home.stdout }}"
          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"

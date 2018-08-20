@@ -33,8 +33,8 @@
          args:
            executable: /bin/bash
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-         register: sc
-         until: "custom_sc not in sc.stdout"
+         register: result_sc
+         until: "custom_sc not in result_sc.stdout"
          delay: 30
          retries: 15
 
@@ -51,7 +51,6 @@
            state: absent
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
          with_items:
-             - "{{test_artifacts}}"
-
-
-
+             - "{{openebs_pvc}}"
+             - "{{sc}}"
+             - "{{storage_pool_path_creation}}"
