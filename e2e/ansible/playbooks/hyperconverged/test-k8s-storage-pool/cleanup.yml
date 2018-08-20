@@ -28,7 +28,7 @@
            executable: /bin/bash
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
-       - name: Check the custom storage class is deleted
+       - name: Check if the custom storage class is deleted
          shell: kubectl get sc
          args:
            executable: /bin/bash
