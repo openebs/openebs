@@ -3,7 +3,7 @@
    include_tasks: "{{utils_path}}/vagrant-halt-up-task.yml"
    vars:
      vagrant_op: halt --force
-     nodename: kubemaster-01
+     nodename: kubemaster-01 
    when: status == "down"
 
  - name: Bring up the kubemaster.

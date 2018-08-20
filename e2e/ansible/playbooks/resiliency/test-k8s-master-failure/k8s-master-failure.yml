@@ -81,7 +81,7 @@
        failed_when: "'jenkins-svc' not in result_service.stdout"
 
      - name: 3c) Get the name of the jenkins pod.
-       shell: source ~/.profile; kubectl get pods -n {{namespace}} | grep jenkins | awk {'print $1'}
+       shell: source ~/.profile; kubectl get pods -n {{namespace}} -l app=jenkins-app --no-headers | awk {'print $1'}
        args:
          executable: /bin/bash
        delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
@@ -163,6 +163,7 @@
          executable: /bin/bash
        delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
        register: First_Build
+
         
      - name: Bring down the kubemaster.
        include: vagrant-up-down.yml
@@ -174,7 +175,7 @@
           timeout: 120
 
      - name: 7) Checking the status of kubemaster after kubemaseter halt.
-       shell: vagrant status kubemaster-01 | grep kubemaster-01 |  awk '{ $1="";print}' | cut -d '(' -f1
+       shell: vagrant status  | grep master |  awk '{print $2}'
        args:
          chdir: "{{vagrant_path}}"
          executable: /bin/bash
@@ -191,7 +192,7 @@
           timeout: 120
 
      - name: 7a) Checking the status of kubemaster.
-       shell: vagrant status kubemaster-01 | grep kubemaster-01 |  awk '{ $1="";print}' | cut -d '(' -f1
+       shell: vagrant status  | grep master |  awk '{print $2}'
        args:
          chdir: "{{vagrant_path}}"
          executable: /bin/bash
