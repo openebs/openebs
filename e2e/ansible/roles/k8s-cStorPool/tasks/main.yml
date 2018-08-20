@@ -78,7 +78,7 @@
         executable: /bin/bash
       delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
       register: deploy_list
-      until: "{{poolname}} not in deploy_list.stdout"
+      until: "poolname not in deploy_list.stdout"
       delay: 20
       retries: 10
 
@@ -88,7 +88,7 @@
         executable: /bin/bash
       delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
       register: cstorpool_pods
-      until: "{{poolname}} not in cstorpool_pods.stdout"
+      until: "poolname not in cstorpool_pods.stdout"
       delay: 10
       retries: 20
 

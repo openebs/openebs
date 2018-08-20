@@ -28,6 +28,16 @@
            executable: /bin/bash
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
+       - name: Check the custom storage class is deleted
+         shell: kubectl get sc
+         args:
+           executable: /bin/bash
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+         register: sc
+         until: "custom_sc not in sc.stdout"
+         delay: 30
+         retries: 15
+
        - name: Delete Storage_pool path
          shell: source ~/.profile; kubectl delete -f "{{ storage_pool_path_creation }}"
          args:

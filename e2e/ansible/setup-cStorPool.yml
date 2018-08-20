@@ -2,5 +2,5 @@
 
 - hosts: kubernetes-kubemasters
   roles:
-   - {role: k8s-cStorPool, when: storage_engine == "cStor"}
+   - {role: k8s-cStorPool}
 
