@@ -37,7 +37,7 @@ KM_MEM = ENV['KM_MEM'] || 2048
 KM_CPUS = ENV['KM_CPUS'] || 2
 
 #Specify the number of Kubernetes Minion nodes, CPU/RAM per node. 
-KH_NODES = ENV['KH_NODES'] || 2
+KH_NODES = ENV['KH_NODES'] || 3
 KH_MEM = ENV['KH_MEM'] || 2048
 KH_CPUS = ENV['KH_CPUS'] || 2
 

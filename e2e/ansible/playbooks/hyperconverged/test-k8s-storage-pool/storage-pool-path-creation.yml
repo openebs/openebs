@@ -1,7 +1,7 @@
 apiVersion: openebs.io/v1alpha1
 kind: StoragePool
 metadata:
-    name: default
+    name: custom-sp
     type: hostdir
 spec:
     path: "/mnt/openebs"
