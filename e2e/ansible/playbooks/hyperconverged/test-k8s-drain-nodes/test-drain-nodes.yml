@@ -52,7 +52,7 @@
 
        - name: Replace the replica count in openebs-storageclasses yaml
          replace:
-           path: "{{ create_sc }}"
+           path: "{{ result_kube_home.stdout }}/{{ create_sc }}"
            regexp: '      - name: ReplicaCount\n        value: "3"'
            replace: '      - name: ReplicaCount\n        value: "{{ (node_count) |int-1 }}"'
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
