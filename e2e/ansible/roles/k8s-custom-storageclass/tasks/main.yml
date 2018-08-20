@@ -15,13 +15,13 @@
     src: default-cstor.j2
     dest: "{{ result_kube_home.stdout }}"
 
-- name: Delete if the StorageClass Already Exists
+- name: Delete if the jiva StorageClass Already Exists
   shell: source ~/.profile; kubectl delete -f {{result_kube_home.stdout}}/default-jiva.j2
   args:
     executable: /bin/bash
   ignore_errors: yes
 
-- name: Create storage class
+- name: Create storage class for jiva storage engine.
   shell: source ~/.profile; kubectl apply -f {{result_kube_home.stdout}}/default-jiva.j2
   args:
     executable: /bin/bash
@@ -30,13 +30,13 @@
   delay: 15
   retries: 5
 
-- name: Delete if the StorageClass Already Exists
+- name: Delete if the cstor StorageClass Already Exists
   shell: source ~/.profile; kubectl delete -f {{result_kube_home.stdout}}/default-cstor.j2
   args:
     executable: /bin/bash
   ignore_errors: yes
 
-- name: Create storage class
+- name: Create a storage class for cStor engine
   shell: source ~/.profile; kubectl apply -f {{result_kube_home.stdout}}/default-cstor.j2
   args:
     executable: /bin/bash
