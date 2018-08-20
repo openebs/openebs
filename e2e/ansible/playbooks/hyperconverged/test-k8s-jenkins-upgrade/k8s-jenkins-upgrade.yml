@@ -93,7 +93,7 @@
        failed_when: "'jenkins-svc' not in result_service.stdout"
 
      - name: 3c) Get the name of the pod.
-       shell: source ~/.profile; kubectl get pods -n {{namespace}} | grep jenkins | awk {'print $1'}
+       shell: source ~/.profile; kubectl get pods -n {{namespace}} -l app=jenkins-app --no-headers | awk {'print $1'}
        args: 
          executable: /bin/bash
        delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
@@ -208,14 +208,14 @@
        failed_when: "'jenkins-svc' not in result_service.stdout"
 
      - name: 8) Get the name of the pod.
-       shell: source ~/.profile; kubectl get pods -n {{ namespace }} | grep jenkins | awk {'print $1'}
+       shell: source ~/.profile; kubectl get pods -n {{ namespace }} -l app=jenkins-app --no-headers | awk {'print $1'}
        args:
          executable: /bin/bash
        delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
        register: jenkins_pod_name_2
 
      - name: Verify jenkins-version post upgrade.
-       shell: source ~/.profile; kubectl describe pod {{jenkins_pod_name_2.stdout }} -n {{ namespace }}  | grep Image | awk {'print $2'} 
+       shell: source ~/.profile; kubectl describe pod {{jenkins_pod_name_2.stdout }} -n {{ namespace }}  | grep 'Image:' | awk '{print $2}' 
        args:
          executable: /bin/bash
        delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
@@ -274,7 +274,6 @@
                status: delete
                ns: "{{ namespace }}"
 
-           - name: Set Test Name as Fact
-             set_fact:
-               testname: "{{ test_name }}"
- 
+           - name: Set Test Name as Fact	          
+             set_fact:	            
+               testname: "{{ test_name }}"  
