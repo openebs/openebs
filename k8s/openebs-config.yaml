@@ -49,6 +49,35 @@ spec:
 #      - disk-66a74896b61c60dcdaf7c7a76fde0ebb
 #      - disk-b34b3f97840872da9aa0bac1edc9578a
 ---
+apiVersion: openebs.io/v1alpha1
+kind: StoragePoolClaim
+metadata:
+  name: cstor-pool-default-sparse-0.7.0
+  annotations:
+    cas.openebs.io/create-pool-template: cstor-pool-create-default-0.7.0
+    cas.openebs.io/delete-pool-template: cstor-pool-delete-default-0.7.0
+spec:
+  name: cstor-pool-default-sparse-0.7.0
+  type: sparse
+  maxPools: 3
+  poolSpec:
+    poolType: striped
+    cacheFile: /tmp/pool1.cache
+    overProvisioning: false
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: openebs-cstor-default-sparse-0.7.0
+  annotations:
+    cas.openebs.io/create-volume-template: cstor-volume-create-default-0.7.0
+    cas.openebs.io/delete-volume-template: cstor-volume-delete-default-0.7.0
+    cas.openebs.io/read-volume-template: cstor-volume-read-default-0.7.0
+    cas.openebs.io/config: |
+      - name: StoragePoolClaim
+        value: "cstor-pool-default-sparse-0.7.0"
+provisioner: openebs.io/provisioner-iscsi
+---
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
