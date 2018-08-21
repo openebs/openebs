@@ -123,9 +123,6 @@ def create_plan_resources(args):
                         }
                     ],
                     "hosts": "localhost"
-                },
-                {
-                    "include": "pre-check.yml"
                 }
             ]
 
