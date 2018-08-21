@@ -747,6 +747,7 @@ data:
       targetIP: {{ .TaskResult.cvolcreateputsvc.clusterIP }}
       targetPort: 3260
       replicas: {{ .ListItems.replicaList.replicas | len }}
+      casType: cstor
 ---
 # runTask to list all cstor target deployment services
 apiVersion: v1
@@ -865,6 +866,7 @@ data:
           targetIP: {{ $clusterIP }}
           targetPort: 3260
           replicas: {{ $replicaName | default "" | splitList ", " | len }}
+          casType: cstor
     {{- end -}}
 ---
 # runTask to list cStor target deployment service
@@ -958,6 +960,7 @@ data:
       targetIP: {{ .TaskResult.readlistsvc.clusterIP }}
       targetPort: 3260
       replicas: {{ .TaskResult.readlistrep.capacity | default "" | splitList " " | len }}
+      casType: cstor
 ---
 # runTask to list the cstorvolume that has to be deleted
 apiVersion: v1
@@ -1361,6 +1364,7 @@ data:
             vsm.openebs.io/targetportals: {{ $clusterIP }}:3260
         spec:
           capacity: {{ $capacity }}
+          casType: jiva
     {{- end -}}
 ---
 apiVersion: v1
@@ -1455,6 +1459,7 @@ data:
       targetPortal: {{ .TaskResult.readlistsvc.clusterIP }}:3260
       iqn: iqn.2016-09.com.openebs.jiva:{{ .Volume.owner }}
       replicas: {{ .TaskResult.readlistrep.podIP | default "" | splitList " " | len }}
+      casType: jiva
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -1851,6 +1856,7 @@ data:
       targetPortal: {{ .TaskResult.createputsvc.clusterIP }}:3260
       iqn: iqn.2016-09.com.openebs.jiva:{{ .Volume.owner }}
       replicas: {{ .Config.ReplicaCount.value }}
+      casType: jiva
 ---
 apiVersion: v1
 kind: ConfigMap
