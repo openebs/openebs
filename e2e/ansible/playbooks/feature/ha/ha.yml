@@ -78,62 +78,73 @@
        - name: Confirm pod status is running
          include_tasks: "{{utils_path}}/deploy_check.yml"
          vars:
-          ns: "{{ namespace }}"
-          lkey: name
-          lvalue: percona
+           ns: "{{ namespace }}"
+           lkey: name
+           lvalue: percona
        ###################################################################
        # PREPARE FOR FAULT-INJECTION                                     #
        # (Includes identifying objects to fail, simulating infra changes)#
        ###################################################################
 
-       - name: Get storage ctrl pod name
-         shell: >
-           source ~/.profile;
-           kubectl get pods -n {{ namespace }} -l openebs/controller=jiva-controller
-           --no-headers
-         args:
-           executable: /bin/bash
-         register: result
-         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+       - block:
+           - name: Get storage ctrl pod name
+             shell: >
+               source ~/.profile;
+               kubectl get pods -n {{ namespace }} -l openebs/controller=jiva-controller --no-headers
+             args:
+               executable: /bin/bash
+             register: result
+             delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+
+           - name: Set ctrl pod name to variable
+             set_fact:
+               ctrl_pod_name: "{{ result.stdout.split()[0] }}"
          when: storage_engine == 'jiva'
 
-       - name: Get storage ctrl pod name
-         shell: >
-           source ~/.profile;
-           kubectl get pods -n {{ operator_ns }} -l openebs.io/controller=cstor-controller | grep {{ namespace }}
-         args:
-           executable: /bin/bash
-         register: result
-         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+       - block:
+           - name: Get storage ctrl pod name
+             shell: >
+               source ~/.profile;
+               kubectl get pods -n {{ operator_ns }} -l openebs.io/controller=cstor-controller | grep {{ namespace }}
+             args:
+               executable: /bin/bash
+             register: result
+             delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+
+           - name: Set ctrl pod name to variable
+             set_fact:
+               ctrl_pod_name: "{{ result.stdout.split()[0] }}"
          when: storage_engine == 'cStor'
 
-       - name: Set ctrl pod name to variable
-         set_fact:
-           ctrl_pod_name: "{{ result.stdout.split()[0] }}"
+       - block:
+           - name: Get node on which the pod is scheduled
+             shell: >
+               source ~/.profile;
+               kubectl get pods -n {{ namespace }} -o wide | grep {{ctrl_pod_name}} | awk {'print $7'}
+             args:
+               executable: /bin/bash
+             register: result
+             delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
 
-       - name: Get node on which the pod is scheduled
-         shell: >
-           source ~/.profile;
-           kubectl get pods -n {{ namespace }} -o wide | grep {{ctrl_pod_name}} | awk {'print $7'}
-         args:
-           executable: /bin/bash
-         register: result
-         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+           - name: Store the ctrl pod node name in a variable
+             set_fact:
+               ctrl_node: "{{ result.stdout }}"
          when: storage_engine == 'jiva'
 
-       - name: Get node on which the pod is scheduled
-         shell: >
-           source ~/.profile;
-           kubectl get pods -n {{ operator_ns }} -o wide | grep {{ctrl_pod_name}} | awk {'print $7'}
-         args:
-           executable: /bin/bash
-         register: result
-         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
-         when: storage_engine == 'cStor'
+       - block:
+           - name: Get node on which the pod is scheduled
+             shell: >
+               source ~/.profile;
+               kubectl get pods -n {{ operator_ns }} -o wide | grep {{ctrl_pod_name}} | awk {'print $7'}
+             args:
+               executable: /bin/bash
+             register: result
+             delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
 
-       - name: Store the ctrl pod node name in a variable
-         set_fact:
-           ctrl_node: "{{ result.stdout }}"
+           - name: Store the ctrl pod node name in a variable
+             set_fact:
+               ctrl_node: "{{ result.stdout }}"
+         when: storage_engine == 'cStor'
 
        - name: Make the current ctrl node unschedulable
          shell: source ~/.profile; kubectl cordon {{ctrl_node}}
@@ -187,7 +198,7 @@
          register: result
          until: "'Running' in result.stdout_lines[1]"
          delay: 15
-         retries: 6
+         retries: 2
          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
          when: storage_engine == 'jiva'
 
@@ -223,16 +234,25 @@
            pod_status: "{{ result.stdout.split()[2] }}"
            pod_restarts: "{{ result.stdout.split()[3] }}"
            pod_ip: "{{ result.stdout.split()[5] }}"
-           pod_name: "{{ result.stdout.split()[1] }}"
+           pod_name: "{{ result.stdout.split()[0] }}"
 
        - name: Verify percona is running w/o restarts
          debug:
            msg: "Percona pod health-check is successful"
          failed_when: "pod_status != 'Running' and pod_restarts != '0'"
 
+       - name: Check if the DB has been initialized
+         shell: kubectl logs {{ pod_name }} -n {{ namespace }} | grep "ready for connections" | wc -l
+         args:
+           executable: /bin/bash
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+         register: status
+         until: status.stdout == '2'
+         delay: 30
+         retries: 20
+
        - name: Create a test db on percona to confirm health
          shell: |
-           sleep 100
            kubectl exec -it {{ pod_name }} -n {{ namespace }} -- mysql -uroot -pk8sDem0 -e "create database tdb;"
            kubectl exec -it {{ pod_name }} -n {{ namespace }} -- mysql -uroot -pk8sDem0 -e "create table ttbl (Data VARCHAR(20));" tdb
            kubectl exec -it {{ pod_name }} -n {{ namespace }} -- mysql -uroot -pk8sDem0 -e "insert into ttbl (Data) VALUES ('tdata');" tdb
@@ -293,17 +313,6 @@
                status: delete
                ns: "{{ namespace }}"
 
-           - include_tasks: "{{utils_path}}/update-testrail.yml"
-             vars:
-               user: "{{ testrail_user }}"
-               password: "{{ testrail_password }}"
-               suite_id: "{{ test_suite_id }}"
-               case_id: "{{ test_case_id }}"
-               st_id: "{{ status_id }}"
-
-           - name: Send slack notification
-             slack:
-              token: "{{ lookup('env','SLACK_TOKEN') }}"
-              msg: '{{ ansible_date_time.time }} TEST: {{test_name}}, RESULT: {{ flag }},{{cflag}},{{tflag}}'
-              color: "{{status}}"
-             when: slack_notify | bool and lookup('env','SLACK_TOKEN')
+           - name: Set Test Name as Fact
+             set_fact:
+               testname: "{{ test_name }}"

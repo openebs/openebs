@@ -12,6 +12,19 @@
     lkey: name
     lvalue: percona
 
+- name: Confirm target pod has been deleted 
+  shell: >
+    source ~/.profile;
+    kubectl get pods -n {{ operator_ns }} | grep {{ namespace }} | wc -l
+  args:
+    executable: /bin/bash
+  register: result
+  delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+  until: result.stdout |int == 0
+  delay: 30
+  retries: 15
+  when: storage_engine == 'cStor'
+
 - name: Make the current ctrl node schedulable
   shell: source ~/.profile; kubectl uncordon {{ctrl_node}}
   args:
