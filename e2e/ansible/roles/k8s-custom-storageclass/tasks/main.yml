@@ -15,6 +15,10 @@
     src: default-cstor.j2
     dest: "{{ result_kube_home.stdout }}"
 
+- template:
+    src: default-cstor-sparse.j2
+    dest: "{{ result_kube_home.stdout }}"
+
 - name: Delete if the jiva StorageClass Already Exists
   shell: source ~/.profile; kubectl delete -f {{result_kube_home.stdout}}/default-jiva.j2
   args:
@@ -45,6 +49,21 @@
   delay: 15
   retries: 5
 
+- name: Delete if the cstor StorageClass using sparse file Already Exists
+  shell: source ~/.profile; kubectl delete -f {{result_kube_home.stdout}}/default-cstor-sparse.j2
+  args:
+    executable: /bin/bash
+  ignore_errors: yes
+
+- name: Create a storage class for cStor engine using sparse file
+  shell: source ~/.profile; kubectl apply -f {{result_kube_home.stdout}}/default-cstor-sparse.j2
+  args:
+    executable: /bin/bash
+  register: sc
+  until: "'created' in sc.stdout"
+  delay: 15
+  retries: 5
+
 - name: Remove the copied templates
   file:
     path: "{{result_kube_home.stdout}}/{{item}}"
@@ -52,4 +71,5 @@
   with_items:
     - default-jiva.j2
     - default-cstor.j2
+    - default-cstor-sparse.j2
 
