@@ -5,8 +5,9 @@ include_before:
  - setup-stern.yml
  - setup-openebs.yml
  - setup-disks.yml
- - setup-cStorPool.yml
+ - create-cStorPool.yml
 include_after:
+ - delete-cStorPool.yml
  - playbooks/deprovision-cvr/deprovision-cvr.yml
  - delete-disks.yml
  - cleanup-openebs.yml

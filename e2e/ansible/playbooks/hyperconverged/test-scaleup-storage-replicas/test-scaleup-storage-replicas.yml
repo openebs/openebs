@@ -60,7 +60,7 @@
 
        - name: Fetch the node count from stdout
          set_fact:
-            node_count: " {{ node_out.stdout}}"
+            node_count: " {{node_out.stdout}}"
 
        - name: Obtaining storage classes yaml
          shell: source ~/.profile; kubectl get sc openebs-standard -o yaml > "{{ result_kube_home.stdout }}/{{ create_sc }}"
