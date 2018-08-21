@@ -520,6 +520,10 @@ data:
         port: 6060
         targetPort: 6060
         protocol: TCP
+      - name: grpc
+        port: 7777
+        targetPort: 7777
+        protocol: TCP
       selector:
         openebs.io/target: cstor-target
         openebs.io/persistent-volume: {{ .Volume.owner }}
@@ -747,6 +751,7 @@ data:
       targetIP: {{ .TaskResult.cvolcreateputsvc.clusterIP }}
       targetPort: 3260
       replicas: {{ .ListItems.replicaList.replicas | len }}
+      engineType: cstor
 ---
 # runTask to list all cstor target deployment services
 apiVersion: v1
@@ -865,6 +870,7 @@ data:
           targetIP: {{ $clusterIP }}
           targetPort: 3260
           replicas: {{ $replicaName | default "" | splitList ", " | len }}
+          engineType: cstor
     {{- end -}}
 ---
 # runTask to list cStor target deployment service
@@ -958,6 +964,7 @@ data:
       targetIP: {{ .TaskResult.readlistsvc.clusterIP }}
       targetPort: 3260
       replicas: {{ .TaskResult.readlistrep.capacity | default "" | splitList " " | len }}
+      engineType: cstor
 ---
 # runTask to list the cstorvolume that has to be deleted
 apiVersion: v1
@@ -1361,6 +1368,8 @@ data:
             vsm.openebs.io/targetportals: {{ $clusterIP }}:3260
         spec:
           capacity: {{ $capacity }}
+          engineType: jiva
+          targetIP: {{ $controllerIP }}
     {{- end -}}
 ---
 apiVersion: v1
@@ -1455,6 +1464,8 @@ data:
       targetPortal: {{ .TaskResult.readlistsvc.clusterIP }}:3260
       iqn: iqn.2016-09.com.openebs.jiva:{{ .Volume.owner }}
       replicas: {{ .TaskResult.readlistrep.podIP | default "" | splitList " " | len }}
+      engineType: jiva
+      targetIP: {{ .TaskResult.readlistctrl.podIP | default "" | splitList " " | first }}
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -1851,6 +1862,7 @@ data:
       targetPortal: {{ .TaskResult.createputsvc.clusterIP }}:3260
       iqn: iqn.2016-09.com.openebs.jiva:{{ .Volume.owner }}
       replicas: {{ .Config.ReplicaCount.value }}
+      engineType: jiva
 ---
 apiVersion: v1
 kind: ConfigMap
