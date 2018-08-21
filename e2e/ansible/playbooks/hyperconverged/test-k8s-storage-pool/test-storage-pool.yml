@@ -52,11 +52,24 @@
            dest: "{{ result_kube_home.stdout }}"
          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
 
+       - name: Copy custom storage class template to master
+         template:
+           src: "{{ sc }}"
+           dest: "{{ result_kube_home.stdout }}"
+         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+
+       - name: Create test specific storage class
+         shell: source ~/.profile; kubectl apply -f "{{ result_kube_home.stdout }}/{{ sc }}"
+         args:
+           executable: /bin/bash
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
        - name: Replace volume-claim name with test parameters
-         replace:
+         include_tasks: "{{utils_path}}/regex_task.yml"
+         vars:
            path: "{{ result_kube_home.stdout }}/{{ openebs_pvc }}"
-           regexp: 'vut'
-           replace: '{{ volume_claim }}'
+           regex1: "{{replace_item}}"
+           regex2: "{{replace_with}}"
          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
 
        - include_tasks: "{{utils_path}}/deploy_task.yml"
@@ -140,17 +153,6 @@
                status: delete
                ns: "{{ namespace }}"
 
-           - include_tasks: "{{utils_path}}/update-testrail.yml"
-             vars:
-               user: "{{ testrail_user }}"
-               password: "{{ testrail_password }}"
-               suite_id: "{{ test_suite_id }}"
-               case_id: "{{ test_case_id }}"
-               st_id: "{{ status_id }}"
-
-           - name: Send slack notification
-             slack:
-               token: "{{ lookup('env','SLACK_TOKEN') }}"
-               msg: '{{ ansible_date_time.time }} TEST: {{test_name}}, RESULT: {{ flag }},{{ cflag }},{{ tflag }}'
-               color: "{{ status }}"
-             when: slack_notify | bool and lookup('env','SLACK_TOKEN')
+           - name: Set Test Name as Fact
+             set_fact:
+               testname: "{{ test_name }}"

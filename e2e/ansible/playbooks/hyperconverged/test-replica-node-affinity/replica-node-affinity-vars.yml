@@ -11,7 +11,7 @@ test_pod_regex: maya*|openebs*|pvc*|percona*|
 
 test_log_path: setup/logs/node_affinity_test.log
 
-namespace: replica-affinity
+namespace: node-affinity
 
 test_suite_id: 826
 

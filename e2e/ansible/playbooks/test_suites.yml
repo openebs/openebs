@@ -1,7 +1,9 @@
 TestRailProjectID: 5
-Platform:
-- GKE:
-    Description: A short description for GKE 
-    Test Suite:
-     - 826:
-        Exclude:
+JivaDevelopmentTestSuite:
+    - 829:
+JivaProductionTestSuite:
+    - 831:
+CstorDevelopmentTestSuite:
+    - 832:
+CstorProductionTestSuite:
+    - 833:

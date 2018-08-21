@@ -47,3 +47,4 @@
   delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
   with_items:
     - "{{percona_files}}"
+    - "{{fault_injection_file}}"

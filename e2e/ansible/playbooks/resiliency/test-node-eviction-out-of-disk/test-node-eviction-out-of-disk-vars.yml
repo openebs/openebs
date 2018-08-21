@@ -1,8 +1,6 @@
 ---
 test_name: test-node-eviction-out-of-disk
 
-storage_engine: jiva
-
 namespace: nodeeviction
 
 percona_links:
