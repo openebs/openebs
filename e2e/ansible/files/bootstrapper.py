@@ -167,7 +167,7 @@ def create_plan_resources(args):
                                             {
                                                 "title": "JIVA Build #" +str(args['build_number'])+" completed",
                                                 "title_link": "https://cloudbyte.testrail.com/index.php?/plans/view/"+str(map_src_id['jiva_plan_run_id']),
-                                                "text": "*Username:* username\n*Password:* Password",
+                                                "text": "*Username:* test@openebs.io\n*Password:* openebs",
                                                 "color": "#439FE0",
                                                 "mrkdwn_in": ["text"]
                                             }
