@@ -85,4 +85,4 @@
   with_items:
     - "{{percona_files}}"
     - "{{chaoskube_files}}"
-
+    - single-replica-sc.j2
