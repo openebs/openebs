@@ -67,6 +67,7 @@ spec:
     objectName: {{.Storagepool.owner}}
     action: get
   post: |
+    # For backward compatibility, getspcinfo.disk is saved as a task result
     {{- jsonpath .JsonResult "{range .spec.disks.diskList[*]}{$},{end}" | trim | saveAs "getspcinfo.disk" .TaskResult | noop -}}
     {{- jsonpath .JsonResult "{.spec.poolSpec.poolType}" | trim | saveAs "getspcinfo.poolType" .TaskResult | noop -}}
     {{- jsonpath .JsonResult "{.spec.poolSpec.cacheFile}" | trim | saveAs "getspcinfo.cacheFile" .TaskResult | noop -}}
@@ -86,13 +87,29 @@ spec:
     action: get
     repeatWith:
       metas:
+      {{- $diskList := .TaskResult.getspcinfo.disk }}
+      # To support backward compatibility
+      # If .TaskResult.getspcinfo.disk is empty, get disk list from CAS engine top level property
+      {{if $diskList}}
       {{- $diskList := .TaskResult.getspcinfo.disk | replace "," " "| trim | split " "}}
       {{ range $k,$v := $diskList }}
       - objectName: {{$v}}
       {{ end }}
+      {{else}}
+      {{- $diskList := .Storagepool.diskList}}
+      {{ range $k,$v := $diskList }}
+      - objectName: {{$v}}
+      {{ end }}
+      {{ end }}
   post: |
-    {{- $nodesList := jsonpath .JsonResult `pkey=nodes,{@.metadata.labels.kubernetes\.io/hostname}={@.spec.devlinks[0].links[1]};` | trim | default "" | splitList ";" -}}
+    {{if eq .TaskResult.getspcinfo.type "disk"}}
+    {{- $nodesList := jsonpath .JsonResult `pkey=nodes,{@.metadata.labels.kubernetes\.io/hostname}={@.spec.devlinks[0].links[0]};` | trim | default "" | splitList ";" -}}
     {{- $nodesList | keyMap "cstorNodePoolList" .ListItems | noop -}}
+    {{end}}
+    {{if eq .TaskResult.getspcinfo.type "sparse"}}
+    {{- $nodesList := jsonpath .JsonResult `pkey=nodes,{@.metadata.labels.kubernetes\.io/hostname}={@.spec.path};` | trim | default "" | splitList ";" -}}
+    {{- $nodesList | keyMap "cstorNodePoolList" .ListItems | noop -}}
+    {{end}}
 ---
 apiVersion: openebs.io/v1alpha1
 kind: RunTask
@@ -192,6 +209,8 @@ spec:
               mountPath: /dev
             - name: tmp
               mountPath: /tmp
+            - name: sparse
+              mountPath: /var/openebs
             - name: udev
               mountPath: /run/udev
               # To avoid clash between terminating and restarting pod
@@ -212,6 +231,8 @@ spec:
               mountPath: /dev
             - name: tmp
               mountPath: /tmp
+            - name: sparse
+              mountPath: /var/openebs
             - name: udev
               mountPath: /run/udev
             env:
@@ -230,6 +251,10 @@ spec:
               # From host, dir called /var/openebs/shared-<uid> is created to avoid clash if two replicas run on same node.
               path: /var/openebs/shared-a2b
               type: {{ .Config.HostPathType.value }}
+          - name: sparse
+            hostPath:
+              path: /var/openebs
+              type: Directory
           - name: udev
             hostPath:
               path: /run/udev
@@ -254,7 +279,6 @@ spec:
   post: |
     {{- jsonpath .JsonResult `{.metadata.name}` | trim | addTo "createputstoragepool.objectName" .TaskResult | noop -}}
   task: |
-    {{- $diskList := .TaskResult.getspcinfo.disk | replace "," " "| trim | split " " }}
     apiVersion: openebs.io/v1alpha1
     kind: StoragePool
     metadata:
