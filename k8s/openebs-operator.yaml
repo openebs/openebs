@@ -69,6 +69,20 @@ roleRef:
   name: openebs-maya-operator
   apiGroup: rbac.authorization.k8s.io
 ---
+# This is the install related config. It specifies the version of openebs
+# components i.e. custom operators that gets installed. This config is 
+# used by maya-apiserver.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: maya-install-config-default-0.7.0
+  namespace: openebs
+data:
+  install: |
+    spec:
+      install:
+      - version: "0.7.0"
+---
 apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
@@ -97,6 +111,16 @@ spec:
         # list volumes. This is a mandatory env variable.
         - name: OPENEBS_IO_CAS_TEMPLATE_TO_LIST_VOLUME
           value: "jiva-volume-list-default-0.7.0"
+        # OPENEBS_IO_INSTALL_CONFIG_NAME provides the name of configmap related
+        # to maya install
+        - name: OPENEBS_IO_INSTALL_CONFIG_NAME
+          value: "maya-install-config-default-0.7.0"
+        # OPENEBS_NAMESPACE provides the namespace of this deployment as an
+        # environment variable
+        - name: OPENEBS_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
         # OPENEBS_IO_KUBE_CONFIG enables maya api service to connect to K8s
         # based on this config. This is ignored if empty.
         # This is supported for maya api server version 0.5.2 onwards
