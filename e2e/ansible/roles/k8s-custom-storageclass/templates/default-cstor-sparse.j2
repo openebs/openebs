@@ -13,4 +13,8 @@ metadata:
         value: openebs/cstor-pool:{{ tag }}
       - name: CstorPoolMgmtImage
         value: openebs/cstor-pool-mgmt:{{ tag }}
+      - name: VolumeControllerImage
+        value: openebs/cstor-volume-mgmt:{{ tag }}
+      - name: VolumeTargetImage
+        value: openebs/cstor-istgt:{{ tag }}
 provisioner: openebs.io/provisioner-iscsi
