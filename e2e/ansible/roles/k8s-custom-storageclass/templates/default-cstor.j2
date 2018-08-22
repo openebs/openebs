@@ -10,10 +10,6 @@ metadata:
     cas.openebs.io/config: |
       - name: StoragePoolClaim
         value: {{ cstor_pool_name }}
-      - name: CstorPoolImage
-        value: openebs/cstor-pool:{{ tag }}
-      - name: CstorPoolMgmtImage
-        value: openebs/cstor-pool-mgmt:{{ tag }}
       - name: VolumeControllerImage
         value: openebs/cstor-volume-mgmt:{{ tag }}
       - name: VolumeTargetImage

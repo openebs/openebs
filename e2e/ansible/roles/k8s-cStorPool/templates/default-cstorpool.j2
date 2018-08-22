@@ -6,9 +6,14 @@ metadata:
   annotations:
     cas.openebs.io/create-pool-template: cstor-pool-create-default-0.7.0
     cas.openebs.io/delete-pool-template: cstor-pool-delete-default-0.7.0
+    cas.openebs.io/config: |
+      - name: CstorPoolImage
+        value: openebs/cstor-pool:{{ tag }}
+      - name: CstorPoolMgmtImage
+        value: openebs/cstor-pool-mgmt:{{ tag }}
 spec:
   name: cstor-pool-default-0.7.0
-  type: openebs-cstor
+  type: disk
   maxPools: 3
   poolSpec:
     poolType: {{ pooltype }}
