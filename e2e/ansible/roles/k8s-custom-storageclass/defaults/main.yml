@@ -7,8 +7,5 @@ jiva_pool_name: default
 
 replica_count: 3
 
-tag: ci
-
-
 
 
