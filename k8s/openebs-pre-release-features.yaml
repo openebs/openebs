@@ -110,6 +110,8 @@ spec:
     {{- $nodesList := jsonpath .JsonResult `pkey=nodes,{@.metadata.labels.kubernetes\.io/hostname}={@.spec.path};` | trim | default "" | splitList ";" -}}
     {{- $nodesList | keyMap "cstorNodePoolList" .ListItems | noop -}}
     {{end}}
+    {{- $nodeDisksList := jsonpath .JsonResult `pkey=nodes,{@.metadata.labels.kubernetes\.io/hostname}={@.metadata.name};` | trim | default "" | splitList ";" -}}
+    {{- $nodeDisksList | keyMap "cstorNodeDisksList" .ListItems | noop -}}
 ---
 apiVersion: openebs.io/v1alpha1
 kind: RunTask
@@ -286,10 +288,11 @@ spec:
       labels:
         openebs.io/storage-pool-claim: {{.Storagepool.owner}}
         openebs.io/cstor-pool: {{ pluck .ListItems.currentRepeatResource .ListItems.cstorNodeUidList.nodesUid |first | splitList " " | last}}
+        openebs.io/cas-type: cstor
         kubernetes.io/hostname: {{ .ListItems.currentRepeatResource }}
     spec:
       disks:
-        diskList: {{ pluck .ListItems.currentRepeatResource .ListItems.cstorNodePoolList.nodes }}
+        diskList: {{ pluck .ListItems.currentRepeatResource .ListItems.cstorNodeDisksList.nodes }}
       poolSpec:
         poolType: {{.TaskResult.getspcinfo.poolType}}
         cacheFile: /tmp/{{.Storagepool.owner}}.cache
