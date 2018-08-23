@@ -105,7 +105,7 @@
            - name: Get storage ctrl pod name
              shell: >
                source ~/.profile;
-               kubectl get pods -n openebs -l openebs.io/target=cstor-target | grep {{ namespace }}
+               kubectl get pods -n {{ operator_ns }} -l openebs.io/target=cstor-target | grep {{ namespace }}
              args:
                executable: /bin/bash
              register: result
