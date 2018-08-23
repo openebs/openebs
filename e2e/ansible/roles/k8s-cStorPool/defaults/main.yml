@@ -6,3 +6,5 @@ pooltype: striped
 storage_engine: cStor
 
 cstor_pool: cstor-pool-default-sparse-0.7.0
+
+disk_kind: disk

@@ -13,7 +13,7 @@ metadata:
         value: openebs/cstor-pool-mgmt:{{ tag }}
 spec:
   name: cstor-pool-default-0.7.0
-  type: disk
+  type: {{disk_kind}}
   maxPools: 3
   poolSpec:
     poolType: {{ pooltype }}
