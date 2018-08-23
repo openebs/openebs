@@ -1799,6 +1799,7 @@ spec:
   task: |
     {{- $isEvictionTolerations := .Config.EvictionTolerations.value | default "false" -}}
     {{- $evictionTolerationsVal := fromYaml .Config.EvictionTolerations.value -}}
+    {{- $isCloneEnable := .Volume.isCloneEnable | default "false" -}}
     apiVersion: extensions/v1beta1
     kind: Deployment
     metadata:
@@ -1854,6 +1855,14 @@ spec:
             - replica
             - --frontendIP
             - {{ .TaskResult.createputsvc.clusterIP }}
+            {{- if ne $isCloneEnable "false" }}
+            - --cloneIP
+            - {{ .Volume.sourceVolumeTargetIP }}
+            - --type
+            - "clone"
+            - --snapName
+            - {{ .Volume.snapshotName }}
+            {{- end }}
             - --size
             - {{ .Volume.capacity }}
             - /openebs
