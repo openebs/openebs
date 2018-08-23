@@ -18,10 +18,16 @@ spec:
   # nothing exists at the given path i.e. an empty directory will be created.
   - name: HostPathType
     value: DirectoryOrCreate
+  # SparseDir is a hostPath directory where to look for sparse files
+  - name: SparseDir
+    value: /var/openebs
   # RunNamespace is the namespace where namespaced resources related to pool
   # will be placed
   - name: RunNamespace
     value: openebs
+  # MemoryLimit specifies the max memory that can be used by the pool pods.
+  - name: MemoryLimit
+    value: 2Gi
   taskNamespace: openebs
   run:
     tasks:
@@ -195,6 +201,9 @@ spec:
           containers:
           - name: cstor-pool
             image: {{ .Config.CstorPoolImage.value }}
+            resources:
+              limits:
+                memory: {{ .Config.MemoryLimit.value }}
             ports:
             - containerPort: 12000
               protocol: TCP
@@ -210,7 +219,7 @@ spec:
             - name: tmp
               mountPath: /tmp
             - name: sparse
-              mountPath: /var/openebs
+              mountPath: {{ .Config.SparseDir.value }}
             - name: udev
               mountPath: /run/udev
               # To avoid clash between terminating and restarting pod
@@ -232,7 +241,7 @@ spec:
             - name: tmp
               mountPath: /tmp
             - name: sparse
-              mountPath: /var/openebs
+              mountPath: {{ .Config.SparseDir.value }}
             - name: udev
               mountPath: /run/udev
             env:
@@ -253,8 +262,8 @@ spec:
               type: {{ .Config.HostPathType.value }}
           - name: sparse
             hostPath:
-              path: /var/openebs
-              type: Directory
+              path: {{ .Config.SparseDir.value }}
+              type: {{ .Config.HostPathType.value }}
           - name: udev
             hostPath:
               path: /run/udev
@@ -2060,5 +2069,7 @@ metadata:
     cas.openebs.io/config: |
       - name: StoragePoolClaim
         value: "cstor-sparse-pool"
+      - name: SparseDir
+        value: /var/openebs
 provisioner: openebs.io/provisioner-iscsi
 ---
