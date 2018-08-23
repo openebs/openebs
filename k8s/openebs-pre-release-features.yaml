@@ -802,7 +802,7 @@ spec:
     We create a pair of "clusterIP"=xxxxx and save it for corresponding volume
     The per volume is servicePair is identified by unique "namespace/vol-name" key
     */}}
-    {{- $servicePairs := jsonpath .JsonResult `{range .items[*]}pkey={@.metadata.labels.openebs\.io/pv},clusterIP={@.spec.clusterIP};{end}` | trim | default "" | splitList ";" -}}
+    {{- $servicePairs := jsonpath .JsonResult `{range .items[*]}pkey={@.metadata.labels.openebs\.io/persistent-volume},clusterIP={@.spec.clusterIP};{end}` | trim | default "" | splitList ";" -}}
     {{- $servicePairs | keyMap "volumeList" .ListItems | noop -}}
 ---
 # runTask to list all cstor target pods
@@ -830,7 +830,7 @@ spec:
     We create a pair of "targetIP"=xxxxx and save it for corresponding volume
     The per volume is servicePair is identified by unique "namespace/vol-name" key
     */}}
-    {{- $targetPairs := jsonpath .JsonResult `{range .items[*]}pkey={@.metadata.labels.openebs\.io/pv},targetIP={@.status.podIP},targetStatus={@.status.containerStatuses[*].ready};{end}` | trim | default "" | splitList ";" -}}
+    {{- $targetPairs := jsonpath .JsonResult `{range .items[*]}pkey={@.metadata.labels.openebs\.io/persistent-volume},targetIP={@.status.podIP},targetStatus={@.status.containerStatuses[*].ready};{end}` | trim | default "" | splitList ";" -}}
     {{- $targetPairs | keyMap "volumeList" .ListItems | noop -}}
 ---
 apiVersion: openebs.io/v1alpha1
@@ -846,7 +846,7 @@ spec:
     kind: CStorVolumeReplica
     action: list
   post: |
-    {{- $replicaPairs := jsonpath .JsonResult `{range .items[*]}pkey={@.metadata.labels.openebs\.io/pv},replicaName={@.metadata.name},capacity={@.spec.capacity};{end}` | trim | default "" | splitList ";" -}}
+    {{- $replicaPairs := jsonpath .JsonResult `{range .items[*]}pkey={@.metadata.labels.openebs\.io/persistent-volume},replicaName={@.metadata.name},capacity={@.spec.capacity};{end}` | trim | default "" | splitList ";" -}}
     {{- $replicaPairs | keyMap "volumeList" .ListItems | noop -}}
 ---
 # runTask to render volume list output
