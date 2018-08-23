@@ -1,5 +1,5 @@
 # This manifest deploys the OpenEBS control plane components, with associated CRs & RBAC rules
-# NOTE: On GKE, deploy the openebs-operator.yaml in admin context 
+# NOTE: On GKE, deploy the openebs-operator.yaml in admin context
 
 # Create the OpenEBS namespace
 apiVersion: v1
@@ -70,7 +70,7 @@ roleRef:
   apiGroup: rbac.authorization.k8s.io
 ---
 # This is the install related config. It specifies the version of openebs
-# components i.e. custom operators that gets installed. This config is 
+# components i.e. custom operators that gets installed. This config is
 # used by maya-apiserver.
 apiVersion: v1
 kind: ConfigMap
@@ -162,7 +162,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: maya-apiserver-service
-  namespace: openebs 
+  namespace: openebs
 spec:
   ports:
   - name: api
@@ -219,7 +219,7 @@ spec:
         - name: OPENEBS_NAMESPACE
           valueFrom:
             fieldRef:
-              fieldPath: metadata.namespace 
+              fieldPath: metadata.namespace
         - name: OPENEBS_MONITOR_URL
           value: "http://127.0.0.1:32515/dashboard/db/openebs-volume-stats?orgId=1"
         - name: OPENEBS_MONITOR_VOLKEY
@@ -459,10 +459,12 @@ kind: StorageClass
 apiVersion: storage.k8s.io/v1
 metadata:
   name: openebs-snapshot-promoter
+  annotations:
+    cas.openebs.io/delete-volume-template: jiva-volume-delete-default-0.7.0
 provisioner: volumesnapshot.external-storage.k8s.io/snapshot-promoter
 ---
-# node-disk-manager-config-default-0.1.0 contains config of available probes 
-# and filters. Probes and filters will initialize with default values if config 
+# node-disk-manager-config-default-0.1.0 contains config of available probes
+# and filters. Probes and filters will initialize with default values if config
 # for that filter or probe not present in configmap.
 apiVersion: v1
 kind: ConfigMap
@@ -516,7 +518,7 @@ spec:
     spec:
       # By default the node-disk-manager will be run on all kubernetes nodes
       # If you would like to limit this to only some nodes, say the nodes
-      # that have storage attached, you could label those node and use 
+      # that have storage attached, you could label those node and use
       # nodeSelector.
       #
       # e.g. label the storage nodes with - "openebs.io/nodegroup"="storage-node"
