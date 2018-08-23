@@ -1400,11 +1400,11 @@ spec:
             openebs.io/targetportals: {{ $clusterIP }}:3260
         spec:
           capacity: {{ $capacity }}
-          iqn: iqn.2016-09.com.openebs.jiva:{{ .Volume.owner }}
-          targetPortal: {{ .TaskResult.readlistsvc.clusterIP }}:3260
+          iqn: iqn.2016-09.com.openebs.jiva:{{ $name }}
+          targetPortal: {{ $clusterIP }}:3260
           replicas: {{ .TaskResult.readlistrep.podIP | default "" | splitList " " | len }}
           casType: jiva
-          targetIP: {{ .TaskResult.readlistsvc.clusterIP }}
+          targetIP: {{ $clusterIP }}
           targetPort: 3260
     {{- end -}}
 ---
