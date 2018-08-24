@@ -18,10 +18,22 @@ spec:
   # nothing exists at the given path i.e. an empty directory will be created.
   - name: HostPathType
     value: DirectoryOrCreate
+  # SparseDir is a hostPath directory where to look for sparse files
+  - name: SparseDir
+    value: /var/openebs/sparse
   # RunNamespace is the namespace where namespaced resources related to pool
   # will be placed
   - name: RunNamespace
     value: openebs
+  # ResourceLimits allow you to set the limits on memory and cpu for pool pods
+  # The resource and limit value should be in the same format as expected by
+  # Kubernetes. Example:
+  #- name: ResourceLimits
+  #  value: |-
+  #      memory: 1Gi
+  # By default, the resource limits are disabled. 
+  - name: ResourceLimits
+    value: "false"
   taskNamespace: openebs
   run:
     tasks:
@@ -173,6 +185,8 @@ spec:
     {{- $resourceNames := jsonpath .JsonResult `pkey=names,{.metadata.name}=;` | trim | default "" | splitList ";" -}}
     {{- $resourceNames | keyMap "resourceNameList" .ListItems | noop -}}
   task: |
+    {{- $setResourceLimits := .Config.ResourceLimits.value | default "false" -}}
+    {{- $resourceLimitsVal := fromYaml .Config.ResourceLimits.value -}}
     apiVersion: extensions/v1beta1
     kind: Deployment
     metadata:
@@ -197,6 +211,13 @@ spec:
           containers:
           - name: cstor-pool
             image: {{ .Config.CstorPoolImage.value }}
+            {{- if ne $setResourceLimits "false" }}
+            resources:
+              limits:
+              {{- range $rKey, $rLimit := $resourceLimitsVal }}
+                {{ $rKey }}: {{ $rLimit }}
+              {{- end }}
+            {{- end }}
             ports:
             - containerPort: 12000
               protocol: TCP
@@ -212,7 +233,7 @@ spec:
             - name: tmp
               mountPath: /tmp
             - name: sparse
-              mountPath: /var/openebs
+              mountPath: {{ .Config.SparseDir.value }}
             - name: udev
               mountPath: /run/udev
               # To avoid clash between terminating and restarting pod
@@ -234,7 +255,7 @@ spec:
             - name: tmp
               mountPath: /tmp
             - name: sparse
-              mountPath: /var/openebs
+              mountPath: {{ .Config.SparseDir.value }}
             - name: udev
               mountPath: /run/udev
             env:
@@ -251,12 +272,12 @@ spec:
           - name: tmp
             hostPath:
               # From host, dir called /var/openebs/shared-<uid> is created to avoid clash if two replicas run on same node.
-              path: /var/openebs/shared-a2b
+              path: /var/openebs/shared-{{.Storagepool.owner}}
               type: {{ .Config.HostPathType.value }}
           - name: sparse
             hostPath:
-              path: /var/openebs
-              type: Directory
+              path: {{ .Config.SparseDir.value }}
+              type: {{ .Config.HostPathType.value }}
           - name: udev
             hostPath:
               path: /run/udev
@@ -2072,5 +2093,7 @@ metadata:
     cas.openebs.io/config: |
       - name: StoragePoolClaim
         value: "cstor-sparse-pool"
+      - name: SparseDir
+        value: /var/openebs
 provisioner: openebs.io/provisioner-iscsi
 ---

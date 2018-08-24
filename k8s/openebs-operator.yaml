@@ -546,7 +546,7 @@ spec:
         - name: procmount
           mountPath: /host/mounts
         - name: sparsepath
-          mountPath: /var/openebs
+          mountPath: /var/openebs/sparse
         env:
         # pass hostname as env variable using downward API to the NDM container
         - name: NODE_NAME
@@ -556,7 +556,7 @@ spec:
         # specify the directory where the sparse files need to be created.
         # if not specified, then sparse files will not be created.
         - name: SPARSE_FILE_DIR
-          value: "/var/openebs"
+          value: "/var/openebs/sparse"
         # Size(bytes) of the sparse file to be created.
         - name: SPARSE_FILE_SIZE
           value: "10737418240"
@@ -578,5 +578,5 @@ spec:
           path: /proc/1/mounts
       - name: sparsepath
         hostPath:
-          path: /var/openebs
+          path: /var/openebs/sparse
 ---
