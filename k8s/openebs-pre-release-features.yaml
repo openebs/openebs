@@ -25,9 +25,15 @@ spec:
   # will be placed
   - name: RunNamespace
     value: openebs
-  # MemoryLimit specifies the max memory that can be used by the pool pods.
-  - name: MemoryLimit
-    value: 2Gi
+  # ResourceLimits allow you to set the limits on memory and cpu for pool pods
+  # The resource and limit value should be in the same format as expected by
+  # Kubernetes. Example:
+  #- name: ResourceLimits
+  #  value: |-
+  #      memory: 1Gi
+  # By default, the resource limits are disabled. 
+  - name: ResourceLimits
+    value: "false"
   taskNamespace: openebs
   run:
     tasks:
@@ -177,6 +183,8 @@ spec:
     {{- $resourceNames := jsonpath .JsonResult `pkey=names,{.metadata.name}=;` | trim | default "" | splitList ";" -}}
     {{- $resourceNames | keyMap "resourceNameList" .ListItems | noop -}}
   task: |
+    {{- $setResourceLimits := .Config.ResourceLimits.value | default "false" -}}
+    {{- $resourceLimitsVal := fromYaml .Config.ResourceLimits.value -}}
     apiVersion: extensions/v1beta1
     kind: Deployment
     metadata:
@@ -201,9 +209,13 @@ spec:
           containers:
           - name: cstor-pool
             image: {{ .Config.CstorPoolImage.value }}
+            {{- if ne $setResourceLimits "false" }}
             resources:
               limits:
-                memory: {{ .Config.MemoryLimit.value }}
+              {{- range $rKey, $rLimit := $resourceLimitsVal }}
+                {{ $rKey }}: {{ $rLimit }}
+              {{- end }}
+            {{- end }}
             ports:
             - containerPort: 12000
               protocol: TCP
@@ -258,7 +270,7 @@ spec:
           - name: tmp
             hostPath:
               # From host, dir called /var/openebs/shared-<uid> is created to avoid clash if two replicas run on same node.
-              path: /var/openebs/shared-a2b
+              path: /var/openebs/shared-{{.Storagepool.owner}}
               type: {{ .Config.HostPathType.value }}
           - name: sparse
             hostPath:
