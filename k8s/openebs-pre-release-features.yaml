@@ -20,7 +20,7 @@ spec:
     value: DirectoryOrCreate
   # SparseDir is a hostPath directory where to look for sparse files
   - name: SparseDir
-    value: /var/openebs
+    value: /var/openebs/sparse
   # RunNamespace is the namespace where namespaced resources related to pool
   # will be placed
   - name: RunNamespace
