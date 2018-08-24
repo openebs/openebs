@@ -593,6 +593,7 @@ spec:
       labels:
         openebs.io/target-service: cstor-target-svc
         openebs.io/storage-engine-type: cstor
+        openebs.io/cas-type: cstor
         openebs.io/persistent-volume: {{ .Volume.owner }}
       name: {{ .Volume.owner }}
     spec:
@@ -673,6 +674,7 @@ spec:
       labels:
         app: cstor-volume-manager
         openebs.io/storage-engine-type: cstor
+        openebs.io/cas-type: cstor
         openebs.io/target: cstor-target
         openebs.io/persistent-volume: {{ .Volume.owner }}
         openebs.io/persistent-volume-claim: {{ .Volume.pvc }}
@@ -1374,6 +1376,88 @@ spec:
 apiVersion: openebs.io/v1alpha1
 kind: CASTemplate
 metadata:
+  name: jiva-volume-list-default-0.6.0
+spec:
+  taskNamespace: openebs
+  run:
+    tasks:
+    - jiva-volume-list-listtargetservice-default-0.6.0
+    - jiva-volume-list-listtargetpod-default-0.6.0
+    - jiva-volume-list-listreplicapod-default-0.6.0
+  output: jiva-volume-list-output-default-0.7.0
+---
+apiVersion: openebs.io/v1alpha1
+kind: RunTask
+metadata:
+  name: jiva-volume-list-listtargetservice-default-0.6.0
+  namespace: openebs
+spec:
+  meta: |
+    {{- $nss := .Volume.runNamespace | default "" | splitList ", " -}}
+    id: listlistsvc
+    repeatWith:
+      metas:
+      {{- range $k, $ns := $nss }}
+      - runNamespace: {{ $ns }}
+      {{- end }}
+    apiVersion: v1
+    kind: Service
+    action: list
+    options: |-
+      labelSelector: openebs.io/controller-service=jiva-controller-service
+  post: |
+    {{- $servicePairs := jsonpath .JsonResult `{range .items[*]}pkey={@.metadata.namespace}/{@.metadata.labels.vsm},clusterIP={@.spec.clusterIP};{end}` | trim | default "" | splitList ";" -}}
+    {{- $servicePairs | keyMap "volumeList" .ListItems | noop -}}
+---
+apiVersion: openebs.io/v1alpha1
+kind: RunTask
+metadata:
+  name: jiva-volume-list-listtargetpod-default-0.6.0
+  namespace: openebs
+spec:
+  meta: |
+    {{- $nss := .Volume.runNamespace | default "" | splitList ", " -}}
+    id: listlistctrl
+    repeatWith:
+      metas:
+      {{- range $k, $ns := $nss }}
+      - runNamespace: {{ $ns }}
+      {{- end }}
+    apiVersion: v1
+    kind: Pod
+    action: list
+    options: |-
+      labelSelector: openebs/controller=jiva-controller
+  post: |
+    {{- $controllerPairs := jsonpath .JsonResult `{range .items[*]}pkey={@.metadata.namespace}/{@.metadata.labels.vsm},controllerIP={@.status.podIP},controllerStatus={@.status.containerStatuses[*].ready};{end}` | trim | default "" | splitList ";" -}}
+    {{- $controllerPairs | keyMap "volumeList" .ListItems | noop -}}
+---
+apiVersion: openebs.io/v1alpha1
+kind: RunTask
+metadata:
+  name: jiva-volume-list-listreplicapod-default-0.6.0
+  namespace: openebs
+spec:
+  meta: |
+    {{- $nss := .Volume.runNamespace | default "" | splitList ", " -}}
+    id: listlistrep
+    repeatWith:
+      metas:
+      {{- range $k, $ns := $nss }}
+      - runNamespace: {{ $ns }}
+      {{- end }}
+    apiVersion: v1
+    kind: Pod
+    action: list
+    options: |-
+      labelSelector: openebs/replica=jiva-replica
+  post: |
+    {{- $replicaPairs := jsonpath .JsonResult `{range .items[*]}pkey={@.metadata.namespace}/{@.metadata.labels.vsm},replicaIP={@.status.podIP},replicaStatus={@.status.containerStatuses[*].ready},capacity=Uknown;{end}` | trim | default "" | splitList ";" -}}
+    {{- $replicaPairs | keyMap "volumeList" .ListItems | noop -}}
+---
+apiVersion: openebs.io/v1alpha1
+kind: CASTemplate
+metadata:
   name: jiva-volume-list-default-0.7.0
 spec:
   taskNamespace: openebs
@@ -1635,14 +1719,12 @@ spec:
     Kind: Service
     metadata:
       labels:
-        openebs/controller-service: jiva-controller-service
-        openebs/volume-provisioner: jiva
-        vsm: {{ .Volume.owner }}
-        pvc: {{ .Volume.pvc }}
         openebs.io/storage-engine-type: jiva
+        openebs.io/cas-type: jiva
         openebs.io/controller-service: jiva-controller-svc
         openebs.io/persistent-volume: {{ .Volume.owner }}
         openebs.io/persistent-volume-claim: {{ .Volume.pvc }}
+        pvc: {{ .Volume.pvc }}
       name: {{ .Volume.owner }}-ctrl-svc
     spec:
       ports:
@@ -1655,8 +1737,6 @@ spec:
         protocol: TCP
         targetPort: 9501
       selector:
-        openebs/controller: jiva-controller
-        vsm: {{ .Volume.owner }}
         openebs.io/controller: jiva-controller
         openebs.io/persistent-volume: {{ .Volume.owner }}
 ---
@@ -1795,17 +1875,15 @@ spec:
     Kind: Deployment
     metadata:
       labels:
-        openebs/volume-provisioner: jiva
-        openebs/controller: jiva-controller
-        vsm: {{ .Volume.owner }}
-        pvc: {{ .Volume.pvc }}
         {{- if eq $isMonitor "true" }}
         monitoring: "volume_exporter_prometheus"
         {{- end}}
         openebs.io/storage-engine-type: jiva
+        openebs.io/cas-type: jiva
         openebs.io/controller: jiva-controller
         openebs.io/persistent-volume: {{ .Volume.owner }}
         openebs.io/persistent-volume-claim: {{ .Volume.pvc }}
+        pvc: {{ .Volume.pvc }}
       annotations:
         {{- if eq $isMonitor "true" }}
         openebs.io/volume-monitor: "true"
@@ -1816,28 +1894,18 @@ spec:
       replicas: 1
       selector:
         matchLabels:
-          openebs/volume-provisioner: jiva
-          openebs/controller: jiva-controller
-          vsm: {{ .Volume.owner }}
-          pvc: {{ .Volume.pvc }}
-          {{- if eq $isMonitor "true" }}
-          monitoring: volume_exporter_prometheus
-          {{- end}}
           openebs.io/controller: jiva-controller
           openebs.io/persistent-volume: {{ .Volume.owner }}
       template:
         metadata:
           labels:
-            openebs/volume-provisioner: jiva
-            openebs/controller: jiva-controller
-            vsm: {{ .Volume.owner }}
-            pvc: {{ .Volume.pvc }}
             {{- if eq $isMonitor "true" }}
             monitoring: volume_exporter_prometheus
             {{- end}}
             openebs.io/controller: jiva-controller
             openebs.io/persistent-volume: {{ .Volume.owner }}
             openebs.io/persistent-volume-claim: {{ .Volume.pvc }}
+            pvc: {{ .Volume.pvc }}
         spec:
           containers:
           - args:
@@ -1928,14 +1996,12 @@ spec:
     kind: Deployment
     metadata:
       labels:
-        openebs/replica: jiva-replica
-        openebs/volume-provisioner: jiva
-        vsm: {{ .Volume.owner }}
-        pvc: {{ .Volume.pvc }}
         openebs.io/storage-engine-type: jiva
+        openebs.io/cas-type: jiva
         openebs.io/replica: jiva-replica
         openebs.io/persistent-volume: {{ .Volume.owner }}
         openebs.io/persistent-volume-claim: {{ .Volume.pvc }}
+        pvc: {{ .Volume.pvc }}
       annotations:
         openebs.io/capacity: {{ .Volume.capacity }}
         openebs.io/storage-pool: {{ .Config.StoragePool.value }}
@@ -1944,22 +2010,15 @@ spec:
       replicas: {{ .Config.ReplicaCount.value }}
       selector:
         matchLabels:
-          openebs/replica: jiva-replica
-          openebs/volume-provisioner: jiva
-          vsm: {{ .Volume.owner }}
-          pvc: {{ .Volume.pvc }}
           openebs.io/replica: jiva-replica
           openebs.io/persistent-volume: {{ .Volume.owner }}
       template:
         metadata:
           labels:
-            openebs/replica: jiva-replica
-            openebs/volume-provisioner: jiva
-            vsm: {{ .Volume.owner }}
-            pvc: {{ .Volume.pvc }}
             openebs.io/replica: jiva-replica
             openebs.io/persistent-volume: {{ .Volume.owner }}
             openebs.io/persistent-volume-claim: {{ .Volume.pvc }}
+            pvc: {{ .Volume.pvc }}
           annotations:
             openebs.io/capacity: {{ .Volume.capacity }}
             openebs.io/storage-pool: {{ .Config.StoragePool.value }}
@@ -1969,9 +2028,7 @@ spec:
               requiredDuringSchedulingIgnoredDuringExecution:
               - labelSelector:
                   matchLabels:
-                    openebs/replica: jiva-replica
                     openebs.io/replica: jiva-replica
-                    vsm: {{ .Volume.owner }}
                     openebs.io/persistent-volume: {{ .Volume.owner }}
                 topologyKey: kubernetes.io/hostname
           containers:

@@ -1,0 +1,11 @@
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: cstor-sc-sparse-ns-default
+spec:
+  storageClassName: openebs-cstor-sparse
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 4G
