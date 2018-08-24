@@ -110,7 +110,7 @@ spec:
         # OPENEBS_IO_CAS_TEMPLATE_TO_LIST_VOLUME sets the cas template name to
         # list volumes. This is a mandatory env variable.
         - name: OPENEBS_IO_CAS_TEMPLATE_TO_LIST_VOLUME
-          value: "jiva-volume-list-default-0.7.0,cstor-volume-list-default-0.7.0"
+          value: "jiva-volume-list-default-0.6.0,jiva-volume-list-default-0.7.0,cstor-volume-list-default-0.7.0"
         # OPENEBS_IO_INSTALL_CONFIG_NAME provides the name of configmap related
         # to maya install
         - name: OPENEBS_IO_INSTALL_CONFIG_NAME
