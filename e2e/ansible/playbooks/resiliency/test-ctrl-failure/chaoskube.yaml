@@ -24,7 +24,7 @@ spec:
         #- --interval=10m
         
         # only target pods in the test environment
-        #- --labels=openebs/controller=jiva-controller
+        #- --labels=openebs.io/controller=jiva-controller
         
         # only consider pods with this annotation
         #- --annotations=chaos.alpha.kubernetes.io/enabled=true

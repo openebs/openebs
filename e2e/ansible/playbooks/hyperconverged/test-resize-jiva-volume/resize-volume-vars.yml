@@ -11,6 +11,6 @@ claim_name: percona-claim
 
 app_label: "name=percona"
 
-replica_label: "openebs/replica=jiva-replica"
+replica_label: "openebs.io/replica=jiva-replica"
 
 namespace: resize-volume

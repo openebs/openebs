@@ -117,7 +117,7 @@
        - name: Get the name of the volume ctrl deployment
          shell: >
            source ~/.profile; kubectl get deployments -n {{ namespace }}
-           -l openebs/controller=jiva-controller --no-headers
+           -l openebs.io/controller=jiva-controller --no-headers
          args:
            executable: /bin/bash
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
@@ -147,7 +147,7 @@
          shell: >
            source ~/.profile; kubectl exec {{ chaospod }} -n {{ namespace }}
            -- timeout -t {{ chaos_duration }} chaoskube
-           --labels 'openebs/controller=jiva-controller'
+           --labels 'openebs.io/controller=jiva-controller'
            --no-dry-run --interval={{ chaos_interval }}s
            --debug
            --namespaces={{ namespace }}
