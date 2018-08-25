@@ -1182,6 +1182,19 @@ spec:
 apiVersion: openebs.io/v1alpha1
 kind: CASTemplate
 metadata:
+  name: jiva-volume-read-default-0.6.0
+spec:
+  taskNamespace: openebs
+  run:
+    tasks:
+    - jiva-volume-read-listtargetservice-default-0.6.0
+    - jiva-volume-read-listtargetpod-default-0.6.0
+    - jiva-volume-read-listreplicapod-default-0.6.0
+  output: jiva-volume-read-output-default-0.7.0
+---
+apiVersion: openebs.io/v1alpha1
+kind: CASTemplate
+metadata:
   name: jiva-volume-read-default-0.7.0
 spec:
   taskNamespace: openebs
@@ -1516,6 +1529,42 @@ spec:
 apiVersion: openebs.io/v1alpha1
 kind: RunTask
 metadata:
+  name: jiva-volume-read-getpv-default-0.6.0
+  namespace: openebs
+spec:
+  meta: |
+    id: readgetpv
+    apiVersion: v1
+    runNamespace: default
+    kind: PersistentVolume
+    objectName: {{ .Volume.owner }}
+    action: get
+  post: |
+    {{- $capacity := jsonpath .JsonResult "{.spec.capacity.storage}" -}}
+    {{- trim $capacity | saveAs "readgetpv.capacity" .TaskResult | noop -}}
+---
+apiVersion: openebs.io/v1alpha1
+kind: RunTask
+metadata:
+  name: jiva-volume-read-listtargetservice-default-0.6.0
+  namespace: openebs
+spec:
+  meta: |
+    id: readlistsvc
+    runNamespace: {{ .Volume.runNamespace }}
+    apiVersion: v1
+    kind: Service
+    action: list
+    options: |-
+      labelSelector: openebs/controller-service=jiva-controller-service,vsm={{ .Volume.owner }}
+  post: |
+    {{- jsonpath .JsonResult "{.items[*].metadata.name}" | trim | saveAs "readlistsvc.items" .TaskResult | noop -}}
+    {{- .TaskResult.readlistsvc.items | notFoundErr "controller service not found" | saveIf "readlistsvc.notFoundErr" .TaskResult | noop -}}
+    {{- jsonpath .JsonResult "{.items[*].spec.clusterIP}" | trim | saveAs "readlistsvc.clusterIP" .TaskResult | noop -}}
+---
+apiVersion: openebs.io/v1alpha1
+kind: RunTask
+metadata:
   name: jiva-volume-read-listtargetservice-default-0.7.0
   namespace: openebs
 spec:
@@ -1531,6 +1580,26 @@ spec:
     {{- jsonpath .JsonResult "{.items[*].metadata.name}" | trim | saveAs "readlistsvc.items" .TaskResult | noop -}}
     {{- .TaskResult.readlistsvc.items | notFoundErr "controller service not found" | saveIf "readlistsvc.notFoundErr" .TaskResult | noop -}}
     {{- jsonpath .JsonResult "{.items[*].spec.clusterIP}" | trim | saveAs "readlistsvc.clusterIP" .TaskResult | noop -}}
+---
+apiVersion: openebs.io/v1alpha1
+kind: RunTask
+metadata:
+  name: jiva-volume-read-listtargetpod-default-0.6.0
+  namespace: openebs
+spec:
+  meta: |
+    id: readlistctrl
+    runNamespace: {{ .Volume.runNamespace }}
+    apiVersion: v1
+    kind: Pod
+    action: list
+    options: |-
+      labelSelector: openebs/controller=jiva-controller,vsm={{ .Volume.owner }}
+  post: |
+    {{- jsonpath .JsonResult "{.items[*].metadata.name}" | trim | saveAs "readlistctrl.items" .TaskResult | noop -}}
+    {{- .TaskResult.readlistctrl.items | notFoundErr "controller pod not found" | saveIf "readlistctrl.notFoundErr" .TaskResult | noop -}}
+    {{- jsonpath .JsonResult "{.items[*].status.podIP}" | trim | saveAs "readlistctrl.podIP" .TaskResult | noop -}}
+    {{- jsonpath .JsonResult "{.items[*].status.containerStatuses[*].ready}" | trim | saveAs "readlistctrl.status" .TaskResult | noop -}}
 ---
 apiVersion: openebs.io/v1alpha1
 kind: RunTask
@@ -1551,6 +1620,27 @@ spec:
     {{- .TaskResult.readlistctrl.items | notFoundErr "controller pod not found" | saveIf "readlistctrl.notFoundErr" .TaskResult | noop -}}
     {{- jsonpath .JsonResult "{.items[*].status.podIP}" | trim | saveAs "readlistctrl.podIP" .TaskResult | noop -}}
     {{- jsonpath .JsonResult "{.items[*].status.containerStatuses[*].ready}" | trim | saveAs "readlistctrl.status" .TaskResult | noop -}}
+---
+apiVersion: openebs.io/v1alpha1
+kind: RunTask
+metadata:
+  name: jiva-volume-read-listreplicapod-default-0.6.0
+  namespace: openebs
+spec:
+  meta: |
+    id: readlistrep
+    runNamespace: {{ .Volume.runNamespace }}
+    apiVersion: v1
+    kind: Pod
+    action: list
+    options: |-
+      labelSelector: openebs/replica=jiva-replica,vsm={{ .Volume.owner }}
+  post: |
+    {{- jsonpath .JsonResult "{.items[*].metadata.name}" | trim | saveAs "readlistrep.items" .TaskResult | noop -}}
+    {{- .TaskResult.readlistrep.items | notFoundErr "replica pod(s) not found" | saveIf "readlistrep.notFoundErr" .TaskResult | noop -}}
+    {{- jsonpath .JsonResult "{.items[*].status.podIP}" | trim | saveAs "readlistrep.podIP" .TaskResult | noop -}}
+    {{- jsonpath .JsonResult "{.items[*].status.containerStatuses[*].ready}" | trim | saveAs "readlistrep.status" .TaskResult | noop -}}
+    {{- "0G" | saveAs "readlistrep.capacity" .TaskResult -}}
 ---
 apiVersion: openebs.io/v1alpha1
 kind: RunTask
