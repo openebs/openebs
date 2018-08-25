@@ -31,6 +31,8 @@ spec:
   #- name: PoolResourceLimits
   #  value: |-
   #      memory: 1Gi
+  - name: PoolResourceLimits
+    value: "false"
   # AuxResourceLimits allow you to set limits on side cars. Limits have to be specified
   # in the format expected by Kubernetes
   - name: AuxResourceLimits
