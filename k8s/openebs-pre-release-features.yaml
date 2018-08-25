@@ -2119,7 +2119,7 @@ spec:
     kind: Service
     action: list
     options: |-
-      labelSelector: openebs/controller-service=jiva-controller-service,openebs/vsm={{ .Volume.owner }}
+      labelSelector: openebs/controller-service=jiva-controller-service,vsm={{ .Volume.owner }}
   post: |
     {{- jsonpath .JsonResult "{.items[*].metadata.name}" | trim | saveAs "deletelistsvc.names" .TaskResult | noop -}}
     {{- .TaskResult.deletelistsvc.names | notFoundErr "controller service not found" | saveIf "deletelistsvc.notFoundErr" .TaskResult | noop -}}
