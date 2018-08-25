@@ -16,12 +16,9 @@ data:
     Kind: Service
     metadata:
       labels:
-        openebs/controller-service: jiva-controller-service
         openebs.io/controller-service: jiva-controller-svc
         openebs.io/storage-engine-type: jiva
-        openebs/volume-provisioner: jiva
-        vsm: {{ .Volume.owner }}
-        openebs.io/pv: {{ .Volume.owner }}
+        openebs.io/persistent-volume: {{ .Volume.owner }}
       name: {{ .Volume.owner }}-ctrl-svc
     spec:
       ports:
@@ -34,10 +31,8 @@ data:
         protocol: TCP
         targetPort: 9501
       selector:
-        openebs/controller: jiva-controller
-        vsm: {{ .Volume.owner }}
         openebs.io/controller: jiva-controller
-        openebs.io/pv: {{ .Volume.owner }}
+        openebs.io/persistent-volume: {{ .Volume.owner }}
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -73,11 +68,8 @@ data:
     metadata:
       labels:
         openebs.io/storage-engine-type: jiva
-        openebs/volume-provisioner: jiva
-        openebs/controller: jiva-controller
         openebs.io/controller: jiva-controller
-        vsm: {{ .Volume.owner }}
-        openebs.io/pv: {{ .Volume.owner }}
+        openebs.io/persistent-volume: {{ .Volume.owner }}
       annotations:
         openebs.io/volume-monitor: "true"
         openebs.io/volume-type: jiva
@@ -86,19 +78,14 @@ data:
       replicas: 1
       selector:
         matchLabels:
-          monitoring: volume_exporter_prometheus
           openebs.io/controller: jiva-controller
-          openebs/controller: jiva-controller
-          openebs.io/pv: {{ .Volume.owner }}
-          vsm: {{ .Volume.owner }}
+          openebs.io/persistent-volume: {{ .Volume.owner }}
       template:
         metadata:
           labels:
             monitoring: volume_exporter_prometheus
             openebs.io/controller: jiva-controller
-            openebs/controller: jiva-controller
-            openebs.io/pv: {{ .Volume.owner }}
-            vsm: {{ .Volume.owner }}
+            openebs.io/persistent-volume: {{ .Volume.owner }}
         spec:
           containers:
           - args:
@@ -155,37 +142,28 @@ data:
     metadata:
       labels:
         openebs.io/storage-engine-type: jiva
-        openebs/volume-provisioner: jiva
-        openebs/replica: jiva-replica
         openebs.io/replica: jiva-replica
-        vsm: {{ .Volume.owner }}
-        openebs.io/pv: {{ .Volume.owner }}
+        openebs.io/persistent-volume: {{ .Volume.owner }}
       name: {{ .Volume.owner }}-rep
     spec:
       replicas: {{ .Policy.ReplicaCount.value }}
       selector:
         matchLabels:
-          openebs/replica: jiva-replica
           openebs.io/replica: jiva-replica
-          vsm: {{ .Volume.owner }}
-          openebs.io/pv: {{ .Volume.owner }}
+          openebs.io/persistent-volume: {{ .Volume.owner }}
       template:
         metadata:
           labels:
-            openebs/replica: jiva-replica
             openebs.io/replica: jiva-replica
-            vsm: {{ .Volume.owner }}
-            openebs.io/pv: {{ .Volume.owner }}
+            openebs.io/persistent-volume: {{ .Volume.owner }}
         spec:
           affinity:
             podAntiAffinity:
               requiredDuringSchedulingIgnoredDuringExecution:
               - labelSelector:
                   matchLabels:
-                    openebs/replica: jiva-replica
                     openebs.io/replica: jiva-replica
-                    vsm: {{ .Volume.owner }}
-                    openebs.io/pv: {{ .Volume.owner }}
+                    openebs.io/persistent-volume: {{ .Volume.owner }}
                 topologyKey: kubernetes.io/hostname
           containers:
           - args:
