@@ -103,10 +103,6 @@ spec:
         ports:
         - containerPort: 5656
         env:
-        # OPENEBS_IO_CAS_TEMPLATE_FEATURE_GATE enables cas template feature;
-        # valid values are 'on' and 'off'. This feature is disabled by default.
-        - name: OPENEBS_IO_CAS_TEMPLATE_FEATURE_GATE
-          value: "true"
         # OPENEBS_IO_CAS_TEMPLATE_TO_LIST_VOLUME sets the cas template name to
         # list volumes. This is a mandatory env variable.
         - name: OPENEBS_IO_CAS_TEMPLATE_TO_LIST_VOLUME
@@ -121,6 +117,12 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
+        # OPENEBS_SERVICE_ACCOUNT provides the service account of this pod as
+        # environment variable
+        - name: OPENEBS_SERVICE_ACCOUNT
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.serviceAccountName
         # OPENEBS_IO_KUBE_CONFIG enables maya api service to connect to K8s
         # based on this config. This is ignored if empty.
         # This is supported for maya api server version 0.5.2 onwards
@@ -191,10 +193,6 @@ spec:
         imagePullPolicy: IfNotPresent
         image: openebs/openebs-k8s-provisioner:ci
         env:
-        # OPENEBS_IO_CAS_TEMPLATE_FEATURE_GATE enables cas template feature;
-        # valid values are 'on' and 'off'. This feature is disabled by default.
-        - name: OPENEBS_IO_CAS_TEMPLATE_FEATURE_GATE
-          value: "true"
         # OPENEBS_IO_K8S_MASTER enables openebs provisioner to connect to K8s
         # based on this address. This is ignored if empty.
         # This is supported for openebs provisioner version 0.5.2 onwards
