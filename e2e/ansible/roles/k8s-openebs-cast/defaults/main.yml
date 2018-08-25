@@ -2,3 +2,5 @@
 openebs_pre_release_link: https://raw.githubusercontent.com/openebs/openebs/master/k8s/openebs-pre-release-features.yaml
 
 openebs_pre_release_alias: openebs-pre-release-features.yaml
+
+operator_ns: openebs

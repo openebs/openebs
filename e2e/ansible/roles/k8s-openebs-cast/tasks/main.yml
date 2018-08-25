@@ -57,3 +57,14 @@
     executable: /bin/bash
   register: result
   failed_when: '"No resources found." in result.stdout'
+
+- name: Confirm default cStor sparse pool pods are running
+  shell: >
+    source ~/.profile;
+    kubectl get pods -n {{operator_ns}} -l app=cstor-pool --no-headers -o custom-columns=:status.phase
+  args:
+    executable: /bin/bash
+  register: result_sp
+  until: "((result_sp.stdout_lines|unique)|length) == 1 and 'Running' in result_sp.stdout"
+  delay: 15
+  retries: 6

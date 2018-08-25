@@ -26,13 +26,6 @@
       delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
       with_items: "{{ diskList.stdout_lines }}"
 
-    - name: Get number of nodes
-      shell: source ~/.profile; kubectl get nodes | grep 'Ready' | grep 'none' | wc -l
-      args:
-        executable: /bin/bash
-      delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-      register: node_count
-
     - name: Create cStorPool
       shell: source ~/.profile; kubectl apply -f {{ result_kube_home.stdout }}/default-cstorpool.j2
       args:
@@ -40,12 +33,14 @@
       delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
     - name: Get number of pools created
-      shell: source ~/.profile; kubectl get pods -n openebs | grep {{poolname}} | grep 'Running' | wc -l
+      shell: >
+        source ~/.profile;
+        kubectl get pods -n {{operator_ns}} -l app=cstor-pool --no-headers -o custom-columns=:status.phase
       args:
         executable: /bin/bash
       delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
       register: pool_count
-      until: (node_count.stdout)|int == (pool_count.stdout)|int
+      until: "((pool_count.stdout_lines|unique)|length) == 1 and 'Running' in pool_count.stdout"
       delay: 10
       retries: 20
 
@@ -66,34 +61,29 @@
         executable: /bin/bash
       register: result_kube_home
       delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-   
+
     - template:
         src: default-cstorpool-sparse.j2
         dest: "{{ result_kube_home.stdout }}"
-         
-    - name: Get number of nodes
-      shell: source ~/.profile; kubectl get nodes | grep 'Ready' | grep 'none' | wc -l
-      args:
-        executable: /bin/bash
-      delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-      register: node_count
-    
+
     - name: Create cStorPool claim using sparse file
       shell: source ~/.profile; kubectl apply -f {{ result_kube_home.stdout }}/default-cstorpool-sparse.j2
       args:
         executable: /bin/bash
       delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-    
+
     - name: Get number of pools created
-      shell: source ~/.profile; kubectl get pods -n openebs | grep {{cstor_pool}} | grep 'Running' | wc -l
+      shell: >
+        source ~/.profile;
+        kubectl get pods -n {{operator_ns}} -l app=cstor-pool --no-headers -o custom-columns=:status.phase
       args:
         executable: /bin/bash
       delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
       register: pool_count
-      until: (node_count.stdout)|int == (pool_count.stdout)|int
+      until: "((pool_count.stdout_lines|unique)|length) == 1 and 'Running' in pool_count.stdout"
       delay: 10
       retries: 20
-    
+
     - name: Remove the copied template.
       file:
         path: "{{result_kube_home.stdout}}/{{item}}"
@@ -102,8 +92,8 @@
         - default-cstorpool-sparse.j2
 
   when: action == 'sparsepool_create'
-    
-- block:  
+
+- block:
 
     - name: Get $HOME of K8s master for kubernetes user
       shell: source ~/.profile; echo $HOME
@@ -148,10 +138,10 @@
         state: absent
       with_items:
         - default-cstorpool.j2
-   
+
   when: action == 'delete'
 
-- block:  
+- block:
 
     - name: Get $HOME of K8s master for kubernetes user
       shell: source ~/.profile; echo $HOME
@@ -189,7 +179,7 @@
       until: "cstor_pool not in cstorpool_pods.stdout"
       delay: 10
       retries: 20
-      
+
     - name: Remove the copied templates
       file:
         path: "{{result_kube_home.stdout}}/{{item}}"

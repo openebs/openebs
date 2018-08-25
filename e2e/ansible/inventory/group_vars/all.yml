@@ -100,8 +100,8 @@ storage_engine: jiva
 tag: ci
 #Custom storage class names
 
-cstor_sc: openebs-cstor-e2e
-jiva_sc: openebs-jiva-e2e
+cstor_sc: openebs-cstor-disk
+jiva_sc: openebs-jiva-sparse
 
 # This allows us to select the tool to create the disks based on the cloud the disks are being created on:
 # Accepted Entries: GCP, AWS
