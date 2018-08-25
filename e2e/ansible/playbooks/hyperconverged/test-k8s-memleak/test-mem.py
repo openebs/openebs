@@ -8,7 +8,7 @@ import subprocess
 import time, os, sys
 list = []
 namespace = sys.argv[1]
-cmd_cntrl_name = "source ~/.profile; kubectl get pod -n %s -l openebs/controller=jiva-controller --no-headers | awk '{print $1}'" %(namespace)
+cmd_cntrl_name = "source ~/.profile; kubectl get pod -n %s -l openebs.io/controller=jiva-controller --no-headers | awk '{print $1}'" %(namespace)
 print cmd_cntrl_name
 out = subprocess.Popen(cmd_cntrl_name,stdout=subprocess.PIPE,shell=True)
 cntrl_name = out.communicate()

@@ -169,7 +169,7 @@
           delegate_to: "{{ groups['kubernetes-kubemasters'].0}}"
 
         - name: Getting the replica pod names
-          shell:  kubectl get pods --all-namespaces --show-labels | grep openebs/replica=jiva-replica | awk {'print $2'} | awk 'FNR == {{ item }} {print}'
+          shell:  kubectl get pods --all-namespaces --show-labels | grep openebs.io/replica=jiva-replica | awk {'print $2'} | awk 'FNR == {{ item }} {print}'
           args:
             executable: /bin/bash
           register: pods

@@ -144,7 +144,7 @@
          include_tasks: "{{utils_path}}/deploy_check.yml"
          vars:
            ns: "{{ namespace }}"
-           lkey: openebs/replica
+           lkey: openebs.io/replica
            lvalue: jiva-replica           
 
        - name: 8) Obtaining the replica pods running on specified node
@@ -269,7 +269,7 @@
          include_tasks: "{{utils_path}}/deploy_check.yml"
          vars:
            ns: "{{ namespace }}"
-           lkey: openebs/replica
+           lkey: openebs.io/replica
            lvalue: jiva-replica
 
        - name: 14) Get Controller SVC IP

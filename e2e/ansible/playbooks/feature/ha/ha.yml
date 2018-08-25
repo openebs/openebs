@@ -90,7 +90,7 @@
            - name: Get storage ctrl pod name
              shell: >
                source ~/.profile;
-               kubectl get pods -n {{ namespace }} -l openebs/controller=jiva-controller --no-headers
+               kubectl get pods -n {{ namespace }} -l openebs.io/controller=jiva-controller --no-headers
              args:
                executable: /bin/bash
              register: result
@@ -192,7 +192,7 @@
        - name: Check if ctrl pod is restarted within 30s
          shell: >
            source ~/.profile;
-           kubectl get pods -n {{ namespace }} -l openebs/controller=jiva-controller
+           kubectl get pods -n {{ namespace }} -l openebs.io/controller=jiva-controller
          args:
            executable: /bin/bash
          register: result
