@@ -1292,6 +1292,22 @@ spec:
 apiVersion: openebs.io/v1alpha1
 kind: CASTemplate
 metadata:
+  name: jiva-volume-delete-default-0.6.0
+spec:
+  taskNamespace: openebs
+  run:
+    tasks:
+    - jiva-volume-delete-listtargetservice-default-0.6.0
+    - jiva-volume-delete-listtargetdeployment-default-0.6.0
+    - jiva-volume-delete-listreplicadeployment-default-0.6.0
+    - jiva-volume-delete-deletetargetservice-default-0.7.0
+    - jiva-volume-delete-deletetargetdeployment-default-0.7.0
+    - jiva-volume-delete-deletereplicadeployment-default-0.7.0
+  output: jiva-volume-delete-output-default-0.7.0
+---
+apiVersion: openebs.io/v1alpha1
+kind: CASTemplate
+metadata:
   name: jiva-volume-delete-default-0.7.0
 spec:
   taskNamespace: openebs
@@ -2092,6 +2108,25 @@ spec:
 apiVersion: openebs.io/v1alpha1
 kind: RunTask
 metadata:
+  name: jiva-volume-delete-listtargetservice-default-0.6.0
+  namespace: openebs
+spec:
+  meta: |
+    id: deletelistsvc
+    runNamespace: {{ .Volume.runNamespace }}
+    apiVersion: v1
+    kind: Service
+    action: list
+    options: |-
+      labelSelector: openebs/controller-service=jiva-controller-service,openebs/vsm={{ .Volume.owner }}
+  post: |
+    {{- jsonpath .JsonResult "{.items[*].metadata.name}" | trim | saveAs "deletelistsvc.names" .TaskResult | noop -}}
+    {{- .TaskResult.deletelistsvc.names | notFoundErr "controller service not found" | saveIf "deletelistsvc.notFoundErr" .TaskResult | noop -}}
+    {{- .TaskResult.deletelistsvc.names | default "" | splitList " " | isLen 1 | not | verifyErr "total no. of controller services is not 1" | saveIf "deletelistsvc.verifyErr" .TaskResult | noop -}}
+---
+apiVersion: openebs.io/v1alpha1
+kind: RunTask
+metadata:
   name: jiva-volume-delete-listtargetservice-default-0.7.0
   namespace: openebs
 spec:
@@ -2111,6 +2146,25 @@ spec:
 apiVersion: openebs.io/v1alpha1
 kind: RunTask
 metadata:
+  name: jiva-volume-delete-listtargetdeployment-default-0.6.0
+  namespace: openebs
+spec:
+  meta: |
+    id: deletelistctrl
+    runNamespace: {{ .Volume.runNamespace }}
+    apiVersion: extensions/v1beta1
+    kind: Deployment
+    action: list
+    options: |-
+      labelSelector: openebs/controller=jiva-controller,vsm={{ .Volume.owner }}
+  post: |
+    {{- jsonpath .JsonResult "{.items[*].metadata.name}" | trim | saveAs "deletelistctrl.names" .TaskResult | noop -}}
+    {{- .TaskResult.deletelistctrl.names | notFoundErr "controller deployment not found" | saveIf "deletelistctrl.notFoundErr" .TaskResult | noop -}}
+    {{- .TaskResult.deletelistctrl.names | default "" | splitList " " | isLen 1 | not | verifyErr "total no. of controller deployments is not 1" | saveIf "deletelistctrl.verifyErr" .TaskResult | noop -}}
+---
+apiVersion: openebs.io/v1alpha1
+kind: RunTask
+metadata:
   name: jiva-volume-delete-listtargetdeployment-default-0.7.0
   namespace: openebs
 spec:
@@ -2126,6 +2180,25 @@ spec:
     {{- jsonpath .JsonResult "{.items[*].metadata.name}" | trim | saveAs "deletelistctrl.names" .TaskResult | noop -}}
     {{- .TaskResult.deletelistctrl.names | notFoundErr "controller deployment not found" | saveIf "deletelistctrl.notFoundErr" .TaskResult | noop -}}
     {{- .TaskResult.deletelistctrl.names | default "" | splitList " " | isLen 1 | not | verifyErr "total no. of controller deployments is not 1" | saveIf "deletelistctrl.verifyErr" .TaskResult | noop -}}
+---
+apiVersion: openebs.io/v1alpha1
+kind: RunTask
+metadata:
+  name: jiva-volume-delete-listreplicadeployment-default-0.6.0
+  namespace: openebs
+spec:
+  meta: |
+    id: deletelistrep
+    runNamespace: {{ .Volume.runNamespace }}
+    apiVersion: extensions/v1beta1
+    kind: Deployment
+    action: list
+    options: |-
+      labelSelector: openebs/replica=jiva-replica,vsm={{ .Volume.owner }}
+  post: |
+    {{- jsonpath .JsonResult "{.items[*].metadata.name}" | trim | saveAs "deletelistrep.names" .TaskResult | noop -}}
+    {{- .TaskResult.deletelistrep.names | notFoundErr "replica deployment not found" | saveIf "deletelistrep.notFoundErr" .TaskResult | noop -}}
+    {{- .TaskResult.deletelistrep.names | default "" | splitList " " | isLen 1 | not | verifyErr "total no. of replica deployments is not 1" | saveIf "deletelistrep.verifyErr" .TaskResult | noop -}}
 ---
 apiVersion: openebs.io/v1alpha1
 kind: RunTask
