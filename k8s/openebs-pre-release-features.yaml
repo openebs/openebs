@@ -25,14 +25,19 @@ spec:
   # will be placed
   - name: RunNamespace
     value: openebs
-  # ResourceLimits allow you to set the limits on memory and cpu for pool pods
+  # PoolResourceLimits allow you to set the limits on memory and cpu for pool pods
   # The resource and limit value should be in the same format as expected by
   # Kubernetes. Example:
-  #- name: ResourceLimits
+  #- name: PoolResourceLimits
   #  value: |-
   #      memory: 1Gi
+  #      cpu: 200m
   # By default, the resource limits are disabled. 
-  - name: ResourceLimits
+  - name: PoolResourceLimits
+    value: "false"
+  # AuxResourceLimits allow you to set limits on side cars. Limits have to be specified
+  # in the format expected by Kubernetes
+  - name: AuxResourceLimits
     value: "false"
   taskNamespace: openebs
   run:
@@ -185,8 +190,10 @@ spec:
     {{- $resourceNames := jsonpath .JsonResult `pkey=names,{.metadata.name}=;` | trim | default "" | splitList ";" -}}
     {{- $resourceNames | keyMap "resourceNameList" .ListItems | noop -}}
   task: |
-    {{- $setResourceLimits := .Config.ResourceLimits.value | default "false" -}}
-    {{- $resourceLimitsVal := fromYaml .Config.ResourceLimits.value -}}
+    {{- $setResourceLimits := .Config.PoolResourceLimits.value | default "false" -}}
+    {{- $resourceLimitsVal := fromYaml .Config.PoolResourceLimits.value -}}
+    {{- $setAuxResourceLimits := .Config.AuxResourceLimits.value | default "false" -}}
+    {{- $auxResourceLimitsVal := fromYaml .Config.AuxResourceLimits.value -}}
     apiVersion: extensions/v1beta1
     kind: Deployment
     metadata:
@@ -244,6 +251,13 @@ spec:
                     command: ["/bin/sh", "-c", "sleep 2"]
           - name: cstor-pool-mgmt
             image: {{ .Config.CstorPoolMgmtImage.value }}
+            {{- if ne $setAuxResourceLimits "false" }}
+            resources:
+              limits:
+              {{- range $rKey, $rLimit := $auxResourceLimitsVal }}
+                {{ $rKey }}: {{ $rLimit }}
+              {{- end }}
+            {{- end }}
             ports:
             - containerPort: 9500
               protocol: TCP
@@ -452,6 +466,20 @@ spec:
     value: openebs/m-exporter:ci
   - name: ReplicaCount
     value: "3"
+  # TargetResourceLimits allow you to set the limits on memory and cpu for target pods
+  # The resource and limit value should be in the same format as expected by
+  # Kubernetes. Example:
+  #- name: TargetResourceLimits
+  #  value: |-
+  #      memory: 1Gi
+  #      cpu: 200m
+  # By default, the resource limits are disabled. 
+  - name: TargetResourceLimits
+    value: "false"
+  # AuxResourceLimits allow you to set limits on side cars. Limits have to be specified
+  # in the format expected by Kubernetes
+  - name: AuxResourceLimits
+    value: "false"
   taskNamespace: openebs
   run:
     tasks:
@@ -625,6 +653,10 @@ spec:
     {{- jsonpath .JsonResult `{.metadata.name}` | trim | saveAs "cvolcreateputctrl.objectName" .TaskResult | noop -}}
   task: |
     {{- $isMonitor := .Config.VolumeMonitor.enabled | default "true" | lower -}}
+    {{- $setResourceLimits := .Config.TargetResourceLimits.value | default "false" -}}
+    {{- $resourceLimitsVal := fromYaml .Config.TargetResourceLimits.value -}}
+    {{- $setAuxResourceLimits := .Config.AuxResourceLimits.value | default "false" -}}
+    {{- $auxResourceLimitsVal := fromYaml .Config.AuxResourceLimits.value -}}
     apiVersion: apps/v1beta1
     Kind: Deployment
     metadata:
@@ -665,6 +697,13 @@ spec:
           - image: {{ .Config.VolumeTargetImage.value }}
             name: cstor-istgt
             imagePullPolicy: IfNotPresent
+            {{- if ne $setResourceLimits "false" }}
+            resources:
+              limits:
+              {{- range $rKey, $rLimit := $resourceLimitsVal }}
+                {{ $rKey }}: {{ $rLimit }}
+              {{- end }}
+            {{- end }}
             ports:
             - containerPort: 3260
               protocol: TCP
@@ -680,6 +719,13 @@ spec:
           {{- if eq $isMonitor "true" }}
           - image: {{ .Config.VolumeMonitorImage.value }}
             name: maya-volume-exporter
+            {{- if ne $setAuxResourceLimits "false" }}
+            resources:
+              limits:
+              {{- range $rKey, $rLimit := $auxResourceLimitsVal }}
+                {{ $rKey }}: {{ $rLimit }}
+              {{- end }}
+            {{- end }}
             args:
             - "-e=cstor"
             command: ["maya-exporter"]
@@ -692,6 +738,13 @@ spec:
           {{- end}}
           - name: cstor-volume-mgmt
             image: {{ .Config.VolumeControllerImage.value }}
+            {{- if ne $setAuxResourceLimits "false" }}
+            resources:
+              limits:
+              {{- range $rKey, $rLimit := $auxResourceLimitsVal }}
+                {{ $rKey }}: {{ $rLimit }}
+              {{- end }}
+            {{- end }}
             imagePullPolicy: IfNotPresent
             ports:
             - containerPort: 80
@@ -1264,6 +1317,25 @@ spec:
         operator: In
         values:
         - some-node-label-value
+  # TargetResourceLimits allow you to set the limits on memory and cpu for jiva 
+  # target pods. The resource and limit value should be in the same format as 
+  # expected by Kubernetes. Example:
+  #- name: TargetResourceLimits
+  #  value: |-
+  #      memory: 1Gi
+  #      cpu: 200m
+  # By default, the resource limits are disabled. 
+  - name: TargetResourceLimits
+    value: "false"
+  # ReplicaResourceLimits allow you to set the limits on memory and cpu for jiva 
+  # replica pods. The resource and limit value should be in the same format as
+  # expected by Kubernetes. Example:
+  - name: ReplicaResourceLimits
+    value: "false"
+  # AuxResourceLimits allow you to set limits on side cars. Limits have to be specified
+  # in the format expected by Kubernetes
+  - name: AuxResourceLimits
+    value: "false"
   taskNamespace: openebs
   run:
     tasks:
@@ -1706,6 +1778,10 @@ spec:
     {{- jsonpath .JsonResult "{.metadata.name}" | trim | saveAs "createputctrl.objectName" .TaskResult | noop -}}
   task: |
     {{- $isMonitor := .Config.VolumeMonitor.enabled | default "true" | lower -}}
+    {{- $setResourceLimits := .Config.TargetResourceLimits.value | default "false" -}}
+    {{- $resourceLimitsVal := fromYaml .Config.TargetResourceLimits.value -}}
+    {{- $setAuxResourceLimits := .Config.AuxResourceLimits.value | default "false" -}}
+    {{- $auxResourceLimitsVal := fromYaml .Config.AuxResourceLimits.value -}}
     apiVersion: extensions/v1beta1
     Kind: Deployment
     metadata:
@@ -1766,6 +1842,13 @@ spec:
             - launch
             image: {{ .Config.ControllerImage.value }}
             name: {{ .Volume.owner }}-ctrl-con
+            {{- if ne $setResourceLimits "false" }}
+            resources:
+              limits:
+              {{- range $rKey, $rLimit := $resourceLimitsVal }}
+                {{ $rKey }}: {{ $rLimit }}
+              {{- end }}
+            {{- end }}
             env:
             - name: "REPLICATION_FACTOR"
               value: {{ .Config.ReplicaCount.value }}
@@ -1781,6 +1864,13 @@ spec:
             - maya-exporter
             image: {{ .Config.VolumeMonitorImage.value }}
             name: maya-volume-exporter
+            {{- if ne $setAuxResourceLimits "false" }}
+            resources:
+              limits:
+              {{- range $rKey, $rLimit := $auxResourceLimitsVal }}
+                {{ $rKey }}: {{ $rLimit }}
+              {{- end }}
+            {{- end }}
             ports:
             - containerPort: 9500
               protocol: TCP
@@ -1821,6 +1911,10 @@ spec:
     {{- $isEvictionTolerations := .Config.EvictionTolerations.value | default "false" -}}
     {{- $evictionTolerationsVal := fromYaml .Config.EvictionTolerations.value -}}
     {{- $isCloneEnable := .Volume.isCloneEnable | default "false" -}}
+    {{- $setResourceLimits := .Config.ReplicaResourceLimits.value | default "false" -}}
+    {{- $resourceLimitsVal := fromYaml .Config.ReplicaResourceLimits.value -}}
+    {{- $setAuxResourceLimits := .Config.AuxResourceLimits.value | default "false" -}}
+    {{- $auxResourceLimitsVal := fromYaml .Config.AuxResourceLimits.value -}}
     apiVersion: extensions/v1beta1
     kind: Deployment
     metadata:
@@ -1891,6 +1985,13 @@ spec:
             - launch
             image: {{ .Config.ReplicaImage.value }}
             name: {{ .Volume.owner }}-rep-con
+            {{- if ne $setResourceLimits "false" }}
+            resources:
+              limits:
+              {{- range $rKey, $rLimit := $resourceLimitsVal }}
+                {{ $rKey }}: {{ $rLimit }}
+              {{- end }}
+            {{- end }}
             ports:
             - containerPort: 9502
               protocol: TCP
@@ -2073,6 +2174,17 @@ metadata:
   annotations:
     cas.openebs.io/create-pool-template: cstor-pool-create-default-0.7.0
     cas.openebs.io/delete-pool-template: cstor-pool-delete-default-0.7.0
+    cas.openebs.io/config: |
+      - name: PoolResourceLimits
+        value: false
+      #- name: PoolResourceLimits
+      #  value: |-
+      #      memory: 2Gi
+      #      cpu: 500m
+      #- name: AuxResourceLimits
+      #  value: |-
+      #      memory: 1Gi
+      #      cpu: 100m
 spec:
   name: cstor-sparse-pool
   type: sparse
@@ -2093,7 +2205,13 @@ metadata:
     cas.openebs.io/config: |
       - name: StoragePoolClaim
         value: "cstor-sparse-pool"
-      - name: SparseDir
-        value: /var/openebs
+      #- name: TargetResourceLimits
+      #  value: |-
+      #      memory: 1Gi
+      #      cpu: 200m
+      #- name: AuxResourceLimits
+      #  value: |-
+      #      memory: 0.5Gi
+      #      cpu: 50m
 provisioner: openebs.io/provisioner-iscsi
 ---
