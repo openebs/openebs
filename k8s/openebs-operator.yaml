@@ -134,9 +134,9 @@ spec:
         #- name: OPENEBS_IO_K8S_MASTER
         #  value: "http://172.28.128.3:8080"
         - name: OPENEBS_IO_JIVA_CONTROLLER_IMAGE
-          value: "openebs/jiva:0.6.0"
+          value: "openebs/jiva:ci"
         - name: OPENEBS_IO_JIVA_REPLICA_IMAGE
-          value: "openebs/jiva:0.6.0"
+          value: "openebs/jiva:ci"
         - name: OPENEBS_IO_VOLUME_MONITOR_IMAGE
           value: "openebs/m-exporter:ci"
         - name: OPENEBS_IO_JIVA_REPLICA_COUNT
@@ -437,9 +437,9 @@ metadata:
     cas.openebs.io/read-volume-template: jiva-volume-read-default-0.7.0
     cas.openebs.io/config: |
       - name: ControllerImage
-        value: openebs/jiva:0.6.0
+        value: openebs/jiva:ci
       - name: ReplicaImage
-        value: openebs/jiva:0.6.0
+        value: openebs/jiva:ci
       - name: VolumeMonitorImage
         value: openebs/m-exporter:ci
       - name: ReplicaCount
