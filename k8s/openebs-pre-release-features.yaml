@@ -1249,6 +1249,7 @@ spec:
   taskNamespace: openebs
   run:
     tasks:
+    - jiva-volume-read-getpv-default-0.6.0
     - jiva-volume-read-listtargetservice-default-0.6.0
     - jiva-volume-read-listtargetpod-default-0.6.0
     - jiva-volume-read-listreplicapod-default-0.6.0
@@ -1737,7 +1738,7 @@ spec:
     {{- .TaskResult.readlistrep.items | notFoundErr "replica pod(s) not found" | saveIf "readlistrep.notFoundErr" .TaskResult | noop -}}
     {{- jsonpath .JsonResult "{.items[*].status.podIP}" | trim | saveAs "readlistrep.podIP" .TaskResult | noop -}}
     {{- jsonpath .JsonResult "{.items[*].status.containerStatuses[*].ready}" | trim | saveAs "readlistrep.status" .TaskResult | noop -}}
-    {{- "0G" | saveAs "readlistrep.capacity" .TaskResult -}}
+    {{- .TaskResult.readgetpv.capacity | saveAs "readlistrep.capacity" .TaskResult -}}
 ---
 apiVersion: openebs.io/v1alpha1
 kind: RunTask
