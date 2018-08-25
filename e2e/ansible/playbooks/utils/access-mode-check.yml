@@ -36,7 +36,9 @@
          failed_when: "pvname not in volname.stdout"
 
        - name: Get the replicas access mode
-         shell: source ~/.profile;  kubectl exec -it {{ mayapod.stdout }} -n openebs -- mayactl volume info --volname {{ volname.stdout.split()[2] }} -n {{ ns }} | grep 'RW' | wc -l
+         shell: >
+            source ~/.profile;  
+            kubectl exec -it {{ mayapod.stdout }} -n openebs -- mayactl volume info --volname "{{volname.stdout_lines[1].split()[0]}}" -n {{ ns }} | grep 'RW' | wc -l
          args:
            executable: /bin/bash
          register: result
