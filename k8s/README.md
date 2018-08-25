@@ -10,7 +10,7 @@ If this is your first time to Kubernetes, please go through these introductory t
 
 ## Usage
 
-### Installing OpenEBS on K8s
+### Installing Pre-released OpenEBS **_(at your own risk)_**
 ```
 kubectl apply -f openebs-operator.yaml
 ```
