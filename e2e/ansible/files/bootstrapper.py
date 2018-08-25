@@ -76,7 +76,7 @@ def get_file_data(path):
 
 def create_plan_resources(args):
     client, yaml_info  = get_client(args), parse_yaml(get_file_data("../playbooks/test_suites.yml"))
-    map_src_id, run_id, project_id, cstor_plan_resources, jiva_plan_resources = {'cStor':{},'jiva':{}}, 0, yaml_info['TestRailProjectID'], [], []
+    map_src_id, run_id, project_id, cstor_plan_resources, jiva_plan_resources = {'cStor_disk':{},'cStor_sparse':{},'jiva':{}}, 0, yaml_info['TestRailProjectID'], [], []
 
     ci_info = parse_yaml(get_file_data('../ci_config.yaml'))
     ci_yaml=[]
@@ -103,21 +103,38 @@ def create_plan_resources(args):
 
     if len(cstor_plan_resources)>0:
         S = ruamel.yaml.scalarstring.DoubleQuotedScalarString
-        map_src_id["cstor_plan_run_id"], case_resources, cstor_test_yaml = create_test_plan(client, args, "CSTOR", project_id), [], []
+        map_src_id["cstor_plan_disk_run_id"],map_src_id["cstor_plan_sparse_run_id"], case_resources, cstor_test_disk_yaml, cstor_test_sparse_yaml = create_test_plan(client, args, "CSTOR_DISK", project_id),create_test_plan(client, args, "CSTOR_SPARSE", project_id), [], [], []
         for suites in cstor_plan_resources:
             for suite_name, suite_info in suites.items():
-                suite_run_id, case_resource = add_suites(map_src_id["cstor_plan_run_id"], suite_name, client, suite_info, project_id)
-                map_src_id['cStor'][suite_name]=suite_run_id
+                suite_run_disk_id, case_resource  = add_suites(map_src_id["cstor_plan_disk_run_id"], suite_name, client, suite_info, project_id)
+                suite_run_sparse_id,_ = add_suites(map_src_id["cstor_plan_sparse_run_id"], suite_name, client, suite_info, project_id)
+                map_src_id['cStor_disk'][suite_name]=suite_run_disk_id
+                map_src_id['cStor_sparse'][suite_name]=suite_run_sparse_id
                 case_resources+=case_resource
         
         if len(case_resources)>0:
-            cstor_test_yaml += [
+            cstor_test_disk_yaml += [
                 {
                     "tasks": [
                         {
                             "when": "slack_notify | bool and lookup('env','SLACK_TOKEN')",
                             "slack": {
-                                "msg": "{{ ansible_date_time.time }} OPENEBS TESTSUITE STARTED - CSTOR",
+                                "msg": "{{ ansible_date_time.time }} OPENEBS TESTSUITE STARTED - CSTOR-DISK",
+                                "token": "{{ lookup('env','SLACK_TOKEN') }}"
+                            }
+                        }
+                    ],
+                    "hosts": "localhost"
+                }
+            ]
+
+            cstor_test_sparse_yaml+=[
+                {
+                    "tasks": [
+                        {
+                            "when": "slack_notify | bool and lookup('env','SLACK_TOKEN')",
+                            "slack": {
+                                "msg": "{{ ansible_date_time.time }} OPENEBS TESTSUITE STARTED - CSTOR-SPARSE",
                                 "token": "{{ lookup('env','SLACK_TOKEN') }}"
                             }
                         }
@@ -129,8 +146,10 @@ def create_plan_resources(args):
             for case_resource in case_resources:
                 if case_resource['path'] is None or len(case_resource['path'])<=0:
                     continue
-                cstor_test_yaml.append({'include': case_resource['path'], 'vars': {'status_id':S(''),'testname':S(''),'flag':S(''),'cflag':S(''),'storage_engine': S('cStor'),'status': S('')}})
-                cstor_test_yaml.append({'hosts': 'localhost',
+                cstor_test_disk_yaml.append({'include': case_resource['path'],
+                 'vars': {'status_id':S(''),'testname':S(''),'flag':S(''),
+                 'cflag':S(''),'storage_engine': S('cStor'),'status': S(''),'cstor_sc':S('openebs-cstor-disk')}})
+                cstor_test_disk_yaml.append({'hosts': 'localhost',
                     'tasks': [{'include_tasks': S('{{utils_path}}/update-status.yml'),
                     'vars': {'c_status': S('{{ cflag }}'),
                         'case_id': case_resource['case_id'],
@@ -138,11 +157,24 @@ def create_plan_resources(args):
                         'suite_id': case_resource['suite_id'],
                         't_status': S('{{ flag }}'),
                         't_name': S('{{ testname }}'),
-                        'storage_engine': S('cStor'),
+                        'storage_engine': S('cStor_disk'),
+                        'color': S('{{ status }}')
+                        }}]})
+                
+                cstor_test_sparse_yaml.append({'include': case_resource['path'], 'vars': {'status_id':S(''),'testname':S(''),'flag':S(''),'cflag':S(''),'storage_engine': S('cStor'),'status': S(''),'cstor_sc':S('openebs-cstor-sparse')}})
+                cstor_test_sparse_yaml.append({'hosts': 'localhost',
+                    'tasks': [{'include_tasks': S('{{utils_path}}/update-status.yml'),
+                    'vars': {'c_status': S('{{ cflag }}'),
+                        'case_id': case_resource['case_id'],
+                        'st_id': S('{{ status_id }}'),
+                        'suite_id': case_resource['suite_id'],
+                        't_status': S('{{ flag }}'),
+                        't_name': S('{{ testname }}'),
+                        'storage_engine': S('cStor_sparse'),
                         'color': S('{{ status }}')
                         }}]})
 
-            cstor_test_yaml += [
+            cstor_test_disk_yaml += [
                     {
                         "include": "pre-check.yml"
                     },
@@ -163,7 +195,7 @@ def create_plan_resources(args):
                                         "attachments": [
                                             {
                                                 "title": "CSTOR Build #" +str(args['build_number'])+" completed",
-                                                "title_link": "https://cloudbyte.testrail.com/index.php?/plans/view/"+str(map_src_id['cstor_plan_run_id']),
+                                                "title_link": "https://cloudbyte.testrail.com/index.php?/plans/view/"+str(map_src_id['cstor_plan_disk_run_id']),
                                                 "text": "*Username:* test@openebs.io\n*Password:* openebs",
                                                 "color": "#439FE0",
                                                 "mrkdwn_in": ["text"]
@@ -183,9 +215,53 @@ def create_plan_resources(args):
                         "hosts": "localhost"
                     }
                 ]
+            cstor_test_sparse_yaml += [
+                    {
+                        "include": "pre-check.yml"
+                    },
+                    {
+                        "hosts": "localhost",
+                        "roles": [
+                            {
+                                "role": "logging",
+                                "when": "logging | bool and deployment_mode == \"hyperconverged\""
+                            }
+                        ]
+                    },
+                    {
+                        "tasks": [
+                            {
+                                "when": "slack_notify | bool and lookup('env','SLACK_TOKEN')",
+                                "slack": {
+                                        "attachments": [
+                                            {
+                                                "title": "CSTOR Build #" +str(args['build_number'])+" completed",
+                                                "title_link": "https://cloudbyte.testrail.com/index.php?/plans/view/"+str(map_src_id['cstor_plan_sparse_run_id']),
+                                                "text": "*Username:* test@openebs.io\n*Password:* openebs",
+                                                "color": "#439FE0",
+                                                "mrkdwn_in": ["text"]
+                                            }
+                                        ],
+                                    "token": "{{ lookup('env','SLACK_TOKEN') }}"
+                                }
+                            },
+                            {
+                                "when": "slack_notify | bool and lookup('env','SLACK_TOKEN')",
+                                "slack": {
+                                    "msg": "{{ ansible_date_time.time }} OPENEBS TESTSUITE: ENDED",
+                                    "token": "{{ lookup('env','SLACK_TOKEN') }}"
+                                }
+                            }
+                        ],
+                        "hosts": "localhost"
+                    }
+                ]
+
             tyaml= ruamel.yaml.YAML()
-            tyaml.dump(cstor_test_yaml,stream=open("../cstor-run-tests.yml",'w+'))
-            ci_yaml.append({'include': 'cstor-run-tests.yml'})
+            tyaml.dump(cstor_test_disk_yaml,stream=open("../cstor-run-disk-tests.yml",'w+'))
+            ci_yaml.append({'include': 'cstor-run-disk-tests.yml'})
+            tyaml.dump(cstor_test_sparse_yaml,stream=open("../cstor-run-sparse-tests.yml",'w+'))
+            ci_yaml.append({'include': 'cstor-run-sparse-tests.yml'})
         # _, err = write_file("../cstor-run-tests.yml", tyaml.dump(cstor_test_yaml, sys.stdout.write))
         # if err == -1:
         #     exit(err)
