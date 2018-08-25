@@ -31,10 +31,6 @@ spec:
   #- name: PoolResourceLimits
   #  value: |-
   #      memory: 1Gi
-  #      cpu: 200m
-  # By default, the resource limits are disabled. 
-  - name: PoolResourceLimits
-    value: "false"
   # AuxResourceLimits allow you to set limits on side cars. Limits have to be specified
   # in the format expected by Kubernetes
   - name: AuxResourceLimits
@@ -480,6 +476,8 @@ spec:
   # in the format expected by Kubernetes
   - name: AuxResourceLimits
     value: "false"
+  - name: RunNamespace
+    value: openebs
   taskNamespace: openebs
   run:
     tasks:
@@ -495,6 +493,9 @@ kind: CASTemplate
 metadata:
   name: cstor-volume-delete-default-0.7.0
 spec:
+  defaultConfig:
+  - name: RunNamespace
+    value: openebs
   taskNamespace: openebs
   run:
     tasks:
@@ -514,6 +515,9 @@ metadata:
   name: cstor-volume-read-default-0.7.0
 spec:
   taskNamespace: openebs
+  defaultConfig:
+  - name: RunNamespace
+    value: openebs
   run:
     tasks:
     - cstor-volume-read-listtargetservice-default-0.7.0
@@ -527,6 +531,9 @@ metadata:
   name: cstor-volume-list-default-0.7.0
 spec:
   taskNamespace: openebs
+  defaultConfig:
+  - name: RunNamespace
+    value: openebs
   run:
     tasks:
     - cstor-volume-list-listtargetservice-default-0.7.0
@@ -543,7 +550,7 @@ metadata:
 spec:
   meta: |
     id: cvolcreatelistpool
-    runNamespace: openebs
+    runNamespace: {{.Config.RunNamespace.value}}
     apiVersion: openebs.io/v1alpha1
     kind: CStorPool
     action: list
@@ -573,7 +580,7 @@ spec:
     kind: Service
     action: put
     id: cvolcreateputsvc
-    runNamespace: openebs
+    runNamespace: {{.Config.RunNamespace.value}}
   post: |
     {{- jsonpath .JsonResult `{.metadata.name}` | trim | saveAs "cvolcreateputsvc.objectName" .TaskResult | noop -}}
     {{- jsonpath .JsonResult `{.spec.clusterIP}` | trim | saveAs "cvolcreateputsvc.clusterIP" .TaskResult | noop -}}
@@ -612,7 +619,7 @@ spec:
     apiVersion: openebs.io/v1alpha1
     kind: CStorVolume
     id: cvolcreateputvolume
-    runNamespace: openebs
+    runNamespace: {{.Config.RunNamespace.value}}
     action: put
   post: |
     {{- jsonpath .JsonResult `{.metadata.uid}` | trim | saveAs "cvolcreateputvolume.cstorid" .TaskResult | noop -}}
@@ -644,7 +651,7 @@ metadata:
   namespace: openebs
 spec:
   meta: |
-    runNamespace: openebs
+    runNamespace: {{.Config.RunNamespace.value}}
     apiVersion: apps/v1beta1
     kind: Deployment
     action: put
@@ -777,7 +784,7 @@ metadata:
 spec:
   meta: |
     apiVersion: openebs.io/v1alpha1
-    runNameSpace: openebs
+    runNamespace: {{.Config.RunNamespace.value}}
     kind: CStorVolumeReplica
     action: put
     id: cstorvolumecreatereplica
@@ -862,7 +869,7 @@ spec:
     Create and save list of namespaces to $nss.
     Iterate over each namespace and perform list task
     */ -}}
-    {{- $nss := .Volume.runNamespace | default "" | splitList ", " -}}
+    {{- $nss := .Config.RunNamespace.value | default "" | splitList ", " -}}
     id: listlistsvc
     repeatWith:
       metas:
@@ -890,7 +897,7 @@ metadata:
   namespace: openebs
 spec:
   meta: |
-    {{- $nss := .Volume.runNamespace | default "" | splitList ", " -}}
+    {{- $nss := .Config.RunNamespace.value | default "" | splitList ", " -}}
     id: listlistctrl
     repeatWith:
       metas:
@@ -917,7 +924,7 @@ metadata:
   namespace: openebs
 spec:
   meta: |
-    runNamespace: openebs
+    runNamespace: {{.Config.RunNamespace.value}}
     id: listlistrep
     apiVersion: openebs.io/v1alpha1
     kind: CStorVolumeReplica
@@ -978,7 +985,7 @@ metadata:
   namespace: openebs
 spec:
   meta: |
-    runNamespace: openebs
+    runNamespace: {{.Config.RunNamespace.value}}
     apiVersion: v1
     id: readlistsvc
     kind: Service
@@ -999,7 +1006,7 @@ metadata:
 spec:
   meta: |
     id: readlistrep
-    runNamespace: openebs
+    runNamespace: {{.Config.RunNamespace.value}}
     apiVersion: openebs.io/v1alpha1
     kind: CStorVolumeReplica
     action: list
@@ -1018,7 +1025,7 @@ metadata:
   namespace: openebs
 spec:
   meta: |
-    runNamespace: openebs
+    runNamespace: {{.Config.RunNamespace.value}}
     apiVersion: v1
     kind: Pod
     action: list
@@ -1071,7 +1078,7 @@ metadata:
   namespace: openebs
 spec:
   meta: |
-    runNamespace: openebs
+    runNamespace: {{.Config.RunNamespace.value}}
     id: deletelistcsv
     apiVersion: openebs.io/v1alpha1
     kind: CStorVolume
@@ -1092,7 +1099,7 @@ metadata:
 spec:
   meta: |
     id: deletelistsvc
-    runNamespace: openebs
+    runNamespace: {{.Config.RunNamespace.value}}
     apiVersion: v1
     kind: Service
     action: list
@@ -1116,7 +1123,7 @@ metadata:
 spec:
   meta: |
     id: deletelistctrl
-    runNamespace: openebs
+    runNamespace: {{.Config.RunNamespace.value}}
     apiVersion: apps/v1beta1
     kind: Deployment
     action: list
@@ -1136,7 +1143,7 @@ metadata:
 spec:
   meta: |
     id: deletelistcvr
-    runNamespace: openebs
+    runNamespace: {{.Config.RunNamespace.value}}
     apiVersion: openebs.io/v1alpha1
     kind: CStorVolumeReplica
     action: list
@@ -1160,7 +1167,7 @@ metadata:
 spec:
   meta: |
     id: deletedeletesvc
-    runNamespace: openebs
+    runNamespace: {{.Config.RunNamespace.value}}
     apiVersion: v1
     kind: Service
     action: delete
@@ -1175,7 +1182,7 @@ metadata:
 spec:
   meta: |
     id: deletedeletectrl
-    runNamespace: openebs
+    runNamespace: {{.Config.RunNamespace.value}}
     apiVersion: apps/v1beta1
     kind: Deployment
     action: delete
@@ -1189,7 +1196,7 @@ metadata:
   namespace: openebs
 spec:
   meta: |
-    runNamespace: openebs
+    runNamespace: {{.Config.RunNamespace.value}}
     id: deletedeletecvr
     action: delete
     kind: CStorVolumeReplica
@@ -1204,7 +1211,7 @@ metadata:
   namespace: openebs
 spec:
   meta: |
-    runNamespace: openebs
+    runNamespace: {{.Config.RunNamespace.value}}
     id: deletedeletecsv
     action: delete
     apiVersion: openebs.io/v1alpha1
