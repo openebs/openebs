@@ -25,6 +25,10 @@ spec:
   # will be placed
   - name: RunNamespace
     value: openebs
+  # ServiceAccountName is the account name assigned to pool management pod
+  # with permissions to view, create, edit, delete required custom resources
+  - name: ServiceAccountName
+    value: openebs-maya-operator
   # PoolResourceLimits allow you to set the limits on memory and cpu for pool pods
   # The resource and limit value should be in the same format as expected by
   # Kubernetes. Example:
@@ -208,7 +212,7 @@ spec:
           labels:
             app: cstor-pool
         spec:
-          serviceAccountName: openebs-maya-operator
+          serviceAccountName: {{ .Config.ServiceAccountName.value }}
           nodeSelector:
             kubernetes.io/hostname: {{ .ListItems.currentRepeatResource}}
           containers:
@@ -478,6 +482,10 @@ spec:
     value: "false"
   - name: RunNamespace
     value: openebs
+  # ServiceAccountName is the account name assigned to volume management pod
+  # with permissions to view, create, edit, delete required custom resources
+  - name: ServiceAccountName
+    value: openebs-maya-operator
   taskNamespace: openebs
   run:
     tasks:
@@ -701,7 +709,7 @@ spec:
             openebs.io/persistent-volume-claim: {{ .Volume.pvc }}
             pvc: {{ .Volume.pvc }}
         spec:
-          serviceAccountName: openebs-maya-operator
+          serviceAccountName: {{ .Config.ServiceAccountName.value }}
           containers:
           - image: {{ .Config.VolumeTargetImage.value }}
             name: cstor-istgt
