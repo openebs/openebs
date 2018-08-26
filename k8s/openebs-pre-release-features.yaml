@@ -1409,6 +1409,28 @@ spec:
   # in the format expected by Kubernetes
   - name: AuxResourceLimits
     value: "false"
+  # TargetNodeSelector allows you to specify the nodes where
+  # openebs targets have to be scheduled. To use this feature,
+  # the nodes should already be labeled with the key=value. For example:
+  # `kubectl label nodes <node-name> nodetype=storage`
+  # Note: It is recommended that node selector for replica specify
+  # nodes that have disks/ssds attached to them. Example:
+  #- name: TargetNodeSelector
+  #  value: |-
+  #      nodetype: storage
+  - name: TargetNodeSelector
+    value: "false"
+  # ReplicaNodeSelector allows you to specify the nodes where
+  # openebs replicas have to be scheduled. To use this feature,
+  # the nodes should already be labeled with the key=value. For example:
+  # `kubectl label nodes <node-name> nodetype=storage`
+  # Note: It is recommended that node selector for replica specify
+  # nodes that have disks/ssds attached to them. Example:
+  #- name: ReplicaNodeSelector
+  #  value: |-
+  #      nodetype: storage
+  - name: ReplicaNodeSelector
+    value: "false"
   taskNamespace: openebs
   run:
     tasks:
@@ -2028,6 +2050,8 @@ spec:
     {{- $resourceLimitsVal := fromYaml .Config.TargetResourceLimits.value -}}
     {{- $setAuxResourceLimits := .Config.AuxResourceLimits.value | default "false" -}}
     {{- $auxResourceLimitsVal := fromYaml .Config.AuxResourceLimits.value -}}
+    {{- $hasNodeSelector := .Config.TargetNodeSelector.value | default "false" -}}
+    {{- $nodeSelectorVal := fromYaml .Config.TargetNodeSelector.value -}}
     apiVersion: extensions/v1beta1
     Kind: Deployment
     metadata:
@@ -2065,6 +2089,12 @@ spec:
             openebs.io/persistent-volume-claim: {{ .Volume.pvc }}
             pvc: {{ .Volume.pvc }}
         spec:
+          {{- if ne $hasNodeSelector "false" }}
+          nodeSelector:
+            {{- range $sK, $sV := $nodeSelectorVal }}
+              {{ $sK }}: {{ $sV }}
+            {{- end }}
+          {{- end}}
           containers:
           - args:
             - controller
@@ -2158,6 +2188,8 @@ spec:
     {{- $resourceLimitsVal := fromYaml .Config.ReplicaResourceLimits.value -}}
     {{- $setAuxResourceLimits := .Config.AuxResourceLimits.value | default "false" -}}
     {{- $auxResourceLimitsVal := fromYaml .Config.AuxResourceLimits.value -}}
+    {{- $hasNodeSelector := .Config.ReplicaNodeSelector.value | default "false" -}}
+    {{- $nodeSelectorVal := fromYaml .Config.ReplicaNodeSelector.value -}}
     apiVersion: extensions/v1beta1
     kind: Deployment
     metadata:
@@ -2189,6 +2221,12 @@ spec:
             openebs.io/capacity: {{ .Volume.capacity }}
             openebs.io/storage-pool: {{ .Config.StoragePool.value }}
         spec:
+          {{- if ne $hasNodeSelector "false" }}
+          nodeSelector:
+            {{- range $sK, $sV := $nodeSelectorVal }}
+              {{ $sK }}: {{ $sV }}
+            {{- end }}
+          {{- end}}
           affinity:
             podAntiAffinity:
               requiredDuringSchedulingIgnoredDuringExecution:

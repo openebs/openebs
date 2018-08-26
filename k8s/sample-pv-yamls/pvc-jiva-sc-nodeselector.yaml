@@ -1,0 +1,40 @@
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: openebs-jiva-nodeselector
+  annotations:
+    cas.openebs.io/create-volume-template: jiva-volume-create-default-0.7.0
+    cas.openebs.io/delete-volume-template: jiva-volume-delete-default-0.7.0
+    cas.openebs.io/read-volume-template: jiva-volume-read-default-0.7.0
+    cas.openebs.io/config: |
+      - name: ControllerImage
+        value: openebs/jiva:ci
+      - name: ReplicaImage
+        value: openebs/jiva:ci
+      - name: VolumeMonitorImage
+        value: openebs/m-exporter:ci
+      - name: ReplicaCount
+        value: "1"
+      - name: StoragePool
+        value: default
+      - name: ReplicaNodeSelector
+        value: |-
+            nodetype: storage
+      - name: TargetNodeSelector
+        value: |-
+            nodetype: app
+provisioner: openebs.io/provisioner-iscsi
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: demo-jiva-replica-pinned
+spec:
+  storageClassName: openebs-jiva-nodeselector
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 4G
+
