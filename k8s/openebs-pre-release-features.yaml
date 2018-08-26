@@ -743,7 +743,9 @@ spec:
               protocol: TCP
             volumeMounts:
             - name: sockfile
-              mountPath: /configs
+              mountPath: /var/run
+            - name: conf
+              mountPath: /usr/local/etc/istgt
           {{- end}}
           - name: cstor-volume-mgmt
             image: {{ .Config.VolumeControllerImage.value }}
