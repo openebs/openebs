@@ -29,6 +29,11 @@ spec:
   # with permissions to view, create, edit, delete required custom resources
   - name: ServiceAccountName
     value: openebs-maya-operator
+  # PoolResourceRequests allow you to specify resource requests that need to be available
+  # before scheduling the containers. If not specified, the default is to use the limits
+  # from PoolResourceLimits or the default requests set in the cluster. 
+  - name: PoolResourceRequests
+    value: "false"
   # PoolResourceLimits allow you to set the limits on memory and cpu for pool pods
   # The resource and limit value should be in the same format as expected by
   # Kubernetes. Example:
@@ -190,6 +195,8 @@ spec:
   post: |
     {{- jsonpath .JsonResult `{.metadata.name}` | trim | addTo "putcstorpooldeployment.objectName" .TaskResult | noop -}}
   task: |
+    {{- $setResourceRequests := .Config.PoolResourceRequests.value | default "false" -}}
+    {{- $resourceRequestsVal := fromYaml .Config.PoolResourceRequests.value -}}
     {{- $setResourceLimits := .Config.PoolResourceLimits.value | default "false" -}}
     {{- $resourceLimitsVal := fromYaml .Config.PoolResourceLimits.value -}}
     {{- $setAuxResourceLimits := .Config.AuxResourceLimits.value | default "false" -}}
@@ -218,13 +225,19 @@ spec:
           containers:
           - name: cstor-pool
             image: {{ .Config.CstorPoolImage.value }}
-            {{- if ne $setResourceLimits "false" }}
             resources:
+              {{- if ne $setResourceLimits "false" }}
               limits:
               {{- range $rKey, $rLimit := $resourceLimitsVal }}
                 {{ $rKey }}: {{ $rLimit }}
               {{- end }}
-            {{- end }}
+              {{- end }}
+              {{- if ne $setResourceRequests "false" }}
+              requests:
+              {{- range $rKey, $rReq := $resourceRequestsVal }}
+                {{ $rKey }}: {{ $rReq }}
+              {{- end }}
+              {{- end }}
             ports:
             - containerPort: 12000
               protocol: TCP
@@ -466,6 +479,11 @@ spec:
     value: openebs/m-exporter:ci
   - name: ReplicaCount
     value: "3"
+  # TargetResourceRequests allow you to specify resource requests that need to be available
+  # before scheduling the containers. If not specified, the default is to use the limits
+  # from TargetResourceLimits or the default requests set in the cluster. 
+  - name: TargetResourceRequests
+    value: "false"
   # TargetResourceLimits allow you to set the limits on memory and cpu for target pods
   # The resource and limit value should be in the same format as expected by
   # Kubernetes. Example:
@@ -671,6 +689,8 @@ spec:
     {{- jsonpath .JsonResult `{.metadata.name}` | trim | saveAs "cvolcreateputctrl.objectName" .TaskResult | noop -}}
   task: |
     {{- $isMonitor := .Config.VolumeMonitor.enabled | default "true" | lower -}}
+    {{- $setResourceRequests := .Config.TargetResourceRequests.value | default "false" -}}
+    {{- $resourceRequestsVal := fromYaml .Config.TargetResourceRequests.value -}}
     {{- $setResourceLimits := .Config.TargetResourceLimits.value | default "false" -}}
     {{- $resourceLimitsVal := fromYaml .Config.TargetResourceLimits.value -}}
     {{- $setAuxResourceLimits := .Config.AuxResourceLimits.value | default "false" -}}
@@ -716,13 +736,19 @@ spec:
           - image: {{ .Config.VolumeTargetImage.value }}
             name: cstor-istgt
             imagePullPolicy: IfNotPresent
-            {{- if ne $setResourceLimits "false" }}
             resources:
+              {{- if ne $setResourceLimits "false" }}
               limits:
               {{- range $rKey, $rLimit := $resourceLimitsVal }}
                 {{ $rKey }}: {{ $rLimit }}
               {{- end }}
-            {{- end }}
+              {{- end }}
+              {{- if ne $setResourceRequests "false" }}
+              requests:
+              {{- range $rKey, $rReq := $resourceRequestsVal }}
+                {{ $rKey }}: {{ $rReq }}
+              {{- end }}
+              {{- end }}
             ports:
             - containerPort: 3260
               protocol: TCP
@@ -1354,6 +1380,11 @@ spec:
         operator: In
         values:
         - some-node-label-value
+  # TargetResourceRequests allow you to specify resource requests that need to be available
+  # before scheduling the containers. If not specified, the default is to use the limits
+  # from TargetResourceLimits or the default requests set in the cluster. 
+  - name: TargetResourceRequests
+    value: "false"
   # TargetResourceLimits allow you to set the limits on memory and cpu for jiva 
   # target pods. The resource and limit value should be in the same format as 
   # expected by Kubernetes. Example:
@@ -1363,6 +1394,11 @@ spec:
   #      cpu: 200m
   # By default, the resource limits are disabled. 
   - name: TargetResourceLimits
+    value: "false"
+  # ReplicaResourceRequests allow you to specify resource requests that need to be available
+  # before scheduling the containers. If not specified, the default is to use the limits
+  # from ReplicaResourceLimits or the default requests set in the cluster. 
+  - name: ReplicaResourceRequests
     value: "false"
   # ReplicaResourceLimits allow you to set the limits on memory and cpu for jiva 
   # replica pods. The resource and limit value should be in the same format as
@@ -1986,6 +2022,8 @@ spec:
     {{- jsonpath .JsonResult "{.metadata.name}" | trim | saveAs "createputctrl.objectName" .TaskResult | noop -}}
   task: |
     {{- $isMonitor := .Config.VolumeMonitor.enabled | default "true" | lower -}}
+    {{- $setResourceRequests := .Config.TargetResourceRequests.value | default "false" -}}
+    {{- $resourceRequestsVal := fromYaml .Config.TargetResourceRequests.value -}}
     {{- $setResourceLimits := .Config.TargetResourceLimits.value | default "false" -}}
     {{- $resourceLimitsVal := fromYaml .Config.TargetResourceLimits.value -}}
     {{- $setAuxResourceLimits := .Config.AuxResourceLimits.value | default "false" -}}
@@ -2039,13 +2077,19 @@ spec:
             - launch
             image: {{ .Config.ControllerImage.value }}
             name: {{ .Volume.owner }}-ctrl-con
-            {{- if ne $setResourceLimits "false" }}
             resources:
+              {{- if ne $setResourceLimits "false" }}
               limits:
               {{- range $rKey, $rLimit := $resourceLimitsVal }}
                 {{ $rKey }}: {{ $rLimit }}
               {{- end }}
-            {{- end }}
+              {{- end }}
+              {{- if ne $setResourceRequests "false" }}
+              requests:
+              {{- range $rKey, $rReq := $resourceRequestsVal }}
+                {{ $rKey }}: {{ $rReq }}
+              {{- end }}
+              {{- end }}
             env:
             - name: "REPLICATION_FACTOR"
               value: {{ .Config.ReplicaCount.value }}
@@ -2108,6 +2152,8 @@ spec:
     {{- $isEvictionTolerations := .Config.EvictionTolerations.value | default "false" -}}
     {{- $evictionTolerationsVal := fromYaml .Config.EvictionTolerations.value -}}
     {{- $isCloneEnable := .Volume.isCloneEnable | default "false" -}}
+    {{- $setResourceRequests := .Config.ReplicaResourceRequests.value | default "false" -}}
+    {{- $resourceRequestsVal := fromYaml .Config.ReplicaResourceRequests.value -}}
     {{- $setResourceLimits := .Config.ReplicaResourceLimits.value | default "false" -}}
     {{- $resourceLimitsVal := fromYaml .Config.ReplicaResourceLimits.value -}}
     {{- $setAuxResourceLimits := .Config.AuxResourceLimits.value | default "false" -}}
@@ -2171,13 +2217,19 @@ spec:
             - launch
             image: {{ .Config.ReplicaImage.value }}
             name: {{ .Volume.owner }}-rep-con
-            {{- if ne $setResourceLimits "false" }}
             resources:
+              {{- if ne $setResourceLimits "false" }}
               limits:
               {{- range $rKey, $rLimit := $resourceLimitsVal }}
                 {{ $rKey }}: {{ $rLimit }}
               {{- end }}
-            {{- end }}
+              {{- end }}
+              {{- if ne $setResourceRequests "false" }}
+              requests:
+              {{- range $rKey, $rReq := $resourceRequestsVal }}
+                {{ $rKey }}: {{ $rReq }}
+              {{- end }}
+              {{- end }}
             ports:
             - containerPort: 9502
               protocol: TCP
@@ -2418,12 +2470,20 @@ metadata:
     cas.openebs.io/create-pool-template: cstor-pool-create-default-0.7.0
     cas.openebs.io/delete-pool-template: cstor-pool-delete-default-0.7.0
     cas.openebs.io/config: |
+      #For default sparse pool set the limit at 2G to safegaurd 
+      # cstor pool from requesting more memory and push the node 
+      # to memory pressure condition. By default K8s will set the 
+      # requests to the same value as Limits and this can case the pool
+      # to be in pending state if node doesn't have 2G memory.
+      # Hence setting the requests to a minimum. 
+      - name: PoolResourceRequests
+        value: |-
+            memory: 0.5Gi
+            cpu: 100m
       - name: PoolResourceLimits
-        value: false
-      #- name: PoolResourceLimits
-      #  value: |-
-      #      memory: 2Gi
-      #      cpu: 500m
+        value: |-
+            memory: 2Gi
+            cpu: 500m
       #- name: AuxResourceLimits
       #  value: |-
       #      memory: 1Gi

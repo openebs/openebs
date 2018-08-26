@@ -7,10 +7,13 @@ metadata:
     cas.openebs.io/create-pool-template: cstor-pool-create-default-0.7.0
     cas.openebs.io/delete-pool-template: cstor-pool-delete-default-0.7.0
     cas.openebs.io/config: |
+      - name: PoolResourceRequests
+        value: |-
+            memory: 1Gi
+            cpu: 100m
       - name: PoolResourceLimits
         value: |-
             memory: 2Gi
-            cpu: 200m
       - name: AuxResourceLimits
         value: |-
             memory: 0.5Gi 
