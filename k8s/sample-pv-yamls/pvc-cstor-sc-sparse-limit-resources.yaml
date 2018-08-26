@@ -2,7 +2,7 @@
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
-  name: openebs-cstor-limits
+  name: openebs-cstor-sparse-limits
   annotations:
     cas.openebs.io/create-volume-template: cstor-volume-create-default-0.7.0
     cas.openebs.io/delete-volume-template: cstor-volume-delete-default-0.7.0
@@ -23,9 +23,9 @@ provisioner: openebs.io/provisioner-iscsi
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
-  name: demo-cstor-limits-claim
+  name: demo-cstor-sc-sparse-limits-claim
 spec:
-  storageClassName: openebs-cstor-limits
+  storageClassName: openebs-cstor-sparse-limits
   accessModes:
     - ReadWriteOnce
   resources:
