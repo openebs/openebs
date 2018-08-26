@@ -607,9 +607,9 @@ spec:
         targetPort: 6060
         protocol: TCP
       selector:
+        app: cstor-volume-manager
         openebs.io/target: cstor-target
         openebs.io/persistent-volume: {{ .Volume.owner }}
-        app: cstor-volume-manager
 ---
 # runTask to create cStorVolume
 apiVersion: openebs.io/v1alpha1
@@ -687,21 +687,21 @@ spec:
       replicas: 1
       selector:
         matchLabels:
-          {{- if eq $isMonitor "true" }}
-          monitoring: volume_exporter_prometheus
-          {{- end}}
+          app: cstor-volume-manager
           openebs.io/target: cstor-target
           openebs.io/persistent-volume: {{ .Volume.owner }}
-          app: cstor-volume-manager
       template:
         metadata:
           labels:
             {{- if eq $isMonitor "true" }}
             monitoring: volume_exporter_prometheus
+            openebs_pv: {{ .Volume.owner }}
             {{- end}}
+            app: cstor-volume-manager
             openebs.io/target: cstor-target
             openebs.io/persistent-volume: {{ .Volume.owner }}
-            app: cstor-volume-manager
+            openebs.io/persistent-volume-claim: {{ .Volume.pvc }}
+            pvc: {{ .Volume.pvc }}
         spec:
           serviceAccountName: openebs-maya-operator
           containers:
@@ -1984,6 +1984,7 @@ spec:
       labels:
         {{- if eq $isMonitor "true" }}
         monitoring: "volume_exporter_prometheus"
+        openebs_pv: {{ .Volume.owner }}
         {{- end}}
         openebs.io/storage-engine-type: jiva
         openebs.io/cas-type: jiva

@@ -55,12 +55,17 @@ data:
       - source_labels: [__meta_kubernetes_pod_label_vsm]
         action: replace
         target_label: openebs_pv
+      - source_labels: [__meta_kubernetes_pod_label_openebs_pv]
+        action: keep
       - source_labels: [__meta_kubernetes_pod_container_port_number]
         action: drop
         regex: '(.*)9501'
       - source_labels: [__meta_kubernetes_pod_container_port_number]
         action: drop
         regex: '(.*)3260'
+      - source_labels: [__meta_kubernetes_pod_container_port_number]
+        action: drop
+        regex: '(.*)80'
 ---
 # prometheus-deployment
 apiVersion: extensions/v1beta1
@@ -146,6 +151,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: openebs-grafana
+  namespace: openebs
 spec:
   type: NodePort
   ports:
@@ -161,6 +167,7 @@ metadata:
   labels:
     app: openebs-grafana
   name: openebs-grafana
+  namespace: openebs
 spec:
   replicas: 1
   revisionHistoryLimit: 2
