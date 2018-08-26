@@ -575,6 +575,8 @@ spec:
     {{- $poolsList | saveAs "pl" .ListItems -}}
     {{- len $poolsList | gt $replicaCount | verifyErr "not enough pools available to create replicas" | saveAs "cvolcreatelistpool.verifyErr" .TaskResult | noop -}}
     {{- $poolsList | keyMap "cvolPoolList" .ListItems | noop -}}
+    {{- $poolsNodeList := jsonpath .JsonResult `{range .items[?(@.status.phase=="Online")]}pkey=pools,{@.metadata.uid}={@.metadata.labels.kubernetes\.io/hostname};{end}` | trim | default "" | splitList ";" -}}
+    {{- $poolsNodeList | keyMap "cvolPoolNodeList" .ListItems | noop -}}
 ---
 # runTask to create cStor target service
 apiVersion: openebs.io/v1alpha1
@@ -830,6 +832,8 @@ spec:
         cstorpool.openebs.io/uid: {{ .ListItems.currentRepeatResource }}
         cstorvolume.openebs.io/name: {{ .Volume.owner }}
         openebs.io/persistent-volume: {{ .Volume.owner }}
+      annotations:
+        cstorpool.openebs.io/hostname: {{ pluck .ListItems.currentRepeatResource .ListItems.cvolPoolNodeList.pools | first }}
       finalizers: ["cstorvolumereplica.openebs.io/finalizer"]
     spec:
       capacity: {{ .Volume.capacity }}
