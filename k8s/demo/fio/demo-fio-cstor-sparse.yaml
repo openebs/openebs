@@ -1,4 +1,25 @@
 ---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: openebs-cstor-sparse-limits
+  annotations:
+    cas.openebs.io/create-volume-template: cstor-volume-create-default-0.7.0
+    cas.openebs.io/delete-volume-template: cstor-volume-delete-default-0.7.0
+    cas.openebs.io/read-volume-template: cstor-volume-read-default-0.7.0
+    cas.openebs.io/config: |
+      - name: StoragePoolClaim
+        value: "cstor-sparse-pool"
+      - name: TargetResourceLimits
+        value: |-
+            memory: 1Gi
+            cpu: 100m
+      - name: AuxResourceLimits
+        value: |-
+            memory: 0.5Gi
+            cpu: 50m
+provisioner: openebs.io/provisioner-iscsi
+---
 apiVersion: v1
 kind: Pod
 metadata:
@@ -12,8 +33,8 @@ spec:
         cpu: 0.5
     name: fio-cstor-sparse
     image: openebs/tests-fio
-    command: ["/fio_runner.sh"]
-    args: ["Basic", "60"]
+    command: ["/bin/bash"]
+    args: ["-c", "./fio_runner.sh --template file/basic-rw --size 256m --duration 6000; exit 0"]
     tty: true
     volumeMounts:
     - mountPath: /datadir
@@ -28,7 +49,7 @@ apiVersion: v1
 metadata:
   name: fio-cstor-sparse-claim
 spec:
-  storageClassName: openebs-cstor-sparse
+  storageClassName: openebs-cstor-sparse-limits
   accessModes:
     - ReadWriteOnce
   resources:
