@@ -175,9 +175,9 @@ def create_plan_resources(args):
                         }}]})
 
             cstor_test_disk_yaml += [
-                    {
-                        "include": "pre-check.yml"
-                    },
+                    # {
+                    #     "include": "pre-check.yml"
+                    # },
                     {
                         "hosts": "localhost",
                         "roles": [
@@ -194,7 +194,7 @@ def create_plan_resources(args):
                                 "slack": {
                                         "attachments": [
                                             {
-                                                "title": "CSTOR Build #" +str(args['build_number'])+" completed",
+                                                "title": "CSTOR DISK BUILD #" +str(args['build_number'])+" completed",
                                                 "title_link": "https://cloudbyte.testrail.com/index.php?/plans/view/"+str(map_src_id['cstor_plan_disk_run_id']),
                                                 "text": "*Username:* test@openebs.io\n*Password:* openebs",
                                                 "color": "#439FE0",
@@ -216,9 +216,9 @@ def create_plan_resources(args):
                     }
                 ]
             cstor_test_sparse_yaml += [
-                    {
-                        "include": "pre-check.yml"
-                    },
+                    # {
+                    #     "include": "pre-check.yml"
+                    # },
                     {
                         "hosts": "localhost",
                         "roles": [
@@ -235,7 +235,7 @@ def create_plan_resources(args):
                                 "slack": {
                                         "attachments": [
                                             {
-                                                "title": "CSTOR Build #" +str(args['build_number'])+" completed",
+                                                "title": "CSTOR SPARSE BUILD #" +str(args['build_number'])+" completed",
                                                 "title_link": "https://cloudbyte.testrail.com/index.php?/plans/view/"+str(map_src_id['cstor_plan_sparse_run_id']),
                                                 "text": "*Username:* test@openebs.io\n*Password:* openebs",
                                                 "color": "#439FE0",
