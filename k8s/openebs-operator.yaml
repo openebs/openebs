@@ -131,6 +131,11 @@ spec:
         # to maya install
         - name: OPENEBS_IO_INSTALL_CONFIG_NAME
           value: "maya-install-config-default-0.7.0"
+        # OPENEBS_IO_INSTALL_DEFAULT_CSTOR_POOL decides wheteher default cstor pool should be
+        # configured as a part op openebs installation.
+        # If "true" a default cstor pool will be configured, if "false" it will not be configured.
+        - name: OPENEBS_IO_INSTALL_DEFAULT_CSTOR_SPARSE_POOL
+          value: "true"
         # OPENEBS_NAMESPACE provides the namespace of this deployment as an
         # environment variable
         - name: OPENEBS_NAMESPACE
