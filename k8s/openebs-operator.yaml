@@ -141,19 +141,19 @@ spec:
           value: "openebs/m-exporter:ci"
         - name: OPENEBS_IO_JIVA_REPLICA_COUNT
           value: "3"
-        # DEFAULT_CONTROLLER_NODE_SELECTOR allows your to specify the nodes
+        # DEFAULT_CONTROLLER_NODE_SELECTOR allows you to specify the nodes
         # on which openebs controller have to be scheduled. To use this feature,
         # the nodes should already be labeled with the key=value. For example:
-        # `kubectl label nodes <node-name> nodetype=storage
+        # `kubectl label nodes <node-name> nodetype=storage`
         # Note: It is recommended that node selector for controller be
         # same as that of the stateful apps.
         # This is supported for maya api server version 0.6.0-RC2 onwards
         #- name: DEFAULT_CONTROLLER_NODE_SELECTOR
         #  value: "nodetype=storage"
-        # DEFAULT_REPLICA_NODE_SELECTOR allows your to specify the nodes
+        # DEFAULT_REPLICA_NODE_SELECTOR allows you to specify the nodes
         # on which openebs replicas have to be scheduled. To use this feature,
         # the nodes should already be labeled with the key=value. For example:
-        # `kubectl label nodes <node-name> nodetype=storage
+        # `kubectl label nodes <node-name> nodetype=storage`
         # Note: It is recommended that node selector for replica will specify
         # nodes that have disks/ssds attached to them.
         # This is supported for maya api server version 0.6.0-RC2 onwards

@@ -10,10 +10,13 @@ metadata:
     cas.openebs.io/config: |
       - name: StoragePoolClaim
         value: "cstor-sparse-pool"
+      - name: TargetResourceRequests
+        value: |-
+            memory: 0.5Gi
+            cpu: 100m
       - name: TargetResourceLimits
         value: |-
             memory: 1Gi
-            cpu: 100m
       - name: AuxResourceLimits
         value: |-
             memory: 0.5Gi

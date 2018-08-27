@@ -29,6 +29,11 @@ spec:
   # with permissions to view, create, edit, delete required custom resources
   - name: ServiceAccountName
     value: openebs-maya-operator
+  # PoolResourceRequests allow you to specify resource requests that need to be available
+  # before scheduling the containers. If not specified, the default is to use the limits
+  # from PoolResourceLimits or the default requests set in the cluster. 
+  - name: PoolResourceRequests
+    value: "false"
   # PoolResourceLimits allow you to set the limits on memory and cpu for pool pods
   # The resource and limit value should be in the same format as expected by
   # Kubernetes. Example:
@@ -190,6 +195,8 @@ spec:
   post: |
     {{- jsonpath .JsonResult `{.metadata.name}` | trim | addTo "putcstorpooldeployment.objectName" .TaskResult | noop -}}
   task: |
+    {{- $setResourceRequests := .Config.PoolResourceRequests.value | default "false" -}}
+    {{- $resourceRequestsVal := fromYaml .Config.PoolResourceRequests.value -}}
     {{- $setResourceLimits := .Config.PoolResourceLimits.value | default "false" -}}
     {{- $resourceLimitsVal := fromYaml .Config.PoolResourceLimits.value -}}
     {{- $setAuxResourceLimits := .Config.AuxResourceLimits.value | default "false" -}}
@@ -218,13 +225,19 @@ spec:
           containers:
           - name: cstor-pool
             image: {{ .Config.CstorPoolImage.value }}
-            {{- if ne $setResourceLimits "false" }}
             resources:
+              {{- if ne $setResourceLimits "false" }}
               limits:
               {{- range $rKey, $rLimit := $resourceLimitsVal }}
                 {{ $rKey }}: {{ $rLimit }}
               {{- end }}
-            {{- end }}
+              {{- end }}
+              {{- if ne $setResourceRequests "false" }}
+              requests:
+              {{- range $rKey, $rReq := $resourceRequestsVal }}
+                {{ $rKey }}: {{ $rReq }}
+              {{- end }}
+              {{- end }}
             ports:
             - containerPort: 12000
               protocol: TCP
@@ -466,6 +479,11 @@ spec:
     value: openebs/m-exporter:ci
   - name: ReplicaCount
     value: "3"
+  # TargetResourceRequests allow you to specify resource requests that need to be available
+  # before scheduling the containers. If not specified, the default is to use the limits
+  # from TargetResourceLimits or the default requests set in the cluster. 
+  - name: TargetResourceRequests
+    value: "false"
   # TargetResourceLimits allow you to set the limits on memory and cpu for target pods
   # The resource and limit value should be in the same format as expected by
   # Kubernetes. Example:
@@ -486,6 +504,8 @@ spec:
   # with permissions to view, create, edit, delete required custom resources
   - name: ServiceAccountName
     value: openebs-maya-operator
+  - name: RunNamespace
+    value: openebs
   taskNamespace: openebs
   run:
     tasks:
@@ -558,7 +578,7 @@ metadata:
 spec:
   meta: |
     id: cvolcreatelistpool
-    runNamespace: openebs
+    runNamespace: {{.Config.RunNamespace.value}}
     apiVersion: openebs.io/v1alpha1
     kind: CStorPool
     action: list
@@ -590,7 +610,7 @@ spec:
     kind: Service
     action: put
     id: cvolcreateputsvc
-    runNamespace: openebs
+    runNamespace: {{.Config.RunNamespace.value}}
   post: |
     {{- jsonpath .JsonResult `{.metadata.name}` | trim | saveAs "cvolcreateputsvc.objectName" .TaskResult | noop -}}
     {{- jsonpath .JsonResult `{.spec.clusterIP}` | trim | saveAs "cvolcreateputsvc.clusterIP" .TaskResult | noop -}}
@@ -630,7 +650,7 @@ spec:
     apiVersion: openebs.io/v1alpha1
     kind: CStorVolume
     id: cvolcreateputvolume
-    runNamespace: openebs
+    runNamespace: {{.Config.RunNamespace.value}}
     action: put
   post: |
     {{- jsonpath .JsonResult `{.metadata.uid}` | trim | saveAs "cvolcreateputvolume.cstorid" .TaskResult | noop -}}
@@ -662,7 +682,7 @@ metadata:
   namespace: openebs
 spec:
   meta: |
-    runNamespace: openebs
+    runNamespace: {{.Config.RunNamespace.value}}
     apiVersion: apps/v1beta1
     kind: Deployment
     action: put
@@ -671,6 +691,8 @@ spec:
     {{- jsonpath .JsonResult `{.metadata.name}` | trim | saveAs "cvolcreateputctrl.objectName" .TaskResult | noop -}}
   task: |
     {{- $isMonitor := .Config.VolumeMonitor.enabled | default "true" | lower -}}
+    {{- $setResourceRequests := .Config.TargetResourceRequests.value | default "false" -}}
+    {{- $resourceRequestsVal := fromYaml .Config.TargetResourceRequests.value -}}
     {{- $setResourceLimits := .Config.TargetResourceLimits.value | default "false" -}}
     {{- $resourceLimitsVal := fromYaml .Config.TargetResourceLimits.value -}}
     {{- $setAuxResourceLimits := .Config.AuxResourceLimits.value | default "false" -}}
@@ -716,13 +738,19 @@ spec:
           - image: {{ .Config.VolumeTargetImage.value }}
             name: cstor-istgt
             imagePullPolicy: IfNotPresent
-            {{- if ne $setResourceLimits "false" }}
             resources:
+              {{- if ne $setResourceLimits "false" }}
               limits:
               {{- range $rKey, $rLimit := $resourceLimitsVal }}
                 {{ $rKey }}: {{ $rLimit }}
               {{- end }}
-            {{- end }}
+              {{- end }}
+              {{- if ne $setResourceRequests "false" }}
+              requests:
+              {{- range $rKey, $rReq := $resourceRequestsVal }}
+                {{ $rKey }}: {{ $rReq }}
+              {{- end }}
+              {{- end }}
             ports:
             - containerPort: 3260
               protocol: TCP
@@ -798,7 +826,7 @@ metadata:
 spec:
   meta: |
     apiVersion: openebs.io/v1alpha1
-    runNamespace: openebs
+    runNamespace: {{.Config.RunNamespace.value}}
     kind: CStorVolumeReplica
     action: put
     id: cstorvolumecreatereplica
@@ -885,7 +913,7 @@ spec:
     Create and save list of namespaces to $nss.
     Iterate over each namespace and perform list task
     */ -}}
-    {{- $nss := .Volume.runNamespace | default "" | splitList ", " -}}
+    {{- $nss := .Config.RunNamespace.value | default "" | splitList ", " -}}
     id: listlistsvc
     repeatWith:
       metas:
@@ -913,7 +941,7 @@ metadata:
   namespace: openebs
 spec:
   meta: |
-    {{- $nss := .Volume.runNamespace | default "" | splitList ", " -}}
+    {{- $nss := .Config.RunNamespace.value | default "" | splitList ", " -}}
     id: listlistctrl
     repeatWith:
       metas:
@@ -940,7 +968,7 @@ metadata:
   namespace: openebs
 spec:
   meta: |
-    runNamespace: openebs
+    runNamespace: {{.Config.RunNamespace.value}}
     id: listlistrep
     apiVersion: openebs.io/v1alpha1
     kind: CStorVolumeReplica
@@ -1001,7 +1029,7 @@ metadata:
   namespace: openebs
 spec:
   meta: |
-    runNamespace: openebs
+    runNamespace: {{.Config.RunNamespace.value}}
     apiVersion: v1
     id: readlistsvc
     kind: Service
@@ -1022,7 +1050,7 @@ metadata:
 spec:
   meta: |
     id: readlistrep
-    runNamespace: openebs
+    runNamespace: {{.Config.RunNamespace.value}}
     apiVersion: openebs.io/v1alpha1
     kind: CStorVolumeReplica
     action: list
@@ -1041,7 +1069,7 @@ metadata:
   namespace: openebs
 spec:
   meta: |
-    runNamespace: openebs
+    runNamespace: {{.Config.RunNamespace.value}}
     apiVersion: v1
     kind: Pod
     action: list
@@ -1094,7 +1122,7 @@ metadata:
   namespace: openebs
 spec:
   meta: |
-    runNamespace: openebs
+    runNamespace: {{.Config.RunNamespace.value}}
     id: deletelistcsv
     apiVersion: openebs.io/v1alpha1
     kind: CStorVolume
@@ -1115,7 +1143,7 @@ metadata:
 spec:
   meta: |
     id: deletelistsvc
-    runNamespace: openebs
+    runNamespace: {{.Config.RunNamespace.value}}
     apiVersion: v1
     kind: Service
     action: list
@@ -1139,7 +1167,7 @@ metadata:
 spec:
   meta: |
     id: deletelistctrl
-    runNamespace: openebs
+    runNamespace: {{.Config.RunNamespace.value}}
     apiVersion: apps/v1beta1
     kind: Deployment
     action: list
@@ -1159,7 +1187,7 @@ metadata:
 spec:
   meta: |
     id: deletelistcvr
-    runNamespace: openebs
+    runNamespace: {{.Config.RunNamespace.value}}
     apiVersion: openebs.io/v1alpha1
     kind: CStorVolumeReplica
     action: list
@@ -1183,7 +1211,7 @@ metadata:
 spec:
   meta: |
     id: deletedeletesvc
-    runNamespace: openebs
+    runNamespace: {{.Config.RunNamespace.value}}
     apiVersion: v1
     kind: Service
     action: delete
@@ -1198,7 +1226,7 @@ metadata:
 spec:
   meta: |
     id: deletedeletectrl
-    runNamespace: openebs
+    runNamespace: {{.Config.RunNamespace.value}}
     apiVersion: apps/v1beta1
     kind: Deployment
     action: delete
@@ -1212,7 +1240,7 @@ metadata:
   namespace: openebs
 spec:
   meta: |
-    runNamespace: openebs
+    runNamespace: {{.Config.RunNamespace.value}}
     id: deletedeletecvr
     action: delete
     kind: CStorVolumeReplica
@@ -1227,7 +1255,7 @@ metadata:
   namespace: openebs
 spec:
   meta: |
-    runNamespace: openebs
+    runNamespace: {{.Config.RunNamespace.value}}
     id: deletedeletecsv
     action: delete
     apiVersion: openebs.io/v1alpha1
@@ -1354,6 +1382,11 @@ spec:
         operator: In
         values:
         - some-node-label-value
+  # TargetResourceRequests allow you to specify resource requests that need to be available
+  # before scheduling the containers. If not specified, the default is to use the limits
+  # from TargetResourceLimits or the default requests set in the cluster. 
+  - name: TargetResourceRequests
+    value: "false"
   # TargetResourceLimits allow you to set the limits on memory and cpu for jiva 
   # target pods. The resource and limit value should be in the same format as 
   # expected by Kubernetes. Example:
@@ -1363,6 +1396,11 @@ spec:
   #      cpu: 200m
   # By default, the resource limits are disabled. 
   - name: TargetResourceLimits
+    value: "false"
+  # ReplicaResourceRequests allow you to specify resource requests that need to be available
+  # before scheduling the containers. If not specified, the default is to use the limits
+  # from ReplicaResourceLimits or the default requests set in the cluster. 
+  - name: ReplicaResourceRequests
     value: "false"
   # ReplicaResourceLimits allow you to set the limits on memory and cpu for jiva 
   # replica pods. The resource and limit value should be in the same format as
@@ -1387,6 +1425,28 @@ spec:
   #   failure-domain.beta.kubernetes.io/region
   - name: ReplicaAntiAffinityTopoKey
     value: kubernetes.io/hostname
+  # TargetNodeSelector allows you to specify the nodes where
+  # openebs targets have to be scheduled. To use this feature,
+  # the nodes should already be labeled with the key=value. For example:
+  # `kubectl label nodes <node-name> nodetype=storage`
+  # Note: It is recommended that node selector for replica specify
+  # nodes that have disks/ssds attached to them. Example:
+  #- name: TargetNodeSelector
+  #  value: |-
+  #      nodetype: storage
+  - name: TargetNodeSelector
+    value: "false"
+  # ReplicaNodeSelector allows you to specify the nodes where
+  # openebs replicas have to be scheduled. To use this feature,
+  # the nodes should already be labeled with the key=value. For example:
+  # `kubectl label nodes <node-name> nodetype=storage`
+  # Note: It is recommended that node selector for replica specify
+  # nodes that have disks/ssds attached to them. Example:
+  #- name: ReplicaNodeSelector
+  #  value: |-
+  #      nodetype: storage
+  - name: ReplicaNodeSelector
+    value: "false"
   taskNamespace: openebs
   run:
     tasks:
@@ -2018,10 +2078,14 @@ spec:
     {{- jsonpath .JsonResult "{.metadata.name}" | trim | saveAs "createputctrl.objectName" .TaskResult | noop -}}
   task: |
     {{- $isMonitor := .Config.VolumeMonitor.enabled | default "true" | lower -}}
+    {{- $setResourceRequests := .Config.TargetResourceRequests.value | default "false" -}}
+    {{- $resourceRequestsVal := fromYaml .Config.TargetResourceRequests.value -}}
     {{- $setResourceLimits := .Config.TargetResourceLimits.value | default "false" -}}
     {{- $resourceLimitsVal := fromYaml .Config.TargetResourceLimits.value -}}
     {{- $setAuxResourceLimits := .Config.AuxResourceLimits.value | default "false" -}}
     {{- $auxResourceLimitsVal := fromYaml .Config.AuxResourceLimits.value -}}
+    {{- $hasNodeSelector := .Config.TargetNodeSelector.value | default "false" -}}
+    {{- $nodeSelectorVal := fromYaml .Config.TargetNodeSelector.value -}}
     apiVersion: extensions/v1beta1
     Kind: Deployment
     metadata:
@@ -2059,6 +2123,12 @@ spec:
             openebs.io/persistent-volume-claim: {{ .Volume.pvc }}
             pvc: {{ .Volume.pvc }}
         spec:
+          {{- if ne $hasNodeSelector "false" }}
+          nodeSelector:
+            {{- range $sK, $sV := $nodeSelectorVal }}
+              {{ $sK }}: {{ $sV }}
+            {{- end }}
+          {{- end}}
           containers:
           - args:
             - controller
@@ -2071,13 +2141,19 @@ spec:
             - launch
             image: {{ .Config.ControllerImage.value }}
             name: {{ .Volume.owner }}-ctrl-con
-            {{- if ne $setResourceLimits "false" }}
             resources:
+              {{- if ne $setResourceLimits "false" }}
               limits:
               {{- range $rKey, $rLimit := $resourceLimitsVal }}
                 {{ $rKey }}: {{ $rLimit }}
               {{- end }}
-            {{- end }}
+              {{- end }}
+              {{- if ne $setResourceRequests "false" }}
+              requests:
+              {{- range $rKey, $rReq := $resourceRequestsVal }}
+                {{ $rKey }}: {{ $rReq }}
+              {{- end }}
+              {{- end }}
             env:
             - name: "REPLICATION_FACTOR"
               value: {{ .Config.ReplicaCount.value }}
@@ -2140,12 +2216,16 @@ spec:
     {{- $isEvictionTolerations := .Config.EvictionTolerations.value | default "false" -}}
     {{- $evictionTolerationsVal := fromYaml .Config.EvictionTolerations.value -}}
     {{- $isCloneEnable := .Volume.isCloneEnable | default "false" -}}
+    {{- $setResourceRequests := .Config.ReplicaResourceRequests.value | default "false" -}}
+    {{- $resourceRequestsVal := fromYaml .Config.ReplicaResourceRequests.value -}}
     {{- $setResourceLimits := .Config.ReplicaResourceLimits.value | default "false" -}}
     {{- $resourceLimitsVal := fromYaml .Config.ReplicaResourceLimits.value -}}
     {{- $setAuxResourceLimits := .Config.AuxResourceLimits.value | default "false" -}}
     {{- $auxResourceLimitsVal := fromYaml .Config.AuxResourceLimits.value -}}
     {{- $replicaAntiAffinityVal := .TaskResult.creategetpvc.replicaAntiAffinity -}}
     {{- $scVersion := .TaskResult.creategetsc.storageClassVersion | default "false" -}}
+    {{- $hasNodeSelector := .Config.ReplicaNodeSelector.value | default "false" -}}
+    {{- $nodeSelectorVal := fromYaml .Config.ReplicaNodeSelector.value -}}
     apiVersion: extensions/v1beta1
     kind: Deployment
     metadata:
@@ -2180,6 +2260,12 @@ spec:
             openebs.io/capacity: {{ .Volume.capacity }}
             openebs.io/storage-pool: {{ .Config.StoragePool.value }}
         spec:
+          {{- if ne $hasNodeSelector "false" }}
+          nodeSelector:
+            {{- range $sK, $sV := $nodeSelectorVal }}
+              {{ $sK }}: {{ $sV }}
+            {{- end }}
+          {{- end}}
           affinity:
             podAntiAffinity:
               requiredDuringSchedulingIgnoredDuringExecution:
@@ -2218,13 +2304,19 @@ spec:
             - launch
             image: {{ .Config.ReplicaImage.value }}
             name: {{ .Volume.owner }}-rep-con
-            {{- if ne $setResourceLimits "false" }}
             resources:
+              {{- if ne $setResourceLimits "false" }}
               limits:
               {{- range $rKey, $rLimit := $resourceLimitsVal }}
                 {{ $rKey }}: {{ $rLimit }}
               {{- end }}
-            {{- end }}
+              {{- end }}
+              {{- if ne $setResourceRequests "false" }}
+              requests:
+              {{- range $rKey, $rReq := $resourceRequestsVal }}
+                {{ $rKey }}: {{ $rReq }}
+              {{- end }}
+              {{- end }}
             ports:
             - containerPort: 9502
               protocol: TCP
@@ -2465,12 +2557,21 @@ metadata:
     cas.openebs.io/create-pool-template: cstor-pool-create-default-0.7.0
     cas.openebs.io/delete-pool-template: cstor-pool-delete-default-0.7.0
     cas.openebs.io/config: |
+      #For default sparse pool set the limit at 2Gi to safegaurd 
+      # cstor pool from consuming more memory and causing the node 
+      # to get into memory pressure condition. By default K8s will set the 
+      # Requests to the same value as Limits. For example, when Limit is
+      # set to 2Gi, the pool could get stuck in pending schedule state,
+      # if node doesn't have Requested (2Gi) memory. 
+      # Hence setting the Requests to a minimum (0.5Gi). 
+      - name: PoolResourceRequests
+        value: |-
+            memory: 0.5Gi
+            cpu: 100m
       - name: PoolResourceLimits
-        value: false
-      #- name: PoolResourceLimits
-      #  value: |-
-      #      memory: 2Gi
-      #      cpu: 500m
+        value: |-
+            memory: 2Gi
+            cpu: 500m
       #- name: AuxResourceLimits
       #  value: |-
       #      memory: 1Gi
