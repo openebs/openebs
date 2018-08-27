@@ -2276,7 +2276,7 @@ spec:
                          This is usually the case for STS that creates PVCs from a 
                          PVC Template. So, a STS can have multiple PVs with their
                          unique id. To schedule/spread out replicas belonging to 
-                         different PV, a unique label assoicated with the STS should 
+                         different PV, a unique label associated with the STS should 
                          be passed to all the PVCs tied to the STS. */}}
                     {{- if ne $replicaAntiAffinityVal "none" }}
                     openebs.io/replica-anti-affinity: {{ $replicaAntiAffinityVal }}
