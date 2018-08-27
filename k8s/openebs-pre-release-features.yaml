@@ -1373,14 +1373,29 @@ spec:
   # in the format expected by Kubernetes
   - name: AuxResourceLimits
     value: "false"
+  # ReplicaAntiAffinityTopoKey is used to schedule replica pods 
+  # of a given volume/application, such that they are:
+  # - not co-located on the same node. (kubernetes.io/hostname)
+  # - not co-located on the same availability zone.(failure-domain.beta.kubernetes.io/zone) 
+  # The value for toplogy key can be anythign supported by Kubernetes
+  # clusters. It is possible that some cluster might support topology schemes
+  # like the rack or floor.
+  #
+  # Examples:
+  #   kubernetes.io/hostname (default)
+  #   failure-domain.beta.kubernetes.io/zone
+  #   failure-domain.beta.kubernetes.io/region
+  - name: ReplicaAntiAffinityTopoKey
+    value: kubernetes.io/hostname
   taskNamespace: openebs
   run:
     tasks:
     - jiva-volume-create-getstorageclass-default-0.7.0
+    - jiva-volume-create-getpvc-default-0.7.0
     - jiva-volume-create-puttargetservice-default-0.7.0
     - jiva-volume-create-getstoragepoolcr-default-0.7.0
-    - jiva-volume-create-puttargetdeployment-default-0.7.0
     - jiva-volume-create-putreplicadeployment-default-0.7.0
+    - jiva-volume-create-puttargetdeployment-default-0.7.0
   output: jiva-volume-create-output-default-0.7.0
 ---
 apiVersion: openebs.io/v1alpha1
@@ -1893,6 +1908,23 @@ spec:
 apiVersion: openebs.io/v1alpha1
 kind: RunTask
 metadata:
+  name: jiva-volume-create-getpvc-default-0.7.0
+  namespace: openebs
+spec:
+  meta: |
+    id: creategetpvc
+    apiVersion: v1
+    runNamespace: {{ .Volume.runNamespace }}
+    kind: PersistentVolumeClaim
+    objectName: {{ .Volume.pvc }}
+    action: get
+  post: |
+    {{- $replicaAntiAffinity := jsonpath .JsonResult "{.metadata.labels.openebs\\.io/replica-anti-affinity}" | default "none" -}}
+    {{- trim $replicaAntiAffinity | saveAs "creategetpvc.replicaAntiAffinity" .TaskResult | noop -}}
+---
+apiVersion: openebs.io/v1alpha1
+kind: RunTask
+metadata:
   name: jiva-volume-create-listreplicapod-default-0.7.0
   namespace: openebs
 spec:
@@ -2112,6 +2144,8 @@ spec:
     {{- $resourceLimitsVal := fromYaml .Config.ReplicaResourceLimits.value -}}
     {{- $setAuxResourceLimits := .Config.AuxResourceLimits.value | default "false" -}}
     {{- $auxResourceLimitsVal := fromYaml .Config.AuxResourceLimits.value -}}
+    {{- $replicaAntiAffinityVal := .TaskResult.creategetpvc.replicaAntiAffinity -}}
+    {{- $scVersion := .TaskResult.creategetsc.storageClassVersion | default "false" -}}
     apiVersion: extensions/v1beta1
     kind: Deployment
     metadata:
@@ -2139,6 +2173,9 @@ spec:
             openebs.io/persistent-volume: {{ .Volume.owner }}
             openebs.io/persistent-volume-claim: {{ .Volume.pvc }}
             pvc: {{ .Volume.pvc }}
+            {{- if ne $replicaAntiAffinityVal "none" }}
+            openebs.io/replica-anti-affinity: {{ $replicaAntiAffinityVal }}
+            {{- end }}
           annotations:
             openebs.io/capacity: {{ .Volume.capacity }}
             openebs.io/storage-pool: {{ .Config.StoragePool.value }}
@@ -2149,8 +2186,18 @@ spec:
               - labelSelector:
                   matchLabels:
                     openebs.io/replica: jiva-replica
+                    {{/* If PVC object has a replica anti-affinity value. Use it.
+                         This is usually the case for STS that creates PVCs from a 
+                         PVC Template. So, a STS can have multiple PVs with their
+                         unique id. To schedule/spread out replicas belonging to 
+                         different PV, a unique label assoicated with the STS should 
+                         be passed to all the PVCs tied to the STS. */}}
+                    {{- if ne $replicaAntiAffinityVal "none" }}
+                    openebs.io/replica-anti-affinity: {{ $replicaAntiAffinityVal }}
+                    {{- else }}
                     openebs.io/persistent-volume: {{ .Volume.owner }}
-                topologyKey: kubernetes.io/hostname
+                    {{- end }}
+                topologyKey: {{ .Config.ReplicaAntiAffinityTopoKey.value }}
           containers:
           - args:
             - replica
