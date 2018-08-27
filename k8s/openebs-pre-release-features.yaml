@@ -1059,6 +1059,7 @@ spec:
   post: |
     {{- jsonpath .JsonResult `{.items[*].metadata.name}` | trim | saveAs "readlistrep.items" .TaskResult | noop -}}
     {{- jsonpath .JsonResult `{.items[*].metadata.annotations.cstorpool\.openebs\.io/hostname}` | trim | saveAs "readlistrep.hostname" .TaskResult | noop -}}
+    {{- jsonpath .JsonResult `{.items[*].metadata.labels.cstorpool\.openebs\.io/name}` | trim | saveAs "readlistrep.poolname" .TaskResult | noop -}}
     {{- .TaskResult.readlistrep.items | notFoundErr "replicas not found" | saveIf "readlistrep.notFoundErr" .TaskResult | noop -}}
     {{- jsonpath .JsonResult `{.items[*].spec.capacity}` | trim | saveAs "readlistrep.capacity" .TaskResult | noop -}}
 ---
@@ -1106,8 +1107,9 @@ spec:
       annotations:
         openebs.io/controller-ips: {{ .TaskResult.readlistctrl.podIP | default "" | splitList " " | first }}
         openebs.io/controller-status: {{ .TaskResult.readlistctrl.status | default "" | splitList " " | join "," | replace "true" "running" | replace "false" "notready" }}
-        openebs.io/cvr-name: {{ .TaskResult.readlistrep.items | default "" | splitList " " | join "," }}
-        openebs.io/host-name: {{ .TaskResult.readlistrep.hostname | default "" | splitList " " | join "," }}
+        openebs.io/cvr-names: {{ .TaskResult.readlistrep.items | default "" | splitList " " | join "," }}
+        openebs.io/host-names: {{ .TaskResult.readlistrep.hostname | default "" | splitList " " | join "," }}
+        openebs.io/pool-names: {{ .TaskResult.readlistrep.poolname | default "" | splitList " " | join "," }}
     spec:
       capacity: {{ $capacity }}
       iqn: iqn.2016-09.com.openebs.cstor:{{ .Volume.owner }}
