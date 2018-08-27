@@ -1,0 +1,29 @@
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: jiva-vol1-raa-claim
+  labels:
+    openebs.io/replica-anti-affinity: application-name
+spec:
+  storageClassName: openebs-standard
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 4G
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: jiva-vol2-raa-claim
+  labels:
+    openebs.io/replica-anti-affinity: application-name
+spec:
+  storageClassName: openebs-standard
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 4G
+---
