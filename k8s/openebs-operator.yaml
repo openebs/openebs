@@ -107,6 +107,26 @@ spec:
         # list volumes. This is a mandatory env variable.
         - name: OPENEBS_IO_CAS_TEMPLATE_TO_LIST_VOLUME
           value: "jiva-volume-list-default-0.6.0,jiva-volume-list-default-0.7.0,cstor-volume-list-default-0.7.0"
+        # OPENEBS_IO_CAS_TEMPLATE_TO_CREATE_VOLUME provides name of create volume
+        # template for volume create operations
+        - name: OPENEBS_IO_CAS_TEMPLATE_TO_CREATE_VOLUME
+          value: "jiva-volume-create-default-0.7.0"
+        # OPENEBS_IO_CAS_TEMPLATE_TO_READ_VOLUME provides name of create volume
+        # template for volume read operations
+        - name: OPENEBS_IO_CAS_TEMPLATE_TO_READ_VOLUME
+          value: "jiva-volume-read-default-0.7.0"
+        # OPENEBS_IO_CAS_TEMPLATE_TO_DELETE_VOLUME provides name of create volume
+        # template for volume delete operations
+        - name: OPENEBS_IO_CAS_TEMPLATE_TO_DELETE_VOLUME
+          value: "jiva-volume-delete-default-0.7.0"
+        # OPENEBS_IO_CAS_TEMPLATE_TO_DELETE_VOLUME provides name of create-pool
+        # template for storage pool create operations
+        - name: OPENEBS_IO_CAS_TEMPLATE_TO_CREATE_POOL
+          value: "cstor-pool-create-default-0.7.0"
+        # OPENEBS_IO_CAS_TEMPLATE_TO_DELETE_VOLUME provides name of delete-pool
+        # template for storage pool delete operations
+        - name: OPENEBS_IO_CAS_TEMPLATE_TO_DELETE_POOL
+          value: "cstor-pool-delete-default-0.7.0"
         # OPENEBS_IO_INSTALL_CONFIG_NAME provides the name of configmap related
         # to maya install
         - name: OPENEBS_IO_INSTALL_CONFIG_NAME
