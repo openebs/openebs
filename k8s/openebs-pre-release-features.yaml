@@ -2470,12 +2470,13 @@ metadata:
     cas.openebs.io/create-pool-template: cstor-pool-create-default-0.7.0
     cas.openebs.io/delete-pool-template: cstor-pool-delete-default-0.7.0
     cas.openebs.io/config: |
-      #For default sparse pool set the limit at 2G to safegaurd 
-      # cstor pool from requesting more memory and push the node 
-      # to memory pressure condition. By default K8s will set the 
-      # requests to the same value as Limits and this can case the pool
-      # to be in pending state if node doesn't have 2G memory.
-      # Hence setting the requests to a minimum. 
+      #For default sparse pool set the limit at 2Gi to safegaurd 
+      # cstor pool from consuming more memory and causing the node 
+      # to get into memory pressure condition. By default K8s will set the 
+      # Requests to the same value as Limits. For example, when Limit is
+      # set to 2Gi, the pool could get stuck in pending schedule state,
+      # if node doesn't have Requested (2Gi) memory. 
+      # Hence setting the Requests to a minimum (0.5Gi). 
       - name: PoolResourceRequests
         value: |-
             memory: 0.5Gi
