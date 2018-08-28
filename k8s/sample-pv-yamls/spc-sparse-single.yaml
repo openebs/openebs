@@ -10,4 +10,5 @@ spec:
   minPools: 1
   poolSpec:
     poolType: striped
+    cacheFile: /var/openebs/sparse/sparse-claim-auto.cache
     overProvisioning: false
