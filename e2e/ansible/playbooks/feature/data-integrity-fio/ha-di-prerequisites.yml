@@ -1,0 +1,19 @@
+---
+- name: Install the package jq
+  shell: apt-get install jq
+  args:
+    executable: /bin/bash
+  become: true
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+- name: Get $HOME of K8s master for kubernetes user
+  shell: source ~/.profile; echo $HOME
+  args:
+    executable: /bin/bash
+  register: result_kube_home
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+  changed_when: true
+
+- include_tasks: "{{utils_path}}/stern_task.yml"
+  vars:
+    status: start
