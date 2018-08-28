@@ -196,7 +196,7 @@
          args:
            executable: /bin/bash
          register: result
-         until: "'Running' in result.stdout_lines[1]"
+         until: "'Running' in result.stdout"
          delay: 15
          retries: 2
          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
@@ -209,7 +209,7 @@
          args:
            executable: /bin/bash
          register: result
-         until: "'Running' in result.stdout_lines[1]"
+         until: "'Running' in result.stdout"
          delay: 15
          retries: 2
          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"

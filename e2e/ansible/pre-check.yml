@@ -52,21 +52,3 @@
       until: result.stdout_lines == list 
       delay: 30
       retries: 15
-
-    - name: Logging out the stale iscsi sessions
-      shell: iscsiadm -m node -u
-      args:
-        executable: /bin/bash
-      become: true
-      delegate_to: "{{ item }}"
-      with_items: "{{groups['kubernetes-kubeminions']}}" 
-      ignore_errors: yes
-
-    - name: Deleting the stale targets
-      shell: iscsiadm -m node -o delete
-      args:
-        executable: /bin/bash
-      become: true
-      delegate_to: "{{ item }}"
-      with_items: "{{groups['kubernetes-kubeminions']}}"
-      ignore_errors: yes

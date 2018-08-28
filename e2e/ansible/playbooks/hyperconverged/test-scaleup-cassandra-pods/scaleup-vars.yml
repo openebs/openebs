@@ -17,7 +17,7 @@ loadgen_yaml_alias: cassandra-loadgen.yaml
 
 io_minutes: 3
 
-namespace: scaleup-cassandra
+namespace: scaleup-app
 
 profile: ~/.profile
 
@@ -27,7 +27,7 @@ cassandra_artifacts:
 
 test_log_path: setup/logs/scaleup-cassandra-pods.log
 
-test_pod_regex: maya*|openebs*|pvc*|cassandra*
+test_pod_regex: maya*|openebs*|pvc*|cassandra*|*target*|*pool*
 
 test_suite_id: 826
 
