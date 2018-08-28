@@ -1,3 +1,24 @@
+# Create a StorageClass suited for Mongo StatefulSet
+# Since Mongo takes care of replication, one replica will suffice
+# Can be configured with Anti affinity topology key of hostname (default)
+#  or across zone. 
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: mongo-pv-az
+  annotations:
+    cas.openebs.io/config: |
+      - name: ReplicaCount
+        value: "1"
+      - name: StoragePool
+        value: default
+      - name: FSType
+        value: "xfs"
+      #- name: ReplicaAntiAffinityTopoKey
+      #  value: failure-domain.beta.kubernetes.io/zone
+provisioner: openebs.io/provisioner-iscsi
+---
 # Headless service for stable DNS entries of StatefulSet members.
 apiVersion: v1
 kind: Service
@@ -25,6 +46,10 @@ spec:
      labels:
        role: mongo
        environment: test
+       #This label will be used by openebs to place in replica
+       # pod anti-affinity to make sure data of different mongo
+       # instances are not co-located on the same node
+       openebs.io/replica-anti-affinity: vehicle-db
    spec:
      terminationGracePeriodSeconds: 10
      containers:
@@ -51,7 +76,7 @@ spec:
  - metadata:
      name: mongo-persistent-storage
    spec:
-     storageClassName: openebs-mongodb
+     storageClassName: mongo-pv-az
      accessModes:
        - ReadWriteOnce
      resources:
