@@ -1519,7 +1519,7 @@ metadata:
   namespace: openebs
 spec:
   meta: |
-    id: is070casvolume
+    id: is070jivavolume
     runNamespace: {{.Volume.runNamespace}}
     apiVersion: v1
     kind: Service
@@ -1527,8 +1527,8 @@ spec:
     options: |-
       labelSelector: vsm={{ .Volume.owner }}
   post: |
-    {{- jsonpath .JsonResult "{.items[*].metadata.name}" | trim | saveAs "is070casvolume.name" .TaskResult | noop -}}
-    {{- .TaskResult.is070casvolume.name | empty | not | versionMismatchErr "is not a cas volume of 0.7.0 version" | saveIf "is070casvolume.versionMismatchErr" .TaskResult | noop -}}
+    {{- jsonpath .JsonResult "{.items[*].metadata.name}" | trim | saveAs "is070jivavolume.name" .TaskResult | noop -}}
+    {{- .TaskResult.is070jivavolume.name | empty | not | versionMismatchErr "is not a jiva volume of 0.7.0 version" | saveIf "is070jivavolume.versionMismatchErr" .TaskResult | noop -}}
 ---
 apiVersion: openebs.io/v1alpha1
 kind: RunTask
