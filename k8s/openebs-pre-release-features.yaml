@@ -1308,10 +1308,12 @@ spec:
   taskNamespace: openebs
   run:
     tasks:
+    - jiva-volume-isvalidversion-default-0.7.0
     - jiva-volume-read-listtargetservice-default-0.7.0
     - jiva-volume-read-listtargetpod-default-0.7.0
     - jiva-volume-read-listreplicapod-default-0.7.0
   output: jiva-volume-read-output-default-0.7.0
+  fallback: jiva-volume-read-default-0.6.0
 ---
 apiVersion: openebs.io/v1alpha1
 kind: CASTemplate
@@ -1487,6 +1489,7 @@ spec:
   taskNamespace: openebs
   run:
     tasks:
+    - jiva-volume-isvalidversion-default-0.7.0
     - jiva-volume-delete-listtargetservice-default-0.7.0
     - jiva-volume-delete-listtargetdeployment-default-0.7.0
     - jiva-volume-delete-listreplicadeployment-default-0.7.0
@@ -1494,6 +1497,7 @@ spec:
     - jiva-volume-delete-deletetargetdeployment-default-0.7.0
     - jiva-volume-delete-deletereplicadeployment-default-0.7.0
   output: jiva-volume-delete-output-default-0.7.0
+  fallback: jiva-volume-delete-default-0.6.0
 ---
 apiVersion: openebs.io/v1alpha1
 kind: CASTemplate
@@ -1507,6 +1511,24 @@ spec:
     - jiva-volume-list-listtargetpod-default-0.6.0
     - jiva-volume-list-listreplicapod-default-0.6.0
   output: jiva-volume-list-output-default-0.7.0
+---
+apiVersion: openebs.io/v1alpha1
+kind: RunTask
+metadata:
+  name: jiva-volume-isvalidversion-default-0.7.0
+  namespace: openebs
+spec:
+  meta: |
+    id: is070jivavolume
+    runNamespace: {{.Volume.runNamespace}}
+    apiVersion: v1
+    kind: Service
+    action: list
+    options: |-
+      labelSelector: vsm={{ .Volume.owner }}
+  post: |
+    {{- jsonpath .JsonResult "{.items[*].metadata.name}" | trim | saveAs "is070jivavolume.name" .TaskResult | noop -}}
+    {{- .TaskResult.is070jivavolume.name | empty | not | versionMismatchErr "is not a jiva volume of 0.7.0 version" | saveIf "is070jivavolume.versionMismatchErr" .TaskResult | noop -}}
 ---
 apiVersion: openebs.io/v1alpha1
 kind: RunTask
@@ -1528,7 +1550,7 @@ spec:
     options: |-
       labelSelector: openebs.io/controller-service=jiva-controller-service
   post: |
-    {{- $servicePairs := jsonpath .JsonResult `{range .items[*]}pkey={@.metadata.namespace}/{@.metadata.labels.vsm},clusterIP={@.spec.clusterIP};{end}` | trim | default "" | splitList ";" -}}
+    {{- $servicePairs := jsonpath .JsonResult "{range .items[*]}pkey={@.metadata.namespace}/{@.metadata.labels.vsm},clusterIP={@.spec.clusterIP};{end}" | trim | default "" | splitList ";" -}}
     {{- $servicePairs | keyMap "volumeList" .ListItems | noop -}}
 ---
 apiVersion: openebs.io/v1alpha1
@@ -1551,7 +1573,7 @@ spec:
     options: |-
       labelSelector: openebs/controller=jiva-controller
   post: |
-    {{- $controllerPairs := jsonpath .JsonResult `{range .items[*]}pkey={@.metadata.namespace}/{@.metadata.labels.vsm},controllerIP={@.status.podIP},controllerStatus={@.status.containerStatuses[*].ready};{end}` | trim | default "" | splitList ";" -}}
+    {{- $controllerPairs := jsonpath .JsonResult "{range .items[*]}pkey={@.metadata.namespace}/{@.metadata.labels.vsm},controllerIP={@.status.podIP},controllerStatus={@.status.containerStatuses[*].ready};{end}" | trim | default "" | splitList ";" -}}
     {{- $controllerPairs | keyMap "volumeList" .ListItems | noop -}}
 ---
 apiVersion: openebs.io/v1alpha1
@@ -1574,7 +1596,7 @@ spec:
     options: |-
       labelSelector: openebs/replica=jiva-replica
   post: |
-    {{- $replicaPairs := jsonpath .JsonResult `{range .items[*]}pkey={@.metadata.namespace}/{@.metadata.labels.vsm},replicaIP={@.status.podIP},replicaStatus={@.status.containerStatuses[*].ready},capacity=Uknown;{end}` | trim | default "" | splitList ";" -}}
+    {{- $replicaPairs := jsonpath .JsonResult "{range .items[*]}pkey={@.metadata.namespace}/{@.metadata.labels.vsm},replicaIP={@.status.podIP},replicaStatus={@.status.containerStatuses[*].ready},capacity=Uknown;{end}" | trim | default "" | splitList ";" -}}
     {{- $replicaPairs | keyMap "volumeList" .ListItems | noop -}}
 ---
 apiVersion: openebs.io/v1alpha1
@@ -1610,7 +1632,7 @@ spec:
     options: |-
       labelSelector: openebs.io/controller-service=jiva-controller-svc
   post: |
-    {{- $servicePairs := jsonpath .JsonResult `{range .items[*]}pkey={@.metadata.namespace}/{@.metadata.labels.openebs\.io/persistent-volume},clusterIP={@.spec.clusterIP};{end}` | trim | default "" | splitList ";" -}}
+    {{- $servicePairs := jsonpath .JsonResult "{range .items[*]}pkey={@.metadata.namespace}/{@.metadata.labels.openebs\\.io/persistent-volume},clusterIP={@.spec.clusterIP};{end}" | trim | default "" | splitList ";" -}}
     {{- $servicePairs | keyMap "volumeList" .ListItems | noop -}}
 ---
 apiVersion: openebs.io/v1alpha1
@@ -1633,7 +1655,7 @@ spec:
     options: |-
       labelSelector: openebs.io/controller=jiva-controller
   post: |
-    {{- $controllerPairs := jsonpath .JsonResult `{range .items[*]}pkey={@.metadata.namespace}/{@.metadata.labels.openebs\.io/persistent-volume},controllerIP={@.status.podIP},controllerStatus={@.status.containerStatuses[*].ready};{end}` | trim | default "" | splitList ";" -}}
+    {{- $controllerPairs := jsonpath .JsonResult "{range .items[*]}pkey={@.metadata.namespace}/{@.metadata.labels.openebs\\.io/persistent-volume},controllerIP={@.status.podIP},controllerStatus={@.status.containerStatuses[*].ready};{end}" | trim | default "" | splitList ";" -}}
     {{- $controllerPairs | keyMap "volumeList" .ListItems | noop -}}
 ---
 apiVersion: openebs.io/v1alpha1
@@ -1656,7 +1678,7 @@ spec:
     options: |-
       labelSelector: openebs.io/replica=jiva-replica
   post: |
-    {{- $replicaPairs := jsonpath .JsonResult `{range .items[*]}pkey={@.metadata.namespace}/{@.metadata.labels.openebs\.io/persistent-volume},replicaIP={@.status.podIP},replicaStatus={@.status.containerStatuses[*].ready},capacity={@.metadata.annotations.openebs\.io/capacity};{end}` | trim | default "" | splitList ";" -}}
+    {{- $replicaPairs := jsonpath .JsonResult "{range .items[*]}pkey={@.metadata.namespace}/{@.metadata.labels.openebs\\.io/persistent-volume},replicaIP={@.status.podIP},replicaStatus={@.status.containerStatuses[*].ready},capacity={@.metadata.annotations.openebs\\.io/capacity};{end}" | trim | default "" | splitList ";" -}}
     {{- $replicaPairs | keyMap "volumeList" .ListItems | noop -}}
 ---
 apiVersion: openebs.io/v1alpha1
@@ -1851,7 +1873,7 @@ spec:
     {{- .TaskResult.readlistrep.items | notFoundErr "replica pod(s) not found" | saveIf "readlistrep.notFoundErr" .TaskResult | noop -}}
     {{- jsonpath .JsonResult "{.items[*].status.podIP}" | trim | saveAs "readlistrep.podIP" .TaskResult | noop -}}
     {{- jsonpath .JsonResult "{.items[*].status.containerStatuses[*].ready}" | trim | saveAs "readlistrep.status" .TaskResult | noop -}}
-    {{- jsonpath .JsonResult `{.items[*].metadata.annotations.openebs\.io/capacity}` | trim | saveAs "readlistrep.capacity" .TaskResult | noop -}}
+    {{- jsonpath .JsonResult "{.items[*].metadata.annotations.openebs\\.io/capacity}" | trim | saveAs "readlistrep.capacity" .TaskResult | noop -}}
 ---
 apiVersion: openebs.io/v1alpha1
 kind: RunTask
