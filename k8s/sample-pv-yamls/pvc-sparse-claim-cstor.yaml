@@ -4,6 +4,7 @@ kind: StorageClass
 metadata:
   name: openebs-cstor-sparse-auto
   annotations:
+    openebs.io/cas-type: cstor
     cas.openebs.io/config: |
       - name: StoragePoolClaim
         value: "sparse-claim-auto"
@@ -20,7 +21,7 @@ provisioner: openebs.io/provisioner-iscsi
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
-  name: percona-cstor-pvc
+  name: cstor-vol1-1r-claim
 spec:
   storageClassName: openebs-cstor-sparse-auto
   accessModes:
