@@ -1,0 +1,13 @@
+---
+apiVersion: openebs.io/v1alpha1
+kind: StoragePoolClaim
+metadata:
+  name: sparse-claim-auto
+spec:
+  name: sparse-claim-auto
+  type: sparse
+  maxPools: 1
+  minPools: 1
+  poolSpec:
+    poolType: striped
+    overProvisioning: false
