@@ -57,7 +57,7 @@
 
        - include_tasks: "{{utils_path}}/deploy_check.yml"
          vars:
-           ns: openebs
+           ns: "{{ operator_ns }}"
            lkey: name
            lvalue: maya-apiserver
 
@@ -141,7 +141,7 @@
 
        - block:
 
-           - name: 4) Get the name of the volume ctrl deployment
+           - name: 4) Get the name of the jiva controller deployment
              shell: >
                source ~/.profile; kubectl get deployments -n {{ namespace }}
                -l openebs.io/controller=jiva-controller --no-headers
@@ -161,7 +161,7 @@
        # failures, verify successful FI via end marker)       #
        ########################################################
 
-           - name: 4b) Get the resourceVersion of the controller deployment
+           - name: 4b) Get the resourceVersion of the jiva controller deployment
              shell: >
                source ~/.profile; kubectl get deploy -n {{ namespace }}
                {{ ctrl_deploy }} -o yaml | grep resourceVersion
@@ -185,7 +185,7 @@
              register: chaos_result
              ignore_errors: true
 
-           - name: 5a) Get the resourceVersion of the controller deployment
+           - name: 5a) Get the resourceVersion of the controller deployment after recovery.
              shell: >
                source ~/.profile; kubectl get deploy -n {{ namespace }}
                {{ ctrl_deploy }} -o yaml | grep resourceVersion
@@ -195,7 +195,7 @@
              delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
              register: rv_aft
 
-           - name: 5b) Compare resourceVersions of controller deployments
+           - name: 5b) Compare resourceVersions of of both current and previous deployment.
              debug:
                msg: "Verified controller pods were restarted by chaoskube"
              failed_when: "rv_bef.stdout | int == rv_aft.stdout | int"
@@ -216,7 +216,7 @@
 
        - block:
 
-           - name: 4) Get the name of the volume ctrl deployment
+           - name: 4) Get the name of cstor target deployment
              shell: >
                source ~/.profile; kubectl get deployments -n {{ operator_ns }}
                -l openebs.io/target=cstor-target --no-headers
@@ -235,7 +235,7 @@
        # failures, verify successful FI via end marker)       #
        ########################################################
 
-           - name: 4b) Get the resourceVersion of the controller deployment
+           - name: 4b) Get the resourceVersion of the cstor target deployment
              shell: >
                source ~/.profile; kubectl get deploy -n {{ operator_ns }}
                {{ ctrl_deploy }} -o yaml | grep resourceVersion
@@ -245,7 +245,7 @@
              delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
              register: rv_bef
 
-           - name: 5) Initiate periodic controller failures from chaoskube
+           - name: 5) Initiate periodic target failures from chaoskube
              shell: >
                source ~/.profile; kubectl exec {{ chaospod }} -n {{ namespace }}
                -- timeout -t {{ chaos_duration }} chaoskube
@@ -259,7 +259,7 @@
              register: chaos_result
              ignore_errors: true
 
-           - name: 5a) Get the resourceVersion of the controller deployment
+           - name: 5a) Get the resourceVersion of the target deployment
              shell: >
                source ~/.profile; kubectl get deploy -n {{ operator_ns }}
                {{ ctrl_deploy }} -o yaml | grep resourceVersion
@@ -269,7 +269,7 @@
              delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
              register: rv_aft
 
-           - name: 5b) Compare resourceVersions of controller deployments
+           - name: 5b) Compare resourceVersions of target deployments
              debug:
                msg: "Verified controller pods were restarted by chaoskube"
              failed_when: "rv_bef.stdout | int == rv_aft.stdout | int"
@@ -280,7 +280,7 @@
        # pod is still in running state)                       #
        ########################################################
 
-           - name: 6) Check if the application is running
+           - name: 6) Check if the application is running.
              shell: source ~/.profile; kubectl get pods -n {{ namespace }} -l name=percona --no-headers
              args:
                executable: /bin/bash
