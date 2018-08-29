@@ -1,18 +1,18 @@
-# ha.yml
-#Description:
+# ha-di.yml
+#Description: Verify data Integrity of OpenEBS volumes using FIO
 
 ###############################################################################################
 #Test Steps:
 #1. Install the packages and dependencies.
 #2. Copy the test artifacts to k8s master.
 #3. Check if the OpenEBS components are deployed.
-#3. Deploy Fio write job in test pvc.
-#4. Check if the pods are up and running.
-#5. Obtain the node where the conteoller pod is scheduled.
-#6. Make the current node unschedulable.
-#7. Delete the controller pod anc check if it is scheduled again on different node.
-#7. Perform the data Integrity check using fio read job.
-#8. Perform test cleanup.
+#4. Deploy Fio write job in test pvc.
+#5. Check if the pods are up and running.
+#6. Obtain the node where the conteoller pod is scheduled.
+#7. Make the current node unschedulable.
+#8. Delete the controller pod anc check if it is scheduled again on different node.
+#9. Perform the data Integrity check using fio read job.
+#10 Perform test cleanup.
 ###############################################################################################
 
 ---
@@ -25,7 +25,7 @@
    - block:
 
        #################################################
-       # PREPARE TEST ENV FOR THE HA TEST              #
+       # PREPARE TEST ENV FOR THE DATA INTEGRITY TEST  #
        # (Includes installing packages, deploying apps)#
        #################################################
 
@@ -79,7 +79,7 @@
          failed_when: "'fio' not in result_job.stdout"
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
-       - name: 11b) Obtaining the fio write job pod name
+       - name: Obtaining the fio write job pod name
          shell: >
           source ~/.profile;
           kubectl get pods -n "{{ namespace }}" -l job-name=fio
@@ -109,9 +109,6 @@
          failed_when: result_write.stdout != '0'
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
-       # (Includes identifying objects to fail, simulating infra changes)#
-       ###################################################################
-
        - block:
            - name: Get storage ctrl pod name
              shell: >
@@ -125,6 +122,20 @@
            - name: Set ctrl pod name to variable
              set_fact:
                ctrl_pod_name: "{{ result.stdout.split()[0] }}"
+
+           - name: Get node on which the ctrl pod is scheduled
+             shell: >
+               source ~/.profile;
+               kubectl get pods {{ ctrl_pod_name }} -n {{ namespace }} -o jsonpath='{..nodeName}'
+             args:
+               executable: /bin/bash
+             register: result
+             delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+
+           - name: Store the ctrl pod node name in a variable
+             set_fact:
+               ctrl_node: "{{ result.stdout }}"
+
          when: storage_engine == 'jiva'
 
        - block:
@@ -138,7 +149,7 @@
              register: pv
              delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
 
-           - name: Get storage ctrl pod name
+           - name: Get storage target pod name
              shell: >
                source ~/.profile;
                kubectl get pods -n {{ operator_ns }} -l openebs.io/target=cstor-target | grep "{{ pv.stdout.split()[0] }}"
@@ -147,27 +158,10 @@
              register: result
              delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
 
-           - name: Set ctrl pod name to variable
+           - name: Set target pod name to variable
              set_fact:
                ctrl_pod_name: "{{ result.stdout.split()[0] }}"
-         when: storage_engine == 'cStor'
 
-       - block:
-           - name: Get node on which the ctrl pod is scheduled
-             shell: >
-               source ~/.profile;
-               kubectl get pods {{ ctrl_pod_name }} -n {{ namespace }} -o jsonpath='{..nodeName}'
-             args:
-               executable: /bin/bash
-             register: result
-             delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
-
-           - name: Store the ctrl pod node name in a variable
-             set_fact:
-               ctrl_node: "{{ result.stdout }}"
-         when: storage_engine == 'jiva'
-
-       - block:
            - name: Get node on which the target pod is scheduled
              shell: >
                source ~/.profile;
@@ -177,7 +171,7 @@
              register: result
              delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
 
-           - name: Store the ctrl pod node name in a variable
+           - name: Store the target pod node name in a variable
              set_fact:
                ctrl_node: "{{ result.stdout }}"
          when: storage_engine == 'cStor'
