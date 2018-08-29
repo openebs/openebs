@@ -18,6 +18,7 @@
     - test-ctrl-failure-vars.yml
 
   tasks:
+
    - block:
 
        - include: test-ctrl-failure-prereq.yml
@@ -54,6 +55,8 @@
            regexp: 'namespace: default'
            replace: 'namespace: {{ namespace }}'
          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+
+      # Check if mayaapiserver is running
 
        - include_tasks: "{{utils_path}}/deploy_check.yml"
          vars:
@@ -113,6 +116,8 @@
          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
          when:  storage_engine  == 'cStor'
 
+       # Deploy percona application using the selected storage engine.
+
        - include_tasks: "{{utils_path}}/deploy_task.yml"
          vars:
            app_yml: "{{ percona_files.0 }}"
@@ -123,7 +128,6 @@
             ns: "{{ namespace }}"
             lkey: name
             lvalue: percona
-         when:  storage_engine  == 'jiva'
 
        - name: 3b) Check if the cStor target has been created and running.
          shell: source ~/.profile; kubectl get pods -n {{ operator_ns }} | grep {{ namespace }}
@@ -139,95 +143,30 @@
          wait_for:
            timeout: 120
 
-       - block:
-
-           - name: 4) Get the name of the jiva controller deployment
-             shell: >
-               source ~/.profile; kubectl get deployments -n {{ namespace }}
-               -l openebs.io/controller=jiva-controller --no-headers
-             args:
-               executable: /bin/bash
-             delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-             register: result_deploy
-
-           - name: 4a) Set the ctrl deployment name to variable
-             set_fact:
-               ctrl_deploy: "{{ result_deploy.stdout_lines[0].split()[0] }}"
-
-
-       ########################################################
-       #        INJECT FAULTS FOR SPECIFIED PERIOD            #
-       # (Obtain begin marker before fault-inject(FI),do ctrl #
-       # failures, verify successful FI via end marker)       #
-       ########################################################
-
-           - name: 4b) Get the resourceVersion of the jiva controller deployment
-             shell: >
-               source ~/.profile; kubectl get deploy -n {{ namespace }}
-               {{ ctrl_deploy }} -o yaml | grep resourceVersion
-               | awk '{print $2}' | sed 's|"||g'
-             args:
-               executable: /bin/bash
-             delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-             register: rv_bef
-
-           - name: 5) Initiate periodic controller failures from chaoskube
-             shell: >
-               source ~/.profile; kubectl exec {{ chaospod }} -n {{ namespace }}
-               -- timeout -t {{ chaos_duration }} chaoskube
-               --labels 'openebs.io/controller=jiva-controller'
-               --no-dry-run --interval={{ chaos_interval }}s
-               --debug
-               --namespaces={{ namespace }}
-             args:
-               executable: /bin/bash
-             delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-             register: chaos_result
-             ignore_errors: true
-
-           - name: 5a) Get the resourceVersion of the controller deployment after recovery.
-             shell: >
-               source ~/.profile; kubectl get deploy -n {{ namespace }}
-               {{ ctrl_deploy }} -o yaml | grep resourceVersion
-               | awk '{print $2}' | sed 's|"||g'
-             args:
-               executable: /bin/bash
-             delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-             register: rv_aft
-
-           - name: 5b) Compare resourceVersions of of both current and previous deployment.
-             debug:
-               msg: "Verified controller pods were restarted by chaoskube"
-             failed_when: "rv_bef.stdout | int == rv_aft.stdout | int"
-
-       ########################################################
-       #        VERIFY RESILINCY/FAULT-TOLERATION             #
-       # (Confirm liveness checks on percona are successful & #
-       # pod is still in running state)                       #
-       ########################################################
-
-           - include_tasks: "{{utils_path}}/deploy_check.yml"
-             vars:
-               ns: "{{ namespace }}"
-               lkey: name
-               lvalue: percona
-
+       - name: Setting values to variables specific to jiva
+         set_fact:
+           ns: "{{ namespace }}"
+           pod_label: "openebs.io/controller=jiva-controller"
          when: storage_engine  == 'jiva'
 
-       - block:
+       - name: Setting values to variables specific to cstor
+         set_fact:
+           ns: "{{ operator_ns }}"
+           pod_label: "openebs.io/target=cstor-target"
+         when: storage_engine  == 'cStor'
 
-           - name: 4) Get the name of cstor target deployment
-             shell: >
-               source ~/.profile; kubectl get deployments -n {{ operator_ns }}
-               -l openebs.io/target=cstor-target --no-headers
-             args:
-               executable: /bin/bash
-             delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-             register: result_deploy
+       - name: 4) Get the name of the controller/target deployment
+         shell: >
+           source ~/.profile; kubectl get deployments -n {{ ns }}
+           -l {{ pod_label }} --no-headers
+         args:
+           executable: /bin/bash
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+         register: result_deploy
 
-           - name: 4a) Set the target deployment name to variable
-             set_fact:
-               ctrl_deploy: "{{ result_deploy.stdout_lines[0].split()[0] }}"
+       - name: 4a) Set the ctrl deployment name to variable
+         set_fact:
+           ctrl_deploy: "{{ result_deploy.stdout_lines[0].split()[0] }}"
 
        ########################################################
        #        INJECT FAULTS FOR SPECIFIED PERIOD            #
@@ -235,77 +174,65 @@
        # failures, verify successful FI via end marker)       #
        ########################################################
 
-           - name: 4b) Get the resourceVersion of the cstor target deployment
-             shell: >
-               source ~/.profile; kubectl get deploy -n {{ operator_ns }}
-               {{ ctrl_deploy }} -o yaml | grep resourceVersion
-               | awk '{print $2}' | sed 's|"||g'
-             args:
-               executable: /bin/bash
-             delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-             register: rv_bef
+       - name: 4b) Get the resourceVersion of the controller/target deployment
+         shell: >
+           source ~/.profile; kubectl get deploy -n {{ ns }}
+           {{ ctrl_deploy }} -o yaml | grep resourceVersion
+           | awk '{print $2}' | sed 's|"||g'
+         args:
+           executable: /bin/bash
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+         register: rv_bef
 
-           - name: 5) Initiate periodic target failures from chaoskube
-             shell: >
-               source ~/.profile; kubectl exec {{ chaospod }} -n {{ namespace }}
-               -- timeout -t {{ chaos_duration }} chaoskube
-               --labels 'openebs.io/target=cstor-target'
-               --no-dry-run --interval={{ chaos_interval }}s
-               --debug
-               --namespaces={{ operator_ns }}
-             args:
-               executable: /bin/bash
-             delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-             register: chaos_result
-             ignore_errors: true
+       - name: 5) Initiate periodic controller/target failure through chaoskube
+         shell: >
+           source ~/.profile; kubectl exec {{ chaospod }} -n {{ namespace }}
+           -- timeout -t {{ chaos_duration }} chaoskube
+           --labels '{{ pod_label }}'
+           --no-dry-run --interval={{ chaos_interval }}s
+           --debug
+           --namespaces={{ ns }}
+         args:
+           executable: /bin/bash
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+         register: chaos_result
+         ignore_errors: true
 
-           - name: 5a) Get the resourceVersion of the target deployment
-             shell: >
-               source ~/.profile; kubectl get deploy -n {{ operator_ns }}
-               {{ ctrl_deploy }} -o yaml | grep resourceVersion
-               | awk '{print $2}' | sed 's|"||g'
-             args:
-               executable: /bin/bash
-             delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-             register: rv_aft
+       - name: 5a) Get the resourceVersion of the controller/target deployment after recovery.
+         shell: >
+           source ~/.profile; kubectl get deploy -n {{ ns }}
+           {{ ctrl_deploy }} -o yaml | grep resourceVersion
+           | awk '{print $2}' | sed 's|"||g'
+         args:
+           executable: /bin/bash
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+         register: rv_aft
 
-           - name: 5b) Compare resourceVersions of target deployments
-             debug:
-               msg: "Verified controller pods were restarted by chaoskube"
-             failed_when: "rv_bef.stdout | int == rv_aft.stdout | int"
+       - name: 5b) Compare resourceVersions of both current and previous deployment.
+         debug:
+           msg: "Verified controller pods were restarted by chaoskube"
+         failed_when: "rv_bef.stdout | int == rv_aft.stdout | int"
 
        ########################################################
-       #        VERIFY RESILINCY/FAULT-TOLERATION             #
+       #        VERIFY RESILENCY/FAULT-TOLERATION             #
        # (Confirm liveness checks on percona are successful & #
        # pod is still in running state)                       #
        ########################################################
 
-           - name: 6) Check if the application is running.
-             shell: source ~/.profile; kubectl get pods -n {{ namespace }} -l name=percona --no-headers
-             args:
-               executable: /bin/bash
-             register: app_pod
-             until: "'Running' in app_pod.stdout"
-             delay: 30
-             retries: 15
-          
-         when: storage_engine  == 'cStor'
-
-
-       ########################################################
-       #                        CLEANUP                       #
-       # (Tear down application, liveness configmap as well as#
-       # the FI (chaoskube) infrastructure. Also stop logger) #
-       ########################################################
-
+       - include_tasks: "{{utils_path}}/deploy_check.yml"
+         vars:
+           ns: "{{ namespace }}"
+           lkey: name
+           lvalue: percona
 
        - name: Setting pass flag
          set_fact:
-            flag: "Test Passed"
-            status: "good"
-            status_id: 1
+           flag: "Test Passed"
+           status: "good"
+           status_id: 1
 
      rescue:
+
        - name: Setting fail flag
          set_fact:
            flag: "Test Failed"
@@ -313,7 +240,15 @@
            status_id: 5
 
      always:
+
        - block:
+
+       ########################################################
+       #                        CLEANUP                       #
+       # (Tear down application, liveness configmap as well as#
+       # the FI (chaoskube) infrastructure. Also stop logger) #
+       ########################################################
+
 
            - include: test-ctrl-failure-cleanup.yml
 
