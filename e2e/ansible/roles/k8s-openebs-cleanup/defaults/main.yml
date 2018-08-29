@@ -1,5 +1,5 @@
 ---
-openebs_operator_alias: openebs-operator.yaml 
+openebs_operator_alias: openebs-operator.yaml
 
 openebs_storageclasses_alias: openebs-storageclasses.yaml
 
