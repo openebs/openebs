@@ -42,11 +42,11 @@
   retries: 10
 
 - name: Confirm pre-release features have been deleted	
-  shell: source ~/.profile; kubectl get cast -n openebs	
+  shell: source ~/.profile; kubectl get cast -n {{ operator_ns }}	
   args:	
     executable: /bin/bash	
   register: result	
-  until: "result.rc == 0 and 'No resources found.' in result.stderr"	
+  until: "result.rc != 0 in result.stderr"	
   delay: 20	
   retries: 10
 

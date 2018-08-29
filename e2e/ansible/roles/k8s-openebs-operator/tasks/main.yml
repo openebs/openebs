@@ -115,7 +115,7 @@
   failed_when: "'m-apiserver status:  running' not in result_vers.stdout"
 
 - name: Confirm CAS Templates are deployed
-  shell: source ~/.profile; kubectl get cast -n openebs
+  shell: source ~/.profile; kubectl get cast -n {{ operator_ns }}
   args:
     executable: /bin/bash
   register: result
