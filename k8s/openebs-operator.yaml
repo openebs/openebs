@@ -160,6 +160,18 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: spec.serviceAccountName
+        # OPENEBS_MAYA_POD_NAME provides the name of this pod as
+        # environment variable
+        - name: OPENEBS_MAYA_POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        # OPENEBS_MAYA_POD_NAMESPACE provides the namespaces of this pod as
+        # environment variable
+        - name: OPENEBS_MAYA_POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
         # OPENEBS_IO_KUBE_CONFIG enables maya api service to connect to K8s
         # based on this config. This is ignored if empty.
         # This is supported for maya api server version 0.5.2 onwards
