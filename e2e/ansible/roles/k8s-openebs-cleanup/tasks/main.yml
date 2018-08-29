@@ -41,6 +41,15 @@
   delay: 30
   retries: 10
 
+- name: Confirm pre-release features have been deleted	
+  shell: source ~/.profile; kubectl get cast -n openebs	
+  args:	
+    executable: /bin/bash	
+  register: result	
+  until: "result.rc == 0 and 'No resources found.' in result.stderr"	
+  delay: 20	
+  retries: 10
+
 - name: Delete the artifacts
   file:
     path: "{{ ansible_env.HOME }}/{{ item }}"
