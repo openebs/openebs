@@ -1,10 +1,10 @@
 ---
-- hosts: kubernetes-kubemasters 
-  roles: 
+- hosts: kubernetes-kubemasters
+  roles:
     - {role: k8s-openebs-operator-helm, when: deployment_mode == "hyperconverged" and openebs_deploy == "helm"}
 
 - hosts: kubernetes-kubemasters
   roles:
     - {role: k8s-openebs-operator, when: deployment_mode == "hyperconverged" and openebs_deploy == "kubectl"}
-    - {role: k8s-custom-storageclass} 
+    - {role: k8s-custom-storageclass}
 
