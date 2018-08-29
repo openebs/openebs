@@ -8,7 +8,9 @@ metadata:
     cas.openebs.io/config: |
       - name: StoragePoolClaim
         value: "sparse-claim-auto"
-      #- name: TargetResourceLimits
+      - name: ReplicaCount
+        value: "1"
+     #- name: TargetResourceLimits
       #  value: |-
       #      memory: 1Gi
       #      cpu: 200m
