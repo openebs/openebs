@@ -5,7 +5,7 @@
 #Test Steps:
 #1. Copy Test artifacts to Kubemaster.
 #2. Deploy Percona application with liveness probe running db queries continuously.
-#3. Create chaoskube infrastructe to induce failures.
+#3. Create chaoskube infrastructure to induce failures.
 #4. Gather Node,Container/target and chaoskube pod details required for test.
 #5. Initiate periodic pod failures from chaoskube
 #6. Check percona application status to ensure that it is running after the failure.
