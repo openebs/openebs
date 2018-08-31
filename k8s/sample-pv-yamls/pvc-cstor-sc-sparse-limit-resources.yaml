@@ -4,9 +4,7 @@ kind: StorageClass
 metadata:
   name: openebs-cstor-sparse-limits
   annotations:
-    cas.openebs.io/create-volume-template: cstor-volume-create-default-0.7.0
-    cas.openebs.io/delete-volume-template: cstor-volume-delete-default-0.7.0
-    cas.openebs.io/read-volume-template: cstor-volume-read-default-0.7.0
+    openebs.io/cas-type: cstor
     cas.openebs.io/config: |
       - name: StoragePoolClaim
         value: "cstor-sparse-pool"
