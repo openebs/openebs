@@ -24,7 +24,7 @@ def write_file(path, content):
     return path, 0
 
 def create_test_plan(client, args, storage_engine_type, project_id):
-    plan_name = "BUILD_"+ storage_engine_type + "_" + args['build_number'] + "_" + str(datetime.now())[:10]
+    plan_name = "BUILD_"+args['image_tag'] + "_" + storage_engine_type + "_" + args['build_number'] + "_" + str(datetime.now())[:10]
     description = "Jenkins logs: http://104.197.185.168:8080/blue/organizations/jenkins/Jiva/detail/Jiva/"+str(args['build_number'])+"/pipeline/\nUsername: test\nPassword:"
     plan = client.send_post('add_plan/'+str(project_id), {'name': plan_name, 'description': description})
     if plan['id'] is None:
@@ -334,7 +334,7 @@ def create_plan_resources(args):
                                 "slack": {
                                         "attachments": [
                                             {
-                                                "title": "JIVA Build #" +str(args['build_number'])+" completed",
+                                                "title": "JIVA BUILD #" +str(args['build_number'])+" completed",
                                                 "title_link": "https://cloudbyte.testrail.com/index.php?/plans/view/"+str(map_src_id['jiva_plan_run_id']),
                                                 "text": "*Username:* test@openebs.io\n*Password:* openebs",
                                                 "color": "#439FE0",
@@ -392,6 +392,7 @@ def main():
     parser.add_argument('-tpass', '--testrail-password',
                         help='password for testrail', required=True)
     parser.add_argument('-bn', '--build-number', help='jenkins build number', required=True)
+    parser.add_argument('-tag', '--image-tag', help='image tag', required=True)
     args = vars(parser.parse_args())
     create_plan_resources(args)
     exit(0)
