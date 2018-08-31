@@ -27,9 +27,6 @@ apiVersion: openebs.io/v1alpha1
 kind: StoragePoolClaim
 metadata:
   name: cstor-pool-default-0.7.0
-  annotations:
-    cas.openebs.io/create-pool-template: cstor-pool-create-default-0.7.0
-    cas.openebs.io/delete-pool-template: cstor-pool-delete-default-0.7.0
 spec:
   name: cstor-pool-default-0.7.0
   type: disk
@@ -54,9 +51,7 @@ kind: StorageClass
 metadata:
   name: openebs-cstor-default-0.7.0
   annotations:
-    cas.openebs.io/create-volume-template: cstor-volume-create-default-0.7.0
-    cas.openebs.io/delete-volume-template: cstor-volume-delete-default-0.7.0
-    cas.openebs.io/read-volume-template: cstor-volume-read-default-0.7.0
+    openebs.io/cas-type: cstor
     cas.openebs.io/config: |
       - name: StoragePoolClaim
         value: "cstor-pool-default-0.7.0"

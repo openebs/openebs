@@ -103,46 +103,6 @@ spec:
         ports:
         - containerPort: 5656
         env:
-        # OPENEBS_IO_CAS_TEMPLATE_TO_LIST_VOLUME sets the cas template name to
-        # list volumes. This is a mandatory env variable.
-        - name: OPENEBS_IO_CAS_TEMPLATE_TO_LIST_VOLUME
-          value: "jiva-volume-list-default-0.6.0,jiva-volume-list-default-0.7.0,cstor-volume-list-default-0.7.0"
-        # OPENEBS_IO_JIVA_CAS_TEMPLATE_TO_CREATE_VOLUME provides name of create volume
-        # template for jiva volume create operations
-        - name: OPENEBS_IO_JIVA_CAS_TEMPLATE_TO_CREATE_VOLUME
-          value: "jiva-volume-create-default-0.7.0"
-        # OPENEBS_IO_JIVA_CAS_TEMPLATE_TO_READ_VOLUME provides name of create volume
-        # template for jiva volume read operations
-        - name: OPENEBS_IO_JIVA_CAS_TEMPLATE_TO_READ_VOLUME
-          value: "jiva-volume-read-default-0.7.0"
-        # OPENEBS_IO_JIVA_CAS_TEMPLATE_TO_DELETE_VOLUME provides name of create volume
-        # template for jiva volume delete operations
-        - name: OPENEBS_IO_JIVA_CAS_TEMPLATE_TO_DELETE_VOLUME
-          value: "jiva-volume-delete-default-0.7.0"
-        # OPENEBS_IO_CSTOR_CAS_TEMPLATE_TO_CREATE_VOLUME provides name of create volume
-        # template for cstor volume create operations
-        - name: OPENEBS_IO_CSTOR_CAS_TEMPLATE_TO_CREATE_VOLUME
-          value: "cstor-volume-create-default-0.7.0"
-        # OPENEBS_IO_CSTOR_CAS_TEMPLATE_TO_READ_VOLUME provides name of create volume
-        # template for cstor volume read operations
-        - name: OPENEBS_IO_CSTOR_CAS_TEMPLATE_TO_READ_VOLUME
-          value: "cstor-volume-read-default-0.7.0"
-        # OPENEBS_IO_CSTOR_CAS_TEMPLATE_TO_DELETE_VOLUME provides name of create volume
-        # template for cstor volume delete operations
-        - name: OPENEBS_IO_CSTOR_CAS_TEMPLATE_TO_DELETE_VOLUME
-          value: "cstor-volume-delete-default-0.7.0"
-        # OPENEBS_IO_CAS_TEMPLATE_TO_CREATE_POOL provides name of create-pool
-        # template for storage pool create operations
-        - name: OPENEBS_IO_CAS_TEMPLATE_TO_CREATE_POOL
-          value: "cstor-pool-create-default-0.7.0"
-        # OPENEBS_IO_CAS_TEMPLATE_TO_DELETE_POOL provides name of delete-pool
-        # template for storage pool delete operations
-        - name: OPENEBS_IO_CAS_TEMPLATE_TO_DELETE_POOL
-          value: "cstor-pool-delete-default-0.7.0"
-        # OPENEBS_IO_INSTALL_CONFIG_NAME provides the name of configmap related
-        # to maya install
-        - name: OPENEBS_IO_INSTALL_CONFIG_NAME
-          value: "maya-install-config-default-0.7.0"
         # OPENEBS_IO_INSTALL_DEFAULT_CSTOR_SPARSE_POOL decides whether default cstor sparse pool should be
         # configured as a part of openebs installation.
         # If "true" a default cstor sparse pool will be configured, if "false" it will not be configured.
@@ -180,10 +140,16 @@ spec:
           value: "openebs/jiva:ci"
         - name: OPENEBS_IO_JIVA_REPLICA_IMAGE
           value: "openebs/jiva:ci"
+        - name: OPENEBS_IO_CSTOR_TARGET_IMAGE
+          value: "openebs/cstor-istgt:ci"
+        - name: OPENEBS_IO_CSTOR_POOL_IMAGE
+          value: "openebs/cstor-pool:ci"
+        - name: OPENEBS_IO_CSTOR_POOL_MGMT_IMAGE
+          value: "openebs/cstor-pool-mgmt:ci"
+        - name: OPENEBS_IO_CSTOR_VOLUME_MGMT_IMAGE
+          value: "openebs/cstor-volume-mgmt:ci"
         - name: OPENEBS_IO_VOLUME_MONITOR_IMAGE
           value: "openebs/m-exporter:ci"
-        - name: OPENEBS_IO_JIVA_REPLICA_COUNT
-          value: "3"
         # DEFAULT_CONTROLLER_NODE_SELECTOR allows you to specify the nodes
         # on which openebs controller have to be scheduled. To use this feature,
         # the nodes should already be labeled with the key=value. For example:
@@ -246,13 +212,6 @@ spec:
         # This is supported for openebs provisioner version 0.5.2 onwards
         #- name: OPENEBS_IO_KUBE_CONFIG
         #  value: "/home/ubuntu/.kube/config"
-        # OPENEBS_VALID_FSTYPE enables openebs provisioner to provision openebs
-        # volume other then ext4(default fstype). After adding "openebs.io/fstype"
-        # parameters in StorageClasse will provision the volume with specified fstype.
-        # This is ignored if empty.
-        # This is supported for openebs provisioner version 0.5.4 onwards
-        #- name: OPENEBS_VALID_FSTYPE
-        #  value: "ext4,xfs"
         - name: NODE_NAME
           valueFrom:
             fieldRef:
@@ -475,16 +434,7 @@ kind: StorageClass
 metadata:
   name: openebs-standard
   annotations:
-    cas.openebs.io/create-volume-template: jiva-volume-create-default-0.7.0
-    cas.openebs.io/delete-volume-template: jiva-volume-delete-default-0.7.0
-    cas.openebs.io/read-volume-template: jiva-volume-read-default-0.7.0
     cas.openebs.io/config: |
-      - name: ControllerImage
-        value: openebs/jiva:ci
-      - name: ReplicaImage
-        value: openebs/jiva:ci
-      - name: VolumeMonitorImage
-        value: openebs/m-exporter:ci
       - name: ReplicaCount
         value: "3"
       - name: StoragePool
@@ -511,8 +461,6 @@ kind: StorageClass
 apiVersion: storage.k8s.io/v1
 metadata:
   name: openebs-snapshot-promoter
-  annotations:
-    cas.openebs.io/delete-volume-template: jiva-volume-delete-default-0.7.0
 provisioner: volumesnapshot.external-storage.k8s.io/snapshot-promoter
 ---
 # node-disk-manager-config-default-0.1.0 contains config of available probes

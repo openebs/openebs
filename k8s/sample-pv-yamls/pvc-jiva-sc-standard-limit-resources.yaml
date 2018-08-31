@@ -2,22 +2,12 @@
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
-  name: openebs-jiva-limits
+  name: openebs-jiva-1r-limits
   annotations:
-    cas.openebs.io/create-volume-template: jiva-volume-create-default-0.7.0
-    cas.openebs.io/delete-volume-template: jiva-volume-delete-default-0.7.0
-    cas.openebs.io/read-volume-template: jiva-volume-read-default-0.7.0
+    openebs.io/cas-type: jiva
     cas.openebs.io/config: |
-      - name: ControllerImage
-        value: openebs/jiva:ci
-      - name: ReplicaImage
-        value: openebs/jiva:ci
-      - name: VolumeMonitorImage
-        value: openebs/m-exporter:ci
       - name: ReplicaCount
         value: "1"
-      - name: StoragePool
-        value: default
       - name: TargetResourceLimits
         value: |-
             memory: 1Gi
@@ -35,9 +25,9 @@ provisioner: openebs.io/provisioner-iscsi
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
-  name: demo-jiva-limits-claim
+  name: demo-jiva-1r-limits-claim
 spec:
-  storageClassName: openebs-jiva-limits
+  storageClassName: openebs-jiva-1r-limits
   accessModes:
     - ReadWriteOnce
   resources:

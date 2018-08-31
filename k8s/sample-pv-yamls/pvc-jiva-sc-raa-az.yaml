@@ -4,14 +4,10 @@ kind: StorageClass
 metadata:
   name: jiva-raa-az
   annotations:
-    cas.openebs.io/create-volume-template: jiva-volume-create-default-0.7.0
-    cas.openebs.io/delete-volume-template: jiva-volume-delete-default-0.7.0
-    cas.openebs.io/read-volume-template: jiva-volume-read-default-0.7.0
+    openebs.io/cas-type: jiva
     cas.openebs.io/config: |
       - name: ReplicaCount
         value: "3"
-      - name: StoragePool
-        value: default
       - name: ReplicaAntiAffinityTopoKey
         value: failure-domain.beta.kubernetes.io/zone
 provisioner: openebs.io/provisioner-iscsi
