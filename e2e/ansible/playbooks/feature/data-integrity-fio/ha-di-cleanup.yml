@@ -1,0 +1,62 @@
+---
+- name: Uncordon the K8S node as part of cleanup
+  shell: source ~/.profile; kubectl uncordon {{ctrl_node}}
+  args:
+    executable: /bin/bash
+  register: result
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+- name: Delete fio-write job pod yaml
+  include_tasks: "{{utils_path}}/delete_deploy.yml"
+  vars:
+    app_yml: "{{ fio_write }}"
+    ns: "{{ namespace }}"
+
+- name: Confirm fio-write pod has been deleted
+  include_tasks: "{{utils_path}}/delete_deploy_check.yml"
+  vars:
+    ns: "{{  namespace }}"
+    lkey: job-name
+    lvalue: fio
+
+- name: Delete fio-read job pod yaml
+  include_tasks: "{{utils_path}}/delete_deploy.yml"
+  vars:
+    app_yml: "{{ fio_read }}"
+    ns: "{{ namespace }}"
+
+- name: Confirm fio-read pod has been deleted
+  include_tasks: "{{utils_path}}/delete_deploy_check.yml"
+  vars:
+    ns: "{{  namespace }}"
+    lkey: job-name
+    lvalue: fio-read
+
+- name: Confirm target pod has been deleted
+  shell: >
+    source ~/.profile;
+    kubectl get pods -n {{ operator_ns }} | grep {{ namespace }} | wc -l
+  args:
+    executable: /bin/bash
+  register: result
+  delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+  until: result.stdout |int == 0
+  delay: 30
+  retries: 15
+  when: storage_engine == 'cStor'
+
+- name: Make the current ctrl node schedulable
+  shell: source ~/.profile; kubectl uncordon {{ctrl_node}}
+  args:
+    executable: /bin/bash
+  register: result
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+- name: Remove test artifacts
+  file:
+    path: "{{ result_kube_home.stdout }}/{{ item }}"
+    state: absent
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+  with_items:
+    - "{{ fio_write }}"
+    - "{{ fio_read }}"

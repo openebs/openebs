@@ -1,0 +1,21 @@
+---
+test_name: ha_data_integrity
+
+test_log_path: setup/logs/ha_data_integrity.log
+
+test_pod_regex: maya*|openebs*|pvc*|fio*
+
+fio_write: demo-fio-write-openebs.yml
+
+fio_read: demo-fio-read-openebs.yml
+
+fio_files:
+  - demo-fio-write-openebs.yml
+  - demo-fio-read-openebs.yml
+
+namespace: ha-fio
+
+test_suite_id: 
+
+test_case_id:
+

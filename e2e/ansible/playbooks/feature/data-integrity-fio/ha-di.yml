@@ -1,0 +1,344 @@
+# ha-di.yml
+#Description: Verify data Integrity of OpenEBS volumes using FIO
+
+###############################################################################################
+#Test Steps:
+#1. Install the packages and dependencies.
+#2. Copy the test artifacts to k8s master.
+#3. Check if the OpenEBS components are deployed.
+#4. Deploy Fio write job in test pvc.
+#5. Check if the pods are up and running.
+#6. Obtain the node where the conteoller pod is scheduled.
+#7. Make the current node unschedulable.
+#8. Delete the controller pod anc check if it is scheduled again on different node.
+#9. Perform the data Integrity check using fio read job.
+#10 Perform test cleanup.
+###############################################################################################
+
+---
+- hosts: localhost
+
+  vars_files:
+    - ha-di-vars.yml
+
+  tasks:
+   - block:
+
+       #################################################
+       # PREPARE TEST ENV FOR THE DATA INTEGRITY TEST  #
+       # (Includes installing packages, deploying apps)#
+       #################################################
+
+       - include: ha-di-prerequisites.yml
+
+       - include_tasks: "{{utils_path}}/deploy_check.yml"
+         vars:
+            ns: "{{ operator_ns }}"
+            lkey: name
+            lvalue: maya-apiserver
+
+       - name: Copy the fio job specific files to K8s master
+         copy:
+           src: "{{ item }}"
+           dest: "{{ result_kube_home.stdout }}"
+         with_items: "{{ fio_files }}"
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+       - name: Replace storage-class to use cstor storage engine
+         replace:
+           path: "{{ result_kube_home.stdout }}/{{ fio_write }}"
+           regexp: 'openebs-standard'
+           replace: '{{ cstor_sc }}'
+         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+         when:  storage_engine  == 'cStor'
+
+       - name: Replace storage-class to use jiva storage engine
+         replace:
+           path: "{{ result_kube_home.stdout }}/{{ fio_write }}"
+           regexp: 'openebs-standard'
+           replace: '{{ jiva_sc }}'
+         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+         when:  storage_engine  == 'jiva'
+
+       - name: Create namespaces.
+         include_tasks: "{{utils_path}}/namespace_task.yml"
+         vars:
+           status: create
+           ns: "{{ namespace }}"
+
+       - include_tasks: "{{utils_path}}/deploy_task.yml"
+         vars:
+           app_yml: "{{ fio_write }}"
+           ns: "{{ namespace }}"
+
+       - name: Check if fio job created successfully
+         shell: source ~/.profile; kubectl get jobs -n "{{ namespace }}"
+         args:
+           executable: /bin/bash
+         register: result_job
+         failed_when: "'fio' not in result_job.stdout"
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+       - name: Obtaining the fio write job pod name
+         shell: >
+          source ~/.profile;
+          kubectl get pods -n "{{ namespace }}" -l job-name=fio
+         args:
+           executable: /bin/bash
+         register: result_write_pod
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+       - name: Check if fio write job is completed
+         shell: >
+           source ~/.profile;
+           kubectl get pods -n "{{ namespace }}" -o jsonpath='{.items[?(@.metadata.labels.job-name=="fio")].status.containerStatuses[*].state.terminated.reason}'
+         args:
+           executable: /bin/bash
+         register: result_fio_pod
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+         until: "'Completed' in result_fio_pod.stdout"
+         delay: 60
+         retries: 10
+
+       - name: Verify the fio write job status
+         shell: >
+           source ~/.profile; kubectl logs "{{ result_write_pod.stdout_lines[1].split()[0] }}" -n "{{ namespace }}" | grep -v '!!' | jq '.jobs[0].error'
+         args:
+           executable: /bin/bash
+         register: result_write
+         failed_when: result_write.stdout != '0'
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+       - block:
+           - name: Get storage ctrl pod name
+             shell: >
+               source ~/.profile;
+               kubectl get pods -n {{ namespace }} -l openebs.io/controller=jiva-controller --no-headers
+             args:
+               executable: /bin/bash
+             register: result
+             delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+
+           - name: Set ctrl pod name to variable
+             set_fact:
+               ctrl_pod_name: "{{ result.stdout.split()[0] }}"
+
+           - name: Get node on which the ctrl pod is scheduled
+             shell: >
+               source ~/.profile;
+               kubectl get pods {{ ctrl_pod_name }} -n {{ namespace }} -o jsonpath='{..nodeName}'
+             args:
+               executable: /bin/bash
+             register: result
+             delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+
+           - name: Store the ctrl pod node name in a variable
+             set_fact:
+               ctrl_node: "{{ result.stdout }}"
+
+         when: storage_engine == 'jiva'
+
+       - block:
+
+           - name: Get the PV name
+             shell: >
+               source ~/.profile;
+               kubectl get pv -n {{ operator_ns }} --no-headers
+             args:
+               executable: /bin/bash
+             register: pv
+             delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+
+           - name: Get storage target pod name
+             shell: >
+               source ~/.profile;
+               kubectl get pods -n {{ operator_ns }} -l openebs.io/target=cstor-target | grep "{{ pv.stdout.split()[0] }}"
+             args:
+               executable: /bin/bash
+             register: result
+             delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+
+           - name: Set target pod name to variable
+             set_fact:
+               ctrl_pod_name: "{{ result.stdout.split()[0] }}"
+
+           - name: Get node on which the target pod is scheduled
+             shell: >
+               source ~/.profile;
+               kubectl get pods {{ ctrl_pod_name }} -n {{ operator_ns }} -o jsonpath='{..nodeName}'
+             args:
+               executable: /bin/bash
+             register: result
+             delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+
+           - name: Store the target pod node name in a variable
+             set_fact:
+               ctrl_node: "{{ result.stdout }}"
+         when: storage_engine == 'cStor'
+
+       - name: Make the current ctrl node unschedulable
+         shell: source ~/.profile; kubectl cordon {{ctrl_node}}
+         args:
+           executable: /bin/bash
+         register: result
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+       - name: Confirm ctrl node is unschedulable
+         shell: source ~/.profile; kubectl get nodes {{ctrl_node}}
+         args:
+           executable: /bin/bash
+         register: result
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+         failed_when: "'SchedulingDisabled' not in result.stdout"
+
+       ########################################################
+       # INJECT FAULT                                         #
+       # (Includes using tools, commands etc.,)               #
+       ########################################################
+
+       - name: Delete the ctrl pod to force reschedule
+         shell: source ~/.profile; kubectl delete pod {{ctrl_pod_name}} -n {{ namespace }}
+         args:
+           executable: /bin/bash
+         register: result
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+         failed_when: "ctrl_pod_name and 'deleted' not in result.stdout"
+         when: storage_engine == 'jiva'
+
+       - name: Delete the target pod to force reschedule
+         shell: source ~/.profile; kubectl delete pod {{ctrl_pod_name}} -n {{ operator_ns }}
+         args:
+           executable: /bin/bash
+         register: result
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+         failed_when: "ctrl_pod_name and 'deleted' not in result.stdout"
+         when: storage_engine == 'cStor'
+
+       #########################################################
+       # VERIFY RECOVERY                                       #
+       # (Includes checking desired fault-tolerance behaviour) #
+       #########################################################
+
+       - name: Check if ctrl pod is restarted
+         shell: >
+           source ~/.profile;
+           kubectl get pods -n {{ namespace }} -l openebs.io/controller=jiva-controller
+         args:
+           executable: /bin/bash
+         register: result
+         until: "'Running' in result.stdout"
+         delay: 15
+         retries: 6
+         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+         when: storage_engine == 'jiva'
+
+       - name: Check if target pod is restarted
+         shell: >
+           source ~/.profile;
+           kubectl get pods -n {{ operator_ns }} -l openebs.io/target=cstor-target | grep "{{ pv.stdout.split()[0] }}"
+         args:
+           executable: /bin/bash
+         register: result
+         until: "'Running' in result.stdout"
+         delay: 15
+         retries: 6
+         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+         when: storage_engine == 'cStor'
+
+       - include_tasks: "{{utils_path}}/deploy_task.yml"
+         vars:
+           app_yml: "{{ fio_read }}"
+           ns: "{{ namespace }}"
+
+       - name: Check if fio job created successfully
+         shell: source ~/.profile; kubectl get jobs -n "{{ namespace }}"
+         args:
+           executable: /bin/bash
+         register: result_read
+         failed_when: "'fio-read' not in result_read.stdout"
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+       - name: Obtaining the fio read job pod name
+         shell: >
+           source ~/.profile;
+           kubectl get pods -a -n "{{ namespace }}" -l job-name=fio-read
+         args:
+           executable: /bin/bash
+         register: result_read_pod
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+       - name: Check if fio read job is completed
+         shell: >
+           source ~/.profile;
+           kubectl get pods -n "{{ namespace }}" -o jsonpath='{.items[?(@.metadata.labels.job-name=="fio-read")].status.containerStatuses[*].state.terminated.reason}'
+         args:
+           executable: /bin/bash
+         register: result_read_job
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+         until: "'Completed' in result_read_job.stdout"
+         delay: 60
+         retries: 10
+
+       - name: Verify the data integrity check
+         shell: >
+           source ~/.profile;
+           kubectl logs "{{ result_read_pod.stdout_lines[1].split()[0] }}" -n "{{ namespace }}" | grep -v '!!' | jq '.jobs[0].error'
+         args:
+           executable: /bin/bash
+         register: result_di
+         failed_when: result_di.stdout != '0'
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+       ########################################################
+       # REVERT FAULTS AND CLEANUP                            #
+       # (Includes commands, delete applications etc.,)       #
+       ########################################################
+
+       - name: Uncordon the K8S node as part of cleanup
+         shell: source ~/.profile; kubectl uncordon {{ctrl_node}}
+         args:
+           executable: /bin/bash
+         register: result
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+       - name: Setting pass flag
+         set_fact:
+            flag: "Test Passed"
+            status: "good"
+            status_id: 1
+
+     rescue:
+        - name: Setting fail flag
+          set_fact:
+           flag: "Test Failed"
+           status: "danger"
+           status_id: 5
+
+     always:
+        - block:
+
+            - include: ha-di-cleanup.yml
+
+            - name: Test Cleanup Passed
+              set_fact:
+                cflag: "Cleanup Passed"
+
+          rescue:
+            - name: Test Cleanup Failed
+              set_fact:
+                cflag: "Cleanup Failed"
+
+          always:
+
+            - include_tasks: "{{utils_path}}/stern_task.yml"
+              vars:
+                status: stop
+
+            - include_tasks: "{{utils_path}}/namespace_task.yml"
+              vars:
+                status: delete
+                ns: "{{ namespace }}"
+
+            - name: Set Test Name as Fact
+              set_fact:
+                testname: "{{ test_name }}"
