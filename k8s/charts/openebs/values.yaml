@@ -21,7 +21,7 @@ apiserver:
     externalPort: 5656
     internalPort: 5656
   nodeSelector: {}
-  tolerations: {}
+  tolerations: []
   affinity: {}
 
 
@@ -30,7 +30,7 @@ provisioner:
   imageTag: "0.6.0"
   replicas: 1
   nodeSelector: {}
-  tolerations: {}
+  tolerations: []
   affinity: {}
 
 snapshotOperator:
@@ -43,7 +43,7 @@ snapshotOperator:
   replicas: 1
   upgradeStrategy: "Recreate"
   nodeSelector: {}
-  tolerations: {}
+  tolerations: []
   affinity: {}
 
 jiva:
@@ -51,9 +51,9 @@ jiva:
   imageTag: "0.6.0"
   replicas: 3
   replicaNodeSelector:
-    #Enable this option and specify the node label that will be used to 
-    #select the nodes where replica pods are scheduled. To use this feature,
-    #the nodes should already be labeled with the key=value. For example:
+    # Enable this option and specify the node label that will be used to 
+    # select the nodes where replica pods are scheduled. To use this feature,
+    # the nodes should already be labeled with the key=value. For example:
     # `kubectl label nodes <node-name> nodetype=storage
     enabled: false
     value: "nodetype=storage"
