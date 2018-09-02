@@ -23,7 +23,7 @@ Any line of the commit message cannot be longer 80 characters! This allows the m
 
 Subject line may be prefixed for continuous integration purposes
  or better project management with a ticket id. The ticket id could 
- a Github Issue, Rally Id, JIRA Id, etc.,  For example,
+ be a Github Issue, Rally Id, JIRA Id, etc.,  For example,
  if you use Rally to track your development, the subject could be
  "[TA-1234] test(mayactl): add unit tests for cstor volume list"
 
@@ -113,4 +113,12 @@ Fixes #123, #246, #333
 ### Revert
 
 If the commit reverts a previous commit, it should begin with revert:, followed by the header of the reverted commit. In the body it should say: This reverts commit <hash>., where the hash is the SHA of the commit being reverted.
+
+### Examples
+
+Here are some PRs that follow the convention proposed in this document.
+- https://github.com/openebs/openebs/pull/1876
+- https://github.com/openebs/maya/pull/502
+- https://github.com/openebs/jiva/pull/110
+- https://github.com/openebs/cstor/pull/38
 
