@@ -8,9 +8,10 @@ metadata:
     chart: {{ template "openebs.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
+  annotations:
+    cas.openebs.io/config: |
+      - name: ReplicaCount
+        value: "3"
+      - name: StoragePool
+        value: default
 provisioner: openebs.io/provisioner-iscsi
-parameters:
-  openebs.io/storage-pool: "default"
-  openebs.io/jiva-replica-count: "{{ .Values.jiva.replicas }}"
-  openebs.io/volume-monitor: "true"
-  openebs.io/capacity: 5G

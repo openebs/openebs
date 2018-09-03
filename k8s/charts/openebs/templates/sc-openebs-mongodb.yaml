@@ -8,10 +8,7 @@ metadata:
     chart: {{ template "openebs.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
-provisioner: openebs.io/provisioner-iscsi
-parameters:
-  openebs.io/storage-pool: "default"
-  openebs.io/jiva-replica-count: "{{ .Values.jiva.replicas }}"
-  openebs.io/volume-monitor: "true"
-  openebs.io/capacity: 5G
-  openebs.io/fstype: "xfs"
+  annotations:
+    cas.openebs.io/config: |
+      - name: FSType
+        value: "xfs"
