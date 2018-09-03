@@ -39,14 +39,14 @@ data:
           "name": "vendor filter",
           "state": "true",
           "include":"",
-          "exclude":{{ .Values.ndm.filters.excludeVendors }}
+          "exclude": "{{ .Values.ndm.filters.excludeVendors }}"
         },
         {
           "key": "path-filter",
           "name": "path filter",
           "state": "true",
           "include":"",
-          "exclude":{{ .Values.ndm.filters.excludePath }}
+          "exclude":"{{ .Values.ndm.filters.excludePaths }}"
         }
       ]
     }

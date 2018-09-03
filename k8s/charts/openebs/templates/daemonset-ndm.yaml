@@ -38,17 +38,17 @@ spec:
         # specify the directory where the sparse files need to be created.
         # if not specified, then sparse files will not be created.
         - name: SPARSE_FILE_DIR
-          value: {{ .Values.ndm.sparse.path }}
+          value: "{{ .Values.ndm.sparse.path }}"
 {{- end }}
 {{- if .Values.ndm.sparse.size }}
         # Size(bytes) of the sparse file to be created.
         - name: SPARSE_FILE_SIZE
-          value: {{ .Values.ndm.sparse.size }}
+          value: "{{ .Values.ndm.sparse.size }}"
 {{- end }}
 {{- if .Values.ndm.sparse.count }}
         # Specify the number of sparse files to be created
         - name: SPARSE_FILE_COUNT
-          value: {{ .Values.ndm.sparse.count }}
+          value: "{{ .Values.ndm.sparse.count }}"
 {{- end }}
 {{- end }}
         volumeMounts:

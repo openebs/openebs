@@ -45,7 +45,7 @@ spec:
         # configured as a part of openebs installation.
         # If "true" a default cstor sparse pool will be configured, if "false" it will not be configured.
         - name: OPENEBS_IO_INSTALL_DEFAULT_CSTOR_SPARSE_POOL
-          value: {{ .Values.ndm.sparse.enabled }}
+          value: "{{ .Values.ndm.sparse.enabled }}"
 {{- end }}
 {{- end }}
         # OPENEBS_NAMESPACE provides the namespace of this deployment as an
