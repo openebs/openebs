@@ -12,3 +12,4 @@ metadata:
     cas.openebs.io/config: |
       - name: FSType
         value: "xfs"
+provisioner: openebs.io/provisioner-iscsi
