@@ -1,0 +1,23 @@
+---
+apiVersion: openebs.io/v1alpha1
+kind: StoragePoolClaim
+metadata:
+  name: cstor-disk
+spec:
+  name: cstor-disk
+  type: disk
+  maxPools: 3
+  poolSpec:
+    poolType: striped
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: openebs-cstor-disk
+  annotations:
+    openebs.io/cas-type: cstor
+    cas.openebs.io/config: |
+      - name: StoragePoolClaim
+        value: "cstor-disk"
+provisioner: openebs.io/provisioner-iscsi
+---
