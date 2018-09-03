@@ -1,0 +1,150 @@
+apiVersion: extensions/v1beta1
+kind: DaemonSet
+metadata:
+  name: {{ template "openebs.fullname" . }}-ndm
+  labels:
+    app: {{ template "openebs.name" . }}
+    chart: {{ template "openebs.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+    component: ndm
+spec:
+  template:
+    metadata:
+      labels:
+        app: {{ template "openebs.name" . }}
+        release: {{ .Release.Name }}
+        component: ndm
+    spec:
+      serviceAccountName: {{ template "openebs.serviceAccountName" . }}
+      hostNetwork: true
+      containers:
+      - name: {{ template "openebs.name" . }}-ndm
+        image: "{{ .Values.ndm.image }}:{{ .Values.ndm.imageTag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        command:
+        - /usr/sbin/ndm
+        - start
+        securityContext:
+          privileged: true
+        env:
+        # pass hostname as env variable using downward API to the NDM container
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        # specify the directory where the sparse files need to be created.
+        # if not specified, then sparse files will not be created.
+        - name: SPARSE_FILE_DIR
+          value: "/var/openebs/sparse"
+        # Size(bytes) of the sparse file to be created.
+        - name: SPARSE_FILE_SIZE
+          value: "10737418240"
+        # Specify the number of sparse files to be created
+        - name: SPARSE_FILE_COUNT
+          value: "1"
+        volumeMounts:
+        - name: config
+          mountPath: /host/node-disk-manager.config
+          subPath: node-disk-manager.config
+          readOnly: true
+        - name: udev
+          mountPath: /run/udev
+        - name: procmount
+          mountPath: /host/mounts
+        - name: sparsepath
+          mountPath: /var/openebs/sparse
+      volumes:
+      - name: config
+        configMap:
+          name: {{ template "openebs.fullname" . }}-ndm-config
+      - name: udev
+        hostPath:
+          path: /run/udev
+          type: Directory
+      # mount /proc/1/mounts (mount file of process 1 of host) inside container
+      # to read which partition is mounted on / path
+      - name: procmount
+        hostPath:
+          path: /proc/1/mounts
+      - name: sparsepath
+        hostPath:
+          path: /var/openebs/sparse
+      # By default the node-disk-manager will be run on all kubernetes nodes
+      # If you would like to limit this to only some nodes, say the nodes
+      # that have storage attached, you could label those node and use
+      # nodeSelector.
+      #
+      # e.g. label the storage nodes with - "openebs.io/nodegroup"="storage-node"
+      # kubectl label node <node-name> "openebs.io/nodegroup"="storage-node"
+      #nodeSelector:
+      #  "openebs.io/nodegroup": "storage-node"
+{{- if .Values.ndm.nodeSelector }}
+      nodeSelector:
+{{ toYaml .Values.ndm.nodeSelector | indent 8 }}
+{{- end }}
+---
+    spec:
+      containers:
+        ports:
+        - containerPort: {{ .Values.apiserver.ports.internalPort }}
+        env:
+        # OPENEBS_IO_KUBE_CONFIG enables maya api service to connect to K8s
+        # based on this config. This is ignored if empty.
+        # This is supported for maya api server version 0.5.2 onwards
+        #- name: OPENEBS_IO_KUBE_CONFIG
+        #  value: "/home/ubuntu/.kube/config"
+        # OPENEBS_IO_K8S_MASTER enables maya api service to connect to K8s
+        # based on this address. This is ignored if empty.
+        # This is supported for maya api server version 0.5.2 onwards
+        #- name: OPENEBS_IO_K8S_MASTER
+        #  value: "http://172.28.128.3:8080"
+        # OPENEBS_IO_INSTALL_CONFIG_NAME specifies the config map containing the install configuration. 
+        # Currently, the configuration can be used to specifiy the default version for the CAS Templates 
+        - name: OPENEBS_IO_INSTALL_CONFIG_NAME
+          value: "maya-install-config"
+        # OPENEBS_IO_INSTALL_DEFAULT_CSTOR_SPARSE_POOL decides whether default cstor sparse pool should be
+        # configured as a part of openebs installation.
+        # If "true" a default cstor sparse pool will be configured, if "false" it will not be configured.
+        - name: OPENEBS_IO_INSTALL_DEFAULT_CSTOR_SPARSE_POOL
+          value: "true"
+        # OPENEBS_NAMESPACE provides the namespace of this deployment as an
+        # environment variable
+        - name: OPENEBS_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        # OPENEBS_SERVICE_ACCOUNT provides the service account of this pod as
+        # environment variable
+        - name: OPENEBS_SERVICE_ACCOUNT
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.serviceAccountName
+        # OPENEBS_MAYA_POD_NAME provides the name of this pod as
+        # environment variable
+        - name: OPENEBS_MAYA_POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: OPENEBS_IO_JIVA_CONTROLLER_IMAGE
+          value: "{{ .Values.jiva.image }}:{{ .Values.jiva.imageTag }}"
+        - name: OPENEBS_IO_JIVA_REPLICA_IMAGE
+          value: "{{ .Values.jiva.image }}:{{ .Values.jiva.imageTag }}"
+        - name: OPENEBS_IO_CSTOR_TARGET_IMAGE
+          value: "{{ .Values.cstor.target.image }}:{{ .Values.cstor.target.imageTag }}"
+        - name: OPENEBS_IO_CSTOR_POOL_IMAGE
+          value: "{{ .Values.cstor.pool.image }}:{{ .Values.cstor.pool.imageTag }}"
+        - name: OPENEBS_IO_CSTOR_POOL_MGMT_IMAGE
+          value: "{{ .Values.cstor.poolmgmt.image }}:{{ .Values.cstor.poolmgmt.imageTag }}"
+        - name: OPENEBS_IO_CSTOR_VOLUME_MGMT_IMAGE
+          value: "{{ .Values.cstor.volmgmt.image }}:{{ .Values.cstor.volmgmt.imageTag }}"
+        - name: OPENEBS_IO_VOLUME_MONITOR_IMAGE
+          value: "{{ .Values.policies.monitoring.image }}:{{ .Values.policies.monitoring.imageTag }}"
+{{- if .Values.apiserver.tolerations }}
+      tolerations:
+{{ toYaml .Values.apiserver.tolerations | indent 8 }}
+{{- end }}
+{{- if .Values.apiserver.affinity }}
+      affinity:
+{{ toYaml .Values.apiserver.affinity | indent 8 }}
+{{- end }}
