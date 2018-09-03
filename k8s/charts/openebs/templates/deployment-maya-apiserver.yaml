@@ -38,12 +38,16 @@ spec:
         # OPENEBS_IO_INSTALL_CONFIG_NAME specifies the config map containing the install configuration. 
         # Currently, the configuration can be used to specifiy the default version for the CAS Templates 
         - name: OPENEBS_IO_INSTALL_CONFIG_NAME
-          value: "maya-install-config"
+          value: {{ template "openebs.fullname" . }}-install-config
+{{- if .Values.ndm.sparse }}
+{{- if .Values.ndm.sparse.enabled }}
         # OPENEBS_IO_INSTALL_DEFAULT_CSTOR_SPARSE_POOL decides whether default cstor sparse pool should be
         # configured as a part of openebs installation.
         # If "true" a default cstor sparse pool will be configured, if "false" it will not be configured.
         - name: OPENEBS_IO_INSTALL_DEFAULT_CSTOR_SPARSE_POOL
-          value: "true"
+          value: {{ .Values.ndm.sparse.enabled }}
+{{- end }}
+{{- end }}
         # OPENEBS_NAMESPACE provides the namespace of this deployment as an
         # environment variable
         - name: OPENEBS_NAMESPACE
@@ -71,9 +75,9 @@ spec:
         - name: OPENEBS_IO_CSTOR_POOL_IMAGE
           value: "{{ .Values.cstor.pool.image }}:{{ .Values.cstor.pool.imageTag }}"
         - name: OPENEBS_IO_CSTOR_POOL_MGMT_IMAGE
-          value: "{{ .Values.cstor.poolmgmt.image }}:{{ .Values.cstor.poolmgmt.imageTag }}"
+          value: "{{ .Values.cstor.poolMgmt.image }}:{{ .Values.cstor.poolMgmt.imageTag }}"
         - name: OPENEBS_IO_CSTOR_VOLUME_MGMT_IMAGE
-          value: "{{ .Values.cstor.volmgmt.image }}:{{ .Values.cstor.volmgmt.imageTag }}"
+          value: "{{ .Values.cstor.volMgmt.image }}:{{ .Values.cstor.volMgmt.imageTag }}"
         - name: OPENEBS_IO_VOLUME_MONITOR_IMAGE
           value: "{{ .Values.policies.monitoring.image }}:{{ .Values.policies.monitoring.imageTag }}"
 {{- if .Values.apiserver.nodeSelector }}

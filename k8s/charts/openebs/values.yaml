@@ -15,7 +15,7 @@ image:
 
 apiserver:
   image: "openebs/m-apiserver"
-  imageTag: "0.6.0"
+  imageTag: "0.7.0-RC3"
   replicas: 1
   ports:
     externalPort: 5656
@@ -24,10 +24,9 @@ apiserver:
   tolerations: []
   affinity: {}
 
-
 provisioner:
   image: "openebs/openebs-k8s-provisioner"
-  imageTag: "0.6.0"
+  imageTag: "0.7.0-RC3"
   replicas: 1
   nodeSelector: {}
   tolerations: []
@@ -36,19 +35,32 @@ provisioner:
 snapshotOperator:
   controller:
     image: "openebs/snapshot-controller"
-    imageTag: "0.6.0"
+    imageTag: "0.7.0-RC3"
   provisioner:
     image: "openebs/snapshot-provisioner"
-    imageTag: "0.6.0"
+    imageTag: "0.7.0-RC3"
   replicas: 1
   upgradeStrategy: "Recreate"
   nodeSelector: {}
   tolerations: []
   affinity: {}
 
+ndm:
+  image: "openebs/node-disk-manager-amd64"
+  imageTag: "v0.1.0-RC3"
+  sparse:
+    enabled: "true"
+    path: "/var/openebs/sparse"
+    size: "10737418240"
+    count: "1"
+  filters:
+    excludeVendors: "CLOUDBYT,OpenEBS"
+    excludePaths: "loop"
+  nodeSelector: {}
+
 jiva:
   image: "openebs/jiva"
-  imageTag: "0.6.0"
+  imageTag: "0.7.0-RC3"
   replicas: 3
   replicaNodeSelector:
     # Enable this option and specify the node label that will be used to 
@@ -58,6 +70,19 @@ jiva:
     enabled: false
     value: "nodetype=storage"
 
+cstor:
+  pool:
+    image: "openebs/cstor-pool"
+    imageTag: "0.7.0-RC3"
+  poolMgmt:
+    image: "openebs/cstor-pool-mgmt"
+    imageTag: "0.7.0-RC3"
+  target:
+    image: "openebs/cstor-istgt"
+    imageTag: "0.7.0-RC3"
+  volumeMgmt:
+    image: "openebs/cstor-volume-mgmt"
+    imageTag: "0.7.0-RC3"
 
 grafana:
   image: "grafana/grafana"
@@ -79,4 +104,4 @@ policies:
   monitoring:
     enabled: true
     image: "openebs/m-exporter"
-    imageTag: "0.6.0"
+    imageTag: "0.7.0-RC3"

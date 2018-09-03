@@ -39,14 +39,14 @@ data:
           "name": "vendor filter",
           "state": "true",
           "include":"",
-          "exclude":"CLOUDBYT,OpenEBS"
+          "exclude":{{- if .Values.ndm.filters.excludeVendors }}
         },
         {
           "key": "path-filter",
           "name": "path filter",
           "state": "true",
           "include":"",
-          "exclude":"loop"
+          "exclude":{{- if .Values.ndm.filters.excludePath }}
         }
       ]
     }
