@@ -485,7 +485,7 @@ data:
           "name": "path filter",
           "state": "true",
           "include":"",
-          "exclude":"loop"
+          "exclude":"loop,dm-"
         }
       ]
     }

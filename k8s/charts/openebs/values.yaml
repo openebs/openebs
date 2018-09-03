@@ -55,7 +55,7 @@ ndm:
     count: "1"
   filters:
     excludeVendors: "CLOUDBYT,OpenEBS"
-    excludePaths: "loop"
+    excludePaths: "loop,dm-"
   nodeSelector: {}
 
 jiva:
