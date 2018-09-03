@@ -61,7 +61,7 @@ jiva:
 
 grafana:
   image: "grafana/grafana"
-  imageTag: "4.6.3"
+  imageTag: "5.2.0"
   ports:
     externalPort: 3000
     internalPort: 3000
@@ -69,7 +69,7 @@ grafana:
 
 prometheus:
   image: "prom/prometheus"
-  imageTag: "v2.1.0"
+  imageTag: "v2.3.0"
   ports:
     externalPort: 80
     internalPort: 9090
