@@ -21,16 +21,16 @@ metadata:
   name: openebs-maya-operator
 rules:
 - apiGroups: ["*"]
-  resources: ["nodes","nodes/proxy"]
+  resources: ["nodes", "nodes/proxy"]
   verbs: ["*"]
 - apiGroups: ["*"]
-  resources: ["namespaces","services","pods","deployments","events","endpoints","configmaps"]
+  resources: ["namespaces", "services", "pods", "deployments", "events", "endpoints", "configmaps"]
   verbs: ["*"]
 - apiGroups: ["*"]
-  resources: ["storageclasses","persistentvolumeclaims","persistentvolumes"]
+  resources: ["storageclasses", "persistentvolumeclaims", "persistentvolumes"]
   verbs: ["*"]
 - apiGroups: ["volumesnapshot.external-storage.k8s.io"]
-  resources: ["volumesnapshots","volumesnapshotdatas"]
+  resources: ["volumesnapshots", "volumesnapshotdatas"]
   verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
 - apiGroups: ["apiextensions.k8s.io"]
   resources: ["customresourcedefinitions"]
@@ -39,13 +39,13 @@ rules:
   resources: [ "disks"]
   verbs: ["*" ]
 - apiGroups: ["*"]
-  resources: [ "storagepoolclaims","storagepools"]
+  resources: [ "storagepoolclaims", "storagepools"]
   verbs: ["*" ]
 - apiGroups: ["*"]
-  resources: [ "castemplates","runtasks"]
+  resources: [ "castemplates", "runtasks"]
   verbs: ["*" ]
 - apiGroups: ["*"]
-  resources: [ "cstorpools","cstorvolumereplicas","cstorvolumes"]
+  resources: [ "cstorpools", "cstorvolumereplicas", "cstorvolumes"]
   verbs: ["*" ]
 - nonResourceURLs: ["/metrics"]
   verbs: ["get"]
@@ -83,6 +83,52 @@ data:
       install:
       - version: "0.7.0"
 ---
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  # name must match the spec fields below, and be in the form: <plural>.<group>
+  name: castemplates.openebs.io
+spec:
+  # group name to use for REST API: /apis/<group>/<version>
+  group: openebs.io
+  # version name to use for REST API: /apis/<group>/<version>
+  version: v1alpha1
+  # either Namespaced or Cluster
+  scope: Cluster
+  names:
+    # plural name to be used in the URL: /apis/<group>/<version>/<plural>
+    plural: castemplates
+    # singular name to be used as an alias on the CLI and for display
+    singular: castemplate
+    # kind is normally the CamelCased singular type. Your resource manifests use this.
+    kind: CASTemplate
+    # shortNames allow shorter string to match your resource on the CLI
+    shortNames:
+    - cast
+---
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  # name must match the spec fields below, and be in the form: <plural>.<group>
+  name: runtasks.openebs.io
+spec:
+  # group name to use for REST API: /apis/<group>/<version>
+  group: openebs.io
+  # version name to use for REST API: /apis/<group>/<version>
+  version: v1alpha1
+  # either Namespaced or Cluster
+  scope: Namespaced
+  names:
+    # plural name to be used in the URL: /apis/<group>/<version>/<plural>
+    plural: runtasks
+    # singular name to be used as an alias on the CLI and for display
+    singular: runtask
+    # kind is normally the CamelCased singular type. Your resource manifests use this.
+    kind: RunTask
+    # shortNames allow shorter string to match your resource on the CLI
+    shortNames:
+    - rtask
+---
 apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
@@ -103,6 +149,16 @@ spec:
         ports:
         - containerPort: 5656
         env:
+        # OPENEBS_IO_KUBE_CONFIG enables maya api service to connect to K8s
+        # based on this config. This is ignored if empty.
+        # This is supported for maya api server version 0.5.2 onwards
+        #- name: OPENEBS_IO_KUBE_CONFIG
+        #  value: "/home/ubuntu/.kube/config"
+        # OPENEBS_IO_K8S_MASTER enables maya api service to connect to K8s
+        # based on this address. This is ignored if empty.
+        # This is supported for maya api server version 0.5.2 onwards
+        #- name: OPENEBS_IO_K8S_MASTER
+        #  value: "http://172.28.128.3:8080"
         # OPENEBS_IO_INSTALL_CONFIG_NAME specifies the config map containing the install configuration. 
         # Currently, the configuration can be used to specifiy the default version for the CAS Templates 
         - name: OPENEBS_IO_INSTALL_CONFIG_NAME
@@ -130,16 +186,6 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
-        # OPENEBS_IO_KUBE_CONFIG enables maya api service to connect to K8s
-        # based on this config. This is ignored if empty.
-        # This is supported for maya api server version 0.5.2 onwards
-        #- name: OPENEBS_IO_KUBE_CONFIG
-        #  value: "/home/ubuntu/.kube/config"
-        # OPENEBS_IO_K8S_MASTER enables maya api service to connect to K8s
-        # based on this address. This is ignored if empty.
-        # This is supported for maya api server version 0.5.2 onwards
-        #- name: OPENEBS_IO_K8S_MASTER
-        #  value: "http://172.28.128.3:8080"
         - name: OPENEBS_IO_JIVA_CONTROLLER_IMAGE
           value: "openebs/jiva:0.7.0-RC3"
         - name: OPENEBS_IO_JIVA_REPLICA_IMAGE
@@ -154,24 +200,6 @@ spec:
           value: "openebs/cstor-volume-mgmt:0.7.0-RC3"
         - name: OPENEBS_IO_VOLUME_MONITOR_IMAGE
           value: "openebs/m-exporter:0.7.0-RC3"
-        # DEFAULT_CONTROLLER_NODE_SELECTOR allows you to specify the nodes
-        # on which openebs controller have to be scheduled. To use this feature,
-        # the nodes should already be labeled with the key=value. For example:
-        # `kubectl label nodes <node-name> nodetype=storage`
-        # Note: It is recommended that node selector for controller be
-        # same as that of the stateful apps.
-        # This is supported for maya api server version 0.6.0-RC2 onwards
-        #- name: DEFAULT_CONTROLLER_NODE_SELECTOR
-        #  value: "nodetype=storage"
-        # DEFAULT_REPLICA_NODE_SELECTOR allows you to specify the nodes
-        # on which openebs replicas have to be scheduled. To use this feature,
-        # the nodes should already be labeled with the key=value. For example:
-        # `kubectl label nodes <node-name> nodetype=storage`
-        # Note: It is recommended that node selector for replica will specify
-        # nodes that have disks/ssds attached to them.
-        # This is supported for maya api server version 0.6.0-RC2 onwards
-        #- name: DEFAULT_REPLICA_NODE_SELECTOR
-        #  value: "nodetype=storage"
 ---
 apiVersion: v1
 kind: Service
@@ -224,12 +252,12 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
-        - name: OPENEBS_MONITOR_URL
-          value: "http://127.0.0.1:32515/dashboard/db/openebs-volume-stats?orgId=1"
-        - name: OPENEBS_MONITOR_VOLKEY
-          value: "&var-OpenEBS"
-        - name: MAYA_PORTAL_URL
-          value: "https://mayaonline.io/"
+        # OPENEBS_MAYA_SERVICE_NAME provides the maya-apiserver K8s service name,
+        # that provisioner should forward the volume create/delete requests.
+        # If not present, "maya-apiserver-service" will be used for lookup.
+        # This is supported for openebs provisioner version 0.5.3-RC1 onwards
+        #- name: OPENEBS_MAYA_SERVICE_NAME
+        #  value: "maya-apiserver-apiservice"
 ---
 apiVersion: apps/v1beta1
 kind: Deployment
@@ -255,6 +283,12 @@ spec:
             valueFrom:
               fieldRef:
                 fieldPath: metadata.namespace
+        # OPENEBS_MAYA_SERVICE_NAME provides the maya-apiserver K8s service name,
+        # that snapshot controller should forward the snapshot create/delete requests.
+        # If not present, "maya-apiserver-service" will be used for lookup.
+        # This is supported for openebs provisioner version 0.5.3-RC1 onwards
+        #- name: OPENEBS_MAYA_SERVICE_NAME
+        #  value: "maya-apiserver-apiservice"
         - name: snapshot-provisioner
           image: openebs/snapshot-provisioner:0.7.0-RC3
           imagePullPolicy: IfNotPresent
@@ -263,6 +297,12 @@ spec:
             valueFrom:
               fieldRef:
                 fieldPath: metadata.namespace
+        # OPENEBS_MAYA_SERVICE_NAME provides the maya-apiserver K8s service name,
+        # that snapshot provisioner  should forward the clone create/delete requests.
+        # If not present, "maya-apiserver-service" will be used for lookup.
+        # This is supported for openebs provisioner version 0.5.3-RC1 onwards
+        #- name: OPENEBS_MAYA_SERVICE_NAME
+        #  value: "maya-apiserver-apiservice"
 ---
 apiVersion: apiextensions.k8s.io/v1beta1
 kind: CustomResourceDefinition
@@ -337,30 +377,30 @@ apiVersion: apiextensions.k8s.io/v1beta1
 kind: CustomResourceDefinition
 metadata:
   # name must match the spec fields below, and be in the form: <plural>.<group>
-  name: castemplates.openebs.io
+  name: cstorvolumes.openebs.io
 spec:
   # group name to use for REST API: /apis/<group>/<version>
   group: openebs.io
   # version name to use for REST API: /apis/<group>/<version>
   version: v1alpha1
   # either Namespaced or Cluster
-  scope: Cluster
+  scope: Namespaced
   names:
-    # plural name to be used in the URL: /apis/<group>/<version>/<plural>
-    plural: castemplates
-    # singular name to be used as an alias on the CLI and for display
-    singular: castemplate
     # kind is normally the CamelCased singular type. Your resource manifests use this.
-    kind: CASTemplate
+    kind: CStorVolume
+    # plural name to be used in the URL: /apis/<group>/<version>/<plural>
+    plural: cstorvolumes
+    # singular name to be used as an alias on the CLI and for display
+    singular: cstorvolume
     # shortNames allow shorter string to match your resource on the CLI
     shortNames:
-    - cast
+    - cstorvolume
 ---
 apiVersion: apiextensions.k8s.io/v1beta1
 kind: CustomResourceDefinition
 metadata:
   # name must match the spec fields below, and be in the form: <plural>.<group>
-  name: runtasks.openebs.io
+  name: cstorvolumereplicas.openebs.io
 spec:
   # group name to use for REST API: /apis/<group>/<version>
   group: openebs.io
@@ -369,31 +409,15 @@ spec:
   # either Namespaced or Cluster
   scope: Namespaced
   names:
-    # plural name to be used in the URL: /apis/<group>/<version>/<plural>
-    plural: runtasks
-    # singular name to be used as an alias on the CLI and for display
-    singular: runtask
     # kind is normally the CamelCased singular type. Your resource manifests use this.
-    kind: RunTask
+    kind: CStorVolumeReplica
+    # plural name to be used in the URL: /apis/<group>/<version>/<plural>
+    plural: cstorvolumereplicas
+    # singular name to be used as an alias on the CLI and for display
+    singular: cstorvolumereplica
     # shortNames allow shorter string to match your resource on the CLI
     shortNames:
-    - rtask
----
-apiVersion: apiextensions.k8s.io/v1beta1
-kind: CustomResourceDefinition
-metadata:
-  name: cstorvolumereplicas.openebs.io
-spec:
-  group: openebs.io
-  names:
-    kind: CStorVolumeReplica
-    listKind: CStorVolumeReplicaList
-    plural: cstorvolumereplicas
-    shortNames:
     - cvr
-    singular: cstorvolumereplica
-  scope: Namespaced
-  version: v1alpha1
 ---
 apiVersion: apiextensions.k8s.io/v1beta1
 kind: CustomResourceDefinition
@@ -405,6 +429,7 @@ spec:
   group: openebs.io
   # version name to use for REST API: /apis/<group>/<version>
   version: v1alpha1
+  # either Namespaced or Cluster
   scope: Cluster
   names:
     # plural name to be used in the URL: /apis/<group>/<version>/<plural>
@@ -417,68 +442,17 @@ spec:
     shortNames:
     - disk
 ---
-apiVersion: apiextensions.k8s.io/v1beta1
-kind: CustomResourceDefinition
-metadata:
-  name: cstorvolumes.openebs.io
-spec:
-  group: openebs.io
-  names:
-    kind: CStorVolume
-    listKind: CStorVolumeList
-    plural: cstorvolumes
-    shortNames:
-    - cstorvolume
-    singular: cstorvolume
-  scope: Namespaced
-  version: v1alpha1
----
-apiVersion: storage.k8s.io/v1
-kind: StorageClass
-metadata:
-  name: openebs-standard
-  annotations:
-    cas.openebs.io/config: |
-      - name: ReplicaCount
-        value: "3"
-      - name: StoragePool
-        value: default
-      #- name: TargetResourceLimits
-      #  value: |-
-      #      memory: 1Gi
-      #      cpu: 100m
-      #- name: AuxResourceLimits
-      #  value: |-
-      #      memory: 0.5Gi
-      #      cpu: 50m
-      #- name: ReplicaResourceLimits
-      #  value: |-
-      #      memory: 2Gi
-provisioner: openebs.io/provisioner-iscsi
-parameters:
-  openebs.io/storage-pool: "default"
-  openebs.io/jiva-replica-count: "3"
-  openebs.io/volume-monitor: "true"
-  openebs.io/capacity: 5G
----
-kind: StorageClass
-apiVersion: storage.k8s.io/v1
-metadata:
-  name: openebs-snapshot-promoter
-provisioner: volumesnapshot.external-storage.k8s.io/snapshot-promoter
----
-# node-disk-manager-config-default-0.1.0 contains config of available probes
-# and filters. Probes and filters will initialize with default values if config
-# for that filter or probe not present in configmap.
+# This is the node-disk-manager related config. 
+# It can be used to customize the disks probes and filters
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: node-disk-manager-config
+  name: openebs-ndm-config
   namespace: openebs
 data:
-  # udev-probe is default or primary probe it should be enabled to run ndm
-  # filterconfigs contails configs of filters. To provide a group of include
-  # and exclude values add it as , separated string
+  # udev-probe is default or primary probe which should be enabled to run ndm
+  # filterconfigs contails configs of filters - in ther form fo include
+  # and exclude comma separated strings
   node-disk-manager.config: |
     {
       "probeconfigs": [
@@ -519,13 +493,13 @@ data:
 apiVersion: extensions/v1beta1
 kind: DaemonSet
 metadata:
-  name: node-disk-manager
+  name: openebs-ndm
   namespace: openebs
 spec:
   template:
     metadata:
       labels:
-        app: node-disk-manager
+        name: openebs-ndm
     spec:
       # By default the node-disk-manager will be run on all kubernetes nodes
       # If you would like to limit this to only some nodes, say the nodes
@@ -577,7 +551,7 @@ spec:
       volumes:
       - name: config
         configMap:
-          name: node-disk-manager-config
+          name: openebs-ndm-config
       - name: udev
         hostPath:
           path: /run/udev
@@ -590,4 +564,38 @@ spec:
       - name: sparsepath
         hostPath:
           path: /var/openebs/sparse
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: openebs-standard
+  annotations:
+    cas.openebs.io/config: |
+      - name: ReplicaCount
+        value: "3"
+      - name: StoragePool
+        value: default
+      #- name: TargetResourceLimits
+      #  value: |-
+      #      memory: 1Gi
+      #      cpu: 100m
+      #- name: AuxResourceLimits
+      #  value: |-
+      #      memory: 0.5Gi
+      #      cpu: 50m
+      #- name: ReplicaResourceLimits
+      #  value: |-
+      #      memory: 2Gi
+provisioner: openebs.io/provisioner-iscsi
+parameters:
+  openebs.io/storage-pool: "default"
+  openebs.io/jiva-replica-count: "3"
+  openebs.io/volume-monitor: "true"
+  openebs.io/capacity: 5G
+---
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  name: openebs-snapshot-promoter
+provisioner: volumesnapshot.external-storage.k8s.io/snapshot-promoter
 ---
