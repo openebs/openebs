@@ -77,7 +77,7 @@ spec:
         - name: OPENEBS_IO_CSTOR_POOL_MGMT_IMAGE
           value: "{{ .Values.cstor.poolMgmt.image }}:{{ .Values.cstor.poolMgmt.imageTag }}"
         - name: OPENEBS_IO_CSTOR_VOLUME_MGMT_IMAGE
-          value: "{{ .Values.cstor.volMgmt.image }}:{{ .Values.cstor.volMgmt.imageTag }}"
+          value: "{{ .Values.cstor.volumeMgmt.image }}:{{ .Values.cstor.volumeMgmt.imageTag }}"
         - name: OPENEBS_IO_VOLUME_MONITOR_IMAGE
           value: "{{ .Values.policies.monitoring.image }}:{{ .Values.policies.monitoring.imageTag }}"
 {{- if .Values.apiserver.nodeSelector }}
