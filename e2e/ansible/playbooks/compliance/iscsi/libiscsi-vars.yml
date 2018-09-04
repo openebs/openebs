@@ -3,7 +3,7 @@ test_name: libiscsi_test_suite
 
 test_log_path: setup/logs/libiscsi_test_suite.log
 
-test_pod_regex: maya*|openebs*|pvc*
+test_pod_regex: maya*|openebs*|cstor*|libiscsi*|node*
 
 volume_def: test-pvc.yaml
 
