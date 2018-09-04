@@ -52,6 +52,14 @@ data:
       - source_labels: [__meta_kubernetes_pod_name]
         action: replace
         target_label: kubernetes_pod_name
+      # Below entry ending with vsm is deprecated and is maintained for
+      # backward compatibility purpose.
+      - source_labels: [__meta_kubernetes_pod_label_vsm]
+        action: replace
+        target_label: openebs_pv
+      # Below entry is the correct entry. Though the above and below entries
+      # are having same target_label as openebs_pv, only one of them will be
+      # valid for any release.
       - source_labels: [__meta_kubernetes_pod_label_openebs_io_persistent_volume]
         action: replace
         target_label: openebs_pv
