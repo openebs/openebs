@@ -16,3 +16,4 @@
     msg: '{{ ansible_date_time.time }} TEST: {{t_name}}, RESULT: {{ t_status }},{{ c_status }},{{tflag}}'
     color: "{{color}}"
   when: slack_notify | bool and lookup('env','SLACK_TOKEN')
+  ignore_errors: yes
