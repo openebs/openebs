@@ -22,7 +22,7 @@ test_name: Testing storage pool path
 
 test_log_path: setup/logs/hyperconverged_test-storage-pool.log
 
-test_pod_regex: maya*|openebs*|pvc*
+test_pod_regex: maya*|openebs*|storage*|cstor*|node*
 
 namespace: storage-pool
 

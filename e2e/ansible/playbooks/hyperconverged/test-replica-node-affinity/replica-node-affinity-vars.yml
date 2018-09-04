@@ -7,7 +7,7 @@ create_sc: storage-class.yaml
 
 percona_link: https://raw.githubusercontent.com/openebs/openebs/master/k8s/demo/percona/demo-percona-mysql-pvc.yaml
 
-test_pod_regex: maya*|openebs*|pvc*|percona*|
+test_pod_regex: maya*|openebs*|cstor*|percona*|node*
 
 test_log_path: setup/logs/node_affinity_test.log
 

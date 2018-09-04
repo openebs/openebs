@@ -27,7 +27,7 @@ cassandra_artifacts:
 
 test_log_path: setup/logs/scaleup-cassandra-pods.log
 
-test_pod_regex: maya*|openebs*|pvc*|cassandra*|*target*|*pool*
+test_pod_regex: maya*|openebs*|scaleup*|cassandra*|node*|cstor*
 
 test_suite_id: 826
 
