@@ -3,7 +3,7 @@ test_name: ha_data_integrity
 
 test_log_path: setup/logs/ha_data_integrity.log
 
-test_pod_regex: maya*|openebs*|pvc*|fio*
+test_pod_regex: maya*|openebs*|ha*|fio*|cstor*|node*
 
 fio_write: demo-fio-write-openebs.yml
 

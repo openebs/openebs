@@ -5,7 +5,7 @@ namespace: k8s-snapshot
 
 test_log_path: setup/logs/snap_create_revert.log
 
-test_pod_regex: maya*|openebs*|pvc*|snapshot*
+test_pod_regex: maya*|openebs*|cstor*|snapshot*|node*
 
 percona_link: https://raw.githubusercontent.com/openebs/openebs/master/k8s/demo/percona/demo-percona-mysql-pvc.yaml
 

@@ -5,7 +5,7 @@ namespace: simple-volume
 
 test_log_path: setup/logs/snap_create_revert.log
 
-test_pod_regex: maya*|openebs*|pvc*
+test_pod_regex: maya*|openebs*|volume*|cstor*|node*
 
 volume_def: test-pvc.yaml
 

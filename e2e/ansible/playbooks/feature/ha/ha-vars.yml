@@ -3,7 +3,7 @@ test_name: ha_pod_reschedule
 
 test_log_path: setup/logs/ha_pod_reschedule.log
 
-test_pod_regex: maya*|openebs*|pvc*|percona*|*target*|*pool*
+test_pod_regex: maya*|openebs*|ha*|percona*|node*|cstor*
 
 percona_mysql_plugin_link: https://raw.githubusercontent.com/openebs/openebs/master/k8s/demo/percona/demo-percona-mysql-pvc.yaml
 
