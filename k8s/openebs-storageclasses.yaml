@@ -4,8 +4,8 @@ metadata:
   name: openebs-standalone
   annotations:
     cas.openebs.io/config: |
-      - name: FSType
-        value: "xfs"
+      - name: ReplicaCount
+        value: "1"
 provisioner: openebs.io/provisioner-iscsi
 ---
 apiVersion: storage.k8s.io/v1
