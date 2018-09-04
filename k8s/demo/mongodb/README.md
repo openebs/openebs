@@ -10,20 +10,16 @@ This tutorial provides detailed instructions to perform the following tasks :
 
 Prerequisites include the following:
 
-- A fully configured Kubernetes cluster (versions 1.6.3/4/6,1.7.0 & 1.7.5 have been tested) with K8S master and at least one K8S node. 
-This maybe created on cloud platforms like GKE, on-premise virtual machines (vagrant/VMware/Hyper-V) or baremetal boxes
+- A fully configured Kubernetes cluster (versions 1.9.7+ have been tested)
 
-  Note:
-  
-  - OpenEBS recommends using a 3-node cluster, with one master and two nodes, as this will aid creation of storage replicas on separate 
-nodes. This is helpful to maintain redundancy and data availability.
+  Note: _OpenEBS recommends using atleast a 3-node cluster_
 
     ```
     test@Master:~$ kubectl get nodes
-    NAME         STATUS    AGE       VERSION
-    host01   Ready     18h       v1.6.3
-    host02   Ready     18h       v1.6.3
-    master   Ready     18h       v1.6.3
+    NAME                                        STATUS    ROLES     AGE       VERSION
+    gke-kmova-helm-default-pool-6b1e777c-8gdf   Ready     <none>    17h       v1.9.7-gke.6
+    gke-kmova-helm-default-pool-6b1e777c-fwgp   Ready     <none>    17h       v1.9.7-gke.6
+    gke-kmova-helm-default-pool-6b1e777c-m07h   Ready     <none>    17h       v1.9.7-gke.6
     ```
     
 - Sufficient resources on the nodes to host the OpenEBS storage pods and application pods. This includes sufficient disk space, 
@@ -71,43 +67,10 @@ Apply the openebs-operator.yml on the Kubernetes cluster. This creates the maya 
 kubectl apply -f openebs-operator.yaml
 ```
 
-Add the OpenEBS storage classes, that can be used by developers to map a suitable storage profile for their applications in their 
-respective persistent volume claims.
-
-```
-kubectl apply -f openebs-storageclasses.yaml
-```
-
 Check whether the deployments are running successfully.
 
 ```
-test@Master:~$ kubectl get deployments
-NAME                                            DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE
-maya-apiserver                                  1         1         1            1           5s
-openebs-provisioner                             1         1         1            1           6s
-
-testk@Master:~$ kubectl get pods
-NAME                                   READY     STATUS    RESTARTS   AGE
-maya-apiserver-1089964587-x5q15        1/1       Running   0          10s
-openebs-provisioner-1149663462-5pdcq   1/1       Running   0          9s
-
-```
-
-Check whether the storage classes are applied successfully.
-
-```
-test@Master:~$ kubectl get sc
-NAME                 TYPE
-openebs-cassandra    openebs.io/provisioner-iscsi
-openebs-es-data-sc   openebs.io/provisioner-iscsi
-openebs-jupyter      openebs.io/provisioner-iscsi
-openebs-kafka        openebs.io/provisioner-iscsi
-openebs-mongodb      openebs.io/provisioner-iscsi
-openebs-percona      openebs.io/provisioner-iscsi
-openebs-redis        openebs.io/provisioner-iscsi
-openebs-standalone   openebs.io/provisioner-iscsi
-openebs-standard     openebs.io/provisioner-iscsi
-openebs-zk           openebs.io/provisioner-iscsi
+test@Master:~$ kubectl get pods -n openebs
 ```
 
 ## Step-2: Deploy the mongo-statefulset with OpenEBS storage
@@ -115,7 +78,7 @@ openebs-zk           openebs.io/provisioner-iscsi
 Use OpenEBS as persistent storage for the mongodb statefulset by selecting an OpenEBS storage class in the persistent volume claim. 
 A sample mongodb statefulset yaml (with container attributes and pvc details) is available in the openebs git repository.
 
-The number of replicas in the statefulset can be modified as required. This example makes use of 2 replicas. The replica count
+The number of replicas in the statefulset can be modified as required. This example makes use of 1 replica. The replica count
 can be edited in the statefulset specification : 
 
 ```
@@ -150,25 +113,19 @@ are successfully deployed and are in "Running" state.
 ```
 test@Master:~$ kubectl get pods
 NAME                                                             READY     STATUS    RESTARTS   AGE
-maya-apiserver-1089964587-x5q15                                  1/1       Running   0          8m
 mongo-0                                                          2/2       Running   0          2m
 mongo-1                                                          2/2       Running   0          2m
 mongo-2                                                          2/2       Running   0          1m
 openebs-provisioner-1149663462-5pdcq                             1/1       Running   0          8m
 pvc-0d39583c-bad7-11e7-869d-000c298ff5fc-ctrl-4109100951-v2ndc   1/1       Running   0          2m
 pvc-0d39583c-bad7-11e7-869d-000c298ff5fc-rep-1655873671-50f8z    1/1       Running   0          2m
-pvc-0d39583c-bad7-11e7-869d-000c298ff5fc-rep-1655873671-ctp0q    1/1       Running   0          2m
 pvc-21da76b6-bad7-11e7-869d-000c298ff5fc-ctrl-2618026111-z5hzt   1/1       Running   0          2m
 pvc-21da76b6-bad7-11e7-869d-000c298ff5fc-rep-187343257-9w46n     1/1       Running   0          2m
-pvc-21da76b6-bad7-11e7-869d-000c298ff5fc-rep-187343257-sd5hl     1/1       Running   0          2m
 pvc-3a9ca1ec-bad7-11e7-869d-000c298ff5fc-ctrl-2347166037-vsc2t   1/1       Running   0          1m
 pvc-3a9ca1ec-bad7-11e7-869d-000c298ff5fc-rep-849715916-3w1c7     1/1       Running   0          1m
-pvc-3a9ca1ec-bad7-11e7-869d-000c298ff5fc-rep-849715916-f2f3p     1/1       Running   0          1m
 
 test@Master:~$ kubectl get svc
 NAME                                                CLUSTER-IP       EXTERNAL-IP   PORT(S)             AGE
-kubernetes                                          10.96.0.1        <none>        443/TCP             19h
-maya-apiserver-service                              10.103.216.160   <none>        5656/TCP            8m
 mongo                                               None             <none>        27017/TCP           3m
 pvc-0d39583c-bad7-11e7-869d-000c298ff5fc-ctrl-svc   10.105.60.71     <none>        3260/TCP,9501/TCP   3m
 pvc-21da76b6-bad7-11e7-869d-000c298ff5fc-ctrl-svc   10.105.178.143   <none>        3260/TCP,9501/TCP   2m
