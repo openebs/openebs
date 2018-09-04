@@ -19,7 +19,7 @@ replace_with:
 
 namespace: node-failure 
 
-test_pod_regex: maya*|openebs*|pvc*|percona*
+test_pod_regex: maya*|openebs*|node*|percona*|cstor*
 
 test_log_path: setup/logs/node_failure_test.log
 
