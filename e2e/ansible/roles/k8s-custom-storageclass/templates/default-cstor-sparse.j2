@@ -1,18 +1,13 @@
+---
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
   name: openebs-cstor-default-sparse
   annotations:
-    cas.openebs.io/create-volume-template: cstor-volume-create-default-0.7.0
-    cas.openebs.io/delete-volume-template: cstor-volume-delete-default-0.7.0
-    cas.openebs.io/read-volume-template: cstor-volume-read-default-0.7.0
+    openebs.io/cas-type: cstor
     cas.openebs.io/config: |
       - name: StoragePoolClaim
         value: "cstor-pool-default-sparse-0.7.0"
-      - name: CstorPoolImage
-        value: openebs/cstor-pool:{{ tag }}
-      - name: CstorPoolMgmtImage
-        value: openebs/cstor-pool-mgmt:{{ tag }}
       - name: VolumeControllerImage
         value: openebs/cstor-volume-mgmt:{{ tag }}
       - name: VolumeTargetImage
