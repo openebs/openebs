@@ -34,7 +34,7 @@ test_name: deploy openebs and percona with its own namespace
 deb_packages:
   - python-pip
 
-test_pod_regex: maya*|openebs*|pvc*|percona*
+test_pod_regex: maya*|openebs*|node*|percona*|cstor*
 
 test_log_path: setup/logs/openebs-percona-ownnamespace.log
 

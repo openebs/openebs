@@ -1,5 +1,5 @@
 ---
-test_pod_regex: maya*|openebs*|pvc*|percona*
+test_pod_regex: maya*|openebs*|resize*|percona*|cstor*|node*
 
 test_log_path: setup/logs/resize_volume.log
 
