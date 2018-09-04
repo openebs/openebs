@@ -48,7 +48,7 @@ data:
         action: replace
         target_label: openebs_pv
       - source_labels: [__meta_kubernetes_pod_label_openebs_io_persistent_volume]
-        action: keep
+        action: replace
         target_label: openebs_pv
       - source_labels: [__meta_kubernetes_pod_container_port_number]
         action: drop
