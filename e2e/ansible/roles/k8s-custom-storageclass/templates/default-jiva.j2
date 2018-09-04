@@ -9,6 +9,8 @@ metadata:
         value: openebs/jiva:{{tag}}
       - name: ReplicaImage
         value: openebs/jiva:{{tag}}
+      - name: VolumeMonitorImage
+        value: openebs/m-exporter:{{ tag }}
       - name: ReplicaCount
         value: "{{replica_count}}"
       - name: StoragePool

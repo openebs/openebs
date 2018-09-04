@@ -12,4 +12,6 @@ metadata:
         value: openebs/cstor-volume-mgmt:{{ tag }}
       - name: VolumeTargetImage
         value: openebs/cstor-istgt:{{ tag }}
+      - name: VolumeMonitorImage
+        value: openebs/m-exporter:{{ tag }}
 provisioner: openebs.io/provisioner-iscsi
