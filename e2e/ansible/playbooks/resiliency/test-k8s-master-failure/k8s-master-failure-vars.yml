@@ -15,7 +15,7 @@ job_config_files:
   - Build_config.sh
 
 
-test_pod_regex: maya*|openebs*|pvc*|jenkins*
+test_pod_regex: maya*|openebs*|jenkins*|k8s*|node*|cstor*
 
 test_log_path: setup/logs/master_failure_test.log
 

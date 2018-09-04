@@ -22,7 +22,7 @@ replace_with:
   - disk
   - "{{result_mountpoint.stdout}}"
 
-test_pod_regex: maya*|openebs*|pvc*|percona*
+test_pod_regex: maya*|openebs*|percona*|node*|cstor*|disk*
  
 test_log_path: setup/logs/test-disk-failure.log
 

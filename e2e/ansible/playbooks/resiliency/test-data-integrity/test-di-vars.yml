@@ -3,7 +3,7 @@ test_name: data_integrity_check
 
 test_log_path: setup/logs/data_integrity.log
 
-test_pod_regex: maya*|openebs*|pvc*|snapshot*|fio*
+test_pod_regex: maya*|openebs*|snapshot*|fio*|node*|cstor*
 
 namespace: fio
 

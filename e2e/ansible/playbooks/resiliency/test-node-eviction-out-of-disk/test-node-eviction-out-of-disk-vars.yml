@@ -19,7 +19,7 @@ replace_with:
   - test-node-eviction
   - test-nodeeviction
 
-test_pod_regex: maya*|openebs*|pvc*|percona*|*target*|*pool*
+test_pod_regex: maya*|openebs*|node*|percona*|cstor*
 
 test_log_path: setup/logs/test-node-eviction-out-of-disk.log
 

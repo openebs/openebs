@@ -3,7 +3,7 @@ test_name: test-volume-capacity
 
 test_log_path: setup/logs/volume_capacity.log
 
-test_pod_regex: maya*|openebs*|pvc*|vol*|fio*
+test_pod_regex: maya*|openebs*|vol*|fio*|node*|cstor*
 
 namespace: volume
 

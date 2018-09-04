@@ -23,7 +23,7 @@ namespace: replica-quorum
 
 fault_injection_file: inject_replica_quorum_failure.yml
 
-test_pod_regex: maya*|openebs*|pvc*|percona*
+test_pod_regex: maya*|openebs*|replica*|percona*|node*|cstor*
 
 test_log_path: setup/logs/replica_quorum_failure_test.log
 
