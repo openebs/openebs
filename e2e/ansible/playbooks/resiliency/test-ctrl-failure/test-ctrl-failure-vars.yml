@@ -27,7 +27,7 @@ chaos_duration: 120
 
 chaos_interval: 20
 
-test_pod_regex: maya*|openebs*|pvc*|percona*|chaos*
+test_pod_regex: maya*|openebs*|test*|percona*|chaos*|node*|cstor*
 
 test_log_path: setup/logs/controller_failure_test.log
 

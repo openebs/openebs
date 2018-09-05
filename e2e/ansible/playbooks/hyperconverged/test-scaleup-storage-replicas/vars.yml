@@ -21,7 +21,7 @@ create_sc: storage-class.yml
 
 namespace: scaleup-storage
 
-test_pod_regex: maya*|openebs*|pvc*|percona*
+test_pod_regex: maya*|openebs*|cstor*|percona*|scaleup*|node*
 
 test_log_path: setup/logs/scaleup_storage_replicas_test.log
 
