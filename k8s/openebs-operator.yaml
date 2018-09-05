@@ -34,7 +34,7 @@ rules:
   verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
 - apiGroups: ["apiextensions.k8s.io"]
   resources: ["customresourcedefinitions"]
-  verbs: [ "get", "list", "create" ]
+  verbs: [ "get", "list", "create", "update", "delete"]
 - apiGroups: ["*"]
   resources: [ "disks"]
   verbs: ["*" ]
@@ -83,52 +83,6 @@ data:
       install:
       - version: "0.7.0"
 ---
-apiVersion: apiextensions.k8s.io/v1beta1
-kind: CustomResourceDefinition
-metadata:
-  # name must match the spec fields below, and be in the form: <plural>.<group>
-  name: castemplates.openebs.io
-spec:
-  # group name to use for REST API: /apis/<group>/<version>
-  group: openebs.io
-  # version name to use for REST API: /apis/<group>/<version>
-  version: v1alpha1
-  # either Namespaced or Cluster
-  scope: Cluster
-  names:
-    # plural name to be used in the URL: /apis/<group>/<version>/<plural>
-    plural: castemplates
-    # singular name to be used as an alias on the CLI and for display
-    singular: castemplate
-    # kind is normally the CamelCased singular type. Your resource manifests use this.
-    kind: CASTemplate
-    # shortNames allow shorter string to match your resource on the CLI
-    shortNames:
-    - cast
----
-apiVersion: apiextensions.k8s.io/v1beta1
-kind: CustomResourceDefinition
-metadata:
-  # name must match the spec fields below, and be in the form: <plural>.<group>
-  name: runtasks.openebs.io
-spec:
-  # group name to use for REST API: /apis/<group>/<version>
-  group: openebs.io
-  # version name to use for REST API: /apis/<group>/<version>
-  version: v1alpha1
-  # either Namespaced or Cluster
-  scope: Namespaced
-  names:
-    # plural name to be used in the URL: /apis/<group>/<version>/<plural>
-    plural: runtasks
-    # singular name to be used as an alias on the CLI and for display
-    singular: runtask
-    # kind is normally the CamelCased singular type. Your resource manifests use this.
-    kind: RunTask
-    # shortNames allow shorter string to match your resource on the CLI
-    shortNames:
-    - rtask
----
 apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
@@ -144,8 +98,8 @@ spec:
       serviceAccountName: openebs-maya-operator
       containers:
       - name: maya-apiserver
-        imagePullPolicy: IfNotPresent
-        image: openebs/m-apiserver:0.7.0-RC3
+        imagePullPolicy: Always
+        image: openebs/m-apiserver:ci
         ports:
         - containerPort: 5656
         env:
@@ -187,19 +141,19 @@ spec:
             fieldRef:
               fieldPath: metadata.name
         - name: OPENEBS_IO_JIVA_CONTROLLER_IMAGE
-          value: "openebs/jiva:0.7.0-RC3"
+          value: "openebs/jiva:0.7.0"
         - name: OPENEBS_IO_JIVA_REPLICA_IMAGE
-          value: "openebs/jiva:0.7.0-RC3"
+          value: "openebs/jiva:0.7.0"
         - name: OPENEBS_IO_CSTOR_TARGET_IMAGE
-          value: "openebs/cstor-istgt:0.7.0-RC3"
+          value: "openebs/cstor-istgt:0.7.0"
         - name: OPENEBS_IO_CSTOR_POOL_IMAGE
-          value: "openebs/cstor-pool:0.7.0-RC3"
+          value: "openebs/cstor-pool:0.7.0"
         - name: OPENEBS_IO_CSTOR_POOL_MGMT_IMAGE
-          value: "openebs/cstor-pool-mgmt:0.7.0-RC3"
+          value: "openebs/cstor-pool-mgmt:ci"
         - name: OPENEBS_IO_CSTOR_VOLUME_MGMT_IMAGE
-          value: "openebs/cstor-volume-mgmt:0.7.0-RC3"
+          value: "openebs/cstor-volume-mgmt:ci"
         - name: OPENEBS_IO_VOLUME_MONITOR_IMAGE
-          value: "openebs/m-exporter:0.7.0-RC3"
+          value: "openebs/m-exporter:ci"
 ---
 apiVersion: v1
 kind: Service
@@ -232,7 +186,7 @@ spec:
       containers:
       - name: openebs-provisioner
         imagePullPolicy: IfNotPresent
-        image: openebs/openebs-k8s-provisioner:0.7.0-RC3
+        image: openebs/openebs-k8s-provisioner:0.7.0
         env:
         # OPENEBS_IO_K8S_MASTER enables openebs provisioner to connect to K8s
         # based on this address. This is ignored if empty.
@@ -276,7 +230,7 @@ spec:
       serviceAccountName: openebs-maya-operator
       containers:
         - name: snapshot-controller
-          image: openebs/snapshot-controller:0.7.0-RC3
+          image: openebs/snapshot-controller:0.7.0
           imagePullPolicy: IfNotPresent
           env:
           - name: OPENEBS_NAMESPACE
@@ -290,7 +244,7 @@ spec:
         #- name: OPENEBS_MAYA_SERVICE_NAME
         #  value: "maya-apiserver-apiservice"
         - name: snapshot-provisioner
-          image: openebs/snapshot-provisioner:0.7.0-RC3
+          image: openebs/snapshot-provisioner:0.7.0
           imagePullPolicy: IfNotPresent
           env:
           - name: OPENEBS_NAMESPACE
@@ -303,144 +257,6 @@ spec:
         # This is supported for openebs provisioner version 0.5.3-RC1 onwards
         #- name: OPENEBS_MAYA_SERVICE_NAME
         #  value: "maya-apiserver-apiservice"
----
-apiVersion: apiextensions.k8s.io/v1beta1
-kind: CustomResourceDefinition
-metadata:
-  # name must match the spec fields below, and be in the form: <plural>.<group>
-  name: storagepoolclaims.openebs.io
-spec:
-  # group name to use for REST API: /apis/<group>/<version>
-  group: openebs.io
-  # version name to use for REST API: /apis/<group>/<version>
-  version: v1alpha1
-  # either Namespaced or Cluster
-  scope: Cluster
-  names:
-    # plural name to be used in the URL: /apis/<group>/<version>/<plural>
-    plural: storagepoolclaims
-    # singular name to be used as an alias on the CLI and for display
-    singular: storagepoolclaim
-    # kind is normally the CamelCased singular type. Your resource manifests use this.
-    kind: StoragePoolClaim
-    # shortNames allow shorter string to match your resource on the CLI
-    shortNames:
-    - spc
----
-apiVersion: apiextensions.k8s.io/v1beta1
-kind: CustomResourceDefinition
-metadata:
-  # name must match the spec fields below, and be in the form: <plural>.<group>
-  name: storagepools.openebs.io
-spec:
-  # group name to use for REST API: /apis/<group>/<version>
-  group: openebs.io
-  # version name to use for REST API: /apis/<group>/<version>
-  version: v1alpha1
-  # either Namespaced or Cluster
-  scope: Cluster
-  names:
-    # plural name to be used in the URL: /apis/<group>/<version>/<plural>
-    plural: storagepools
-    # singular name to be used as an alias on the CLI and for display
-    singular: storagepool
-    # kind is normally the CamelCased singular type. Your resource manifests use this.
-    kind: StoragePool
-    # shortNames allow shorter string to match your resource on the CLI
-    shortNames:
-    - sp
----
-apiVersion: apiextensions.k8s.io/v1beta1
-kind: CustomResourceDefinition
-metadata:
-  # name must match the spec fields below, and be in the form: <plural>.<group>
-  name: cstorpools.openebs.io
-spec:
-  # group name to use for REST API: /apis/<group>/<version>
-  group: openebs.io
-  # version name to use for REST API: /apis/<group>/<version>
-  version: v1alpha1
-  # either Namespaced or Cluster
-  scope: Cluster
-  names:
-    # plural name to be used in the URL: /apis/<group>/<version>/<plural>
-    plural: cstorpools
-    # singular name to be used as an alias on the CLI and for display
-    singular: cstorpool
-    # kind is normally the CamelCased singular type. Your resource manifests use this.
-    kind: CStorPool
-    # shortNames allow shorter string to match your resource on the CLI
-    shortNames:
-    - csp
----
-apiVersion: apiextensions.k8s.io/v1beta1
-kind: CustomResourceDefinition
-metadata:
-  # name must match the spec fields below, and be in the form: <plural>.<group>
-  name: cstorvolumes.openebs.io
-spec:
-  # group name to use for REST API: /apis/<group>/<version>
-  group: openebs.io
-  # version name to use for REST API: /apis/<group>/<version>
-  version: v1alpha1
-  # either Namespaced or Cluster
-  scope: Namespaced
-  names:
-    # kind is normally the CamelCased singular type. Your resource manifests use this.
-    kind: CStorVolume
-    # plural name to be used in the URL: /apis/<group>/<version>/<plural>
-    plural: cstorvolumes
-    # singular name to be used as an alias on the CLI and for display
-    singular: cstorvolume
-    # shortNames allow shorter string to match your resource on the CLI
-    shortNames:
-    - cstorvolume
----
-apiVersion: apiextensions.k8s.io/v1beta1
-kind: CustomResourceDefinition
-metadata:
-  # name must match the spec fields below, and be in the form: <plural>.<group>
-  name: cstorvolumereplicas.openebs.io
-spec:
-  # group name to use for REST API: /apis/<group>/<version>
-  group: openebs.io
-  # version name to use for REST API: /apis/<group>/<version>
-  version: v1alpha1
-  # either Namespaced or Cluster
-  scope: Namespaced
-  names:
-    # kind is normally the CamelCased singular type. Your resource manifests use this.
-    kind: CStorVolumeReplica
-    # plural name to be used in the URL: /apis/<group>/<version>/<plural>
-    plural: cstorvolumereplicas
-    # singular name to be used as an alias on the CLI and for display
-    singular: cstorvolumereplica
-    # shortNames allow shorter string to match your resource on the CLI
-    shortNames:
-    - cvr
----
-apiVersion: apiextensions.k8s.io/v1beta1
-kind: CustomResourceDefinition
-metadata:
-  # name must match the spec fields below, and be in the form: <plural>.<group>
-  name: disks.openebs.io
-spec:
-  # group name to use for REST API: /apis/<group>/<version>
-  group: openebs.io
-  # version name to use for REST API: /apis/<group>/<version>
-  version: v1alpha1
-  # either Namespaced or Cluster
-  scope: Cluster
-  names:
-    # plural name to be used in the URL: /apis/<group>/<version>/<plural>
-    plural: disks
-    # singular name to be used as an alias on the CLI and for display
-    singular: disk
-    # kind is normally the CamelCased singular type. Your resource manifests use this.
-    kind: Disk
-    # shortNames allow shorter string to match your resource on the CLI
-    shortNames:
-    - disk
 ---
 # This is the node-disk-manager related config. 
 # It can be used to customize the disks probes and filters
@@ -485,7 +301,7 @@ data:
           "name": "path filter",
           "state": "true",
           "include":"",
-          "exclude":"loop,dm-"
+          "exclude":"loop,/dev/fd0,/dev/sr0,/dev/ram,/dev/dm-"
         }
       ]
     }
@@ -517,8 +333,8 @@ spec:
         command:
         - /usr/sbin/ndm
         - start
-        image: openebs/node-disk-manager-amd64:v0.1.0-RC3
-        imagePullPolicy: IfNotPresent
+        image: openebs/node-disk-manager-amd64:ci
+        imagePullPolicy: Always
         securityContext:
           privileged: true
         volumeMounts:
@@ -564,33 +380,4 @@ spec:
       - name: sparsepath
         hostPath:
           path: /var/openebs/sparse
----
-apiVersion: storage.k8s.io/v1
-kind: StorageClass
-metadata:
-  name: openebs-standard
-  annotations:
-    cas.openebs.io/config: |
-      - name: ReplicaCount
-        value: "3"
-      - name: StoragePool
-        value: default
-      #- name: TargetResourceLimits
-      #  value: |-
-      #      memory: 1Gi
-      #      cpu: 100m
-      #- name: AuxResourceLimits
-      #  value: |-
-      #      memory: 0.5Gi
-      #      cpu: 50m
-      #- name: ReplicaResourceLimits
-      #  value: |-
-      #      memory: 2Gi
-provisioner: openebs.io/provisioner-iscsi
----
-kind: StorageClass
-apiVersion: storage.k8s.io/v1
-metadata:
-  name: openebs-snapshot-promoter
-provisioner: volumesnapshot.external-storage.k8s.io/snapshot-promoter
 ---
