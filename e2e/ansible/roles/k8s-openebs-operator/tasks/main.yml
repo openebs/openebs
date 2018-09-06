@@ -89,7 +89,7 @@
   register: node_count
 
 - name: Confirm if node-disk-manager is running in all the nodes
-  shell: source ~/.profile; kubectl get pods -n {{ namespace }} --selector=app=node-disk-manager | grep Running | wc -l
+  shell: source ~/.profile; kubectl get pods -n {{ namespace }} --selector=name=openebs-ndm | grep Running | wc -l
   args:
     executable: /bin/bash
   register: ndm_count
