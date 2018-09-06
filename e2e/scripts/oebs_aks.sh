@@ -7,6 +7,9 @@ password=$(echo $PASSWORD) #--- Password for the azure account
 
 name=$(echo $(mktemp)| tr '[:upper:]' '[:lower:]' | cut -d '.' -f 2)
 
+# Logging random resource name affix
+echo $name > oebs_aks_name
+
 echo "Installing Prerequisites..."
 sudo apt-get update
 
