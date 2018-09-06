@@ -15,7 +15,7 @@ replace_with:
 
 namespace: kubelet-service
 
-test_pod_regex: maya*|openebs*|pvc*|percona*
+test_pod_regex: maya*|openebs*|percona*|kubelet*|cstor*|node*
 
 test_log_path: setup/logs/kubelet_service_restart_test.log
 

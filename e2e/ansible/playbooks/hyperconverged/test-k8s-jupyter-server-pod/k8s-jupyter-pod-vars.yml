@@ -11,7 +11,7 @@ jupyter_server_vol_size: 5G
 
 namespace: jupyter-test
 
-test_pod_regex: maya*|openebs*|pvc*|jupyter*|*target*|*pool*
+test_pod_regex: maya*|openebs*|node*|jupyter*|cstor*
 
 test_log_path: setup/logs/jupyter_test.log
 

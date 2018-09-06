@@ -9,7 +9,7 @@ namespace: pvc-deletion
 
 storage_class: openebs-test 
 
-test_pod_regex: maya*|openebs*|pvc*|
+test_pod_regex: maya*|openebs*|pvc*|node*|cstor*
 
 test_log_path: setup/logs/delete_pvc.log
 

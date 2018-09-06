@@ -26,7 +26,7 @@ namespace: nw-rep
 
 pumba_file: pumba_kube.yml
 
-test_pod_regex: maya*|openebs*|pvc*|percona*|pumba*
+test_pod_regex: maya*|openebs*|percona*|pumba*|nw*|node*|cstor*
 
 test_log_path: setup/logs/network_failure_test.log
 
