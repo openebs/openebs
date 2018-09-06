@@ -15,7 +15,7 @@ image:
 
 apiserver:
   image: "openebs/m-apiserver"
-  imageTag: "ci"
+  imageTag: "0.7.0"
   replicas: 1
   ports:
     externalPort: 5656
@@ -47,7 +47,7 @@ snapshotOperator:
 
 ndm:
   image: "openebs/node-disk-manager-amd64"
-  imageTag: "ci"
+  imageTag: "v0.1.0"
   sparse:
     enabled: "true"
     path: "/var/openebs/sparse"
@@ -55,20 +55,13 @@ ndm:
     count: "1"
   filters:
     excludeVendors: "CLOUDBYT,OpenEBS"
-    excludePaths: "loop,/dev/fd0,/dev/sr0,/dev/ram,/dev/dm-"
+    excludePaths: "loop,fd0,sr0,/dev/ram,/dev/dm-"
   nodeSelector: {}
 
 jiva:
   image: "openebs/jiva"
   imageTag: "0.7.0"
   replicas: 3
-  replicaNodeSelector:
-    # Enable this option and specify the node label that will be used to 
-    # select the nodes where replica pods are scheduled. To use this feature,
-    # the nodes should already be labeled with the key=value. For example:
-    # `kubectl label nodes <node-name> nodetype=storage
-    enabled: false
-    value: "nodetype=storage"
 
 cstor:
   pool:
@@ -76,13 +69,13 @@ cstor:
     imageTag: "0.7.0"
   poolMgmt:
     image: "openebs/cstor-pool-mgmt"
-    imageTag: "ci"
+    imageTag: "0.7.0"
   target:
     image: "openebs/cstor-istgt"
     imageTag: "0.7.0"
   volumeMgmt:
     image: "openebs/cstor-volume-mgmt"
-    imageTag: "ci"
+    imageTag: "0.7.0"
 
 grafana:
   image: "grafana/grafana"
@@ -104,4 +97,4 @@ policies:
   monitoring:
     enabled: true
     image: "openebs/m-exporter"
-    imageTag: "ci"
+    imageTag: "0.7.0"

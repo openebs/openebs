@@ -70,6 +70,8 @@ spec:
           value: "{{ .Values.jiva.image }}:{{ .Values.jiva.imageTag }}"
         - name: OPENEBS_IO_JIVA_REPLICA_IMAGE
           value: "{{ .Values.jiva.image }}:{{ .Values.jiva.imageTag }}"
+        - name: OPENEBS_IO_JIVA_REPLICA_COUNT
+          value: "{{ .Values.jiva.replicas }}"
         - name: OPENEBS_IO_CSTOR_TARGET_IMAGE
           value: "{{ .Values.cstor.target.image }}:{{ .Values.cstor.target.imageTag }}"
         - name: OPENEBS_IO_CSTOR_POOL_IMAGE
