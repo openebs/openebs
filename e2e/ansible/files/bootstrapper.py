@@ -216,9 +216,9 @@ def create_plan_resources(args):
                     }
                 ]
             cstor_test_sparse_yaml += [
-                    # {
-                    #     "include": "pre-check.yml"
-                    # },
+                     {
+                         "include": "cleanup-target.yml"
+                     },
                     {
                         "hosts": "localhost",
                         "roles": [
@@ -282,6 +282,9 @@ def create_plan_resources(args):
 
         if len(case_resources)>0:
             jiva_test_yaml+=[
+                {
+                    "include": "cleanup-target.yml"
+                },
                 {
                     "tasks": [
                         {
