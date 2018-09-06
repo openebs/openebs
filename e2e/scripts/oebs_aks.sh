@@ -102,7 +102,7 @@ function associate_ip(){
 
 #SSH into nodes and install iscsi in kubelet container
 function iscsi_install(){
- echo "Installing iSCSI packages" | & tee -a oebs_aks.log
+ echo "Installing iSCSI packages" |& tee -a oebs_aks.log
     ip_address=$(az network public-ip list -g ${MC_group_list} | grep ipAddress | awk '{print $2}' | cut -d '"' -f2 )
     for k in $ip_address
     do
