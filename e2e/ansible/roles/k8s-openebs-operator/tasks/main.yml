@@ -19,13 +19,20 @@
   replace:
     path: "{{ ansible_env.HOME }}/{{ openebs_operator_alias }}"
     regexp: "{{item}}:[\\w.-]+"
-    replace: "{{item}}:{{ test_tag }}"
+    replace: "{{item}}:{{ tag }}"
   with_items:
     - m-apiserver
     - jiva
     - openebs-k8s-provisioner
     - snapshot-controller
     - snapshot-provisioner
+
+- name: Change the images of ndm resources to desired tag in operator YAML
+  replace:
+    path: "{{ ansible_env.HOME }}/{{ openebs_operator_alias }}"
+    regexp: "{{item}}:[\\w.-]+"
+    replace: "{{item}}:{{ ndm_tag }}"
+  with_items:
     - node-disk-manager-amd64
 
 - block:
