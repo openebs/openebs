@@ -98,6 +98,7 @@ cluster_type: managed
 
 storage_engine: jiva
 tag: ci
+ndm_tag: ci
 #Custom storage class names
 
 cstor_sc: openebs-cstor-disk
