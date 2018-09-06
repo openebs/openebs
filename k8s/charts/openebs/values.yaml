@@ -15,53 +15,71 @@ image:
 
 apiserver:
   image: "openebs/m-apiserver"
-  imageTag: "0.6.0"
+  imageTag: "0.7.0"
   replicas: 1
   ports:
     externalPort: 5656
     internalPort: 5656
   nodeSelector: {}
-  tolerations: {}
+  tolerations: []
   affinity: {}
-
 
 provisioner:
   image: "openebs/openebs-k8s-provisioner"
-  imageTag: "0.6.0"
+  imageTag: "0.7.0"
   replicas: 1
   nodeSelector: {}
-  tolerations: {}
+  tolerations: []
   affinity: {}
 
 snapshotOperator:
   controller:
     image: "openebs/snapshot-controller"
-    imageTag: "0.6.0"
+    imageTag: "0.7.0"
   provisioner:
     image: "openebs/snapshot-provisioner"
-    imageTag: "0.6.0"
+    imageTag: "0.7.0"
   replicas: 1
   upgradeStrategy: "Recreate"
   nodeSelector: {}
-  tolerations: {}
+  tolerations: []
   affinity: {}
+
+ndm:
+  image: "openebs/node-disk-manager-amd64"
+  imageTag: "v0.1.0"
+  sparse:
+    enabled: "true"
+    path: "/var/openebs/sparse"
+    size: "10737418240"
+    count: "1"
+  filters:
+    excludeVendors: "CLOUDBYT,OpenEBS"
+    excludePaths: "loop,fd0,sr0,/dev/ram,/dev/dm-"
+  nodeSelector: {}
 
 jiva:
   image: "openebs/jiva"
-  imageTag: "0.6.0"
+  imageTag: "0.7.0"
   replicas: 3
-  replicaNodeSelector:
-    #Enable this option and specify the node label that will be used to 
-    #select the nodes where replica pods are scheduled. To use this feature,
-    #the nodes should already be labeled with the key=value. For example:
-    # `kubectl label nodes <node-name> nodetype=storage
-    enabled: false
-    value: "nodetype=storage"
 
+cstor:
+  pool:
+    image: "openebs/cstor-pool"
+    imageTag: "0.7.0"
+  poolMgmt:
+    image: "openebs/cstor-pool-mgmt"
+    imageTag: "0.7.0"
+  target:
+    image: "openebs/cstor-istgt"
+    imageTag: "0.7.0"
+  volumeMgmt:
+    image: "openebs/cstor-volume-mgmt"
+    imageTag: "0.7.0"
 
 grafana:
   image: "grafana/grafana"
-  imageTag: "4.6.3"
+  imageTag: "5.2.0"
   ports:
     externalPort: 3000
     internalPort: 3000
@@ -69,7 +87,7 @@ grafana:
 
 prometheus:
   image: "prom/prometheus"
-  imageTag: "v2.1.0"
+  imageTag: "v2.3.0"
   ports:
     externalPort: 80
     internalPort: 9090
@@ -79,4 +97,4 @@ policies:
   monitoring:
     enabled: true
     image: "openebs/m-exporter"
-    imageTag: "0.6.0"
+    imageTag: "0.7.0"

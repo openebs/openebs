@@ -1,100 +1,31 @@
-apiVersion: storage.k8s.io/v1
-kind: StorageClass
-metadata:
-   name: openebs-standalone
-provisioner: openebs.io/provisioner-iscsi
-parameters:
-  openebs.io/storage-pool: "default"
-  openebs.io/jiva-replica-count: "1"
-  openebs.io/volume-monitor: "true"
-  openebs.io/capacity: 5G
 ---
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
-   name: openebs-percona
+  name: openebs-standard
+  annotations:
+    cas.openebs.io/config: |
+      - name: ReplicaCount
+        value: "3"
 provisioner: openebs.io/provisioner-iscsi
-parameters:
-  openebs.io/storage-pool: "default"
-  openebs.io/jiva-replica-count: "3"
-  openebs.io/volume-monitor: "true"
-  openebs.io/capacity: 5G
 ---
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
-   name: openebs-jupyter
+  name: openebs-standalone
+  annotations:
+    cas.openebs.io/config: |
+      - name: ReplicaCount
+        value: "1"
 provisioner: openebs.io/provisioner-iscsi
-parameters:
-  openebs.io/storage-pool: "default"
-  openebs.io/jiva-replica-count: "3"
-  openebs.io/volume-monitor: "true"
-  openebs.io/capacity: 5G
 ---
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
-   name: openebs-mongodb
+  name: openebs-mongodb
+  annotations:
+    cas.openebs.io/config: |
+      - name: FSType
+        value: "xfs"
 provisioner: openebs.io/provisioner-iscsi
-parameters:
-  openebs.io/storage-pool: "default"
-  openebs.io/jiva-replica-count: "3"
-  openebs.io/volume-monitor: "true"
-  openebs.io/capacity: 5G
-  openebs.io/fstype: "xfs"
----
-apiVersion: storage.k8s.io/v1
-kind: StorageClass
-metadata:
-   name: openebs-cassandra
-provisioner: openebs.io/provisioner-iscsi
-parameters:
-  openebs.io/storage-pool: "default"
-  openebs.io/jiva-replica-count: "3"
-  openebs.io/volume-monitor: "true"
-  openebs.io/capacity: 5G
----
-apiVersion: storage.k8s.io/v1
-kind: StorageClass
-metadata:
-   name: openebs-redis
-provisioner: openebs.io/provisioner-iscsi
-parameters:
-  openebs.io/storage-pool: "default"
-  openebs.io/jiva-replica-count: "3"
-  openebs.io/volume-monitor: "true"
-  openebs.io/capacity: 5G
----
-apiVersion: storage.k8s.io/v1
-kind: StorageClass
-metadata:
-   name: openebs-kafka
-provisioner: openebs.io/provisioner-iscsi
-parameters:
-  openebs.io/storage-pool: "default"
-  openebs.io/jiva-replica-count: "3"
-  openebs.io/volume-monitor: "true"
-  openebs.io/capacity: 10G
----
-apiVersion: storage.k8s.io/v1
-kind: StorageClass
-metadata:
-   name: openebs-zk
-provisioner: openebs.io/provisioner-iscsi
-parameters:
-  openebs.io/storage-pool: "default"
-  openebs.io/jiva-replica-count: "3"
-  openebs.io/volume-monitor: "true"
-  openebs.io/capacity: 5G
----
-apiVersion: storage.k8s.io/v1
-kind: StorageClass
-metadata:
-   name: openebs-es-data-sc
-provisioner: openebs.io/provisioner-iscsi
-parameters:
-  openebs.io/storage-pool: "default"
-  openebs.io/jiva-replica-count: "3"
-  openebs.io/volume-monitor: "true"
-  openebs.io/capacity: 5G
 ---

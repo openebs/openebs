@@ -10,7 +10,7 @@ and use stable/openebs chart located at:
 ------------------------------------------------------------------------------
 
 ## Prerequisites
-- Kubernetes 1.7.5+ with RBAC enabled
+- Kubernetes 1.9.7+ with RBAC enabled
 - iSCSI PV support in the underlying infrastructure
 - helm is installed and the tiller has admin privileges. To assign admin
   to tiller, login as admin and use the following instructions:
@@ -61,26 +61,42 @@ helm del --purge <openebs-chart-name>
 
 The following table lists the configurable parameters of OpenEBS chart and their default values.
 
-| Parameter                              | Description                                   | Default                           |
-| ---------------------------------------| --------------------------------------------- | --------------------------------- |
-| `rbac.create`                          | Enable RBAC Resources                         | `true`                            |
-| `image.pullPolicy`                     | Container pull policy                         | `IfNotPresent`                    |
-| `apiserver.image`                      | Docker Image for API Server                   | `openebs/m-apiserver`             |
-| `apiserver.imageTag`                   | Docker Image Tag for API Server               | `0.6.0`                           |
-| `apiserver.replicas`                   | Number of API Server Replicas                 | `1`                               |
-| `provisioner.image`                    | Docker Image for Provisioner                  | `openebs/openebs-k8s-provisioner` |
-| `provisioner.imageTag`                 | Docker Image Tag for Provisioner              | `0.6.0`                           |
-| `provisioner.replicas`                 | Number of Provisioner Replicas                | `1`                               |
-| `snapshotOperator.provisioner.image`   | Docker Image for Snapshot Provisioner         | `openebs/snapshot-provisioner`    |
-| `snapshotOperator.provisioner.imageTag`| Docker Image Tag for Snapshot Provisioner     | `0.6.0`                           |
-| `snapshotOperator.controller.image`    | Docker Image for Snapshot Controller          | `openebs/snapshot-controller`     |
-| `snapshotOperator.controller.imageTag` | Docker Image Tag for Snapshot Controller      | `0.6.0`                           |
-| `snapshotOperator.replicas`            | Number of Snapshot Operator Replicas          | `1`                               |
-| `jiva.image`                           | Docker Image for Jiva                         | `openebs/jiva`                    |
-| `jiva.imageTag`                        | Docker Image Tag for Jiva                     | `0.6.0`                           |
-| `jiva.replicas`                        | Number of Jiva Replicas                       | `3`                               |
-| `jiva.replicaNodeSelector.enabled`     | Enable scheduling replicas with node selector | `false`                           |
-| `jiva.replicaNodeSelector.value`       | node labels assigned to replica pods          | `nodetype=storage`                |
+| Parameter                              | Description                                   | Default                                   | 
+| ---------------------------------------| --------------------------------------------- | ----------------------------------------- |
+| `rbac.create`                          | Enable RBAC Resources                         | `true`                                    |
+| `image.pullPolicy`                     | Container pull policy                         | `IfNotPresent`                            |
+| `apiserver.image`                      | Docker Image for API Server                   | `openebs/m-apiserver`                     |
+| `apiserver.imageTag`                   | Docker Image Tag for API Server               | `0.7.0`                                   |
+| `apiserver.replicas`                   | Number of API Server Replicas                 | `1`                                       |
+| `provisioner.image`                    | Docker Image for Provisioner                  | `openebs/openebs-k8s-provisioner`         |
+| `provisioner.imageTag`                 | Docker Image Tag for Provisioner              | `0.7.0`                                   |
+| `provisioner.replicas`                 | Number of Provisioner Replicas                | `1`                                       |
+| `snapshotOperator.provisioner.image`   | Docker Image for Snapshot Provisioner         | `openebs/snapshot-provisioner`            |
+| `snapshotOperator.provisioner.imageTag`| Docker Image Tag for Snapshot Provisioner     | `0.7.0`                                   |
+| `snapshotOperator.controller.image`    | Docker Image for Snapshot Controller          | `openebs/snapshot-controller`             |
+| `snapshotOperator.controller.imageTag` | Docker Image Tag for Snapshot Controller      | `0.7.0`                                   |
+| `snapshotOperator.replicas`            | Number of Snapshot Operator Replicas          | `1`                                       |
+| `ndm.image`                            | Docker Image for Node Disk Manager            | `openebs/openebs/node-disk-manager-amd64` |
+| `ndm.imageTag`                         | Docker Image Tag for Node Disk Manager        | `v0.1.0`                                  |
+| `ndm.sparse.enabled`                   | Create Sparse files and cStor Sparse Pool     | `true`                                    |
+| `ndm.sparse.path`                      | Directory where Sparse files are created      | `/var/openebs/sparse`                     |
+| `ndm.sparse.size`                      | Size of the sparse file in bytes              | `10737418240`                             |
+| `ndm.sparse.count`                     | Number of sparse files to be created          | `1`                                       |
+| `ndm.sparse.filters.excludeVendors`    | Exclude devices with specified vendor         | `CLOUDBYT,OpenEBS`                        |
+| `ndm.sparse.filters.excludePaths`      | Exclude devices with specified path patterns  | `loop,fd0,sr0,/dev/ram,/dev/dm-`          |
+| `jiva.image`                           | Docker Image for Jiva                         | `openebs/jiva`                            |
+| `jiva.imageTag`                        | Docker Image Tag for Jiva                     | `0.7.0`                                   |
+| `jiva.replicas`                        | Number of Jiva Replicas                       | `3`                                       |
+| `cstor.pool.image`                     | Docker Image for cStor Pool                   | `openebs/cstor-pool`                      |
+| `cstor.pool.imageTag`                  | Docker Image Tag for cStor Pool               | `0.7.0`                                   |
+| `cstor.poolMgmt.image`                 | Docker Image for cStor Pool  Management       | `openebs/cstor-pool-mgmt`                 |
+| `cstor.poolMgmt.imageTag`              | Docker Image Tag for cStor Pool Management    | `0.7.0`                                   |
+| `cstor.target.image`                   | Docker Image for cStor Target                 | `openebs/cstor-target`                    |
+| `cstor.target.imageTag`                | Docker Image Tag for cStor Target             | `0.7.0`                                   |
+| `cstor.volumeMgmt.image`               | Docker Image for cStor Volume  Management     | `openebs/cstor-volume-mgmt`               |
+| `cstor.volumeMgmt.imageTag`            | Docker Image Tag for cStor Volume Management  | `0.7.0`                                   |
+| `policies.monitoring.image`            | Docker Image for Prometheus Exporter          | `openebs/m-exporter`                      |
+| `policies.monitoring.imageTag`         | Docker Image Tag for Prometheus Exporter      | `0.7.0`                                   |
 
 Specify each parameter using the `--set key=value[,key=value]` argument to `helm install`.
 

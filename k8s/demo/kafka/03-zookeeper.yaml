@@ -151,7 +151,7 @@ spec:
   - metadata:
       name: datadir
     spec:
-      storageClassName: openebs-zk
+      storageClassName: openebs-standard
       accessModes: [ "ReadWriteOnce" ]
       resources:
         requests:
