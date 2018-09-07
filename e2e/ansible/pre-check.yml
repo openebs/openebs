@@ -27,8 +27,8 @@
       delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
       register: list_pv
 
-    - name: Delete pv's 
-      shell: source ~/.profile; kubectl delete pv {{ item }} 
+    - name: Delete pv's
+      shell: source ~/.profile; kubectl delete pv {{ item }}
       args:
         executable: /bin/bash
       delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
@@ -61,7 +61,7 @@
         executable: /bin/bash
       delegate_to: "{{ groups['kubernetes-kubemasters'].0}}"
       with_items: "{{ list_disk.stdout_lines }}"
-    
+
     - name: Delete namespaces which are not required
       shell: source ~/.profile; kubectl delete ns {{ item }} --grace-period=0 --force
       args:
@@ -77,6 +77,6 @@
         executable: /bin/bash
       delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
       register: result
-      until: result.stdout_lines == list 
+      until: result.stdout_lines == list
       delay: 30
       retries: 15
