@@ -143,16 +143,23 @@
          wait_for:
            timeout: 120
 
+       - name: Get pv name created
+         shell: source ~/.profile; kubectl get pvc -n {{ namespace }} -o custom-columns=:spec.volumeName --no-headers
+         args:
+           executable: /bin/bash
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+         register: pv
+
        - name: Setting values to variables specific to jiva
          set_fact:
            ns: "{{ namespace }}"
-           pod_label: "openebs.io/controller=jiva-controller"
+           pod_label: "openebs.io/persistent-volume={{pv.stdout}}"
          when: storage_engine  == 'jiva'
 
        - name: Setting values to variables specific to cstor
          set_fact:
            ns: "{{ operator_ns }}"
-           pod_label: "openebs.io/target=cstor-target"
+           pod_label: "openebs.io/persistent-volume={{pv.stdout}}"
          when: storage_engine  == 'cStor'
 
        - name: 4) Get the name of the controller/target deployment

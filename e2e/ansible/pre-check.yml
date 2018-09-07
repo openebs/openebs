@@ -5,13 +5,13 @@
 
   tasks:
 
-    - name: Cleanup /var/openebs
-      file:
-        path: "/var/openebs"
-        state: absent
-      become: true
-      delegate_to: "{{ item }}"
-      with_items: "{{groups['kubernetes-kubeminions']}}"
+          #- name: Cleanup /var/openebs
+          #file:
+          #path: "/var/openebs"
+          #state: absent
+          #become: true
+          #delegate_to: "{{ item }}"
+          #with_items: "{{groups['kubernetes-kubeminions']}}"
 
     - name: List available namespaces
       shell: source ~/.profile; kubectl get ns --no-headers | awk {'print $1'}
