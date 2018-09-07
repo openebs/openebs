@@ -33,6 +33,34 @@
         executable: /bin/bash
       delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
       with_items: "{{ list_pv.stdout_lines }}"
+
+    - name: Get the list of available spc
+      shell: source ~/.profile; kubectl get spc --no-headers -o custom-columns=:metadata.name
+      args:
+        executable: /bin/bash
+      delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+      register: list_spc
+
+    - name: Delete the spc's
+      shell: source ~/.profile; kubectl delete spc {{ item }}
+      args:
+        executable: /bin/bash
+      delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+      with_items: "{{ list_spc.stdout_lines }}"
+
+    - name: Get the available disk list
+      shell: source ~/.profile; kubectl get disks  --no-headers -o custom-columns=:metadata.name
+      args:
+        executable: /bin/bash
+      delegate_to: "{{ groups['kubernetes-kubemasters'].0}}"
+      register: list_disk
+
+    - name: Delete the available disks
+      shell: source ~/.profile; kubectl delete disks {{ item }}
+      args:
+        executable: /bin/bash
+      delegate_to: "{{ groups['kubernetes-kubemasters'].0}}"
+      with_items: "{{ list_disk.stdout_lines }}"
     
     - name: Delete namespaces which are not required
       shell: source ~/.profile; kubectl delete ns {{ item }} --grace-period=0 --force
