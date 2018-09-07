@@ -3,7 +3,7 @@ apiVersion: v1
 metadata:
   name: demo-cstor-vol1-claim
 spec:
-  storageClassName: openebs-cstor-default-0.7.0
+  storageClassName: openebs-cstor-sparse 
   accessModes:
     - ReadWriteOnce
   resources:
