@@ -25,6 +25,6 @@
         executable: /bin/bash
       register: result
       delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-      until: " nodepod.stdout not in result.stdout"
+      until: result.rc ==0
       delay: 30
-      retries: 15
+      retries: 10
