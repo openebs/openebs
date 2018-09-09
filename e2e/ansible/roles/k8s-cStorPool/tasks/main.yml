@@ -111,6 +111,7 @@
       args:
         executable: /bin/bash
       delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+      ignore_errors: True
 
     - name: Verify deployments are deleted
       shell: source ~/.profile; kubectl get deploy -n openebs
@@ -121,6 +122,7 @@
       until: "poolname not in deploy_list.stdout"
       delay: 20
       retries: 10
+      ignore_errors: True
 
     - name: Verify cStor Pool pods are deleted
       shell: source ~/.profile; kubectl get pods -n openebs
@@ -131,6 +133,7 @@
       until: "poolname not in cstorpool_pods.stdout"
       delay: 10
       retries: 20
+      ignore_errors: True
 
     - name: Remove the copied templates
       file:
