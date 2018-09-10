@@ -33,7 +33,7 @@
   ignore_errors: yes
 
 - name: Confirm pod has been deleted
-  shell: source ~/.profile; kubectl get pods -n openebs
+  shell: source ~/.profile; kubectl get pods -n {{ operator_ns }}
   args:
     executable: /bin/bash
   register: result
@@ -41,12 +41,18 @@
   delay: 30
   retries: 10
 
+- name: Delete the pre-release features
+  shell: source ~/.profile; kubectl delete cast -n {{ operator_ns }} --all
+  args:
+    executable: /bin/bash
+  register: cast
+
 - name: Confirm pre-release features have been deleted
   shell: source ~/.profile; kubectl get cast -n {{ operator_ns }}
   args:
     executable: /bin/bash
   register: result
-  until: "result.rc != 0 in result.stderr"
+  until: '"No resources found." in result.stderr'
   delay: 20
   retries: 10
 
