@@ -126,7 +126,9 @@
   args:
     executable: /bin/bash
   register: result
-  failed_when: '"No resources found." in result.stdout'
+  until:  "result.rc ==0"
+  delay: 5
+  retries: 3
 
 - name: Confirm default cStor sparse pool pods are running
   shell: >
