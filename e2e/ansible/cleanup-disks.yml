@@ -1,0 +1,18 @@
+---
+- hosts: localhost
+
+  tasks:
+
+    - name: Get list of disks attached
+      shell: source ~/.profile; kubectl get disks -l ndm.io/disk-type=disk --no-headers -o custom-columns=:metadata.name
+      args:
+        executable: /bin/bash
+      delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+      register: diskList
+
+    - name: Delete stale disk entries
+      shell: source ~/.profile; kubectl delete disks {{ item }}
+      args:
+        executable: /bin/bash
+      delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+      with_items: "{{ diskList.stdout_lines }}"
