@@ -39,6 +39,7 @@
       args:
         executable: /bin/bash
       delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+      register: result
       until: "result.rc == 0"
       delay: 20
       retries: 10
