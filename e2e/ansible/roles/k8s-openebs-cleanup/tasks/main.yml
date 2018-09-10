@@ -33,7 +33,7 @@
   ignore_errors: yes
 
 - name: Confirm pod has been deleted
-  shell: source ~/.profile; kubectl get pods -n openebs
+  shell: source ~/.profile; kubectl get pods -n {{ operator_ns }}
   args:
     executable: /bin/bash
   register: result
@@ -52,7 +52,7 @@
   args:
     executable: /bin/bash
   register: result
-  until: "result.rc == 0"
+  until: '"No resources found." in result.stderr'
   delay: 20
   retries: 10
 
