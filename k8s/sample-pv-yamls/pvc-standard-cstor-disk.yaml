@@ -1,0 +1,12 @@
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: demo-cstor-disk-vol1-claim
+spec:
+  storageClassName: openebs-cstor-disk
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 4G
+---
