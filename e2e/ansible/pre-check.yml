@@ -34,7 +34,7 @@
       delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
       with_items: "{{ list_pv.stdout_lines }}"
 
-    - name: Delete the spc,csp
+    - name: Delete spc,csp
       shell: source ~/.profile; kubectl delete spc,csp --all
       args:
         executable: /bin/bash
@@ -43,9 +43,8 @@
       until: "result.rc == 0"
       delay: 20
       retries: 10
-
     - name: Get the available disk list
-      shell: source ~/.profile; kubectl get disks  --no-headers -o custom-columns=:metadata.name
+      shell: source ~/.profile; kubectl get disks -l ndm.io/disk-type=sparse --no-headers -o custom-columns=:metadata.name
       args:
         executable: /bin/bash
       delegate_to: "{{ groups['kubernetes-kubemasters'].0}}"
