@@ -9,5 +9,6 @@ include_before:
  - create-cStorPool.yml
 include_after:
  - delete-cStorPool.yml
+ - playbooks/deprovision-cvr/deprovision-cvr.yml
  - delete-disks.yml
  - cleanup-openebs.yml
