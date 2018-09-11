@@ -11,5 +11,4 @@ include_after:
  - delete-cStorPool.yml
  - playbooks/deprovision-cvr/deprovision-cvr.yml
  - delete-disks.yml
- - cleanup-disks.yml
  - cleanup-openebs.yml
