@@ -153,7 +153,7 @@
        - name: Setting values to variables specific to jiva
          set_fact:
            ns: "{{ namespace }}"
-           pod_label: "openebs.io/persistent-volume={{pv.stdout}}"
+           pod_label: "openebs.io/controller=jiva-controller"
          when: storage_engine  == 'jiva'
 
        - name: Setting values to variables specific to cstor
