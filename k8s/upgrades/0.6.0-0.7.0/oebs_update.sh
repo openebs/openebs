@@ -19,6 +19,20 @@ function usage() {
     exit 1
 }
 
+function setDeploymentRecreateStrategy() {
+    ns=$1
+    dn=$2
+    currStrategy=`kubectl get deploy -n $ns $dn -o jsonpath="{.spec.strategy.type}"`
+
+    if [ $currStrategy = "RollingUpdate" ]; then
+       kubectl patch deployment --namespace $ns --type json $dn -p "$(cat patch-strategy-recreate.json)"
+       rc=$?; if [ $rc -ne 0 ]; then echo "ERROR: $rc"; exit; fi
+       echo "Deployment upgrade strategy set as recreate"
+    else
+       echo "Deployment upgrade strategy was already set as recreate"
+    fi
+}
+
 
 if [ "$#" -ne 2 ]; then
     usage
@@ -65,12 +79,10 @@ done
 
 
 echo "Patching Replica Deployment upgrade strategy as recreate"
-kubectl patch deployment --namespace $ns --type json $r_dep -p "$(cat patch-strategy-recreate.json)"
-rc=$?; if [ $rc -ne 0 ]; then echo "ERROR: $rc"; exit; fi
+setDeploymentRecreateStrategy $ns $r_dep
 
 echo "Patching Target Deployment upgrade strategy as recreate"
-kubectl patch deployment --namespace $ns --type json $c_dep -p "$(cat patch-strategy-recreate.json)"
-rc=$?; if [ $rc -ne 0 ]; then echo "ERROR: $rc"; exit; fi
+setDeploymentRecreateStrategy $ns $c_dep
 
 # Fetch the older target and replica - ReplicaSet objects which need to be 
 # deleted before upgrading. If not deleted, the new pods will be stuck in 
