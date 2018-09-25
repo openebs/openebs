@@ -155,10 +155,59 @@ openshift_disable_check=disk_availability,memory_availability,docker_storage,doc
 20.10.45.111  openshift_public_ip=20.10.45.111 openshift_ip=20.10.45.111 openshift_public_hostname=osnode1.mdataqa.in openshift_hostname=osnode1.mdataqa.in containerized=True connect_to=20.10.45.111 ansible_connection=local
 ```
 
+-With above inventory file it will try to pull the latest openshift images. If you want to install openshift specific version such as v3.9.33 then you need to provide the image tag also in inventory file as mentioned below.
+
+```
+[OSEv3:children]
+nodes
+masters
+nfs
+etcd
+
+[OSEv3:vars]
+openshift_master_cluster_public_hostname=None
+ansible_ssh_user=root
+openshift_master_cluster_hostname=None
+openshift_hostname_check=false
+deployment_type=openshift-enterprise
+openshift_release=v3.9.33
+openshift_image_tag=v3.9.33
+openshift_pkg_version=-3.9.33
+openshift_version=3.9.33
+openshift_disable_check=disk_availability,memory_availability,docker_storage,docker_image_availability
+
+[nodes]
+20.10.151.251  openshift_public_ip=20.10.151.251 openshift_ip=20.10.151.251 openshift_public_hostname=osc1.mayacb.in openshift_hostname=osc1.mayacb.in containerized=True openshift_node_labels="{'region': 'infra'}" openshift_schedulable=True ansible_connection=local
+20.10.151.252  openshift_public_ip=20.10.151.252 openshift_ip=20.10.151.252 openshift_public_hostname=osc2.mayacb.in openshift_hostname=osc2.mayacb.in containerized=True openshift_node_labels="{'region': 'infra'}" openshift_schedulable=True
+20.10.151.253  openshift_public_ip=20.10.151.253 openshift_ip=20.10.151.253 openshift_public_hostname=osc3.mayacb.in openshift_hostname=osc3.mayacb.in containerized=True openshift_schedulable=True
+20.10.151.254  openshift_public_ip=20.10.151.254 openshift_ip=20.10.151.254 openshift_public_hostname=osc4.mayacb.in openshift_hostname=osc4.mayacb.in containerized=True openshift_schedulable=True
+20.10.151.255  openshift_public_ip=20.10.151.255 openshift_ip=20.10.151.255 openshift_public_hostname=osc5.mayacb.in openshift_hostname=osc5.mayacb.in containerized=True openshift_schedulable=True
+
+[masters]
+20.10.151.251  openshift_public_ip=20.10.151.251 openshift_ip=20.10.151.251 openshift_public_hostname=osc1.mayacb.in openshift_hostname=osc1.mayacb.in containerized=True ansible_connection=local
+
+[nfs]
+20.10.151.251  openshift_public_ip=20.10.151.251 openshift_ip=20.10.151.251 openshift_public_hostname=osc1.mayacb.in openshift_hostname=osc1.mayacb.in containerized=True ansible_connection=local
+
+[etcd]
+20.10.151.251  openshift_public_ip=20.10.151.251 openshift_ip=20.10.151.251 openshift_public_hostname=osc1.mayacb.in openshift_hostname=osc1.mayacb.in containerized=True ansible_connection=local
+```
+
+Once the inventory file is created run the **prerequistes.yml** playbook using your inventory file
+
+```
+ansible-playbook -i <inventory_file> /usr/share/ansible/openshift-ansible/playbooks/prerequisites.yml
+```
+
+Run the **deploy_cluster.yml** playbook using your inventory file:
+
+```
+ansible-playbook -i <inventory_file> /usr/share/ansible/openshift-ansible/playbooks/deploy_cluster.yml
+```
+
 -While installing, if you get following error, use docker pull command to download the package on both master and nodes.
 
 ```
-
   1. Hosts:    20.10.45.111
      Play:     OpenShift Health Checks
      Task:     Run health checks (install) - EL
