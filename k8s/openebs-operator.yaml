@@ -163,6 +163,13 @@ spec:
             - version
           initialDelaySeconds: 300
           periodSeconds: 60
+        readinessProbe:
+          exec:
+            command:
+            - /usr/local/bin/mayactl
+            - version
+          initialDelaySeconds: 300
+          periodSeconds: 60
 ---
 apiVersion: v1
 kind: Service
