@@ -155,7 +155,7 @@ openshift_disable_check=disk_availability,memory_availability,docker_storage,doc
 20.10.45.111  openshift_public_ip=20.10.45.111 openshift_ip=20.10.45.111 openshift_public_hostname=osnode1.mdataqa.in openshift_hostname=osnode1.mdataqa.in containerized=True connect_to=20.10.45.111 ansible_connection=local
 ```
 
--With above inventory file it will try to pull the latest openshift images. If you want to install openshift specific version such as v3.9.33 then you need to provide the image tag also in inventory file as mentioned below.
+-With above inventory file it will try to pull the latest OpenShift images. If you want to install a specific OpenShift version such as v3.9.33, you must also provide the image tag in the inventory file as mentioned below.
 
 ```
 [OSEv3:children]
@@ -193,19 +193,19 @@ openshift_disable_check=disk_availability,memory_availability,docker_storage,doc
 20.10.151.251  openshift_public_ip=20.10.151.251 openshift_ip=20.10.151.251 openshift_public_hostname=osc1.mayacb.in openshift_hostname=osc1.mayacb.in containerized=True ansible_connection=local
 ```
 
-Once the inventory file is created run the **prerequistes.yml** playbook using your inventory file
+Once the inventory file is created, run the **prerequistes.yml** playbook using your inventory file
 
 ```
 ansible-playbook -i <inventory_file> /usr/share/ansible/openshift-ansible/playbooks/prerequisites.yml
 ```
 
-Run the **deploy_cluster.yml** playbook using your inventory file:
+Run the **deploy_cluster.yml** playbook file using the following command.
 
 ```
 ansible-playbook -i <inventory_file> /usr/share/ansible/openshift-ansible/playbooks/deploy_cluster.yml
 ```
 
--While installing, if you get following error, use docker pull command to download the package on both master and nodes.
+-While installing, if you get the following error, use the docker pull command to download the package on both master and nodes.
 
 ```
   1. Hosts:    20.10.45.111
