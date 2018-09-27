@@ -1,0 +1,80 @@
+---
+
+- name: Replace storage-class to use cstor storage engine
+  replace:
+    path: "{{ result_kube_home.stdout }}/{{ percona_file }}"
+    regexp: 'openebs-standard'
+    replace: '{{ cstor_sc }}'
+  delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+
+- name: Deploy Percona application
+  include_tasks: "{{utils_path}}/deploy_task.yml"
+  vars:
+    app_yml: "{{ percona_file }}"
+    ns: "{{ namespace }}"
+
+- name: Check if the application is running.
+  include_tasks: "{{utils_path}}/deploy_check.yml"
+  vars:
+    ns: "{{ namespace }}"
+    lkey: name
+    lvalue: percona
+
+- name: Obtain the number of pools
+  shell: source ~/.profile; kubectl get pods -n {{ operator_ns }} | grep cstor | grep -i running | wc -l
+  args:
+    executable: /bin/bash
+  register: pool_count
+
+- name: Obtaining the cstor pool pods
+  shell: source ~/.profile; kubectl get pods -n {{ operator_ns }} | grep cstor | awk {'print $1'}
+  args:
+    executable: /bin/bash
+  register: cstor_pods
+  delegate_to: "{{ groups['kubernetes-kubemasters'].0}}"
+
+- name: Getting the node name
+  shell: source ~/.profile; kubectl get pods -n {{ operator_ns }} {{ cstor_pods.stdout_lines[0] }} --no-headers -o custom-columns=:spec.nodeName
+  args:
+    executable: /bin/bash
+  register: node
+  delegate_to: "{{ groups['kubernetes-kubemasters'].0}}"
+
+- name: Drain one of the nodes
+  shell: source ~/.profile; kubectl drain {{ node.stdout }} --ignore-daemonsets --force
+  args:
+    executable: /bin/bash
+  delegate_to: "{{ groups['kubernetes-kubemasters'].0}}"
+
+- name: Check if one of the pools is pending.
+  shell: source ~/.profile; kubectl get pods -n {{operator_ns}} | grep cstor | grep -i pending | wc -l
+  args:
+    executable: /bin/bash
+  register: pending_pod
+  until: "'1' in pending_pod.stdout"
+  delay: 30
+  retries: 20
+  delegate_to: "{{ groups['kubernetes-kubemasters'].0}}"
+
+- name: Uncordon the node
+  shell: source ~/.profile; kubectl uncordon {{ node.stdout }}
+  args:
+    executable: /bin/bash
+  register: result
+  delegate_to: "{{ groups['kubernetes-kubemasters'].0}}"
+
+- name: Obtain the number of pools
+  shell: source ~/.profile; kubectl get pods -n {{ operator_ns }} | grep cstor | grep -i running | wc -l
+  args:
+    executable: /bin/bash
+  register: pool_count
+  until: "'3' in pool_count.stdout"
+  delay: 60
+  retries: 20
+
+- name: Check if the application is running.
+  include_tasks: "{{utils_path}}/deploy_check.yml"
+  vars:
+    ns: "{{ namespace }}"
+    lkey: name
+    lvalue: percona
