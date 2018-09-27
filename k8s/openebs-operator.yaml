@@ -156,6 +156,20 @@ spec:
           value: "openebs/cstor-volume-mgmt:ci"
         - name: OPENEBS_IO_VOLUME_MONITOR_IMAGE
           value: "openebs/m-exporter:ci"
+        livenessProbe:
+          exec:
+            command:
+            - /usr/local/bin/mayactl
+            - version
+          initialDelaySeconds: 300
+          periodSeconds: 60
+        readinessProbe:
+          exec:
+            command:
+            - /usr/local/bin/mayactl
+            - version
+          initialDelaySeconds: 300
+          periodSeconds: 60
 ---
 apiVersion: v1
 kind: Service
@@ -214,6 +228,13 @@ spec:
         # This is supported for openebs provisioner version 0.5.3-RC1 onwards
         #- name: OPENEBS_MAYA_SERVICE_NAME
         #  value: "maya-apiserver-apiservice"
+        livenessProbe:
+          exec:
+            command:
+            - pgrep
+            - ".*provisioner"
+          initialDelaySeconds: 300
+          periodSeconds: 60
 ---
 apiVersion: apps/v1beta1
 kind: Deployment
@@ -239,6 +260,13 @@ spec:
             valueFrom:
               fieldRef:
                 fieldPath: metadata.namespace
+          livenessProbe:
+            exec:
+              command:
+              - pgrep
+              - ".*controller"
+            initialDelaySeconds: 300
+            periodSeconds: 60
         # OPENEBS_MAYA_SERVICE_NAME provides the maya-apiserver K8s service name,
         # that snapshot controller should forward the snapshot create/delete requests.
         # If not present, "maya-apiserver-service" will be used for lookup.
@@ -259,6 +287,13 @@ spec:
         # This is supported for openebs provisioner version 0.5.3-RC1 onwards
         #- name: OPENEBS_MAYA_SERVICE_NAME
         #  value: "maya-apiserver-apiservice"
+          livenessProbe:
+            exec:
+              command:
+              - pgrep
+              - ".*provisioner"
+            initialDelaySeconds: 300
+            periodSeconds: 60
 ---
 # This is the node-disk-manager related config.
 # It can be used to customize the disks probes and filters
@@ -366,6 +401,13 @@ spec:
         # Specify the number of sparse files to be created
         - name: SPARSE_FILE_COUNT
           value: "1"
+        livenessProbe:
+          exec:
+            command:
+            - pgrep
+            - ".*ndm"
+          initialDelaySeconds: 300
+          periodSeconds: 60
       volumes:
       - name: config
         configMap:
