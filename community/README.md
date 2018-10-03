@@ -2,7 +2,7 @@
 
 This is a meta-repository for OpenEBS. Here, you will find links to various artifacts related to documentation, e2e tests, and code related to building and deploying OpenEBS.
 
-Nevertheless, find below a list of many general channels, groups, and meetings devoted to OpenEBS.
+Below, you will find a list of many general channels, groups, and meetings devoted to OpenEBS.
 
 ## Communication
 
@@ -16,7 +16,7 @@ Real time discussions happen at [OpenEBS Community Slack](https://openebs-commun
 
 ## How Can I Help?
 
-Documentation (like the text you are reading now) can always use improvement!
+Documentation (like the text you are reading now) can always be improved!
 
 There's a curated list of issues, [Good First Issue](https://github.com/openebs/openebs/issues?utf8=%E2%9C%93&q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) that should not need deep knowledge of the system.
 
@@ -31,11 +31,11 @@ Reading the [CONTRIBUTING.md](../CONTRIBUTING.md) will help you get started with
 ## Issues
 
 If you have a question about OpenEBS or have a problem using it, please start with the [troubleshooting guide](https://docs.openebs.io/docs/troubleshooting.html).
-If that does not answer your questions, or if you think you found a bug, please [file an issue](https://github.com/openebs/openebs/issues).
+If the question you have isn't covered in the guide, or if you think you found a bug, please [file an issue](https://github.com/openebs/openebs/issues).
 
 ## Weekly Meeting
 
-We have weekly contributor meeting every Friday at 10 am Indian Standard Time over [Zoom](https://zoom.us/j/438333946).
+We have weekly contributor meetings every Friday at 10 AM Indian Standard Time over [Zoom](https://zoom.us/j/438333946).
 
 To add this event to your calendar, please send an email to nisanta.sahoo@openebs.io or use the following [public event link](https://calendar.google.com/calendar/embed?src=openebs%40gmail.com&ctz=Asia%2FCalcutta).
 
