@@ -99,7 +99,7 @@ spec:
       containers:
       - name: maya-apiserver
         imagePullPolicy: IfNotPresent
-        image: openebs/m-apiserver:0.7.0
+        image: openebs/m-apiserver:v0.7.x-ci
         ports:
         - containerPort: 5656
         env:
@@ -141,21 +141,21 @@ spec:
             fieldRef:
               fieldPath: metadata.name
         - name: OPENEBS_IO_JIVA_CONTROLLER_IMAGE
-          value: "openebs/jiva:0.7.0"
+          value: "openebs/jiva:v0.7.x-ci"
         - name: OPENEBS_IO_JIVA_REPLICA_IMAGE
-          value: "openebs/jiva:0.7.0"
+          value: "openebs/jiva:v0.7.x-ci"
         - name: OPENEBS_IO_JIVA_REPLICA_COUNT
           value: "3"
         - name: OPENEBS_IO_CSTOR_TARGET_IMAGE
-          value: "openebs/cstor-istgt:0.7.0"
+          value: "openebs/cstor-istgt:v0.7.x-ci"
         - name: OPENEBS_IO_CSTOR_POOL_IMAGE
-          value: "openebs/cstor-pool:0.7.0"
+          value: "openebs/cstor-pool:v0.7.x-ci"
         - name: OPENEBS_IO_CSTOR_POOL_MGMT_IMAGE
-          value: "openebs/cstor-pool-mgmt:0.7.0"
+          value: "openebs/cstor-pool-mgmt:v0.7.x-ci"
         - name: OPENEBS_IO_CSTOR_VOLUME_MGMT_IMAGE
-          value: "openebs/cstor-volume-mgmt:0.7.0"
+          value: "openebs/cstor-volume-mgmt:v0.7.x-ci"
         - name: OPENEBS_IO_VOLUME_MONITOR_IMAGE
-          value: "openebs/m-exporter:0.7.0"
+          value: "openebs/m-exporter:v0.7.x-ci"
 ---
 apiVersion: v1
 kind: Service
@@ -188,7 +188,7 @@ spec:
       containers:
       - name: openebs-provisioner
         imagePullPolicy: IfNotPresent
-        image: openebs/openebs-k8s-provisioner:0.7.0
+        image: openebs/openebs-k8s-provisioner:v0.7.x-ci
         env:
         # OPENEBS_IO_K8S_MASTER enables openebs provisioner to connect to K8s
         # based on this address. This is ignored if empty.
@@ -232,7 +232,7 @@ spec:
       serviceAccountName: openebs-maya-operator
       containers:
         - name: snapshot-controller
-          image: openebs/snapshot-controller:0.7.0
+          image: openebs/snapshot-controller:v0.7.x-ci
           imagePullPolicy: IfNotPresent
           env:
           - name: OPENEBS_NAMESPACE
@@ -246,7 +246,7 @@ spec:
         #- name: OPENEBS_MAYA_SERVICE_NAME
         #  value: "maya-apiserver-apiservice"
         - name: snapshot-provisioner
-          image: openebs/snapshot-provisioner:0.7.0
+          image: openebs/snapshot-provisioner:v0.7.x-ci
           imagePullPolicy: IfNotPresent
           env:
           - name: OPENEBS_NAMESPACE
