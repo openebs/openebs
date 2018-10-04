@@ -72,6 +72,36 @@ git push origin --delete <branch_name>
 git branch -d <branch_name>
 ```
 
+## Tagging
+
+```bash
+# Listing existing Tags (Version tags)
+git tag
+```
+``` bash
+# Creating annotated tags w.r.t openebs.
+git tag -a <tag name> -m "tag comment"
+# example to name a v2.1 version for a project
+git tag -a v2.1 -m "openebs 2.1"
+```
+``` bash
+#Sharing tags : Pushing tags to remote repo link https://github.com/openebs/openebs.git
+git push origin v2.1
+
+#Sharing more tags at once : Pushing more tags at once to remote repo https://github.com/openebs/openebs.git
+git push origin --tags
+```
+``` bash
+#Deleting existing tags
+git tag -d <tag name>
+# example to delete a v2.1 tag version for a project
+git tag -d v2.1
+```
+```bash
+#Checking out Tags : To view the versions of files a tag is pointing . 
+git checkout v2.1
+
+```
 ## Writing a Unit Test
 
 Though it is important to write unit tests, do not try to achieve 100% code coverage if it complicates writing these tests. If a unit test is simple to write & understand, most probably it will be extended when new code gets added. However, the reverse will lead to its removal on the whole. In other words, complicated unit tests will lead to decrease in the overall coverage in the long run.
