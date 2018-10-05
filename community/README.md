@@ -45,6 +45,6 @@ Map that to your local time with this [timezone table](https://www.google.com/se
 
 - Agenda and any notes from each meeting are captured in this [document](https://docs.google.com/document/d/1mHL1ypds4Hf6OnOGz2dOufamu4LiSt4Sgnl9QFrxDls).
 
-- Feature requests and current release tasks are captured in this [planning sheet](https://docs.google.com/spreadsheets/d/1bbphUqbxShBhgr1VHaEQUzIGMaJJacPNKc1ckNXU1QE).
+- Feature requests and current release tasks are recorded in this [planning sheet](https://docs.google.com/spreadsheets/d/1bbphUqbxShBhgr1VHaEQUzIGMaJJacPNKc1ckNXU1QE).
 
 Go back to [**Contributing to OpenEBS**](../CONTRIBUTING.md).
