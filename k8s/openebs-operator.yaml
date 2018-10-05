@@ -161,14 +161,14 @@ spec:
             command:
             - /usr/local/bin/mayactl
             - version
-          initialDelaySeconds: 300
+          initialDelaySeconds: 30
           periodSeconds: 60
         readinessProbe:
           exec:
             command:
             - /usr/local/bin/mayactl
             - version
-          initialDelaySeconds: 300
+          initialDelaySeconds: 30
           periodSeconds: 60
 ---
 apiVersion: v1
@@ -233,7 +233,7 @@ spec:
             command:
             - pgrep
             - ".*provisioner"
-          initialDelaySeconds: 300
+          initialDelaySeconds: 30
           periodSeconds: 60
 ---
 apiVersion: apps/v1beta1
@@ -265,7 +265,7 @@ spec:
               command:
               - pgrep
               - ".*controller"
-            initialDelaySeconds: 300
+            initialDelaySeconds: 30
             periodSeconds: 60
         # OPENEBS_MAYA_SERVICE_NAME provides the maya-apiserver K8s service name,
         # that snapshot controller should forward the snapshot create/delete requests.
@@ -292,7 +292,7 @@ spec:
               command:
               - pgrep
               - ".*provisioner"
-            initialDelaySeconds: 300
+            initialDelaySeconds: 30
             periodSeconds: 60
 ---
 # This is the node-disk-manager related config.
@@ -406,7 +406,7 @@ spec:
             command:
             - pgrep
             - ".*ndm"
-          initialDelaySeconds: 300
+          initialDelaySeconds: 30
           periodSeconds: 60
       volumes:
       - name: config
