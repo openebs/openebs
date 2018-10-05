@@ -224,7 +224,7 @@
 
      - name: 8b) Create a new build from existing  job inside pod.
        shell: >
-          source ~/.profie; kubectl exec  {{ jenkins_pod_name_2.stdout }} -n {{ namespace }}
+          source ~/.profile; kubectl exec  {{ jenkins_pod_name_2.stdout }} -n {{ namespace }}
           -- bash -c "java -jar /var/jenkins_home/jenkins-cli.jar -s http://localhost:8080 console sample"
        args:
          executable: /bin/bash
