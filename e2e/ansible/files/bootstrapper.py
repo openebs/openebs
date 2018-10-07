@@ -141,6 +141,9 @@ def create_plan_resources(args):
                     ],
                     "hosts": "localhost"
                 }
+                # {
+                #     "include": "cleanup-target.yml"
+                # }
             ]
 
             for case_resource in case_resources:
@@ -216,9 +219,6 @@ def create_plan_resources(args):
                     }
                 ]
             cstor_test_sparse_yaml += [
-                     {
-                         "include": "cleanup-target.yml"
-                     },
                     {
                         "hosts": "localhost",
                         "roles": [
@@ -283,9 +283,6 @@ def create_plan_resources(args):
         if len(case_resources)>0:
             jiva_test_yaml+=[
                 {
-                    "include": "cleanup-target.yml"
-                },
-                {
                     "tasks": [
                         {
                             "when": "slack_notify | bool and lookup('env','SLACK_TOKEN')",
@@ -297,6 +294,9 @@ def create_plan_resources(args):
                     ],
                     "hosts": "localhost"
                 },
+                # {
+                #     "include": "cleanup-target.yml"
+                # },
                 {
                     "include": "pre-check.yml"
                 }
