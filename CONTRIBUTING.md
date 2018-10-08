@@ -36,7 +36,7 @@ There is always something more that is required, to make it easier to suit your 
 
 ## Contributing to Source Code and Bug Fixes
 
-Provide PRs with appropriate tags for bug fixes or enhancements to the source code. For a list of tags that could be used, see [this]((./contribute/labels-of-issues.md)).
+Provide PRs with appropriate tags for bug fixes or enhancements to the source code. For a list of tags that could be used, see [this](./contribute/labels-of-issues.md).
 
 * For contributing to K8s demo, please refer to this [document](./contribute/CONTRIBUTING-TO-K8S-DEMO.md).
 	- For checking out how OpenEBS works with K8s, refer to this [document](./k8s/README.md) 
