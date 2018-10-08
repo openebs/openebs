@@ -8,7 +8,7 @@
 # Internal variables or constants.
 # NOTE - These will be executed when any make target is invoked.
 #
-IS_DOCKER_INSTALLED       := $(shell which docker >> /dev/null 2>&1; echo $$?)
+IS_DOCKER_INSTALLED   := $(shell which docker >> /dev/null 2>&1; echo $$?)
 
 help:
 	@echo ""
