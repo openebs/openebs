@@ -13,7 +13,7 @@ http://www.openebs.io/
 **OpenEBS** allows you to treat your persistent workload containers, such as DBs on containers, just like other containers. OpenEBS itself is deployed as just another container on your host and enables storage services that can be designated on a per pod, application, cluster or container level, including:
 - Data persistence across nodes, dramatically reducing time spent rebuilding Cassandra rings for example.
 - Synchronization of data across availability zones and cloud providers improving availability and decreasing attach/detach times for example.
-- A common layer so whether you are running on AKS, or your bare-metal, or GKE, or AWS - your wiring and developer experience for storage services is as similar as possible.
+- A common layer so whether you are running on AKS, or your bare metal, or GKE, or AWS - your wiring and developer experience for storage services is as similar as possible.
 - Integration with Kubernetes, so  developer and application intent flows into OpenEBS configurations automatically.
 - Management of tiering to and from S3 and other targets.
   
