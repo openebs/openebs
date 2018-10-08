@@ -12,8 +12,8 @@ http://www.openebs.io/
  
 **OpenEBS** allows you to treat your persistent workload containers, such as DBs on containers, just like other containers. OpenEBS itself is deployed as just another container on your host and enables storage services that can be designated on a per pod, application, cluster or container level, including:
 - Data persistence across nodes, dramatically reducing time spent rebuilding Cassandra rings for example.
-- Synchronization of data across availability zones and cloud providers improving availability and decreasing attach / detach times for example.
-- A common layer so whether you are running on AKS, or your baremetal, or GKE, or AWS - your wiring and developer experience for storage services is as similar as possible.
+- Synchronization of data across availability zones and cloud providers improving availability and decreasing attach/detach times for example.
+- A common layer so whether you are running on AKS, or your bare metal, or GKE, or AWS - your wiring and developer experience for storage services is as similar as possible.
 - Integration with Kubernetes, so  developer and application intent flows into OpenEBS configurations automatically.
 - Management of tiering to and from S3 and other targets.
   
@@ -25,7 +25,7 @@ OpenEBS can scale to include an arbitrarily large number of containerized storag
 
 ## Installation and Getting Started
  
-OpenEBS can be setup in few easy steps. You can get going on your choice of Kubernetes cluster by having open-iscsi installed on the Kubernetes nodes and running the openebs-operator using kubectl. 
+OpenEBS can be set up in a few easy steps. You can get going on your choice of Kubernetes cluster by having open-iscsi installed on the Kubernetes nodes and running the openebs-operator using kubectl. 
 
 **Start the OpenEBS Services using operator**
 ```bash
@@ -41,10 +41,10 @@ kubectl apply -f https://openebs.github.io/charts/openebs-storageclasses.yaml
 
 You could also follow our [QuickStart Guide](https://docs.openebs.io/docs/overview.html).
 
-OpenEBS can be deployed on any Kubernetes cluster - either in cloud, on-premise or developer laptop (minikube).  Note that there are no changes to the underlying kernal that are required as OpenEBS operates in user space.  Please follow our [OpenEBS Setup](https://docs.openebs.io/docs/overview.html) documentation. Also, we have a Vagrant environment available that includes a sample Kubernetes deployment and synthetic load that you can use to simulate the performance of OpenEBS. You may also find interesting the related project called Litmus (https://www.openebs.io/litmus) which helps with chaos engineering for stateful workloads on Kubernetes.
+OpenEBS can be deployed on any Kubernetes cluster - either in cloud, on-premise or developer laptop (minikube).  Note that there are no changes to the underlying kernal that are required as OpenEBS operates in userspace.  Please follow our [OpenEBS Setup](https://docs.openebs.io/docs/overview.html) documentation. Also, we have a Vagrant environment available that includes a sample Kubernetes deployment and synthetic load that you can use to simulate the performance of OpenEBS. You may also find interesting the related project called Litmus (https://www.openebs.io/litmus) which helps with chaos engineering for stateful workloads on Kubernetes.
 
 ## Status
-We are approaching beta stage with active development underway. See our [Project Tracker](https://github.com/openebs/openebs/wiki/Project-Tracker) for more details.  Many users are running OpenEBS in production and early access commercial solutions were made available in September 2018 by our primary sponsor MayaData (www.mayadata.io).  
+We are approaching the beta stage with active development underway. See our [Project Tracker](https://github.com/openebs/openebs/wiki/Project-Tracker) for more details.  Many users are running OpenEBS in production and early access commercial solutions were made available in September 2018 by our primary sponsor MayaData (www.mayadata.io).  
  
 ## Contributing
  
