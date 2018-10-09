@@ -22,10 +22,29 @@
     replace: "{{item}}:{{ tag }}"
   with_items:
     - m-apiserver
-    - jiva
     - openebs-k8s-provisioner
     - snapshot-controller
     - snapshot-provisioner
+    - m-exporter
+
+- name: Change the images of openebs jiva resource to desired tag in operator YAML
+  replace:
+    path: "{{ ansible_env.HOME }}/{{ openebs_operator_alias }}"
+    regexp: "{{item}}:[\\w.-]+"
+    replace: "{{item}}:{{ jiva_tag }}"
+  with_items:
+    - jiva
+
+- name: Change the images of openebs cstor resources to desired tag in operator YAML
+  replace:
+    path: "{{ ansible_env.HOME }}/{{ openebs_operator_alias }}"
+    regexp: "{{item}}:[\\w.-]+"
+    replace: "{{item}}:{{ cstor_tag }}"
+  with_items:
+    - cstor-istgt
+    - cstor-pool
+    - cstor-pool-mgmt
+    - cstor-volume-mgmt
 
 - name: Change the images of ndm resources to desired tag in operator YAML
   replace:
