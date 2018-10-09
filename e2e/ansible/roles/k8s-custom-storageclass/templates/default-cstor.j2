@@ -9,9 +9,9 @@ metadata:
       - name: StoragePoolClaim
         value: {{ cstor_pool_name }}
       - name: VolumeControllerImage
-        value: openebs/cstor-volume-mgmt:{{ tag }}
+        value: openebs/cstor-volume-mgmt:{{ cstor_tag }}
       - name: VolumeTargetImage
-        value: openebs/cstor-istgt:{{ tag }}
+        value: openebs/cstor-istgt:{{ cstor_tag }}
       - name: VolumeMonitorImage
-        value: openebs/m-exporter:{{ tag }}
+        value: openebs/m-exporter:{{ openebs_tag }}
 provisioner: openebs.io/provisioner-iscsi
