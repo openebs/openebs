@@ -19,7 +19,7 @@
   replace:
     path: "{{ ansible_env.HOME }}/{{ openebs_operator_alias }}"
     regexp: "{{item}}:[\\w.-]+"
-    replace: "{{item}}:{{ tag }}"
+    replace: "{{item}}:{{ openebs_tag }}"
   with_items:
     - m-apiserver
     - openebs-k8s-provisioner

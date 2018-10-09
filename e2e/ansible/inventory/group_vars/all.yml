@@ -97,7 +97,7 @@ cluster_type: managed
 #Storage engine type. The possible value can either be 'cstor' or 'jiva'
 
 storage_engine: jiva
-tag: ci
+openebs_tag: ci
 ndm_tag: ci
 jiva_tag: ci
 cstor_tag: ci
