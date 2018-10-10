@@ -42,8 +42,8 @@
              node_count: " {{ node_out.stdout}}"
 
 #Copying openebs-test storage class yaml file to k8s master
-        - name: 3) Copy the storage classes yaml to k8s master
-          copy:
+        - name: 3) Copy the storage class template to k8s master
+          template:
             src: "{{ sc_def }}"
             dest: "{{ result_kube_home.stdout }}"
           delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
@@ -70,11 +70,12 @@
             ns: "{{ namespace }}"
 
 #create the storage class 'openebs-test'
-        - name: 6) Create the storage class in K8s master
-          include_tasks: "{{utils_path}}/deploy_task.yml"
-          vars:
-           app_yml: "{{ sc_def }}"
-           ns: default
+
+        - name: 6)Create test specific storage class
+          shell: source ~/.profile; kubectl apply -f "{{ result_kube_home.stdout }}/{{ sc_def }}"
+          args:
+            executable: /bin/bash
+          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
 #Copying the create_pvc.yaml to k8s master
         - name: 6a) Copy pvc yaml to K8s master
