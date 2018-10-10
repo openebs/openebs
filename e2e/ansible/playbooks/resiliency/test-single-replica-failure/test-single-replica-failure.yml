@@ -37,7 +37,7 @@
              - "{{ percona_files }}"
 
        - name: Copy SC template to master
-         template: 
+         template:
            src: single-replica-sc.j2
            dest: "{{ result_kube_home.stdout }}"
          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
