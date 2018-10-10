@@ -24,12 +24,12 @@
     - k8s-delete-pvc-vars.yml
 
   tasks:
-  
+
     - block:
 
         - name: 1) Run the pre-requisites
-          include: pre-requisites.yml 
-     
+          include: pre-requisites.yml
+
         - name: 2) Get the number of nodes in the cluster
           shell: source ~/.profile; kubectl get nodes | grep '<none>' | wc -l
           args:
@@ -83,7 +83,7 @@
             src: "{{ pvc_def }}"
             dest: "{{ result_kube_home.stdout }}"
           delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
-      
+
         - name: 6b) Create PVC in k8s cluster
           include_tasks: "{{utils_path}}/deploy_task.yml"
           vars:
@@ -102,7 +102,7 @@
           delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
 
 #Find the PV name by using the above pvc name
-        - name: 7) Finding PV name 
+        - name: 7) Finding PV name
           shell: source ~/.profile; kubectl get pv | grep {{ pvc.stdout }} | awk {'print $1'}
           args:
             executable: /bin/bash
@@ -124,7 +124,7 @@
           delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
 
 #Check if there is one replica in pending state
- 
+
         - name: 8) Check if one replica is unscheduled
           shell: source ~/.profile; kubectl get pods -n {{ namespace }}| grep "{{ pv_name.stdout }}" | grep -i "pending" |wc -l
           args:
@@ -136,17 +136,17 @@
           delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
 
 #Checking if there is svc created by grepping pv name
-      
+
         - name: 8a) Check if the svc is created
           shell: source ~/.profile; kubectl get svc -n {{ namespace }} | grep "{{ pv_name.stdout }}" |wc -l
           args:
             executable: /bin/bash
           register: svc
-          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}" 
+          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
           until: svc.stdout|int ==1
           delay: 10
           retries: 3
-         
+
 #Getting service name by greping the pv name
         - name: 8b) Getting service name
           shell: source ~/.profile; kubectl get svc -n {{ namespace }}| grep "{{ pv_name.stdout }}" | awk {'print $1'}
@@ -154,13 +154,13 @@
             executable: /bin/bash
           register: svc_name
           delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
- 
+
         - name: 9) Delete PVC
           include_tasks: "{{utils_path}}/delete_deploy.yml"
           vars:
            app_yml: "{{ pvc_def }}"
            ns: "{{ namespace }}"
-       
+
         - name: 10) check if the pods are deleted
           shell: source ~/.profile; kubectl get pods -n {{ namespace }} | grep "{{pv_name.stdout}}" | grep {{item}}  | wc -l
           args:
@@ -173,9 +173,9 @@
             - ctrl
             - rep
           delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
-  
+
         - name: 10a) Check if the pv is deleted
-          shell: source ~/.profile; kubectl get pv 
+          shell: source ~/.profile; kubectl get pv
           args:
             executable: /bin/bash
           register: pv_out
@@ -183,7 +183,7 @@
           delay: 120
           retries: 5
           delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
-               
+
         - name: 10b) Check if the svc is deleted
           shell: source ~/.profile; kubectl get svc -n {{ namespace }} | grep "{{ svc_name.stdout }}" | wc -l
           args:
@@ -193,7 +193,7 @@
           until: delete_svc.stdout|int == 0
           delay: 20
           retries: 5
-            
+
         - name: Setting pass flag
           set_fact:
              flag: "Test Passed"
@@ -208,24 +208,24 @@
             status_id: 5
 
       always:
-       
+
         - block:
- 
+
             - name: 11) Cleaning up the test artifacts
               include: cleanup.yml
- 
+
             - name: Setting cleanup flag to passed
-              set_fact: 
+              set_fact:
                 cflag: "Cleanup Passed"
-       
+
           rescue:
-        
+
             - name: Setting cleanup to failed
               set_fact:
                 cflag: "Cleanup Failed"
-       
+
           always:
-        
+
             - include_tasks: "{{utils_path}}/stern_task.yml"
               vars:
                 status: stop
