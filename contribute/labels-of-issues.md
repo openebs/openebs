@@ -1,9 +1,9 @@
 # List of labels for issues and PRs on OpenEBS Project
 
-This document provides a list of labels and their purpose. These labels can be attached to issues and PRs. The aim behind having such list of labels is, we can sort and distinguish issues. This list will help new community members to dive-in OpenEBS if they wish to contribute to project or investigate the problem.
+This document provides a list of labels and their purpose. These labels can be attached to issues and PRs. The aim behind having such list of labels is, we can sort and distinguish issues. This list will help new community members to dive-in OpenEBS if they wish to contribute to a project or investigate the problem.
 
 Use case:
-> I am a beginner, I want to contribute to OpenEBS project and I am not sure from where to begin?
+> I am a beginner, I want to contribute to OpenEBS project, and I am not sure from where to begin?
 
 Answer:
 > Start looking into the issues tagged with labels such as `help/small` , `size/XS`, `kind/unit-test` etc. Solve such issues and raise PR.
@@ -29,7 +29,7 @@ Labels prefixed with *kind* indicate the type of issue and PR. Suppose, you want
 
 ## Help
 
-Labels prefixed with *help* implies that issue needs some help from community/users. Further, you can adjust the level of help required, by specifying small, medium, large etc.
+Labels prefixed with *help* implies that issue needs some help from community/users. Further, you can adjust the level of help required, by specifying small, medium, large, etc.
 
 | Label | Description |
 |---|---|
@@ -41,7 +41,7 @@ Labels prefixed with *help* implies that issue needs some help from community/us
 
 ## Area
 
-Labels prefixed with *area* indicates that which area issue or PR belong. Here, area implies component of the OpenEBS project. It will be easier to sort an issue based on the area of user's interest.
+Labels prefixed with *area* indicates that which area issue or PR belong. Here, area implies component of the OpenEBS project. It will be easier to sort an issue based on the area of the user's interest.
 
 | Label | Description |
 |---|---|
@@ -69,7 +69,7 @@ Labels prefixed with *size* defines the size of change done in particular PR.
 
 ### NOTE
 
-Please do not club major changes into single PR. It'll be difficult for a reviewer to review a big PR. In that case, reviewer may discard your PR and will ask you create multiple PRs.
+Please do not club major changes into single PR. It'll be difficult for a reviewer to review a big PR. In that case, the reviewer may discard your PR and will ask you to create multiple PRs.
 
 ---
 
@@ -88,7 +88,7 @@ Labels with prefix *priority* defines the severity of the issue. Severity level 
 
 ### Repo
 
-Labels with prefix *repo* points the repository where given issue needs to be fixed. If users have no idea where to file the issue then they can file a issue in `openebs/openebs` later OpenEBS contributors/authors/owners will tag issue with the appropriate repository using *repo* label.
+Labels with prefix *repo* points the repository where given issue needs to be fixed. If users have no idea where to file the issue then they can file an issue in `openebs/openebs` later OpenEBS contributors/authors/owners will tag issue with the appropriate repository using *repo* label.
 
 | Label | Description |
 |---|---|
@@ -101,7 +101,7 @@ Labels with prefix *repo* points the repository where given issue needs to be fi
 
 ### General
 
-As the name suggests, this contains general category labels and they are self-explanatory.
+As the name suggests, this contains general category labels, and they are self-explanatory.
 
 | Label | Description |
 |---|---|
