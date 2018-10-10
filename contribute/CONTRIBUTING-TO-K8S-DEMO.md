@@ -1,6 +1,6 @@
 # Add examples of applications using OpenEBS
 
-This document describes the process for adding or improving the exisiting examples of applications using OpenEBS Volumes.
+This document describes the process for adding or improving the existing examples of applications using OpenEBS Volumes.
 
 Kubernetes YAML files for running application using OpenEBS Volumes are located under the folder [openebs/k8s/demo](https://github.com/openebs/openebs/tree/master/k8s/demo)
 
@@ -10,7 +10,7 @@ Each application example should comprise of the following:
 - K8s YAML file(s) for starting a client that accesses the application. This is optional, in case the application itself provides a mechanism like in Jupyter, Wordpress, etc.
 
   When demonstrating a database-like application like Apache Cassandra, Redis, and so on, it is recommended to have such a mechanism to test that the application has been launched.
-- An instruction guide, that will help in launch and verification of the application.
+- An instruction guide that will help in launch and verification of the application.
 
 At a very high level, the process to contribute and improve is pretty simple:
 
