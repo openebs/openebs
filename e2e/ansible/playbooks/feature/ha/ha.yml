@@ -102,10 +102,18 @@
          when: storage_engine == 'jiva'
 
        - block:
+
+           - name: Get pv name created
+             shell: source ~/.profile; kubectl get pvc -n {{ namespace }} -o custom-columns=:spec.volumeName --no-headers
+             args:
+               executable: /bin/bash
+             delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+             register: pv
+
            - name: Get storage ctrl pod name
              shell: >
                source ~/.profile;
-               kubectl get pods -n {{ operator_ns }} -l openebs.io/target=cstor-target | grep {{ namespace }}
+               kubectl get pods -n {{ operator_ns }} -l openebs.io/target=cstor-target | grep {{ pv.stdout }}
              args:
                executable: /bin/bash
              register: result
@@ -205,7 +213,7 @@
        - name: Check if target pod is restarted within 30s
          shell: >
            source ~/.profile;
-           kubectl get pods -n {{ operator_ns }} -l openebs.io/target=cstor-target | grep {{ namespace }}
+           kubectl get pods -n {{ operator_ns }} -l openebs.io/target=cstor-target | grep {{ pv.stdout }}
          args:
            executable: /bin/bash
          register: result
