@@ -230,6 +230,9 @@
          executable: /bin/bash
        delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
        register: Second_Build
+       until: "'Finished' in Second_Build.stdout"
+       delay: 60
+       retries: 5
 
      - name: Compare between two builds
        set_fact:
