@@ -156,6 +156,14 @@ spec:
           value: "openebs/cstor-volume-mgmt:ci"
         - name: OPENEBS_IO_VOLUME_MONITOR_IMAGE
           value: "openebs/m-exporter:ci"
+        - name: OPENEBS_IO_JIVA_CAS_TEMPLATE_TO_CREATE_SNAPSHOT
+          value: "jiva-snapshot-create-default-0.7.0"
+        - name: OPENEBS_IO_JIVA_CAS_TEMPLATE_TO_DELETE_SNAPSHOT
+          value: "jiva-snapshot-delete-default-0.7.0"
+        - name: OPENEBS_IO_CSTOR_CAS_TEMPLATE_TO_DELETE_SNAPSHOT
+          value: "cstor-snapshot-delete-default-0.7.0"
+        - name: OPENEBS_IO_CSTOR_CAS_TEMPLATE_TO_CREATE_SNAPSHOT
+          value: "cstor-snapshot-create-default-0.7.0"
         livenessProbe:
           exec:
             command:
