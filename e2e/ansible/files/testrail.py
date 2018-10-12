@@ -80,7 +80,7 @@ class APIClient:
 
         if e != None:
             if result and 'error' in result:
-                error = '"' + result['error'] + '"'
+                error = '"{}"'.format(result['error'])
             else:
                 error = 'No additional error message received'
             raise APIError('TestRail API returned HTTP %s (%s)' %
