@@ -29,7 +29,7 @@ def get_json_file_data(path):
 
 def update_testrail_with_status(args):
     testrail_client = get_testrail_client(args)
-    suites, err = '{}/mapping.json'.format(get_json_file_data(os.path.expanduser('~')))
+    suites, err = get_json_file_data('{}/mapping.json'.format(os.path.expanduser('~')))
     if err != None:
         print('TestRail Update Failed.')
         return err
