@@ -1,4 +1,4 @@
-# OpenEBS
+> # __OpenEBS__
 
 [![Build Status](https://img.shields.io/travis/openebs/openebs/master.svg?style=flat-square)](https://travis-ci.org/openebs/jiva)
 [![Docker Pulls](https://img.shields.io/docker/pulls/openebs/jiva.svg?style=flat-square)](https://hub.docker.com/r/openebs/jiva/)
@@ -19,11 +19,11 @@ http://www.openebs.io/
   
 **Our vision** is simple: let storage and storage services for persistent workloads be fully integrated into the environment so that each team and workload benefits from granularity of control and Kubernetes native behavior. 
 
-## Scalability
+> ## __Scalability__
  
 OpenEBS can scale to include an arbitrarily large number of containerized storage controllers. Kubernetes is used to provide fundamental pieces such as using etcd for inventory.  OpenEBS scales to the extent your Kubernetes scales.  
 
-## Installation and Getting Started
+> ## __Installation and Getting Started__
  
 OpenEBS can be set up in a few easy steps. You can get going on your choice of Kubernetes cluster by having open-iscsi installed on the Kubernetes nodes and running the openebs-operator using kubectl. 
 
@@ -43,10 +43,10 @@ You could also follow our [QuickStart Guide](https://docs.openebs.io/docs/overvi
 
 OpenEBS can be deployed on any Kubernetes cluster - either in cloud, on-premise or developer laptop (minikube).  Note that there are no changes to the underlying kernal that are required as OpenEBS operates in userspace.  Please follow our [OpenEBS Setup](https://docs.openebs.io/docs/overview.html) documentation. Also, we have a Vagrant environment available that includes a sample Kubernetes deployment and synthetic load that you can use to simulate the performance of OpenEBS. You may also find interesting the related project called Litmus (https://www.openebs.io/litmus) which helps with chaos engineering for stateful workloads on Kubernetes.
 
-## Status
+> ## __Status__
 We are approaching the beta stage with active development underway. See our [Project Tracker](https://github.com/openebs/openebs/wiki/Project-Tracker) for more details.  Many users are running OpenEBS in production and early access commercial solutions were made available in September 2018 by our primary sponsor MayaData (www.mayadata.io).  
  
-## Contributing
+> ## __Contributing__
  
 OpenEBS welcomes your feedback and contributions in any form possible.
  
@@ -60,7 +60,7 @@ OpenEBS welcomes your feedback and contributions in any form possible.
   - See [contributing guide](./CONTRIBUTING.md)
   - Want to join our community, [check this out](./community/README.md). 
 
-## Show me the Code
+> ## __Show me the Code__
 
 This is a meta-repository for OpenEBS. The source code is available at the following locations:
 - The source code for the initial storage engine is under [openebs/jiva](https://github.com/openebs/jiva).
@@ -70,7 +70,7 @@ This is a meta-repository for OpenEBS. The source code is available at the follo
 Please start with the pinned repositories or with [OpenEBS Architecture](./contribute/design/README.md) document. 
 
 
-## License
+> ## __License__
 
 OpenEBS is developed under Apache 2.0 license at the project level. 
 Some components of the project are derived from other open source projects and are distributed under their respective licenses. 
