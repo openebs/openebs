@@ -69,7 +69,6 @@ This is a meta-repository for OpenEBS. The source code is available at the follo
 
 Please start with the pinned repositories or with [OpenEBS Architecture](./contribute/design/README.md) document. 
 
-
 ## License
 
 OpenEBS is developed under Apache 2.0 license at the project level. 
