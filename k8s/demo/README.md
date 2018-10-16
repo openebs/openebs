@@ -1,4 +1,4 @@
-OpenEBS can be deployed in dedicated or hyper-converged mode with Kubernetes. There are serveral ways in which Kubernetes Cluster can be setup - Checkout [Kubernetes - Getting Started Guides](https://kubernetes.io/docs/getting-started-guides/). We have tested with the following deployment options. 
+OpenEBS can be deployed in dedicated or hyper-converged mode with Kubernetes. There are several ways in which Kubernetes Cluster can be setup - Checkout [Kubernetes - Getting Started Guides](https://kubernetes.io/docs/getting-started-guides/). We have tested with the following deployment options.
 
 ## Google Container Engine
 

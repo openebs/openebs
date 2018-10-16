@@ -15,7 +15,7 @@ If this is your first time to Kubernetes, please go through these introductory t
 kubectl apply -f openebs-operator.yaml
 ```
 
-The following YAML contains configuration that is required by the pre-release-features, that are currently under developement. As we progress towards the release, the content in this will be either moved to openebs-operator.yaml or installed/configured via the code.
+The following YAML contains configuration that is required by the pre-release-features, that are currently under development. As we progress towards the release, the content in this will be either moved to openebs-operator.yaml or installed/configured via the code.
 ```
 kubectl apply -f openebs-pre-release-features.yaml
 ```

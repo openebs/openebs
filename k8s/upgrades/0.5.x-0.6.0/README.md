@@ -56,7 +56,7 @@ Even after the OpenEBS Operator has been upgraded to 0.6, the volumes will conti
 
 *Note: There has been a change in the way OpenEBS Controller Pods communicate with the Replica Pods. So, it is recommended to schedule a downtime for the application using the OpenEBS PV while performing this upgrade. Also, make sure you have taken a backup of the data before starting the below upgrade procedure.*
 
-In 0.5.x releases, when a replica is shutdown, it will get rescheduled to another availble node in the cluster and start copying the data from the other replicas. This is not a desired behaviour during upgrades, which will create new replica's as part of the rolling-upgrade. To pin the replicas or force them to the nodes where the data is already present, starting with 0.6 - we use the concept of nodeSelector and Tolerations that will make sure replica's are not moved on node or pod delete operations.
+In 0.5.x releases, when a replica is shutdown, it will get rescheduled to another available node in the cluster and start copying the data from the other replicas. This is not a desired behaviour during upgrades, which will create new replica's as part of the rolling-upgrade. To pin the replicas or force them to the nodes where the data is already present, starting with 0.6 - we use the concept of nodeSelector and Tolerations that will make sure replica's are not moved on node or pod delete operations.
 
 So as part of upgrade, we recommend that you label the nodes where the replica pods are scheduled as follows:
 ```
