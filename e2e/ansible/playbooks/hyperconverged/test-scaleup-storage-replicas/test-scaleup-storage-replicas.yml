@@ -181,7 +181,7 @@
          vars:
            ns: "{{ namespace }}"
 
-        #### Delete the replica which is scheduled before scale up to check newly crated replica is in sync"
+        #### Delete the replica which is scheduled before scale up to check newly created replica is in sync"
 
        - name: Delete the replica which is scheduled before scale up
          shell: source ~/.profile; kubectl delete pod {{ old_replica_name.stdout }} -n "{{ namespace }}"

@@ -232,7 +232,7 @@
          set_fact:
            rep2_node: "{{ result.stdout.split()[13] }}"
 
-       ############## veriftying the Taint and toleration policy ###############
+       ############## verifying the Taint and toleration policy ###############
 
        - name:  Verifying the replicas are deployed on tainted nodes
          command: echo " check replicas are running on the tainted nodes"

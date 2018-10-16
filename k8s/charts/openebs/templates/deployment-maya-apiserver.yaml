@@ -35,8 +35,8 @@ spec:
         # This is supported for maya api server version 0.5.2 onwards
         #- name: OPENEBS_IO_K8S_MASTER
         #  value: "http://172.28.128.3:8080"
-        # OPENEBS_IO_INSTALL_CONFIG_NAME specifies the config map containing the install configuration. 
-        # Currently, the configuration can be used to specifiy the default version for the CAS Templates 
+        # OPENEBS_IO_INSTALL_CONFIG_NAME specifies the config map containing the install configuration.
+        # Currently, the configuration can be used to specify the default version for the CAS Templates
         - name: OPENEBS_IO_INSTALL_CONFIG_NAME
           value: {{ template "openebs.fullname" . }}-install-config
 {{- if .Values.ndm.sparse }}
