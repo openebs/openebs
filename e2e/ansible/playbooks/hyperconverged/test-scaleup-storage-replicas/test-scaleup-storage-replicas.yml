@@ -145,7 +145,7 @@
          replace:
            path: "{{ result_kube_home.stdout }}/{{ ctrl_deployment }}"
            regexp: '        - name: REPLICATION_FACTOR\n          value: "2"'
-           replace: '        - name: REPLICATION_FACTOR\n          value: "{{(node_count)}}"'
+           replace: '        - name: REPLICATION_FACTOR\n          value: "{{node_count}}"'
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
        - name: Update the controller deployment 
