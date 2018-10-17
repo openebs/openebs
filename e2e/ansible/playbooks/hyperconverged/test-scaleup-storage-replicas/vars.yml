@@ -19,7 +19,7 @@ replace_with:
 
 create_sc: storage-class.yml
 
-ctrl_deployment: controler-deployment.yaml
+ctrl_deployment: controller-deployment.yml
 
 namespace: scaleup-storage
 

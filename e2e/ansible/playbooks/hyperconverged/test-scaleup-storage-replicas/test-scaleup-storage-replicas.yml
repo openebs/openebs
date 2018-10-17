@@ -128,14 +128,14 @@
          register: rep_deployment_name
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
-       - name: Get the controler deployment name 
+       - name: Get the controller deployment name 
          shell: source ~/.profile; kubectl get deployment -n {{ namespace }} -l openebs.io/controller=jiva-controller --no-headers | awk {'print $1'}
          args:
            executable: /bin/bash
          register: ctrl_deploy
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
-       - name: Obtain the Controler deploment yaml
+       - name: Obtain the Controller deployment yaml
          shell: source ~/.profile; kubectl get deployment -n {{ namespace }} {{ ctrl_deploy.stdout }} -o yaml > "{{result_kube_home.stdout }}/{{ ctrl_deployment }}"
          args: 
            executable: /bin/bash
@@ -148,7 +148,7 @@
            replace: '        - name: REPLICATION_FACTOR\n          value: "{{(node_count)}}"'
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
-       - name: Update the controler deployment 
+       - name: Update the controller deployment 
          shell: source ~/.profile; kubectl patch deployment "{{ ctrl_deploy.stdout }}" -n "{{namespace}}" -p "$(cat {{ result_kube_home.stdout }}/{{ ctrl_deployment }})"
          args:
            executable: /bin/bash
@@ -158,9 +158,9 @@
          delay: 20
          retries: 5
 
-       #### scale up the stoarge replica using kubectl command ####
+       #### scale up the storage replica using kubectl command ####
 
-       - name: Scaleup the srorage replicas using kubectl command
+       - name: Scaleup the storage replicas using kubectl command
          shell: source ~/.profile; kubectl scale deployment {{ rep_deployment_name.stdout }} --replicas={{(node_count |int)}} -n {{ namespace }}
          args:
            executable: /bin/bash
