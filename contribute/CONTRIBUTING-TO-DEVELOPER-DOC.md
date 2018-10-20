@@ -22,7 +22,7 @@ At a very high level, the process to contributing and improving the code is pret
 - Submit your Pull Request
 
 The following sections describe some guidelines that can come in handy with the above process.
-*Followed by the guidelines, is a [cheatsheet](./contribute/git-cheatsheet.md) with frequently used git commands.*
+*Followed by the guidelines, is a [cheatsheet](https://github.com/openebs/openebs/blob/master/contribute/git-cheatsheet.md) with frequently used git commands.*
 
 ## Submit an issue describing your proposed change
 
