@@ -18,7 +18,7 @@
       args:
         executable: /bin/bash
       delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-      register: result
+      register: result_ns
 
     - name: Get list of pv's for all namespaces
       shell: source ~/.profile; kubectl get pv --no-headers | awk {'print $1'}
@@ -43,6 +43,7 @@
       until: "result.rc == 0"
       delay: 20
       retries: 10
+
     - name: Get the available disk list
       shell: source ~/.profile; kubectl get disks -l ndm.io/disk-type=sparse --no-headers -o custom-columns=:metadata.name
       args:
@@ -62,7 +63,7 @@
       args:
         executable: /bin/bash
       delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-      with_items: "{{ result.stdout_lines }}"
+      with_items: "{{ result_ns.stdout_lines }}"
       when: item != 'kube-system' and item != 'openebs' and item != 'kube-public' and item != 'default'
       ignore_errors: true
 

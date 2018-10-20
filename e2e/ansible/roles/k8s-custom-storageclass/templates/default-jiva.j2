@@ -6,11 +6,11 @@ metadata:
     openebs.io/cas-type: jiva
     cas.openebs.io/config: |
       - name: ControllerImage
-        value: openebs/jiva:{{tag}}
+        value: openebs/jiva:{{jiva_tag}}
       - name: ReplicaImage
-        value: openebs/jiva:{{tag}}
+        value: openebs/jiva:{{jiva_tag}}
       - name: VolumeMonitorImage
-        value: openebs/m-exporter:{{ tag }}
+        value: openebs/m-exporter:{{ openebs_tag }}
       - name: ReplicaCount
         value: "{{replica_count}}"
       - name: StoragePool

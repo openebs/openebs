@@ -6,9 +6,9 @@ metadata:
   annotations:
     cas.openebs.io/config: |
       - name: CstorPoolImage
-        value: openebs/cstor-pool:{{ tag }}
+        value: openebs/cstor-pool:{{ cstor_tag }}
       - name: CstorPoolMgmtImage
-        value: openebs/cstor-pool-mgmt:{{ tag }}
+        value: openebs/cstor-pool-mgmt:{{ cstor_tag }}
 spec:
   name: cstor-pool-default-sparse-0.7.0
   type: sparse
