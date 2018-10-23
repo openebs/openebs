@@ -17,7 +17,7 @@ You can either use an existing container cluster or create a new one by Logging 
 
 ### iSCSI Configuration
 
-Go to **Google Cloud Platform** -> **Compute Engine** -> **VM instances**. The nodes that are displayed by default in this console are the Compute Engine VMs.The display is similar to the following screen.
+Go to **Google Cloud Platform** -> **Compute Engine** -> **VM instances**. The nodes that are displayed by default in this console are the Compute Engine VMs. The display is similar to the following screen.
 
 ![Compute VMs]
 

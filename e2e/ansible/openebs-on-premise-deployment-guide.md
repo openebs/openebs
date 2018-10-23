@@ -35,7 +35,7 @@ The following instructions have been verified on:
   - 1 core processor
 
   Note: The minimum requirements are based on the scenario where the VMs are built using the vagrantfile in the ansible
-  repository.  
+  repository.
 
 - All linux machines require : 
   
