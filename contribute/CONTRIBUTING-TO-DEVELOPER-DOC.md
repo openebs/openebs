@@ -22,7 +22,7 @@ At a very high level, the process to contributing and improving the code is pret
 - Submit your Pull Request
 
 The following sections describe some guidelines that can come in handy with the above process.
-*Followed by the guidelines, is a [cheatsheet](./contribute/git-cheatsheet.md) with frequently used git commands.*
+*Followed by the guidelines, is a [cheatsheet](./git-cheatsheet.md) with frequently used git commands.*
 
 ## Submit an issue describing your proposed change
 
@@ -35,7 +35,7 @@ You can also help with some existing issues under this category available at [de
 
 ## Create your development branch
 
-- Fork the [OpenEBS](www.github.com/openebs/openebs) repository and if you have forked it already, rebase with master branch to fetch latest changes to your local system.
+- Fork the [OpenEBS](https://github.com/openebs/openebs) repository and if you have forked it already, rebase with master branch to fetch latest changes to your local system.
 - Create a new development branch in your forked repository with the following naming convention: *"task description-#issue"*
 
   **Example:** This change is being developed with the branch named: *OpenEBS-DevDoc-PR-Workflow-#213*
