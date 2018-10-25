@@ -40,6 +40,21 @@
           "nodeSelector": {
               "openebs-pv-@pv-name": "@replica_node_label"
           },
+          "affinity": {
+              "podAntiAffinity": {
+                  "requiredDuringSchedulingIgnoredDuringExecution" : [
+                     {
+                         "labelSelector": {
+                             "matchLabels": {
+                                 "openebs.io/replica": "jiva-replica",
+                                 "openebs.io/persistent-volume": "@pv-name"
+                             }
+                          },
+                          "topologyKey": "kubernetes.io/hostname"
+                     }
+                  ]
+              }
+          },
           "tolerations": [
             {
               "effect": "NoExecute",

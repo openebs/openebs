@@ -56,7 +56,7 @@ for sc in `echo $sc_list | tr ":" " "`; do
        # Check if SC has other parameters and warn the user about patching them manually.
        # or contact openebs dev.
 
-       echo "Successfully upgraded $sc to 0.7."
+       echo "Successfully upgraded $sc to 0.7"
     fi
 done
 

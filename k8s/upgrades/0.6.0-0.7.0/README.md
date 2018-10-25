@@ -14,8 +14,8 @@ This document describes the steps for upgrading OpenEBS from 0.6.0 to 0.7.0. The
 ## Step 1: Upgrade the OpenEBS Operator
 
 OpenEBS 0.7.0 has made the following significant changes to the OpenEBS Operator (aka OpenEBS control plane components):
-- A new provisioning and policy enforcement engine. This introduces a breaking changes as it expects the volume policies to be present as annotations in storage class as opposed to `parameters` or `environment variables`.
-- OpenEBS will install default jiva storage pool (named `default`) and storage class (named `openebs-jiva-default`). If these names conflict with your existing storage pool or storage classes, rename of re-apply your storage classes.
+- A new provisioning and policy enforcement engine. This introduces breaking changes as it expects the volume policies to be present as annotations in storage class as opposed to `parameters` or `environment variables`.
+- OpenEBS will install default jiva storage pool (named `default`) and storage class (named `openebs-jiva-default`). If these names conflict with your existing storage pool or storage classes, rename and re-apply your storage classes.
 - Integrated with OpenEBS NDM project. A new Daemonset will be launched to discover the block devices attached to the nodes.
 
 ### Download the upgrade scripts

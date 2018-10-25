@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash
 
 ################################################################
 # STEP: Get Persistent Volume (PV) name as argument            #
@@ -10,12 +10,12 @@ function usage() {
     echo 
     echo "Usage:"
     echo 
-    echo "$0 <pv-name> <replica-label>"
+    echo "$0 <pv-name> <custom-label>"
     echo 
     echo "  <pv-name> Get the PV name using: kubectl get pv"
-    echo "  <node-label> Label to be applied to the nodes where replicas of"
-    echo "    this PV are present. Get the nodes by running:"
-    echo "    kubectl get pods --all-namespaces -o wide | grep <pv-name>"
+    echo "  <custom-label> Label to be applied to the nodes where replicas of"
+    echo "    this PV are present. This is done to make sure the replicas    "
+    echo "    stay on the same node after upgrade."
     exit 1
 }
 
@@ -180,6 +180,8 @@ kubectl delete rs $c_rs --namespace $ns
 rollout_status=$(kubectl rollout status --namespace $ns  deployment/$c_dep)
 rc=$?; if [[ ($rc -ne 0) || !($rollout_status =~ "successfully rolled out") ]];
 then echo "ERROR: $rc"; exit; fi
+
+kubectl annotate pv $pv openebs.io/cas-type=jiva
 
 echo "Clearing temporary files"
 rm jiva-replica-patch.tpl.json.0
