@@ -1,6 +1,6 @@
 # Contributing to OpenEBS
 
-Great!! We are always on the lookout for more OpenEBS hackers. You can get started by reading this [overview](./contribute/design/README.md)
+Great! We are always on the lookout for more OpenEBS hackers. You can get started by reading this [overview](./contribute/design/README.md)
 
 Firstly, if you are unsure or afraid of anything, just ask or submit the issue or pull request anyways. You won't be yelled at for giving your best effort. The worst that can happen is that you'll be politely asked to change something. We appreciate any sort of contributions and don't want a wall of rules to get in the way of that.
 
