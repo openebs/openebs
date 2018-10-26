@@ -32,11 +32,6 @@ def update_testrail_with_status(args):
         return err
     try:
         suite_run_id = suites[args['engine_type']][args['suite_id']]
-        r = testrail_client.send_post('add_result_for_case/' + str(suite_run_id) + '/' + args['case_id'],
-                                        {
-                                            'status_id': args['status_id']
-                                        }
-                                    )
         #print('Successfully updated case_id - %s' % args['case_id'])
         print('TestRail Updated.')
         return None
