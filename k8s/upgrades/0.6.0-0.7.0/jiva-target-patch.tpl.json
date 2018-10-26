@@ -36,7 +36,7 @@
            "containers":[
               {
                 "name": "@c_name",
-                "image": "openebs/jiva:0.7.0",
+                "image": "quay.io/openebs/jiva:0.7.1",
                 "env":[
                   {
                     "name": "REPLICATION_FACTOR",
@@ -49,7 +49,7 @@
                 "command": [
                    "maya-exporter"
                 ],
-                "image": "openebs/m-exporter:0.7.0"
+                "image": "quay.io/openebs/m-exporter:0.7.1"
               }
            ], 
           "tolerations": [

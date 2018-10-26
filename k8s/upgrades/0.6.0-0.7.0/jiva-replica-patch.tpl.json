@@ -34,7 +34,7 @@
            "containers":[
               {
                 "name": "@r_name",
-                "image": "openebs/jiva:0.7.0"
+                "image": "quay.io/openebs/jiva:0.7.1"
               }
            ],
           "nodeSelector": {
