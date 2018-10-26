@@ -15,38 +15,25 @@ data:
   # filterconfigs contails configs of filters - in ther form fo include
   # and exclude comma separated strings
   node-disk-manager.config: |
-    {
-      "probeconfigs": [
-        {
-          "key": "udev-probe",
-          "name": "udev probe",
-          "state": "true"
-        },
-        {
-          "key": "smart-probe",
-          "name": "smart probe",
-          "state": "true"
-        }
-      ],
-      "filterconfigs": [
-        {
-          "key": "os-disk-exclude-filter",
-          "name": "os disk exclude filter",
-          "state": "true"
-        },
-        {
-          "key": "vendor-filter",
-          "name": "vendor filter",
-          "state": "true",
-          "include":"",
-          "exclude": "{{ .Values.ndm.filters.excludeVendors }}"
-        },
-        {
-          "key": "path-filter",
-          "name": "path filter",
-          "state": "true",
-          "include":"",
-          "exclude":"{{ .Values.ndm.filters.excludePaths }}"
-        }
-      ]
-    }
+    probeconfigs:
+      - key: udev-probe
+        name: udev probe
+        state: true
+      - key: smart-probe
+        name: smart probe
+        state: true
+    filterconfigs:
+      - key: os-disk-exclude-filter
+        name: os disk exclude filter
+        state: true
+        exclude: "/,/etc/hosts,/boot"
+      - key: vendor-filter
+        name: vendor filter
+        state: true
+        include: ""
+        exclude: "{{ .Values.ndm.filters.excludeVendors }}"
+      - key: path-filter
+        name: path filter
+        state: true
+        include: ""
+        exclude: "{{ .Values.ndm.filters.excludePaths }}"
