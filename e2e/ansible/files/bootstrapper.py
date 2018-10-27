@@ -9,7 +9,7 @@ import yaml
 
 import testrail
 
-
+#validating clients with user name and password
 def get_client(args):
     """
     returns api client
