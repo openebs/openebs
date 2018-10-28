@@ -56,8 +56,8 @@ OpenEBS welcomes your feedback and contributions in any form possible.
   - If it is a generic (or `not really sure`), you can still raise it at [issues](https://github.com/openebs/openebs/issues)
   - Project (repository) specific issues also can be raised at [issues](https://github.com/openebs/openebs/issues) and tagged with the individual repository labels like *repo/maya*.
 - Want to help with fixes and features?
-  - See [open issues](https://github.com/openebs/openebs/labels)
-  - See [contributing guide](./CONTRIBUTING.md)
+  - See [open issues](https://github.com/openebs/openebs/labels).
+  - See [contributing guide](./CONTRIBUTING.md).
   - Want to join our community, [check this out](./community/README.md). 
 
 ## Show me the Code
