@@ -19,8 +19,6 @@ replace_with:
 
 create_sc: storage-class.yml
 
-ctrl_deployment: controller-deployment.yml
-
 namespace: scaleup-storage
 
 test_pod_regex: maya*|openebs*|cstor*|percona*|scaleup*|node*
