@@ -157,8 +157,9 @@ def create_plan_resources(args):
         scalar_string = ruamel.yaml.scalarstring.DoubleQuotedScalarString
 
         map_src_id["cstor_plan_disk_run_id"], map_src_id["cstor_plan_sparse_run_id"], case_resources, \
-            cstor_test_disk_yaml, cstor_test_sparse_yaml = create_test_plan(client, args, "CSTOR_DISK", project_id), \
-            create_test_plan(client, args, "CSTOR_SPARSE", project_id), [], [], []
+        cstor_test_disk_yaml, cstor_test_sparse_yaml = create_test_plan(client, args, "CSTOR_DISK", project_id), \
+                                                       create_test_plan(client, args, "CSTOR_SPARSE",
+                                                                        project_id), [], [], []
 
         for suites in cstor_plan_resources:
             for suite_name, suite_info in suites.items():
@@ -208,36 +209,44 @@ def create_plan_resources(args):
                 if case_resource['path'] is None or len(case_resource['path']) <= 0:
                     continue
                 cstor_test_disk_yaml.append({'include': case_resource['path'],
-                                             'vars': {'status_id': scalar_string(''), 'testname': scalar_string(''), 'flag': scalar_string(''),
-                                                      'cflag': scalar_string(''), 'storage_engine': scalar_string('cStor'), 'status': scalar_string(''),
+                                             'vars': {'status_id': scalar_string(''), 'testname': scalar_string(''),
+                                                      'flag': scalar_string(''),
+                                                      'cflag': scalar_string(''),
+                                                      'storage_engine': scalar_string('cStor'),
+                                                      'status': scalar_string(''),
                                                       'cstor_sc': scalar_string('openebs-cstor-disk')}})
                 cstor_test_disk_yaml.append({'hosts': 'localhost',
-                                             'tasks': [{'include_tasks': scalar_string('{{utils_path}}/update-status.yml'),
-                                                        'vars': {'c_status': scalar_string('{{ cflag }}'),
-                                                                 'case_id': case_resource['case_id'],
-                                                                 'st_id': scalar_string('{{ status_id }}'),
-                                                                 'suite_id': case_resource['suite_id'],
-                                                                 't_status': scalar_string('{{ flag }}'),
-                                                                 't_name': scalar_string('{{ testname }}'),
-                                                                 'storage_engine': scalar_string('cStor_disk'),
-                                                                 'color': scalar_string('{{ status }}')
-                                                                 }}]})
+                                             'tasks': [
+                                                 {'include_tasks': scalar_string('{{utils_path}}/update-status.yml'),
+                                                  'vars': {'c_status': scalar_string('{{ cflag }}'),
+                                                           'case_id': case_resource['case_id'],
+                                                           'st_id': scalar_string('{{ status_id }}'),
+                                                           'suite_id': case_resource['suite_id'],
+                                                           't_status': scalar_string('{{ flag }}'),
+                                                           't_name': scalar_string('{{ testname }}'),
+                                                           'storage_engine': scalar_string('cStor_disk'),
+                                                           'color': scalar_string('{{ status }}')
+                                                           }}]})
 
                 cstor_test_sparse_yaml.append({'include': case_resource['path'],
-                                               'vars': {'status_id': scalar_string(''), 'testname': scalar_string(''), 'flag': scalar_string(''),
-                                                        'cflag': scalar_string(''), 'storage_engine': scalar_string('cStor'), 'status': scalar_string(''),
+                                               'vars': {'status_id': scalar_string(''), 'testname': scalar_string(''),
+                                                        'flag': scalar_string(''),
+                                                        'cflag': scalar_string(''),
+                                                        'storage_engine': scalar_string('cStor'),
+                                                        'status': scalar_string(''),
                                                         'cstor_sc': scalar_string('openebs-cstor-sparse')}})
                 cstor_test_sparse_yaml.append({'hosts': 'localhost',
-                                               'tasks': [{'include_tasks': scalar_string('{{utils_path}}/update-status.yml'),
-                                                          'vars': {'c_status': scalar_string('{{ cflag }}'),
-                                                                   'case_id': case_resource['case_id'],
-                                                                   'st_id': scalar_string('{{ status_id }}'),
-                                                                   'suite_id': case_resource['suite_id'],
-                                                                   't_status': scalar_string('{{ flag }}'),
-                                                                   't_name': scalar_string('{{ testname }}'),
-                                                                   'storage_engine': scalar_string('cStor_sparse'),
-                                                                   'color': scalar_string('{{ status }}')
-                                                                   }}]})
+                                               'tasks': [
+                                                   {'include_tasks': scalar_string('{{utils_path}}/update-status.yml'),
+                                                    'vars': {'c_status': scalar_string('{{ cflag }}'),
+                                                             'case_id': case_resource['case_id'],
+                                                             'st_id': scalar_string('{{ status_id }}'),
+                                                             'suite_id': case_resource['suite_id'],
+                                                             't_status': scalar_string('{{ flag }}'),
+                                                             't_name': scalar_string('{{ testname }}'),
+                                                             'storage_engine': scalar_string('cStor_sparse'),
+                                                             'color': scalar_string('{{ status }}')
+                                                             }}]})
 
             cstor_test_disk_yaml += [
                 # {
@@ -368,7 +377,8 @@ def create_plan_resources(args):
                 if case_resource['path'] is None or len(case_resource['path']) <= 0:
                     continue
                 jiva_test_yaml.append({'include': case_resource['path'],
-                                       'vars': {'status_id': scalar_string(''), 'testname': scalar_string(''), 'flag': scalar_string(''), 'cflag': scalar_string(''),
+                                       'vars': {'status_id': scalar_string(''), 'testname': scalar_string(''),
+                                                'flag': scalar_string(''), 'cflag': scalar_string(''),
                                                 'storage_engine': scalar_string('jiva'), 'status': scalar_string('')}})
                 jiva_test_yaml.append({'hosts': 'localhost',
                                        'tasks': [{'include_tasks': scalar_string('{{utils_path}}/update-status.yml'),
