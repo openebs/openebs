@@ -135,7 +135,6 @@
          register: ctrl_deploy
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
-
        - name: Update the controller deployment 
          shell: source ~/.profile; kubectl set env deployment/{{ ctrl_deploy.stdout }} -n "{{namespace}}" REPLICATION_FACTOR="{{node_count}}"
          args:
@@ -146,6 +145,12 @@
          delay: 20
          retries: 5
 
+       - include_tasks: "{{utils_path}}/deploy_check.yml"
+         vars:
+            ns: "{{ namespace }}"
+            lkey: name
+            lvalue: percona
+
        #### scale up the storage replica using kubectl command ####
 
        - name: Scaleup the storage replicas using kubectl command
@@ -155,7 +160,9 @@
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
        - name: Confirm scaled up replica  pod status is running
-         shell: source ~/.profile; kubectl get pods -n {{ namespace }} | grep rep | grep Running | wc -l
+         shell: >
+           source ~/.profile; 
+           kubectl get pods -n {{ namespace }} -l openebs.io/replica=jiva-replica --no-headers -o custom-columns=:status.phase | wc -l
          args:
            executable: /bin/bash
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
@@ -196,7 +203,9 @@
             lvalue: percona
 
        - name: Confirm the replica is scheduled again
-         shell: source ~/.profile; kubectl get pods -n {{ namespace }} | grep rep | grep Running | wc -l
+         shell: > 
+           source ~/.profile; 
+           kubectl get pods -n {{ namespace }} -l openebs.io/replica=jiva-replica --no-headers -o custom-columns=:status.phase | wc -l
          args:
            executable: /bin/bash
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
