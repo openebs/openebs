@@ -76,4 +76,3 @@
          with_items:
            - "{{percona_files}}"
            - "{{ create_sc }}"
-
