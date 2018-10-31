@@ -4,10 +4,9 @@ from __future__ import absolute_import
 import unittest
 import sys
 import os
+from validator import Validator  # flake8: noqa
 
 sys.path.insert(1, os.path.join(sys.path[0], '..'))
-
-from validator import Validator # flake8: noqa
 
 
 class validatorTest(unittest.TestCase):

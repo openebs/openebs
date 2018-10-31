@@ -10,7 +10,7 @@
 #5) Unmount the file system
 #6) Logout the iscsi target
 #7) Get the id of the volume
-#8) Modfiy the volume size
+#8) Modify the volume size
 #9) Restart the replicas
 #10) Check the file system consistency
 #10) Expand the file system
