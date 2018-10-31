@@ -46,7 +46,7 @@ ubuntu@kubemaster-01:~$
 
 ### Pod Spec
 
-The application in kubernetes can launched directly through kubectl commands or through an yaml spec file. This example uses an spec file, that is shipped with the kubemaster. 
+The application in kubernetes can be launched directly through kubectl commands or through an yaml spec file. This example uses an spec file, that is shipped with the kubemaster. 
 
 ```
 ubuntu@kubemaster-01:~$ cd demo/k8s/spec/
@@ -100,7 +100,7 @@ hello-world   1/1       Running   0          4m
 ubuntu@kubemaster-01:~/demo/k8s/spec$ 
 ```
 
-The pod will be assigned an IP address. This can be obtained through the kubectl describe
+The pod will be assigned an IP address. This can be obtained through the kubectl describe.
 ```
 ubuntu@kubemaster-01:~/demo/k8s/spec$ kubectl describe pod hello-world
 Name:		hello-world
