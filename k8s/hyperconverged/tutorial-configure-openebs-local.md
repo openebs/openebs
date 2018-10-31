@@ -73,5 +73,5 @@ The above command will create the following, which can be verified using the cor
   (kubectl get pvc)
   (kubectl get pv)
   (kubectl get pods)
-- Expose the Jupyter Server to external world via the http://NodeIP:8888 (NodeIP is any of the minion nodes external IP)
+- Expose the Jupyter Server to external world via the `http://NodeIP:8888` (NodeIP is any of the minion nodes external IP)
   (kubectl get pods)
