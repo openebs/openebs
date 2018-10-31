@@ -188,7 +188,7 @@
            timeout: 180
 
 
-       - name: Check if the replica is rebuilded using mayactl commands
+       - name: Check if the replica is rebuilt using mayactl commands
          include_tasks: "{{utils_path}}/access-mode-check.yml"
          vars:
            ns: "{{ namespace }}"

@@ -2,7 +2,7 @@
 
 ### Pre-requisites
 
-Let us assume that you already have a working Go environment. You to make sure that your `$GOPATH/bin` is included in your PATH.
+Let us assume that you already have a working Go environment. You need to make sure that your `$GOPATH/bin` is included in your PATH.
 
 ### Install vim, if not already done
 ```

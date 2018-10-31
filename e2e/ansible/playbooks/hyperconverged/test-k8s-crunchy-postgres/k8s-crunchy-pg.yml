@@ -1,5 +1,5 @@
 # k8s-crunchy-pg.yml
-# Description: Deploy postgress application
+# Description: Deploy postgres application
 
 ###############################################################################################
 #Test Steps:
@@ -7,9 +7,9 @@
 #2. Check whether the OpenEBS components are deployed.
 #3. Download the test artifacts to k8s master.
 #4. Modify the size and obtain the number of statefulset
-#5. Deploy the postgress application by executing the shell script.
+#5. Deploy the postgres application by executing the shell script.
 #6. Check if the application pod is up and running
-#7. Check if the postgress master and replica services are running.
+#7. Check if the postgres master and replica services are running.
 #8. Perform cleanup of test artifacts.
 ###############################################################################################
 

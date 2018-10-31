@@ -129,7 +129,7 @@ Note:
 
 ```
 $ terraform
-Usage: terraform [--version] [--help] <comman> [args]
+Usage: terraform [--version] [--help] <command> [args]
 
 The available commands for execution are listed below.
 The most common, useful commands are shown first, followed by

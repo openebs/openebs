@@ -12,7 +12,7 @@
 #7. Scale up the cassandra application pods.
 #8. Generate the load using cassandra-loadgen yaml.
 #9. Install python-minimal,pip and cqlsh packages.
-#10.Verify the data distribution acorss all the pods.
+#10.Verify the data distribution across all the pods.
 #12.Perform Cleanup
 
 #############################################################################################################
@@ -210,7 +210,7 @@
            cassandra_pod3_percentage: "{{ result.stdout.split()[36] }}"
 
 
-       - name: Verfy the Data distribution percentages
+       - name: Verify the Data distribution percentages
          command: echo "Verfiy the data distribution on all the cassandra pods"
          when: cassandra_pod1_percentage != 0 and cassandra_pod2_percentage != 0 and cassandra_pod3_percentage !=0
          register: result

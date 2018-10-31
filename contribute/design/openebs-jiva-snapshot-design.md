@@ -43,7 +43,7 @@ the PVC.
      notion of "reclaim policy" - there is no way to recover the deleted snapshot.
    * The controller removes the ​VolumeSnapshotData​ object.
   
-* After snapshots are taken, users might use them to create new volumes using the snapshot, that was       previously taken.
+* After snapshots are taken, users might use them to create new volumes using the snapshot, that was previously taken.
 
     i. Promote snapshot to PV (or Clone PV using a snapshot):
 
@@ -456,7 +456,7 @@ invoked with:
     * Unique Snapshot name (which is pv name + snapshot name + timestamp)
     * Volume Name
 
-  * In case of any errors, the are perculated up the stack from replica upto the
+  * In case of any errors, the are perculated up the stack from replica up to the
 snapshot-controller, which will set the VolumeSnapshot Condition to errored
 state.
   * Once a snapshot is created successfully, Snapshot Controller will update the
@@ -630,7 +630,7 @@ User should be able to view the details failure/success messages by performing
 a kubectl describe <snapshot>
   * The failure responses:
 i. Unsupported PV. Only PVs provisioned by OpenEBS are handled
-ii. Snapshot unique name is longer than 255 characters. Only upto 255
+ii. Snapshot unique name is longer than 255 characters. Only up to 255
 characters are supported.
 iii. Unable to contact K8s server
 iv. Unable to contact maya-apiserver
@@ -898,7 +898,7 @@ the same clone (replica)
 
 * Verify that snapshot can be taken on a volume and a clone is created from the volume.
 * Verify the boundary condition for the name - the snapshot should be created with a
-name upto 255 chars.
+name up to 255 chars.
 * Verify that snapshot with the same name is not created.
 * Verify that the cloned volume is getting deleted even if the initial sync is in progress. For
 example if the volume is of high data size. And if the user is associated a PVC that is still

@@ -23,7 +23,7 @@ You can change affinity selector in the Deployment spec.
 |---|---|--- | --- |
 |`requiredDuringSchedulingIgnoredDuringExecution`  | Runs | Fails | Keeps Running |
 |`preferredDuringSchedulingIgnoredDuringExecution` |	Runs |	Runs |	Keeps Running|
-|`requiredDuringSchedulingRequiredDuringExecution` (Not recommanded) |	Runs |	Fails | Fails|
+|`requiredDuringSchedulingRequiredDuringExecution` (Not recommended) |	Runs |	Fails | Fails|
 
 
 
