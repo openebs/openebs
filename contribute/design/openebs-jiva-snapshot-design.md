@@ -43,7 +43,7 @@ the PVC.
      notion of "reclaim policy" - there is no way to recover the deleted snapshot.
    * The controller removes the ​VolumeSnapshotData​ object.
   
-* After snapshots are taken, users might use them to create new volumes using the snapshot, that was       previously taken.
+* After snapshots are taken, users might use them to create new volumes using the snapshot, that was previously taken.
 
     i. Promote snapshot to PV (or Clone PV using a snapshot):
 
