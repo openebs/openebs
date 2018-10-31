@@ -232,7 +232,7 @@ spec:
           exec:
             command:
             - pgrep
-            - ".*provisioner"
+            - ".*openebs"
           initialDelaySeconds: 30
           periodSeconds: 60
 ---
