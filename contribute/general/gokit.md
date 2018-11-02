@@ -1,7 +1,7 @@
 # What is the Go Kit Project?
 To understand in plain terms, let us take an example where we end up writing same Go packages, repeatedly, to do the same task at different levels in different Go projects under the same organization. We are all familiar with the custom logger package in the different Go projects.
 What if, the custom logger package is same across the organization and can be reused by simply importing it, then this custom logger package is the perfect fit for kit project. The advantages of this approach go beyond avoiding duplicate code, improved readability of the projects in an organization, to savings in terms of time and cost as well :-)
-If you go through the [Bill’s](https://twitter.com/goinggodotnet) [talk](https://youtu.be/spKM5CyBwJA?list=PLFjrjdmBd0CoclkJ_JdBET5fzz4u0SELZ), you will notice that kit project is characterized by usability, purpose and portability. In this blog, we will discuss how we have applied the refactored the code to use the “Kit Project” pattern for [maya](https://github.com/openebs/maya).
+If you go through the [Bill’s](https://twitter.com/goinggodotnet) [talk](https://youtu.be/spKM5CyBwJA?list=PLFjrjdmBd0CoclkJ_JdBET5fzz4u0SELZ), you will notice that kit project is characterized by usability, purpose and portability. In this blog, we will discuss how we have refractored the code to use the “Kit Project” pattern for [maya](https://github.com/openebs/maya).
 
 ## How to convert existing projects to have “kit”?
 OpenEBS being a container native project is delivered via a set of containers. For instance, with OpenEBS 0.3 release we have the following active maya related projects:

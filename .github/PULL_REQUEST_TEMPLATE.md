@@ -1,7 +1,2 @@
-<!--  Thanks for sending a pull request!  Here are some tips for you -->
-
-**What this PR does / why we need it**:
-
-**Which issue this PR fixes** *(optional, in `fixes #<issue number>(, fixes #<issue_number>, ...)` format, will close that issue when PR gets merged)*: fixes #
-
-**Special notes for your reviewer**:
+<!-- For fixing bugs use https://github.com/openebs/openebs/compare/?template=bugs.md -->
+<!-- For pull requesting new features, improvements and changes use https://github.com/openebs/openebs/compare/?template=features.md -->

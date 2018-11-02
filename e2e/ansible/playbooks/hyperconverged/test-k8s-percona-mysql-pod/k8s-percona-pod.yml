@@ -3,7 +3,7 @@
 
 ###############################################################################################
 #Test Steps:
-#1. Install the prerequisites ans dependencies
+#1. Install the prerequisites and dependencies
 #2. Download the test artifacts to k8s master.
 #3. Check whether the OpenEBS components are deployed.
 #4. Deploy Percona application.

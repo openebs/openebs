@@ -12,7 +12,7 @@ Prerequisites include the following:
 
 - A fully configured Kubernetes cluster (versions 1.9.7+ have been tested)
 
-  Note: _OpenEBS recommends using atleast a 3-node cluster_
+  Note: _OpenEBS recommends using at least a 3-node cluster_
 
     ```
     test@Master:~$ kubectl get nodes

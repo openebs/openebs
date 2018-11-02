@@ -119,7 +119,7 @@ end
 # Entry point of this Vagrantfile
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
-    # Dont look for updates
+    # Don't look for updates
     if Vagrant.has_plugin?("vagrant-vbguest") then
       config.vbguest.auto_update = false
     end

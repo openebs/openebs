@@ -19,7 +19,7 @@ variable "project" {}
 # Name of kubernetes cluster 
 variable "clustername" { default = "oebs-staging" }
 
-# Default: 3 (Accomodate min. 3 OpenEBS vol replicas as per recommendation)
+# Default: 3 (Accommodate min. 3 OpenEBS vol replicas as per recommendation)
 variable "nodecount" { default = "3" } 
 
 #-------MASTER_AUTH VARS-------#

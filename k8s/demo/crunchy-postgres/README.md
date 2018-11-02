@@ -5,7 +5,7 @@ simple database operations to verify successful deployment.
 
 ## Crunchy-Postgres 
 
-The postgres container used in the StatefulSet is sourced from (CrunchyData)[https://github.com/CrunchyData/crunchy-containers]. CrunchyData provides cloud agnostic PostgreSQL container technology that is designed for production 
+The postgres container used in the StatefulSet is sourced from [CrunchyData](https://github.com/CrunchyData/crunchy-containers). CrunchyData provides cloud agnostic PostgreSQL container technology that is designed for production 
 workloads with cloud native High Availability, Disaster Recovery, and monitoring.  
 
 ## Prerequisite
