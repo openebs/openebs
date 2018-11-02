@@ -180,8 +180,8 @@ test@Master:~$ curl GET http://10.47.0.5:9501/v1/replicas | grep createTypes | j
 
 Perform the following actions if Step-4 was executed. 
 
-- Access the grafana dashboard at http://*NodeIP*:32515
-- Add the prometheus data source by giving URL as http://*NodeIP*:32514 
+- Access the grafana dashboard at `http://*NodeIP*:32515`
+- Add the prometheus data source by giving URL as `http://*NodeIP*:32514`
 - Once data source is validated, import the dashboard JSON from : 
   https://raw.githubusercontent.com/openebs/openebs/master/k8s/openebs-pg-dashboard.json
 - Access the volume stats by selecting the volume name (pvc-*) in the OpenEBS Volume dashboard
