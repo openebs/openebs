@@ -34,13 +34,13 @@ do
  
  Header $result_file $suite;
  
- p_c=`cat $log_location/$i | grep Test | grep -i passed | wc -l` 
+ p_c=`grep Test $log_location/$i | grep -i passed | wc -l` 
  t_p_count=`expr $t_p_count + $p_c`
- cat $log_location/$i | grep Test | grep -i passed | awk '{printf("%-5s %20s %10s\n", $1, $2, "PASSED")}' >> $result_file
+ grep Test $log_location/$i  | grep -i passed | awk '{printf("%-5s %20s %10s\n", $1, $2, "PASSED")}' >> $result_file
  
- f_c=`cat $log_location/$i | grep Test | grep -i failed | wc -l`
+ f_c=`grep Test $log_location/$i | grep -i failed | wc -l`
  t_f_count=`expr $t_f_count + $f_c`
- cat $log_location/$i | grep Test | grep -i failed | awk '{printf("%-5s %20s %10s\n", $1, $2, "FAILED")}' >> $result_file 
+ grep Test $log_location/$i | grep -i failed | awk '{printf("%-5s %20s %10s\n", $1, $2, "FAILED")}' >> $result_file 
 }
 done
  

@@ -2,8 +2,8 @@ OpenShift 3 Database Examples
 =============================
 
 This directory contains example JSON templates to deploy databases in OpenShift
-on OpenEBS volumes. They can be used to immediately instantiate a database and 
-expose it as a service in the current project, or to add a template that can be 
+on OpenEBS volumes. They can be used to immediately instantiate a database and
+expose it as a service in the current project, or to add a template that can be
 later used from the Web Console or the CLI.
 
 The examples can also be tweaked to create new templates.
@@ -30,8 +30,8 @@ the command line with the `-p` option:
 
 ### Deleting a new database service
 
-Use these instructions when you need to completely delete the app and persistent 
-volumes in your current project. Seperately delete your database service and 
+Use these instructions when you need to completely delete the app and persistent
+volumes in your current project. Separately delete your database service and
 persistentvolumeclaim using the commands below:
 
     $ oc delete all -l app=openebs-mongodb-persistent
@@ -41,9 +41,9 @@ Use "oc get pvc" command to find your persistentvolumeclaim name:
     $ oc get pvc
 
 Delete the pvc using the correct name from the output of above command:
- 
+
     $ oc delete pvc mongodb
-    $ oc delete secret mongodb 
+    $ oc delete secret mongodb
 
 ## More information
 

@@ -1,6 +1,24 @@
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binary, build with `go test -c`
+*.test
+
+# Output of the go coverage tool, specifically when used with LiteIDE
+*.out
+
+# Kubernetes demo
 k8s/demo/.vagrant/
 k8s/demo/*.log
 k8s/demo/*test*
-documentation/build/
+
+# Kubernetes lib
 k8s/lib/vagrant/*.box
 k8s/lib/vagrant/*.log
+
+# Local build for docs
+documentation/build/

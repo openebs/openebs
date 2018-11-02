@@ -12,7 +12,7 @@ metadata:
     component: ndm-config
 data:
   # udev-probe is default or primary probe which should be enabled to run ndm
-  # filterconfigs contails configs of filters - in ther form fo include
+  # filterconfigs contails configs of filters - in their form fo include
   # and exclude comma separated strings
   node-disk-manager.config: |
     probeconfigs:

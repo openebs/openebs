@@ -2,29 +2,29 @@
 
 This tutorial, provides detailed instructions on how to setup a Kubernetes and OpenEBS Cluster using the Vagrantfile provided in this folder.
 The following types of VMs can be launched:
-- Kubernetes Master 
-- Kubernetes Minion 
-- OpenEBS Maya Master 
-- OpenEBS Storage Host 
+- Kubernetes Master
+- Kubernetes Minion
+- OpenEBS Maya Master
+- OpenEBS Storage Host
 
-Depending on your need, you can also use this Vagrantfile, to only setup a Kubernetes Cluster or just OpenEBS Cluster or both. The number of nodes under each category is also configurable. 
+Depending on your need, you can also use this Vagrantfile, to only setup a Kubernetes Cluster or just OpenEBS Cluster or both. The number of nodes under each category is also configurable.
 
-The Kubernetes cluster is setup, in this Vagrantfile using "kubeadm". 
+The Kubernetes cluster is setup, in this Vagrantfile using "kubeadm".
 
 ## Running the setup on Ubuntu 16.04
 
-The following instructions have been verified on : 
+The following instructions have been verified on :
 - Laptop installed with Ubuntu 16.04
 - Laptop installed Windows 10 and Ubuntu 16.04 VM (created using VMWare Player 12)
 
 ### Prerequisites
 
-Verify that you have the required software installed, with atleast minimum specified version. 
+Verify that you have the required software installed, with at least minimum specified version.
 
 ```
 1.Vagrant (>=1.9.1)
 2.VirtualBox 5.1
-3.Git 
+3.Git
 ```
 
 #### Verify
@@ -32,13 +32,13 @@ Verify that you have the required software installed, with atleast minimum speci
 ubuntu-host:~/$ vagrant version
 Installed Version: 1.9.1
 Latest Version: 1.9.1
- 
+
 You're running an up-to-date version of Vagrant!
 ubuntu-host:~/$ vboxmanage --version
 5.1.14r112924
 ubuntu-hos:~/$ git version
 git version 2.7.4
-ubuntu-host:~/$ 
+ubuntu-host:~/$
 
 ```
 
@@ -79,7 +79,7 @@ By default, 5 VMs will be created as shown above. To create these VMs, you will 
 
 ### Working with Slow Internet
 
-If you are installing for the first time on the host, the vagrant will need to download the virtualbox images. If you are running on a low speed internet, the download can take considerable time. We recommend that you perform the following two steps, prior to issuing the "vagrant up" command below. Both the images put together will require around 1500MB. 
+If you are installing for the first time on the host, the vagrant will need to download the virtualbox images. If you are running on a low speed internet, the download can take considerable time. We recommend that you perform the following two steps, prior to issuing the "vagrant up" command below. Both the images put together will require around 1500MB.
 
 ```
 cd $demo-folder/openebs/k8s/demo
@@ -87,15 +87,15 @@ vagrant box add openebs/k8s-1.5.5
 vagrant box add openebs/openebs-0.2
 ```
 
-#### Verify 
+#### Verify
 
 ```
 ubuntu-host:~/demo-folder/openebs/k8s/demo$ vagrant box list | grep openebs
 openebs/k8s-1.5.5      (virtualbox, 2017033101)
 openebs/openebs-0.2    (virtualbox, 2017033102)
-ubuntu-host:~/demo-folder/openebs/k8s/demo$ 
+ubuntu-host:~/demo-folder/openebs/k8s/demo$
 ```
-It is possible that, you may have a later versions downloaded. Thats ok!
+It is possible that, you may have a later versions downloaded. That's ok!
 
 ### Install Kubernetes and OpenEBS Cluster
 
@@ -103,7 +103,7 @@ It is possible that, you may have a later versions downloaded. Thats ok!
 cd $demo-folder/openebs/k8s/demo
 vagrant up
 ```
-This step, can take few minutes depending on your network speed. The required vagrant plugins are installed (for caching the vagrant boxes), the ubuntu-xenial box is download and the required software packages for each of the node are downloaded and installed. 
+This step, can take few minutes depending on your network speed. The required vagrant plugins are installed (for caching the vagrant boxes), the ubuntu-xenial box is download and the required software packages for each of the node are downloaded and installed.
 
 #### Verify the VM installation
 
@@ -120,7 +120,7 @@ osh-02                    running (virtualbox)
 This environment represents multiple VMs. The VMs are all listed
 above with their current state. For more information about a specific
 VM, run `vagrant status NAME`.
-ubuntu-host:~/demo-folder/openebs/k8s/demo$ 
+ubuntu-host:~/demo-folder/openebs/k8s/demo$
 ```
 
 Note: The network slowness can abort the process of installation, since a default timeout of 300 seconds is specified for the VMs to be launched. This can be modified by editing the Vagrantfile ( vmCfg.vm.boot_timeout ) value. If the installation aborts in between, make sure to clean-up before starting with the installation again.
@@ -131,7 +131,7 @@ vagrant destroy
 
 #### Verify the Kubernetes Cluster Status
 
-Use the kubectl from within the Kubernetes master to get the current status. 
+Use the kubectl from within the Kubernetes master to get the current status.
 
 ```
 ubuntu-host:~/demo-folder/openebs/k8s/demo$ vagrant ssh kubemaster-01
@@ -140,10 +140,10 @@ ubuntu@kubemaster-01:~$ kubectl get nodes
 NAME            STATUS         AGE
 kubemaster-01   Ready,master   1h
 kubeminion-01   Ready          57m
-ubuntu@kubemaster-01:~$ 
+ubuntu@kubemaster-01:~$
 ```
 
-Check the status of the system pods. 
+Check the status of the system pods.
 
 ```
 ubuntu@kubemaster-01:~$ kubectl get pods --all-namespaces
@@ -172,12 +172,12 @@ https://kubernetes.io/docs/user-guide/kubectl-cheatsheet/
 
 #### Verify the OpenEBS Cluster Status
 
-Use the mayactl from within the OpenEBS Maya Master to get the current status. 
+Use the mayactl from within the OpenEBS Maya Master to get the current status.
 
 ```
 ubuntu-host:~/demo-folder/openebs/k8s/demo$ vagrant ssh omm-01
 ... snipped ...
-ubuntu@omm-01:~$ 
+ubuntu@omm-01:~$
 ubuntu@omm-01:~$ maya omm-status
 Name           Address       Port  Status  Leader  Protocol  Build  Datacenter  Region
 omm-01.global  172.28.128.4  4648  alive   true    2         0.5.5  dc1         global
@@ -204,7 +204,7 @@ ubuntu@omm-01:~$
 
 ### Known Issues
 
-Check out the issues section for known issues and possible workarounds for some of the commom glitches while setting up kubernetes clusters on Ubunut/VirtualBox. 
+Check out the issues section for known issues and possible workarounds for some of the common glitches while setting up kubernetes clusters on Ubunut/VirtualBox.
 
 https://github.com/openebs/openebs/issues?utf8=%E2%9C%93&q=label%3Ademo%2Fk8s%20
 

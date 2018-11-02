@@ -282,7 +282,7 @@
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
          changed_when: true
 
-       - name: 14a) Check if replica is rebuilded
+       - name: 14a) Check if replica is rebuilt
          shell: curl GET http://{{ result_svc.stdout }}:9501/v1/replicas | grep createTypes | jq -r '.data[].mode' | grep 'RW'
          args:
            executable: /bin/bash

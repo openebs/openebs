@@ -114,7 +114,7 @@ spec:
         #- name: OPENEBS_IO_K8S_MASTER
         #  value: "http://172.28.128.3:8080"
         # OPENEBS_IO_INSTALL_CONFIG_NAME specifies the config map containing the install configuration.
-        # Currently, the configuration can be used to specifiy the default version for the CAS Templates
+        # Currently, the configuration can be used to specify the default version for the CAS Templates
         - name: OPENEBS_IO_INSTALL_CONFIG_NAME
           value: "maya-install-config"
         # OPENEBS_IO_INSTALL_DEFAULT_CSTOR_SPARSE_POOL decides whether default cstor sparse pool should be
@@ -232,7 +232,7 @@ spec:
           exec:
             command:
             - pgrep
-            - ".*provisioner"
+            - ".*openebs"
           initialDelaySeconds: 30
           periodSeconds: 60
 ---
@@ -304,7 +304,7 @@ metadata:
   namespace: openebs
 data:
   # udev-probe is default or primary probe which should be enabled to run ndm
-  # filterconfigs contails configs of filters - in ther form fo include
+  # filterconfigs contails configs of filters - in their form fo include
   # and exclude comma separated strings
   node-disk-manager.config: |
     probeconfigs:

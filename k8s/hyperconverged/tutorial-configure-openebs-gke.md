@@ -17,7 +17,7 @@ You can either use an existing container cluster or create a new one by Logging 
 
 ### iSCSI Configuration
 
-Go to **Google Cloud Platform** -> **Compute Engine** -> **VM instances**. The nodes that are displayed by default in this console are the Compute Engine VMs.The display is similar to the following screen.
+Go to **Google Cloud Platform** -> **Compute Engine** -> **VM instances**. The nodes that are displayed by default in this console are the Compute Engine VMs. The display is similar to the following screen.
 
 ![Compute VMs]
 
@@ -92,7 +92,7 @@ The below command will prompt for username/password. Provide username as "admin"
 kubectl config use-context demo-openebs03
 kubectl config use-context gke_strong-eon-153112_us-central1-a_demo-openebs03
 ```
-**To get the admin priviledge to your cluster(cluster-role admin)**
+**To get the admin privilege to your cluster(cluster-role admin)**
  get current google identity
 `$ gcloud info | grep Account`
 Account: [myname@example.org]
@@ -142,7 +142,7 @@ The above command will create the following, which can be verified using the cor
   (kubectl get pvc)
   (kubectl get pv)
   (kubectl get pods)
-- Expose the Jupyter Server to external world via the http://NodeIP:32424 (NodeIP is any of the minion nodes external IP)
+- Expose the Jupyter Server to external world via the `http://NodeIP:32424` (NodeIP is any of the minion nodes external IP)
   (kubectl get pods)
 
 Note:To access the Jupyter Server over the internet, set the firewall rules to allow traffic on port 32424 in you GCP / Networking / Firewalls
