@@ -1,0 +1,18 @@
+{
+  "metadata": {
+     "labels": {
+       "openebs.io/cas-type": "jiva",
+       "openebs.io/storage-engine-type": "jiva",
+       "openebs.io/controller-service": "jiva-controller-svc",
+       "openebs.io/persistent-volume": "@pv-name",
+       "openebs.io/persistent-volume-claim": "@pvc-name"
+     }
+  },
+  "spec": {
+     "selector": {
+       "openebs.io/controller": "jiva-controller",
+       "openebs.io/persistent-volume": "@pv-name",
+       "vsm": "deprecated"
+     }
+  }
+} 
