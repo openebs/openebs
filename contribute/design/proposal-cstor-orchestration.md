@@ -1,6 +1,6 @@
 # Managing cStor based OpenEBS Volumes. 
 
-This document provides the design details on how the OpenEBS Orchestration Components will create OpenEBS StoragePools and Volumes using OpenEBS cStor storage-engine. 
+This document provides the design details on how the OpenEBS Control Plane will create OpenEBS StoragePools and Volumes using OpenEBS cStor storage-engine. 
 
 ## Prerequisites
 - Container Attached Storage or storage for containers in containers. [Introduction to OpenEBS](https://docs.google.com/presentation/d/1XPZZx7DYv2ah0Yy_A_CwTVVhZj3Sc0XkSsdQc7BG72I/edit#slide=id.p)
@@ -9,75 +9,99 @@ This document provides the design details on how the OpenEBS Orchestration Compo
 - Knowledge about Kubernetes concepts like Custom Controllers, initializers and reconciliation loop that wait on objects to move from actual to desired state.
 - Familiar with Kubernetes and OpenEBS Storage Concepts:
   * PersistentVolume(PV) and PersistentVolumeClaim(PVC) are standard Kubernetes terms used to associate volumes to a given workload. A PVC will be watched by a dynamic provisioner, which will in turn spin-up OpenEBS Volume Containers and create a PV (iSCSI) to be used by the workload.
-  * Disks and DiskClaims(DCs) are used to represent and identify the storage (a disk) attached to a Kubernetes Node. DiskClaims are created by the User and node-disk-manager will use that information to discover disks matching the criteria mentioned in DC to create the Disks. It is also possible that the User will directly create Disk representing a storage attached to a node. Each Disk will be represented by a cluster wide unique identifier like -- rs://host:nodea/device:/dev/disk-by-id/avcd-121312-hfjgdf. [OpenEBS Storage Management via Node-bot](https://github.com/openebs/node-disk-manager/pull/1)
-  * StoragePool(SP) and StoragePoolClaim(SPC) are used to represent and identify a pool of storage that is created using one more Disks. Each StoragePool can be used to then serve one or more OpenEBS Volume Replicas. The StoragePools can be of different types depending on how the underlying disks/storage are aggregated and how the pool is exposed. Till 0.6, OpenEBS supported storage pools of type (file-system), which where basically either a hostDirectory or ext4 mount of a single block disk. From 0.7, OpenEBS will support creation of storage pools that expose blocks. These block type pools are implemented using cStor containers. 
+  * Disks and DiskClaims(DCs) are used to represent and identify the storage (a disk) attached to a Kubernetes Node. DiskClaims are created by the User and node-disk-manager will use that information to discover disks matching the criteria mentioned in DC to create the Disks. It is also possible that the User will directly create Disk representing a storage attached to a node. Each Disk will be represented by a cluster wide unique identifier like -- rs://host:nodea/device:/dev/disk-by-id/avcd-121312-hfjgdf. Disk and DiskClaims are managed by [OpenEBS Node Disk Manager](https://github.com/openebs/node-disk-manager/blob/master/docs/design.md)
+  * StoragePool(SP) and StoragePoolClaim(SPC) are used to represent and identify a pool of storage that is created using one more Disks. Each StoragePool can be used to then serve one or more OpenEBS Volume Replicas. The StoragePools can be of different types depending on how the underlying disks/storage are aggregated and how the pool is exposed. Till 0.6, OpenEBS supported storage pools of type (file-system), which where basically either a hostDirectory or ext4 mount of a single block disk. From 0.7, OpenEBS will support creation of storage pools that expose blocks. These block type pools are implemented using cStor storage-engine. 
 
 
 ## Proposed Workflow
 
-The workflow is split into two aspects - creation of storage pools using cStor Engine and creating OpenEBS Volumes using the cStor engine. The workflow uses CRDs to store the disk, pool and volume related information and to pass it across different components. 
+The workflow is split into two steps:
+- creation of storage pools using cStor Storage Engine and 
+- creating OpenEBS Volumes using the cStor Storage engine. 
+
+The workflow uses CRDs to store the disk, pool and volume related information and to pass it across different components. 
 
 This workflow requires that the node-disk-manager is already setup and openebs components are installed. The following CRDs will already be available.
 - Disk and DiskClaim
 - StoragePool and StoragePoolClaim
 
-As part of implementing the cStor, the following CRDs are loaded:
+As part of implementing the cStor, the following new CRDs are loaded:
 - CStorPool
 - CStorVolume
 - CStorVolumeReplica
 
 ### Workflow for creating cStor StoragePools:
 
-   * Admin will create StoragePoolClaim(SPC) with type=openebs-cstor and the SPC will contains information like:
+   * Admin will create StoragePoolClaim(SPC) with type=cstor and the SPC will contains information like:
      ```
      apiVersion: openebs.io/v1alpha1
      kind: StoragePoolClaim
      metadata:
        name: pool1
+       annotations:
+         openebs.io/cas-type: cstor
+         #(Optional) Use the following to enforce the limits on CPU and RAM to be allocated/used 
+         # by the cStor Pool containers. AuxResourceLimits can be used to specify 
+         # CPU and RAM limits for the cStor Pool Management side cars
+         #If not specified, the default requests and limits will be assigned.
+         cas.openebs.io/config: |
+           - name: PoolResourceRequests
+             value: |-
+                 memory: 1Gi
+                 cpu: 100m
+           - name: PoolResourceLimits
+             value: |-
+                 memory: 2Gi
+           - name: AuxResourceLimits
+             value: |-
+                 memory: 0.5Gi 
+                 cpu: 50m
      spec:
-       type: openebs-cstor
+       name: pool1
+       #Specify whether cstor pool should be created with disk or sparse files. 
+       type: disk
        #Admin can specify the maximum number of cStor pools to be created with this name. 
        #maxPools: 3 (default no-limit)
-       #Admin can specify the exact nodes or a list of nodes where the pool has to be created. 
-       #nodeSelector: [ "host-label1", "host-label2",..]
-       diskTypes:
-         #Specify the template of type of disks to be selected for creating the pool
-         #For cStor Pool, the valid type is block.
-         - type: block
-           capacity:
-             minStorage: 10Gi
-             maxStorage: 10Ti
-       #Instead of templates for disk, specific list of disks to be used.
-       #In this case, the pool will be provisioned on the nodes where the 
-       # disks are available.
-       #Disks here refer to the Disk CRs added by the node-disk-manager. 
-       # The disks could refer to local disks or disks from external storage 
-       # providers like EBS, GPD or SAN.
-       #diskList: ["disk-name1", "disk-name2",...]
-       #poolSpec: 
-         #Define the type of pool to be created. Default is stripe. The other supported type is "mirror"
-         #poolType: "stripe"
-         #Define the required capacity and the max limit
-         capacity: 
-           requests:
-             storage: 100Gi
-           #increment:
-           #  storage: 100Gi
-           #limits:
-           #  storage: 1PBi
-         #Use the following to enforce the limits on CPU and RAM to be allocated/used by the cStor Pool containers.
-         #resources:
-           #limits:
-             #cpu: 1
-             #memory: 512Mi
-           #requests:
-             #cpu: 2
-             #memory: 256Mi
-         #Pools can be configured with different features. An example feature could be to enable/disable over provisioning.
-         #overProvisioning: false
+       poolSpec:
+         #Define the type of pool to be created. Default is striped. The other supported type is "mirror"
+         poolType: striped
+         #Pools can be configured with different features. 
+         #An example feature could be to enable/disable over provisioning.
+         overProvisioning: false
+         #(Optional - Phase2) Define the required capacity and the max limit
+         #capacity: 
+         # requests:
+         #   storage: 100Gi
+         # increment:
+         #   storage: 100Gi
+         # limits:
+         #   storage: 1PBi
+       #(Optional) Specify the exact disks or type of disks on which pools 
+       # should be created. Disks here refer to the Disk CRs added 
+       # by the node-disk-manager. The disks could refer to local disks 
+       # or disks from external storage providers like EBS, GPD or SAN.
+       disks:
+         # Specify exact disks. 
+         # If 3 striped pools of single disk, then provide 3 disks from different nodes.
+         # If 3 striped pools of two disk, then provide 6 disks with 2 from 3 different nodes.
+         diskList:
+           - disk-0c84c169ab2f398b92914f56dad41f81
+           - disk-66a74896b61c60dcdaf7c7a76fde0ebb
+           - disk-b34b3f97840872da9aa0bac1edc9578a
+         #(Optiona - Phase2) Specify the type of disks to select from different nodes
+         # disks will be selected to specify the requested capacity
+         diskTypes:
+           - type: block
+             capacity:
+               minStorage: 10Gi
+               maxStorage: 10Ti
+       #(Optional - Phase2) Specify the nodes or a list of nodes where the pool has to be created. 
+       # by providing a list of node labels
+       #nodeSelector: 
+         nodetype: storage
      ```
 
-   * maya-cstor-operator (could be embedded into maya-apiserver), will be watching for SPCs (type=openebs-cstor).
+   * maya-cstor-operator (embedded into maya-apiserver), will be watching for SPCs (type=cstor).
    
    * When maya-cstor-operator detects a new SPC object, it will identify the list of nodes that satisfy the SPC constraints in terms of:
      - availability of disks
@@ -103,17 +127,19 @@ As part of implementing the cStor, the following CRDs are loaded:
          uid: 7b99e406-1260-11e8-aa43-00505684eb2e
          labels:
            "kubernetes.io/hostname": "node-host-label"
+           openebs.io/storage-pool-claim: pool1
        spec:
          disks:
            #Disks that are actually used for creating the cstor pool are listed here. 
-           #disk-list: ["disk-name1", "disk-name2",...]
+           diskList: 
+             - disk-0c84c169ab2f398b92914f56dad41f81
          poolSpec: 
-           #Defines the type of pool as passed from the SPC. stripe or mirror. 
-           poolType: "stripe"
            #Pool features as passed from the SPC.
+           #Defines the type of pool as passed from the SPC. stripe or mirror. 
+           poolType: "striped"
            #overProvisioning: false       
-           # status is updated by the cstor-pool-mgmt to reflect the current status of the pool. 
-           # The valid values are : init, online, offline
+       # status is updated by the cstor-pool-mgmt to reflect the current status of the pool. 
+       # The valid values are : init, online, offline
        status:
          phase: init
        ```
