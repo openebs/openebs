@@ -6,7 +6,7 @@ metadata:
     component: elasticsearch
     role: data
 spec:
-  clusterIP: none
+  clusterIP: None
   selector:
     component: elasticsearch
     role: data
