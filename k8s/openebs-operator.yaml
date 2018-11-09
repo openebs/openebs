@@ -99,7 +99,7 @@ spec:
       containers:
       - name: maya-apiserver
         imagePullPolicy: IfNotPresent
-        image: quay.io/openebs/m-apiserver:ci
+        image: openebs/m-apiserver:ci
         ports:
         - containerPort: 5656
         env:
@@ -141,21 +141,21 @@ spec:
             fieldRef:
               fieldPath: metadata.name
         - name: OPENEBS_IO_JIVA_CONTROLLER_IMAGE
-          value: "quay.io/openebs/jiva:ci"
+          value: "openebs/jiva:ci"
         - name: OPENEBS_IO_JIVA_REPLICA_IMAGE
-          value: "quay.io/openebs/jiva:ci"
+          value: "openebs/jiva:ci"
         - name: OPENEBS_IO_JIVA_REPLICA_COUNT
           value: "3"
         - name: OPENEBS_IO_CSTOR_TARGET_IMAGE
-          value: "quay.io/openebs/cstor-istgt:ci"
+          value: "openebs/cstor-istgt:ci"
         - name: OPENEBS_IO_CSTOR_POOL_IMAGE
-          value: "quay.io/openebs/cstor-pool:ci"
+          value: "openebs/cstor-pool:ci"
         - name: OPENEBS_IO_CSTOR_POOL_MGMT_IMAGE
-          value: "quay.io/openebs/cstor-pool-mgmt:ci"
+          value: "openebs/cstor-pool-mgmt:ci"
         - name: OPENEBS_IO_CSTOR_VOLUME_MGMT_IMAGE
-          value: "quay.io/openebs/cstor-volume-mgmt:ci"
+          value: "openebs/cstor-volume-mgmt:ci"
         - name: OPENEBS_IO_VOLUME_MONITOR_IMAGE
-          value: "quay.io/openebs/m-exporter:ci"
+          value: "openebs/m-exporter:ci"
         # OPENEBS_IO_ENABLE_ANALYTICS if set to true sends anonymous usage
         # events to Google Analytics
         - name: OPENEBS_IO_ENABLE_ANALYTICS
@@ -206,7 +206,7 @@ spec:
       containers:
       - name: openebs-provisioner
         imagePullPolicy: IfNotPresent
-        image: quay.io/openebs/openebs-k8s-provisioner:ci
+        image: openebs/openebs-k8s-provisioner:ci
         env:
         # OPENEBS_IO_K8S_MASTER enables openebs provisioner to connect to K8s
         # based on this address. This is ignored if empty.
@@ -257,7 +257,7 @@ spec:
       serviceAccountName: openebs-maya-operator
       containers:
         - name: snapshot-controller
-          image: quay.io/openebs/snapshot-controller:ci
+          image: openebs/snapshot-controller:ci
           imagePullPolicy: IfNotPresent
           env:
           - name: OPENEBS_NAMESPACE
@@ -278,7 +278,7 @@ spec:
         #- name: OPENEBS_MAYA_SERVICE_NAME
         #  value: "maya-apiserver-apiservice"
         - name: snapshot-provisioner
-          image: quay.io/openebs/snapshot-provisioner:ci
+          image: openebs/snapshot-provisioner:ci
           imagePullPolicy: IfNotPresent
           env:
           - name: OPENEBS_NAMESPACE
@@ -361,7 +361,7 @@ spec:
         command:
         - /usr/sbin/ndm
         - start
-        image: quay.io/openebs/node-disk-manager-amd64:ci
+        image: openebs/node-disk-manager-amd64:ci
         imagePullPolicy: IfNotPresent
         securityContext:
           privileged: true
