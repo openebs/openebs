@@ -71,7 +71,7 @@ apiVersion: v1
 metadata:
   name: datadir-claim-3
 spec:
-  storageClassName: openebs-standard
+  storageClassName: openebs-jiva-default
   accessModes:
     - ReadWriteOnce
   resources:

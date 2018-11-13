@@ -3,7 +3,7 @@ apiVersion: v1
 metadata:
   name: jenkins-claim
   annotations:
-    volume.beta.kubernetes.io/storage-class: openebs-standard
+    volume.beta.kubernetes.io/storage-class: openebs-jiva-default
 spec:
   accessModes:
     - ReadWriteOnce
