@@ -80,7 +80,7 @@ spec:
   - metadata:
       name: cassandra-data
       annotations:
-        volume.beta.kubernetes.io/storage-class: openebs-standard
+        volume.beta.kubernetes.io/storage-class: openebs-jiva-default
     spec:
       accessModes: [ "ReadWriteOnce" ]
       resources:

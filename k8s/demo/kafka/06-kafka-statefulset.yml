@@ -67,7 +67,7 @@ spec:
   - metadata:
       name: data
     spec:
-      storageClassName: openebs-standard
+      storageClassName: openebs-jiva-default
       accessModes: [ "ReadWriteOnce" ]
       resources:
         requests:

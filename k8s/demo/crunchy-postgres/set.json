@@ -79,7 +79,7 @@
           "accessModes": [
             "ReadWriteOnce"
           ],
-	  "storageClassName": "openebs-standard",
+	  "storageClassName": "openebs-jiva-default",
           "resources": {
             "requests": {
               "storage": "400M"
