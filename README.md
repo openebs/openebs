@@ -21,6 +21,12 @@ https://www.openebs.io/
   
 **Our vision** is simple: let storage and storage services for persistent workloads be fully integrated into the environment so that each team and workload benefits from granularity of control and Kubernetes native behavior. 
 
+#### *Read this in [other languages](translations/TRANSLATIONS.md).*
+
+[🇩🇪](translations/README.de.md)
+[🇷🇺](translations/README.ru.md)
+[🇹🇷](translations/README.tr.md)
+
 ## Scalability
  
 OpenEBS can scale to include an arbitrarily large number of containerized storage controllers. Kubernetes is used to provide fundamental pieces such as using etcd for inventory. OpenEBS scales to the extent your Kubernetes scales.  
