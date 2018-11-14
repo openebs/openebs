@@ -14,7 +14,8 @@ kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
   name: jiva-beta-sc-claim
-  volume.beta.kubernetes.io/storage-class: jiva-beta-sc
+  annotations:
+    volume.beta.kubernetes.io/storage-class: jiva-beta-sc
 spec:
   accessModes:
     - ReadWriteOnce
