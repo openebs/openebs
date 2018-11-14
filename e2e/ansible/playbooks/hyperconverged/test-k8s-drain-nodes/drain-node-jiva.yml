@@ -1,6 +1,6 @@
 ---
 - name: Obtaining storage classes yaml
-  shell: source ~/.profile; kubectl get sc openebs-standard -o yaml > "{{ result_kube_home.stdout }}/{{ create_sc }}"
+  shell: source ~/.profile; kubectl get sc openebs-jiva-default -o yaml > "{{ result_kube_home.stdout }}/{{ create_sc }}"
   args:
     executable: /bin/bash
   delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
@@ -13,7 +13,7 @@
   delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
 - name: Delete the existing storage class and create new one
-  shell: source ~/.profile; kubectl delete sc openebs-standard; kubectl apply -f "{{ result_kube_home.stdout }}/{{ create_sc }}"
+  shell: source ~/.profile; kubectl delete sc openebs-jiva-default; kubectl apply -f "{{ result_kube_home.stdout }}/{{ create_sc }}"
   args:
     executable: /bin/bash
   register: sc_out
