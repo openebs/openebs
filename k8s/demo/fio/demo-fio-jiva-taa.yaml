@@ -4,6 +4,7 @@ metadata:
   name: fio-jiva
   labels:
     name: fio-jiva
+    openebs.io/target-affinity: fio-jiva
 spec:
   containers:
   - resources:
@@ -26,8 +27,10 @@ kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
   name: fio-jiva-claim
+  labels:
+    openebs.io/target-affinity: fio-jiva
 spec:
-  storageClassName: openebs-jiva-limits
+  storageClassName: openebs-jiva-fio-taa
   accessModes:
     - ReadWriteOnce
   resources:
