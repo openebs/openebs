@@ -1,0 +1,15 @@
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: cstor-sc-sparse-ns-default
+  annotations:
+    cas.openebs.io/config: |
+      - name: ReplicaCount
+        value: "1"
+spec:
+  storageClassName: openebs-cstor-sparse
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 4G
