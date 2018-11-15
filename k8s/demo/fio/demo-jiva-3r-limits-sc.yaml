@@ -1,0 +1,29 @@
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: openebs-jiva-limits
+  annotations:
+    openebs.io/cas-type: jiva
+    cas.openebs.io/config: |
+      - name: TargetResourceRequests
+        value: |-
+            memory: 0.5Gi
+            cpu: 100m
+      - name: TargetResourceLimits
+        value: |-
+            memory: 1Gi
+      - name: ReplicaResourceRequests
+        value: |-
+            memory: 0.5Gi
+            cpu: 100m
+      - name: ReplicaResourceLimits
+        value: |-
+            memory: 2Gi
+            cpu: 200m
+      - name: AuxResourceLimits
+        value: |-
+            memory: 0.5Gi
+            cpu: 50m
+provisioner: openebs.io/provisioner-iscsi
+---

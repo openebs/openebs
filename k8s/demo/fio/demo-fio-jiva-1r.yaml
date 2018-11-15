@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: fio-jiva
+  name: fio-jiva-1r
   labels:
     name: fio-jiva
 spec:
@@ -25,9 +25,9 @@ spec:
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
-  name: fio-jiva-claim
+  name: fio-jiva-1r-claim
 spec:
-  storageClassName: openebs-jiva-limits
+  storageClassName: openebs-jiva-fio-1r
   accessModes:
     - ReadWriteOnce
   resources:
