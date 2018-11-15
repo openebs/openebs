@@ -1,0 +1,14 @@
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: jiva-disable-scrub-claim
+spec:
+  storageClassName: jiva-sjr-disabled
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 4G
+---
+
