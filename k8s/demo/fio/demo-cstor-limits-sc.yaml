@@ -1,0 +1,23 @@
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: openebs-cstor-sparse-limits
+  annotations:
+    openebs.io/cas-type: cstor
+    cas.openebs.io/config: |
+      - name: StoragePoolClaim
+        value: "cstor-sparse-pool"
+      - name: TargetResourceRequests
+        value: |-
+            memory: 0.5Gi
+            cpu: 100m
+      - name: TargetResourceLimits
+        value: |-
+            memory: 1Gi
+      - name: AuxResourceLimits
+        value: |-
+            memory: 0.5Gi
+            cpu: 50m
+provisioner: openebs.io/provisioner-iscsi
+---
