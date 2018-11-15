@@ -43,7 +43,7 @@
            - name:  Replace storage-class to use jiva storage engine
              replace:
                path: "{{ result_kube_home.stdout }}/{{ volume_def }}"
-               regexp: 'openebs-standard'
+               regexp: 'openebs-jiva-default'
                replace: '{{ jiva_sc }}'
              delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
 
@@ -95,7 +95,7 @@
            - name: Replace the storage class in the volume definition yaml
              replace:
                path: "{{ result_kube_home.stdout }}/{{ volume_def }}"
-               regexp: 'openebs-standard'
+               regexp: 'openebs-jiva-default'
                replace: '{{ cstor_sc }}'
              delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
 

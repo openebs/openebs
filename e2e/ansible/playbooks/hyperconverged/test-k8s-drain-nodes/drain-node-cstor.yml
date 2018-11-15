@@ -3,7 +3,7 @@
 - name: Replace storage-class to use cstor storage engine
   replace:
     path: "{{ result_kube_home.stdout }}/{{ percona_file }}"
-    regexp: 'openebs-standard'
+    regexp: 'openebs-jiva-default'
     replace: '{{ cstor_sc }}'
   delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
 

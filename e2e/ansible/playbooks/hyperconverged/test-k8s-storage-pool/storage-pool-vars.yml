@@ -12,7 +12,7 @@ custom_sc: storage-pool-sc
 
 replace_item:
   - vut
-  - openebs-standard
+  - openebs-jiva-default
 
 replace_with:
   - storage-pool-test
