@@ -1,0 +1,77 @@
+# node-exporter will be launch as daemonset.
+apiVersion: extensions/v1beta1
+kind: DaemonSet
+metadata:
+  name: node-exporter
+spec:
+  template:
+    metadata:
+      labels:
+        app: node-exporter
+      name: node-exporter
+    spec:
+      containers:
+      - image: prom/node-exporter:v0.16.0
+        name: node-exporter
+        ports:
+        - containerPort: 9100
+          hostPort: 9100
+          name: scrape
+        resources:
+            requests:
+              # A memory request of 250M means it will try to ensure minimum
+              # 250MB RAM .
+              memory: "128M"
+              # A cpu request of 128m means it will try to ensure minimum
+              # .125 CPU; where 1 CPU means :
+              # 1 *Hyperthread* on a bare-metal Intel processor with Hyperthreading
+              cpu: "128m"
+            limits:
+              memory: "700M"
+              cpu: "500m"
+        volumeMounts:
+        # All the application data stored in data-disk
+        - name: data-disk
+          mountPath: /data-disk
+          readOnly: true
+        # Root disk is where OS(Node) is installed
+        - name: root-disk
+          mountPath: /root-disk
+          readOnly: true
+      # The Kubernetes scheduler’s default behavior works well for most cases
+      # -- for example, it ensures that pods are only placed on nodes that have 
+      # sufficient free resources, it ties to spread pods from the same set 
+      # (ReplicaSet, StatefulSet, etc.) across nodes, it tries to balance out 
+      # the resource utilization of nodes, etc.
+      #
+      # But sometimes you want to control how your pods are scheduled. For example,
+      # perhaps you want to ensure that certain pods only schedule on nodes with 
+      # specialized hardware, or you want to co-locate services that communicate 
+      # frequently, or you want to dedicate a set of nodes to a particular set of 
+      # users. Ultimately, you know much more about how your applications should be
+      # scheduled and deployed than Kubernetes ever will.
+      #
+      # “taints and tolerations,” allows you to mark (“taint”) a node so that no 
+      # pods can schedule onto it unless a pod explicitly “tolerates” the taint.
+      # toleration  is particularly useful for situations where most pods in 
+      # the cluster should avoid scheduling onto the node. In our case we want
+      # node-exporter to run on master node also i.e, we want to collect metrics 
+      # from master node. That's why tolerations added.
+      # if removed master's node metrics can't be scrapped by prometheus.
+      tolerations:
+      - effect: NoSchedule
+        operator: Exists
+      volumes:
+        # A hostPath volume mounts a file or directory from the host node’s 
+        # filesystem.For example, some uses for a hostPath are:
+        # running a container that needs access to Docker internals; use a hostPath 
+        # of /var/lib/docker
+        # running cAdvisor in a container; use a hostPath of /dev/cgroups
+        - name: data-disk
+          hostPath:
+            path: /localdata
+        - name: root-disk
+          hostPath:
+            path: /
+      hostNetwork: true
+      hostPID: true
