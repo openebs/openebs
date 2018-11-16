@@ -1,0 +1,60 @@
+---
+# Source: prometheus-mysql-exporter/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: prometheus-mysql-exporter
+  labels:
+    app: prometheus-mysql-exporter
+spec:
+  type: ClusterIP
+  ports:
+    - port: 9104
+      targetPort: 9104
+      protocol: TCP
+      name: mysql-exporter
+  selector:
+    app: prometheus-mysql-exporter
+---
+# Source: prometheus-mysql-exporter/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prometheus-mysql-exporter
+  labels:
+    app: prometheus-mysql-exporter
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: prometheus-mysql-exporter
+  template:
+    metadata:
+      labels:
+        app: prometheus-mysql-exporter
+      annotations:
+        prometheus.io/path: /metrics
+        prometheus.io/port: "9104"
+        prometheus.io/scrape: "true"
+        
+    spec:
+      containers:
+        - name: prometheus-mysql-exporter
+          image: "prom/mysqld-exporter:v0.11.0"
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: DATA_SOURCE_NAME
+              value: "root:k8sDem0@(10.47.249.175:3306)/"
+          ports:
+            - containerPort: 9104
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 9104
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 9104
+          resources:
+            {}
+---
