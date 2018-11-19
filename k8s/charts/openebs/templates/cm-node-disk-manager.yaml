@@ -1,4 +1,4 @@
-# This is the node-disk-manager related config. 
+# This is the node-disk-manager related config.
 # It can be used to customize the disks probes and filters
 apiVersion: v1
 kind: ConfigMap
@@ -37,3 +37,4 @@ data:
         state: true
         include: ""
         exclude: "{{ .Values.ndm.filters.excludePaths }}"
+---
