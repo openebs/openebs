@@ -36,15 +36,15 @@ Kullanım durumlarınıza uymayı kolaylaştırmak için her zaman gereken daha 
 
 ## Kaynak Kod ve Hata Düzeltmelerine Katkı Sağlamak
 
-PR'leri hata düzeltmeleri veya kaynak kodundaki geliştirmeler için uygun etiketlerle sağlayın. Kullanılabilecek etiketlerin listesi için, bkz. [This](./contribute/labels-of-issues.md).
+PR'leri hata düzeltmeleri veya kaynak kodundaki geliştirmeler için uygun etiketlerle sağlayın. Kullanılabilecek etiketlerin listesi için, bkz. [Buraya](./contribute/labels-of-issues.md).
 
-* K8s demosuna katkıda bulunmak için lütfen bu [belge] bölümüne bakınız.(./contribute/CONTRIBUTING-TO-K8S-DEMO.md).
-	- OpenEBS'in K8'lerle nasıl çalıştığını kontrol etmek için, bu [belge] bölümüne bakın.(./k8s/README.md) 
-- Kubernetes OpenEBS Provisioner'a katkıda bulunmak için lütfen bu [dokümana] bakınız.(./contribute/CONTRIBUTING-TO-KUBERNETES-OPENEBS-PROVISIONER.md).
-* CI ve e2e'ye katkıda bulunmak için, bu [dokümana] bakınız.(./contribute/CONTRIBUTING-TO-CI-AND-E2E.md)
+* K8s demosuna katkıda bulunmak için lütfen bu [belge](./contribute/CONTRIBUTING-TO-K8S-DEMO.md) bölümüne bakınız..
+	- OpenEBS'in K8'lerle nasıl çalıştığını kontrol etmek için, bu [belge](./k8s/README.md) bölümüne bakın.
+- Kubernetes OpenEBS Provisioner'a katkıda bulunmak için lütfen bu [dokümana](./contribute/CONTRIBUTING-TO-KUBERNETES-OPENEBS-PROVISIONER.md) bakınız.
+* CI ve e2e'ye katkıda bulunmak için, bu [dokümana](./contribute/CONTRIBUTING-TO-CI-AND-E2E.md) bakınız.
 	- e2e için buna bakın [genel bakış](./e2e/README.md).
 	
-Kod yapılandırması ve takip edilecek yönergeler hakkında daha fazla bilgi için bu [belge] bölümüne bakın.(./contribute/design/code-structuring.md) 
+Kod yapılandırması ve takip edilecek yönergeler hakkında daha fazla bilgi için bu [belge](./contribute/design/code-structuring.md) bölümüne bakın
 
 ## Mevcut Sorunları Çözme
 
