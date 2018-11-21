@@ -62,7 +62,7 @@ Onaylayabilirseniz, her git taahhüt mesajına bir satır ekleyin:
 ````
   İmzalayan: Random J Developer <random@developer.example.org>
   ````
-taahhütleriniz üzerinde oturum açmak için. komutu kullan `git commit -s -m "commit message comes here"`
+taahhütleriniz üzerinde oturum açmak için. `git commit -s -m "commit message comes here"` komutunu kullanın.
 
 Gerçek adınızı kullanın (üzgünüm, takma adlar veya anonim katkılar yok). `User.name` ve` user.email` git yapılandırmalarınızı ayarlarsanız, `git commit -s` ile işleminizi otomatik olarak imzalayabilirsiniz. Git [aliases] 'ı da kullanabilirsiniz. (https://git-scm.com/book/en/v2/Git-Basics-Git-Aliases)  `git config --global alias.ci 'commit -s'`. Şimdi 'git ci' ile taahhütte bulunabilirsiniz ve taahhüt imzalanacaktır.
 
