@@ -69,4 +69,4 @@ Gerçek adınızı kullanın (üzgünüm, takma adlar veya anonim katkılar yok)
 
 ## Topluluğumuza Katılın
 
-OpenEBS topluluğunda aktif olarak geliştirmek ve katkıda bulunmak istiyorsanız, bu [dokümana] başvurun. (./community/README.md).
+OpenEBS topluluğunda aktif olarak geliştirmek ve katkıda bulunmak istiyorsanız, bu [dokümana](./community/README.md) başvurun.
