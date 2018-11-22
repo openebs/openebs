@@ -332,7 +332,7 @@ data:
         name: path filter
         state: true
         include: ""
-        exclude: "loop,/dev/fd0,/dev/sr0,/dev/ram,/dev/dm-"
+        exclude: "loop,/dev/fd0,/dev/sr0,/dev/ram,/dev/dm-,/dev/md-"
 ---
 apiVersion: extensions/v1beta1
 kind: DaemonSet
