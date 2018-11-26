@@ -20,7 +20,7 @@ spec:
   volumes:
     - name: datavol
       persistentVolumeClaim:
-        claimName: fio-jiva-claim 
+        claimName: fio-jiva-1r-claim 
 ---
 kind: PersistentVolumeClaim
 apiVersion: v1

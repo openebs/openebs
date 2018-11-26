@@ -1,0 +1,60 @@
+---
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: percona-clone-cstor
+  labels:
+    name: percona-clone-cstor
+spec:
+  replicas: 1
+  selector: 
+    matchLabels:
+      name: percona-clone-cstor
+  template: 
+    metadata:
+      labels: 
+        name: percona-clone-cstor
+    spec:
+      securityContext:
+        fsGroup: 999
+      tolerations:
+      - key: "ak"
+        value: "av"
+        operator: "Equal"
+        effect: "NoSchedule"
+      containers:
+        - resources:
+            limits:
+              cpu: 0.5
+          name: percona-clone-cstor
+          image: percona
+          args:
+            - "--ignore-db-dir"
+            - "lost+found"
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              value: k8sDem0
+          ports:
+            - containerPort: 3306
+              name: percona
+          volumeMounts:
+            - mountPath: /var/lib/mysql
+              name: demo-cstor-vol1
+      volumes:
+        - name: demo-cstor-vol1
+          persistentVolumeClaim:
+            claimName: demo-cstor-snap-vol-claim
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: demo-cstor-snap-vol-claim
+  namespace: default
+  annotations:
+    snapshot.alpha.kubernetes.io/snapshot: cstor-snapshot-demo
+spec:
+  storageClassName: openebs-snapshot-promoter
+  accessModes: [ "ReadWriteOnce" ]
+  resources:
+    requests:
+      storage: 5Gi
