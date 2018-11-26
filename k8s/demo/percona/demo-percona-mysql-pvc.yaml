@@ -6,6 +6,8 @@ metadata:
   labels:
     name: percona
 spec:
+  securityContext:
+    fsGroup: 999
   containers:
   - resources:
       limits:
