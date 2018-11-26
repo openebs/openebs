@@ -11,7 +11,7 @@ spec:
       limits:
         cpu: 0.5
     name: percona
-    image: percona
+    image: openebs/tests-custom-percona:latest
     args:
       - "--ignore-db-dir"
       - "lost+found"
