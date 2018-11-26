@@ -6,12 +6,14 @@ metadata:
   labels:
     name: percona
 spec:
+  securityContext:
+    fsGroup: 999
   containers:
   - resources:
       limits:
         cpu: 0.5
     name: percona
-    image: openebs/tests-custom-percona:latest
+    image: percona
     args:
       - "--ignore-db-dir"
       - "lost+found"
