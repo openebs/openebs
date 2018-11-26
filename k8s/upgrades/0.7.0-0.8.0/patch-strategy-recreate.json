@@ -1,0 +1,4 @@
+[
+  { "op": "remove", "path": "/spec/strategy/rollingUpdate" },
+  { "op": "replace", "path": "/spec/strategy/type", "value": "Recreate" }
+]

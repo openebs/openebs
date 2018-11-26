@@ -69,20 +69,6 @@ roleRef:
   name: openebs-maya-operator
   apiGroup: rbac.authorization.k8s.io
 ---
-# This is the install related config. It specifies the version of openebs
-# components i.e. custom operators that gets installed. This config is
-# used by maya-apiserver.
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: maya-install-config
-  namespace: openebs
-data:
-  install: |
-    spec:
-      install:
-      - version: "0.7.0"
----
 apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
@@ -113,10 +99,6 @@ spec:
         # This is supported for maya api server version 0.5.2 onwards
         #- name: OPENEBS_IO_K8S_MASTER
         #  value: "http://172.28.128.3:8080"
-        # OPENEBS_IO_INSTALL_CONFIG_NAME specifies the config map containing the install configuration.
-        # Currently, the configuration can be used to specify the default version for the CAS Templates
-        - name: OPENEBS_IO_INSTALL_CONFIG_NAME
-          value: "maya-install-config"
         # OPENEBS_IO_INSTALL_DEFAULT_CSTOR_SPARSE_POOL decides whether default cstor sparse pool should be
         # configured as a part of openebs installation.
         # If "true" a default cstor sparse pool will be configured, if "false" it will not be configured.
@@ -160,6 +142,12 @@ spec:
         # events to Google Analytics
         - name: OPENEBS_IO_ENABLE_ANALYTICS
           value: "true"
+        # OPENEBS_IO_ANALYTICS_PING_INTERVAL can be used to specify the duration (in hours)
+        # for periodic ping events sent to Google Analytics.
+        # Default is 24h.
+        # Minimum is 1h. You can convert this to weekly by setting 168h
+        #- name: OPENEBS_IO_ANALYTICS_PING_INTERVAL
+        #  value: "24h"
         livenessProbe:
           exec:
             command:
@@ -332,7 +320,7 @@ data:
         name: path filter
         state: true
         include: ""
-        exclude: "loop,/dev/fd0,/dev/sr0,/dev/ram,/dev/dm-"
+        exclude: "loop,/dev/fd0,/dev/sr0,/dev/ram,/dev/dm-,/dev/md"
 ---
 apiVersion: extensions/v1beta1
 kind: DaemonSet
@@ -361,7 +349,7 @@ spec:
         command:
         - /usr/sbin/ndm
         - start
-        image: quay.io/openebs/node-disk-manager-amd64:ci
+        image: quay.io/openebs/node-disk-manager-amd64:v0.2.0
         imagePullPolicy: IfNotPresent
         securityContext:
           privileged: true

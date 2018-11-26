@@ -38,8 +38,8 @@ echo "Installed Version: $VERSION_INSTALLED"
 if [ -z $VERSION_INSTALLED ] || [ $VERSION_INSTALLED = "0*" ]; then 
     echo "Unable to determine installed openebs version"
     print_usage
-elif test `echo $VERSION_INSTALLED | grep -c 0.6.` -eq 0; then
-    echo "Upgrade is supported only from 0.6.0"
+elif test `echo $VERSION_INSTALLED | grep -c 0.7.` -eq 0; then
+    echo "Upgrade is supported only from 0.7.0"
     exit 1
 fi
 
@@ -53,7 +53,7 @@ if [ $rc -eq 0 ]; then
      echo "Found Jiva StoragePool named 'default' with path as /var/openebs"
    else
      echo "Found Jiva StoragePool named 'default' with cutomized path"
-     echo " After upgrading to 0.7.0, you will need to re-apply your StoragePool"
+     echo " After upgrading to 0.8.0, you will need to re-apply your StoragePool"
      echo " or consider renaming the pool." 
      exit 1
    fi
@@ -64,9 +64,9 @@ fi
 echo
 OLDER_PVS=`kubectl get pods --all-namespaces -l openebs/controller | wc -l`
 if [ -z $OLDER_PVS ] || [ $OLDER_PVS -lt 2 ]; then 
-    echo "There are no PVs that need to be upgraded to 0.7.0"
+    echo "There are no PVs that need to be upgraded to 0.8.0"
 else
-    echo "Found PVs that need to be upgraded to 0.7.0"
+    echo "Found PVs that need to be upgraded to 0.8.0"
 fi
 
 echo
