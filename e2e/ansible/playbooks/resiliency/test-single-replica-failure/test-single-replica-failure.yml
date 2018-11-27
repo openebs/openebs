@@ -253,19 +253,6 @@
      always:
        - block:
 
-           - include: test-single-replica-failure-cleanup.yml
-
-           - name: Test Cleanup Passed
-             set_fact:
-               cflag: "Cleanup Passed"
-
-         rescue:
-           - name: Test Cleanup Failed
-             set_fact:
-               cflag: "Cleanup Failed"
-
-         always:
-
            - name: Uncordon the nodes
              shell: >
                source ~/.profile; kubectl uncordon {{ item }}
@@ -282,6 +269,19 @@
              delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
              register: result
              failed_when: "'SchedulingDisabled' in result.stdout"
+
+           - include: test-single-replica-failure-cleanup.yml
+
+           - name: Test Cleanup Passed
+             set_fact:
+               cflag: "Cleanup Passed"
+
+         rescue:
+           - name: Test Cleanup Failed
+             set_fact:
+               cflag: "Cleanup Failed"
+
+         always:
 
            - include_tasks: "{{utils_path}}/stern_task.yml"
              vars:
