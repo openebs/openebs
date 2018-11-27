@@ -253,13 +253,21 @@
      always:
        - block:
 
+           - name: Get the node list
+             shell: >
+               source ~/.profile; kubectl get nodes --no-headers | awk '{print $1}'
+             args:
+               executable: /bin/bash
+             delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+             register: nodes
+
            - name: Uncordon the nodes
              shell: >
                source ~/.profile; kubectl uncordon {{ item }}
              args:
                executable: /bin/bash
              delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-             with_items: "{{ result_nodes.stdout_lines }}"
+             with_items: "{{ nodes.stdout_lines }}"
 
            - name: Check if the nodes are uncordoned
              shell: >
