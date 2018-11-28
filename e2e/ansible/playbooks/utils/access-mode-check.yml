@@ -74,7 +74,7 @@
          delay: 30
          retries: 15
          changed_when: True
-         when: "mayactl > '0.7.0'"
+         when: "mayactl is version('0.7.0', '>')"
 
        - name: Get the replicas access mode
          shell: >
@@ -88,7 +88,7 @@
          delay: 30
          retries: 15
          changed_when: True
-         when: "mayactl <= '0.7.0'"
+         when: "mayactl is version('0.7.0', '<=')"
 
        - debug:
            msg: "All the replicas are in sync"
