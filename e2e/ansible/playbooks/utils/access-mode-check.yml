@@ -13,10 +13,23 @@
            executable: /bin/bash
          register: node_count
          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
-
+      
        - name: Set PV name to a variable
          set_fact:
-           pvname: "{{pv_name.stdout.split()[10] }}"
+           pvname: "{{pv_name.stdout.split()[10] }}"         
+
+       - name: Record the jiva replica deployment of the PV
+         set_fact: 
+           # Depends on the naming convention in maya-apiserver (<pv-id>-rep)  
+           jiva_replica_deploy: "{{ pvname }}-rep"
+       
+       - name: Obtain the number of replicas in the deployment
+         shell: >
+           kubectl get deployment {{ jiva_replica_deploy }} -n {{ ns }}
+           --no-headers -o custom-columns=:spec.replicas
+         args:
+           executable: /bin/bash
+         register: replica_count
 
        - name: Get the maya-apiserver pod name
          shell: source ~/.profile; kubectl get pods -n openebs -l name=maya-apiserver --no-headers | awk '{print $1}'
@@ -37,6 +50,32 @@
          delay: 30
          retries: 5
 
+       - name: Get the mayactl version
+         shell: source ~/.profile; kubectl exec -it {{ mayapod.stdout }} -n openebs -- mayactl version | grep -i Version | awk 'FNR == 1 {print}' | awk {'print $2'}
+         args:
+           executable: /bin/bash
+         register: mayactl_version
+         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+         changed_when: True
+
+       - name: Set Mayactl version to a variable
+         set_fact:
+           mayactl: "{{mayactl_version.stdout.split('-')[0]}}"
+
+       - name: Get the replicas access mode
+         shell: >
+            source ~/.profile;  
+            kubectl exec -it {{ mayapod.stdout }} -n openebs -- mayactl volume describe --volname "{{volname.stdout_lines[2].split()[1]}}" -n {{ ns }} | grep 'RW' | wc -l
+         args:
+           executable: /bin/bash
+         register: result
+         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+         until: result.stdout| int == replica_count.stdout | int
+         delay: 30
+         retries: 15
+         changed_when: True
+         when: "mayactl > '0.7.0'"
+
        - name: Get the replicas access mode
          shell: >
             source ~/.profile;  
@@ -49,6 +88,7 @@
          delay: 30
          retries: 15
          changed_when: True
+         when: "mayactl <= '0.7.0'"
 
        - debug:
            msg: "All the replicas are in sync"
