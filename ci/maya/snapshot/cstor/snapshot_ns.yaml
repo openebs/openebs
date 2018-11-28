@@ -1,0 +1,7 @@
+apiVersion: volumesnapshot.external-storage.k8s.io/v1
+kind: VolumeSnapshot
+metadata:
+  name: snapshot-demo-cstor-ns
+  namespace: default
+spec:
+  persistentVolumeClaimName: openebs-pvc-in-custom-ns

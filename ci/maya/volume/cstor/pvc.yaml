@@ -1,0 +1,10 @@
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: openebs-pvc-in-custom-ns
+spec:
+  storageClassName: openebs-cstor-override-ns
+  accessModes: [ "ReadWriteOnce" ]
+  resources:
+    requests:
+      storage: 1G
