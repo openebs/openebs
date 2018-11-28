@@ -3,9 +3,6 @@ kind: StorageClass
 metadata:
   name: openebs-test
   annotations:
-    cas.openebs.io/create-volume-template: jiva-volume-create-default-0.7.0
-    cas.openebs.io/delete-volume-template: jiva-volume-delete-default-0.7.0
-    cas.openebs.io/read-volume-template: jiva-volume-read-default-0.7.0
     cas.openebs.io/config: |
       - name: ControllerImage
         value: openebs/jiva:{{ jiva_tag }}
