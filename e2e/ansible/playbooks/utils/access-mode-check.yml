@@ -7,14 +7,19 @@
          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
          changed_when: True
 
-       - name: Record the jiva replica deployment of the PV
-         set_fact: 
-           # Depends on the naming convention in maya-apiserver (<pv-id>-rep)  
-           jiva_replica_deploy: "{{ pvname.stdout }}-rep"
-       
+       - name: Obtain the jiva replica deployment name
+         shell: >
+           source ~/.profile; 
+           kubectl get deployment -n (( ns }} -l openebs.io/replica=jiva-replica -o custom-columns=:.metadata.name --no-headers
+         args:
+           executable: /bin/bash
+         register: jiva_deploy
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+         changed_when: True
+
        - name: Obtain the number of replicas in the deployment
          shell: >
-           kubectl get deployment {{ jiva_replica_deploy }} -n {{ ns }}
+           kubectl get deployment {{ jiva_deploy.stdout }} -n {{ ns }}
            --no-headers -o custom-columns=:spec.replicas
          args:
            executable: /bin/bash
