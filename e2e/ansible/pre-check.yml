@@ -35,7 +35,7 @@
       with_items: "{{ list_pv.stdout_lines }}"
 
     - name: Delete spc,csp
-      shell: source ~/.profile; kubectl delete spc,csp --all
+      shell: source ~/.profile; kubectl delete jobs,spc,csp --all
       args:
         executable: /bin/bash
       delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
