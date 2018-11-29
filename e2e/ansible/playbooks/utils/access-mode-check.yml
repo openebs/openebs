@@ -10,7 +10,7 @@
        - name: Obtain the jiva replica deployment name
          shell: >
            source ~/.profile; 
-           kubectl get deployment -n (( ns }} -l openebs.io/replica=jiva-replica -o custom-columns=:.metadata.name --no-headers
+           kubectl get deployment -n {{ ns }} -l openebs.io/replica=jiva-replica -o custom-columns=:.metadata.name --no-headers
          args:
            executable: /bin/bash
          register: jiva_deploy
