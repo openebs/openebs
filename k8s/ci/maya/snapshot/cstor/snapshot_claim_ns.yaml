@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: demo-snap-vol-claim-cstor-ns
+  namespace: default
+  annotations:
+    snapshot.alpha.kubernetes.io/snapshot: snapshot-demo-cstor-ns
+spec:
+  storageClassName: openebs-snapshot-promoter
+  accessModes: [ "ReadWriteOnce" ]
+  resources:
+    requests:
+      storage: 1G

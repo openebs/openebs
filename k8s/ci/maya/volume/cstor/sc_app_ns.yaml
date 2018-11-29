@@ -1,0 +1,14 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  annotations:
+    cas.openebs.io/config: |
+      - name: StoragePoolClaim
+        value: "sparse-claim-auto"
+      - name: ReplicaCount
+        value: "1"
+      - name: PVCServiceAccountName
+        value: "user-service-account"
+    openebs.io/cas-type: cstor
+  name: openebs-cstor-override-ns
+provisioner: openebs.io/provisioner-iscsi
