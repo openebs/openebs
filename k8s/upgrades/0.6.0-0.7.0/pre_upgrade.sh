@@ -29,7 +29,7 @@ oens=$1
 
 
 echo
-VERSION_INSTALLED=`kubectl get deploy -n openebs -o yaml \
+VERSION_INSTALLED=`kubectl get deploy -n $oens -o yaml \
  | grep m-apiserver | grep image: \
  | awk -F ':' '{print $3}'`
 
