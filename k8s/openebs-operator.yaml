@@ -79,6 +79,7 @@ spec:
     metadata:
       labels:
         name: maya-apiserver
+        openebs.io/component-name: maya-apiserver
     spec:
       serviceAccountName: openebs-maya-operator
       containers:
@@ -188,6 +189,7 @@ spec:
     metadata:
       labels:
         name: openebs-provisioner
+        openebs.io/component-name: openebs-provisioner
     spec:
       serviceAccountName: openebs-maya-operator
       containers:
@@ -240,6 +242,7 @@ spec:
     metadata:
       labels:
         name: openebs-snapshot-operator
+        openebs.io/component-name: openebs-snapshot-operator
     spec:
       serviceAccountName: openebs-maya-operator
       containers:
@@ -336,6 +339,7 @@ spec:
     metadata:
       labels:
         name: openebs-ndm
+        openebs.io/component-name: ndm
     spec:
       # By default the node-disk-manager will be run on all kubernetes nodes
       # If you would like to limit this to only some nodes, say the nodes
