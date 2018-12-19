@@ -8,6 +8,7 @@ metadata:
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
     component: snapshot-operator
+    openebs.io/component-name: openebs-snapshot-operator
 spec:
   replicas: {{ .Values.snapshotOperator.replicas }}
   selector:
