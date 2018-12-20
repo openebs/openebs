@@ -19,7 +19,7 @@
          include_tasks: "{{utils_path}}/copy_task.yml"
          vars:
            destination_node: "{{groups['kubernetes-kubemasters'].0}}"
-         files_to_copy: "{{ patch_file }}"
+           files_to_copy: "{{ patch_file }}"
 
        - name: Get the list available cvr.
          shell: source ~/.profile; kubectl get cvr -n {{ operator_ns }} --no-headers
