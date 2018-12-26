@@ -54,12 +54,12 @@
   with_items:
     - node-disk-manager-amd64
 
-- name: Change the ImagePullPolicy of openebs resources to Always in operator YAML
+- name: Change the openebs analytics value of openebs resources in operator YAML
   replace:
     path: "{{ ansible_env.HOME }}/{{ openebs_operator_alias }}"
-    regexp: "true"
+    regexp: 'value: "true"'
     after: '- name: OPENEBS_IO_ENABLE_ANALYTICS'
-    replace: "false"
+    replace: 'value: "false"'
 
 - block:
 
