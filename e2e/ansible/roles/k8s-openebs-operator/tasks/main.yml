@@ -54,6 +54,13 @@
   with_items:
     - node-disk-manager-amd64
 
+- name: Change the ImagePullPolicy of openebs resources to Always in operator YAML
+  replace:
+    path: "{{ ansible_env.HOME }}/{{ openebs_operator_alias }}"
+    regexp: "true"
+    after: '- name: OPENEBS_IO_ENABLE_ANALYTICS'
+    replace: "false"
+
 - block:
 
     - name: Get kubernetes master name
