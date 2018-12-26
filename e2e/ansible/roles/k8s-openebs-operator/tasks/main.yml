@@ -54,6 +54,13 @@
   with_items:
     - node-disk-manager-amd64
 
+- name: Change the openebs analytics value of openebs resources in operator YAML
+  replace:
+    path: "{{ ansible_env.HOME }}/{{ openebs_operator_alias }}"
+    regexp: 'value: "true"'
+    after: '- name: OPENEBS_IO_ENABLE_ANALYTICS'
+    replace: 'value: "false"'
+
 - block:
 
     - name: Get kubernetes master name
