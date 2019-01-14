@@ -8,7 +8,7 @@ Ancak, projeye katkıda bulunmanın en iyi yolu hakkında biraz daha fazla rehbe
 
 Bununla birlikte, OpenEBS Açık Kaynakta bir yazılımdır. Herhangi bir şekilde katkıda bulunabilirsiniz ve sağlanan tüm yardımlar takdir edilmektedir.
 
-- [Yeni işlevsellik istemek, belgeleri düzeltmek veya hataları bildirmek için sorunları yükseltin.](sorunları-yükseltme)
+- [Yeni işlevsellik istemek, belgeleri düzeltmek veya hataları bildirmek için sorunları yükseltin.](sorunlari-yükseltme)
 - [Belgeleri iyileştirmek için değişiklikleri gönderin.](#belgeleri-geliştirmek-için-değişiklik-gönder) 
 - [Yeni özellikler / geliştirmeler için teklifler gönderin.](#yeni-özellikler-için-öneriler-gönderin)
 - [Belgeleme veya kod ile ilgili mevcut sorunları çözün.](#kaynak-kod-ve-hata-düzeltmelerine-katkı-sağlamak)
