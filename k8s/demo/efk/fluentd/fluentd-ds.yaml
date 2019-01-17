@@ -137,9 +137,6 @@ spec:
               mountPath: /var/lib/docker/containers
             - name: posloc
               mountPath: /tmp
-            - name: config
-              mountPath: /fluentd/etc/fluent.conf
-              subPath: fluent.conf
       volumes:
         - name: varlog
           hostPath:
@@ -147,9 +144,6 @@ spec:
         - name: varlibdockercontainers
           hostPath:
             path: /var/lib/docker/containers
-        - name: config
-          configMap:
-            name: fluentd
         - name: posloc
           hostPath:
-            path: /tmp            
+            path: /tmp
