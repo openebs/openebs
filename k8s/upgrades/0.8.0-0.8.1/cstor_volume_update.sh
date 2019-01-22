@@ -80,7 +80,7 @@ sed "s/@sc_name/$sc_name/g" cstor-volume-replica-patch.tpl.json | sed -u "s/@sc_
 
 # #### PATCH TARGET DEPLOYMENT ####
 echo "Upgrading Target Deployment to 0.8.1"
-kubectl patch deployment  --namespace $ns $c_dep -p "$(cat cstor-target-patch.json)"
+kubectl patch deployment  --namespace $ns $c_dep -p "$(cat cstor-target-patch.json)" 
 rc=$?; if [ $rc -ne 0 ]; then echo "ERROR: $rc"; exit; fi
 
 kubectl delete rs $c_rs --namespace $ns
@@ -108,7 +108,7 @@ replicas=$(kubectl get cvr -n $ns -l cstorvolume.openebs.io/name=$pv -o jsonpath
 for replica in $replicas
 do
     echo "Patching replic: $replica"
-    kubectl patch cvr $replica --namespace $ns -p "$(cat cstor-volume-replica-patch.json)" --type=merge
+    kubectl patch cvr $replica --namespace openebs -p "$(cat cstor-volume-replica-patch.json)" --type=merge
     rc=$?; if [ $rc -ne 0 ]; then echo "ERROR: $rc"; exit; fi
     echo "Successfully updated replica: $replica"
 done
