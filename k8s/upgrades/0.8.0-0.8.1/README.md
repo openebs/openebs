@@ -101,6 +101,6 @@ pvc-1085415d-f84c-11e8-aadf-42010a8000bb   5G         RWO            Delete     
 ```
 
 ```
-./cstor_target_update.sh pvc-1085415d-f84c-11e8-aadf-42010a8000bb openebs
+./cstor_volume_update.sh pvc-1085415d-f84c-11e8-aadf-42010a8000bb openebs
 ```
 
