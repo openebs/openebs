@@ -16,6 +16,20 @@ function usage() {
     exit 1
 }
 
+function setDeploymentRecreateStrategy() {
+    dns=$1 # deployment namespace
+    dn=$2  # deployment name
+    currStrategy=`kubectl get deploy -n $dns $dn -o jsonpath="{.spec.strategy.type}"`
+
+    if [ $currStrategy = "RollingUpdate" ]; then
+       kubectl patch deployment --namespace $dns --type json $dn -p "$(cat patch-strategy-recreate.json)"
+       rc=$?; if [ $rc -ne 0 ]; then echo "ERROR: $rc"; exit; fi
+       echo "Deployment upgrade strategy set as recreate"
+    else
+       echo "Deployment upgrade strategy was already set as recreate"
+    fi
+}
+
 if [ "$#" -ne 1 ]; then
     usage
 fi
@@ -39,13 +53,13 @@ ns=`kubectl get pv $pv -o jsonpath="{.spec.claimRef.namespace}"`
 sc_name=`kubectl get pv $pv -o jsonpath="{.spec.storageClassName}"`
 sc_res_ver=`kubectl get sc $sc_name -n $ns -o jsonpath="{.metadata.resourceVersion}"`
 
-################################################################ 
-# STEP: Generate deploy, replicaset and container names from PV#
-#                                                              #
-# NOTES: Ex: If PV="pvc-cec8e86d-0bcc-11e8-be1c-000c298ff5fc", #
-#                                                              #
-# ctrl-dep: pvc-cec8e86d-0bcc-11e8-be1c-000c298ff5fc-ctrl      # 
-################################################################
+################################################################# 
+# STEP: Generate deploy, replicaset and container names from PV #
+#                                                               #
+# NOTES: Ex: If PV="pvc-cec8e86d-0bcc-11e8-be1c-000c298ff5fc"   #
+#                                                               #
+# ctrl-dep: pvc-cec8e86d-0bcc-11e8-be1c-000c298ff5fc-ctrl       # 
+#################################################################
 
 c_dep=$(echo $pv-ctrl);
 r_dep=$(echo $pv-rep);
@@ -66,6 +80,22 @@ r_rs=$(kubectl get rs -o name --namespace $ns | grep $r_dep | cut -d '/' -f 2)
 # previous step                                                #  
 ################################################################
 
+# Check if openebs resources exist and provisioned version is 0.8
+
+kubectl get deployment $c_dep -n $ns &>/dev/null
+rc=$?; if [ $rc -ne 0 ]; then echo "Target deployment not found: $rc"; exit; fi
+
+openebs_version=`kubectl get deployment $c_dep -n $ns -o jsonpath='{.metadata.labels.openebs\.io/version}'`
+if [ $openebs_version != "0.8.0" ]; then
+    echo "Current volumes version is not 0.8.0";exit 1;    
+fi
+
+kubectl get deployment $r_dep -n $ns &>/dev/null
+rc=$?; if [ $rc -ne 0 ]; then echo "Replica deplyment not found $rc"; exit; fi
+
+kubectl get svc $c_svc -n $ns &>/dev/null
+rc=$?; if [ $rc -ne 0 ]; then echo "Service not found: $rc"; exit; fi
+
 sed "s/@sc_name/$sc_name/g" jiva-replica-patch.tpl.json | sed -u "s/@sc_resource_version/$sc_res_ver/g" > jiva-replica-patch.json
 sed "s/@sc_name/$sc_name/g" jiva-target-patch.tpl.json | sed -u "s/@sc_resource_version/$sc_res_ver/g" > jiva-target-patch.json
 sed "s/@sc_name/$sc_name/g" jiva-target-svc-patch.tpl.json | sed -u "s/@sc_resource_version/$sc_res_ver/g" > jiva-target-svc-patch.json
@@ -76,6 +106,10 @@ sed "s/@sc_name/$sc_name/g" jiva-target-svc-patch.tpl.json | sed -u "s/@sc_resou
 
 # PATCH JIVA REPLICA DEPLOYMENT ####
 echo "Upgrading Replica Deployment to 0.8.1"
+
+# Setting the update stratergy to recreate
+setDeploymentRecreateStrategy $ns $r_dep
+
 kubectl patch deployment --namespace $ns $r_dep -p "$(cat jiva-replica-patch.json)"
 rc=$?; if [ $rc -ne 0 ]; then echo "ERROR: $rc"; exit; fi
 
@@ -88,6 +122,10 @@ then echo "ERROR: $rc"; exit; fi
 
 # #### PATCH TARGET DEPLOYMENT ####
 echo "Upgrading Target Deployment to 0.8.1"
+
+# Setting the update stratergy to recreate
+setDeploymentRecreateStrategy $ns $c_dep
+
 kubectl patch deployment  --namespace $ns $c_dep -p "$(cat jiva-target-patch.json)"
 rc=$?; if [ $rc -ne 0 ]; then echo "ERROR: $rc"; exit; fi
 

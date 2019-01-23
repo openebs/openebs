@@ -1,19 +1,23 @@
 {
-    "metadata": {
-       "annotations": {
-          "openebs.io/storage-class-ref": "name: @sc_name\nresourceVersion: @sc_resource_version\n"
-       }
-    },
-    "spec": {
-       "template": {
-          "metadata": {
-             "annotations": {
-                "openebs.io/storage-class-ref": "name: @sc_name\nresourceVersion: @sc_resource_version\n"
-             },
-             "labels":{
+   "metadata": {
+      "annotations": {
+         "openebs.io/storage-class-ref": "name: @sc_name\nresourceVersion: @sc_resource_version\n"
+      },
+      "labels": {
+         "openebs.io/version": "0.8.1",
+         "openebs.io/cas-template-name": "jiva-volume-create-default-0.8.1"
+      }
+   },
+   "spec": {
+      "template": {
+         "metadata": {
+            "annotations": {
+               "openebs.io/storage-class-ref": "name: @sc_name\nresourceVersion: @sc_resource_version\n"
+            },
+            "labels": {
                "openebs.io/storage-class": "@sc_name"
-             }
-          }
-       }
-    }
- }
+            }
+         }
+      }
+   }
+}

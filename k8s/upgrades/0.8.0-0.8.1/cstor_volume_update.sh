@@ -18,6 +18,20 @@ function usage() {
     exit 1
 }
 
+function setDeploymentRecreateStrategy() {
+    dns=$1 # deployment namespace
+    dn=$2  # deployment name
+    currStrategy=`kubectl get deploy -n $dns $dn -o jsonpath="{.spec.strategy.type}"`
+
+    if [ $currStrategy = "RollingUpdate" ]; then
+       kubectl patch deployment --namespace $dns --type json $dn -p "$(cat patch-strategy-recreate.json)"
+       rc=$?; if [ $rc -ne 0 ]; then echo "ERROR: $rc"; exit; fi
+       echo "Deployment upgrade strategy set as recreate"
+    else
+       echo "Deployment upgrade strategy was already set as recreate"
+    fi
+}
+
 if [ "$#" -ne 2 ]; then
     usage
 fi
@@ -68,6 +82,19 @@ c_rs=$(kubectl get rs -o name --namespace $ns | grep $c_dep | cut -d '/' -f 2)
 # previous step                                                #  
 ################################################################
 
+# Check if openebs resources exist and provisioned version is 0.8
+
+kubectl get deployment $c_dep -n $ns &>/dev/null
+rc=$?; if [ $rc -ne 0 ]; then echo "Target deployment not found: $rc"; exit; fi
+
+openebs_version=`kubectl get deployment $c_dep -n $ns -o jsonpath='{.metadata.labels.openebs\.io/version}'`
+if [ $openebs_version != "0.8.0" ]; then
+    echo "Current volumes version is not 0.8.0";exit 1;    
+fi
+
+kubectl get svc $c_svc -n $ns &>/dev/null
+rc=$?; if [ $rc -ne 0 ]; then echo "Service not found: $rc"; exit; fi
+
 sed "s/@sc_name/$sc_name/g" cstor-target-patch.tpl.json | sed -u "s/@sc_resource_version/$sc_res_ver/g" > cstor-target-patch.json
 sed "s/@sc_name/$sc_name/g" cstor-target-svc-patch.tpl.json | sed -u "s/@sc_resource_version/$sc_res_ver/g" > cstor-target-svc-patch.json
 sed "s/@sc_name/$sc_name/g" cstor-volume-patch.tpl.json | sed -u "s/@sc_resource_version/$sc_res_ver/g" > cstor-volume-patch.json
@@ -80,6 +107,10 @@ sed "s/@sc_name/$sc_name/g" cstor-volume-replica-patch.tpl.json | sed -u "s/@sc_
 
 # #### PATCH TARGET DEPLOYMENT ####
 echo "Upgrading Target Deployment to 0.8.1"
+
+# Setting deployment startegy to recreate
+setDeploymentRecreateStrategy $ns $c_dep
+
 kubectl patch deployment  --namespace $ns $c_dep -p "$(cat cstor-target-patch.json)" 
 rc=$?; if [ $rc -ne 0 ]; then echo "ERROR: $rc"; exit; fi
 
