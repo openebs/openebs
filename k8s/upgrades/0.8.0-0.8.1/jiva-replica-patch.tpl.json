@@ -14,6 +14,17 @@
             "annotations": {
                "openebs.io/storage-class-ref": "name: @sc_name\nresourceVersion: @sc_resource_version\n"
             }
+         },
+         "spec": {
+            "containers": [
+               {
+                  "name": "@r_name",
+                  "image": "quay.io/openebs/jiva:0.8.1"
+               }
+            ],
+            "nodeSelector": {
+               "openebs-pv-@pv-name": "@replica_node_label"
+            }
          }
       }
    }

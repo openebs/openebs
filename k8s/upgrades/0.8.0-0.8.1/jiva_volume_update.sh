@@ -35,6 +35,7 @@ if [ "$#" -ne 1 ]; then
 fi
 
 pv=$1
+replica_node_label="openebs-jiva"
 
 # Check if pv exists
 kubectl get pv $pv &>/dev/null;check_pv=$?
@@ -61,9 +62,31 @@ sc_res_ver=`kubectl get sc $sc_name -n $ns -o jsonpath="{.metadata.resourceVersi
 # ctrl-dep: pvc-cec8e86d-0bcc-11e8-be1c-000c298ff5fc-ctrl       # 
 #################################################################
 
-c_dep=$(echo $pv-ctrl);
-r_dep=$(echo $pv-rep);
+c_dep=$(echo $pv-ctrl)
+r_dep=$(echo $pv-rep)
 c_svc=$(echo $c_dep-svc)
+c_name=$(echo $c_dep-con)
+r_name=$(echo $r_dep-con)
+
+# Get the number of replicas configured. 
+# This field is currently not used, but can add additional validations
+# based on the nodes and expected number of replicas
+rep_count=`kubectl get deploy $r_dep --namespace $ns -o jsonpath="{.spec.replicas}"`
+
+# Get the list of nodes where replica pods are running, delimited by ':'
+rep_nodenames=`kubectl get pods -n $ns \
+ -l "openebs.io/persistent-volume=$pv" -l "openebs.io/replica=jiva-replica" \
+ -o jsonpath="{range .items[*]}{@.spec.nodeName}:{end}"`
+
+echo "Checking if the node with replica pod has been labeled with $replica_node_label"
+for rep_node in `echo $rep_nodenames | tr ":" " "`; do
+    nl="";nl=`kubectl get nodes $rep_node -o jsonpath="{.metadata.labels.openebs-pv-$pv}"`
+    if [  -z "$nl" ];
+    then
+       echo "Labeling $rep_node";
+       kubectl label node $rep_node "openebs-pv-${pv}=$replica_node_label"
+    fi
+done
 
 # Fetch the older target and replica - ReplicaSet objects which need to be 
 # deleted before upgrading. If not deleted, the new pods will be stuck in 
@@ -96,8 +119,8 @@ rc=$?; if [ $rc -ne 0 ]; then echo "Replica deplyment not found $rc"; exit; fi
 kubectl get svc $c_svc -n $ns &>/dev/null
 rc=$?; if [ $rc -ne 0 ]; then echo "Service not found: $rc"; exit; fi
 
-sed "s/@sc_name/$sc_name/g" jiva-replica-patch.tpl.json | sed -u "s/@sc_resource_version/$sc_res_ver/g" > jiva-replica-patch.json
-sed "s/@sc_name/$sc_name/g" jiva-target-patch.tpl.json | sed -u "s/@sc_resource_version/$sc_res_ver/g" > jiva-target-patch.json
+sed "s/@sc_name/$sc_name/g" jiva-replica-patch.tpl.json | sed -u "s/@sc_resource_version/$sc_res_ver/g" | sed -u "s/@replica_node_label/$replica_node_label/g" | sed -u "s/@r_name/$r_name/g" | sed -u "s/@pv-name/$pv/g" > jiva-replica-patch.json
+sed "s/@sc_name/$sc_name/g" jiva-target-patch.tpl.json | sed -u "s/@sc_resource_version/$sc_res_ver/g" | sed -u "s/@c_name/$c_name/g" > jiva-target-patch.json
 sed "s/@sc_name/$sc_name/g" jiva-target-svc-patch.tpl.json | sed -u "s/@sc_resource_version/$sc_res_ver/g" > jiva-target-svc-patch.json
 
 #################################################################################

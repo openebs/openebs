@@ -14,6 +14,18 @@
             "annotations": {
                "openebs.io/storage-class-ref": "name: @sc_name\nresourceVersion: @sc_resource_version\n"
             }
+         },
+         "spec": {
+            "containers": [
+               {
+                  "name": "@c_name",
+                  "image": "quay.io/openebs/jiva:0.8.1"
+               },
+               {
+                  "name": "maya-volume-exporter",
+                  "image": "quay.io/openebs/m-exporter:0.8.1"
+               }
+            ]
          }
       }
    }
