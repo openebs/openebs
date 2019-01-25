@@ -1,0 +1,37 @@
+{
+  "metadata": {
+     "labels": {
+        "openebs.io/version": "0.8.1"
+     }
+  },
+  "spec": {
+     "template": {
+        "spec": {
+           "containers": [
+              {
+                 "name": "cstor-pool",
+                 "image": "quay.io/openebs/cstor-pool:0.8.1",
+                 "livenessProbe": {
+                    "exec": {
+                       "command": [
+                          "/bin/sh",
+                          "-c",
+                          "zfs set io.openebs:livenesstimestap='$(date)' cstor-$OPENEBS_IO_CSTOR_ID"
+                        ]
+                    },
+                    "failureThreshold": 3,
+                    "initialDelaySeconds": 300,
+                    "periodSeconds": 10,
+                    "successThreshold": 1,
+                    "timeoutSeconds": 30
+                  }
+              },
+              {
+                "name": "cstor-pool-mgmt",
+                "image": "quay.io/openebs/cstor-pool-mgmt:0.8.1"
+              }
+          ]
+        }
+     }
+  }
+}
