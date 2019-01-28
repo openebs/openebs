@@ -23,7 +23,7 @@ function setDeploymentRecreateStrategy() {
 
     if [ $currStrategy = "RollingUpdate" ]; then
        kubectl patch deployment --namespace $dns --type json $dn -p "$(cat patch-strategy-recreate.json)"
-       rc=$?; if [ $rc -ne 0 ]; then echo "ERROR: $rc"; exit; fi
+       rc=$?; if [ $rc -ne 0 ]; then echo " Upgrade failed | ERROR: $rc"; exit; fi
        echo "Deployment upgrade strategy set as recreate"
     else
        echo "Deployment upgrade strategy was already set as recreate"
@@ -134,14 +134,14 @@ echo "Upgrading Replica Deployment to 0.8.1"
 setDeploymentRecreateStrategy $ns $r_dep
 
 kubectl patch deployment --namespace $ns $r_dep -p "$(cat jiva-replica-patch.json)"
-rc=$?; if [ $rc -ne 0 ]; then echo "ERROR: $rc"; exit; fi
+rc=$?; if [ $rc -ne 0 ]; then echo "Upgrade failed | ERROR: $rc"; exit; fi
 
 kubectl delete rs $r_rs --namespace $ns
-rc=$?; if [ $rc -ne 0 ]; then echo "ERROR: $rc"; exit; fi
+rc=$?; if [ $rc -ne 0 ]; then echo " Upgrade failed | ERROR: $rc"; exit; fi
 
 rollout_status=$(kubectl rollout status --namespace $ns deployment/$r_dep)
 rc=$?; if [[ ($rc -ne 0) || !($rollout_status =~ "successfully rolled out") ]];
-then echo "ERROR: $rc"; exit; fi
+then echo " Upgrade failed | ERROR: $rc"; exit; fi
 
 # #### PATCH TARGET DEPLOYMENT ####
 echo "Upgrading Target Deployment to 0.8.1"
@@ -150,20 +150,20 @@ echo "Upgrading Target Deployment to 0.8.1"
 setDeploymentRecreateStrategy $ns $c_dep
 
 kubectl patch deployment  --namespace $ns $c_dep -p "$(cat jiva-target-patch.json)"
-rc=$?; if [ $rc -ne 0 ]; then echo "ERROR: $rc"; exit; fi
+rc=$?; if [ $rc -ne 0 ]; then echo " Upgrade failed | ERROR: $rc"; exit; fi
 
 kubectl delete rs $c_rs --namespace $ns
-rc=$?; if [ $rc -ne 0 ]; then echo "ERROR: $rc"; exit; fi
+rc=$?; if [ $rc -ne 0 ]; then echo " Upgrade failed | ERROR: $rc"; exit; fi
 
 rollout_status=$(kubectl rollout status --namespace $ns  deployment/$c_dep)
 rc=$?; if [[ ($rc -ne 0) || !($rollout_status =~ "successfully rolled out") ]];
-then echo "ERROR: $rc"; exit; fi
+then echo " Upgrade failed | ERROR: $rc"; exit; fi
 
 
 # #### PATCH TARGET SERVICE ####
 echo "Upgrading Target Service to 0.8.1"
 kubectl patch service --namespace $ns $c_svc -p "$(cat jiva-target-svc-patch.json)"
-rc=$?; if [ $rc -ne 0 ]; then echo "ERROR: $rc"; exit; fi
+rc=$?; if [ $rc -ne 0 ]; then echo " Upgrade failed | ERROR: $rc"; exit; fi
 
 echo "Clearing temporary files"
 rm jiva-replica-patch.json

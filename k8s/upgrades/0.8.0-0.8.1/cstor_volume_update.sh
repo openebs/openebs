@@ -25,7 +25,7 @@ function setDeploymentRecreateStrategy() {
 
     if [ $currStrategy = "RollingUpdate" ]; then
        kubectl patch deployment --namespace $dns --type json $dn -p "$(cat patch-strategy-recreate.json)"
-       rc=$?; if [ $rc -ne 0 ]; then echo "ERROR: $rc"; exit; fi
+       rc=$?; if [ $rc -ne 0 ]; then echo "Upgrade failed | ERROR: $rc"; exit; fi
        echo "Deployment upgrade strategy set as recreate"
     else
        echo "Deployment upgrade strategy was already set as recreate"
@@ -94,7 +94,7 @@ cv_uuid="";cv_uuid=`kubectl get cstorvolume -n $ns $pv -o jsonpath="{.metadata.u
 echo "$c_dep -> cv uuid is $cv_uuid"
 if [  -z "$cv_uuid" ];
 then
-    echo "Error: Unable to fetch cv uuid";
+    echo "Upgrade failed | Error: Unable to fetch cv uuid";
     exit 1
 fi
 
@@ -123,29 +123,29 @@ echo "Upgrading Target Deployment to 0.8.1"
 setDeploymentRecreateStrategy $ns $c_dep
 
 kubectl patch deployment  --namespace $ns $c_dep -p "$(cat cstor-target-patch.json)" 
-rc=$?; if [ $rc -ne 0 ]; then echo "ERROR: $rc"; exit; fi
+rc=$?; if [ $rc -ne 0 ]; then echo "Upgrade failed | ERROR: $rc"; exit; fi
 
 
 
 kubectl delete rs $c_rs --namespace $ns
-rc=$?; if [ $rc -ne 0 ]; then echo "ERROR: $rc"; exit; fi
+rc=$?; if [ $rc -ne 0 ]; then echo "Upgrade failed | ERROR: $rc"; exit; fi
 
 
 rollout_status=$(kubectl rollout status --namespace $ns  deployment/$c_dep)
 rc=$?; if [[ ($rc -ne 0) || !($rollout_status =~ "successfully rolled out") ]];
-then echo "ERROR: $rc"; exit; fi
+then echo "Upgrade failed | ERROR: $rc"; exit; fi
 
 
 
 # #### PATCH TARGET SERVICE ####
 echo "Upgrading Target Service to 0.8.1"
 kubectl patch service --namespace $ns $c_svc -p "$(cat cstor-target-svc-patch.json)"
-rc=$?; if [ $rc -ne 0 ]; then echo "ERROR: $rc"; exit; fi
+rc=$?; if [ $rc -ne 0 ]; then echo "Upgrade failed | ERROR: $rc"; exit; fi
 
 # #### PATCH CSTOR Volume CR ####
 echo "Upgrading cstor volume CR to 0.8.1"
 kubectl patch cstorvolume --namespace $ns $c_svc -p "$(cat cstor-volume-patch.json)" --type=merge
-rc=$?; if [ $rc -ne 0 ]; then echo "ERROR: $rc"; exit; fi
+rc=$?; if [ $rc -ne 0 ]; then echo "Upgrade failed | ERROR: $rc"; exit; fi
 
 # #### PATCH CSTOR Volume Replica CR ####
 echo "Upgrading cstor volume replicas CR to 0.8.1"
@@ -155,7 +155,7 @@ for replica in $replicas
 do
     echo "Patching replic: $replica"
     kubectl patch cvr $replica --namespace openebs -p "$(cat cstor-volume-replica-patch.json)" --type=merge
-    rc=$?; if [ $rc -ne 0 ]; then echo "ERROR: $rc"; exit; fi
+    rc=$?; if [ $rc -ne 0 ]; then echo "Upgrade failed | ERROR: $rc"; exit; fi
     echo "Successfully updated replica: $replica"
 done
 
