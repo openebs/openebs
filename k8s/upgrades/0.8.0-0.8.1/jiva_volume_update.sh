@@ -1,5 +1,5 @@
 #!/bin/bash
-
+set -e
 ################################################################
 # STEP: Get Persistent Volume (PV) name as argument            #
 #                                                              #
