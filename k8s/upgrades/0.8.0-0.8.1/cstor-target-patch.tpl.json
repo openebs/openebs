@@ -29,31 +29,7 @@
                },
                {
                   "name": "cstor-volume-mgmt",
-                  "image": "quay.io/openebs/cstor-volume-mgmt:0.8.1",
-                  "env": [
-                     {
-                        "name": "OPENEBS_IO_CSTOR_VOLUME_ID",
-                        "value": "@cv_uuid"
-                     },
-                     {
-                        "name": "NODE_NAME",
-                        "valueFrom": {
-                           "fieldRef": {
-                              "apiVersion": "v1",
-                              "fieldPath": "spec.nodeName"
-                           }
-                        }
-                     },
-                     {
-                        "name": "POD_NAME",
-                        "valueFrom": {
-                           "fieldRef": {
-                              "apiVersion": "v1",
-                              "fieldPath": "metadata.name"
-                           }
-                        }
-                     }
-                  ]
+                  "image": "quay.io/openebs/cstor-volume-mgmt:0.8.1"
                }
             ]
          }

@@ -66,6 +66,8 @@ sc_res_ver=`kubectl get sc $sc_name -n $sc_ns -o jsonpath="{.metadata.resourceVe
 #################################################################
 
 c_dep=$(echo $pv-target)
+c_svc=$(echo $pv)
+c_vol=$(echo $pv)
 
 # Check if openebs resources exist and provisioned version is 0.8
 
@@ -81,23 +83,12 @@ kubectl get svc $c_svc -n $ns &>/dev/null
 rc=$?; if [ $rc -ne 0 ]; then echo "Service not found: $rc"; exit; fi
 
 
-c_svc=$(echo $pv)
-c_vol=$(echo $pv)
-
 # Fetch the older target and replica - ReplicaSet objects which need to be 
 # deleted before upgrading. If not deleted, the new pods will be stuck in 
 # creating state - due to affinity rules. 
 
 c_rs=$(kubectl get rs -o name --namespace $ns | grep $c_dep | cut -d '/' -f 2)
 
-#fetch the cstor volume uid as cv_uuid
-cv_uuid="";cv_uuid=`kubectl get cstorvolume -n $ns $pv -o jsonpath="{.metadata.uid}"`
-echo "$c_dep -> cv uuid is $cv_uuid"
-if [  -z "$cv_uuid" ];
-then
-    echo "Upgrade failed | Error: Unable to fetch cv uuid";
-    exit 1
-fi
 
 ################################################################ 
 # STEP: Update patch files with appropriate resource names     #
@@ -107,7 +98,7 @@ fi
 # previous step                                                #  
 ################################################################
 
-sed "s/@sc_name/$sc_name/g" cstor-target-patch.tpl.json | sed -u "s/@sc_resource_version/$sc_res_ver/g" | sed -u "s/@cv_uuid/$cv_uuid/g" > cstor-target-patch.json
+sed "s/@sc_name/$sc_name/g" cstor-target-patch.tpl.json | sed -u "s/@sc_resource_version/$sc_res_ver/g" > cstor-target-patch.json
 sed "s/@sc_name/$sc_name/g" cstor-target-svc-patch.tpl.json | sed -u "s/@sc_resource_version/$sc_res_ver/g" > cstor-target-svc-patch.json
 sed "s/@sc_name/$sc_name/g" cstor-volume-patch.tpl.json | sed -u "s/@sc_resource_version/$sc_res_ver/g" > cstor-volume-patch.json
 sed "s/@sc_name/$sc_name/g" cstor-volume-replica-patch.tpl.json | sed -u "s/@sc_resource_version/$sc_res_ver/g" > cstor-volume-replica-patch.json

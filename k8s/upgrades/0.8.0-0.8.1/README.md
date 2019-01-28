@@ -60,7 +60,7 @@ kubectl apply -f https://openebs.github.io/charts/openebs-operator-0.8.1.yaml
 As a first step, you must update your custom helm chart or YAML with 0.8.1 release tags and changes made in the values/templates. 
 
 You can use the following as references to know about the changes in 0.8.1: 
-- openebs-charts [PR#2314](https://github.com/openebs/openebs/pull/2314) as reference.
+- openebs-charts [PR#2352](https://github.com/openebs/openebs/pull/2352) as reference.
 
 After updating the YAML or helm chart or helm chart values, you can use the above procedures to upgrade the OpenEBS Operator
 
@@ -88,7 +88,7 @@ pvc-48fb36a2-947f-11e8-b1f3-42010a800004   5G         RWO            Delete     
 ```
 
 ```
-./jiva_volume_update.sh pvc-48fb36a2-947f-11e8-b1f3-42010a800004
+./jiva_volume_upgrade.sh pvc-48fb36a2-947f-11e8-b1f3-42010a800004
 ```
 
 ### Upgrade cStor Volumes
@@ -101,6 +101,6 @@ pvc-1085415d-f84c-11e8-aadf-42010a8000bb   5G         RWO            Delete     
 ```
 
 ```
-./cstor_volume_update.sh pvc-1085415d-f84c-11e8-aadf-42010a8000bb openebs
+./cstor_volume_upgrade.sh pvc-1085415d-f84c-11e8-aadf-42010a8000bb openebs
 ```
 
