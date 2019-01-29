@@ -33,7 +33,7 @@ if [ $openebs_version != "0.8.0" ]; then
 fi
 
 ###Get the no.of pool pods are running #######
-pool_cnt=$(kubectl get po -n $ns -l app=cstor-pool -o jsonpath='{.items[?(@.status.phase=="Running")].metadata.name}'| wc -w)
+pool_cnt=$(kubectl get po -n $ns -l app=cstor-pool,openebs.io/storage-pool-claim=$spc -o jsonpath='{.items[?(@.status.phase=="Running")].metadata.name}'| wc -w)
 
 # Get the list of pool deployments for given SPC, delimited by ':'
 pool_deploys=`kubectl get deploy -n $ns \
@@ -86,7 +86,7 @@ done
 ## Cross check whether the pods are in running status or not if not wait untill it comes to running####
 while [ true ]
 do
-		cnt_aft_upg=$(kubectl get po -n $ns -l app=cstor-pool \
+		cnt_aft_upg=$(kubectl get po -n $ns -l app=cstor-pool,openebs.io/storage-pool-claim=$spc \
 						       -o jsonpath='{.items[?(@.status.phase=="Running")].metadata.name}' | wc -w)
 		if [ $cnt_aft_upg -eq $pool_cnt ]
 		then
@@ -97,7 +97,7 @@ do
 done
 
 ## Fetching the Running pod names
-running_pool_pods=$(kubectl get po -n $ns -l app=cstor-pool -o jsonpath='{.items[?(@.status.phase=="Running")].metadata.name}'| tr " " "\n")
+running_pool_pods=$(kubectl get po -n $ns -l app=cstor-pool,openebs.io/storage-pool-claim=$spc -o jsonpath='{.items[?(@.status.phase=="Running")].metadata.name}'| tr " " "\n")
 
 ## Setting the quorum enabled in the new pool pods ###
 for pool_pod in $running_pool_pods
@@ -117,7 +117,7 @@ do
 				echo "ERROR: while executing zfs get quorum for pool $pool_name. Exit code: $rc"
 		exit 1; fi
 
-		no_of_non_quorum_vol=$(echo $output | grep -wc off)
+		no_of_non_quorum_vol=$(echo $output | grep -wo off | wc -l)
 		if [ $no_of_non_quorum_vol -ne 0 ]; then
 				echo "Failed to get quorum values from pool $pool_name, exit code: $rc"
 		 exit 1; fi
