@@ -42,8 +42,8 @@ pool_deploys=`kubectl get deploy -n $ns \
 
 echo "Patching the csp resource"
 for csp_res in `echo $pool_deploys | tr ":" " "`; do
-		kubectl patch csp $csp_res -p "$(cat csp_patch.json)" --type=merge
-		rc=$?; if [ $rc -ne 0 ]; then echo "Error occured while applying the patch for $csp_res Exit Code: $rc"; exit; fi
+		kubectl patch csp $csp_res -p "$(cat cr_patch.json)" --type=merge
+		rc=$?; if [ $rc -ne 0 ]; then echo "Error occured while applying the patch for csp: $csp_res Exit Code: $rc"; exit; fi
 done
 
 echo "Patching Pool Deployment with new image"
@@ -121,6 +121,13 @@ do
 		if [ $no_of_non_quorum_vol -ne 0 ]; then
 				echo "Failed to get quorum values from pool $pool_name, exit code: $rc"
 		 exit 1; fi
+done
+
+### Patch the sp ###
+echo "Patching the SP resource"
+for sp_res in `echo $pool_deploys | tr ":" " "`; do
+		kubectl patch sp $sp_res -p "$(cat cr_patch.json)" --type=merge
+		rc=$?; if [ $rc -ne 0 ]; then echo "Error occured while applying the patch for SP resource $sp_res Exit Code: $rc"; exit; fi
 done
 
 echo "Successfully upgraded $spc to 0.8.1 Please run your application checks."
