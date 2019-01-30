@@ -1,0 +1,11 @@
+---
+apiVersion: openebs.io/v1alpha1
+kind: StoragePoolClaim
+metadata:
+  name: r1-pool
+spec:
+  name: r1-pool
+  type: disk
+  maxPools: 1
+  poolSpec:
+    poolType: striped
