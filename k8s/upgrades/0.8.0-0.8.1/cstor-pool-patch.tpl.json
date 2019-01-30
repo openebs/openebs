@@ -11,6 +11,12 @@
               {
                  "name": "cstor-pool",
                  "image": "quay.io/openebs/cstor-pool:0.8.1",
+                 "env": [
+                     {
+                        "name": "OPENEBS_IO_CSTOR_ID",
+                        "value": "@csp_uuid"
+                     }
+                 ],
                  "livenessProbe": {
                     "exec": {
                        "command": [
