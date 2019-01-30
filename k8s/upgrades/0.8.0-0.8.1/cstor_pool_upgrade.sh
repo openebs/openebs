@@ -1,11 +1,11 @@
 #!/bin/bash
 set -e
 
-##################################################################
-# STEP: Get SPC name as argument                                 #
-#                                                                #
-# NOTES: Obtain the pool deployments to perform upgrade operation#
-##################################################################
+###########################################################################
+# STEP: Get SPC name and namespace where OpenEBS is deployed as arguments #                               #
+#                                                                         #
+# NOTES: Obtain the pool deployments to perform upgrade operation         #
+###########################################################################
 
 function usage() {
 		echo
@@ -29,10 +29,10 @@ ns=$2
 ##Checking the version of OpenEBS ####
 openebs_version=$(kubectl get csp -o jsonpath="{.items[0].metadata.labels.openebs\.io/version}")
 if [ $openebs_version != "0.8.0" ]; then
-		echo "Current replica version is not 0.8.0";exit 1;
+		echo "Current cStor pool version is not 0.8.0";exit 1;
 fi
 
-###Get the no.of pool pods are running #######
+###Get the no.of pool pods that are running #######
 pool_cnt=$(kubectl get po -n $ns -l app=cstor-pool,openebs.io/storage-pool-claim=$spc -o jsonpath='{.items[?(@.status.phase=="Running")].metadata.name}'| wc -w)
 
 # Get the list of pool deployments for given SPC, delimited by ':'
@@ -55,18 +55,9 @@ for pool_dep in `echo $pool_deploys | tr ":" " "`; do
      -o jsonpath="{range .items[?(@.metadata.ownerReferences[0].name=='$pool_dep')]}{@.metadata.name}{end}")
     echo "$pool_dep -> rs is $pool_rs"
 
-    #fetch the csp_uuid
-    csp_uuid="";csp_uuid=`kubectl get csp -n $ns $pool_dep -o jsonpath="{.metadata.uid}"`
-    echo "$pool_dep -> csp uuid is $csp_uuid"
-    if [  -z "$csp_uuid" ];
-    then
-       echo "Error: Unable to fetch csp uuid";
-       exit 1
-    fi
+		cat cstor-pool-patch.tpl.json > cstor-pool-patch.json
 
-    sed "s/@csp_uuid[^ \"]*/$csp_uuid/g" cstor-pool-patch.tpl.json > cstor-pool-patch.json
-
-    kubectl patch deployment --namespace $ns $pool_dep -p "$(cat cstor-pool-patch.json)"
+		kubectl patch deployment --namespace $ns $pool_dep -p "$(cat cstor-pool-patch.json)"
     rc=$?; if [ $rc -ne 0 ]; then echo "ERROR: $rc"; exit; fi
     rollout_status=$(kubectl rollout status --namespace $ns deployment/$pool_dep)
     rc=$?; if [[ ($rc -ne 0) || !($rollout_status =~ "successfully rolled out") ]];
@@ -123,7 +114,7 @@ do
 		 exit 1; fi
 done
 
-### Patch the sp ###
+### Patch sp resource###
 echo "Patching the SP resource"
 for sp_res in `echo $pool_deploys | tr ":" " "`; do
 		kubectl patch sp $sp_res -p "$(cat cr_patch.json)" --type=merge
