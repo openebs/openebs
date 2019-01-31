@@ -14,7 +14,7 @@
                  "env": [
                      {
                         "name": "OPENEBS_IO_CSTOR_ID",
-                        "value": "@csp_uuid"
+                        "value": "@csp_uuid@"
                      }
                  ],
                  "livenessProbe": {
