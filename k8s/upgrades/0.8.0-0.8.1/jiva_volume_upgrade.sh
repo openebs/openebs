@@ -159,42 +159,54 @@ sed "s/@sc_name@/$sc_name/g" jiva-target-svc-patch.tpl.json | sed -u "s/@sc_reso
 #################################################################################
 
 # PATCH JIVA REPLICA DEPLOYMENT ####
-echo "Upgrading Replica Deployment to $target_upgrade_version"
+if [[ "$replica_version" != "$target_upgrade_version" ]]; then
+    echo "Upgrading Replica Deployment to $target_upgrade_version"
 
-# Setting the update stratergy to recreate
-setDeploymentRecreateStrategy $ns $r_dep
+    # Setting the update stratergy to recreate
+    setDeploymentRecreateStrategy $ns $r_dep
 
-kubectl patch deployment --namespace $ns $r_dep -p "$(cat jiva-replica-patch.json)"
-rc=$?; if [ $rc -ne 0 ]; then echo "Failed to patch the deployment $r_dep | Exit code: $rc"; exit; fi
+    kubectl patch deployment --namespace $ns $r_dep -p "$(cat jiva-replica-patch.json)"
+    rc=$?; if [ $rc -ne 0 ]; then echo "Failed to patch the deployment $r_dep | Exit code: $rc"; exit; fi
 
-kubectl delete rs $r_rs --namespace $ns
-rc=$?; if [ $rc -ne 0 ]; then echo "Failed to delete ReplicaSet $r_rs  | Exit code: $rc"; exit; fi
+    kubectl delete rs $r_rs --namespace $ns
+    rc=$?; if [ $rc -ne 0 ]; then echo "Failed to delete ReplicaSet $r_rs  | Exit code: $rc"; exit; fi
 
-rollout_status=$(kubectl rollout status --namespace $ns deployment/$r_dep)
-rc=$?; if [[ ($rc -ne 0) || !($rollout_status =~ "successfully rolled out") ]];
-then echo " RollOut for $r_dep failed | Exit code: $rc"; exit; fi
+    rollout_status=$(kubectl rollout status --namespace $ns deployment/$r_dep)
+    rc=$?; if [[ ($rc -ne 0) || !($rollout_status =~ "successfully rolled out") ]];
+    then echo " RollOut for $r_dep failed | Exit code: $rc"; exit; fi
+else
+    echo "Replica Deployment $r_dep is already at $target_upgrade_version"
+fi
 
 # #### PATCH TARGET DEPLOYMENT ####
-echo "Upgrading Target Deployment to $target_upgrade_version"
+if [[ "$controller_version" != "$target_upgrade_version" ]]; then
+    echo "Upgrading Target Deployment to $target_upgrade_version"
 
-# Setting the update stratergy to recreate
-setDeploymentRecreateStrategy $ns $c_dep
+    # Setting the update stratergy to recreate
+    setDeploymentRecreateStrategy $ns $c_dep
 
-kubectl patch deployment  --namespace $ns $c_dep -p "$(cat jiva-target-patch.json)"
-rc=$?; if [ $rc -ne 0 ]; then echo "Failed to patch deployment $c_dep | Exit code: $rc"; exit; fi
+    kubectl patch deployment  --namespace $ns $c_dep -p "$(cat jiva-target-patch.json)"
+    rc=$?; if [ $rc -ne 0 ]; then echo "Failed to patch deployment $c_dep | Exit code: $rc"; exit; fi
 
-kubectl delete rs $c_rs --namespace $ns
-rc=$?; if [ $rc -ne 0 ]; then echo "Failed to patch deployment $c_rs | Exit code: $rc"; exit; fi
+    kubectl delete rs $c_rs --namespace $ns
+    rc=$?; if [ $rc -ne 0 ]; then echo "Failed to patch deployment $c_rs | Exit code: $rc"; exit; fi
 
-rollout_status=$(kubectl rollout status --namespace $ns  deployment/$c_dep)
-rc=$?; if [[ ($rc -ne 0) || !($rollout_status =~ "successfully rolled out") ]];
-then echo " Failed to patch the deployment | Exit code: $rc"; exit; fi
+    rollout_status=$(kubectl rollout status --namespace $ns  deployment/$c_dep)
+    rc=$?; if [[ ($rc -ne 0) || !($rollout_status =~ "successfully rolled out") ]];
+    then echo " Failed to patch the deployment | Exit code: $rc"; exit; fi
+else
+    echo "Controller Deployment $c_dep is already at $target_upgrade_version"
 
+fi
 
 # #### PATCH TARGET SERVICE ####
-echo "Upgrading Target Service to $target_upgrade_version"
-kubectl patch service --namespace $ns $c_svc -p "$(cat jiva-target-svc-patch.json)"
-rc=$?; if [ $rc -ne 0 ]; then echo "Failed to patch the service $svc | Exit code: $rc"; exit; fi
+if [[ "$controller_svc_version" != "$target_upgrade_version" ]]; then
+    echo "Upgrading Target Service to $target_upgrade_version"
+    kubectl patch service --namespace $ns $c_svc -p "$(cat jiva-target-svc-patch.json)"
+    rc=$?; if [ $rc -ne 0 ]; then echo "Failed to patch the service $svc | Exit code: $rc"; exit; fi
+else 
+    echo "Controller service $c_svc is already at $target_upgrade_version"
+fi
 
 echo "Clearing temporary files"
 rm jiva-replica-patch.json

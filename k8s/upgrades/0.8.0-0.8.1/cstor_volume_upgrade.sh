@@ -5,7 +5,6 @@
 #                                                              #
 # NOTES: Obtain the pv to upgrade via "kubectl get pv"         #
 ################################################################
-
 target_upgrade_version="0.8.1"
 current_version="0.8.0"
 
@@ -118,12 +117,11 @@ fi
 
 for replica in $c_replicas
 do
-    if [[ "`kubectl get cvr $replica -n openebs -o jsonpath='{.metadata.labels.openebs\.io/version}'`" != "$current_version" ]]; then
+    replica_version=`kubectl get cvr $replica -n openebs -o jsonpath='{.metadata.labels.openebs\.io/version}'`
+    if [[ "$replica_version" != "$current_version" ]] && [[ "$replica_version" != "$target_upgrade_version" ]]; then
         echo "CStor volume replica $replica version is not $current_version"; exit 1;
     fi
 done
-
-
 
 
 ################################################################ 
@@ -145,40 +143,56 @@ sed "s/@sc_name@/$sc_name/g" cstor-volume-replica-patch.tpl.json | sed -u "s/@sc
 
 
 # #### PATCH TARGET DEPLOYMENT ####
-echo "Upgrading Target Deployment to $target_upgrade_version"
 
-# Setting deployment startegy to recreate
-setDeploymentRecreateStrategy $ns $c_dep
+if [[ "$controller_version" != "$target_upgrade_version" ]]; then
+    echo "Upgrading Target Deployment to $target_upgrade_version"
 
-kubectl patch deployment  --namespace $ns $c_dep -p "$(cat cstor-target-patch.json)" 
-rc=$?; if [ $rc -ne 0 ]; then echo "Failed to patch cstor target deployment $c_dep | Exit code: $rc"; exit; fi
+    # Setting deployment startegy to recreate
+    setDeploymentRecreateStrategy $ns $c_dep
 
-kubectl delete rs $c_rs --namespace $ns
-rc=$?; if [ $rc -ne 0 ]; then echo "Failed to delete cstor replica set $c_rs | Exit code: $rc"; exit; fi
+    kubectl patch deployment  --namespace $ns $c_dep -p "$(cat cstor-target-patch.json)" 
+    rc=$?; if [ $rc -ne 0 ]; then echo "Failed to patch cstor target deployment $c_dep | Exit code: $rc"; exit; fi
 
-rollout_status=$(kubectl rollout status --namespace $ns  deployment/$c_dep)
-rc=$?; if [[ ($rc -ne 0) || !($rollout_status =~ "successfully rolled out") ]];
-then echo "Failed to rollout for deployment $c_dep | Exit code: $rc"; exit; fi
+    kubectl delete rs $c_rs --namespace $ns
+    rc=$?; if [ $rc -ne 0 ]; then echo "Failed to delete cstor replica set $c_rs | Exit code: $rc"; exit; fi
+
+    rollout_status=$(kubectl rollout status --namespace $ns  deployment/$c_dep)
+    rc=$?; if [[ ($rc -ne 0) || !($rollout_status =~ "successfully rolled out") ]];
+    then echo "Failed to rollout for deployment $c_dep | Exit code: $rc"; exit; fi
+else
+    echo "Target deployment $c_dep is already at $target_upgrade_version"
+fi
 
 # #### PATCH TARGET SERVICE ####
-echo "Upgrading Target Service to $target_upgrade_version"
-kubectl patch service --namespace $ns $c_svc -p "$(cat cstor-target-svc-patch.json)"
-rc=$?; if [ $rc -ne 0 ]; then echo "Failed to patch service $svc | Exit code: $rc"; exit; fi
+if [[ "$controller_service_version" != "$target_upgrade_version" ]]; then
+    echo "Upgrading Target Service to $target_upgrade_version"
+    kubectl patch service --namespace $ns $c_svc -p "$(cat cstor-target-svc-patch.json)"
+    rc=$?; if [ $rc -ne 0 ]; then echo "Failed to patch service $svc | Exit code: $rc"; exit; fi
+else 
+    echo "Target service $c_svc is already at $target_upgrade_version"
+fi
 
 # #### PATCH CSTOR Volume CR ####
-echo "Upgrading cstor volume CR to $target_upgrade_version"
-kubectl patch cstorvolume --namespace $ns $c_vol -p "$(cat cstor-volume-patch.json)" --type=merge
-rc=$?; if [ $rc -ne 0 ]; then echo "Failed to patch cstor volumes CR $c_vol | Exit code: $rc"; exit; fi
+if [[ "$cstor_volume_version" != "$target_upgrade_version" ]]; then
+    echo "Upgrading cstor volume CR to $target_upgrade_version"
+    kubectl patch cstorvolume --namespace $ns $c_vol -p "$(cat cstor-volume-patch.json)" --type=merge
+    rc=$?; if [ $rc -ne 0 ]; then echo "Failed to patch cstor volumes CR $c_vol | Exit code: $rc"; exit; fi
+else
+    echo "CStor volume CR  $c_vol is already at $target_upgrade_version"
+fi
 
 # #### PATCH CSTOR Volume Replica CR ####
-echo "Upgrading cstor volume replicas CR to $target_upgrade_version"
 
 for replica in $c_replicas
 do
-    echo "Patching replic: $replica"
-    kubectl patch cvr $replica --namespace openebs -p "$(cat cstor-volume-replica-patch.json)" --type=merge
-    rc=$?; if [ $rc -ne 0 ]; then echo "Failed to patch CstorVolumeReplica $replica | Exit code: $rc"; exit; fi
-    echo "Successfully updated replica: $replica"
+    if [[ "`kubectl get cvr $replica -n openebs -o jsonpath='{.metadata.labels.openebs\.io/version}'`" != "$target_upgrade_version" ]]; then
+        echo "Upgrading cstor volume replica $replica to $target_upgrade_version"
+        kubectl patch cvr $replica --namespace openebs -p "$(cat cstor-volume-replica-patch.json)" --type=merge
+        rc=$?; if [ $rc -ne 0 ]; then echo "Failed to patch CstorVolumeReplica $replica | Exit code: $rc"; exit; fi
+        echo "Successfully updated replica: $replica"
+    else
+        echo "cstor replica  $replica is already at $target_upgrade_version"
+    fi
 done
 
 echo "Clearing temporary files"
