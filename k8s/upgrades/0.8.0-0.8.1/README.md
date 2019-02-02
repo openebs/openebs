@@ -64,9 +64,9 @@ You can use the following as references to know about the changes in 0.8.1:
 
 After updating the YAML or helm chart or helm chart values, you can use the above procedures to upgrade the OpenEBS Operator
 
-## Step 2: Upgrade the OpenEBS Volumes
+## Step 2: Upgrade the OpenEBS Pools and Volumes
 
-Even after the OpenEBS Operator has been upgraded to 0.8.1, the Storage volumes (both jiva and cStor)  will continue to work with older versions. Use the following steps to upgrade the Volumes. 
+Even after the OpenEBS Operator has been upgraded to 0.8.1, the cStor Storage Pools and volumes (both jiva and cStor)  will continue to work with older versions. Use the following steps in the same order to upgrade cStor Pools and volumes.
 
 *Note: Upgrade functionality is still under active development. It is highly recommended to schedule a downtime for the application using the OpenEBS PV while performing this upgrade. Also, make sure you have taken a backup of the data before starting the below upgrade procedure.*
 
@@ -91,6 +91,21 @@ pvc-48fb36a2-947f-11e8-b1f3-42010a800004   5G         RWO            Delete     
 ./jiva_volume_upgrade.sh pvc-48fb36a2-947f-11e8-b1f3-42010a800004
 ```
 
+### Upgrade cStor Pools
+
+Extract the SPC name using `kubectl get spc`
+
+```
+NAME                AGE
+cstor-sparse-pool   24m
+```
+
+```
+./cstor_pool_upgrade.sh cstor-sparse-pool openebs
+```
+Make sure that this step completes successfully before proceeding to next step.
+
+
 ### Upgrade cStor Volumes
 
 Extract the PV name using `kubectl get pv`
@@ -103,4 +118,3 @@ pvc-1085415d-f84c-11e8-aadf-42010a8000bb   5G         RWO            Delete     
 ```
 ./cstor_volume_upgrade.sh pvc-1085415d-f84c-11e8-aadf-42010a8000bb openebs
 ```
-
