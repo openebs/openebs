@@ -1,7 +1,7 @@
 {
   "metadata": {
      "labels": {
-        "openebs.io/version": "0.8.1"
+        "openebs.io/version": "@pool_version@"
      }
   },
   "spec": {
@@ -10,7 +10,7 @@
            "containers": [
               {
                  "name": "cstor-pool",
-                 "image": "quay.io/openebs/cstor-pool:0.8.1",
+                 "image": "quay.io/openebs/cstor-pool:@pool_version@",
                  "env": [
                      {
                         "name": "OPENEBS_IO_CSTOR_ID",
@@ -34,7 +34,7 @@
               },
               {
                 "name": "cstor-pool-mgmt",
-                "image": "quay.io/openebs/cstor-pool-mgmt:0.8.1"
+                "image": "quay.io/openebs/cstor-pool-mgmt:@pool_version@"
               }
           ]
         }

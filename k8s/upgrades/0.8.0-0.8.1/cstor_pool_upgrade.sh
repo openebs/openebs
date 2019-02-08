@@ -6,6 +6,9 @@
 # NOTES: Obtain the pool deployments to perform upgrade operation         #
 ###########################################################################
 
+pool_upgrade_version="0.8.1"
+current_version="0.8.0"
+
 function usage() {
     echo
     echo "Usage:"
@@ -25,8 +28,8 @@ function verify_openebs_version() {
     local openebs_version=$(kubectl get $resource $name_res -n $ns \
                  -o jsonpath="{.metadata.labels.openebs\.io/version}")
 
-    if [[ $openebs_version != "0.8.0" ]] && [[ $openebs_version != "0.8.1" ]]; then
-        echo "Expected version of $name_res in $resource is 0.8.0 but got $openebs_version";exit 1;
+    if [[ $openebs_version != $current_version ]] && [[ $openebs_version != $pool_upgrade_version ]]; then
+        echo "Expected version of $name_res in $resource is $current_version but got $openebs_version";exit 1;
     fi
     echo $openebs_version
 }
@@ -59,10 +62,17 @@ if [ $rc -ne 0 ]; then
     exit 1
 fi
 
+################################################################
+# STEP: Update patch files with pool upgrade version           #
+#                                                              #
+################################################################
+
+sed "s/@pool_version@/$pool_upgrade_version/g" cr-patch.tpl.json > cr_patch.json
+
 echo "Patching the csp resource"
 for csp in `echo $csp_list | tr ":" " "`; do
     version=$(verify_openebs_version "csp" $csp)
-    if [ $version == "0.8.1" ]; then
+    if [ $version == $pool_upgrade_version ]; then
         continue
     fi
     ## Patching the csp resource
@@ -78,7 +88,7 @@ for csp in `echo $csp_list | tr ":" " "`; do
         -o jsonpath="{.items[?(@.metadata.labels.openebs\.io/cstor-pool=='$csp')].metadata.name}")
 
     version=$(verify_openebs_version "deploy" $pool_dep)
-    if [ $version == "0.8.1" ]; then
+    if [ $version == $pool_upgrade_version ]; then
         continue
     fi
 
@@ -96,7 +106,7 @@ for csp in `echo $csp_list | tr ":" " "`; do
     fi
 
     ## Modifies the cstor-pool-patch template with the original values ##
-    sed "s/@csp_uuid@/$csp_uuid/g" cstor-pool-patch.tpl.json > cstor-pool-patch.json
+    sed "s/@csp_uuid@/$csp_uuid/g" cstor-pool-patch.tpl.json | sed -u "s/@pool_version@/$pool_upgrade_version/g" > cstor-pool-patch.json
 
     ## Patch the deployment file ###
     kubectl patch deployment --namespace $ns $pool_dep -p "$(cat cstor-pool-patch.json)"
@@ -125,7 +135,7 @@ fi
 echo "Patching the SP resource"
 for sp in `echo $sp_list | tr ":" " "`; do
     version=$(verify_openebs_version "sp" $sp)
-    if [ $version == "0.8.1" ]; then
+    if [ $version == $pool_upgrade_version ]; then
         continue
     fi
     kubectl patch sp $sp -p "$(cat cr_patch.json)" --type=merge
@@ -133,10 +143,13 @@ for sp in `echo $sp_list | tr ":" " "`; do
     if [ $rc -ne 0 ]; then echo "Error: failed to patch for SP resource $sp Exit Code: $rc"; exit; fi
 done
 
-echo "Successfully upgraded $spc to 0.8.1"
+###Cleaning temporary patch file
+rm cr_patch.json
+
+echo "Successfully upgraded $spc to $pool_upgrade_version"
 echo "Running post pool upgrade scripts for $spc..."
 
 ./cstor_pool_post_upgrade.sh $spc $ns
 
-echo "Post upgrade of $spc is done successfully to 0.8.1 Please run volume upgrade scripts."
+echo "Post upgrade of $spc is done successfully to $pool_upgrade_version Please run volume upgrade scripts."
 exit 0
