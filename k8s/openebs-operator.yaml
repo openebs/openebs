@@ -303,6 +303,9 @@ data:
       - key: udev-probe
         name: udev probe
         state: true
+      - key: seachest-probe
+        name: seachest probe
+        state: true
       - key: smart-probe
         name: smart probe
         state: true
@@ -328,6 +331,8 @@ metadata:
   name: openebs-ndm
   namespace: openebs
 spec:
+  updateStrategy:
+    type: RollingUpdate
   template:
     metadata:
       labels:
@@ -346,9 +351,6 @@ spec:
       hostNetwork: true
       containers:
       - name: node-disk-manager
-        command:
-        - /usr/sbin/ndm
-        - start
         image: quay.io/openebs/node-disk-manager-amd64:v0.2.0
         imagePullPolicy: IfNotPresent
         securityContext:
