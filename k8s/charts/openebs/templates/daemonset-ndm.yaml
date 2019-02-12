@@ -14,6 +14,8 @@ spec:
       app: {{ template "openebs.name" . }}
       release: {{ .Release.Name }}
       component: ndm
+  updateStrategy:
+    type: RollingUpdate
   template:
     metadata:
       labels:
@@ -27,9 +29,6 @@ spec:
       - name: {{ template "openebs.name" . }}-ndm
         image: "{{ .Values.ndm.image }}:{{ .Values.ndm.imageTag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
-        command:
-        - /usr/sbin/ndm
-        - start
         securityContext:
           privileged: true
         env:
