@@ -16,7 +16,7 @@ spec:
       release: {{ .Release.Name }}
       component: ndm
   updateStrategy:
-    type: RollingUpdate
+    type: "RollingUpdate"
   template:
     metadata:
       labels:
@@ -56,6 +56,13 @@ spec:
           value: "{{ .Values.ndm.sparse.count }}"
 {{- end }}
 {{- end }}
+        livenessProbe:
+          exec:
+            command:
+            - pgrep
+            - ".*ndm"
+          initialDelaySeconds: {{ .Values.ndm.healthCheck.initialDelaySeconds }}
+          periodSeconds: {{ .Values.ndm.healthCheck.periodSeconds }}
         volumeMounts:
         - name: config
           mountPath: /host/node-disk-manager.config
