@@ -72,7 +72,10 @@ sed "s/@pool_version@/$pool_upgrade_version/g" cr-patch.tpl.json > cr_patch.json
 echo "Patching the csp resource"
 for csp in `echo $csp_list | tr ":" " "`; do
     version=$(verify_openebs_version "csp" $csp)
-    if [ $version == $pool_upgrade_version ]; then
+    rc=$?
+    if [ $rc -ne 0 ]; then
+        exit 1
+    elif [ $version == $pool_upgrade_version ]; then
         continue
     fi
     ## Patching the csp resource
@@ -88,7 +91,10 @@ for csp in `echo $csp_list | tr ":" " "`; do
         -o jsonpath="{.items[?(@.metadata.labels.openebs\.io/cstor-pool=='$csp')].metadata.name}")
 
     version=$(verify_openebs_version "deploy" $pool_dep)
-    if [ $version == $pool_upgrade_version ]; then
+    rc=$?
+    if [ $rc -ne 0 ]; then
+        exit 1
+    elif [ $version == $pool_upgrade_version ]; then
         continue
     fi
 
@@ -135,7 +141,10 @@ fi
 echo "Patching the SP resource"
 for sp in `echo $sp_list | tr ":" " "`; do
     version=$(verify_openebs_version "sp" $sp)
-    if [ $version == $pool_upgrade_version ]; then
+    rc=$?
+    if [ $rc -ne 0 ]; then
+        exit 1
+    elif [ $version == $pool_upgrade_version ]; then
         continue
     fi
     kubectl patch sp $sp -p "$(cat cr_patch.json)" --type=merge
