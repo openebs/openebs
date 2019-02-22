@@ -57,7 +57,8 @@ fi
 sc_ns=`kubectl get pv $pv -o jsonpath="{.spec.claimRef.namespace}"`
 sc_name=`kubectl get pv $pv -o jsonpath="{.spec.storageClassName}"`
 sc_res_ver=`kubectl get sc $sc_name -n $sc_ns -o jsonpath="{.metadata.resourceVersion}"`
-
+pvc_name=`kubectl get pv $pv -o jsonpath="{.spec.claimRef.name}"`
+pvc_namespace=`kubectl get pv $pv -o jsonpath="{.spec.claimRef.namespace}"`
 ################################################################# 
 # STEP: Generate deploy, replicaset and container names from PV #
 #                                                               #
@@ -133,7 +134,7 @@ done
 ################################################################
 
 sed "s/@sc_name@/$sc_name/g" cstor-target-patch.tpl.json | sed -u "s/@sc_resource_version@/$sc_res_ver/g" | sed -u "s/@target_version@/$target_upgrade_version/g" > cstor-target-patch.json
-sed "s/@sc_name@/$sc_name/g" cstor-target-svc-patch.tpl.json | sed -u "s/@sc_resource_version@/$sc_res_ver/g" | sed -u "s/@target_version@/$target_upgrade_version/g" > cstor-target-svc-patch.json
+sed "s/@sc_name@/$sc_name/g" cstor-target-svc-patch.tpl.json | sed -u "s/@sc_resource_version@/$sc_res_ver/g" | sed -u "s/@target_version@/$target_upgrade_version/g" | sed -u "s/@pvc-name@/$pvc_name/g" | sed -u "s/@pvc-namespace@/$pvc_namespace/g" > cstor-target-svc-patch.json
 sed "s/@sc_name@/$sc_name/g" cstor-volume-patch.tpl.json | sed -u "s/@sc_resource_version@/$sc_res_ver/g" | sed -u "s/@target_version@/$target_upgrade_version/g" > cstor-volume-patch.json
 sed "s/@sc_name@/$sc_name/g" cstor-volume-replica-patch.tpl.json | sed -u "s/@sc_resource_version@/$sc_res_ver/g" | sed -u "s/@target_version@/$target_upgrade_version/g" > cstor-volume-replica-patch.json
 
