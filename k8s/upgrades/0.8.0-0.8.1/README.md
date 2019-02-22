@@ -44,6 +44,9 @@ The upgrade steps vary depending on the way OpenEBS was installed, select one of
 #kubectl delete -f https://raw.githubusercontent.com/openebs/openebs/v0.5/k8s/openebs-operator.yaml
 # Wait for objects to be delete, you can check using `kubectl get deploy`
 
+#Change updateStrategy of openebs ndm pods from onDelete to RollingUpdate
+kubectl patch ds openebs-ndm -n openebs --patch='{"spec":{"updateStrategy":{"type": "RollingUpdate"}}}'
+
 #Upgrade to 0.8.1 OpenEBS Operator
 kubectl apply -f https://openebs.github.io/charts/openebs-operator-0.8.1.yaml
 ```
