@@ -24,7 +24,7 @@ The easiest way to get all the upgrade scripts is via git clone.
 mkdir upgrade-openebs
 cd upgrade-openebs
 git clone https://github.com/openebs/openebs.git
-cd openebs/k8s/upgrade/0.8.0-0.8.1/
+cd openebs/k8s/upgrades/0.8.0-0.8.1/
 ```
 
 ## Step 1: Upgrade the OpenEBS Operator
