@@ -25,12 +25,11 @@
        - name: 1) Install the prerequisites
          include: k8s-percona-pod-prerequisites.yml
 
-       - name: 2) Download YAML for percona mysql plugin
-         include_tasks: "{{utils_path}}/get_url.yml"
-         vars:
-           url: "{{ percona_mysql_plugin_link }}"
-           dest: "{{ result_kube_home.stdout }}/{{ pod_yaml_alias }}"
-           delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+       - name: 2)Copy the fio job specific files to K8s master
+         copy:
+           src: "{{ pod_yaml_alias }}"
+           dest: "{{ result_kube_home.stdout }}"
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"                    
 
        - name: 3) Check whether maya-apiserver pod is deployed
          include_tasks: "{{utils_path}}/deploy_check.yml"
