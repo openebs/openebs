@@ -112,7 +112,7 @@ sed "s/@c_name[^ \"]*/$c_name/g" jiva-target-patch.tpl.json > jiva-target-patch.
 # PATCH JIVA REPLICA DEPLOYMENT ####
 echo "Upgrading Replica Deployment to 0.8"
 kubectl patch deployment --namespace $ns $r_dep -p "$(cat jiva-replica-patch.json)"
-c=$?; if [ $rc -ne 0 ]; then echo "ERROR: $rc"; exit; fi
+rc=$?; if [ $rc -ne 0 ]; then echo "ERROR: $rc"; exit; fi
 
 kubectl delete rs $r_rs --namespace $ns
 
