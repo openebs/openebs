@@ -8,6 +8,8 @@ The upgrade of OpenEBS is a two step process:
 - *Step 1* - Upgrade the OpenEBS Operator 
 - *Step 2* - Upgrade the OpenEBS Volumes from previous versions (0.8.0) 
 
+#### Note: It is mandatory to make sure to that all volumes are running at version 0.8.0 before the upgrade.
+
 ### Terminology
 - *OpenEBS Operator : Refers to maya-apiserver & openebs-provisioner along w/ respective services, service a/c, roles, rolebindings*
 - *OpenEBS Volume: Storage Engine pods like cStor or Jiva controller(aka target) & replica pods*
@@ -27,7 +29,12 @@ git clone https://github.com/openebs/openebs.git
 cd openebs/k8s/upgrades/0.8.0-0.8.1/
 ```
 
-## Step 1: Upgrade the OpenEBS Operator
+## Step 1: Checking the openebs openebs labels
+
+- Run `./pre-check.sh` to get all the openebs volume resources not having `openebs.io/version` tag.
+- Run `./labeltagger.sh 0.8.0` to add `openebs.io/version` label to all the openebs volume resources.
+
+## Step 2: Upgrade the OpenEBS Operator
 
 ### Upgrading OpenEBS Operator CRDs and Deployments
 
@@ -38,12 +45,6 @@ The upgrade steps vary depending on the way OpenEBS was installed, select one of
 **The sample steps below will work if you have installed openebs without modifying the default values in openebs-operator.yaml. If you have customized it for your cluster, you will have to download the 0.8.1 openebs-operator.yaml and customize it again**
 
 ```
-# Starting with OpenEBS 0.6, all the components are installed in namespace `openebs`
-# as opposed to `default` namespace in earlier releases. 
-# If Upgrading from 0.5.x, delete older operator. 
-#kubectl delete -f https://raw.githubusercontent.com/openebs/openebs/v0.5/k8s/openebs-operator.yaml
-# Wait for objects to be delete, you can check using `kubectl get deploy`
-
 #Change updateStrategy of openebs ndm pods from onDelete to RollingUpdate
 kubectl patch ds openebs-ndm -n openebs --patch='{"spec":{"updateStrategy":{"type": "RollingUpdate"}}}'
 
@@ -67,7 +68,7 @@ You can use the following as references to know about the changes in 0.8.1:
 
 After updating the YAML or helm chart or helm chart values, you can use the above procedures to upgrade the OpenEBS Operator
 
-## Step 2: Upgrade the OpenEBS Pools and Volumes
+## Step 3: Upgrade the OpenEBS Pools and Volumes
 
 Even after the OpenEBS Operator has been upgraded to 0.8.1, the cStor Storage Pools and volumes (both jiva and cStor)  will continue to work with older versions. Use the following steps in the same order to upgrade cStor Pools and volumes.
 

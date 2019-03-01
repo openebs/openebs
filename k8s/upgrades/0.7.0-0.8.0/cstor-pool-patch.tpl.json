@@ -1,4 +1,9 @@
 {
+  "metadata": {
+    "labels": {
+      "openebs.io/version": "0.8.0"
+    }
+  },
   "spec": {
      "template": {
         "spec": {

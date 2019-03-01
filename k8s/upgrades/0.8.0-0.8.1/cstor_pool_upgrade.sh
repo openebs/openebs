@@ -159,6 +159,7 @@ echo "Successfully upgraded $spc to $pool_upgrade_version"
 echo "Running post pool upgrade scripts for $spc..."
 
 ./cstor_pool_post_upgrade.sh $spc $ns
+rc=$?
+if [ $rc -eq 0 ]; then echo "Post upgrade of $spc is done successfully to $pool_upgrade_version Please run volume upgrade scripts."; exit; fi
 
-echo "Post upgrade of $spc is done successfully to $pool_upgrade_version Please run volume upgrade scripts."
 exit 0

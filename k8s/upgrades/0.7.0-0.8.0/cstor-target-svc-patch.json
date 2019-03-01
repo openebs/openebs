@@ -1,5 +1,10 @@
 {
-  "spec": {
+    "metadata": {
+        "labels": {
+            "openebs.io/version": "0.8.0"
+        }
+    },
+    "spec": {
         "ports": [
             {
                 "name": "cstor-iscsi",
@@ -26,5 +31,5 @@
                 "targetPort": 9500
             }
         ]
-  }
-} 
+    }
+}
