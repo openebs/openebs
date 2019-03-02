@@ -34,6 +34,8 @@ cd openebs/k8s/upgrades/0.8.0-0.8.1/
 - Run `./pre-check.sh` to get all the openebs volume resources not having `openebs.io/version` tag.
 - Run `./labeltagger.sh 0.8.0` to add `openebs.io/version` label to all the openebs volume resources.
 
+#### Please make sure that all pods are back to running state before proceeding to Step 2
+
 ## Step 2: Upgrade the OpenEBS Operator
 
 ### Upgrading OpenEBS Operator CRDs and Deployments
