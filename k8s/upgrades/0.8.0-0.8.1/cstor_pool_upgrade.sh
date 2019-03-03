@@ -112,7 +112,7 @@ for csp in `echo $csp_list | tr ":" " "`; do
     fi
 
     ## Modifies the cstor-pool-patch template with the original values ##
-    sed "s/@csp_uuid@/$csp_uuid/g" cstor-pool-patch.tpl.json | sed -u "s/@pool_version@/$pool_upgrade_version/g" > cstor-pool-patch.json
+    sed "s/@csp_uuid@/$csp_uuid/g" cstor-pool-patch.tpl.json | sed "s/@pool_version@/$pool_upgrade_version/g" > cstor-pool-patch.json
 
     ## Patch the deployment file ###
     kubectl patch deployment --namespace $ns $pool_dep -p "$(cat cstor-pool-patch.json)"
