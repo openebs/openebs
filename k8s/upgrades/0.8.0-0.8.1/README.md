@@ -4,9 +4,10 @@
 
 This document describes the steps for upgrading OpenEBS from 0.8.0 to 0.8.1 
 
-The upgrade of OpenEBS is a two step process: 
-- *Step 1* - Upgrade the OpenEBS Operator 
-- *Step 2* - Upgrade the OpenEBS Volumes from previous versions (0.8.0) 
+The upgrade of OpenEBS is a three step process: 
+- *Step 1* - Checking the openebs version labels
+- *Step 2* - Upgrade the OpenEBS Operator 
+- *Step 3* - Upgrade the OpenEBS Volumes from previous versions (0.8.0) 
 
 #### Note: It is mandatory to make sure to that all volumes are running at version 0.8.0 before the upgrade.
 
@@ -29,12 +30,13 @@ git clone https://github.com/openebs/openebs.git
 cd openebs/k8s/upgrades/0.8.0-0.8.1/
 ```
 
-## Step 1: Checking the openebs openebs labels
+## Step 1: Checking the openebs version labels
 
 - Run `./pre-check.sh` to get all the openebs volume resources not having `openebs.io/version` tag.
 - Run `./labeltagger.sh 0.8.0` to add `openebs.io/version` label to all the openebs volume resources.
 
 #### Please make sure that all pods are back to running state before proceeding to Step 2
+### Note: It is ok to get no resources to label in pre-check process. The pre-check is to help users upgrading or upgraded from 0.7.
 
 ## Step 2: Upgrade the OpenEBS Operator
 
@@ -60,7 +62,7 @@ kubectl apply -f https://openebs.github.io/charts/openebs-operator-0.8.1.yaml
 
 - Run `helm repo update` to update local cache with latest package
 - Run `helm ls` to get the release name of openebs. 
-- Upgrade using `helm upgrade -f https://openebs.github.io/charts/helm-values-0.8.1.yaml <release-name> stable/openebs`
+- Upgrade using `helm upgrade openebs stable/openebs`
 
 #### Using customized operator YAML or helm chart.
 As a first step, you must update your custom helm chart or YAML with 0.8.1 release tags and changes made in the values/templates. 
