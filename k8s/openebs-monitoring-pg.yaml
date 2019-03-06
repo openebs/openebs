@@ -72,7 +72,7 @@ data:
       kubernetes_sd_configs:
       - role: pod
       relabel_configs:
-      - source_labels: [__meta_kubernetes_pod_annotation_monitoring]
+      - source_labels: [__meta_kubernetes_pod_annotation_openebs_io_monitoring]
         regex: pool_exporter_prometheus
         action: keep
       - source_labels: [__meta_kubernetes_pod_name]
