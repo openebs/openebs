@@ -1,0 +1,63 @@
+{
+  "metadata": {
+     "labels": {
+        "openebs.io/version": "@pool_version@"
+     },
+     "annotations": {
+        "openebs.io/monitoring": "pool_exporter_prometheus",
+        "prometheus.io/path": "/metrics",
+        "prometheus.io/port": "9500",
+        "prometheus.io/scrape": "true"
+     }
+  },
+  "spec": {
+     "template": {
+        "spec": {
+           "containers": [
+              {
+                 "name": "cstor-pool",
+                 "image": "quay.io/openebs/cstor-pool:@pool_version@"
+              },
+              {
+                "name": "cstor-pool-mgmt",
+                "image": "quay.io/openebs/cstor-pool-mgmt:@pool_version@"
+              },
+              {
+                "image": "quay.io/openebs/m-exporter:@pool_version@",
+                "name": "maya-exporter",
+                "args": [
+                    "-e=pool"
+                ],
+                "command": [
+                    "maya-exporter"
+                ],
+                "ports": [
+                    {
+                        "containerPort": 9500,
+                        "protocol": "TCP"
+                    }
+                ],
+                "volumeMounts": [
+                    {
+                        "mountPath": "/dev",
+                        "name": "device"
+                    },
+                    {
+                        "mountPath": "/tmp",
+                        "name": "tmp"
+                    },
+                    {
+                        "mountPath": "/var/openebs/sparse",
+                        "name": "sparse"
+                    },
+                    {
+                        "mountPath": "/run/udev",
+                        "name": "udev"
+                    }
+                ]
+               }
+          ]
+        }
+     }
+  }
+}
