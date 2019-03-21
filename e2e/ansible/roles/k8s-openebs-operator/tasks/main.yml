@@ -100,7 +100,8 @@
   shell: >
     source ~/.profile;
     kubectl apply -f {{ ansible_env.HOME }}/{{ openebs_operator_alias }}
-    | grep deployment | awk '{print $1}' | cut -d "/" -f2 | grep -v openebs-admission-server
+    | grep deployment | awk '{print $2}'
+    | tr -d '"' | grep -v openebs-admission-server
   args:
     executable: /bin/bash
   register: labels
