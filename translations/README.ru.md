@@ -3,7 +3,7 @@
 [![Build Status](https://img.shields.io/travis/openebs/openebs/master.svg?style=flat-square)](https://travis-ci.org/openebs/jiva)
 [![Docker Pulls](https://img.shields.io/docker/pulls/openebs/jiva.svg?style=flat-square)](https://hub.docker.com/r/openebs/jiva/)
 [![Releases](https://img.shields.io/github/release/openebs/openebs/all.svg?style=flat-square)](https://github.com/openebs/openebs/releases)
-[![Slack](https://img.shields.io/badge/chat!!!-slack-ff1493.svg?style=flat-square)]( https://openebsslacksignup.herokuapp.com/)
+[![Slack](https://img.shields.io/badge/chat!!!-slack-ff1493.svg?style=flat-square)]( https://openebs-community.slack.com)
 [![Twitter](https://img.shields.io/twitter/follow/openebs.svg?style=social&label=Follow)](https://twitter.com/intent/follow?screen_name=openebs)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](https://github.com/openebs/openebs/blob/master/CONTRIBUTING.md)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/openebs/openebs/blob/master/LICENSE)
@@ -61,7 +61,7 @@ OpenEBS можно развернуть на любом Kubernetes класте�
  
 Команда OpenEBS будет рада вашим отзывам, пожеланиям и предложениям:
  
-- Присоединяйтесь к нам в [Slack](https://slack.openebs.io/).
+- [присоединяйтесь к нашему сообществу](https://openebs.io/join-our-community).
   - Уже зарегистрированы? Присоединяйтесь к нашим обсуждениям в [# openebs-users](https://openebs-community.slack.com/messages/openebs-users/).
 - Хотите задать вопрос?
   - Если ваш вопрос общий (или «не совсем уверен»), вы можете его задать в [issues](https://github.com/openebs/openebs/issues).
