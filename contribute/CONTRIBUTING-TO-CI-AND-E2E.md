@@ -23,7 +23,7 @@ The following schema illustrates the workflow:
 
 Contributions are welcome. But, before starting, read the project documentation at [https://docs.openebs.io/](https://docs.openebs.io/). This step is highly recommended. Please raise a Github issue for any questions you may have on the project in general or with e2e or CI in particular.
 
-You can post questions on the [OpenEBS Slack channel](http://slack.openebs.io/) as well.
+You can post questions on the OpenEBS Slack Channel by [joining our community](https://openebs.io/join-our-community) as well.
 
 You can contribute to any of the following areas:
 

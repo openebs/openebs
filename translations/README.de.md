@@ -3,7 +3,7 @@
 [![Build Status](https://img.shields.io/travis/openebs/openebs/master.svg?style=flat-square)](https://travis-ci.org/openebs/jiva)
 [![Docker Pulls](https://img.shields.io/docker/pulls/openebs/jiva.svg?style=flat-square)](https://hub.docker.com/r/openebs/jiva/)
 [![Releases](https://img.shields.io/github/release/openebs/openebs/all.svg?style=flat-square)](https://github.com/openebs/openebs/releases)
-[![Slack](https://img.shields.io/badge/chat!!!-slack-ff1493.svg?style=flat-square)]( https://openebsslacksignup.herokuapp.com/)
+[![Slack](https://img.shields.io/badge/chat!!!-slack-ff1493.svg?style=flat-square)](https://openebs-community.slack.com)
 [![Twitter](https://img.shields.io/twitter/follow/openebs.svg?style=social&label=Follow)](https://twitter.com/intent/follow?screen_name=openebs)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](https://github.com/openebs/openebs/blob/master/CONTRIBUTING.md)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/openebs/openebs/blob/master/LICENSE)
@@ -59,7 +59,7 @@ Wir nähern uns der Beta-Phase mit aktiver Entwicklung. Weitere Informationen fi
  
 OpenEBS freut sich über Ihr Feedback und Ihre Beiträge in jeder möglichen Form.
  
-- Besuchen Sie uns unter [Slack](https://openebsslacksignup.herokuapp.com/)
+- [Tritt unserer Gemeinschaft](https://openebs.io/join-our-community)
   - Bereits angemeldet? Besuchen Sie unsere Diskussionen unter [#openebs-users](https://openebs-community.slack.com/messages/openebs-users/).
 - Möchten Sie ein Problem ansprechen?
   - Wenn es sich um ein generisches Produkt (oder "nicht wirklich sicher") handelt, können Sie es dennoch unter [issues](https://github.com/openebs/openebs/issues) anheben.

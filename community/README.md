@@ -6,7 +6,7 @@ Nevertheless, find below a list of many general channels, groups, and meetings d
 
 ## Communication
 
-- [Slack](https://slack.openebs.io) - Sign Up.
+- [Community](https://openebs.io/join-our-community) - Sign Up for Slack.
 
 - [Blog](https://blog.openebs.io) - Blogs on Containerized Storage, and DevOps.
 
