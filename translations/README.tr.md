@@ -43,11 +43,11 @@ OpenEBS birkaç kolay adımda kurulabilir. Kubernetes kümenizde (cluster) open-
 kubectl apply -f https://openebs.github.io/charts/openebs-operator.yaml
 ```
 
-**OpenEBS Depolama Sınıflarını Uygula**
+**OpenEBS servislerini Helm ile başlatın**
 
 ```bash
-# bu yamayı uygula
-kubectl apply -f https://openebs.github.io/charts/openebs-storageclasses.yaml
+helm repo update
+helm install --namespace openebs --name openebs stable/openebs
 ```
 
 Ayrıca [Hızlı Başlangıç ​​Kılavuzu](https://docs.openebs.io/docs/overview.html)'nu da takip edebilirsiniz.
