@@ -187,8 +187,7 @@
        - name: 4b) Get the resourceVersion of the controller/target deployment
          shell: >
            source ~/.profile; kubectl get deploy -n {{ ns }}
-           {{ ctrl_deploy }} -o yaml | grep resourceVersion
-           | awk '{print $2}' | sed 's|"||g'
+           {{ ctrl_deploy }} -o custom-columns=:.metadata.resourceVersion --no-headers
          args:
            executable: /bin/bash
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
@@ -211,8 +210,7 @@
        - name: 5a) Get the resourceVersion of the controller/target deployment after recovery.
          shell: >
            source ~/.profile; kubectl get deploy -n {{ ns }}
-           {{ ctrl_deploy }} -o yaml | grep resourceVersion
-           | awk '{print $2}' | sed 's|"||g'
+           {{ ctrl_deploy }} -o custom-columns=:.metadata.resourceVersion --no-headers
          args:
            executable: /bin/bash
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
