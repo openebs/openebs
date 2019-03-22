@@ -42,10 +42,10 @@ OpenEBS kann in wenigen einfachen Schritten eingerichtet werden. Sie können Ihr
 kubectl apply -f https://openebs.github.io/charts/openebs-operator.yaml
 ```
 
-**Anwenden von OpenEBS StorageClasses**
+**Starten Sie die OpenEBS Services mit dem helm**
 ```bash
-# dieses yaml anwenden
-kubectl gelten -f https://openebs.github.io/charts/openebs-storageclasses.yaml
+helm repo update
+helm install --namespace openebs --name openebs stable/openebs
 ```
 
 Sie können auch unserem [QuickStart Guide](https://docs.openebs.io/docs/overview.html) folgen.

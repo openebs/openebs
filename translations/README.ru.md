@@ -43,10 +43,11 @@ OpenEBS можно настроить с помощью нескольких п�
 kubectl apply -f https://openebs.github.io/charts/openebs-operator.yaml
 ```
 
-1. Примените OpenEBS StorageClasses, используя `openebs-storageclasses.yaml`:
+1. Запустите службы OpenEBS с `helm`:
 
    ```bash
-   kubectl apply -f https://openebs.github.io/charts/openebs-storageclasses.yaml
+   helm repo update
+   helm install --namespace openebs --name openebs stable/openebs
    ```
 
    Вы также можете ознакомиться с нашим [Руководством по быстрому запуску](https://docs.openebs.io/docs/overview.html).
