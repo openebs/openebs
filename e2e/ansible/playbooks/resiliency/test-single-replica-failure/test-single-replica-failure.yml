@@ -182,8 +182,7 @@
        - name: Get the resourceVersion of the replica deployment
          shell: >
            source ~/.profile; kubectl get deploy -n {{ namespace }}
-           {{ replica_deploy }} -o yaml | grep resourceVersion
-           | awk '{print $2}' | sed 's|"||g'
+           {{ replica_deploy }} -o custom-columns=:.metadata.resourceVersion --no-headers
          args:
            executable: /bin/bash
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
@@ -206,8 +205,7 @@
        - name: Get the resourceVersion of the replica deployment
          shell: >
            source ~/.profile; kubectl get deploy -n {{ namespace }}
-           {{ replica_deploy }} -o yaml | grep resourceVersion
-           | awk '{print $2}' | sed 's|"||g'
+           {{ replica_deploy }} -o custom-columns=:.metadata.resourceVersion --no-headers
          args:
            executable: /bin/bash
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
