@@ -1,0 +1,8 @@
+{
+   "metadata": {
+      "labels": {
+         "openebs.io/source-volume": "@sourcevolume@",
+         "openebs.io/version": "@target_version@"
+      }
+   }
+}

@@ -1,0 +1,12 @@
+{
+   "metadata": {
+      "annotations": {
+         "openebs.io/pvc-namespace":"@pvc-namespace@",
+         "openebs.io/storage-class-ref": "name: @sc_name@\nresourceVersion: @sc_resource_version@\n"
+      },
+      "labels": {
+         "openebs.io/version": "@target_version@",
+         "openebs.io/persistent-volume-claim":"@pvc-name@"
+      }
+   }
+}
