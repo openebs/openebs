@@ -45,7 +45,7 @@ rules:
   resources: [ "castemplates", "runtasks"]
   verbs: ["*" ]
 - apiGroups: ["*"]
-  resources: [ "cstorpools", "cstorvolumereplicas", "cstorvolumes"]
+  resources: [ "cstorpools", "cstorpools/finalizers", "cstorvolumereplicas", "cstorvolumes"]
   verbs: ["*" ]
 - nonResourceURLs: ["/metrics"]
   verbs: ["get"]
