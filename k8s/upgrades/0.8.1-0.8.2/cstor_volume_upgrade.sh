@@ -40,6 +40,7 @@ fi
 pv=$1
 ns=$2
 
+source snapshotdata_upgrade.sh
 # Check if pv exists
 kubectl get pv $pv &>/dev/null;check_pv=$?
 if [ $check_pv -ne 0 ]; then
@@ -58,7 +59,6 @@ cas_type=`kubectl get pv $pv -o jsonpath="{.metadata.labels.openebs\.io/cas-type
 if [ $cas_type != "cstor" ]; then
     echo "Cstor volume not found";exit 1;
 fi
-
 
 ### 1. Get the cstorvolume name related to the given PV ###
 ### get the cloned volume cstorvolume name if exists
@@ -176,6 +176,12 @@ version=$(verify_volume_version "deploy" $cv_deploy)
     ## 5. Remove the temporary patch file
     rm cstor-target-patch.json
 
+##Patch cstor snapshotdata crs related to pv
+run_snapshotdata_upgrades $pv
+rc=$?
+if [ $rc -ne 0 ]; then
+   exit 1
+fi
 
 echo "Successfully upgraded $pv to $target_upgrade_version Please run your application checks."
 exit 0

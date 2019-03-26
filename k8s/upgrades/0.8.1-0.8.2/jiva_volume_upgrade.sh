@@ -40,6 +40,8 @@ fi
 pv=$1
 replica_node_label="openebs-jiva"
 
+source snapshotdata_upgrade.sh
+
 # Check if pv exists
 kubectl get pv $pv &>/dev/null;check_pv=$?
 if [ $check_pv -ne 0 ]; then
@@ -206,6 +208,13 @@ if [[ "$controller_svc_version" != "$target_upgrade_version" ]]; then
     rc=$?; if [ $rc -ne 0 ]; then echo "Failed to patch the service $svc | Exit code: $rc"; exit; fi
 else
     echo "Controller service $c_svc is already at $target_upgrade_version"
+fi
+
+##Patch jiva snapshotdata crs related to pv
+run_snapshotdata_upgrades $pv
+rc=$?
+if [ $rc -ne 0 ]; then
+   exit 1
 fi
 
 echo "Clearing temporary files"
