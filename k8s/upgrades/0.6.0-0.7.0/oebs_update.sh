@@ -10,12 +10,9 @@ function usage() {
     echo 
     echo "Usage:"
     echo 
-    echo "$0 <pv-name> <custom-label>"
+    echo "$0 <pv-name>"
     echo 
     echo "  <pv-name> Get the PV name using: kubectl get pv"
-    echo "  <custom-label> Label to be applied to the nodes where replicas of"
-    echo "    this PV are present. This is done to make sure the replicas    "
-    echo "    stay on the same node after upgrade."
     exit 1
 }
 
@@ -34,12 +31,12 @@ function setDeploymentRecreateStrategy() {
 }
 
 
-if [ "$#" -ne 2 ]; then
+if [ "$#" -ne 1 ]; then
     usage
 fi
 
 pv=$1
-replica_node_label=$2
+replica_node_label="openebs-jiva"
 
 pvc=`kubectl get pv $pv -o jsonpath="{.spec.claimRef.name}"`
 ns=`kubectl get pv $pv -o jsonpath="{.spec.claimRef.namespace}"`
