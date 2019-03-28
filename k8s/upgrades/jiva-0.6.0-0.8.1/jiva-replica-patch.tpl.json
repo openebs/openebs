@@ -1,0 +1,119 @@
+{
+   "metadata": {
+      "annotations": {
+        "openebs.io/capacity": "@capacity@",
+        "openebs.io/storage-class-ref": "name: @sc_name@\nresourceVersion: @sc_resource_version@\n",
+        "openebs.io/storage-pool": "TODO"
+      },
+      "labels": {
+        "openebs.io/cas-type": "jiva",
+        "openebs.io/persistent-volume": "@pv-name@",
+        "openebs.io/persistent-volume-claim": "@pvc-name@",
+        "openebs.io/replica": "jiva-replica",
+        "openebs.io/storage-engine-type": "jiva",
+        "vsm": "deprecated",
+        "openebs.io/version": "@target_version@"
+      }
+   },
+   "spec": {
+      "selector": {
+         "matchLabels": {
+            "openebs.io/persistent-volume": "@pv-name@",
+            "openebs.io/replica": "jiva-replica",
+            "vsm": "deprecated"
+         }
+      },
+      "template": {
+         "metadata": {
+            "annotations": {
+               "openebs.io/storage-class-ref": "name: @sc_name@\nresourceVersion: @sc_resource_version@\n"
+            },
+            "labels": {
+              "openebs.io/persistent-volume": "@pv-name@",
+              "openebs.io/persistent-volume-claim": "@pvc-name@",
+              "openebs.io/replica": "jiva-replica",
+              "vsm": "deprecated"
+            }
+         },
+         "spec": {
+            "containers":[
+               {
+                  "name": "@r_name@",
+                  "image": "quay.io/openebs/jiva:@target_version@"
+               }
+            ],
+           "nodeSelector": {
+               "openebs-pv-@pv-name@": "@replica_node_label@"
+           },
+           "affinity": {
+               "podAntiAffinity": {
+                   "requiredDuringSchedulingIgnoredDuringExecution" : [
+                      {
+                          "labelSelector": {
+                              "matchLabels": {
+                                  "openebs.io/replica": "jiva-replica",
+                                  "openebs.io/persistent-volume": "@pv-name@"
+                              }
+                           },
+                           "topologyKey": "kubernetes.io/hostname"
+                      }
+                   ]
+               }
+           },
+           "tolerations": [
+             {
+               "effect": "NoExecute",
+               "key": "node.alpha.kubernetes.io/notReady",
+               "operator": "Exists"
+             },
+             {
+               "effect": "NoExecute",
+               "key": "node.alpha.kubernetes.io/unreachable",
+               "operator": "Exists"
+             },
+             {
+               "effect": "NoExecute",
+               "key": "node.kubernetes.io/not-ready",
+               "operator": "Exists"
+             },
+             {
+               "effect": "NoExecute",
+               "key": "node.kubernetes.io/unreachable",
+               "operator": "Exists"
+             },
+             {
+               "effect": "NoExecute",
+               "key": "node.kubernetes.io/out-of-disk",
+               "operator": "Exists"
+             },
+             {
+               "effect": "NoExecute",
+               "key": "node.kubernetes.io/memory-pressure",
+               "operator": "Exists"
+             },
+             {
+               "effect": "NoExecute",
+               "key": "node.kubernetes.io/disk-pressure",
+               "operator": "Exists"
+             },
+             {
+               "effect": "NoExecute",
+               "key": "node.kubernetes.io/network-unavailable",
+               "operator": "Exists"
+             },
+             {
+               "effect": "NoExecute",
+               "key": "node.kubernetes.io/unschedulable",
+               "operator": "Exists"
+             },
+             {
+               "effect": "NoExecute",
+               "key": "node.cloudprovider.kubernetes.io/uninitialized",
+               "operator": "Exists"
+             }
+           ]
+         }
+      }
+   }
+ } 
+ 

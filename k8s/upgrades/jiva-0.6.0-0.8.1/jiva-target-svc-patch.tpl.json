@@ -1,0 +1,43 @@
+{
+   "metadata": {
+      "annotations": {
+         "openebs.io/storage-class-ref": "name: @sc_name@\nresourceVersion: @sc_resource_version@\n"
+      },
+      "labels": {
+        "openebs.io/cas-type": "jiva",
+        "openebs.io/storage-engine-type": "jiva",
+        "openebs.io/controller-service": "jiva-controller-svc",
+        "openebs.io/persistent-volume": "@pv-name@",
+        "openebs.io/persistent-volume-claim": "@pvc-name@",
+        "openebs.io/version": "@target_version@"
+      }
+   },
+   "spec": {
+      "selector": {
+        "openebs.io/controller": "jiva-controller",
+        "openebs.io/persistent-volume": "@pv-name@",
+        "vsm": "deprecated"
+      },
+      "ports": [
+         {
+             "name": "iscsi",
+             "port": 3260,
+             "protocol": "TCP",
+             "targetPort": 3260
+         },
+         {
+             "name": "api",
+             "port": 9501,
+             "protocol": "TCP",
+             "targetPort": 9501
+         },
+         {
+             "name": "exporter",
+             "port": 9500,
+             "protocol": "TCP",
+             "targetPort": 9500
+         }
+     ]
+   }
+ } 
+ 

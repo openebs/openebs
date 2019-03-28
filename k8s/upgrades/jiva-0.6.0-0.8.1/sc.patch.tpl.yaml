@@ -1,0 +1,14 @@
+metadata:
+  labels:
+    openebs.io/cas-type: jiva
+  annotations:
+    openebs.io/cas-type: jiva
+    cas.openebs.io/config: |
+      - name: VolumeMonitor
+        enabled: "@volume-monitoring"
+      - name: ReplicaCount
+        value: "@jiva-replica-count"
+      - name: StoragePool
+        value: "@storage-pool"
+      - name: FSType
+        value: "@fstype"
