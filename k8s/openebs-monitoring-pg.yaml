@@ -67,25 +67,6 @@ data:
       - source_labels: [__meta_kubernetes_pod_container_port_number]
         action: drop
         regex: '(.*)80'
-    - job_name: 'openebs-pools'
-      scheme: http
-      kubernetes_sd_configs:
-      - role: pod
-      relabel_configs:
-      - source_labels: [__meta_kubernetes_pod_annotation_openebs_io_monitoring]
-        regex: pool_exporter_prometheus
-        action: keep
-      - source_labels: [__meta_kubernetes_pod_name]
-        action: replace
-        target_label: kubernetes_pod_name
-      - source_labels: [__meta_kubernetes_pod_label_openebs_io_storage_pool_claim]
-        action: replace
-        target_label: storage_pool_claim
-      - source_labels: [__address__, __meta_kubernetes_pod_annotation_prometheus_io_port]
-        action: replace
-        regex: ([^:]+)(?::\d+)?;(\d+)
-        replacement: ${1}:${2}
-        target_label: __address__
     - job_name: 'node'
       tls_config:
         ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt

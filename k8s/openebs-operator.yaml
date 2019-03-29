@@ -138,8 +138,6 @@ spec:
           value: "quay.io/openebs/cstor-volume-mgmt:ci"
         - name: OPENEBS_IO_VOLUME_MONITOR_IMAGE
           value: "quay.io/openebs/m-exporter:ci"
-        - name: OPENEBS_IO_CSTOR_POOL_EXPORTER_IMAGE
-          value: "quay.io/openebs/m-exporter:ci"
         # OPENEBS_IO_ENABLE_ANALYTICS if set to true sends anonymous usage
         # events to Google Analytics
         - name: OPENEBS_IO_ENABLE_ANALYTICS
