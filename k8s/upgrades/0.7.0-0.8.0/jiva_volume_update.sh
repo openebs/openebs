@@ -10,7 +10,7 @@ function usage() {
     echo 
     echo "Usage:"
     echo 
-    echo "$0 <pv-name> <custom-label>"
+    echo "$0 <pv-name>"
     echo 
     echo "  <pv-name> Get the PV name using: kubectl get pv"
     exit 1
