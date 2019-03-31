@@ -113,15 +113,15 @@ if [[ -z $c_name ]]; then
 fi
 
 controller_version=`kubectl get deployment $c_dep -n $ns -o jsonpath='{.metadata.labels.openebs\.io/version}'`
-if [[ "$controller_version" != "" ]] && [[ "$controller_version" != "$target_upgrade_version" ]]; then
+if [[ "$controller_version" != "" ]] && [[ "$controller_version" == "$target_upgrade_version" ]]; then
     echo "Current Target deployment $c_dep version is not $current_version or $target_upgrade_version";exit 1;
 fi
 replica_version=`kubectl get deployment $r_dep -n $ns -o jsonpath='{.metadata.labels.openebs\.io/version}'`
-if [[ "$replica_version" != "" ]] && [[ "$replica_version" != "$target_upgrade_version" ]]; then
+if [[ "$replica_version" != "" ]] && [[ "$replica_version" == "$target_upgrade_version" ]]; then
     echo "Current Replica deployment $r_dep version is not $current_version or $target_upgrade_version";exit 1;
 fi
 controller_svc_version=`kubectl get svc $c_svc -n $ns -o jsonpath='{.metadata.labels.openebs\.io/version}'`
-if [[ "$controller_svc_version" != "" ]] && [[ "$controller_svc_version" != "$target_upgrade_version" ]] ; then
+if [[ "$controller_svc_version" != "" ]] && [[ "$controller_svc_version" == "$target_upgrade_version" ]] ; then
     echo "Current Target service $c_svc version is not $current_version or $target_upgrade_version";exit 1;
 fi
 
