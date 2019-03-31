@@ -1,0 +1,4 @@
+[
+  { "op": "remove", "path": "/spec/selector/openebs~1controller" },
+  { "op": "remove", "path": "/spec/selector/vsm" }
+]

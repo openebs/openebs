@@ -1,0 +1,92 @@
+{
+  "metadata": {
+    "annotations": {
+      "openebs.io/fs-type": "ext4",
+      "openebs.io/lun": "0",
+      "openebs.io/volume-monitor": "true",
+      "openebs.io/volume-type": "jiva",
+      "openebs.io/storage-class-ref": "name: @sc_name@\nresourceVersion: @sc_resource_version@\n"
+    },
+    "labels": {
+      "openebs.io/cas-type": "jiva",
+      "openebs.io/storage-engine-type": "jiva",
+      "openebs.io/controller": "jiva-controller",
+      "openebs.io/persistent-volume": "@pv-name@",
+      "openebs.io/persistent-volume-claim": "@pvc-name@",
+      "vsm": "deprecated",
+      "openebs.io/version": "@target_version@"
+    }
+  },
+  "spec": {
+    "selector": {
+      "matchLabels": {
+        "openebs.io/controller": "jiva-controller",
+        "openebs.io/persistent-volume": "@pv-name@",
+        "vsm": "deprecated"
+      }
+    },
+    "template": {
+      "metadata": {
+        "annotations": {
+          "openebs.io/storage-class-ref": "name: @sc_name@\nresourceVersion: @sc_resource_version@\n",
+            "prometheus.io/path": "/metrics",
+            "prometheus.io/port": "9500",
+            "prometheus.io/scrape": "true"
+        },
+        "labels": {
+          "openebs.io/controller": "jiva-controller",
+          "openebs.io/persistent-volume": "@pv-name@",
+          "openebs.io/persistent-volume-claim": "@pvc-name@",
+          "vsm": "deprecated"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "@c_name@",
+            "image": "quay.io/openebs/jiva:@target_version@",
+            "env": [
+              {
+                "name": "REPLICATION_FACTOR",
+                "value": "@rep_count@"
+              }
+            ]
+          },
+          {
+            "name": "maya-volume-exporter",
+            "command": [
+              "maya-exporter"
+            ],
+            "image": "quay.io/openebs/m-exporter:@target_version@"
+          }
+        ],
+        "tolerations": [
+          {
+            "effect": "NoExecute",
+            "key": "node.alpha.kubernetes.io/notReady",
+            "operator": "Exists",
+            "tolerationSeconds": 0
+          },
+          {
+            "effect": "NoExecute",
+            "key": "node.alpha.kubernetes.io/unreachable",
+            "operator": "Exists",
+            "tolerationSeconds": 0
+          },
+          {
+            "effect": "NoExecute",
+            "key": "node.kubernetes.io/not-ready",
+            "operator": "Exists",
+            "tolerationSeconds": 0
+          },
+          {
+            "effect": "NoExecute",
+            "key": "node.kubernetes.io/unreachable",
+            "operator": "Exists",
+            "tolerationSeconds": 0
+          }
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,8 @@
+[
+  { "op": "remove", "path": "/metadata/labels/openebs~1controller" },
+  { "op": "remove", "path": "/metadata/labels/vsm" },
+  { "op": "remove", "path": "/spec/selector/matchLabels/openebs~1controller" },
+  { "op": "remove", "path": "/spec/selector/matchLabels/vsm" },
+  { "op": "remove", "path": "/spec/template/metadata/labels/openebs~1controller" },
+  { "op": "remove", "path": "/spec/template/metadata/labels/vsm" }
+]
