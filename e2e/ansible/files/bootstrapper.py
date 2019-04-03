@@ -329,6 +329,7 @@ def create_plan_resources(args):
                     "hosts": "localhost"
                 }
             ]
+            cstor_test_sparse_yaml=[]
 
             tyaml = ruamel.yaml.YAML()
             tyaml.dump(cstor_test_disk_yaml, stream=open("../cstor-run-disk-tests.yml", 'w+'))
