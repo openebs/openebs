@@ -57,9 +57,11 @@ kubectl apply -f https://openebs.github.io/charts/openebs-operator-0.8.2.yaml
 
 **The sample steps below will work if you have installed openebs with default values provided by stable/openebs helm chart.**
 
-- Run `helm repo update` to update local cache with latest package
-- Run `helm ls` to get the release name of openebs.
-- Upgrade using `helm upgrade openebs stable/openebs`
+Before upgrading using helm, please review the default values available with latest stable/openebs chart. (https://raw.githubusercontent.com/helm/charts/master/stable/openebs/values.yaml).
+
+- If the default values seem appropriate, you can use the `helm upgrade --reset-values <release name> stable/openebs`.
+- If not, customize the values into your copy (say custom-values.yaml), by copying the content from above default yamls and edit the values to suite your environment. You can upgrade using your custom values using:
+`helm upgrade <release name> stable/openebs -f custom-values.yaml`
 
 #### Using customized operator YAML or helm chart.
 As a first step, you must update your custom helm chart or YAML with 0.8.2 release tags and changes made in the values/templates.
