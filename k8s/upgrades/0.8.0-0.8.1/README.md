@@ -2,12 +2,12 @@
 
 ## Overview
 
-This document describes the steps for upgrading OpenEBS from 0.8.0 to 0.8.1 
+This document describes the steps for upgrading OpenEBS from 0.8.0 to 0.8.1
 
-The upgrade of OpenEBS is a three step process: 
+The upgrade of OpenEBS is a three step process:
 - *Step 1* - Checking the openebs version labels
-- *Step 2* - Upgrade the OpenEBS Operator 
-- *Step 3* - Upgrade the OpenEBS Volumes from previous versions (0.8.0) 
+- *Step 2* - Upgrade the OpenEBS Operator
+- *Step 3* - Upgrade the OpenEBS Volumes from previous versions (0.8.0)
 
 #### Note: It is mandatory to make sure to that all volumes are running at version 0.8.0 before the upgrade.
 
@@ -56,18 +56,20 @@ kubectl patch ds openebs-ndm -n openebs --patch='{"spec":{"updateStrategy":{"typ
 kubectl apply -f https://openebs.github.io/charts/openebs-operator-0.8.1.yaml
 ```
 
-#### Install/Upgrade using helm chart (using stable/openebs, openebs-charts repo, etc.,) 
+#### Install/Upgrade using helm chart (using stable/openebs, openebs-charts repo, etc.,)
 
 **The sample steps below will work if you have installed openebs with default values provided by stable/openebs helm chart.**
 
-- Run `helm repo update` to update local cache with latest package
-- Run `helm ls` to get the release name of openebs. 
-- Upgrade using `helm upgrade openebs stable/openebs`
+Before upgrading using helm, please review the default values available with latest stable/openebs chart. (https://raw.githubusercontent.com/helm/charts/master/stable/openebs/values.yaml).
+
+- If the default values seem appropriate, you can use the `helm upgrade --reset-values <release name> stable/openebs`.
+- If not, customize the values into your copy (say custom-values.yaml), by copying the content from above default yamls and edit the values to suite your environment. You can upgrade using your custom values using:
+`helm upgrade <release name> stable/openebs -f custom-values.yaml`
 
 #### Using customized operator YAML or helm chart.
-As a first step, you must update your custom helm chart or YAML with 0.8.1 release tags and changes made in the values/templates. 
+As a first step, you must update your custom helm chart or YAML with 0.8.1 release tags and changes made in the values/templates.
 
-You can use the following as references to know about the changes in 0.8.1: 
+You can use the following as references to know about the changes in 0.8.1:
 - openebs-charts [PR#2352](https://github.com/openebs/openebs/pull/2352) as reference.
 
 After updating the YAML or helm chart or helm chart values, you can use the above procedures to upgrade the OpenEBS Operator
@@ -80,13 +82,13 @@ Even after the OpenEBS Operator has been upgraded to 0.8.1, the cStor Storage Po
 
 Limitations:
 - this is a preliminary script only intended for using on volumes where data has been backed-up.
-- please have the following link handy in case the volume gets into read-only during upgrade 
+- please have the following link handy in case the volume gets into read-only during upgrade
   https://docs.openebs.io/docs/next/readonlyvolumes.html
 - automatic rollback option is not provided. To rollback, you need to update the controller, exporter and replica pod images to the previous version
 - in the process of running the below steps, if you run into issues, you can always reach us on slack
 
 
-### Upgrade the Jiva based OpenEBS PV 
+### Upgrade the Jiva based OpenEBS PV
 
 Extract the PV name using `kubectl get pv`
 
