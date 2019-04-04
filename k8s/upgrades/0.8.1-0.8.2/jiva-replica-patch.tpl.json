@@ -1,0 +1,19 @@
+{
+   "metadata": {
+      "labels": {
+         "openebs.io/version": "@target_version@"
+      }
+   },
+   "spec": {
+      "template": {
+         "spec": {
+            "containers": [
+               {
+                  "name": "@r_name@",
+                  "image": "quay.io/openebs/jiva:@target_version@"
+               }
+            ]
+         }
+      }
+   }
+}
