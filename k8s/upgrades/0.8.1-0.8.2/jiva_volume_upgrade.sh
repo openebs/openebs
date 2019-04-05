@@ -208,13 +208,6 @@ else
     echo "Controller service $c_svc is already at $target_upgrade_version"
 fi
 
-##Patch jiva snapshotdata crs related to pv
-run_snapshotdata_upgrades $pv
-rc=$?
-if [ $rc -ne 0 ]; then
-   exit 1
-fi
-
 echo "Clearing temporary files"
 rm jiva-replica-patch.json
 rm jiva-target-patch.json
