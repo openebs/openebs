@@ -5,7 +5,7 @@
 # NOTES: Obtain the pv to upgrade via "kubectl get pv"         #
 ################################################################
 
-target_upgrade_version="0.8.2"
+target_upgrade_version="0.8.2-RC4"
 current_version="0.8.1"
 
 function usage() {
@@ -39,8 +39,6 @@ fi
 
 pv=$1
 replica_node_label="openebs-jiva"
-
-source snapshotdata_upgrade.sh
 
 # Check if pv exists
 kubectl get pv $pv &>/dev/null;check_pv=$?
@@ -152,9 +150,9 @@ for rep_node in `echo $rep_nodenames | tr ":" " "`; do
 done
 
 
-sed -u "s/@r_name@/$r_name/g" | sed -u "s/@target_version@/$target_upgrade_version/g"  > jiva-replica-patch.json
-sed -u "s/@target_version@/$target_upgrade_version/g" > jiva-target-patch.json
-sed -u "s/@target_version@/$target_upgrade_version/g" > jiva-target-svc-patch.json
+sed -u "s/@r_name@/$r_name/g" jiva-replica-patch.tpl.json | sed -u "s/@target_version@/$target_upgrade_version/g" > jiva-replica-patch.json
+sed -u "s/@c_name@/$c_name/g" jiva-target-patch.tpl.json | sed -u "s/@target_version@/$target_upgrade_version/g" > jiva-target-patch.json
+sed -u "s/@target_version@/$target_upgrade_version/g" jiva-target-svc-patch.tpl.json > jiva-target-svc-patch.json
 
 #################################################################################
 # STEP: Patch OpenEBS volume deployments (jiva-target, jiva-replica & jiva-svc) #

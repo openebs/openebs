@@ -27,7 +27,7 @@ kubectl get service --all-namespaces -l 'openebs.io/version notin (0.8.2), opene
 printf "\nCStor Target Deployment:\n"
 echo "---------------------"
 printf "\n"
-# Search for CStor Target Service
+# Search for CStor Target Deployment
 kubectl get deployment --all-namespaces -l 'openebs.io/version notin (0.8.2), openebs.io/version notin (0.8.1), openebs.io/target in (cstor-target)'
 
 

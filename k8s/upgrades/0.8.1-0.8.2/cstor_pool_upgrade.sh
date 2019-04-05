@@ -6,7 +6,7 @@
 # NOTES: Obtain the pool deployments to perform upgrade operation         #
 ###########################################################################
 
-pool_upgrade_version="v0.8.x-ci"
+pool_upgrade_version="0.8.2-RC4"
 current_version="0.8.1"
 
 function usage() {
@@ -41,17 +41,6 @@ fi
 
 spc=$1
 ns=$2
-
-### Get the deployment pods which are in not running state that are related to provided spc ###
-pending_pods=$(kubectl get po -n $ns \
-    -l app=cstor-pool,openebs.io/storage-pool-claim=$spc \
-    -o jsonpath='{.items[?(@.status.phase!="Running")].metadata.name}')
-
-## If any deployments pods are in not running state then exit the upgrade process ###
-if [ $(echo $pending_pods | wc -w) -ne 0 ]; then
-    echo "To continue with upgrade script make sure all the deployment pods corresponding to $spc must be in running state"
-    exit 1
-fi
 
 ### Get the csp list which are related to the given spc ###
 csp_list=$(kubectl get csp -l openebs.io/storage-pool-claim=$spc \
