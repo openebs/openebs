@@ -67,8 +67,8 @@ sc_res_ver=`kubectl get sc $sc_name -n $ns -o jsonpath="{.metadata.resourceVersi
 c_dep=$(kubectl get deploy -n $ns -l openebs.io/persistent-volume=$pv,openebs.io/controller=jiva-controller -o jsonpath="{.items[*].metadata.name}")
 r_dep=$(kubectl get deploy -n $ns -l openebs.io/persistent-volume=$pv,openebs.io/replica=jiva-replica -o jsonpath="{.items[*].metadata.name}")
 c_svc=$(kubectl get svc -n $ns -l openebs.io/persistent-volume=$pv -o jsonpath="{.items[*].metadata.name}")
-c_name=$(kubectl get deploy -n $ns $c_dep -o jsonpath="{range .spec.template.spec.containers[*]}{@.name}{'\n'}{end}" | grep "con")
-r_name=$(kubectl get deploy -n $ns $r_dep -o jsonpath="{range .spec.template.spec.containers[*]}{@.name}{'\n'}{end}" | grep "con")
+c_name=$(kubectl get deploy -n $ns $c_dep -o jsonpath="{range .spec.template.spec.containers[*]}{@.name}{'\n'}{end}" | grep "ctrl-con")
+r_name=$(kubectl get deploy -n $ns $r_dep -o jsonpath="{range .spec.template.spec.containers[*]}{@.name}{'\n'}{end}" | grep "rep-con")
 
 # Fetch the older target and replica - ReplicaSet objects which need to be
 # deleted before upgrading. If not deleted, the new pods will be stuck in

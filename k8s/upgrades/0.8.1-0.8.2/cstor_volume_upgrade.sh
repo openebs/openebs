@@ -6,7 +6,7 @@
 # NOTES: Obtain the pv to upgrade via "kubectl get pv"         #
 ################################################################
 target_upgrade_version="0.8.2-RC4"
-current_version="0.8.0"
+current_version="0.8.1"
 
 function usage() {
     echo
