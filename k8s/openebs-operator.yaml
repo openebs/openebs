@@ -356,7 +356,7 @@ spec:
       hostNetwork: true
       containers:
       - name: node-disk-manager
-        image: quay.io/openebs/node-disk-manager-amd64:v0.2.0
+        image: quay.io/openebs/node-disk-manager-amd64:v0.3.4
         imagePullPolicy: IfNotPresent
         securityContext:
           privileged: true
