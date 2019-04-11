@@ -51,7 +51,7 @@ cas_type=`kubectl get pv $pv -o jsonpath="{.metadata.annotations.openebs\.io/cas
 if [ $cas_type != "jiva" ]; then
     echo "Jiva volume not found";exit 1;
 elif [ $cas_type == "jiva" ]; then
-    echo "It is a jiva volume"
+    echo "$pv is a jiva volume"
 else
     echo "Volume is neither jiva or jiva";exit 1;
 fi
