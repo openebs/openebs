@@ -1,57 +1,47 @@
 # Overview
 
-OpenEBS is an open source storage platform delivering containerized block storage for containers. 
+OpenEBS is the most widely deployed open source example of a category of storage solutions sometimes called [Container Attached Storage](https://www.cncf.io/blog/2018/04/19/container-attached-storage-a-primer/). OpenEBS is itself deployed as a set of containers on Kubernetes worker nodes. This document describes the high level architecture of OpenEBS and the links to the Source Code and its Dependencies. 
 
-Yes! The storage controller functionality is itself, delivered as containers. An OpenEBS Volume comprises of one or more containers working as a clustered microservice, providing block storage to other containers. This is a micro-services based architecture for storage controller functionality - where data for each volume is served by its own set of containers as against a single monolithic storage controller serving multiple volumes. This is what differentiates OpenEBS from traditional storage appliances.
+Some key aspects that make OpenEBS different compared to other traditional storage solutions:
+* Built using the micro-services architecture like the applications it serves. Use Kubernetes itself to orchestrate and manage the OpenEBS components 
+* Built completely in userspace making it highly portable to run across any OS / Platform
+* Completely intent driven, inheriting the same principles that drive the ease of use with Kubernetes
 
-OpenEBS Storage Controller functionality comprises of several micro-services (or containers) that can be classified into two broad categories: 
-- OpenEBS Data Plane - that serves the data to the applications and 
-- OpenEBS Control Plane - that manages the OpenEBS Volume Containers
-Hence, If you notice this classification, resembling a typical Container Orchestrator (CO), it is because OpenEBS Volumes are delivered through containers and these containers are better managed by COs! Hence OpenEBS Control Plane services work in conjunction with the CO - schedulers, apiserver, and so on.
- 
-## OpenEBS Volume Container (aka jiva, aka data plane)
+# Architecture 
 
-*openebs/jiva* containers are at the heart of the OpenEBS Volume's storage functionality. OpenEBS Volumes are fully isolated user-space storage engines that present the block storage via iSCSI and persist the data onto the storage attached to Nodes (aka Docker Hosts). The storage attached to the docker hosts can either be directly attached disks or cloud volumes (like EBS, GPD, and so on) depending on where the Container Cluster is deployed. 
+The architecture of OpenEBS is container native and horizontally scalable. OpenEBS is a collection of different microservices that can be grouped into 3 major areas (or planes):
 
-![OpenEBS Data Plane](../../documentation/source/_static/OpenEBS-Data-Plane.png)
+## Data Engines or the Data Plane
 
-OpenEBS Volumes provide persistent storage for containers, with resiliency against system failures, faster access to the storage, snapshot and backup capabilities. In addition, it provides a mechanism for monitoring the usage and enforcing QoS policies. 
+The data engines are the containers responsible for interfacing with the underlying storage devices such as host filesystem, rotational drives, SSDs and NVMe devices. The data engines provide volumes with required capabilities like high availability, snapshots, clones, etc. Volume capabilities can be optimized based on the workload they serve. Depending on the capabilities requested, OpenEBS selects different data engines like cStor ( a CoW based) or Jiva or even Local PVs for a given volume. 
 
-The Disks where data is persisted are called as *Storage Backends*, which can be either host directories, attached block devices or remote disks. Each OpenEBS Volume comprises of an iSCSI Target Container (represented as openebs-vol1 in the above diagram) and one or more Replicas Containers (openebs-vol1-R1 and openebs-vol1-R2).
+The high availability is achieved by abstracting the access to the volume into the target container - which in turn does the synchronous replication to multiple different replica containers. The replica containers save the data to the underlying storage devices. If a node serving the application container and the target container fails, the application and target are rescheduled to a new node. The target connects with the other available replicas and will start serving the IO.
 
-The application pods will access the storage via the iSCSI Target Container, which replicates the data to all its replica's. In the event of node failure, the iSCSI Target Container starts on one of the remaining online nodes and will serve the data by connecting to the available Replica containers.
+## Storage Management or Control Plane
 
-### Source Code
+The Storage Management or Control Plane is responsible for interfacing between Kubernetes (Volume/CSI interface) and managing the volumes created using the OpenEBS Data Engines. The Storage Management Plane is implemented using a set of containers that are either running at the cluster level or the node level. Some of the storage management options are also provided by containers running as side-cars to the data engine containers. 
 
-- [openebs/jiva](https://github.com/openebs/jiva) Storage Controller functionality includes the replication logic 
-- [openebs/gotgt](https://github.com/openebs/gotgt) iSCSI Target functionality used by *openebs/jiva*.
+The storage management containers are responsible for providing APIs for gathering details about the volumes. The APIs can be used by Kubernetes Provisioners for managing volumes, snapshots, backups, so forth; used by Prometheus to collect metrics of volumes; used by custom programs like CLI or UI to provide insights into the OpenEBS Storage status or management.
 
-## OpenEBS Control Plane (aka OpenEBS Storage Orchestration, aka Maya)
+## Storage Device Management Plane
 
-OpenEBS Control Plane - augments the functionality provided by the Container Orchestrator, with storage-specific orchestration capabilities, via a set of services. OpenEBS control plane can hook into any of the container orchestrators like Kubernetes, Docker Swarm, Nomad, etc., making it possible to run OpenEBS hyperconverged with Container Orchestrators. 
+While this plane is an integral part of the OpenEBS Storage Management Plane, the containers and custom resources under this plane can be used by other projects that require a Kubernetes native way of managing the Storage Devices (rotational drives, SSDs and NVMe, etc.) attached to Kubernetes nodes.
 
-![OpenEBS Control Plane](../../documentation/source/_static/OpenEBS-Control-Plane.png)
+Storage Device Management Plane can be viewed as an Inventory Management tool, that discovers devices and keeps track of their usage via device claims (akin to PV/PVC concept). All the operations like device listing, identifying the topology or details of a specific device can be accessed via kubectl and Kubernetes Custom Resources.
 
-OpenEBS Control Plane is also delivered as micro-services, where the services built can be classified as follows:
-- Plugins into Container Orchestrators, which augment the functionality by hooking into the framework provided like:
-  - K8s Dynamic Provisioners - [openebs-provisioner](https://github.com/openebs/external-storage/tree/master/openebs)
-  - Kube Dashboard - [openebs-dashboard](https://github.com/openebs/dashboard)
-  - Extended Schema - like CRDs in case of Kubernetes to store the OpenEBS specific configuration related data
-- Cluster Services provides OpenEBS specific storage intelligence like:
-  - Maya-apiserver - includes the API for performing Volume operations that can translate requests into CO specific operations
-  - Maya-mulebot - uses the information gathered to suggest optimized placement and event handling tips
-  - Maya-connect - allows uploading the monitoring data to maya-cloud for further storage access pattern analysis
-- Node Services provides OpenEBS specific storage intelligence running along-side kubelet like:
-  - Maya-agent - includes storage management functionality 
+# Source Code and Dependencies 
 
-Monitoring and tracing capabilities are added by instrumenting the above services with Prometheus, Grafana, and Jaegar. 
+| Component | Repo Link | License | Dependency and Notes
+|---|---|---|---|
+| Storage Management | https://github.com/openebs/maya | Apache 2.0  | Contains all the OpenEBS Storage Management components that help with managing multiple data engines. Dependencies are in: https://github.com/openebs/maya/blob/master/Gopkg.lock
+| Storage Management - Dynamic Provisioners | https://github.com/openebs/external-storage | Apache 2.0  | Contains OpenEBS extensions for Kubernetes External Dynamic Provisioners. This will be replaced with CSI drivers under the above repo. 
+| Data Engine - Jiva | https://github.com/openebs/jiva | Apache 2.0  | The first data engine supported by OpenEBS. Forked out from Rancher Longhorn engine. Dependencies are in: https://github.com/openebs/jiva/blob/master/vendor.conf
+| Data Engine - cStor Replica | https://github.com/openebs/cstor | CDDL *  | The second data engine supported by OpenEBS. Forked out from https://github.com/zfsonlinux/zfs. * Currently licensed under CDDL, but will be modified to extract out the changes done as diff patches that can be released via Apache 2.0. 
+| Data Engine - cStor Target | https://github.com/openebs/istgt | BSD  | Part of the cStor data engine that implements the iSCSI Target. 
+| Storage Device Management | https://github.com/openebs/node-disk-manager | Apache 2.0  | Contains Kubernetes Device Inventory Management functionality. Dependencies are in https://github.com/openebs/node-disk-manager/blob/master/Gopkg.lock
+| OpenEBS Documentation | https://github.com/openebs/openebs-docs | Apache 2.0  | Uses Docusaurus. Dependencies are in https://github.com/openebs/openebs-docs/blob/staging/website/package.json
+| OpenEBS Examples | https://github.com/openebs/openebs | Apache 2.0  | Wrapper repo for examples and project management.|
 
-*Note: In case of K8s, the monitoring aspects like heapster can be changed in future, depending on the outcome from sig-instrumentation design proposals*
+# Further details
 
-### Source Code
-
-- [openebs/maya](https://github.com/openebs/maya) The code for all binaries that are specific (non-plugins) are stored in this repository - like maya-apiserver, maya-agent, maya-mulebot, maya-connect, mayactl, and so on.
-- [openebs-dashboard](https://github.com/openebs/dashboard) A fork of the Kubernetes dashboard project, that is extended with storage functionality.
-- [openebs-provisioner](https://github.com/openebs/external-storage/tree/master/openebs) is the OpenEBS K8s Provisioner forked from Kubernetes Incubator project. 
-
-***Note:** In future, OpenEBS can also be deployed as a storage service (non hyperconverged) like the traditional software-defined storage, and can be connected via the storage plugins.*
+Additional details and how each of the Data engines operate are provided in this [Presentation](https://docs.google.com/presentation/d/1mjOkAQppyd23sw7PIryxu5kSrex352bT6bINzw6mUFY/edit?usp=sharing)
