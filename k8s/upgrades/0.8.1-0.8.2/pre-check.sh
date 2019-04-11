@@ -43,7 +43,7 @@ printf "\nJiva Replica Deployment:\n"
 echo "------------------------"
 printf "\n"
 # Search for Jiva Replica Deployment
-kubectl get deployment --all-namespaces -l 'openebs.io/version notin (0.8.2), openebs.io/version notin (0.8.1), openebs.io/replica in (replica)'
+kubectl get deployment --all-namespaces -l 'openebs.io/version notin (0.8.2), openebs.io/version notin (0.8.1), openebs.io/replica in (jiva-replica)'
 
 printf "\nJiva Controller Deployment:\n"
 echo "------------------------"

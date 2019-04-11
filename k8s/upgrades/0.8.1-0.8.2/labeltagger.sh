@@ -32,7 +32,7 @@ kubectl get deployment --all-namespaces -l 'openebs.io/version notin (0.8.2), op
 
 # Adding jiva resources
 kubectl get service --all-namespaces -l 'openebs.io/version notin (0.8.2), openebs.io/version notin (0.8.1), openebs.io/controller-service in (jiva-controller-svc)' -o jsonpath="{range .items[*]}kubectl label {@.kind} {@.metadata.name} openebs.io/version=$currentVersion -n {@.metadata.namespace} --overwrite=true;{end}" | tr ";" "\n" >> label.sh
-kubectl get deployment --all-namespaces -l 'openebs.io/version notin (0.8.2), openebs.io/version notin (0.8.1), openebs.io/replica in (replica)' -o jsonpath="{range .items[*]}kubectl label {@.kind} {@.metadata.name} openebs.io/version=$currentVersion -n {@.metadata.namespace} --overwrite=true;{end}" | tr ";" "\n" >> label.sh
+kubectl get deployment --all-namespaces -l 'openebs.io/version notin (0.8.2), openebs.io/version notin (0.8.1), openebs.io/replica in (jiva-replica)' -o jsonpath="{range .items[*]}kubectl label {@.kind} {@.metadata.name} openebs.io/version=$currentVersion -n {@.metadata.namespace} --overwrite=true;{end}" | tr ";" "\n" >> label.sh
 kubectl get deployment --all-namespaces -l 'openebs.io/version notin (0.8.2), openebs.io/version notin (0.8.1), openebs.io/controller in (jiva-controller)' -o jsonpath="{range .items[*]}kubectl label {@.kind} {@.metadata.name} openebs.io/version=$currentVersion -n {@.metadata.namespace} --overwrite=true;{end}" | tr ";" "\n" >> label.sh
 
 # Adding pool resources
