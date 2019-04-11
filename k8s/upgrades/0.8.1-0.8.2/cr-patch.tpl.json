@@ -1,0 +1,7 @@
+{
+  "metadata": {
+     "labels": {
+        "openebs.io/version": "@pool_version@"
+     }
+  }
+}
