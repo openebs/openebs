@@ -75,11 +75,15 @@ metadata:
   namespace: openebs
 spec:
   replicas: 1
+  selector:
+    matchLabels:
+      openebs.io/version: 0.9.0
   template:
     metadata:
       labels:
         name: maya-apiserver
         openebs.io/component-name: maya-apiserver
+        openebs.io/version: 0.9.0
     spec:
       serviceAccountName: openebs-maya-operator
       containers:
@@ -187,11 +191,15 @@ metadata:
   namespace: openebs
 spec:
   replicas: 1
+  selector:
+    matchLabels:
+      openebs.io/version: 0.9.0
   template:
     metadata:
       labels:
         name: openebs-provisioner
         openebs.io/component-name: openebs-provisioner
+        openebs.io/version: 0.9.0
     spec:
       serviceAccountName: openebs-maya-operator
       containers:
@@ -238,6 +246,9 @@ metadata:
   namespace: openebs
 spec:
   replicas: 1
+  selector:
+    matchLabels:
+      openebs.io/version: 0.9.0
   strategy:
     type: Recreate
   template:
@@ -245,6 +256,7 @@ spec:
       labels:
         name: openebs-snapshot-operator
         openebs.io/component-name: openebs-snapshot-operator
+        openebs.io/version: 0.9.0
     spec:
       serviceAccountName: openebs-maya-operator
       containers:
@@ -335,6 +347,9 @@ metadata:
   name: openebs-ndm
   namespace: openebs
 spec:
+  selector:
+    matchLabels:
+      openebs.io/version: 0.9.0
   updateStrategy:
     type: RollingUpdate
   template:
@@ -342,6 +357,7 @@ spec:
       labels:
         name: openebs-ndm
         openebs.io/component-name: ndm
+        openebs.io/version: 0.9.0
     spec:
       # By default the node-disk-manager will be run on all kubernetes nodes
       # If you would like to limit this to only some nodes, say the nodes
@@ -452,10 +468,12 @@ spec:
   selector:
     matchLabels:
       app: admission-webhook
+      openebs.io/version: 0.9.0
   template:
     metadata:
       labels:
         app: admission-webhook
+        openebs.io/version: 0.9.0
     spec:
       serviceAccountName: openebs-maya-operator
       containers:
