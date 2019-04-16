@@ -129,7 +129,7 @@ export MAPIPOD=$(kubectl get pods -o jsonpath='{.items[?(@.spec.containers[0].na
 export CSTORVOL=$(kubectl get pv -o jsonpath='{.items[?(@.spec.claimRef.name=="cstor-vol1-1r-claim")].metadata.name}')
 export CSTORVOLNS=$(kubectl get pv -o jsonpath='{.items[?(@.spec.claimRef.name=="openebs-pvc-in-custom-ns")].metadata.name}')
 export JIVAVOL=$(kubectl get pv -o jsonpath='{.items[?(@.metadata.annotations.openebs\.io/cas-type=="jiva")].metadata.name}')
-export POOLNAME=$(kubectl get csp -o jsonpath='{.items[?(@.metadata.labels.openebs\.io/cas-type=="cstor")].metadata.name}')
+export POOLNAME=$(kubectl get csp -o jsonpath='{.items[?(@.metadata.labels.openebs\.io/storage-pool-claim=="sparse-claim-auto")].metadata.name}')
 
 echo "------------------Extracted Pod names---------------------"
 echo MAPIPOD: $MAPIPOD
