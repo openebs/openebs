@@ -39,7 +39,7 @@ rules:
   resources: [ "disks"]
   verbs: ["*" ]
 - apiGroups: ["*"]
-  resources: [ "storagepoolclaims", "storagepools"]
+  resources: [ "storagepoolclaims", "storagepoolclaims/finalizers", "storagepools"]
   verbs: ["*" ]
 - apiGroups: ["*"]
   resources: [ "castemplates", "runtasks"]
