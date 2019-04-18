@@ -1,9 +1,0 @@
----
-- hosts: localhost  
-
-  vars_files:
-    - fio-vars.yml
-
-  roles:
-    - {role: cleanup, when: run_demo | bool}
-

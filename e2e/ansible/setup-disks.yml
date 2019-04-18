@@ -1,4 +1,0 @@
----
-- hosts: localhost
-  roles:
-    - {role: k8s-gke-attach, when: cloud_provider == "GCP"} 

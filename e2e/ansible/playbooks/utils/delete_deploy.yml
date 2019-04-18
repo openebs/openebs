@@ -1,8 +1,0 @@
----
-- name: Delete application 
-  shell: source ~/.profile; kubectl delete -f "{{result_kube_home.stdout}}/{{ item }}" -n {{ ns }}
-  args:
-    executable: /bin/bash
-  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-  with_items: "{{ app_yml }}"
-

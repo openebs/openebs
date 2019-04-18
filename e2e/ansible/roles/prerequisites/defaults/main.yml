@@ -1,6 +1,0 @@
----
-pip_pre_packages:
-  - paramiko
-  - configparser
-
-

@@ -1,8 +1,0 @@
----
-- name: Copy the test specs files to kubemaster
-  copy:
-    src: "{{ item }}"
-    dest: "{{ result_kube_home.stdout }}"
-  delegate_to: "{{ destination_node }}"
-  with_items: "{{ files_to_copy }}"
-

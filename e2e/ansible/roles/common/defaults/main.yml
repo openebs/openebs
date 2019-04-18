@@ -1,9 +1,0 @@
----
-deb_packages:
-  - unzip
-  - curl
-  - wget
-
-openebs_maya_url:
-  - https://github.com/openebs/maya/releases/download/0.2.1/maya-linux_amd64.zip
-

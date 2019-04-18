@@ -1,7 +1,0 @@
----
-- name: Restart M_APIServer
-  service:
-    name: m-apiserver
-    state: restarted
-    enabled: yes
-  become: true

@@ -1,7 +1,0 @@
----
-- hosts: localhost  
-
-  roles:
-    - {role: volume, when: run_demo | bool}
-    - {role: iometer, when: run_demo | bool}
-

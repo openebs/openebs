@@ -41,8 +41,6 @@ PR'leri hata düzeltmeleri veya kaynak kodundaki geliştirmeler için uygun etik
 * K8s demosuna katkıda bulunmak için lütfen bu [belge] bölümüne bakınız.(../contribute/CONTRIBUTING-TO-K8S-DEMO.md).
 	- OpenEBS'in K8'lerle nasıl çalıştığını kontrol etmek için, bu belge bölümüne [bakın.](../k8s/README.md) 
 - Kubernetes OpenEBS Provisioner'a katkıda bulunmak için lütfen bu dokümana [bakınız.](../contribute/CONTRIBUTING-TO-KUBERNETES-OPENEBS-PROVISIONER.md).
-* CI ve e2e'ye katkıda bulunmak için, bu dokümana [bakınız.](../contribute/CONTRIBUTING-TO-CI-AND-E2E.md)
-	- e2e için buna bakın [genel bakış](../e2e/README.md).
 	
 Kod yapılandırması ve takip edilecek yönergeler hakkında daha fazla bilgi için bu belge bölümüne [bakın.](../contribute/design/code-structuring.md) 
 

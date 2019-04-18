@@ -1,9 +1,0 @@
-TestRailProjectID: 5
-JivaDevelopmentTestSuite:
-    - 829:
-JivaProductionTestSuite:
-    - 831:
-CstorDevelopmentTestSuite:
-    - 832:
-CstorProductionTestSuite:
-    - 833:

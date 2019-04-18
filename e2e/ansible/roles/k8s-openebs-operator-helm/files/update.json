@@ -1,6 +1,0 @@
-{
-    "spec": {
-       "template": {
-            "spec": {
-                "serviceAccountName": "tiller"}}}}
-
