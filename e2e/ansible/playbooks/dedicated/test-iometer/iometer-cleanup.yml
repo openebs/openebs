@@ -1,6 +1,0 @@
----
-- hosts: localhost  
-
-  roles:
-    - {role: cleanup, when: run_demo | bool}
-

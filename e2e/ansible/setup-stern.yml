@@ -1,5 +1,0 @@
----
-
-- hosts: kubernetes-kubemasters
-  roles:
-    - {role: k8s-stern, when: deployment_mode == "hyperconverged"}

@@ -1,4 +1,0 @@
----
-operator_ns: openebs
-
-patch_file: patch.yml

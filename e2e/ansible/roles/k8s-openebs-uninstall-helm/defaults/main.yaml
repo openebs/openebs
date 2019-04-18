@@ -1,9 +1,0 @@
-
-
-patch_file: update.json
-
-k8s_namespace: kube-system
-
-storage_classes: https://raw.githubusercontent.com/openebs/openebs/master/k8s/openebs-storageclasses.yaml
-
-namespace: openebs 

@@ -1,4 +1,0 @@
----
-
-ansible_connection: local
-cluster_zone: "{{ lookup ('env','ZONE') }}"

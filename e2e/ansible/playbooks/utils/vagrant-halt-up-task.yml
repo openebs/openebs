@@ -1,7 +1,0 @@
- - name: Bring up/down node using vagrant command 
-   shell: vagrant {{vagrant_op}} {{ nodename }}
-   args:
-     chdir: "{{ansible_env.HOME}}/{{vagrant_path}}"
-     executable: /bin/bash
-
-

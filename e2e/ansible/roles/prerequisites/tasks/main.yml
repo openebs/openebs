@@ -1,8 +1,0 @@
----
-- name: Install PIP Packages
-  pip:
-    name: "{{ item }}"
-    state: present
-  with_items: "{{ pip_pre_packages }}"
-  delegate_to: 127.0.0.1
-  become: true

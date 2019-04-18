@@ -41,8 +41,6 @@ Provide PRs with appropriate tags for bug fixes or enhancements to the source co
 * For contributing to K8s demo, please refer to this [document](./contribute/CONTRIBUTING-TO-K8S-DEMO.md).
 	- For checking out how OpenEBS works with K8s, refer to this [document](./k8s/README.md) 
 - For contributing to Kubernetes OpenEBS Provisioner, please refer to this [document](./contribute/CONTRIBUTING-TO-KUBERNETES-OPENEBS-PROVISIONER.md).
-* For contributing to CI and e2e, refer to this [document](./contribute/CONTRIBUTING-TO-CI-AND-E2E.md)
-	- Refer to this [overview](./e2e/README.md) of e2e.
 	
 Refer to this [document](./contribute/design/code-structuring.md) for more information on code structuring and guidelines to follow on the same.
 

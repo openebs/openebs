@@ -1,4 +1,0 @@
----
-cn_network_cidr: 172.28.128.10/24
-
-cn_interface: enp0s8
