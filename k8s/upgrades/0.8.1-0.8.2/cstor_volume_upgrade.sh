@@ -5,7 +5,7 @@
 #                                                              #
 # NOTES: Obtain the pv to upgrade via "kubectl get pv"         #
 ################################################################
-target_upgrade_version="0.8.2-RC4"
+target_upgrade_version="0.8.2"
 current_version="0.8.1"
 
 function usage() {
@@ -18,21 +18,6 @@ function usage() {
     echo "  <openebs-namespace> Get the namespace where openebs"
     echo "  pods are installed"
     exit 1
-}
-
-function setDeploymentRecreateStrategy() {
-    dns=$1 # deployment namespace
-    dn=$2  # deployment name
-    currStrategy=`kubectl get deploy -n $dns $dn -o jsonpath="{.spec.strategy.type}"`
-    rc=$?; if [ $rc -ne 0 ]; then echo "Failed to get the deployment stratergy for $dn | Exit code: $rc"; exit; fi
-
-    if [ $currStrategy != "Recreate" ]; then
-       kubectl patch deployment --namespace $dns --type json $dn -p "$(cat patch-strategy-recreate.json)"
-       rc=$?; if [ $rc -ne 0 ]; then echo "Failed to patch the deployment $dn | Exit code: $rc"; exit; fi
-       echo "Deployment upgrade strategy set as recreate"
-    else
-       echo "Deployment upgrade strategy was already set as recreate"
-    fi
 }
 
 if [ "$#" -ne 2 ]; then
@@ -52,6 +37,10 @@ fi
 cas_type=`kubectl get pv $pv -o jsonpath="{.metadata.annotations.openebs\.io/cas-type}"`
 if [ $cas_type != "cstor" ]; then
     echo "Cstor volume not found";exit 1;
+elif [ $cas_type == "cstor"]; then
+	  echo "$pv is a cstor volume"
+else
+	  echo "Volume is neither cstor or cstor"; exit 1;
 fi
 
 sc_ns=`kubectl get pv $pv -o jsonpath="{.spec.claimRef.namespace}"`
@@ -147,9 +136,6 @@ sed "s/@target_version@/$target_upgrade_version/g" cstor-volume-replica-patch.tp
 
 if [[ "$controller_version" != "$target_upgrade_version" ]]; then
     echo "Upgrading Target Deployment to $target_upgrade_version"
-
-    # Setting deployment startegy to recreate
-    setDeploymentRecreateStrategy $ns $c_dep
 
     kubectl patch deployment  --namespace $ns $c_dep -p "$(cat cstor-target-patch.json)"
     rc=$?; if [ $rc -ne 0 ]; then echo "Failed to patch cstor target deployment $c_dep | Exit code: $rc"; exit; fi
