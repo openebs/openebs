@@ -5,7 +5,7 @@
 # NOTES: Obtain the pv to upgrade via "kubectl get pv"         #
 ################################################################
 
-target_upgrade_version="0.8.2-RC4"
+target_upgrade_version="0.8.2"
 current_version="0.8.1"
 
 function usage() {
@@ -16,21 +16,6 @@ function usage() {
     echo
     echo "  <pv-name> Get the PV name using: kubectl get pv"
     exit 1
-}
-
-function setDeploymentRecreateStrategy() {
-    dns=$1 # deployment namespace
-    dn=$2  # deployment name
-    currStrategy=`kubectl get deploy -n $dns $dn -o jsonpath="{.spec.strategy.type}"`
-    rc=$?; if [ $rc -ne 0 ]; then echo "Failed to get the deployment stratergy for $dn | Exit code: $rc"; exit; fi
-
-    if [ $currStrategy != "Recreate" ]; then
-       kubectl patch deployment --namespace $dns --type json $dn -p "$(cat patch-strategy-recreate.json)"
-       rc=$?; if [ $rc -ne 0 ]; then echo "Failed to patch the deployment $dn | Exit code: $rc"; exit; fi
-       echo "Deployment upgrade strategy set as recreate"
-    else
-       echo "Deployment upgrade strategy was already set as recreate"
-    fi
 }
 
 if [ "$#" -ne 1 ]; then
@@ -166,9 +151,6 @@ sed -u "s/@target_version@/$target_upgrade_version/g" jiva-target-svc-patch.tpl.
 if [[ "$replica_version" != "$target_upgrade_version" ]]; then
     echo "Upgrading Replica Deployment to $target_upgrade_version"
 
-    # Setting the update stratergy to recreate
-    setDeploymentRecreateStrategy $ns $r_dep
-
     kubectl patch deployment --namespace $ns $r_dep -p "$(cat jiva-replica-patch.json)"
     rc=$?; if [ $rc -ne 0 ]; then echo "Failed to patch the deployment $r_dep | Exit code: $rc"; exit; fi
 
@@ -185,9 +167,6 @@ fi
 # #### PATCH TARGET DEPLOYMENT ####
 if [[ "$controller_version" != "$target_upgrade_version" ]]; then
     echo "Upgrading Target Deployment to $target_upgrade_version"
-
-    # Setting the update stratergy to recreate
-    setDeploymentRecreateStrategy $ns $c_dep
 
     kubectl patch deployment  --namespace $ns $c_dep -p "$(cat jiva-target-patch.json)"
     rc=$?; if [ $rc -ne 0 ]; then echo "Failed to patch deployment $c_dep | Exit code: $rc"; exit; fi

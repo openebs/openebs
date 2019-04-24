@@ -6,7 +6,7 @@
 # NOTES: Obtain the pool deployments to perform upgrade operation         #
 ###########################################################################
 
-pool_upgrade_version="0.8.2-RC4"
+pool_upgrade_version="0.8.2"
 current_version="0.8.1"
 
 function usage() {

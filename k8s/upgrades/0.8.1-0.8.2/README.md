@@ -30,13 +30,10 @@ git clone https://github.com/openebs/openebs.git
 cd openebs/k8s/upgrades/0.8.1-0.8.2/
 ```
 
-## Step 1: Checking the openebs version labels
+## Step 1: Checking the OpenEBS current version.
 
-- Run `./pre-check.sh` to get all the openebs volume resources not having `openebs.io/version` tag.
-- Run `./labeltagger.sh 0.8.1` to add `openebs.io/version` label to all the openebs volume resources.
-
-#### Please make sure that all pods are back to running state before proceeding to Step 2
-### Note: It is ok to get no resources to label in pre-check process. The pre-check is to help users upgrading or upgraded from 0.7.
+#### Please make sure that current OpenEBS version is 0.8.1 before proceeding to
+step 2.
 
 ## Step 2: Upgrade the OpenEBS Operator
 
