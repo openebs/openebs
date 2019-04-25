@@ -47,7 +47,7 @@ snapshotOperator:
 
 ndm:
   image: "quay.io/openebs/node-disk-manager-amd64"
-  imageTag: "v0.2.0"
+  imageTag: "v0.3.5"
   sparse:
     enabled: "true"
     path: "/var/openebs/sparse"

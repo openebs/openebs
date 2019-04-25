@@ -354,7 +354,7 @@ spec:
       hostNetwork: true
       containers:
       - name: node-disk-manager
-        image: quay.io/openebs/node-disk-manager-amd64:v0.3.4
+        image: quay.io/openebs/node-disk-manager-amd64:v0.3.5
         imagePullPolicy: IfNotPresent
         securityContext:
           privileged: true
@@ -366,7 +366,8 @@ spec:
         - name: udev
           mountPath: /run/udev
         - name: procmount
-          mountPath: /host/mounts
+          mountPath: /host/proc
+          readOnly: true
         - name: sparsepath
           mountPath: /var/openebs/sparse
         env:
@@ -400,11 +401,12 @@ spec:
         hostPath:
           path: /run/udev
           type: Directory
-      # mount /proc/1/mounts (mount file of process 1 of host) inside container
-      # to read which partition is mounted on / path
+      # mount /proc (to access mount file of process 1 of host) inside container
+      # to read mount-point of disks and partitions
       - name: procmount
         hostPath:
-          path: /proc/1/mounts
+          path: /proc
+          type: Directory
       - name: sparsepath
         hostPath:
           path: /var/openebs/sparse
