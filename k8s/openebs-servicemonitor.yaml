@@ -15,3 +15,4 @@ spec:
   selector:
     matchLabels:
       openebs.io/cas-type: cstor
+      monitoring: volume_exporter_prometheus

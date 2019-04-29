@@ -61,4 +61,4 @@ kubectl -n openebs apply -f openebs-servicemonitor.yaml
 
 Find [docs here](https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#servicemonitor) to read about other fields in `ServiceMonitor` object.
 
-Now once this config is picked up by prometheus operator it will start scraping the metrics and you can start seeing them in prometheus dashboard. The metrics relevant to openebs are conveniently prefixed with `openebs*`.
+Now once this config is picked up by prometheus operator it will start scraping the metrics and you can start seeing them in prometheus dashboard. The metrics relevant to openebs are conveniently prefixed with `openebs*` or `latest_openebs*`.
