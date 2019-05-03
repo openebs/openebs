@@ -86,7 +86,7 @@ spec:
       containers:
       - name: maya-apiserver
         imagePullPolicy: IfNotPresent
-        image: quay.io/openebs/m-apiserver:ci
+        image: quay.io/openebs/m-apiserver:v0.9.x-ci
         ports:
         - containerPort: 5656
         env:
@@ -124,23 +124,23 @@ spec:
             fieldRef:
               fieldPath: metadata.name
         - name: OPENEBS_IO_JIVA_CONTROLLER_IMAGE
-          value: "quay.io/openebs/jiva:ci"
+          value: "quay.io/openebs/jiva:v0.9.x-ci"
         - name: OPENEBS_IO_JIVA_REPLICA_IMAGE
-          value: "quay.io/openebs/jiva:ci"
+          value: "quay.io/openebs/jiva:v0.9.x-ci"
         - name: OPENEBS_IO_JIVA_REPLICA_COUNT
           value: "3"
         - name: OPENEBS_IO_CSTOR_TARGET_IMAGE
-          value: "quay.io/openebs/cstor-istgt:ci"
+          value: "quay.io/openebs/cstor-istgt:v0.9.x-ci"
         - name: OPENEBS_IO_CSTOR_POOL_IMAGE
-          value: "quay.io/openebs/cstor-pool:ci"
+          value: "quay.io/openebs/cstor-pool:v0.9.x-ci"
         - name: OPENEBS_IO_CSTOR_POOL_MGMT_IMAGE
-          value: "quay.io/openebs/cstor-pool-mgmt:ci"
+          value: "quay.io/openebs/cstor-pool-mgmt:v0.9.x-ci"
         - name: OPENEBS_IO_CSTOR_VOLUME_MGMT_IMAGE
-          value: "quay.io/openebs/cstor-volume-mgmt:ci"
+          value: "quay.io/openebs/cstor-volume-mgmt:v0.9.x-ci"
         - name: OPENEBS_IO_VOLUME_MONITOR_IMAGE
-          value: "quay.io/openebs/m-exporter:ci"
+          value: "quay.io/openebs/m-exporter:v0.9.x-ci"
         - name: OPENEBS_IO_CSTOR_POOL_EXPORTER_IMAGE
-          value: "quay.io/openebs/m-exporter:ci"
+          value: "quay.io/openebs/m-exporter:v0.9.x-ci"
         # OPENEBS_IO_ENABLE_ANALYTICS if set to true sends anonymous usage
         # events to Google Analytics
         - name: OPENEBS_IO_ENABLE_ANALYTICS
@@ -199,7 +199,7 @@ spec:
       containers:
       - name: openebs-provisioner
         imagePullPolicy: IfNotPresent
-        image: quay.io/openebs/openebs-k8s-provisioner:ci
+        image: quay.io/openebs/openebs-k8s-provisioner:v0.9.x-ci
         env:
         # OPENEBS_IO_K8S_MASTER enables openebs provisioner to connect to K8s
         # based on this address. This is ignored if empty.
@@ -252,7 +252,7 @@ spec:
       serviceAccountName: openebs-maya-operator
       containers:
         - name: snapshot-controller
-          image: quay.io/openebs/snapshot-controller:ci
+          image: quay.io/openebs/snapshot-controller:v0.9.x-ci
           imagePullPolicy: IfNotPresent
           env:
           - name: OPENEBS_NAMESPACE
@@ -273,7 +273,7 @@ spec:
         #- name: OPENEBS_MAYA_SERVICE_NAME
         #  value: "maya-apiserver-apiservice"
         - name: snapshot-provisioner
-          image: quay.io/openebs/snapshot-provisioner:ci
+          image: quay.io/openebs/snapshot-provisioner:v0.9.x-ci
           imagePullPolicy: IfNotPresent
           env:
           - name: OPENEBS_NAMESPACE
@@ -467,7 +467,7 @@ spec:
       serviceAccountName: openebs-maya-operator
       containers:
         - name: admission-webhook
-          image: openebs/admission-server:ci
+          image: openebs/admission-server:v0.9.x-ci
           imagePullPolicy: IfNotPresent
           args:
             - -tlsCertFile=/etc/webhook/certs/cert.pem
