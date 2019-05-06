@@ -19,8 +19,8 @@ is the most interesting or fun.
 Maintainers are often under-appreciated, because their work is harder to appreciate.
 It's easy to appreciate a really cool and technically advanced feature. It's harder
 to appreciate the absence of bugs, the slow but steady improvement in stability,
-or the reliability of a release process. But those things distinguish a good
-project from a great one.
+or the reliability of a release process. But those things distinguish a great
+project from a good one.
 
 ## Reviewers
 
@@ -44,12 +44,12 @@ depend on and trust to make decisions in the best interest of the project.
 
 Periodically, the existing maintainers curate a list of contributors that have
 shown regular activity on the project over the prior months. From this list,
-maintainer candidates are selected and proposed on the maintainers mailing list.
+maintainer candidates are selected and proposed maintainers slack channel.
 
-After a candidate has been announced on the maintainers mailing list, the
+After a candidate has been announced on the maintainers slack channel, the
 existing maintainers are given five business days to discuss the candidate,
-raise objections and cast their vote. Votes may take place on the mailing list
-or via pull request comment. Candidates must be approved by at least 66% of the
+raise objections and cast their vote. The Votes take place via the pull request 
+comment. Candidates must be approved by at least 66% of the
 current maintainers by adding their vote on the mailing list. The reviewer role
 has the same process but only requires 33% of current maintainers. Only
 maintainers of the repository that the candidate is proposed for are allowed to

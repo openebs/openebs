@@ -1,0 +1,27 @@
+# Official list of OpenEBS Maintainers.
+#
+# Names added to this file should be in the following format:
+#     Individual's name,@githubhandle, Company Name
+#
+# Each of the OpenEBS sub project may have one or more of the 
+# following maintainers and list of reviewers who are 
+# in the process of becoming maintainers. 
+#
+# Please keep the below list sorted in ascending order.
+#
+#Maintainers
+
+"Amit Kumar Das",@AmitKumarDas,MayaData
+"Jeffry Molanus",@gila,MayaData
+"Karthik Satchitanand",@ksatchit,MayaData
+"Kiran Mova",@kmova,MayaData
+"Murat Karslioglu",@muratkars,MayaData
+"Richard Elling",@richardelling,Viking Enterprise Solutions a division of Sanmina Corporation
+"Vishnu Itta",@vishnuitta,MayaData
+
+#Reviewers
+"Evan Powell",@epowell101,MayaData
+"Prateek Pandey",@prateekpandey14,MayaData
+"Uma Mukkara",@umamukkara,MayaData
+"Utkarsh Mani Tripathi",@utkarshmani1997,MayaData
+
