@@ -1,0 +1,18 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    app: openebs
+  name: openebs
+  namespace: openebs
+spec:
+  endpoints:
+  - path: /metrics
+    port: exporter
+  namespaceSelector:
+    matchNames:
+    - openebs
+  selector:
+    matchLabels:
+      openebs.io/cas-type: cstor
+      monitoring: volume_exporter_prometheus
