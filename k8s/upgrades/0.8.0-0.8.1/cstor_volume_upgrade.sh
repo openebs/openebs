@@ -70,7 +70,7 @@ pvc_namespace=`kubectl get pv $pv -o jsonpath="{.spec.claimRef.namespace}"`
 c_dep=$(kubectl get deploy -n $ns -l openebs.io/persistent-volume=$pv,openebs.io/target=cstor-target -o jsonpath="{.items[*].metadata.name}")
 c_svc=$(kubectl get svc -n $ns -l openebs.io/persistent-volume=$pv,openebs.io/target-service=cstor-target-svc -o jsonpath="{.items[*].metadata.name}")
 c_vol=$(kubectl get cstorvolumes -l openebs.io/persistent-volume=$pv -n $ns -o jsonpath="{.items[*].metadata.name}")
-c_replicas=$(kubectl get cvr -n openebs -l openebs.io/persistent-volume=$pv -o jsonpath="{range .items[*]}{@.metadata.name};{end}" | tr ";" "\n")
+c_replicas=$(kubectl get cvr -n $ns -l openebs.io/persistent-volume=$pv -o jsonpath="{range .items[*]}{@.metadata.name};{end}" | tr ";" "\n")
 
 # Fetch the older target and replica - ReplicaSet objects which need to be 
 # deleted before upgrading. If not deleted, the new pods will be stuck in 
@@ -118,7 +118,7 @@ fi
 
 for replica in $c_replicas
 do
-    replica_version=`kubectl get cvr $replica -n openebs -o jsonpath='{.metadata.labels.openebs\.io/version}'`
+    replica_version=`kubectl get cvr $replica -n $ns -o jsonpath='{.metadata.labels.openebs\.io/version}'`
     if [[ "$replica_version" != "$current_version" ]] && [[ "$replica_version" != "$target_upgrade_version" ]]; then
         echo "CStor volume replica $replica version is not $current_version"; exit 1;
     fi
@@ -186,9 +186,9 @@ fi
 
 for replica in $c_replicas
 do
-    if [[ "`kubectl get cvr $replica -n openebs -o jsonpath='{.metadata.labels.openebs\.io/version}'`" != "$target_upgrade_version" ]]; then
+    if [[ "`kubectl get cvr $replica -n $ns -o jsonpath='{.metadata.labels.openebs\.io/version}'`" != "$target_upgrade_version" ]]; then
         echo "Upgrading cstor volume replica $replica to $target_upgrade_version"
-        kubectl patch cvr $replica --namespace openebs -p "$(cat cstor-volume-replica-patch.json)" --type=merge
+        kubectl patch cvr $replica --namespace $ns -p "$(cat cstor-volume-replica-patch.json)" --type=merge
         rc=$?; if [ $rc -ne 0 ]; then echo "Failed to patch CstorVolumeReplica $replica | Exit code: $rc"; exit; fi
         echo "Successfully updated replica: $replica"
     else
