@@ -59,7 +59,7 @@ Wir nähern uns der Beta-Phase mit aktiver Entwicklung. Weitere Informationen fi
  
 OpenEBS freut sich über Ihr Feedback und Ihre Beiträge in jeder möglichen Form.
  
-- [Tritt unserer Gemeinschaft](https://openebs.io/join-our-community)
+- [Tritt unserer Gemeinschaft](https://openebs.io/join-our-slack-community)
   - Bereits angemeldet? Besuchen Sie unsere Diskussionen unter [#openebs-users](https://openebs-community.slack.com/messages/openebs-users/).
 - Möchten Sie ein Problem ansprechen?
   - Wenn es sich um ein generisches Produkt (oder "nicht wirklich sicher") handelt, können Sie es dennoch unter [issues](https://github.com/openebs/openebs/issues) anheben.

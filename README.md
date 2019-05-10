@@ -58,7 +58,7 @@ We are approaching the beta stage with active development underway. See our [Pro
  
 OpenEBS welcomes your feedback and contributions in any form possible.
  
-- [Join our community](https://openebs.io/join-our-community)
+- [Join our community](https://openebs.io/join-our-slack-community)
   - Already signed up? Head to our discussions at [#openebs-users](https://openebs-community.slack.com/messages/openebs-users/)
 - Want to raise an issue?
   - If it is a generic (or `not really sure`), you can still raise it at [issues](https://github.com/openebs/openebs/issues)
