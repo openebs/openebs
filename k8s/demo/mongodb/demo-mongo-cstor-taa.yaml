@@ -18,8 +18,8 @@ kind: StatefulSet
 metadata:
  name: mongo
  labels: 
-   app: mongo
-   openebs.io/target-affinity: mongo 
+   app: mongo 
+   openebs.io/sts-target-affinity: mongo 
 spec:
  serviceName: "mongo"
  replicas: 1
@@ -28,7 +28,7 @@ spec:
      labels:
        app: mongo
        role: mongo
-       openebs.io/target-affinity: mongo
+       openebs.io/sts-target-affinity: mongo
        environment: test
    spec:
      terminationGracePeriodSeconds: 10
@@ -56,7 +56,7 @@ spec:
  - metadata:
      name: mongo-pvc
      labels: 
-       openebs.io/target-affinity: mongo
+       openebs.io/sts-target-affinity: mongo
    spec:
      storageClassName: openebs-cstor-sparse 
      accessModes:
