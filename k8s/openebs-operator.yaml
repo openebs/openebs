@@ -519,6 +519,7 @@ spec:
       labels:
         name: openebs-localpv-provisioner
         openebs.io/component-name: openebs-localpv-provisioner
+        openebs.io/version: 0.9.0
     spec:
       serviceAccountName: openebs-maya-operator
       containers:
