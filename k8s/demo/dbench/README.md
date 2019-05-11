@@ -122,7 +122,7 @@ policies similar to the replica count in 0.9. These values are translated
 into a configuration file (istgt.conf) that resides within the target pod. 
 To modify them, 
  `kubectl exec -it -n openebs <cstor-target-pod> -c cstor-istgt /bin/bash`
-  - cd /usr/local/istgt
+  - cd /usr/local/etc/istgt
   - sed -i '/Luworkers 6/c\  Luworkers 1' istgt.conf
   - check for the istgt process `ps -aux`
   - kill -9 pid <istgt-pid>
