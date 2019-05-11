@@ -80,6 +80,7 @@ spec:
       labels:
         name: maya-apiserver
         openebs.io/component-name: maya-apiserver
+        openebs.io/version: dev
     spec:
       serviceAccountName: openebs-maya-operator
       containers:
@@ -192,6 +193,7 @@ spec:
       labels:
         name: openebs-provisioner
         openebs.io/component-name: openebs-provisioner
+        openebs.io/version: dev
     spec:
       serviceAccountName: openebs-maya-operator
       containers:
@@ -245,6 +247,7 @@ spec:
       labels:
         name: openebs-snapshot-operator
         openebs.io/component-name: openebs-snapshot-operator
+        openebs.io/version: dev
     spec:
       serviceAccountName: openebs-maya-operator
       containers:
@@ -342,6 +345,7 @@ spec:
       labels:
         name: openebs-ndm
         openebs.io/component-name: ndm
+        openebs.io/version: dev
     spec:
       # By default the node-disk-manager will be run on all kubernetes nodes
       # If you would like to limit this to only some nodes, say the nodes
@@ -458,6 +462,7 @@ spec:
     metadata:
       labels:
         app: admission-webhook
+        openebs.io/version: dev
     spec:
       serviceAccountName: openebs-maya-operator
       containers:
@@ -514,6 +519,7 @@ spec:
       labels:
         name: openebs-localpv-provisioner
         openebs.io/component-name: openebs-localpv-provisioner
+        openebs.io/version: dev
     spec:
       serviceAccountName: openebs-maya-operator
       containers:
