@@ -1,0 +1,48 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: upgrade-config
+  namespace: default
+data:
+  upgrade: |
+    casTemplate: cstor-volume-update-082-090
+    resources:
+    - name: pvc-923da62e-6fe7-11e9-98c5-42010a80023a
+      kind: cstor-volume
+      namespace: openebs
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: volume-upgrade
+spec:
+  template:
+    spec:
+      serviceAccountName: cluster-admin
+      containers:
+      - name:  oupgrade
+        image: sagarkrsd/m-upgrade:ci
+        imagePullPolicy: Always
+        volumeMounts:
+        - name: config
+          mountPath: /etc/config
+          readOnly: true
+        env:
+        - name: OPENEBS_IO_SELF_NAME
+          value: volume-upgrade
+          #valueFrom:
+            #fieldRef:
+              #fieldPath: metadata.name
+        - name: OPENEBS_IO_SELF_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: OPENEBS_IO_SELF_UID
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.uid
+      volumes:
+      - name: config
+        configMap:
+          name: upgrade-config
+      restartPolicy: Never

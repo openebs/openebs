@@ -1,0 +1,752 @@
+# Sample runtasks for upgrading a cstor volume
+
+# CASTemplate cstor-volume-update-082-090 is
+# used to upgrade a cstor volume
+apiVersion: openebs.io/v1alpha1
+kind: CASTemplate
+metadata:
+  name: cstor-volume-update-082-090
+spec:
+  defaultConfig:
+  - name: baseversion
+    value: "0.8.0"
+  - name: targetversion
+    value: "v0.9.0-RC1"
+  - name: successStatus
+    value: "Success"
+  - name: failStatus
+    value: "Fail"
+  run:
+    tasks:
+    - upgrade-cstor-volume-082-090-patch-upgrade-result
+#    - upgrade-cstor-volume-082-090-get-vol-details
+#    - upgrade-cstor-volume-082-090-get-sc-res-version
+#    - upgrade-cstor-volume-082-090-list-target-deployment
+#    - upgrade-cstor-volume-082-090-list-target-svc
+#    - upgrade-cstor-volume-082-090-list-cstorvolumecr
+#    - upgrade-cstor-volume-082-090-list-cstorvolumereplicas
+#    - upgrade-cstor-volume-082-090-list-target-old-rs
+#    - upgrade-cstor-volume-082-090-pre-check-deployment-rollout-status-strategy
+#    - upgrade-cstor-volume-082-090-patch-deployment-strategy
+#    - upgrade-cstor-volume-082-090-post-check-deployment-rollout-status-strategy
+#    - upgrade-cstor-volume-082-090-post-check-deployment-strategy-patch
+#    - upgrade-cstor-volume-082-090-patch-target-deployment-latest-versions
+#    - upgrade-cstor-volume-082-090-post-check-deployment-rollout-status-latest-versions
+#    - upgrade-cstor-volume-082-090-post-check-patch-deployment-image
+#    - upgrade-cstor-volume-082-090-patch-target-svc
+#    - upgrade-cstor-volume-082-090-post-check-target-svc
+#    - upgrade-cstor-volume-082-090-patch-cstor-volume-cr
+#    - upgrade-cstor-volume-082-090-post-check-cstor-volume-cr
+#    - upgrade-cstor-volume-082-090-patch-cstor-volume-replica
+#    - upgrade-cstor-volume-082-090-post-check-cstor-volume-replicas
+#    - upgrade-cstor-volume-082-090-delete-target-old-replicaset
+  taskNamespace: default
+
+---
+
+# This runtask will patch the upgrade result CR
+# with the basic details such as name, namespace and kind
+apiVersion: openebs.io/v1alpha1
+kind: RunTask
+metadata:
+  name: upgrade-cstor-volume-082-090-patch-upgrade-result
+  namespace: default
+spec:
+  meta: |
+    id: patchResult
+    apiVersion: openebs.io/v1alpha1
+    kind: UpgradeResult
+    action: patch
+    objectName: {{ .UpgradeItem.upgradeResultName }}
+    runNamespace: default
+  post: |
+    {{ $retries := 0 -}}
+    {{- $message := printf "upgradeResult {%s} has been patched with basic details such as name and namespace of the resource to be upgraded." .UpgradeItem.upgradeResultName -}}
+    {{- $URName := upgradeResultWithTaskOwnerName .UpgradeItem.upgradeResultName -}}
+    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace "default" -}}
+    {{- $taskName := upgradeResultWithTaskName "upgrade-cstor-volume-082-090-patch-upgrade-result" -}}
+    {{- $taskStatus := upgradeResultWithTaskStatus "successful" -}}
+    {{- $taskMessage := upgradeResultWithTaskMessage $message -}}
+    {{- $taskStartTime := upgradeResultWithTaskStartTime now -}}
+    {{- $taskEndTime := upgradeResultWithTaskEndTime now -}}
+    {{- $taskRetries := upgradeResultWithTaskRetries 7 -}}
+    {{- upgradeResultUpdateTasks $taskStartTime $taskRetries $URName $URNamespace $taskName $taskStatus $taskMessage $taskEndTime -}}
+  task: |-
+    type: merge
+    pspec: |-
+      status:
+        resource:
+          name: {{ .UpgradeItem.name }}
+          namespace: {{ .UpgradeItem.namespace }}
+          kind: {{ .UpgradeItem.kind }}
+---
+# get volume details
+apiVersion: openebs.io/v1alpha1
+kind: RunTask
+metadata:
+  name: upgrade-cstor-volume-082-090-get-vol-details
+  namespace: default
+spec:
+  meta: |
+    id: getvoldetails
+    apiVersion: v1
+    kind: PersistentVolume
+    action: get
+    objectName: {{ .UpgradeItem.name }}
+    runNamespace: {{ .UpgradeItem.namespace }}
+  post: |
+    {{- jsonpath .JsonResult "{.metadata.annotations.openebs\\.io/cas-type}" | trim | saveAs "getvoldetails.volCASType" .TaskResult | noop -}}
+    {{- .TaskResult.getvoldetails.volCASType | notFoundErr "volume CAS type not found" | saveIf "getvoldetails.notFoundErr" .TaskResult | noop -}}
+    {{- jsonpath .JsonResult "{.spec.storageClassName}" | trim | saveAs "getvoldetails.storageClassName" .TaskResult | noop -}}
+    {{- .TaskResult.getvoldetails.storageClassName | notFoundErr "storage class name not found for given volume" | saveIf "getvoldetails.notFoundErr" .TaskResult | noop -}}
+    {{- jsonpath .JsonResult "{.spec.claimRef.namespace}" | trim | saveAs "getvoldetails.storageClassNamespace" .TaskResult | noop -}}
+    {{- .TaskResult.getvoldetails.storageClassNamespace | notFoundErr "storage class namespace not found for given volume" | saveIf "getvoldetails.notFoundErr" .TaskResult | noop -}}
+    {{- jsonpath .JsonResult "{.spec.claimRef.namespace}" | trim | saveAs "getvoldetails.pvcNamespace" .TaskResult | noop -}}
+    {{- .TaskResult.getvoldetails.pvcNamespace | notFoundErr "pvc namespace not found for given volume" | saveIf "getvoldetails.notFoundErr" .TaskResult | noop -}}
+    {{- jsonpath .JsonResult "{.spec.claimRef.name}" | trim | saveAs "getvoldetails.pvcName" .TaskResult | noop -}}
+    {{- .TaskResult.getvoldetails.pvcName | notFoundErr "pvc name not found for given volume" | saveIf "getvoldetails.notFoundErr" .TaskResult | noop -}}
+    {{ $retries := 0 -}}
+    {{- $message := printf "details for volume {%s} are : volCASType: {%s}, storageClassName: {%s}, storageClassNamespace: {%s}, pvcName: {%s}, pvcNamespace: {%s}" .UpgradeItem.name .TaskResult.getvoldetails.volCASType .TaskResult.getvoldetails.storageClassName .TaskResult.getvoldetails.storageClassNamespace .TaskResult.getvoldetails.pvcName .TaskResult.getvoldetails.pvcNamespace -}}
+    {{- updateUpgradeResult .UpgradeItem.upgradeResult "default" "upgrade-cstor-volume-082-090-get-vol-details" "Success" $message $retries now }}
+---
+# Get storage class resource version
+apiVersion: openebs.io/v1alpha1
+kind: RunTask
+metadata:
+  name: upgrade-cstor-volume-082-090-get-sc-res-version
+  namespace: default
+spec:
+  meta: |
+    id: getstorageclassresversion
+    apiVersion: storage.k8s.io/v1
+    kind: StorageClass
+    action: get
+    objectName: {{.TaskResult.getvoldetails.storageClassName}}
+    runNamespace: {{.TaskResult.getvoldetails.storageClassNamespace}}
+  post: |
+    {{- jsonpath .JsonResult "{.metadata.resourceVersion}" | trim | saveAs "getstorageclassresversion.storageClassResVersion" .TaskResult | noop -}}
+    {{- .TaskResult.getstorageclassresversion.storageClassResVersion | notFoundErr "storage class resource version not found" | saveIf "getstorageclassresversion.notFoundErr" .TaskResult | noop -}}
+    {{ $retries := 0 -}}
+    {{- $message := printf "resource version for storage class {%s} is : {%s}" .TaskResult.getvoldetails.storageClassName .TaskResult.getstorageclassresversion.storageClassResVersion -}}
+    {{- updateUpgradeResult .UpgradeItem.upgradeResult "default" "upgrade-cstor-volume-082-090-get-sc-res-version" "Success" $message $retries now }}
+
+---
+
+# list volume target deployment
+apiVersion: openebs.io/v1alpha1
+kind: RunTask
+metadata:
+  name: upgrade-cstor-volume-082-090-list-target-deployment
+  namespace: default
+spec:
+  meta: |
+    id: listtargetdeployment
+    apiVersion: extensions/v1beta1
+    kind: Deployment
+    action: list
+    runNamespace: {{ .UpgradeItem.namespace }}
+    options: |-
+      labelSelector: openebs.io/persistent-volume={{ .UpgradeItem.name }},openebs.io/target=cstor-target
+  post: |
+    {{- jsonpath .JsonResult "{.items[*].metadata.name}" | trim | saveAs "listtargetdeployment.targetDeploymentName" .TaskResult | noop -}}
+    {{- .TaskResult.listtargetdeployment.targetDeploymentName | notFoundErr "volume target deployment not found" | saveIf "listtargetdeployment.notFoundErr" .TaskResult | noop -}}
+    {{ $retries := 0 -}}
+    {{- $message := printf "the target deployment for this volume is : {%s}" .TaskResult.listtargetdeployment.targetDeploymentName -}}
+    {{- updateUpgradeResult .UpgradeItem.upgradeResult "default" "upgrade-cstor-volume-082-090-list-target-deployment" "Success" $message $retries now }}
+
+---
+
+# list target svc
+apiVersion: openebs.io/v1alpha1
+kind: RunTask
+metadata:
+  name: upgrade-cstor-volume-082-090-list-target-svc
+  namespace: default
+spec:
+  meta: |
+    id: listtargetservice
+    apiVersion: v1
+    kind: Service
+    action: list
+    runNamespace: {{ .UpgradeItem.namespace }}
+    options: |-
+      labelSelector: openebs.io/persistent-volume={{ .UpgradeItem.name }},openebs.io/target-service=cstor-target-svc
+  post: |
+    {{- jsonpath .JsonResult "{.items[*].metadata.name}" | trim | saveAs "listtargetservice.items" .TaskResult | noop -}}
+    {{- .TaskResult.listtargetservice.items | notFoundErr "volume target service not found" | saveIf "listtargetservice.notFoundErr" .TaskResult | noop -}}
+    {{ $retries := 0 -}}
+    {{- $message := printf "the target service for this volume is : {%s}" .TaskResult.listtargetservice.items -}}
+    {{- updateUpgradeResult .UpgradeItem.upgradeResult "default" "upgrade-cstor-volume-082-090-list-target-svc" "Success" $message $retries now }}
+
+---
+
+# list cstor volumes CR
+apiVersion: openebs.io/v1alpha1
+kind: RunTask
+metadata:
+  name: upgrade-cstor-volume-082-090-list-cstorvolumecr
+  namespace: default
+spec:
+  meta: |
+    id: listcstorvolumecr
+    apiVersion: openebs.io/v1alpha1
+    kind: CStorVolume
+    action: list
+    runNamespace: {{ .UpgradeItem.namespace }}
+    options: |-
+      labelSelector: openebs.io/persistent-volume={{ .UpgradeItem.name }}
+  post: |
+    {{- jsonpath .JsonResult "{.items[*].metadata.name}" | trim | saveAs "listcstorvolumecr.items" .TaskResult | noop -}}
+    {{- .TaskResult.listcstorvolumecr.items | notFoundErr "cstor volume cr not found" | saveIf "listcstorvolumecr.notFoundErr" .TaskResult | noop -}}
+    {{ $retries := 0 -}}
+    {{- $message := printf "the CStorVolume list is : {%s}" .TaskResult.listcstorvolumecr.items -}}
+    {{- updateUpgradeResult .UpgradeItem.upgradeResult "default" "upgrade-cstor-volume-082-090-list-cstorvolumecr" "Success" $message $retries now }}
+
+---
+
+# list cstor volume replicas
+apiVersion: openebs.io/v1alpha1
+kind: RunTask
+metadata:
+  name: upgrade-cstor-volume-082-090-list-cstorvolumereplicas	
+  namespace: default
+spec:
+  meta: |
+    id: listcstorvolumeReplicas
+    apiVersion: openebs.io/v1alpha1
+    kind: CStorVolumeReplica
+    action: list
+    runNamespace: {{ .UpgradeItem.namespace }}
+    options: |-
+      labelSelector: openebs.io/persistent-volume={{ .UpgradeItem.name }}
+  post: |
+    {{- jsonpath .JsonResult "{range .items[*]}{@.metadata.name} {end}" | trim | saveAs "listcstorvolumeReplicas.items" .TaskResult | noop -}}
+    {{- .TaskResult.listcstorvolumeReplicas.items | notFoundErr "cstor volume replicas not found" | saveIf "listcstorvolumeReplicas.notFoundErr" .TaskResult | noop -}}
+    {{ $retries := 0 -}}
+    {{- $message := printf "the CStorVolumeReplica list is : {%s}" .TaskResult.listcstorvolumeReplicas.items -}}
+    {{- updateUpgradeResult .UpgradeItem.upgradeResult "default" "upgrade-cstor-volume-082-090-list-cstorvolumereplicas" "Success" $message $retries now }}
+
+
+---
+
+# list target older replicasets
+apiVersion: openebs.io/v1alpha1
+kind: RunTask
+metadata:
+  name: upgrade-cstor-volume-082-090-list-target-old-rs
+  namespace: default
+spec:
+  meta: |
+    id: listtargetoldrs
+    apiVersion: extensions/v1beta1
+    kind: ReplicaSet
+    action: list
+    runNamespace: {{ .UpgradeItem.namespace }}
+    options: |-
+      labelSelector: openebs.io/persistent-volume={{ .UpgradeItem.name }}
+  post: |
+    {{- jsonpath .JsonResult "{.items[*].metadata.name}" | trim | saveAs "listtargetoldrs.items" .TaskResult | noop -}}
+    {{- .TaskResult.listtargetoldrs.items | notFoundErr "older replicasets for volume target deployment not found" | saveIf "listtargetoldrs.notFoundErr" .TaskResult | noop -}}
+    {{ $retries := 0 -}}
+    {{- $message := printf "the older replicaset to be deleted after patching target {%s} is : {%s}" .TaskResult.listtargetdeployment.targetDeploymentName .TaskResult.listtargetoldrs.items -}}
+    {{- updateUpgradeResult .UpgradeItem.upgradeResult "default" "upgrade-cstor-volume-082-090-list-target-old-rs" "Success" $message $retries now }}
+
+---
+
+# ----------------------- Patching volume target deployment strategy to recreate ---------------------------------------
+#
+# Check the deployment for desired status
+apiVersion: openebs.io/v1alpha1
+kind: RunTask
+metadata:
+  name: upgrade-cstor-volume-082-090-pre-check-deployment-rollout-status-strategy
+  namespace: default
+spec:
+  meta: |
+    id: precheckdeploymentstatusstrategy
+    apiVersion: extensions/v1beta1
+    kind: Deployment
+    action: rolloutstatus
+    objectName: {{ .TaskResult.listtargetdeployment.targetDeploymentName }}
+    runNamespace: {{ .UpgradeItem.namespace }}
+    retry: "20,20s"
+  post: |
+    {{- $rolledOut := jsonpath .JsonResult "{.isRolledout}" | trim -}}
+    {{- $rolloutMessage := jsonpath .JsonResult "{.message}" | trim -}}
+    {{- $endTime := now | date "2006-01-02T15:04:05Z07:00" -}}
+    {{- $retries := 0 -}}
+    {{- if eq $rolledOut "true" }}
+    {{- $status := "Success" -}}
+    {{- $message := "Pre check deployment rollout status for patching with recreate strategy passed" -}}
+    {{- updateUpgradeResult .UpgradeItem.upgradeResult "default" "upgrade-cstor-volume-082-090-pre-check-deployment-rollout-status-strategy" $status $message $retries now }}
+    {{- else }}
+    {{- $status := "Failed" -}}
+    {{- $message := "Pre check deployment rollout status for patching with recreate strategy failed" -}}
+    {{- updateUpgradeResult .UpgradeItem.upgradeResult "default" "upgrade-cstor-volume-082-090-pre-check-deployment-rollout-status-strategy" $status $message $retries now }}
+    {{- "waiting for deployment rollout" | saveAs "precheckdeploymentstatusstrategy.verifyErr" .TaskResult | noop -}}
+    {{- end }}
+
+---
+
+# Patch volume target deployment strategy to recreate
+apiVersion: openebs.io/v1alpha1
+kind: RunTask
+metadata:
+  name: upgrade-cstor-volume-082-090-patch-deployment-strategy
+  namespace: default
+spec:
+  meta: |
+    id: patchdeploymentstrategy
+    apiVersion: extensions/v1beta1
+    kind: Deployment
+    runNamespace: {{ .UpgradeItem.namespace }}
+    objectName: {{ .TaskResult.listtargetdeployment.targetDeploymentName }}
+    action: patch
+  post: |
+    {{ "Recreate" | saveAs "patchdeploymentstrategy.strategy" .TaskResult | noop -}}
+    {{ $retries := 0 -}}
+    {{- $message := printf "deployment {%s} has been patched with {%s} strategy." .TaskResult.listtargetdeployment.targetDeploymentName .TaskResult.patchdeploymentstrategy.strategy -}}
+    {{- updateUpgradeResult .UpgradeItem.upgradeResult "default" "upgrade-cstor-volume-082-090-patch-deployment-strategy" "Success" $message $retries now }}
+  task: |-
+    type: merge
+    pspec: |-
+      spec:
+        strategy:
+          rollingUpdate:
+          type: Recreate
+
+---
+
+# Post check target deployment rollout status after patching with recreate strategy
+apiVersion: openebs.io/v1alpha1
+kind: RunTask
+metadata:
+  name: upgrade-cstor-volume-082-090-post-check-deployment-rollout-status-strategy
+  namespace: default
+spec:
+  meta: |
+    id: postcheckdeploymentstatusstrategy
+    apiVersion: extensions/v1beta1
+    kind: Deployment
+    action: rolloutstatus
+    objectName: {{ .TaskResult.listtargetdeployment.targetDeploymentName }}
+    runNamespace: {{ .UpgradeItem.namespace }}
+    retry: "20,20s"
+  post: |
+    {{- $rolledOut := jsonpath .JsonResult "{.isRolledout}" | trim -}}
+    {{- $rolloutMessage := jsonpath .JsonResult "{.message}" | trim -}}
+    {{- $endTime := now | date "2006-01-02T15:04:05Z07:00" -}}
+    {{- $retries := 0 -}}
+    {{- if eq $rolledOut "true" }}
+    {{- $status := "Success" -}}
+    {{- $message := "Post check deployment rollout status after patching with recreate strategy passed" -}}
+    {{- updateUpgradeResult .UpgradeItem.upgradeResult "" "upgrade-cstor-volume-082-090-post-check-deployment-rollout-status-strategy" $status $message $retries now }}
+    {{- else }}
+    {{- $status := "Failed" -}}
+    {{- $message := "Post check deployment rollout status after patching with recreate strategy failed" -}}
+    {{- updateUpgradeResult .UpgradeItem.upgradeResult "default" "upgrade-cstor-volume-082-090-post-check-deployment-rollout-status-strategy" $status $message $retries now }}
+    {{- "waiting for deployment rollout" | saveAs "postcheckdeploymentstatusstrategy.verifyErr" .TaskResult | noop -}}
+    {{- end }}
+
+---
+
+# Post check target deployment strategy if successfully patched to recreate or not
+apiVersion: openebs.io/v1alpha1
+kind: RunTask
+metadata:
+  name: upgrade-cstor-volume-082-090-post-check-deployment-strategy-patch
+  namespace: default
+spec:
+  meta: |
+    id: postCheckDeploymentStrategyPatch
+    apiVersion: extensions/v1beta1
+    kind: Deployment
+    action: get
+    objectName: {{ .TaskResult.listtargetdeployment.targetDeploymentName }}
+    runNamespace: {{ .UpgradeItem.namespace }}
+  post: |
+    {{ $retries := 0 -}}
+    {{- $deploymentStrategy := jsonpath .JsonResult "{.spec.strategy.type}" | trim -}}
+    {{- if eq $deploymentStrategy .TaskResult.patchdeploymentstrategy.strategy }}
+    {{- $message := printf "post check after patching deployment {%s} with {%s} strategy has passed." .TaskResult.listtargetdeployment.targetDeploymentName .TaskResult.patchdeploymentstrategy.strategy -}}
+    {{- updateUpgradeResult .UpgradeItem.upgradeResult "default" "upgrade-cstor-volume-082-090-post-check-deployment-strategy-patch" "Success" $message $retries now }}
+    {{- else }}
+    {{- $message := printf "post check for patching deployment {%s} with {%s} strategy has failed." .TaskResult.listtargetdeployment.targetDeploymentName .TaskResult.patchdeploymentstrategy.strategy -}}
+    {{- updateUpgradeResult .UpgradeItem.upgradeResult "default" "upgrade-cstor-volume-082-090-post-check-deployment-strategy-patch" "Failed" $message $retries now }}
+    {{- "volume target deployment not patched with recreate strategy" | saveAs "postCheckDeploymentStrategyPatch.verifyErr" .TaskResult | noop -}}
+    {{- end }}
+
+# ----------------------- Patched volume target deployment strategy to recreate ---------------------------------------/end
+---
+
+# ----------------------- Patching volume target deployment with latest images -----------------------------------------
+apiVersion: openebs.io/v1alpha1
+kind: RunTask
+metadata:
+  name: upgrade-cstor-volume-082-090-patch-target-deployment-latest-versions
+  namespace: default
+spec:
+  meta: |
+    id: patchtargetdeploymentlatestversions
+    apiVersion: extensions/v1beta1
+    kind: Deployment
+    runNamespace: {{ .UpgradeItem.namespace }}
+    objectName: {{ .TaskResult.listtargetdeployment.targetDeploymentName }}
+    action: patch
+  post: |
+    {{ $retries := 0 -}}
+    {{- $message := printf "deployment {%s} has been patched with latest images for {%s} version." .TaskResult.listtargetdeployment.targetDeploymentName .Config.targetversion.value -}}
+    {{- updateUpgradeResult .UpgradeItem.upgradeResult "default" "upgrade-cstor-volume-082-090-patch-target-deployment-latest-versions" "Success" $message $retries now }}
+  task: |-
+    type: strategic
+    pspec: |-
+      metadata:
+        annotations: 
+          openebs.io/storage-class-ref: "name: {{ .TaskResult.getvoldetails.storageClassName }}\nresourceVersion: {{ .TaskResult.getstorageclassresversion.storageClassResVersion }}\n"
+        labels: 
+          openebs.io/version: {{ .Config.targetversion.value}}
+      spec: 
+        template: 
+          metadata: 
+            annotations: 
+              openebs.io/storage-class-ref: "name: {{ .TaskResult.getvoldetails.storageClassName }}\nresourceVersion: {{ .TaskResult.getstorageclassresversion.storageClassResVersion }}\n"
+            labels: 
+              openebs.io/storage-class: {{ .TaskResult.getvoldetails.storageClassName }}
+          spec: 
+            containers: 
+            - name: cstor-istgt
+              image: quay.io/openebs/cstor-istgt:{{ .Config.targetversion.value}}
+            - name: maya-volume-exporter
+              image: quay.io/openebs/m-exporter:{{ .Config.targetversion.value}}
+            - name: cstor-volume-mgmt
+              image: quay.io/openebs/cstor-volume-mgmt:{{ .Config.targetversion.value}}
+
+---
+
+# Post check target deployment rollout status after patching with latest versions
+apiVersion: openebs.io/v1alpha1
+kind: RunTask
+metadata:
+  name: upgrade-cstor-volume-082-090-post-check-deployment-rollout-status-latest-versions
+  namespace: default
+spec:
+  meta: |
+    id: postcheckdeploymentstatuslatestversions
+    apiVersion: extensions/v1beta1
+    kind: Deployment
+    action: rolloutstatus
+    objectName: {{ .TaskResult.listtargetdeployment.targetDeploymentName }}
+    runNamespace: {{ .UpgradeItem.namespace }}
+    retry: "20,20s"
+  post: |
+    {{- $rolledOut := jsonpath .JsonResult "{.isRolledout}" | trim -}}
+    {{- $rolloutMessage := jsonpath .JsonResult "{.message}" | trim -}}
+    {{- $endTime := now | date "2006-01-02T15:04:05Z07:00" -}}
+    {{- $retries := 0 -}}
+    {{- if eq $rolledOut "true" }}
+    {{- $status := "Success" -}}
+    {{- $message := "Post check deployment rollout status after patching with latest versions passed" -}}
+    {{- updateUpgradeResult .UpgradeItem.upgradeResult "default" "upgrade-cstor-volume-082-090-post-check-deployment-rollout-status-latest-versions" $status $message $retries now }}
+    {{- else }}
+    {{- $status := "Failed" -}}
+    {{- $message := "Post check deployment rollout status after patching with latest versions failed" -}}
+    {{- updateUpgradeResult .UpgradeItem.upgradeResult "default" "upgrade-cstor-volume-082-090-post-check-deployment-rollout-status-latest-versions" $status $message $retries now }}
+    {{- "waiting for deployment rollout" | saveAs "postcheckdeploymentstatuslatestversions.verifyErr" .TaskResult | noop -}}
+    {{- end }}
+
+---
+
+# Post check target deployment images patch with latest versions
+apiVersion: openebs.io/v1alpha1
+kind: RunTask
+metadata:
+  name: upgrade-cstor-volume-082-090-post-check-patch-deployment-image
+  namespace: default
+spec:
+  meta: |
+    id: postCheckDeploymentImagePatch
+    apiVersion: extensions/v1beta1
+    kind: Deployment
+    action: get
+    objectName: {{ .TaskResult.listtargetdeployment.targetDeploymentName }}
+    runNamespace: {{ .UpgradeItem.namespace }}
+  post: |
+    {{- $passed := "true" -}}
+    {{- $cstorIstgtImage := jsonpath .JsonResult "{.spec.template.spec.containers[?(@.name=='cstor-istgt')].image}" | trim -}}
+    {{- $mayaVolExporterImage := jsonpath .JsonResult "{.spec.template.spec.containers[?(@.name=='maya-volume-exporter')].image}" | trim -}}
+    {{- $cstorVolMgmtImage := jsonpath .JsonResult "{.spec.template.spec.containers[?(@.name=='cstor-volume-mgmt')].image}" | trim -}}
+    {{- if contains .Config.targetversion.value $cstorIstgtImage }}
+    {{- else }}
+    {{- $passed = "false" -}}
+    {{- "cstor-istgt container image of volume target deployment not patched" | saveAs "postCheckDeploymentImagePatch.verifyErr" .TaskResult | noop -}}
+    {{- end }}
+    {{- if contains .Config.targetversion.value $mayaVolExporterImage }}
+    {{- else }}
+    {{- $passed = "false" -}}
+    {{- "maya-exporter container image of volume target deployment not patched" | saveAs "postCheckDeploymentImagePatch.verifyErr" .TaskResult | noop -}}
+    {{- end }}
+    {{- if contains .Config.targetversion.value $cstorVolMgmtImage }}
+    {{- else }}
+    {{- $passed = "false" -}}
+    {{- "cstor-volume-mgmt container image of volume target deployment not patched" | saveAs "postCheckDeploymentImagePatch.verifyErr" .TaskResult | noop -}}
+    {{- end }}
+    {{ $retries := 0 -}}
+    {{- if eq $passed "true" -}}
+    {{- $message := printf "post check for patching deployment {%s} with latest images for target version {%s} has passed." .TaskResult.listtargetdeployment.targetDeploymentName .Config.targetversion.value -}}
+    {{- updateUpgradeResult .UpgradeItem.upgradeResult "default" "upgrade-cstor-volume-082-090-post-check-patch-deployment-image" "Success" $message $retries now }}
+    {{- else -}}
+    {{- $message := printf "post check for patching deployment {%s} with latest images for target version {%s} has failed." .TaskResult.listtargetdeployment.targetDeploymentName .Config.targetversion.value -}}
+    {{- updateUpgradeResult .UpgradeItem.upgradeResult "default" "upgrade-cstor-volume-082-090-post-check-patch-deployment-image" "Failed" $message $retries now }}
+    {{- end }}
+
+# ------------------------- Patched volume target deployment with latest versions ---------------------------------------/end
+---
+
+# ------------------------- Patching target svc ---------------------------------------------------------------------
+# Patch target service
+apiVersion: openebs.io/v1alpha1
+kind: RunTask
+metadata:
+  name: upgrade-cstor-volume-082-090-patch-target-svc
+  namespace: default
+spec:
+  meta: |
+    id: patchtargetsvc
+    apiVersion: v1
+    kind: Service
+    runNamespace: {{ .UpgradeItem.namespace }}
+    objectName: {{ .TaskResult.listtargetservice.items }}
+    action: patch
+  post: |
+    {{ $retries := 0 -}}
+    {{- $message := printf "service {%s} has been patched with required labels and annotations." .TaskResult.listtargetservice.items -}}
+    {{- updateUpgradeResult .UpgradeItem.upgradeResult "default" "upgrade-cstor-volume-082-090-patch-target-svc" "Success" $message $retries now }}
+  task: |-
+    type: merge
+    pspec: |-
+      metadata:
+        annotations: 
+          openebs.io/storage-class-ref: "name: {{ .TaskResult.getvoldetails.storageClassName }}\nresourceVersion: {{ .TaskResult.getstorageclassresversion.storageClassResVersion }}\n"
+        labels: 
+          openebs.io/version: {{ .Config.targetversion.value }}
+
+---
+
+# Post check for target svc after patch
+apiVersion: openebs.io/v1alpha1
+kind: RunTask
+metadata:
+  name: upgrade-cstor-volume-082-090-post-check-target-svc
+  namespace: default
+spec:
+  meta: |
+    id: postchecktargetsvc
+    apiVersion: v1
+    kind: Service
+    action: get
+    objectName: {{ .TaskResult.listtargetservice.items }}
+    runNamespace: {{ .UpgradeItem.namespace }}
+  post: |
+    {{- $scrAnnotation := jsonpath .JsonResult "{.metadata.annotations.openebs\\.io/storage-class-ref}" | trim | saveAs "scrAnnotation" .TaskResult | noop -}}
+    {{- $labels := jsonpath .JsonResult "{.metadata.labels.openebs\\.io/version}" | trim | saveAs "labels" .TaskResult | noop -}}
+    {{- $desiredAnnotation := printf "name: %s\nresourceVersion: %s\n" .TaskResult.getvoldetails.storageClassName .TaskResult.getstorageclassresversion.storageClassResVersion | saveAs "desAnnotation" .TaskResult | noop -}}
+    {{- $retries := 0 -}}
+    {{- if contains .TaskResult.getvoldetails.storageClassName .TaskResult.scrAnnotation -}}
+    {{- else -}}
+    {{- $status := "Failed" -}}
+    {{- $message := "Post check for target service after patching failed" -}}
+    {{- updateUpgradeResult .UpgradeItem.upgradeResult "default" "upgrade-cstor-volume-082-090-post-check-target-svc" $status $message $retries now }}
+    {{- "annotations not patched for volume target service" | saveAs "postchecktargetsvc.verifyErr" .TaskResult | noop -}}
+    {{- end }}
+    
+    {{- if eq "0.8.1" .TaskResult.labels -}}
+    {{- $status := "Success" -}}
+    {{- $message := "Post check for target service after patching passed" -}}
+    {{- updateUpgradeResult .UpgradeItem.upgradeResult "default" "upgrade-cstor-volume-082-090-post-check-target-svc" $status $message $retries now }}
+    {{- else -}}
+    {{- $status := "Failed" -}}
+    {{- $message := "Post check target service after patching failed" -}}
+    {{- updateUpgradeResult .UpgradeItem.upgradeResult "default" "upgrade-cstor-volume-082-090-post-check-target-svc" $status $message $retries now }}
+    {{- "labels not patched for volume target service" | saveAs "postchecktargetsvc.verifyErr" .TaskResult | noop -}}
+    {{- end }}
+
+# ------------------------- Patched target svc -------------------------------------------------------------------\end
+---
+
+# Patch cstor volume cr
+apiVersion: openebs.io/v1alpha1
+kind: RunTask
+metadata:
+  name: upgrade-cstor-volume-082-090-patch-cstor-volume-cr
+  namespace: default
+spec:
+  meta: |
+    id: patchcstorvolumecr
+    apiVersion: openebs.io/v1alpha1
+    kind: CStorVolume
+    runNamespace: {{ .UpgradeItem.namespace }}
+    objectName: {{ .TaskResult.listcstorvolumecr.items }}
+    action: patch
+  post: |
+    {{ $retries := 0 -}}
+    {{- $message := printf "cstor volume {%s} has been patched with required labels and annotations." .TaskResult.listcstorvolumecr.items -}}
+    {{- updateUpgradeResult .UpgradeItem.upgradeResult "default" "upgrade-cstor-volume-082-090-patch-cstor-volume-cr" "Success" $message $retries now }}
+  task: |-
+    type: merge
+    pspec: |-
+      metadata:
+        annotations: 
+          openebs.io/storage-class-ref: "name: {{ .TaskResult.getvoldetails.storageClassName }}\nresourceVersion: {{ .TaskResult.getstorageclassresversion.storageClassResVersion }}\n"
+        labels: 
+          openebs.io/version: {{ .Config.targetversion.value }}
+
+---
+
+# Post check for cstor volume cr after patch
+apiVersion: openebs.io/v1alpha1
+kind: RunTask
+metadata:
+  name: upgrade-cstor-volume-082-090-post-check-cstor-volume-cr
+  namespace: default
+spec:
+  meta: |
+    id: postcheckcstorvolumecr
+    apiVersion: openebs.io/v1alpha1
+    kind: CStorVolume
+    action: get
+    objectName: {{ .TaskResult.listcstorvolumecr.items }}
+    runNamespace: {{ .UpgradeItem.namespace }}
+  post: |
+    {{- $scrAnnotation := jsonpath .JsonResult "{.metadata.annotations.openebs\\.io/storage-class-ref}" | trim | saveAs "scrAnnotation" .TaskResult | noop -}}
+    {{- $labels := jsonpath .JsonResult "{.metadata.labels.openebs\\.io/version}" | trim | saveAs "labels" .TaskResult | noop -}}
+    {{- $desiredAnnotation := printf "name: %s\nresourceVersion: %s\n" .TaskResult.getvoldetails.storageClassName .TaskResult.getstorageclassresversion.storageClassResVersion | saveAs "desAnnotation" .TaskResult | noop -}}
+    {{- $retries := 0 -}}
+    {{- if contains .TaskResult.getvoldetails.storageClassName .TaskResult.scrAnnotation -}}
+    {{- else -}}
+    {{- $status := "Failed" -}}
+    {{- $message := "Post check cstor volume cr after patching failed" -}}
+    {{- updateUpgradeResult .UpgradeItem.upgradeResult "default" "upgrade-cstor-volume-082-090-post-check-cstor-volume-cr" $status $message $retries now }}
+    {{- "annotations not patched for cstor volume cr" | saveAs "postcheckcstorvolumecr.verifyErr" .TaskResult | noop -}}
+    {{- end }}
+    
+    {{- if eq "0.8.1" .TaskResult.labels -}}
+    {{- $status := "Success" -}}
+    {{- $message := "Post check cstor volume cr after patching passed" -}}
+    {{- updateUpgradeResult .UpgradeItem.upgradeResult "default" "upgrade-cstor-volume-082-090-post-check-cstor-volume-cr" $status $message $retries now }}
+    {{- else }}
+    {{- $status := "Failed" -}}
+    {{- $message := "Post check cstor volume cr after patching failed" -}}
+    {{- updateUpgradeResult .UpgradeItem.upgradeResult "default" "upgrade-cstor-volume-082-090-post-check-cstor-volume-cr" $status $message $retries now }}
+    {{- "labels not patched for cstor volume cr" | saveAs "postcheckcstorvolumecr.verifyErr" .TaskResult | noop -}}
+    {{- end }}
+
+# ------------------------- Patched cstor volume cr -------------------------------------------------------------------\end
+---
+
+# Patch cstor volume replicas
+apiVersion: openebs.io/v1alpha1
+kind: RunTask
+metadata:
+  name: upgrade-cstor-volume-082-090-patch-cstor-volume-replica
+  namespace: default
+spec:
+  meta: |
+    {{- $cstorVolReplicaList := .TaskResult.listcstorvolumeReplicas.items | default "" | splitList " " -}}
+    id: patchcstorvolumereplicacr
+    apiVersion: openebs.io/v1alpha1
+    kind: CStorVolumeReplica
+    runNamespace: {{ .UpgradeItem.namespace }}
+    action: patch
+    repeatWith:
+      metas:
+      {{- range $k, $cvr := $cstorVolReplicaList }}
+      - objectName: {{ $cvr }}
+      {{- end }}
+  post: |
+    {{ $retries := 0 -}}
+    {{- $message := printf "cstor volume replicas {%s} has been patched with required labels and annotations." .TaskResult.listcstorvolumeReplicas.items -}}
+    {{- updateUpgradeResult .UpgradeItem.upgradeResult "default" "upgrade-cstor-volume-082-090-patch-cstor-volume-replica" "Success" $message $retries now }}
+  task: |-
+    type: merge
+    pspec: |-
+      metadata:
+        annotations: 
+          openebs.io/storage-class-ref: "name: {{ .TaskResult.getvoldetails.storageClassName }}\nresourceVersion: {{ .TaskResult.getstorageclassresversion.storageClassResVersion }}\n"
+        labels: 
+          openebs.io/version: {{ .Config.targetversion.value }}
+
+---
+
+# Post check for cstor volume replicas after patch
+apiVersion: openebs.io/v1alpha1
+kind: RunTask
+metadata:
+  name: upgrade-cstor-volume-082-090-post-check-cstor-volume-replicas
+  namespace: default
+spec:
+  meta: |
+    id: postcheckcstorvolumereplicas
+    apiVersion: openebs.io/v1alpha1
+    kind: CStorVolumeReplica
+    action: list
+    runNamespace: {{ .UpgradeItem.namespace }}
+    options: |-
+      labelSelector: openebs.io/persistent-volume={{ .UpgradeItem.name }}
+  post: |
+    {{- $retries := 0 -}}
+    {{- $upgradeResultName := .UpgradeItem.upgradeResult | default "" -}}
+    {{- $upgradeResultNamespace := .UpgradeItem.namespace | default "" -}}
+    {{- $cvrAnnotationLabels := jsonpath .JsonResult "{range .items[*]}pkey={@.metadata.name},scrAnnotation={@.metadata.annotations.openebs\\.io/storage-class-ref},labels={@..metadata.labels.openebs\\.io/version};{end}" | trim | default "" | splitList ";" -}}
+    {{- $cvrAnnotationLabels | keyMap "cvrList" .ListItems | noop -}}
+    {{- range $pkey, $map := .ListItems.cvrList }}
+    {{- $pkey := $pkey }}
+    {{- $map := $map }}
+    {{- $scrAnnotation := pluck "scrAnnotation" $map | first | trim | default "" | saveAs "scrAnnotation" .TaskResult }}
+    {{- $labels := pluck "labels" $map | first | trim | default "" | saveAs "labels" .TaskResult }}
+    {{- if contains "openebs-cstor-sparse" $scrAnnotation -}}
+    {{- else -}}
+    {{- $status := "Failed" -}}
+    {{- $message := "Post check cstor volume replicas after patching failed" -}}
+    {{- updateUpgradeResult .UpgradeItem.upgradeResult "default" "upgrade-cstor-volume-082-090-post-check-cstor-volume-replicas" $status $message $retries now }}
+    {{- "annotations not patched for cstor volume replicas" | saveAs "postcheckcstorvolumereplicas.verifyErr" .TaskResult | noop -}}
+    {{- end -}}
+    {{- if contains "0.8.1" $labels -}}
+    {{- $status := "Success" -}}
+    {{- $message := "Post check cstor volume replicas after patching passed" -}}
+    {{- updateUpgradeResult $upgradeResultName "default" "upgrade-cstor-volume-082-090-post-check-cstor-volume-replicas" $status $message $retries now }}
+    {{- else -}}
+    {{- $status := "Failed" -}}
+    {{- $message := "Post check cstor volume replicas after patching failed" -}}
+    {{- updateUpgradeResult $upgradeResultName "default" "upgrade-cstor-volume-082-090-post-check-cstor-volume-replicas" $status $message $retries now }}
+    {{- "labels not patched for cstor volume replicas" | saveAs "postcheckcstorvolumereplicas.verifyErr" .TaskResult | noop -}}
+    {{- end -}}
+    {{- end -}}
+
+# ------------------------- Patched cstor volume replicas -------------------------------------------------------------------\end
+
+---
+
+# Delete older replicasets of volume target deployment
+apiVersion: openebs.io/v1alpha1
+kind: RunTask
+metadata:
+  name: upgrade-cstor-volume-082-090-delete-target-old-replicaset
+  namespace: default
+spec:
+  meta: | 
+    {{- $rslist := .TaskResult.listtargetoldrs.items | default "" | splitList " " -}}
+    id: deletereplicaset
+    apiVersion: extensions/v1beta1
+    kind: ReplicaSet
+    runNamespace: {{ .UpgradeItem.namespace }}
+    action: delete
+    repeatWith:
+      metas:
+      {{- range $k, $rs := $rslist }}
+      - objectName: {{ $rs }}
+      {{- end }}
+  post: |
+    {{ $retries := 0 -}}
+    {{- $message := printf "older replicasets i.e. {%s} has been deleted." .TaskResult.listtargetoldrs.items -}}
+    {{- updateUpgradeResult .UpgradeItem.upgradeResult "default" "upgrade-cstor-volume-082-090-delete-target-old-replicaset" "Success" $message $retries now }}
+

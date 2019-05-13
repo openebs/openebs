@@ -1,0 +1,53 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: pool-upgrade-config
+  namespace: default
+data:
+  upgrade: |
+    casTemplate: cstor-pool-update-082-090
+    resources:
+    - name: cstor-sparse-pool-o0bn
+      kind: cStorPool
+      namespace: openebs
+    - name: cstor-sparse-pool-uga3
+      kind: cStorPool
+      namespace: openebs
+    - name: cstor-sparse-pool-ys5j
+      kind: cStorPool
+      namespace: openebs
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: spc-cstor-sparse-pool-upgrade
+spec:
+  template:
+    spec:
+      serviceAccountName: super-admin
+      containers:
+      - name:  upgrade
+        image: shovan1995/m-upgrade:demo
+        volumeMounts:
+        - name: config
+          mountPath: /etc/config
+          readOnly: true
+        env:
+        - name: OPENEBS_IO_SELF_NAME
+          value: spc-cstor-sparse-pool-upgrade
+          #valueFrom:
+            #fieldRef:
+              #fieldPath: metadata.name
+        - name: OPENEBS_IO_SELF_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: OPENEBS_IO_SELF_UID
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.uid
+      volumes:
+      - name: config
+        configMap:
+          name: pool-upgrade-config
+      restartPolicy: Never
