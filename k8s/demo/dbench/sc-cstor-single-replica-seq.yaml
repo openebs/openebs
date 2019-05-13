@@ -9,6 +9,7 @@ metadata:
         value: "sparse-claim-auto"
       - name: ReplicaCount
         value: "1"
+      #Use below to pin the target pod to the host where cstor pool is running.
       #- name: TargetNodeSelector
       #  value: |-
       #      "kubernetes.io/hostname": "gke-kmova-helm-default-pool-a169cf59-kxfm"

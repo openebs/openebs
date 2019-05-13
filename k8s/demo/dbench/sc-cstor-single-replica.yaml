@@ -9,8 +9,10 @@ metadata:
         value: "sparse-claim-auto"
       - name: ReplicaCount
         value: "1"
-      - name: TargetNodeSelector
-        value: |-
-            "kubernetes.io/hostname": "gke-kmova-helm-default-pool-a169cf59-kxfm"
+      #To pin the target to the node where pool is provisioned, 
+      #provide the hostname label as follows.
+      #- name: TargetNodeSelector
+      #  value: |-
+      #      "kubernetes.io/hostname": "gke-kmova-helm-default-pool-a169cf59-kxfm"
 provisioner: openebs.io/provisioner-iscsi
 ---

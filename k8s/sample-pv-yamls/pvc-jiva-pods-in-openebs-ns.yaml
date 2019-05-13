@@ -1,0 +1,12 @@
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: demo-jpo-ns
+spec:
+  storageClassName: jiva-pods-in-openebs-ns
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 4G
+
