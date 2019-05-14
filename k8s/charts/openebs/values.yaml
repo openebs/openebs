@@ -15,11 +15,13 @@ image:
 
 apiserver:
   image: "quay.io/openebs/m-apiserver"
-  imageTag: "0.8.1"
+  imageTag: "0.9.0"
   replicas: 1
   ports:
     externalPort: 5656
     internalPort: 5656
+  sparse:
+    enabled: "false"
   nodeSelector: {}
   tolerations: []
   affinity: {}
@@ -29,7 +31,18 @@ apiserver:
 
 provisioner:
   image: "quay.io/openebs/openebs-k8s-provisioner"
-  imageTag: "0.8.1"
+  imageTag: "0.9.0"
+  replicas: 1
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+  healthCheck:
+    initialDelaySeconds: 30
+    periodSeconds: 60
+
+localprovisioner:
+  image: "quay.io/openebs/provisioner-localpv"
+  imageTag: "0.9.0"
   replicas: 1
   nodeSelector: {}
   tolerations: []
@@ -41,10 +54,10 @@ provisioner:
 snapshotOperator:
   controller:
     image: "quay.io/openebs/snapshot-controller"
-    imageTag: "0.8.1"
+    imageTag: "0.9.0"
   provisioner:
     image: "quay.io/openebs/snapshot-provisioner"
-    imageTag: "0.8.1"
+    imageTag: "0.8.2"
   replicas: 1
   upgradeStrategy: "Recreate"
   nodeSelector: {}
@@ -64,36 +77,45 @@ ndm:
     count: "1"
   filters:
     excludeVendors: "CLOUDBYT,OpenEBS"
-    excludePaths: "loop,/dev/fd0,/dev/sr0,/dev/ram,/dev/dm-,/dev/md"
+    excludePaths: "loop,fd0,sr0,/dev/ram,/dev/dm-,/dev/md"
   nodeSelector: {}
   healthCheck:
     initialDelaySeconds: 30
     periodSeconds: 60
 
+webhook:
+  image: "quay.io/openebs/admission-server"
+  imageTag: "0.9.0"
+  generateTLS: true
+  replicas: 1
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+
 jiva:
   image: "quay.io/openebs/jiva"
-  imageTag: "0.8.1"
+  imageTag: "0.9.0"
   replicas: 3
 
 cstor:
   pool:
     image: "quay.io/openebs/cstor-pool"
-    imageTag: "0.8.1"
+    imageTag: "0.9.0"
   poolMgmt:
     image: "quay.io/openebs/cstor-pool-mgmt"
-    imageTag: "0.8.1"
+    imageTag: "0.9.0"
   target:
     image: "quay.io/openebs/cstor-istgt"
-    imageTag: "0.8.1"
+    imageTag: "0.9.0"
   volumeMgmt:
     image: "quay.io/openebs/cstor-volume-mgmt"
-    imageTag: "0.8.1"
+    imageTag: "0.9.0"
 
 policies:
   monitoring:
     enabled: true
     image: "quay.io/openebs/m-exporter"
-    imageTag: "0.8.1"
+    imageTag: "0.9.0"
 
 analytics:
   enabled: true
