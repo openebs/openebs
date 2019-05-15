@@ -76,12 +76,14 @@ The following table lists the configurable parameters of the OpenEBS chart and t
 | `apiserver.image`                       | Image for API Server                          | `quay.io/openebs/m-apiserver`             |
 | `apiserver.imageTag`                    | Image Tag for API Server                      | `0.9.0`                                   |
 | `apiserver.replicas`                    | Number of API Server Replicas                 | `1`                                       |
+| `apiserver.sparse.enabled`              | Create Sparse Pool based on Sparsefile        | `false`                                   |
 | `provisioner.image`                     | Image for Provisioner                         | `quay.io/openebs/openebs-k8s-provisioner` |
 | `provisioner.imageTag`                  | Image Tag for Provisioner                     | `0.9.0`                                   |
 | `provisioner.replicas`                  | Number of Provisioner Replicas                | `1`                                       |
 | `localProvisioner.image`                | Image for localProvisioner                    | `quay.io/openebs/provisioner-localpv`     |
 | `localProvisioner.imageTag`             | Image Tag for localProvisioner                | `0.9.0`                                   |
 | `localProvisioner.replicas`             | Number of localProvisioner Replicas           | `1`                                       |
+| `localProvisioner.basePath`             | BasePath for hostPath volumes on Nodes        | `/var/openebs/local`                      |
 | `webhook.image`                         | Image for admision server                     | `quay.io/openebs/admission-server`        |
 | `webhook.imageTag`                      | Image Tag for admission server                | `0.9.0`                                   |
 | `webhook.replicas`                      | Number of admission server Replicas           | `1`                                       |
@@ -90,9 +92,8 @@ The following table lists the configurable parameters of the OpenEBS chart and t
 | `snapshotOperator.controller.image`     | Image for Snapshot Controller                 | `quay.io/openebs/snapshot-controller`     |
 | `snapshotOperator.controller.imageTag`  | Image Tag for Snapshot Controller             | `0.9.0`                                   |
 | `snapshotOperator.replicas`             | Number of Snapshot Operator Replicas          | `1`                                       |
-| `ndm.image`                             | Image for Node Disk Manager                   | `quay.io/openebs/openebs/node-disk-manager-amd64` |
+| `ndm.image`                             | Image for Node Disk Manager                   | `quay.io/openebs/node-disk-manager-amd64` |
 | `ndm.imageTag`                          | Image Tag for Node Disk Manager               | `v0.3.5`                                  |
-| `ndm.sparse.enabled`                    | Create Sparse files and cStor Sparse Pool     | `true`                                    |
 | `ndm.sparse.path`                       | Directory where Sparse files are created      | `/var/openebs/sparse`                     |
 | `ndm.sparse.size`                       | Size of the sparse file in bytes              | `10737418240`                             |
 | `ndm.sparse.count`                      | Number of sparse files to be created          | `1`                                       |
@@ -121,7 +122,7 @@ Specify each parameter using the `--set key=value[,key=value]` argument to `helm
 Alternatively, a YAML file that specifies the values for the parameters can be provided while installing the chart. For example,
 
 ```shell
-helm install --name `my-release` -f values.yaml stable/openebs
+helm install --name openebs -f values.yaml openebs-charts/openebs
 ```
 
 > **Tip**: You can use the default [values.yaml](values.yaml)

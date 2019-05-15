@@ -19,6 +19,7 @@ spec:
     metadata:
       labels:
         app: admission-webhook
+        openebs.io/version: {{ .Values.release.version }}
     spec:
 {{- if .Values.webhook.nodeSelector }}
       nodeSelector:

@@ -37,7 +37,7 @@ rules:
   resources: [ "cstorpools", "cstorpools/finalizers", "cstorvolumereplicas", "cstorvolumes"]
   verbs: ["*" ]
 - apiGroups: ["*"]
-  resources: [ "backupcstors", "cstorrestores", "backupcstorlasts"]
+  resources: [ "cstorbackups", "cstorrestores", "cstorcompletedbackups"]
   verbs: ["*" ]
 - nonResourceURLs: ["/metrics"]
   verbs: ["get"]

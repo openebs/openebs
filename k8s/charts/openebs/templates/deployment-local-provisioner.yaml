@@ -21,6 +21,7 @@ spec:
         app: {{ template "openebs.name" . }}
         release: {{ .Release.Name }}
         component: localpv-provisioner
+        openebs.io/version: {{ .Values.release.version }}
     spec:
       serviceAccountName: {{ template "openebs.serviceAccountName" . }}
       containers:
@@ -46,6 +47,10 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: spec.nodeName
+        # OPENEBS_IO_BASE_PATH is the environment variable that provides the
+        # default base path on the node where host-path PVs will be provisioned.
+        - name: OPENEBS_IO_BASE_PATH
+          value: "{{ .Values.localprovisioner.basePath }}"
         livenessProbe:
           exec:
             command:
