@@ -1,0 +1,808 @@
+# Runtask for upgrading a jiva volume
+
+# CASTemplate jiva-volume-update-0.8.2-0.9.0 is
+# used to upgrade a jiva volume
+# TODO: update the file with proper naming conventions and error messages
+# TODO: Test need to be performed on multi-node cluster
+apiVersion: openebs.io/v1alpha1
+kind: CASTemplate
+metadata:
+  name: jiva-volume-update-0.8.2-0.9.0
+spec:
+  defaultConfig:
+  - name: baseversion
+    value: "0.8.2"
+  - name: targetversion
+    value: "v0.9.x-ci"
+  - name: successStatus
+    value: "Success"
+  - name: failStatus
+    value: "Fail"
+  run:
+    tasks:
+      - upgrade-jiva-volume-0.8.2-0.9.0-patch-upgrade-results
+      - upgrade-jiva-volume-0.8.2-0.9.0-get-volume-details
+      - upgrade-jiva-volume-0.8.2-0.9.0-get-sc-res-version
+      - upgrade-jiva-volume-0.8.2-0.9.0-get-list-ctrl-deployment
+      - upgrade-jiva-volume-0.8.2-0.9.0-get-list-rep-deployment
+      - upgrade-jiva-volume-0.8.2-0.9.0-get-list-ctrl-svc
+      - upgrade-jiva-volume-0.8.2-0.9.0-get-list-ctrl-old-rs
+      - upgrade-jiva-volume-0.8.2-0.9.0-get-list-rep-old-rs
+      - upgrade-jiva-volume-0.8.2-0.9.0-get-list-rep-nodenames
+      - upgrade-jiva-volume-0.8.2-0.9.0-patch-ctrl-deployment-latest-version
+      - upgrade-jiva-volume-0.8.2-0.9.0-post-check-ctrl-deployment-status-latest-version
+      - upgrade-jiva-volume-0.8.2-0.9.0-post-check-ctrl-deployment-image
+      - upgrade-jiva-volume-0.8.2-0.9.0-patch-rep-deployment-latest-version
+      - upgrade-jiva-volume-0.8.2-0.9.0-post-check-rep-deployment-status-latest-version
+      - upgrade-jiva-volume-0.8.2-0.9.0-post-check-rep-deployment-image
+      - upgrade-jiva-volume-0.8.2-0.9.0-patch-ctrl-svc
+      - upgrade-jiva-volume-0.8.2-0.9.0-post-check-ctrl-svc
+      - upgrade-jiva-volume-0.8.2-0.9.0-delete-old-ctrl-rs
+      - upgrade-jiva-volume-0.8.2-0.9.0-delete-old-rep-rs
+  taskNamespace: default
+---
+## This will patch the upgrade result CR
+# with basic details such as name, namespace and kind
+apiVersion: openebs.io/v1alpha1
+kind: RunTask
+metadata:
+  name: upgrade-jiva-volume-0.8.2-0.9.0-patch-upgrade-results
+  namespace: default
+spec:
+  meta: |
+    id: patchResult
+    apiVersion: openebs.io/v1alpha1
+    kind: UpgradeResult
+    action: patch
+    objectName: {{ .UpgradeItem.upgradeResultName }}
+    runNamespace: {{ .UpgradeItem.upgradeResultNamespace }}
+  task: |-
+    type: merge
+    pspec: |-
+      status:
+        resource:
+          name: {{ .upgradeItem.name }}
+          namespace: {{ .upgradeItem.namespace }}
+          kind: {{ .upgradeItem.kind }}
+  post: |
+    {{- $message := printf "patched UpgradeResult {%s} with name and namespace of the resource to be upgraded" .UpgradeItem.upgradeResultName -}}
+    {{- $status := .Config.successStatus.value -}}
+
+    {{- $URName := upgradeResultWithTaskOwnerName .UpgradeItem.upgradeResultName -}}
+    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace "default" -}}
+    {{- $taskName := upgradeResultWithTaskName "upgrade-jiva-volume-0.8.2-0.9.0-patch-upgrade-results" -}}
+    {{- $taskStatus := upgradeResultWithTaskStatus $status -}}
+    {{- $taskMessage := upgradeResultWithTaskMessage $message -}}
+    {{- $taskStartTime := upgradeResultWithTaskStartTime now -}}
+    {{- $taskEndTime := upgradeResultWithTaskEndTime now -}}
+    {{- upgradeResultUpdateTasks $taskStartTime $URName $URNamespace $taskName $taskStatus $taskMessage $taskEndTime -}}
+---
+apiVersion: openebs.io/v1alpha1
+kind: RunTask
+metadata:
+  name: upgrade-jiva-volume-0.8.2-0.9.0-get-volume-details
+  namespace: default
+spec:
+  meta: |
+    id: getvoldetails
+    apiVersion: v1
+    kind: PersistentVolume
+    action: get
+    objectName: {{ .UpgradeItem.name }}
+    runNamespace: {{ .UpgradeItem.namespace }}
+  post: |
+    {{- jsonpath .JsonResult "{.metadata.annotations.openebs\\.io/cas-type}" | trim | saveAs "getvoldetails.volCASType" .TaskResult | noop -}}
+    {{- .TaskResult.getvoldetails.volCASType | notFoundErr "volume CAS type not found" | saveIf "getvoldetails.notFoundErr" .TaskResult | noop -}}
+
+    {{- jsonpath .JsonResult "{.spec.storageClassName}" | trim | saveAs "getvoldetails.scName" .TaskResult | noop -}}
+    {{- .TaskResult.getvoldetails.scName | notFoundErr "sc name not found for given volume" | saveIf "getvoldetails.notFoundErr" .TaskResult | noop -}}
+
+    {{- jsonpath .JsonResult "{.spec.claimRef.namespace}" | trim | saveAs "getvoldetails.pvcNamespace" .TaskResult | noop -}}
+    {{- .TaskResult.getvoldetails.pvcNamespace | notFoundErr "pvc namespace not found for given volume" | saveIf "getvoldetails.notFoundErr" .TaskResult | noop -}}
+
+    {{- jsonpath .JsonResult "{.spec.claimRef.name}" | trim | saveAs "getvoldetails.pvcName" .TaskResult | noop -}}
+    {{- .TaskResult.getvoldetails.pvcName | notFoundErr "pvc name not found for given volume" | saveIf "getvoldetails.notFoundErr" .TaskResult | noop -}}
+
+    {{- $message := printf "details of volume {%s}: volCASType: {%s}, storageClassName: {%s}, pvcName: {%s}, pvcNamespace: {%s}" .UpgradeItem.name .TaskResult.getvoldetails.volCASType .TaskResult.getvoldetails.scName .TaskResult.getvoldetails.pvcName .TaskResult.getvoldetails.pvcNamespace -}}
+    {{- $status := .Config.successStatus.value -}}
+
+    {{- $URName := upgradeResultWithTaskOwnerName .UpgradeItem.upgradeResultName -}}
+    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace "default" -}}
+    {{- $taskName := upgradeResultWithTaskName "upgrade-jiva-volume-0.8.2-0.9.0-get-volume-details" -}}
+    {{- $taskStatus := upgradeResultWithTaskStatus $status -}}
+    {{- $taskMessage := upgradeResultWithTaskMessage $message -}}
+    {{- $taskStartTime := upgradeResultWithTaskStartTime now -}}
+    {{- $taskEndTime := upgradeResultWithTaskEndTime now -}}
+    {{- upgradeResultUpdateTasks $taskStartTime $URName $URNamespace $taskName $taskStatus $taskMessage $taskEndTime -}}
+
+---
+apiVersion: openebs.io/v1alpha1
+kind: RunTask
+metadata:
+  name: upgrade-jiva-volume-0.8.2-0.9.0-get-sc-res-version
+  namespace: default
+spec:
+  meta: |
+    id: getscdetails
+    apiVersion: storage.k8s.io/v1
+    kind: StorageClass
+    action: get
+    objectName: {{ .TaskResult.getvoldetails.scName }}
+  post: |
+    {{- jsonpath .JsonResult "{.metadata.resourceVersion}" | trim | saveAs "getscdetails.scResVersion" .TaskResult | noop -}}
+    {{- .TaskResult.getscdetails.scResVersion | notFoundErr "sc resource version not found" | saveIf "getscdetails.notFoundErr" .TaskResult | noop -}}
+
+    {{- $message := printf "resource version for StorageClass {%s}: {%s}" .TaskResult.getvoldetails.scName .TaskResult.getscdetails.scResVersion -}}
+    {{- $status := .Config.successStatus.value -}}
+
+    {{- $URName := upgradeResultWithTaskOwnerName .UpgradeItem.upgradeResultName -}}
+    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace "default" -}}
+    {{- $taskName := upgradeResultWithTaskName "upgrade-jiva-volume-0.8.2-0.9.0-get-sc-res-version" -}}
+    {{- $taskStatus := upgradeResultWithTaskStatus $status -}}
+    {{- $taskMessage := upgradeResultWithTaskMessage $message -}}
+    {{- $taskStartTime := upgradeResultWithTaskStartTime now -}}
+    {{- $taskEndTime := upgradeResultWithTaskEndTime now -}}
+    {{- upgradeResultUpdateTasks $taskStartTime $URName $URNamespace $taskName $taskStatus $taskMessage $taskEndTime -}}
+---
+apiVersion: openebs.io/v1alpha1
+kind: RunTask
+metadata:
+  name: upgrade-jiva-volume-0.8.2-0.9.0-get-list-ctrl-deployment
+  namespace: default
+spec:
+  meta: |
+    id: listtargetdeployment
+    apiVersion: extensions/v1beta1
+    kind: Deployment
+    action: list
+    runNamespace: {{ .UpgradeItem.namespace }}
+    options: |-
+      labelSelector: openebs.io/persistent-volume={{ .UpgradeItem.name }},openebs.io/controller=jiva-controller
+  post: |
+    {{- jsonpath .JsonResult "{.items[*].metadata.name}" | trim | saveAs "listtargetdeployment.deploymentName" .TaskResult | noop -}}
+    {{- .TaskResult.listtargetdeployment.deploymentName | notFoundErr "volume target deployment not found" | saveIf "listtargetdeployment.notFoundErr" .TaskResult | noop -}}
+
+    {{- jsonpath .JsonResult "{.items[*].metadata.labels.openebs\\.io/version}" | trim | saveAs "listtargetdeployment.version" .TaskResult | noop -}}
+    {{- .TaskResult.listtargetdeployment.version | notFoundErr "unknown openebs version" | saveIf "listtargetdeployment.notFoundErr" .TaskResult | noop -}}
+
+    {{- $message := "" -}}
+    {{- $status := "" -}}
+
+    {{- $isVersionBase := eq .Config.baseversion.value .TaskResult.listtargetdeployment.version -}}
+    {{- $isVersionTarget := eq .Config.targetversion.value .TaskResult.listtargetdeployment.version -}}
+    {{- $isUpgradeContinue := or $isVersionBase $isVersionTarget -}}
+
+    {{- if $isUpgradeContinue }}
+    {{- $message = printf "target deployment: {%s} is in expected version" .TaskResult.listtargetdeployment.deploymentName -}}
+    {{- $status = .Config.successStatus.value -}}
+    {{- else }}
+    {{- $message = printf "target deployment: {%s} is not in expected version expected: {%s} but got {%s}" .TaskResult.listtargetdeployment.deploymentName .Config.baseversion.value .TaskResult.listtargetdeployment.version -}}
+    {{- not $isUpgradeContinue | verifyErr $message | saveAs "listtargetdeployment.verifyErr" .TaskResult | noop -}}
+    {{- $status = .Config.failStatus.value -}}
+    {{- end }}
+
+    {{- print $isVersionBase | toString | saveAs "listtargetdeployment.shouldPatchCtrlDeployment" .TaskResult -}}
+
+    {{- $URName := upgradeResultWithTaskOwnerName .UpgradeItem.upgradeResultName -}}
+    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace "default" -}}
+    {{- $taskName := upgradeResultWithTaskName "upgrade-jiva-volume-0.8.2-0.9.0-get-list-ctrl-deployment" -}}
+    {{- $taskStatus := upgradeResultWithTaskStatus $status -}}
+    {{- $taskMessage := upgradeResultWithTaskMessage $message -}}
+    {{- $taskStartTime := upgradeResultWithTaskStartTime now -}}
+    {{- $taskEndTime := upgradeResultWithTaskEndTime now -}}
+    {{- upgradeResultUpdateTasks $taskStartTime $URName $URNamespace $taskName $taskStatus $taskMessage $taskEndTime -}}
+---
+apiVersion: openebs.io/v1alpha1
+kind: RunTask
+metadata:
+  name: upgrade-jiva-volume-0.8.2-0.9.0-get-list-rep-deployment
+  namespace: default
+spec:
+  meta: |
+    id: listreplicadeployment
+    apiVersion: extensions/v1beta1
+    kind: Deployment
+    action: list
+    runNamespace: {{ .UpgradeItem.namespace }}
+    options: |-
+      labelSelector: openebs.io/persistent-volume={{ .UpgradeItem.name }},openebs.io/replica=jiva-replica
+  post: |
+    {{- jsonpath .JsonResult "{.items[*].metadata.name}" | trim | saveAs "listreplicadeployment.deploymentName" .TaskResult | noop -}}
+    {{- .TaskResult.listreplicadeployment.deploymentName | notFoundErr "replica deployment not found" | saveIf "listreplicadeployment.notFoundErr" .TaskResult | noop -}}
+
+    {{- jsonpath .JsonResult "{.items[*].metadata.labels.openebs\\.io/version}" | trim | saveAs "listreplicadeployment.version" .TaskResult | noop -}}
+    {{- .TaskResult.listtargetdeployment.version | notFoundErr "unknown openebs version" | saveIf "listreplicadeployment.notFoundErr" .TaskResult | noop -}}
+
+    {{- $message := "" -}}
+    {{- $status := "" -}}
+
+    {{- $isVersionBase := eq .Config.baseversion.value .TaskResult.listreplicadeployment.version -}}
+    {{- $isVersionTarget := eq .Config.targetversion.value .TaskResult.listreplicadeployment.version -}}
+    {{- $isUpgradeContinue := or $isVersionBase $isVersionTarget -}}
+
+    {{- if $isUpgradeContinue }}
+    {{- $message = printf "replica deployment: {%s} is in expected version" .TaskResult.listreplicadeployment.deploymentName -}}
+    {{- $status = .Config.successStatus.value -}}
+    {{- else }}
+    {{- $message = printf "replica deployment: {%s} is not in expected version expected: {%s} but got {%s}" .TaskResult.listreplicadeployment.deploymentName .Config.baseversion.value .TaskResult.listreplicadeployment.version -}}
+    {{- not $isUpgradeContinue | verifyErr $message | saveAs "listreplicadeployment.verifyErr" .TaskResult | noop -}}
+    {{- $status = .Config.failStatus.value -}}
+    {{- end }}
+
+    {{- print $isVersionBase | saveAs "listreplicadeployment.shouldPatchRepDeployment" .TaskResult | noop -}}
+
+    {{- $URName := upgradeResultWithTaskOwnerName .UpgradeItem.upgradeResultName -}}
+    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace "default" -}}
+    {{- $taskName := upgradeResultWithTaskName "upgrade-jiva-volume-0.8.2-0.9.0-get-list-rep-deployment" -}}
+    {{- $taskStatus := upgradeResultWithTaskStatus $status -}}
+    {{- $taskMessage := upgradeResultWithTaskMessage $message -}}
+    {{- $taskStartTime := upgradeResultWithTaskStartTime now -}}
+    {{- $taskEndTime := upgradeResultWithTaskEndTime now -}}
+    {{- upgradeResultUpdateTasks $taskStartTime $URName $URNamespace $taskName $taskStatus $taskMessage $taskEndTime -}}
+---
+apiVersion: openebs.io/v1alpha1
+kind: RunTask
+metadata:
+  name: upgrade-jiva-volume-0.8.2-0.9.0-get-list-ctrl-svc
+  namespace: default
+spec:
+  meta: |
+    id: listtargetservice
+    apiVersion: v1
+    kind: Service
+    action: list
+    runNamespace: {{ .UpgradeItem.namespace }}
+    options: |-
+      labelSelector: openebs.io/persistent-volume={{ .UpgradeItem.name }},openebs.io/controller-service=jiva-controller-svc
+  post: |
+    {{- jsonpath .JsonResult "{.items[*].metadata.name}" | trim | saveAs "listtargetservice.items" .TaskResult | noop -}}
+    {{- .TaskResult.listtargetservice.items | notFoundErr "volume target service not found" | saveIf "listtargetservice.notFoundErr" .TaskResult | noop -}}
+
+    {{- jsonpath .JsonResult "{.items[*].metadata.labels.openebs\\.io/version}" | trim | saveAs "listtargetservice.version" .TaskResult | noop -}}
+    {{- .TaskResult.listtargetdeployment.version | notFoundErr "unknown openebs version" | saveIf "listtargetservice.notFoundErr" .TaskResult | noop -}}
+
+    {{- $message := "" -}}
+    {{- $status := "" -}}
+
+    {{- $isVersionBase := eq .Config.baseversion.value .TaskResult.listtargetservice.version -}}
+    {{- $isVersionTarget := eq .Config.targetversion.value .TaskResult.listtargetservice.version -}}
+    {{- $isUpgradeContinue := or $isVersionBase $isVersionTarget -}}
+
+    {{- if $isUpgradeContinue }}
+    {{- $message = printf "target service: {%s} is in expected version" .TaskResult.listtargetservice.items -}}
+    {{- $status = .Config.successStatus.value -}}
+    {{- else }}
+    {{- $message = printf "target service: {%s} is not in expected version expected: {%s} but got {%s}" .TaskResult.listtargetservice.items .Config.baseversion.value .TaskResult.listtargetservice.version -}}
+    {{- not $isUpgradeContinue | verifyErr $message | saveAs "listtargetservice.verifyErr" .TaskResult | noop -}}
+    {{- $status = .Config.failStatus.value -}}
+    {{- end }}
+
+    {{- print $isVersionBase | saveAs "listtargetservice.shouldPatchCtrlSVC" .TaskResult | noop -}}
+
+    {{- $URName := upgradeResultWithTaskOwnerName .UpgradeItem.upgradeResultName -}}
+    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace "default" -}}
+    {{- $taskName := upgradeResultWithTaskName "upgrade-jiva-volume-0.8.2-0.9.0-get-list-ctrl-svc" -}}
+    {{- $taskStatus := upgradeResultWithTaskStatus $status -}}
+    {{- $taskMessage := upgradeResultWithTaskMessage $message -}}
+    {{- $taskStartTime := upgradeResultWithTaskStartTime now -}}
+    {{- $taskEndTime := upgradeResultWithTaskEndTime now -}}
+    {{- upgradeResultUpdateTasks $taskStartTime $URName $URNamespace $taskName $taskStatus $taskMessage $taskEndTime -}}
+---
+apiVersion: openebs.io/v1alpha1
+kind: RunTask
+metadata:
+  name: upgrade-jiva-volume-0.8.2-0.9.0-get-list-ctrl-old-rs
+  namespace: default
+spec:
+  meta: |
+    id: listtargetoldrs
+    apiVersion: extensions/v1beta1
+    kind: ReplicaSet
+    action: list
+    runNamespace: {{ .UpgradeItem.namespace }}
+    options: |-
+      labelselector: openebs.io/persistent-volume={{ .UpgradeItem.name }},openebs.io/controller=jiva-controller
+  post: |
+    {{- jsonpath .JsonResult "{.items[*].metadata.name}" | trim | saveAs "listtargetoldrs.items" .TaskResult | noop -}}
+    {{- .TaskResult.listtargetoldrs.items | notFoundErr "target deployment replicasets were not found" | saveIf "listtargetoldrs.notFoundErr" .TaskResult | noop -}}
+
+    {{- $message := printf "replicaset to be deleted after patching target deployment {%s} is : {%s}" .TaskResult.listtargetdeployment.deploymentName .TaskResult.listtargetoldrs.items -}}
+    {{- $status := .Config.successStatus.value -}}
+
+    {{- $URName := upgradeResultWithTaskOwnerName .UpgradeItem.upgradeResultName -}}
+    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace "default" -}}
+    {{- $taskName := upgradeResultWithTaskName "upgrade-jiva-volume-0.8.2-0.9.0-get-list-ctrl-old-rs" -}}
+    {{- $taskStatus := upgradeResultWithTaskStatus $status -}}
+    {{- $taskMessage := upgradeResultWithTaskMessage $message -}}
+    {{- $taskStartTime := upgradeResultWithTaskStartTime now -}}
+    {{- $taskEndTime := upgradeResultWithTaskEndTime now -}}
+    {{- upgradeResultUpdateTasks $taskStartTime $URName $URNamespace $taskName $taskStatus $taskMessage $taskEndTime -}}
+---
+apiVersion: openebs.io/v1alpha1
+kind: RunTask
+metadata:
+  name: upgrade-jiva-volume-0.8.2-0.9.0-get-list-rep-old-rs
+  namespace: default
+spec:
+  meta: |
+    id: listreplicaoldsrs
+    apiVersion: extensions/v1beta1
+    kind: ReplicaSet
+    action: list
+    runNamespace: {{ .UpgradeItem.namespace }}
+    options: |-
+      labelselector: openebs.io/persistent-volume={{ .UpgradeItem.name }},openebs.io/replica=jiva-replica
+  post: |
+    {{- jsonpath .JsonResult "{.items[*].metadata.name}" | trim | saveAs "listreplicaoldrs.items" .TaskResult | noop -}}
+    {{- .TaskResult.listreplicaoldrs.items | notFoundErr "replica deployment replicasets were not found" | saveIf "listreplicars.notFoundErr" .TaskResult | noop -}}
+
+    {{- $message := printf "replicasets to be deleted after patching replica deployment: {%s} is : {%s}" .TaskResult.listreplicadeployment.deploymentName .TaskResult.listreplicaoldrs.items -}}
+    {{- $status := .Config.successStatus.value -}}
+
+    {{- $URName := upgradeResultWithTaskOwnerName .UpgradeItem.upgradeResultName -}}
+    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace "default" -}}
+    {{- $taskName := upgradeResultWithTaskName "upgrade-jiva-volume-0.8.2-0.9.0-get-list-rep-old-rs" -}}
+    {{- $taskStatus := upgradeResultWithTaskStatus $status -}}
+    {{- $taskMessage := upgradeResultWithTaskMessage $message -}}
+    {{- $taskStartTime := upgradeResultWithTaskStartTime now -}}
+    {{- $taskEndTime := upgradeResultWithTaskEndTime now -}}
+    {{- upgradeResultUpdateTasks $taskStartTime $URName $URNamespace $taskName $taskStatus $taskMessage $taskEndTime -}}
+---
+apiVersion: openebs.io/v1alpha1
+kind: RunTask
+metadata:
+  name: upgrade-jiva-volume-0.8.2-0.9.0-get-list-rep-nodenames
+  namespace: default
+spec:
+  meta: |
+    id: listreplicanodeName
+    runNamespace: {{ .UpgradeItem.namespace }}
+    apiVersion: v1
+    kind: Pod
+    action: list
+    options: |-
+      labelSelector: openebs.io/persistent-volume={{ .UpgradeItem.name }},openebs.io/replica=jiva-replica
+  post: |
+    {{- jsonpath .JsonResult "{.items[*].spec.nodeName}" | trim | toString | saveAs "listreplicanodeName.nodeNames" .TaskResult | noop -}}
+    {{- .TaskResult.listreplicanodeName.nodeNames | notFoundErr "replica pods nodeName not found" | saveIf "listreplicanodeNames.notFoundErr" .TaskResult | noop -}}
+
+    {{- $message := printf "replica nodeNames for volume: {%s} are {%v}" .UpgradeItem.name .TaskResult.listreplicanodeName.nodeNames -}}
+    {{- $status := .Config.successStatus.value -}}
+
+    {{- $URName := upgradeResultWithTaskOwnerName .UpgradeItem.upgradeResultName -}}
+    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace "default" -}}
+    {{- $taskName := upgradeResultWithTaskName "upgrade-jiva-volume-0.8.2-0.9.0-get-list-rep-nodenames" -}}
+    {{- $taskStatus := upgradeResultWithTaskStatus $status -}}
+    {{- $taskMessage := upgradeResultWithTaskMessage $message -}}
+    {{- $taskStartTime := upgradeResultWithTaskStartTime now -}}
+    {{- $taskEndTime := upgradeResultWithTaskEndTime now -}}
+    {{- upgradeResultUpdateTasks $taskStartTime $URName $URNamespace $taskName $taskStatus $taskMessage $taskEndTime -}}
+---
+apiVersion: openebs.io/v1alpha1
+kind: RunTask
+metadata:
+  name: upgrade-jiva-volume-0.8.2-0.9.0-patch-ctrl-deployment-latest-version
+  namespace: default
+spec:
+  meta: |
+    id: patchctrldeploymentlatestversions
+    apiVersion: extensions/v1beta1
+    kind: Deployment
+    runNamespace: {{ .UpgradeItem.namespace }}
+    action: patch
+    objectName: {{ .TaskResult.listtargetdeployment.deploymentName }}
+    disable: {{ ne .TaskResult.listtargetdeployment.shouldPatchCtrlDeployment "true" }}
+  task: |-
+    type: strategic
+    pspec: |-
+      metadata:
+        annotations:
+          openebs.io/storage-class-ref: "name: {{ .TaskResult.getvoldetails.scName }}\nresourceVersion: {{ .TaskResult.getscdetails.scResVersion }}\n"
+        labels:
+          openebs.io/version: {{ .Config.targetversion.value }}
+      spec:
+        template:
+          metadata:
+            annotations:
+              openebs.io/storage-class-ref: "name: {{ .TaskResult.getvoldetails.scName }}\nresourceVersion: {{ .TaskResult.getscdetails.scResVersion }}\n"
+            labels:
+              openebs.io/version: {{ .Config.targetversion.value }}
+          spec:
+            containers:
+              - name: {{ .UpgradeItem.name }}-ctrl-con
+                image: quay.io/openebs/jiva:{{ .Config.targetversion.value}}
+              - name: maya-volume-exporter
+                image: quay.io/openebs/m-exporter:{{ .Config.targetversion.value}}
+  post: |
+    {{- $message := printf "controller deployment: {%s} patched with latest images version: {%s}" .TaskResult.listtargetdeployment.deploymentName .Config.targetversion.value -}}
+    {{- $status := .Config.successStatus.value -}}
+
+    {{- $URName := upgradeResultWithTaskOwnerName .UpgradeItem.upgradeResultName -}}
+    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace "default" -}}
+    {{- $taskName := upgradeResultWithTaskName "upgrade-jiva-volume-0.8.2-0.9.0-patch-ctrl-deployment-latest-version" -}}
+    {{- $taskStatus := upgradeResultWithTaskStatus $status -}}
+    {{- $taskMessage := upgradeResultWithTaskMessage $message -}}
+    {{- $taskStartTime := upgradeResultWithTaskStartTime now -}}
+    {{- $taskEndTime := upgradeResultWithTaskEndTime now -}}
+    {{- upgradeResultUpdateTasks $taskStartTime $URName $URNamespace $taskName $taskStatus $taskMessage $taskEndTime -}}
+
+---
+apiVersion: openebs.io/v1alpha1
+kind: RunTask
+metadata:
+  name: upgrade-jiva-volume-0.8.2-0.9.0-post-check-ctrl-deployment-status-latest-version
+  namespace: default
+spec:
+  meta: |
+    id: postcheckctrldeploymentstatuslatestversions
+    apiVersion: extensions/v1beta1
+    kind: Deployment
+    action: rolloutstatus
+    objectName: {{ .TaskResult.listtargetdeployment.deploymentName }}
+    runNamespace: {{ .UpgradeItem.namespace }}
+    retry: "25,4s"
+  post: |
+    {{- $rolledOut := jsonpath .JsonResult "{.isRolledout}" | trim | saveAs "postcheckctrldeploymentstatuslatestversions.rolledOutStatus" .TaskResult -}}
+    {{- $rolloutMessage := jsonpath .JsonResult "{.message}" | trim | saveAs "postcheckctrldeploymentstatuslatestversions.msg" .TaskResult -}}
+
+    {{- $URName := upgradeResultWithTaskOwnerName .UpgradeItem.upgradeResultName -}}
+    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace "default" -}}
+    {{- $taskName := upgradeResultWithTaskName "upgrade-jiva-volume-0.8.2-0.9.0-post-check-ctrl-deployment-status-latest-version" -}}
+    {{- $taskStartTime := upgradeResultWithTaskStartTime now -}}
+    {{- $taskEndTime := upgradeResultWithTaskEndTime now -}}
+
+    {{- $status := "" -}}
+    {{- $message := "" -}}
+
+    {{- if eq $rolledOut "true" }}
+    {{- $status = .Config.successStatus.value -}}
+    {{- $message = printf "target deployment: {%s} rollout status: success" .TaskResult.listtargetdeployment.deploymentName -}}
+    {{- else }}
+    {{- $status = .Config.failStatus.value -}}
+    {{- $message = printf "target deployment: {%s} rollout status: failed" .TaskResult.listtargetdeployment.deploymentName -}}
+    {{- end }}
+
+    {{- $taskStatus := upgradeResultWithTaskStatus $status -}}
+    {{- $taskMessage := upgradeResultWithTaskMessage $message -}}
+    {{- upgradeResultUpdateTasks $taskStartTime $URName $URNamespace $taskName $taskStatus $taskMessage $taskEndTime -}}
+---
+apiVersion: openebs.io/v1alpha1
+kind: RunTask
+metadata:
+  name: upgrade-jiva-volume-0.8.2-0.9.0-post-check-ctrl-deployment-image
+  namespace: default
+spec:
+  meta: |
+    id: postcheckctrldeploymentimagelatestversions
+    apiVersion: extensions/v1beta1
+    kind: Deployment
+    action: get
+    objectName: {{ .TaskResult.listtargetdeployment.deploymentName }}
+    runNamespace: {{ .UpgradeItem.namespace }}
+  post: |
+    {{- $passed := "true" -}}
+
+    {{- $CustomJsonPath := printf "{.spec.template.spec.containers[?(@.name=='%s-ctrl-con')].image}" .UpgradeItem.name -}}
+    {{- $jivaCtrlImage := jsonpath .JsonResult $CustomJsonPath | trim -}}
+    {{- $mayaVolExporterImage := jsonpath .JsonResult "{.spec.template.spec.containers[?(@.name=='maya-volume-exporter')].image}" | trim -}}
+
+    {{- $URName := upgradeResultWithTaskOwnerName .UpgradeItem.upgradeResultName -}}
+    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace "default" -}}
+    {{- $taskName := upgradeResultWithTaskName "upgrade-jiva-volume-0.8.2-0.9.0-post-check-ctrl-deployment-image" -}}
+    {{- $taskStartTime := upgradeResultWithTaskStartTime now -}}
+    {{- $taskEndTime := upgradeResultWithTaskEndTime now -}}
+    {{- $status := "" -}}
+    {{- $message := "" -}}
+
+    {{- if contains .Config.targetversion.value $jivaCtrlImage }}
+    {{- else }}
+    {{- $passed = "false" -}}
+    {{- "failed to patch jiva-controller image for controller deployment" | saveAs "postCheckctrlDeploymentImagePatch.verifyErr" .TaskResult | noop -}}
+    {{- end }}
+    {{- if contains .Config.targetversion.value $mayaVolExporterImage }}
+    {{- else }}
+    {{- $passed = "false" -}}
+    {{- "failed to patch maya-volume exporter image for controller deployment" | saveAs "postCheckctrlDeploymentImagePatch.verifyErr" .TaskResult | noop -}}
+    {{- end }}
+
+    {{- if eq $passed "true" -}}
+    {{- $status = .Config.successStatus.value -}}
+    {{- $message = printf "patched controller deployment: {%s} with latest images version: {%s}" .TaskResult.listtargetdeployment.deploymentName .Config.targetversion.value -}}
+    {{- else -}}
+    {{- $status = .Config.failStatus.value -}}
+    {{- $message = printf "failed to patch controller deployment: {%s} with latest images version: {%s}" .TaskResult.listtargetdeployment.deploymentName .Config.targetversion.value -}}
+    {{- end }}
+
+    {{- $taskMessage := upgradeResultWithTaskMessage $message -}}
+    {{- $taskStatus := upgradeResultWithTaskStatus $status -}}
+    {{- upgradeResultUpdateTasks $taskStartTime $URName $URNamespace $taskName $taskStatus $taskMessage $taskEndTime -}}
+---
+apiVersion: openebs.io/v1alpha1
+kind: RunTask
+metadata:
+  name: upgrade-jiva-volume-0.8.2-0.9.0-patch-rep-deployment-latest-version
+  namespace: default
+spec:
+  meta: |
+    id: patchreplicadeploymentlatestversion
+    apiVersion: extensions/v1beta1
+    kind: Deployment
+    runNamespace: {{ .UpgradeItem.namespace }}
+    action: patch
+    objectName: {{ .TaskResult.listreplicadeployment.deploymentName }}
+    disable: {{ ne .TaskResult.listreplicadeployment.shouldPatchRepDeployment "true" }}
+  task: |-
+    {{- $nodeNames := .TaskResult.listreplicanodeName.nodeNames -}}
+    type: strategic
+    pspec: |-
+      metadata:
+        annotations:
+          openebs.io/storage-class-ref: "name: {{ .TaskResult.getvoldetails.scName }}\nresourceVersion: {{ .TaskResult.getscdetails.scResVersion }}\n"
+        labels:
+          openebs.io/version: {{ .Config.targetversion.value }}
+      spec:
+        template:
+          metadata:
+            annotations:
+              openebs.io/storage-class-ref: "name: {{ .TaskResult.getvoldetails.scName }}\nresourceVersion: {{ .TaskResult.getscdetails.scResVersion }}\n"
+            labels:
+              openebs.io/version: {{ .Config.targetversion.value }}
+          spec:
+            affinity:
+              nodeAffinity:
+                requiredDuringSchedulingIgnoredDuringExecution:
+                  nodeSelectorTerms:
+                  - matchExpressions:
+                    - key: kubernetes.io/hostname
+                      operator: In
+                      values:
+                      {{- if ne $nodeNames "" }}
+                      {{- $nodeNamesMap := $nodeNames | split " " }}
+                      {{- range $k, $v := $nodeNamesMap }}
+                      - {{ $v }}
+                      {{- end }}
+                      {{- end }}
+            containers:
+              - name: {{ .UpgradeItem.name }}-rep-con
+                image: quay.io/openebs/jiva:{{ .Config.targetversion.value}}
+  post: |
+    {{- $message := printf "replica deployment: {%s} patched with latest images version: {%s}" .TaskResult.listreplicadeployment.deploymentName .Config.targetversion.value -}}
+    {{- $status := .Config.successStatus.value -}}
+
+    {{- $URName := upgradeResultWithTaskOwnerName .UpgradeItem.upgradeResultName -}}
+    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace "default" -}}
+    {{- $taskName := upgradeResultWithTaskName "upgrade-jiva-volume-0.8.2-0.9.0-patch-rep-deployment-latest-version" -}}
+    {{- $taskStatus := upgradeResultWithTaskStatus $status -}}
+    {{- $taskMessage := upgradeResultWithTaskMessage $message -}}
+    {{- $taskStartTime := upgradeResultWithTaskStartTime now -}}
+    {{- $taskEndTime := upgradeResultWithTaskEndTime now -}}
+    {{- upgradeResultUpdateTasks $taskStartTime $URName $URNamespace $taskName $taskStatus $taskMessage $taskEndTime -}}
+---
+apiVersion: openebs.io/v1alpha1
+kind: RunTask
+metadata:
+  name: upgrade-jiva-volume-0.8.2-0.9.0-post-check-rep-deployment-status-latest-version
+  namespace: default
+spec:
+  meta: |
+    id: postcheckreplicadeploymentstatuslatestversions
+    apiVersion: extensions/v1beta1
+    kind: Deployment
+    action: rolloutstatus
+    objectName: {{ .TaskResult.listreplicadeployment.deploymentName }}
+    runNamespace: {{ .UpgradeItem.namespace }}
+    retry: "20,2s"
+  post: |
+    {{- $rolledOut := jsonpath .JsonResult "{.isRolledout}" | trim | saveAs "postcheckreplicadeploymentstatuslatestversions.rolledOutStatus" .TaskResult -}}
+    {{- $rolloutMessage := jsonpath .JsonResult "{.message}" | trim | saveAs "postcheckreplicadeploymentstatuslatestversions.msg" .TaskResult -}}
+
+    {{- $URName := upgradeResultWithTaskOwnerName .UpgradeItem.upgradeResultName -}}
+    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace "default" -}}
+    {{- $taskName := upgradeResultWithTaskName "upgrade-jiva-volume-0.8.2-0.9.0-post-check-rep-deployment-status-latest-version" -}}
+    {{- $taskStartTime := upgradeResultWithTaskStartTime now -}}
+    {{- $taskEndTime := upgradeResultWithTaskEndTime now -}}
+    {{- $status := "" -}}
+    {{- $message := "" -}}
+
+    {{- if eq $rolledOut "true" }}
+    {{- $status = .Config.successStatus.value -}}
+    {{- $message = printf "replica deployment: {%s} rollout status: success" .TaskResult.listreplicadeployment.deploymentName -}}
+    {{- else }}
+    {{- $status = .Config.failStatus.value -}}
+    {{- $message = printf "replica deployment: {%s} rollout status: failed" .TaskResult.listreplicadeployment.deploymentName -}}
+    {{- "waiting for replica deployment rollout" | saveAs "postcheckreplicadeploymentstatuslatestversions.verifyErr" .TaskResult | noop -}}
+    {{- end }}
+
+    {{- $taskStatus := upgradeResultWithTaskStatus $status -}}
+    {{- $taskMessage := upgradeResultWithTaskMessage $message -}}
+    {{- upgradeResultUpdateTasks $taskStartTime $URName $URNamespace $taskName $taskStatus $taskMessage $taskEndTime -}}
+---
+apiVersion: openebs.io/v1alpha1
+kind: RunTask
+metadata:
+  name: upgrade-jiva-volume-0.8.2-0.9.0-post-check-rep-deployment-image
+  namespace: default
+spec:
+  meta: |
+    id: postcheckreplicadeploymentimagelatestversions
+    apiVersion: extensions/v1beta1
+    kind: Deployment
+    action: get
+    objectName: {{ .TaskResult.listreplicadeployment.deploymentName }}
+    runNamespace: {{ .UpgradeItem.namespace }}
+  post: |
+    {{- $passed := "true" -}}
+
+    {{- $CustomJsonPath := printf "{.spec.template.spec.containers[?(@.name=='%s-rep-con')].image}" .UpgradeItem.name -}}
+    {{- $jivaRepImage := jsonpath .JsonResult $CustomJsonPath | trim -}}
+
+    {{- $URName := upgradeResultWithTaskOwnerName .UpgradeItem.upgradeResultName -}}
+    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace "default" -}}
+    {{- $taskName := upgradeResultWithTaskName "upgrade-jiva-volume-0.8.2-0.9.0-post-check-rep-deployment-image" -}}
+    {{- $taskStartTime := upgradeResultWithTaskStartTime now -}}
+    {{- $taskEndTime := upgradeResultWithTaskEndTime now -}}
+    {{- $status := "" -}}
+    {{- $message := "" -}}
+
+    {{- if contains .Config.targetversion.value $jivaRepImage }}
+    {{- else }}
+    {{- $passed = "false" -}}
+    {{- "failed to patch jiva-replica image" | saveAs "postCheckRepDeploymentImagePatch.verifyErr" .TaskResult | noop -}}
+    {{- end }}
+
+    {{- if eq $passed "true" -}}
+    {{- $status = .Config.successStatus.value -}}
+    {{- $message = printf "patched replica deployment: {%s} with latest images version: {%s}" .TaskResult.listreplicadeployment.deploymentName .Config.targetversion.value -}}
+    {{- else -}}
+    {{- $status = .Config.failStatus.value -}}
+    {{- $message = printf "patched replica deployment: {%s} with latest images version: {%s}" .TaskResult.listreplicadeployment.deploymentName .Config.targetversion.value -}}
+    {{- end }}
+
+    {{- $taskMessage := upgradeResultWithTaskMessage $message -}}
+    {{- $taskStatus := upgradeResultWithTaskStatus $status -}}
+    {{- upgradeResultUpdateTasks $taskStartTime $URName $URNamespace $taskName $taskStatus $taskMessage $taskEndTime -}}
+---
+apiVersion: openebs.io/v1alpha1
+kind: RunTask
+metadata:
+  name: upgrade-jiva-volume-0.8.2-0.9.0-patch-ctrl-svc
+  namespace: default
+spec:
+  meta: |
+    id: patchcontrollersvc
+    apiVersion: v1
+    kind: Service
+    action: patch
+    objectName: {{ .TaskResult.listtargetservice.items }}
+    runNamespace: {{ .UpgradeItem.namespace }}
+    disable: {{ ne .TaskResult.listtargetservice.shouldPatchCtrlSVC "true" }}
+  task: |-
+    type: merge
+    pspec: |-
+      metadata:
+        annotations:
+          openebs.io/storage-class-ref: "name: {{ .TaskResult.getvoldetails.scName }}\nresourceVersion: {{ .TaskResult.getscdetails.scResVersion }}\n"
+        labels:
+          openebs.io/version: {{ .Config.targetversion.value }}
+  post: |
+    {{- $message := printf "patched controller service: {%s} with required labels and annotations" .TaskResult.listtargetservice.items -}}
+    {{- $status := .Config.successStatus.value -}}
+
+    {{- $URName := upgradeResultWithTaskOwnerName .UpgradeItem.upgradeResultName -}}
+    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace "default" -}}
+    {{- $taskName := upgradeResultWithTaskName "upgrade-jiva-volume-0.8.2-0.9.0-patch-ctrl-svc" -}}
+    {{- $taskStatus := upgradeResultWithTaskStatus $status -}}
+    {{- $taskMessage := upgradeResultWithTaskMessage $message -}}
+    {{- $taskStartTime := upgradeResultWithTaskStartTime now -}}
+    {{- $taskEndTime := upgradeResultWithTaskEndTime now -}}
+    {{- upgradeResultUpdateTasks $taskStartTime $URName $URNamespace $taskName $taskStatus $taskMessage $taskEndTime -}}
+---
+apiVersion: openebs.io/v1alpha1
+kind: RunTask
+metadata:
+  name: upgrade-jiva-volume-0.8.2-0.9.0-post-check-ctrl-svc
+  namespace: default
+spec:
+  meta: |
+    id: postcheckctrlsvc
+    apiVersion: v1
+    kind: Service
+    action: get
+    objectName: {{ .TaskResult.listtargetservice.items }}
+    runNamespace: {{ .UpgradeItem.namespace }}
+  post: |
+    {{- $scrAnnotation := jsonpath .JsonResult "{.metadata.annotations.openebs\\.io/storage-class-ref}" | trim | saveAs "postcheckctrlsvc.scrAnnotation" .TaskResult | noop -}}
+    {{- $labels := jsonpath .JsonResult "{.metadata.labels.openebs\\.io/version}" | trim | saveAs "postcheckctrlsvc.version" .TaskResult | noop -}}
+    {{- $desiredAnnotation := printf "name: %s\nresourceVersion: %s\n" .TaskResult.getvoldetails.scName .TaskResult.getscdetails.scResVersion | saveAs "desAnnotation" .TaskResult | noop -}}
+
+    {{- $URName := upgradeResultWithTaskOwnerName .UpgradeItem.upgradeResultName -}}
+    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace "default" -}}
+    {{- $taskName := upgradeResultWithTaskName "upgrade-jiva-volume-0.8.2-0.9.0-post-check-rep-deployment-image" -}}
+    {{- $taskStartTime := upgradeResultWithTaskStartTime now -}}
+    {{- $taskEndTime := upgradeResultWithTaskEndTime now -}}
+    {{- $status := "" -}}
+    {{- $message := "" -}}
+
+    {{- if contains .TaskResult.getvoldetails.scName .TaskResult.postcheckctrlsvc.scrAnnotation -}}
+    {{- else -}}
+    {{- $status = .Config.failStatus.value -}}
+    {{- $message = printf "failed to patch sc annotations on controller svc: {%s}" .TaskResult.listtargetservice.items -}}
+    {{- "failed to patch sc annotations controller service" | saveAs "postcheckctrlsvc.verifyErr" .TaskResult | noop -}}
+    {{- end }}
+    {{- if eq .Config.targetversion.value .TaskResult.postcheckctrlsvc.version -}}
+    {{- $status = .Config.successStatus.value -}}
+    {{- $message = printf "patched version label on controller service: {%s}" .TaskResult.listtargetservice.items -}}
+    {{- else -}}
+    {{- $status = .Config.failStatus.value -}}
+    {{- $message = "failed to patch version label on controller service: {%s}" .TaskResult.listtargetservice.items -}}
+    {{- "labels not patched on jiva controller service" | saveAs "postcheckctrlsvc.verifyErr" .TaskResult | noop -}}
+    {{- end }}
+
+    {{- $taskStatus := upgradeResultWithTaskStatus $status -}}
+    {{- $taskMessage := upgradeResultWithTaskMessage $message -}}
+    {{- upgradeResultUpdateTasks $taskStartTime $URName $URNamespace $taskName $taskStatus $taskMessage $taskEndTime -}}
+---
+apiVersion: openebs.io/v1alpha1
+kind: RunTask
+metadata:
+  name: upgrade-jiva-volume-0.8.2-0.9.0-delete-old-ctrl-rs
+  namespace: default
+spec:
+  meta: |
+    {{- $rslist := .TaskResult.listtargetoldrs.items | default "" | splitList " " -}}
+    id: deletectrlreplicaset
+    apiVersion: extensions/v1beta1
+    kind: ReplicaSet
+    runNamespace: {{ .UpgradeItem.namespace }}
+    action: delete
+    disable: {{ ne .TaskResult.listtargetdeployment.shouldPatchCtrlDeployment "true" }}
+    repeatWith:
+      metas:
+      {{- range $k, $rs := $rslist }}
+      - objectName: {{ $rs }}
+      {{- end }}
+  post: |
+    {{- $message := printf "deleted older controller replicasets: {%s}" .TaskResult.listtargetoldrs.items -}}
+    {{- $status := .Config.successStatus.value -}}
+
+    {{- $URName := upgradeResultWithTaskOwnerName .UpgradeItem.upgradeResultName -}}
+    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace "default" -}}
+    {{- $taskName := upgradeResultWithTaskName "upgrade-jiva-volume-0.8.2-0.9.0-delete-old-ctrl-rs" -}}
+    {{- $taskStatus := upgradeResultWithTaskStatus $status -}}
+    {{- $taskMessage := upgradeResultWithTaskMessage $message -}}
+    {{- $taskStartTime := upgradeResultWithTaskStartTime now -}}
+    {{- $taskEndTime := upgradeResultWithTaskEndTime now -}}
+    {{- upgradeResultUpdateTasks $taskStartTime $URName $URNamespace $taskName $taskStatus $taskMessage $taskEndTime -}}
+---
+apiVersion: openebs.io/v1alpha1
+kind: RunTask
+metadata:
+  name: upgrade-jiva-volume-0.8.2-0.9.0-delete-old-rep-rs
+  namespace: default
+spec:
+  meta: |
+    {{- $rslist := .TaskResult.listreplicaoldrs.items | default "" | splitList " " -}}
+    id: deletereplicareplicaset
+    apiVersion: extensions/v1beta1
+    kind: ReplicaSet
+    runNamespace: {{ .UpgradeItem.namespace }}
+    action: delete
+    disable: {{ ne .TaskResult.listreplicadeployment.shouldPatchRepDeployment "true" }}
+    repeatWith:
+      metas:
+      {{- range $k, $rs := $rslist }}
+      - objectName: {{ $rs }}
+      {{- end }}
+  post: |
+    {{ $retries := 0 -}}
+    {{- $message := printf "deleted older replica replicasets: {%s}" .TaskResult.listtargetoldrs.items -}}
+    {{- $status := .Config.successStatus.value -}}
+
+    {{- $URName := upgradeResultWithTaskOwnerName .UpgradeItem.upgradeResultName -}}
+    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace "default" -}}
+    {{- $taskName := upgradeResultWithTaskName "upgrade-jiva-volume-0.8.2-0.9.0-delete-old-rep-rs" -}}
+    {{- $taskStatus := upgradeResultWithTaskStatus $status -}}
+    {{- $taskMessage := upgradeResultWithTaskMessage $message -}}
+    {{- $taskStartTime := upgradeResultWithTaskStartTime now -}}
+    {{- $taskEndTime := upgradeResultWithTaskEndTime now -}}
+    {{- upgradeResultUpdateTasks $taskStartTime $URName $URNamespace $taskName $taskStatus $taskMessage $taskEndTime -}}

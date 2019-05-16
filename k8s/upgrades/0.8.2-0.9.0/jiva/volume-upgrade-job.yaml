@@ -7,7 +7,7 @@ data:
   upgrade: |
     casTemplate: jiva-volume-update-0.8.2-0.9.0
     resources:
-    - name: pvc-7d4863bd-7715-11e9-b896-54e1ad4a9dd4
+    - name: pvc-58654bd9-7861-11e9-b212-54e1ad4a9dd4
       kind: jiva-volume
       namespace: default
 ---
