@@ -1,0 +1,34 @@
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: openebs-cstor-sparse-auto
+  annotations:
+    openebs.io/cas-type: cstor
+    cas.openebs.io/config: |
+      - name: CStorPoolCluster
+        value: "sparse-cluster-auto"
+      - name: ReplicaCount
+        value: "1"
+     #- name: TargetResourceLimits
+      #  value: |-
+      #      memory: 1Gi
+      #      cpu: 200m
+      #- name: AuxResourceLimits
+      #  value: |-
+      #      memory: 0.5Gi
+      #      cpu: 50m
+provisioner: openebs.io/provisioner-iscsi
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: cstor-vol1-1r-claim
+spec:
+  storageClassName: openebs-cstor-sparse-auto
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 4G
+

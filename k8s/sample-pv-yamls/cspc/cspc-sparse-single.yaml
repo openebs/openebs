@@ -1,0 +1,12 @@
+apiVersion: openebs.io/v1alpha1
+kind: CStorPoolCluster
+metadata:
+  name: sparse-cluster-auto
+spec:
+  name: sparse-cluster-auto
+  type: sparse
+  maxPools: 1
+  poolSpec:
+    poolType: striped
+    cacheFile: /var/openebs/sparse/sparse-claim-auto.cache
+    overProvisioning: false
