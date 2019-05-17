@@ -10,6 +10,12 @@ spec:
     value: "0.8.2"
   - name: targetVersion
     value: "v0.9.0-RC1"
+  - name: cstorPoolImageTag
+    value: "v0.9.x-ci"
+  - name: cstorPoolMgmtImageTag
+    value: "v0.9.x-ci"
+  - name: mExporterImageTag
+    value: "v0.9.x-ci"
   - name: successStatus
     value: "Success"
   - name: failStatus
@@ -17,7 +23,9 @@ spec:
   run:
     tasks:
     # Runtask #1
-    # This runtask gets the cstorpool custom resource and verifies it. 
+    # upgrade-cstor-pool-082-090-get-cstorpool fetches the details of
+    # CStorPool CR. These details are used in other runtask(s) later.
+    # This should always run.
     - upgrade-cstor-pool-082-090-get-cstorpool
 
     # Runtask #2
@@ -104,33 +112,37 @@ spec:
     kind: CStorPool
     action: get
     objectName: {{ .UpgradeItem.name }}
-    disable: false
   post: |
     {{- jsonpath .JsonResult "{.metadata.uid}" | trim | saveAs "CStorPool.uid" .TaskResult | noop -}}
-    {{- jsonpath .JsonResult "{.metadata.labels.openebs\\.io/version}" | trim | saveAs "CStorPool.labels" .TaskResult | noop -}}
+    {{- jsonpath .JsonResult "{.metadata.labels.openebs\\.io/version}" | trim | saveAs "CStorPool.version" .TaskResult | noop -}}
 
     {{- $message :="" }}
     {{- $status :="" }}
-    {{- if eq .TaskResult.CStorPool.labels "0.8.2" }}
+    {{- $successMessage := printf "Successfully got details of CStorPool {%s}." .UpgradeItem.name -}}
+    {{- $errMessageInvalidVersion := printf "CStorPool {%s}, version is not in {%s}." .UpgradeItem.name .Config.baseVersion.value -}}
+
+    {{- $isBaseVersion := eq .TaskResult.CStorPool.version .Config.baseVersion.value }}
+    {{- $isTargetVersion := eq .TaskResult.CStorPool.version .Config.targetVersion.value }}
+    {{- if or $isBaseVersion $isTargetVersion -}}
     {{- $status =.Config.successStatus.value }}
-    {{- $message = printf "Successfully got details of CStorPool {%s}." .UpgradeItem.name -}}
+    {{- $message = $successMessage -}}
     
     {{- else }}
     {{- $status =.Config.failStatus.value }}
-    {{- $message = printf "CStorPool {%s}, version is not in {%s}." .UpgradeItem.name .Config.baseVersion.value -}}
+    {{- $message = $errMessageInvalidVersion -}}
     {{- end }}
 
     {{- $taskStatus := upgradeResultWithTaskStatus $status -}}
     {{- $taskMessage := upgradeResultWithTaskMessage $message -}}
     {{- $taskName := upgradeResultWithTaskName "upgrade-cstor-pool-082-090-get-cstorpool" -}}
     {{- $URName := upgradeResultWithTaskOwnerName .UpgradeItem.upgradeResultName -}}
-    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace "default" -}}
+    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace .UpgradeItem.upgradeResultNamespace -}}
     {{- $taskStartTime := upgradeResultWithTaskStartTime now -}}
     {{- $taskEndTime := upgradeResultWithTaskEndTime now -}}
     {{- upgradeResultUpdateTasks $taskStartTime $URName $URNamespace $taskName $taskStatus $taskMessage $taskEndTime -}}
     
     {{- if eq $status .Config.failStatus.value }}
-    {{- verifyErr "CStorPool version is not 0.8.2" true | saveAs "CStorPool.verifyErr" .TaskResult | noop -}} 
+    {{- verifyErr $errMessageInvalidVersion true | saveAs "CStorPool.verifyErr" .TaskResult | noop -}}
     {{- end }}
 ---
 # Runtask #2 
@@ -147,35 +159,38 @@ spec:
     action: get
     objectName: {{ .UpgradeItem.name }}
     runNamespace: {{ .UpgradeItem.namespace }}
-    disable: false
   post: |
     {{- jsonpath .JsonResult "{.spec.template.spec.containers[?(@.name=='cstor-pool')].image}" | trim | saveAs "poolDeployment.cstorpoolimage" .TaskResult | noop -}}
     {{- jsonpath .JsonResult "{.spec.template.spec.containers[?(@.name=='cstor-pool-mgmt')].image}" | trim | saveAs "poolDeployment.cstorpoolmgmtimage" .TaskResult | noop -}}
-    {{- jsonpath .JsonResult "{.metadata.labels.openebs\\.io/version}" | trim | saveAs "poolDeployment.labels" .TaskResult | noop -}}
+    {{- jsonpath .JsonResult "{.metadata.labels.openebs\\.io/version}" | trim | saveAs "poolDeployment.version" .TaskResult | noop -}}
 
     {{- $message :="" }} 
     {{- $status :="" }}
+    {{- $successMessage := printf "Successfully got details of CStorPool deployment {%s}." .UpgradeItem.name -}}
+    {{- $errMessageInvalidVersion := printf "CStorPool deployment {%s}, version is not in {%s}." .UpgradeItem.name .Config.baseVersion.value -}}
     
-    {{- if eq .TaskResult.poolDeployment.labels "0.8.2" }}
+    {{- $isBaseVersion := eq .TaskResult.poolDeployment.version .Config.baseVersion.value }}
+    {{- $isTargetVersion := eq .TaskResult.poolDeployment.version .Config.targetVersion.value }}
+    {{- if or $isBaseVersion $isTargetVersion -}}
     {{- $status =.Config.successStatus.value }}
-    {{- $message = printf "Successfully got details of CStorPool deployment {%s}." .UpgradeItem.name -}}
-    
+    {{- $message = $successMessage -}}
+
     {{- else }}
     {{- $status =.Config.failStatus.value }}
-    {{- $message = printf "CStorPool deployment {%s}, version is not in {%s}." .UpgradeItem.name .Config.baseVersion.value -}}
+    {{- $message = $errMessageInvalidVersion -}}
     {{- end }}
 
     {{- $taskStatus := upgradeResultWithTaskStatus $status -}}
     {{- $taskMessage := upgradeResultWithTaskMessage $message -}}
     {{- $taskName := upgradeResultWithTaskName "upgrade-cstor-pool-082-090-get-deployment" -}}
     {{- $URName := upgradeResultWithTaskOwnerName .UpgradeItem.upgradeResultName -}}
-    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace "default" -}}
+    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace .UpgradeItem.upgradeResultNamespace -}}
     {{- $taskStartTime := upgradeResultWithTaskStartTime now -}}
     {{- $taskEndTime := upgradeResultWithTaskEndTime now -}}
     {{- upgradeResultUpdateTasks $taskStartTime $URName $URNamespace $taskName $taskStatus $taskMessage $taskEndTime -}}
     
     {{- if eq $status .Config.failStatus.value }}
-    {{- verifyErr "CStorPool deployment version is not 0.8.2" true | saveAs "poolDeployment.verifyErr" .TaskResult | noop -}} 
+    {{- verifyErr $errMessageInvalidVersion true | saveAs "poolDeployment.verifyErr" .TaskResult | noop -}}
     {{- end }}
 ---
 # Runtask #3 
@@ -191,33 +206,36 @@ spec:
     kind: StoragePool
     action: get
     objectName: {{ .UpgradeItem.name }}
-    disable: false
   post: |
     {{- jsonpath .JsonResult "{.metadata.labels.openebs\\.io/version}" | trim | saveAs "StoragePool.labels" .TaskResult | noop -}}
 
     {{- $message :="" }}
     {{- $status :="" }}
+    {{- $successMessage := printf "Successfully got details of StoragePool {%s}." .UpgradeItem.name -}}
+    {{- $errMessageInvalidVersion := printf "StoragePool {%s}, version is not in {%s}." .UpgradeItem.name .Config.baseVersion.value -}}
     
-    {{- if eq .TaskResult.StoragePool.labels "0.8.2" }}
+    {{- $isBaseVersion := eq .TaskResult.StoragePool.labels .Config.baseVersion.value }}
+    {{- $isTargetVersion := eq .TaskResult.StoragePool.labels .Config.targetVersion.value }}
+    {{- if or $isBaseVersion $isTargetVersion -}}
     {{- $status =.Config.successStatus.value }}
-    {{- $message = printf "Successfully got details of StoragePool {%s}." .UpgradeItem.name -}}
+    {{- $message = $successMessage -}}
     
     {{- else }}
     {{- $status =.Config.failStatus.value }}
-    {{- $message = printf "StoragePool {%s}, version is not in {%s}." .UpgradeItem.name .Config.baseVersion.value -}}
+    {{- $message = $errMessageInvalidVersion -}}
     {{- end }}
 
     {{- $taskStatus := upgradeResultWithTaskStatus $status -}}
     {{- $taskMessage := upgradeResultWithTaskMessage $message -}}
     {{- $taskName := upgradeResultWithTaskName "upgrade-cstor-pool-082-090-get-storagepool" -}}
     {{- $URName := upgradeResultWithTaskOwnerName .UpgradeItem.upgradeResultName -}}
-    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace "default" -}}
+    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace .UpgradeItem.upgradeResultNamespace -}}
     {{- $taskStartTime := upgradeResultWithTaskStartTime now -}}
     {{- $taskEndTime := upgradeResultWithTaskEndTime now -}}
     {{- upgradeResultUpdateTasks $taskStartTime $URName $URNamespace $taskName $taskStatus $taskMessage $taskEndTime -}}
     
     {{- if eq $status .Config.failStatus.value }}
-    {{- verifyErr "StoragePool version is not 0.8.2" true | saveAs "StoragePool.verifyErr" .TaskResult | noop -}} 
+    {{- verifyErr $errMessageInvalidVersion true | saveAs "StoragePool.verifyErr" .TaskResult | noop -}}
     {{- end }}
 ---
 # Rutask #4
@@ -253,14 +271,14 @@ spec:
   meta: |
     {{ $isOldCStorPool := contains .Config.baseVersion.value .TaskResult.poolDeployment.cstorpoolimage }}
     {{ $isOldCStorPoolMGMT := contains .Config.baseVersion.value .TaskResult.poolDeployment.cstorpoolmgmtimage  }}
-    {{ $shouldpatch := or $isOldCStorPool $isOldCStorPoolMGMT | toString }}
+    {{ $isOldVersion := or $isOldCStorPool $isOldCStorPoolMGMT | toString }}
     id: patchDeploymentImage
     apiVersion: extensions/v1beta1
     kind: Deployment
     action: patch
     objectName: {{ .UpgradeItem.name }}
     runNamespace: {{ .UpgradeItem.namespace }}
-    disable: {{ eq $shouldpatch "false" }}
+    disable: {{ eq $isOldVersion "false" }}
   task: |-
     type: strategic
     pspec: |-
@@ -273,7 +291,7 @@ spec:
           spec:
             containers:
             - name: cstor-pool
-              image: quay.io/openebs/cstor-pool:v0.9.x-ci
+              image: quay.io/openebs/cstor-pool:{{ .Config.cstorPoolImageTag.value }}
               env:
               - name: OPENEBS_IO_CSTOR_ID
                 value: {{ .TaskResult.CStorPool.uid }}
@@ -289,12 +307,12 @@ spec:
                 successThreshold: 1
                 timeoutSeconds: 30
             - name: cstor-pool-mgmt
-              image: quay.io/openebs/cstor-pool-mgmt:v0.9.x-ci
+              image: quay.io/openebs/cstor-pool-mgmt:{{ .Config.cstorPoolMgmtImageTag.value }}
               # Setting ports to nil, since it is not required and
               # 9500 port is used by m-exporter
               ports:
             - name: maya-exporter
-              image: quay.io/openebs/m-exporter:v0.9.x-ci
+              image: quay.io/openebs/m-exporter:{{ .Config.mExporterImageTag.value }}
               command:
               - maya-exporter
               args:
@@ -313,14 +331,14 @@ spec:
                 name: sparse
               - mountPath: /run/udev
                 name: udev
-  post: |-
+  post: |
     {{- $message := printf "Successfully patched deployment {%s}." .UpgradeItem.name -}}
     {{- $status := .Config.successStatus.value -}}
     {{- $taskStatus := upgradeResultWithTaskStatus $status -}}
     {{- $taskMessage := upgradeResultWithTaskMessage $message -}}
     {{- $taskName := upgradeResultWithTaskName "upgrade-cstor-pool-082-090-patch-deployment-image" -}}
     {{- $URName := upgradeResultWithTaskOwnerName .UpgradeItem.upgradeResultName -}}
-    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace "default" -}}
+    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace .UpgradeItem.upgradeResultNamespace -}}
     {{- $taskStartTime := upgradeResultWithTaskStartTime now -}}
     {{- $taskEndTime := upgradeResultWithTaskEndTime now -}}
     {{- upgradeResultUpdateTasks $taskStartTime $URName $URNamespace $taskName $taskStatus $taskMessage $taskEndTime -}}
@@ -336,7 +354,7 @@ spec:
   meta: |
     {{ $isOldCStorPool := contains .TaskResult.poolDeployment.cstorpoolimage .Config.baseVersion.value }}
     {{ $isOldCStorPoolMGMT := eq .TaskResult.poolDeployment.cstorpoolmgmtimage "" }}
-    {{ $shouldpatch := or $isOldCStorPool $isOldCStorPoolMGMT | toString }}
+    {{ $isOldVersion := or $isOldCStorPool $isOldCStorPoolMGMT | toString }}
     id: patchDeploymentImageStatus
     apiVersion: extensions/v1beta1
     kind: Deployment
@@ -347,7 +365,11 @@ spec:
   post: |
     {{- jsonpath .JsonResult "{.isRolledout}" | trim | saveAs "patchDeploymentImageStatus.isRolledout" .TaskResult | noop -}}
     {{- jsonpath .JsonResult "{.message}" | trim | saveAs "patchDeploymentImageStatus.rolloutStatus" .TaskResult | noop -}}
+
     {{- $status := "" -}}
+    {{- $message :="" -}}
+    {{- $verifyErrMessage := "Pool deployment rollout not successfull" -}}
+    {{- $rolloutStatusMessage := printf "rollout status: {%s} name: {%s} namespace: {%s}" .TaskResult.patchDeploymentImageStatus.rolloutStatus .UpgradeItem.name .UpgradeItem.namespace -}}
     
     {{- if eq .TaskResult.patchDeploymentImageStatus.isRolledout  "true" }}
     {{- $status = .Config.successStatus.value -}}
@@ -357,19 +379,18 @@ spec:
     {{- $status = .Config.failStatus.value -}}
     {{- end }}
 
-    {{- $message := printf "%s name: {%s} namespace: {%s}" .TaskResult.patchDeploymentImageStatus.rolloutStatus .UpgradeItem.name .UpgradeItem.namespace -}}
-
+    {{- $message = $rolloutStatusMessage -}}
 
     {{- $taskStatus := upgradeResultWithTaskStatus $status -}}
     {{- $taskMessage := upgradeResultWithTaskMessage $message -}}
     {{- $taskName := upgradeResultWithTaskName "upgrade-cstor-pool-082-090-patch-deployment-image-status" -}}
     {{- $URName := upgradeResultWithTaskOwnerName .UpgradeItem.upgradeResultName -}}
-    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace "default" -}}
+    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace .UpgradeItem.upgradeResultNamespace -}}
     {{- $taskStartTime := upgradeResultWithTaskStartTime now -}}
     {{- $taskEndTime := upgradeResultWithTaskEndTime now -}}
     
     {{- if eq $status .Config.failStatus.value }}
-    {{- verifyErr "Pool deployment roll out not successfull" true | saveAs "patchDeploymentImageStatus.verifyErr" .TaskResult | noop -}} 
+    {{- verifyErr $verifyErrMessage true | saveAs "patchDeploymentImageStatus.verifyErr" .TaskResult | noop -}}
     {{- end }}
 
 ---
@@ -383,14 +404,14 @@ spec:
   meta: |
     {{ $isOldCStorPool := contains .TaskResult.poolDeployment.cstorpoolimage .Config.baseVersion.value }}
     {{ $isOldCStorPoolMGMT := eq .TaskResult.poolDeployment.cstorpoolmgmtimage "" }}
-    {{ $shouldpatch := or $isOldCStorPool $isOldCStorPoolMGMT | toString }}
+    {{ $isOldVersion := or $isOldCStorPool $isOldCStorPoolMGMT | toString }}
     id: postCheckDeploymentImagePatch
     apiVersion: extensions/v1beta1
     kind: Deployment
     action: get
     objectName: {{ .UpgradeItem.name }}
     runNamespace: {{ .UpgradeItem.namespace }}
-    disable: {{ ne $shouldpatch "true" }}
+    disable: {{ ne $isOldVersion "true" }}
   post: |-
     {{- jsonpath .JsonResult "{.spec.template.spec.containers[?(@.name=='cstor-pool')].image}" | trim | saveAs "postCheckDeploymentImagePatch.cstorpoolimage" .TaskResult | noop -}}
     {{- jsonpath .JsonResult "{.spec.template.spec.containers[?(@.name=='cstor-pool-mgmt')].image}" | trim | saveAs "postCheckDeploymentImagePatch.cstorpoolmgmtimage" .TaskResult | noop -}}
@@ -440,7 +461,7 @@ spec:
     {{- $taskMessage := upgradeResultWithTaskMessage $message -}}
     {{- $taskName := upgradeResultWithTaskName "upgrade-cstor-pool-082-090-patch-sp-version" -}}
     {{- $URName := upgradeResultWithTaskOwnerName .UpgradeItem.upgradeResultName -}}
-    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace "default" -}}
+    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace .UpgradeItem.upgradeResultNamespace -}}
     {{- $taskStartTime := upgradeResultWithTaskStartTime now -}}
     {{- $taskEndTime := upgradeResultWithTaskEndTime now -}}
     {{- upgradeResultUpdateTasks $taskStartTime $URName $URNamespace $taskName $taskStatus $taskMessage $taskEndTime -}}
@@ -459,7 +480,6 @@ spec:
     kind: StoragePool
     action: get
     objectName: {{ .UpgradeItem.name }}
-    disable: false
   post: |
     {{- jsonpath .JsonResult "{.metadata.labels.openebs\\.io/version}" | trim | saveAs "postCheckStoragePoolVersionPatch.version" .TaskResult | noop -}}
 
@@ -478,7 +498,7 @@ spec:
     {{- $taskMessage := upgradeResultWithTaskMessage $message -}}
     {{- $taskName := upgradeResultWithTaskName "upgrade-cstor-pool-082-090-patch-sp-version-post-check" -}}
     {{- $URName := upgradeResultWithTaskOwnerName .UpgradeItem.upgradeResultName -}}
-    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace "default" -}}
+    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace .UpgradeItem.upgradeResultNamespace -}}
     {{- $taskStartTime := upgradeResultWithTaskStartTime now -}}
     {{- $taskEndTime := upgradeResultWithTaskEndTime now -}}
     {{- upgradeResultUpdateTasks $taskStartTime $URName $URNamespace $taskName $taskStatus $taskMessage $taskEndTime -}}
@@ -510,7 +530,7 @@ spec:
     {{- $taskMessage := upgradeResultWithTaskMessage $message -}}
     {{- $taskName := upgradeResultWithTaskName "upgrade-cstor-pool-082-090-patch-csp-version" -}}
     {{- $URName := upgradeResultWithTaskOwnerName .UpgradeItem.upgradeResultName -}}
-    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace "default" -}}
+    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace .UpgradeItem.upgradeResultNamespace -}}
     {{- $taskStartTime := upgradeResultWithTaskStartTime now -}}
     {{- $taskEndTime := upgradeResultWithTaskEndTime now -}}
     {{- upgradeResultUpdateTasks $taskStartTime $URName $URNamespace $taskName $taskStatus $taskMessage $taskEndTime -}}
@@ -548,7 +568,7 @@ spec:
     {{- $taskMessage := upgradeResultWithTaskMessage $message -}}
     {{- $taskName := upgradeResultWithTaskName "upgrade-cstor-pool-082-090-patch-sp-version-post-check" -}}
     {{- $URName := upgradeResultWithTaskOwnerName .UpgradeItem.upgradeResultName -}}
-    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace "default" -}}
+    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace .UpgradeItem.upgradeResultNamespace -}}
     {{- $taskStartTime := upgradeResultWithTaskStartTime now -}}
     {{- $taskEndTime := upgradeResultWithTaskEndTime now -}}
     {{- upgradeResultUpdateTasks $taskStartTime $URName $URNamespace $taskName $taskStatus $taskMessage $taskEndTime -}}
@@ -581,7 +601,7 @@ spec:
     {{- $taskMessage := upgradeResultWithTaskMessage $message -}}
     {{- $taskName := upgradeResultWithTaskName "upgrade-cstor-pool-082-090-patch-deployment-version" -}}
     {{- $URName := upgradeResultWithTaskOwnerName .UpgradeItem.upgradeResultName -}}
-    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace "default" -}}
+    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace .UpgradeItem.upgradeResultNamespace -}}
     {{- $taskStartTime := upgradeResultWithTaskStartTime now -}}
     {{- $taskEndTime := upgradeResultWithTaskEndTime now -}}
     {{- upgradeResultUpdateTasks $taskStartTime $URName $URNamespace $taskName $taskStatus $taskMessage $taskEndTime -}}
@@ -620,7 +640,7 @@ spec:
     {{- $taskMessage := upgradeResultWithTaskMessage $message -}}
     {{- $taskName := upgradeResultWithTaskName "upgrade-cstor-pool-082-090-patch-deployment-version-post-check" -}}
     {{- $URName := upgradeResultWithTaskOwnerName .UpgradeItem.upgradeResultName -}}
-    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace "default" -}}
+    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace .UpgradeItem.upgradeResultNamespace -}}
     {{- $taskStartTime := upgradeResultWithTaskStartTime now -}}
     {{- $taskEndTime := upgradeResultWithTaskEndTime now -}}
     {{- upgradeResultUpdateTasks $taskStartTime $URName $URNamespace $taskName $taskStatus $taskMessage $taskEndTime -}}
@@ -638,7 +658,6 @@ spec:
     kind: ReplicaSet
     action: list
     runNamespace: {{ .UpgradeItem.namespace }}
-    disable: false
     options: |-
       labelSelector: app=cstor-pool,openebs.io/storage-pool-claim=cstor-sparse-pool
   post: |
@@ -652,7 +671,7 @@ spec:
     {{- $taskMessage := upgradeResultWithTaskMessage $message -}}
     {{- $taskName := upgradeResultWithTaskName "upgrade-cstor-pool-082-090-list-replicaset" -}}
     {{- $URName := upgradeResultWithTaskOwnerName .UpgradeItem.upgradeResultName -}}
-    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace "default" -}}
+    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace .UpgradeItem.upgradeResultNamespace -}}
     {{- $taskStartTime := upgradeResultWithTaskStartTime now -}}
     {{- $taskEndTime := upgradeResultWithTaskEndTime now -}}
     {{- upgradeResultUpdateTasks $taskStartTime $URName $URNamespace $taskName $taskStatus $taskMessage $taskEndTime -}}
@@ -672,7 +691,6 @@ spec:
     runNamespace: {{ .UpgradeItem.namespace }}
     options: |-
       labelSelector: app=cstor-pool,openebs.io/storage-pool-claim=cstor-sparse-pool
-    disable: false
   post: |
     {{- $CustomJsonpath := printf "{range .items[?(@.metadata.ownerReferences[0].name== '%s')]}{@.metadata.name}{end}" .TaskResult.newReplicaset.name -}}
     {{- $podrsPairs := jsonpath .JsonResult "{range .items[*]}{@.metadata.name},{@.metadata.ownerReferences[0].name} {end}" | trim | default "" | splitList " " -}}
@@ -715,7 +733,7 @@ spec:
     {{- $taskMessage := upgradeResultWithTaskMessage $message -}}
     {{- $taskName := upgradeResultWithTaskName "upgrade-cstor-pool-082-090-list-pod" -}}
     {{- $URName := upgradeResultWithTaskOwnerName .UpgradeItem.upgradeResultName -}}
-    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace "default" -}}
+    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace .UpgradeItem.upgradeResultNamespace -}}
     {{- $taskStartTime := upgradeResultWithTaskStartTime now -}}
     {{- $taskEndTime := upgradeResultWithTaskEndTime now -}}
     {{- upgradeResultUpdateTasks $taskStartTime $URName $URNamespace $taskName $taskStatus $taskMessage $taskEndTime -}}
@@ -743,7 +761,7 @@ spec:
     {{- $taskStatus := upgradeResultWithTaskStatus $status -}}
     {{- $taskName := upgradeResultWithTaskName "upgrade-cstor-pool-082-090-delete-replicaset" -}}
     {{- $URName := upgradeResultWithTaskOwnerName .UpgradeItem.upgradeResultName -}}
-    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace "default" -}}
+    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace .UpgradeItem.upgradeResultNamespace -}}
     {{- $taskStartTime := upgradeResultWithTaskStartTime now -}}
     {{- $taskEndTime := upgradeResultWithTaskEndTime now -}}
     {{- upgradeResultUpdateTasks $taskStartTime $URName $URNamespace $taskName $taskStatus $taskMessage $taskEndTime -}}

@@ -142,7 +142,7 @@ spec:
   post: |
     {{- $message := printf "upgradeResult {%s} has been patched with basic details such as name and namespace of the resource to be upgraded." .UpgradeItem.upgradeResultName -}}
     {{- $URName := upgradeResultWithTaskOwnerName .UpgradeItem.upgradeResultName -}}
-    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace "default" -}}
+    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace .UpgradeItem.upgradeResultNamespace -}}
     {{- $taskName := upgradeResultWithTaskName "upgrade-cstor-volume-082-090-patch-upgrade-result" -}}
     {{- $taskStatus := upgradeResultWithTaskStatus "successful" -}}
     {{- $taskMessage := upgradeResultWithTaskMessage $message -}}
@@ -194,7 +194,7 @@ spec:
     {{- $taskMessage := upgradeResultWithTaskMessage $message -}}
     {{- $taskName := upgradeResultWithTaskName "upgrade-cstor-volume-082-090-get-pv" -}}
     {{- $URName := upgradeResultWithTaskOwnerName .UpgradeItem.upgradeResultName -}}
-    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace "default" -}}
+    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace .UpgradeItem.upgradeResultNamespace -}}
     {{- $taskStartTime := upgradeResultWithTaskStartTime now -}}
     {{- $taskEndTime := upgradeResultWithTaskEndTime now -}}
     {{- upgradeResultUpdateTasks $taskStartTime $URName $URNamespace $taskName $taskStatus $taskMessage $taskEndTime -}}
@@ -222,7 +222,11 @@ spec:
 
     {{- $message := printf "the target deployment for this PV {%s} is : {%s}" .UpgradeItem.name .TaskResult.listTargetDeployment.targetDeploymentName -}}
     {{- $status :="" }}
-    {{- if eq .TaskResult.listTargetDeployment.labels "0.8.2" }}
+    {{- $verifyErrMessage := "cStor volume target version is not 0.8.2" -}}
+
+    {{- $isBaseVersion := eq .TaskResult.listTargetDeployment.labels .Config.baseVersion.value }}
+    {{- $isTargetVersion := eq .TaskResult.listTargetDeployment.labels .Config.targetVersion.value }}
+    {{- if or $isBaseVersion $isTargetVersion -}}
     {{- $status =.Config.successStatus.value }}
     {{- else }}
     {{- $status =.Config.failStatus.value }}
@@ -232,12 +236,13 @@ spec:
     {{- $taskMessage := upgradeResultWithTaskMessage $message -}}
     {{- $taskName := upgradeResultWithTaskName "upgrade-cstor-pool-082-090-get-cstorpool" -}}
     {{- $URName := upgradeResultWithTaskOwnerName .UpgradeItem.upgradeResultName -}}
-    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace "default" -}}
+    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace .UpgradeItem.upgradeResultNamespace -}}
     {{- $taskStartTime := upgradeResultWithTaskStartTime now -}}
     {{- $taskEndTime := upgradeResultWithTaskEndTime now -}}
     {{- upgradeResultUpdateTasks $taskStartTime $URName $URNamespace $taskName $taskStatus $taskMessage $taskEndTime -}}
+
     {{- if eq $status .Config.failStatus.value }}
-    {{- verifyErr "cStor volume target version is not 0.8.2" true | saveAs "listTargetDeployment.verifyErr" .TaskResult | noop -}}
+    {{- verifyErr $verifyErrMessage true | saveAs "listTargetDeployment.verifyErr" .TaskResult | noop -}}
     {{- end }}
 ---
 # Runtask #4
@@ -262,7 +267,11 @@ spec:
 
     {{- $message := printf "the target service for this volume {%s} is : {%s}" .UpgradeItem.name .TaskResult.listTargetService.items -}}
     {{- $status :="" }}
-    {{- if eq .TaskResult.listTargetService.version "0.8.2" }}
+    {{- $verifyErrMessage := "cStor volume target service version is not 0.8.2" -}}
+
+    {{- $isBaseVersion := eq .TaskResult.listTargetService.version .Config.baseVersion.value -}}
+    {{- $isTargetVersion := eq .TaskResult.listTargetService.version .Config.targetVersion.value -}}
+    {{- if or $isBaseVersion $isTargetVersion -}}
     {{- $status =.Config.successStatus.value }}
     {{- else }}
     {{- $status =.Config.failStatus.value }}
@@ -272,12 +281,13 @@ spec:
     {{- $taskMessage := upgradeResultWithTaskMessage $message -}}
     {{- $taskName := upgradeResultWithTaskName "upgrade-cstor-volume-082-090-list-target-svc" -}}
     {{- $URName := upgradeResultWithTaskOwnerName .UpgradeItem.upgradeResultName -}}
-    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace "default" -}}
+    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace .UpgradeItem.upgradeResultNamespace -}}
     {{- $taskStartTime := upgradeResultWithTaskStartTime now -}}
     {{- $taskEndTime := upgradeResultWithTaskEndTime now -}}
     {{- upgradeResultUpdateTasks $taskStartTime $URName $URNamespace $taskName $taskStatus $taskMessage $taskEndTime -}}
+
     {{- if eq $status .Config.failStatus.value }}
-    {{- verifyErr "cStor volume target service version is not 0.8.2" true | saveAs "listTargetService.verifyErr" .TaskResult | noop -}}
+    {{- verifyErr $verifyErrMessage true | saveAs "listTargetService.verifyErr" .TaskResult | noop -}}
     {{- end }}
 ---
 #Runtask #5
@@ -303,7 +313,11 @@ spec:
 
     {{- $message := printf "cStor volume for this PV {%s} is : {%s}" .UpgradeItem.name .TaskResult.listCStorVolume.items -}}
     {{- $status :="" }}
-    {{- if eq .TaskResult.listCStorVolume.labels "0.8.2" }}
+    {{- $verifyErrMessage:= "cStor volume version is not 0.8.2" -}}
+
+    {{- $isBaseVersion := eq .TaskResult.listCStorVolume.labels .Config.baseVersion.value -}}
+    {{- $isTargetVersion := eq .TaskResult.listCStorVolume.labels .Config.targetVersion.value -}}
+    {{- if or $isBaseVersion $isTargetVersion -}}
     {{- $status =.Config.successStatus.value }}
     {{- else }}
     {{- $status =.Config.failStatus.value }}
@@ -313,12 +327,13 @@ spec:
     {{- $taskMessage := upgradeResultWithTaskMessage $message -}}
     {{- $taskName := upgradeResultWithTaskName "upgrade-cstor-volume-082-090-list-cstorvolume" -}}
     {{- $URName := upgradeResultWithTaskOwnerName .UpgradeItem.upgradeResultName -}}
-    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace "default" -}}
+    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace .UpgradeItem.upgradeResultNamespace -}}
     {{- $taskStartTime := upgradeResultWithTaskStartTime now -}}
     {{- $taskEndTime := upgradeResultWithTaskEndTime now -}}
     {{- upgradeResultUpdateTasks $taskStartTime $URName $URNamespace $taskName $taskStatus $taskMessage $taskEndTime -}}
+
     {{- if eq $status .Config.failStatus.value }}
-    {{- verifyErr "cStor volume version is not 0.8.2" true | saveAs "listCStorVolume.verifyErr" .TaskResult | noop -}}
+    {{- verifyErr $verifyErrMessage true | saveAs "listCStorVolume.verifyErr" .TaskResult | noop -}}
     {{- end }}
 
 ---
@@ -353,24 +368,31 @@ spec:
 
     {{- $status :="" }}
     {{- $message :="" }}
+    {{- $successMessage := printf "Got details of CVR(s), {%s} , successfully for  {%s}" .UpgradeItem.name .TaskResult.listCStorVolume.items -}}
+    {{- $errorMessage := printf "CVR(s) {%s} version not in 0.8.2" .ListItems.cvrVersionList.version -}}
+    {{- $verifyErrMessage := "cStor volume replica(s) version is not 0.8.2" -}}
     {{- $inVersion := "0.8.2" }}
+    {{- $baseVersion := .Config.baseVersion.value -}}
+    {{- $targetVersion := .Config.targetVersion.value -}}
 
     {{- $versionList := jsonpath .JsonResult "{range .items[*]}pkey=version,{@.metadata.name}={@.metadata.labels.openebs\\.io/version};{end}" | trim | default "" | splitList ";" -}}
     {{- $versionList | keyMap "cvrVersionList" .ListItems | noop -}}
 
     {{- range $cvr, $version := .ListItems.cvrVersionList.version }}
-    {{- if ne $version "0.8.2" }}
+    {{- $isNotBaseVersion := ne $version $baseVersion -}}
+    {{- $isNotTargetVersion := ne $version $targetVersion -}}
+    {{- if and $isNotBaseVersion $isNotTargetVersion }}
 
     {{- $inVersion = "false" }}
     {{- end }}
     {{- end }}
 
     {{- if contains "0.8.2" $inVersion }}
-    {{- $message := printf "Got details of CVR(s), {%s} , successfully for  {%s}" .UpgradeItem.name .TaskResult.listCStorVolume.items -}}
+    {{- $message = $successMessage -}}
     {{- $status =.Config.successStatus.value }}
-    
+
     {{- else }}
-    {{- $message = printf "CVR(s) {%s} version not in 0.8.2" .ListItems.cvrVersionList.version -}}
+    {{- $message = $errorMessage -}}
     {{- $status =.Config.failStatus.value }}
     {{- end }}
 
@@ -378,12 +400,13 @@ spec:
     {{- $taskMessage := upgradeResultWithTaskMessage $message -}}
     {{- $taskName := upgradeResultWithTaskName "upgrade-cstor-volume-082-090-list-cstorvolumereplicas" -}}
     {{- $URName := upgradeResultWithTaskOwnerName .UpgradeItem.upgradeResultName -}}
-    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace "default" -}}
+    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace .UpgradeItem.upgradeResultNamespace -}}
     {{- $taskStartTime := upgradeResultWithTaskStartTime now -}}
     {{- $taskEndTime := upgradeResultWithTaskEndTime now -}}
     {{- upgradeResultUpdateTasks $taskStartTime $URName $URNamespace $taskName $taskStatus $taskMessage $taskEndTime -}}
+
     {{- if eq $status .Config.failStatus.value }}
-    {{- verifyErr "cStor volume replica(s) version is not 0.8.2" true | saveAs "listCStorVolumeReplica.verifyErr" .TaskResult | noop -}}
+    {{- verifyErr $verifyErrMessage true | saveAs "listCStorVolumeReplica.verifyErr" .TaskResult | noop -}}
     {{- end }}
 ---
 # Runtask #7
@@ -403,6 +426,9 @@ spec:
   task: |-
     type: strategic
     pspec: |-
+      metadata:
+        labels:
+          openebs.io/version: {{ .Config.targetVersion.value}}
       spec: 
         template: 
           metadata:
@@ -423,7 +449,7 @@ spec:
    {{- $taskMessage := upgradeResultWithTaskMessage $message -}}
    {{- $taskName := upgradeResultWithTaskName "upgrade-cstor-volume-082-090-patch-target-deployment-latest-image" -}}
    {{- $URName := upgradeResultWithTaskOwnerName .UpgradeItem.upgradeResultName -}}
-   {{- $URNamespace := upgradeResultWithTaskOwnerNamespace "default" -}}
+   {{- $URNamespace := upgradeResultWithTaskOwnerNamespace .UpgradeItem.upgradeResultNamespace -}}
    {{- $taskStartTime := upgradeResultWithTaskStartTime now -}}
    {{- $taskEndTime := upgradeResultWithTaskEndTime now -}}
    {{- upgradeResultUpdateTasks $taskStartTime $URName $URNamespace $taskName $taskStatus $taskMessage $taskEndTime -}}
@@ -447,7 +473,10 @@ spec:
   post: |
     {{- jsonpath .JsonResult "{.isRolledout}" | trim | saveAs "postCheckDeploymentRollout.isRolledout" .TaskResult | noop -}}
     {{- jsonpath .JsonResult "{.message}" | trim | saveAs "postCheckDeploymentRollout.rolloutStatus" .TaskResult | noop -}}
+
     {{- $status := "" -}}
+    {{- $verifyErrMessage := "Target deployment roll out not successfull" -}}
+
     {{- if eq .TaskResult.postCheckDeploymentRollout.isRolledout  "true" }}
     {{- $status = .Config.successStatus.value -}}
     {{- else }}
@@ -461,11 +490,11 @@ spec:
     {{- $taskMessage := upgradeResultWithTaskMessage $message -}}
     {{- $taskName := upgradeResultWithTaskName "upgrade-cstor-volume-082-090-post-check-deployment-rollout-status-latest-image" -}}
     {{- $URName := upgradeResultWithTaskOwnerName .UpgradeItem.upgradeResultName -}}
-    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace "default" -}}
+    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace .UpgradeItem.upgradeResultNamespace -}}
     {{- $taskStartTime := upgradeResultWithTaskStartTime now -}}
     {{- $taskEndTime := upgradeResultWithTaskEndTime now -}}
     {{- if eq $status .Config.failStatus.value }}
-    {{- verifyErr "Target deployment roll out not successfull" true | saveAs "postCheckDeploymentRollout.verifyErr" .TaskResult | noop -}} 
+    {{- verifyErr $verifyErrMessage true | saveAs "postCheckDeploymentRollout.verifyErr" .TaskResult | noop -}}
     {{- end }}
 ---
 # Runtask #9
@@ -495,6 +524,8 @@ spec:
 
 
     {{- $status := "" -}}
+    {{- $verifyErrMessage := "Target pod container images not foud in target version" -}}
+
     {{- if and $isNewIstgt $isNewExporter $isNewVolMgmt }}
     {{- $status = .Config.successStatus.value -}}
     {{- else }}
@@ -507,12 +538,13 @@ spec:
     {{- $taskMessage := upgradeResultWithTaskMessage $message -}}
     {{- $taskName := upgradeResultWithTaskName "upgrade-cstor-volume-082-090-post-check-patch-deployment-image" -}}
     {{- $URName := upgradeResultWithTaskOwnerName .UpgradeItem.upgradeResultName -}}
-    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace "default" -}}
+    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace .UpgradeItem.upgradeResultNamespace -}}
     {{- $taskStartTime := upgradeResultWithTaskStartTime now -}}
     {{- $taskEndTime := upgradeResultWithTaskEndTime now -}}
     {{- upgradeResultUpdateTasks $taskStartTime $URName $URNamespace $taskName $taskStatus $taskMessage $taskEndTime -}}
+
     {{- if eq $status .Config.failStatus.value }}
-    {{- verifyErr "Target pod container images not foud in target version" true | saveAs "postCheckDeploymentImagePatch.verifyErr" .TaskResult | noop -}} 
+    {{- verifyErr $verifyErrMessage true | saveAs "postCheckDeploymentImagePatch.verifyErr" .TaskResult | noop -}}
     {{- end }}
 ---
 # Runtask 10
@@ -544,7 +576,7 @@ spec:
     {{- $taskMessage := upgradeResultWithTaskMessage $message -}}
     {{- $taskName := upgradeResultWithTaskName "upgrade-cstor-volume-082-090-patch-target-svc" -}}
     {{- $URName := upgradeResultWithTaskOwnerName .UpgradeItem.upgradeResultName -}}
-    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace "default" -}}
+    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace .UpgradeItem.upgradeResultNamespace -}}
     {{- $taskStartTime := upgradeResultWithTaskStartTime now -}}
     {{- $taskEndTime := upgradeResultWithTaskEndTime now -}}
     {{- upgradeResultUpdateTasks $taskStartTime $URName $URNamespace $taskName $taskStatus $taskMessage $taskEndTime -}}
@@ -580,7 +612,7 @@ spec:
     {{- $taskMessage := upgradeResultWithTaskMessage $message -}}
     {{- $taskName := upgradeResultWithTaskName "upgrade-cstor-volume-082-090-post-check-target-svc" -}}
     {{- $URName := upgradeResultWithTaskOwnerName .UpgradeItem.upgradeResultName -}}
-    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace "default" -}}
+    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace .UpgradeItem.upgradeResultNamespace -}}
     {{- $taskStartTime := upgradeResultWithTaskStartTime now -}}
     {{- $taskEndTime := upgradeResultWithTaskEndTime now -}}
     {{- upgradeResultUpdateTasks $taskStartTime $URName $URNamespace $taskName $taskStatus $taskMessage $taskEndTime -}}
@@ -616,7 +648,7 @@ spec:
     {{- $taskMessage := upgradeResultWithTaskMessage $message -}}
     {{- $taskName := upgradeResultWithTaskName "upgrade-cstor-volume-082-090-patch-cstor-volume" -}}
     {{- $URName := upgradeResultWithTaskOwnerName .UpgradeItem.upgradeResultName -}}
-    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace "default" -}}
+    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace .UpgradeItem.upgradeResultNamespace -}}
     {{- $taskStartTime := upgradeResultWithTaskStartTime now -}}
     {{- $taskEndTime := upgradeResultWithTaskEndTime now -}}
     {{- upgradeResultUpdateTasks $taskStartTime $URName $URNamespace $taskName $taskStatus $taskMessage $taskEndTime -}}
@@ -651,7 +683,7 @@ spec:
     {{- $taskMessage := upgradeResultWithTaskMessage $message -}}
     {{- $taskName := upgradeResultWithTaskName "upgrade-cstor-volume-082-090-post-check-cstor-volume-cr" -}}
     {{- $URName := upgradeResultWithTaskOwnerName .UpgradeItem.upgradeResultName -}}
-    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace "default" -}}
+    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace .UpgradeItem.upgradeResultNamespace -}}
     {{- $taskStartTime := upgradeResultWithTaskStartTime now -}}
     {{- $taskEndTime := upgradeResultWithTaskEndTime now -}}
     {{- upgradeResultUpdateTasks $taskStartTime $URName $URNamespace $taskName $taskStatus $taskMessage $taskEndTime -}}
@@ -690,7 +722,7 @@ spec:
     {{- $taskMessage := upgradeResultWithTaskMessage $message -}}
     {{- $taskName := upgradeResultWithTaskName "upgrade-cstor-volume-082-090-patch-cstor-volume-replica" -}}
     {{- $URName := upgradeResultWithTaskOwnerName .UpgradeItem.upgradeResultName -}}
-    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace "default" -}}
+    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace .UpgradeItem.upgradeResultNamespace -}}
     {{- $taskStartTime := upgradeResultWithTaskStartTime now -}}
     {{- $taskEndTime := upgradeResultWithTaskEndTime now -}}
     {{- upgradeResultUpdateTasks $taskStartTime $URName $URNamespace $taskName $taskStatus $taskMessage $taskEndTime -}}
@@ -716,22 +748,27 @@ spec:
      
     {{- $message := printf "CVRs {%s} version got successfully updated" .TaskResult.listCStorVolumeReplica.items -}}
     {{- $status :="" }}
-    {{- if contains "0.8.2" .TaskResult.postCheckCStorVolumeReplica.version }}
+    {{- $verifyErrMessage := "cStor volume replica(s) version is not 0.9.0" -}}
+    {{- $errorMessage := printf "CVRs {%s} version update failed" .TaskResult.listCStorVolumeReplica.items -}}
+
+    {{- if contains .Config.baseVersion.value .TaskResult.postCheckCStorVolumeReplica.version }}
     {{- $status =.Config.failStatus.value }}
+    {{- $message = $errorMessage -}}
     {{- else }}
     {{- $status =.Config.successStatus.value }}
-    {{- $message = printf "CVRs {%s} version update failed" .TaskResult.listCStorVolumeReplica.items -}}
     {{- end }}
+
     {{- $taskStatus := upgradeResultWithTaskStatus $status -}}
     {{- $taskMessage := upgradeResultWithTaskMessage $message -}}
     {{- $taskName := upgradeResultWithTaskName "upgrade-cstor-volume-082-090-post-check-cstor-volume-replicas" -}}
     {{- $URName := upgradeResultWithTaskOwnerName .UpgradeItem.upgradeResultName -}}
-    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace "default" -}}
+    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace .UpgradeItem.upgradeResultNamespace -}}
     {{- $taskStartTime := upgradeResultWithTaskStartTime now -}}
     {{- $taskEndTime := upgradeResultWithTaskEndTime now -}}
     {{- upgradeResultUpdateTasks $taskStartTime $URName $URNamespace $taskName $taskStatus $taskMessage $taskEndTime -}}
+
     {{- if eq $status .Config.failStatus.value }}
-    {{- verifyErr "cStor volume replica(s) version is not 0.9.0" true | saveAs "postCheckCStorVolumeReplica.verifyErr" .TaskResult | noop -}} 
+    {{- verifyErr $verifyErrMessage true | saveAs "postCheckCStorVolumeReplica.verifyErr" .TaskResult | noop -}}
     {{- end }}
 ---
 # Runtask #16
@@ -747,11 +784,10 @@ spec:
     kind: ReplicaSet
     action: list
     runNamespace: {{ .UpgradeItem.namespace }}
-    disable: false
     options: |-
       labelSelector: openebs.io/persistent-volume={{ .UpgradeItem.name }},app=cstor-volume-manager
   post: |
-    {{- $CustomJsonpath := printf "{range .items[?(@.metadata.ownerReferences[0].name== '%s')]}{@.metadata.name} {end}" .UpgradeItem.name -}}
+    {{- $CustomJsonpath := printf "{range .items[?(@.metadata.ownerReferences[0].name== '%s-target')]}{@.metadata.name} {end}" .UpgradeItem.name -}}
     {{- jsonpath .JsonResult $CustomJsonpath | trim | replace " " "," | saveAs "listReplicaSet.list" .TaskResult | noop -}}
 
     {{- $status := .Config.successStatus.value -}}
@@ -761,7 +797,7 @@ spec:
     {{- $taskMessage := upgradeResultWithTaskMessage $message -}}
     {{- $taskName := upgradeResultWithTaskName "upgrade-cstor-volume-082-090-list-target-replicaset" -}}
     {{- $URName := upgradeResultWithTaskOwnerName .UpgradeItem.upgradeResultName -}}
-    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace "default" -}}
+    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace .UpgradeItem.upgradeResultNamespace -}}
     {{- $taskStartTime := upgradeResultWithTaskStartTime now -}}
     {{- $taskEndTime := upgradeResultWithTaskEndTime now -}}
     {{- upgradeResultUpdateTasks $taskStartTime $URName $URNamespace $taskName $taskStatus $taskMessage $taskEndTime -}}
@@ -781,7 +817,6 @@ spec:
     runNamespace: {{ .UpgradeItem.namespace }}
     options: |-
       labelSelector: openebs.io/persistent-volume={{ .UpgradeItem.name }},app=cstor-volume-manager
-    disable: false
   post: |
     {{- $CustomJsonpath := printf "{range .items[?(@.metadata.ownerReferences[0].name== '%s')]}{@.metadata.name}{end}" .TaskResult.newReplicaset.name -}}
     {{- $podrsPairs := jsonpath .JsonResult "{range .items[*]}{@.metadata.name},{@.metadata.ownerReferences[0].name} {end}" | trim | default "" | splitList " " -}}
@@ -824,7 +859,7 @@ spec:
     {{- $taskMessage := upgradeResultWithTaskMessage $message -}}
     {{- $taskName := upgradeResultWithTaskName "upgrade-cstor-volume-082-090-list-target-pod" -}}
     {{- $URName := upgradeResultWithTaskOwnerName .UpgradeItem.upgradeResultName -}}
-    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace "default" -}}
+    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace .UpgradeItem.upgradeResultNamespace -}}
     {{- $taskStartTime := upgradeResultWithTaskStartTime now -}}
     {{- $taskEndTime := upgradeResultWithTaskEndTime now -}}
     {{- upgradeResultUpdateTasks $taskStartTime $URName $URNamespace $taskName $taskStatus $taskMessage $taskEndTime -}}
@@ -847,10 +882,11 @@ spec:
   post: |
     {{- $message := printf "stale replicaset {%s} successfully deleted in {%s} namespace." .TaskResult.listPod.staleReplicaset .UpgradeItem.namespace -}}
     
+    {{- $taskStatus := upgradeResultWithTaskStatus .Config.successStatus.value -}}
     {{- $taskMessage := upgradeResultWithTaskMessage $message -}}
-    {{- $taskName := upgradeResultWithTaskName upgrade-cstor-volume-082-090-delete-stale-replicaset-target" -}}
+    {{- $taskName := upgradeResultWithTaskName "upgrade-cstor-volume-082-090-delete-stale-replicaset-target" -}}
     {{- $URName := upgradeResultWithTaskOwnerName .UpgradeItem.upgradeResultName -}}
-    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace "default" -}}
+    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace .UpgradeItem.upgradeResultNamespace -}}
     {{- $taskStartTime := upgradeResultWithTaskStartTime now -}}
     {{- $taskEndTime := upgradeResultWithTaskEndTime now -}}
     {{- upgradeResultUpdateTasks $taskStartTime $URName $URNamespace $taskName $taskStatus $taskMessage $taskEndTime -}}
