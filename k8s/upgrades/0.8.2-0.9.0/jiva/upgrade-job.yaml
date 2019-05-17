@@ -1,0 +1,15 @@
+---
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  name: upgraderesults.openebs.io
+spec:
+  group: openebs.io
+  names:
+    kind: UpgradeResult
+    plural: upgraderesults
+    shortNames:
+    - uresult
+    singular: upgraderesult
+  scope: Namespaced
+  version: v1alpha1
