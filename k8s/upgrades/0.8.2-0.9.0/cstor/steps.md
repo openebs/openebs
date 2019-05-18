@@ -7,14 +7,14 @@
 
   - Apply cr.yaml which installs a custom resource definition for UpgradeResult custom reource. This custom resource is used to capture upgrade related information for success or failure case.
   - Apply rbac.yaml for permission stuff.
- 
+
 # Steps For OpenEBS cStor Volume Upgrade:
 
   - Apply cstor-pool-update-082-090.yaml
   - Open pool-upgrade-job.yaml and put the name of cstorpool resource which you want to upgrade. Some comments itself is written in the yaml for clarity.
   - After you are done editing pool-upgrade-job.yaml, save it and apply.
   - You can see logs for your upgrade in a pod which is launched by upgrade job. Do a `kubectl get pod` and hence use kubectl command to see the log of the upgrade job pod.
-  - You can also do a `kubectl get upgraderesult -o yaml` to see the status of upgrade of each item. 
+  - You can also do a `kubectl get upgraderesult -o yaml` to see the status of upgrade of each item.
 
 # Steps For OpenEBS cStor Volume Upgrade:
 
@@ -22,6 +22,6 @@
   - Open volume-upgrade-job.yaml and put the name of cstorvolume resource which you want to upgrade. Some comments itself is written in the yaml for clarity.
   - After you are done editing volume-upgrade-job.yaml, save it and apply.
   - You can see logs for your upgrade in a pod which is launched by upgrade job. Do a `kubectl get pod` and hence use kubectl command to see the log of the upgrade job pod.
-  - You can also do a `kubectl get upgraderesult -o yaml` to see the status of upgrade of each item. 
+  - You can also do a `kubectl get upgraderesult -o yaml` to see the status of upgrade of each item.
 
 
