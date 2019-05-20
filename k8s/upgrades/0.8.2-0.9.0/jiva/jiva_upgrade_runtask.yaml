@@ -69,7 +69,7 @@ spec:
     {{- $status := .Config.successStatus.value -}}
 
     {{- $URName := upgradeResultWithTaskOwnerName .UpgradeItem.upgradeResultName -}}
-    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace "default" -}}
+    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace .UpgradeItem.upgradeResultNamespace -}}
     {{- $taskName := upgradeResultWithTaskName "upgrade-jiva-volume-0.8.2-0.9.0-patch-upgrade-results" -}}
     {{- $taskStatus := upgradeResultWithTaskStatus $status -}}
     {{- $taskMessage := upgradeResultWithTaskMessage $message -}}
@@ -107,7 +107,7 @@ spec:
     {{- $status := .Config.successStatus.value -}}
 
     {{- $URName := upgradeResultWithTaskOwnerName .UpgradeItem.upgradeResultName -}}
-    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace "default" -}}
+    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace .UpgradeItem.upgradeResultNamespace -}}
     {{- $taskName := upgradeResultWithTaskName "upgrade-jiva-volume-0.8.2-0.9.0-get-volume-details" -}}
     {{- $taskStatus := upgradeResultWithTaskStatus $status -}}
     {{- $taskMessage := upgradeResultWithTaskMessage $message -}}
@@ -136,7 +136,7 @@ spec:
     {{- $status := .Config.successStatus.value -}}
 
     {{- $URName := upgradeResultWithTaskOwnerName .UpgradeItem.upgradeResultName -}}
-    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace "default" -}}
+    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace .UpgradeItem.upgradeResultNamespace -}}
     {{- $taskName := upgradeResultWithTaskName "upgrade-jiva-volume-0.8.2-0.9.0-get-sc-res-version" -}}
     {{- $taskStatus := upgradeResultWithTaskStatus $status -}}
     {{- $taskMessage := upgradeResultWithTaskMessage $message -}}
@@ -184,7 +184,7 @@ spec:
     {{- print $isVersionBase | toString | saveAs "listtargetdeployment.shouldPatchCtrlDeployment" .TaskResult -}}
 
     {{- $URName := upgradeResultWithTaskOwnerName .UpgradeItem.upgradeResultName -}}
-    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace "default" -}}
+    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace .UpgradeItem.upgradeResultNamespace -}}
     {{- $taskName := upgradeResultWithTaskName "upgrade-jiva-volume-0.8.2-0.9.0-get-list-ctrl-deployment" -}}
     {{- $taskStatus := upgradeResultWithTaskStatus $status -}}
     {{- $taskMessage := upgradeResultWithTaskMessage $message -}}
@@ -232,7 +232,7 @@ spec:
     {{- print $isVersionBase | saveAs "listreplicadeployment.shouldPatchRepDeployment" .TaskResult | noop -}}
 
     {{- $URName := upgradeResultWithTaskOwnerName .UpgradeItem.upgradeResultName -}}
-    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace "default" -}}
+    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace .UpgradeItem.upgradeResultNamespace -}}
     {{- $taskName := upgradeResultWithTaskName "upgrade-jiva-volume-0.8.2-0.9.0-get-list-rep-deployment" -}}
     {{- $taskStatus := upgradeResultWithTaskStatus $status -}}
     {{- $taskMessage := upgradeResultWithTaskMessage $message -}}
@@ -280,7 +280,7 @@ spec:
     {{- print $isVersionBase | saveAs "listtargetservice.shouldPatchCtrlSVC" .TaskResult | noop -}}
 
     {{- $URName := upgradeResultWithTaskOwnerName .UpgradeItem.upgradeResultName -}}
-    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace "default" -}}
+    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace .UpgradeItem.upgradeResultNamespace -}}
     {{- $taskName := upgradeResultWithTaskName "upgrade-jiva-volume-0.8.2-0.9.0-get-list-ctrl-svc" -}}
     {{- $taskStatus := upgradeResultWithTaskStatus $status -}}
     {{- $taskMessage := upgradeResultWithTaskMessage $message -}}
@@ -310,7 +310,7 @@ spec:
     {{- $status := .Config.successStatus.value -}}
 
     {{- $URName := upgradeResultWithTaskOwnerName .UpgradeItem.upgradeResultName -}}
-    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace "default" -}}
+    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace .UpgradeItem.upgradeResultNamespace -}}
     {{- $taskName := upgradeResultWithTaskName "upgrade-jiva-volume-0.8.2-0.9.0-get-list-ctrl-old-rs" -}}
     {{- $taskStatus := upgradeResultWithTaskStatus $status -}}
     {{- $taskMessage := upgradeResultWithTaskMessage $message -}}
@@ -340,7 +340,7 @@ spec:
     {{- $status := .Config.successStatus.value -}}
 
     {{- $URName := upgradeResultWithTaskOwnerName .UpgradeItem.upgradeResultName -}}
-    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace "default" -}}
+    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace .UpgradeItem.upgradeResultNamespace -}}
     {{- $taskName := upgradeResultWithTaskName "upgrade-jiva-volume-0.8.2-0.9.0-get-list-rep-old-rs" -}}
     {{- $taskStatus := upgradeResultWithTaskStatus $status -}}
     {{- $taskMessage := upgradeResultWithTaskMessage $message -}}
@@ -370,7 +370,7 @@ spec:
     {{- $status := .Config.successStatus.value -}}
 
     {{- $URName := upgradeResultWithTaskOwnerName .UpgradeItem.upgradeResultName -}}
-    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace "default" -}}
+    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace .UpgradeItem.upgradeResultNamespace -}}
     {{- $taskName := upgradeResultWithTaskName "upgrade-jiva-volume-0.8.2-0.9.0-get-list-rep-nodenames" -}}
     {{- $taskStatus := upgradeResultWithTaskStatus $status -}}
     {{- $taskMessage := upgradeResultWithTaskMessage $message -}}
@@ -418,7 +418,7 @@ spec:
     {{- $status := .Config.successStatus.value -}}
 
     {{- $URName := upgradeResultWithTaskOwnerName .UpgradeItem.upgradeResultName -}}
-    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace "default" -}}
+    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace .UpgradeItem.upgradeResultNamespace -}}
     {{- $taskName := upgradeResultWithTaskName "upgrade-jiva-volume-0.8.2-0.9.0-patch-ctrl-deployment-latest-version" -}}
     {{- $taskStatus := upgradeResultWithTaskStatus $status -}}
     {{- $taskMessage := upgradeResultWithTaskMessage $message -}}
@@ -446,7 +446,7 @@ spec:
     {{- $rolloutMessage := jsonpath .JsonResult "{.message}" | trim | saveAs "postcheckctrldeploymentstatuslatestversions.msg" .TaskResult -}}
 
     {{- $URName := upgradeResultWithTaskOwnerName .UpgradeItem.upgradeResultName -}}
-    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace "default" -}}
+    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace .UpgradeItem.upgradeResultNamespace -}}
     {{- $taskName := upgradeResultWithTaskName "upgrade-jiva-volume-0.8.2-0.9.0-post-check-ctrl-deployment-status-latest-version" -}}
     {{- $taskStartTime := upgradeResultWithTaskStartTime now -}}
     {{- $taskEndTime := upgradeResultWithTaskEndTime now -}}
@@ -487,7 +487,7 @@ spec:
     {{- $mayaVolExporterImage := jsonpath .JsonResult "{.spec.template.spec.containers[?(@.name=='maya-volume-exporter')].image}" | trim -}}
 
     {{- $URName := upgradeResultWithTaskOwnerName .UpgradeItem.upgradeResultName -}}
-    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace "default" -}}
+    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace .UpgradeItem.upgradeResultNamespace -}}
     {{- $taskName := upgradeResultWithTaskName "upgrade-jiva-volume-0.8.2-0.9.0-post-check-ctrl-deployment-image" -}}
     {{- $taskStartTime := upgradeResultWithTaskStartTime now -}}
     {{- $taskEndTime := upgradeResultWithTaskEndTime now -}}
@@ -570,7 +570,7 @@ spec:
     {{- $status := .Config.successStatus.value -}}
 
     {{- $URName := upgradeResultWithTaskOwnerName .UpgradeItem.upgradeResultName -}}
-    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace "default" -}}
+    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace .UpgradeItem.upgradeResultNamespace -}}
     {{- $taskName := upgradeResultWithTaskName "upgrade-jiva-volume-0.8.2-0.9.0-patch-rep-deployment-latest-version" -}}
     {{- $taskStatus := upgradeResultWithTaskStatus $status -}}
     {{- $taskMessage := upgradeResultWithTaskMessage $message -}}
@@ -597,7 +597,7 @@ spec:
     {{- $rolloutMessage := jsonpath .JsonResult "{.message}" | trim | saveAs "postcheckreplicadeploymentstatuslatestversions.msg" .TaskResult -}}
 
     {{- $URName := upgradeResultWithTaskOwnerName .UpgradeItem.upgradeResultName -}}
-    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace "default" -}}
+    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace .UpgradeItem.upgradeResultNamespace -}}
     {{- $taskName := upgradeResultWithTaskName "upgrade-jiva-volume-0.8.2-0.9.0-post-check-rep-deployment-status-latest-version" -}}
     {{- $taskStartTime := upgradeResultWithTaskStartTime now -}}
     {{- $taskEndTime := upgradeResultWithTaskEndTime now -}}
@@ -637,7 +637,7 @@ spec:
     {{- $jivaRepImage := jsonpath .JsonResult $CustomJsonPath | trim -}}
 
     {{- $URName := upgradeResultWithTaskOwnerName .UpgradeItem.upgradeResultName -}}
-    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace "default" -}}
+    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace .UpgradeItem.upgradeResultNamespace -}}
     {{- $taskName := upgradeResultWithTaskName "upgrade-jiva-volume-0.8.2-0.9.0-post-check-rep-deployment-image" -}}
     {{- $taskStartTime := upgradeResultWithTaskStartTime now -}}
     {{- $taskEndTime := upgradeResultWithTaskEndTime now -}}
@@ -689,7 +689,7 @@ spec:
     {{- $status := .Config.successStatus.value -}}
 
     {{- $URName := upgradeResultWithTaskOwnerName .UpgradeItem.upgradeResultName -}}
-    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace "default" -}}
+    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace .UpgradeItem.upgradeResultNamespace -}}
     {{- $taskName := upgradeResultWithTaskName "upgrade-jiva-volume-0.8.2-0.9.0-patch-ctrl-svc" -}}
     {{- $taskStatus := upgradeResultWithTaskStatus $status -}}
     {{- $taskMessage := upgradeResultWithTaskMessage $message -}}
@@ -716,7 +716,7 @@ spec:
     {{- $desiredAnnotation := printf "name: %s\nresourceVersion: %s\n" .TaskResult.getvoldetails.scName .TaskResult.getscdetails.scResVersion | saveAs "desAnnotation" .TaskResult | noop -}}
 
     {{- $URName := upgradeResultWithTaskOwnerName .UpgradeItem.upgradeResultName -}}
-    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace "default" -}}
+    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace .UpgradeItem.upgradeResultNamespace -}}
     {{- $taskName := upgradeResultWithTaskName "upgrade-jiva-volume-0.8.2-0.9.0-post-check-rep-deployment-image" -}}
     {{- $taskStartTime := upgradeResultWithTaskStartTime now -}}
     {{- $taskEndTime := upgradeResultWithTaskEndTime now -}}
@@ -766,7 +766,7 @@ spec:
     {{- $status := .Config.successStatus.value -}}
 
     {{- $URName := upgradeResultWithTaskOwnerName .UpgradeItem.upgradeResultName -}}
-    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace "default" -}}
+    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace .UpgradeItem.upgradeResultNamespace -}}
     {{- $taskName := upgradeResultWithTaskName "upgrade-jiva-volume-0.8.2-0.9.0-delete-old-ctrl-rs" -}}
     {{- $taskStatus := upgradeResultWithTaskStatus $status -}}
     {{- $taskMessage := upgradeResultWithTaskMessage $message -}}
@@ -799,7 +799,7 @@ spec:
     {{- $status := .Config.successStatus.value -}}
 
     {{- $URName := upgradeResultWithTaskOwnerName .UpgradeItem.upgradeResultName -}}
-    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace "default" -}}
+    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace .UpgradeItem.upgradeResultNamespace -}}
     {{- $taskName := upgradeResultWithTaskName "upgrade-jiva-volume-0.8.2-0.9.0-delete-old-rep-rs" -}}
     {{- $taskStatus := upgradeResultWithTaskStatus $status -}}
     {{- $taskMessage := upgradeResultWithTaskMessage $message -}}
