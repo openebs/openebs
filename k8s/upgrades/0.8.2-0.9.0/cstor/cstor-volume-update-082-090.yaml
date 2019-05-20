@@ -9,14 +9,14 @@ metadata:
 spec:
   defaultConfig:
   # Base version is the version from which upgrade can happen.
-  # This CAS template is does not support  upgrade of OpenEBS version 
+  # This CAS template is does not support  upgrade of OpenEBS version
   # whose version is anything other that specified base version
   # Using this CAS templates, once can upgrade from OpenEBS version
   # 0.8.2 to 0.9.0 only.
   - name: baseVersion
     value: "0.8.2"
   - name: targetVersion
-    value: "0.9.0-RC1"
+    value: "0.9.0-RC3"
   - name: successStatus
     value: "Success"
   - name: failStatus
@@ -27,102 +27,102 @@ spec:
      # This runatask will patch the upgraderesults cr with the pv detail which
      # is undergoing upgrade.
      - upgrade-cstor-volume-082-090-patch-upgrade-result
-     
+
      # Runtask #2
-     # This runtask will get the details of pv and verify it.  
+     # This runtask will get the details of pv and verify it.
      - upgrade-cstor-volume-082-090-get-pv
-     
+
      # Runtask #3
-     # This runtask will get the details cStor target deployment and verify its current version 
-     # is in expected base version. 
+     # This runtask will get the details cStor target deployment and verify its current version
+     # is in expected base version.
      # For every cStor volume there exists only one target deployment and this runtask
      # is developed on the same assumption
      - upgrade-cstor-volume-082-090-list-target-deployment
 
      # Runtask #4
-     # This runtask will get the details cStor target service and verify its current version 
-     # is in expected base version. 
+     # This runtask will get the details cStor target service and verify its current version
+     # is in expected base version.
      # For every cStor volume there exists only one target service and this runtask
      # is developed on the same assumption
      - upgrade-cstor-volume-082-090-list-target-svc
 
      # Runtask #5
-     # This runtask will get the details cstorvolume custom resource and verify its current version 
-     # is in expected base version. 
+     # This runtask will get the details cstorvolume custom resource and verify its current version
+     # is in expected base version.
      # For every cStor volume there exists only one cstorvolume custom resource and this runtask
      # is developed on the same assumption
      - upgrade-cstor-volume-082-090-list-cstorvolume
 
      # Runtask #6
-     # This runtask will get the details cstorvolumereplica custom resource and verify its current version 
-     # is in expected base version. 
+     # This runtask will get the details cstorvolumereplica custom resource and verify its current version
+     # is in expected base version.
      # This runtask also decides whether the volume is a cloned volume or not. This information
      # is saved in a task result variable to be used later by other runtasks.
      - upgrade-cstor-volume-082-090-list-cstorvolumereplicas
 
      # Runtask #7
-     # This runtask will patch the cStor target deployment containers with the 
-     # target version. 
+     # This runtask will patch the cStor target deployment containers with the
+     # target version.
      - upgrade-cstor-volume-082-090-patch-target-deployment-latest-image
 
      # Runtask #8
-     # This runtask will verify that the cStor target deployment containers after 
-     # the patch has been rolled out successfully.   
+     # This runtask will verify that the cStor target deployment containers after
+     # the patch has been rolled out successfully.
      - upgrade-cstor-volume-082-090-post-check-deployment-rollout-status-latest-image
 
      # Runtask #9
-     # This runtask will verify that the cStor target deployment containers 
+     # This runtask will verify that the cStor target deployment containers
      # that are running successfully has the appropriate target version.
      - upgrade-cstor-volume-082-090-post-check-patch-deployment-image
 
      # Runtask #10
      # This runtask will patch the cStor target service
-     # with the version label of target version. 
-     # It also patches with PVC label. 
+     # with the version label of target version.
+     # It also patches with PVC label.
      - upgrade-cstor-volume-082-090-patch-target-svc
 
      # Runtask #11
      # This runtask will check that the version labels has been
-     # successfully updated for cstor target service. 
+     # successfully updated for cstor target service.
      - upgrade-cstor-volume-082-090-post-check-target-svc
 
      # Runtask #12
      # This runtask will patch the cstorvolume resource
      # with the version label of target version.
-     # This runtask will also add source volume label to 
+     # This runtask will also add source volume label to
      # cstorvolume custom resource if the volume is a cloned
      # volume.
      - upgrade-cstor-volume-082-090-patch-cstor-volume
 
      # Runtask #13
      # This runtask will check that the version labels has been
-     # successfully updated for cstorvolume.    
+     # successfully updated for cstorvolume.
      - upgrade-cstor-volume-082-090-post-check-cstor-volume-cr
 
      # Runtask #14
      # This runtask will patch the CVRs ( i.e. cstorvolumereplicas of the volume)
-     # with the version label of target version.  
+     # with the version label of target version.
      - upgrade-cstor-volume-082-090-patch-cstor-volume-replica
 
      # Runtask #15
      # This runtask will check that the version labels has been
-     # successfully updated for the CVRs.  
+     # successfully updated for the CVRs.
      - upgrade-cstor-volume-082-090-post-check-cstor-volume-replicas
 
      # Runtask #16
      # This runtask will list all the replicaset of the cstor
-     # target deployment  
+     # target deployment
      - upgrade-cstor-volume-082-090-list-target-replicaset
 
      # Runtask #17
      # This runtask will list the current running pod of the cStor
-     # target deployment and help figure out the stale replicaset 
-     # entries of the cstor target deployment.   
+     # target deployment and help figure out the stale replicaset
+     # entries of the cstor target deployment.
      - upgrade-cstor-volume-082-090-list-target-pod
 
      # Runtask #18
-     # This runtask will delete the stale cStor target deployment.  
-     - upgrade-cstor-volume-082-090-delete-stale-replicaset-target 
+     # This runtask will delete the stale cStor target deployment.
+     - upgrade-cstor-volume-082-090-delete-stale-replicaset-target
   taskNamespace: default
 ---
 # Runtask #1
@@ -429,13 +429,13 @@ spec:
       metadata:
         labels:
           openebs.io/version: {{ .Config.targetVersion.value}}
-      spec: 
-        template: 
+      spec:
+        template:
           metadata:
-            labels: 
+            labels:
               openebs.io/version: {{ .Config.targetVersion.value }}
-          spec: 
-            containers: 
+          spec:
+            containers:
             - name: cstor-istgt
               image: quay.io/openebs/cstor-istgt:{{ .Config.targetVersion.value}}
             - name: maya-volume-exporter
@@ -566,11 +566,11 @@ spec:
     pspec: |-
       metadata:
         labels:
-          openebs.io/persistent-volume-claim: {{ .TaskResult.listTargetDeployment.pvcName }} 
+          openebs.io/persistent-volume-claim: {{ .TaskResult.listTargetDeployment.pvcName }}
           openebs.io/version: {{ .Config.targetVersion.value }}
   post: |-
     {{- $message := printf "version label successfully patched for target service {%s}." .TaskResult.listTargetService.items -}}
-    
+
     {{- $status := .Config.successStatus.value -}}
     {{- $taskStatus := upgradeResultWithTaskStatus $status -}}
     {{- $taskMessage := upgradeResultWithTaskMessage $message -}}
@@ -599,7 +599,7 @@ spec:
   post: |
     {{- jsonpath .JsonResult "{.metadata.labels.openebs\\.io/version}" | trim | saveAs "postCheckTargetSVC.version" .TaskResult | noop -}}
 
-  
+
     {{- $status := "" -}}
     {{- if ne .TaskResult.postCheckTargetSVC.version .Config.targetVersion.value }}
     {{- $status = .Config.failStatus.value -}}
@@ -607,7 +607,7 @@ spec:
     {{- $status = .Config.successStatus.value -}}
     {{- end }}
     {{- $message := printf "version label value for target service- {%s}" .TaskResult.postCheckTargetSVC.version -}}
-    
+
     {{- $taskStatus := upgradeResultWithTaskStatus $status -}}
     {{- $taskMessage := upgradeResultWithTaskMessage $message -}}
     {{- $taskName := upgradeResultWithTaskName "upgrade-cstor-volume-082-090-post-check-target-svc" -}}
@@ -642,7 +642,7 @@ spec:
           openebs.io/version: {{ .Config.targetVersion.value }}
   post: |
     {{- $message := printf "version label successfully patched for cstor volume  {%s}." .TaskResult.listCStorVolume.items -}}
-    
+
     {{- $status := .Config.successStatus.value -}}
     {{- $taskStatus := upgradeResultWithTaskStatus $status -}}
     {{- $taskMessage := upgradeResultWithTaskMessage $message -}}
@@ -678,7 +678,7 @@ spec:
     {{- $status = .Config.successStatus.value -}}
     {{- end }}
     {{- $message := printf "version label value for target service- {%s}" .TaskResult.postCheckCStorVolume.version -}}
-    
+
     {{- $taskStatus := upgradeResultWithTaskStatus $status -}}
     {{- $taskMessage := upgradeResultWithTaskMessage $message -}}
     {{- $taskName := upgradeResultWithTaskName "upgrade-cstor-volume-082-090-post-check-cstor-volume-cr" -}}
@@ -711,12 +711,12 @@ spec:
     type: merge
     pspec: |-
       metadata:
-        labels: 
+        labels:
           openebs.io/version: {{ .Config.targetVersion.value }}
   post: |
-    
+
     {{- $message := printf "successfully patched cStor volume replicas  {%s}." .TaskResult.listCStorVolumeReplica.items -}}
-    
+
     {{- $status := .Config.successStatus.value -}}
     {{- $taskStatus := upgradeResultWithTaskStatus $status -}}
     {{- $taskMessage := upgradeResultWithTaskMessage $message -}}
@@ -745,7 +745,7 @@ spec:
       labelSelector: openebs.io/persistent-volume={{ .UpgradeItem.name }}
   post: |
     {{- jsonpath .JsonResult "{.items[*].metadata.labels.openebs\\.io/version}" | trim | saveAs "postCheckCStorVolumeReplica.version" .TaskResult | noop -}}
-     
+
     {{- $message := printf "CVRs {%s} version got successfully updated" .TaskResult.listCStorVolumeReplica.items -}}
     {{- $status :="" }}
     {{- $verifyErrMessage := "cStor volume replica(s) version is not 0.9.0" -}}
@@ -792,7 +792,7 @@ spec:
 
     {{- $status := .Config.successStatus.value -}}
     {{- $message := printf "ReplicaSet list {%s}" .TaskResult.listReplicaSet.list -}}
-    
+
     {{- $taskStatus := upgradeResultWithTaskStatus $status -}}
     {{- $taskMessage := upgradeResultWithTaskMessage $message -}}
     {{- $taskName := upgradeResultWithTaskName "upgrade-cstor-volume-082-090-list-target-replicaset" -}}
@@ -854,7 +854,7 @@ spec:
     {{- $staleReplicaset | saveAs "listPod.staleReplicaset" .TaskResult -}}
 
     {{- $message := printf "pool Pod-ReplicaSet map: {%s}\nstale ReplicaSet list: {%s}" .TaskResult.listPod.map .TaskResult.listPod.staleReplicaset -}}
-    
+
     {{- $taskStatus := upgradeResultWithTaskStatus $status -}}
     {{- $taskMessage := upgradeResultWithTaskMessage $message -}}
     {{- $taskName := upgradeResultWithTaskName "upgrade-cstor-volume-082-090-list-target-pod" -}}
@@ -881,7 +881,7 @@ spec:
     disable: {{ eq .TaskResult.listPod.staleReplicaset "" }}
   post: |
     {{- $message := printf "stale replicaset {%s} successfully deleted in {%s} namespace." .TaskResult.listPod.staleReplicaset .UpgradeItem.namespace -}}
-    
+
     {{- $taskStatus := upgradeResultWithTaskStatus .Config.successStatus.value -}}
     {{- $taskMessage := upgradeResultWithTaskMessage $message -}}
     {{- $taskName := upgradeResultWithTaskName "upgrade-cstor-volume-082-090-delete-stale-replicaset-target" -}}

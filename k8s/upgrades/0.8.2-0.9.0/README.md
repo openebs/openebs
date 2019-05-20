@@ -91,9 +91,9 @@ Limitations:
 If your `pwd` is openebs/k8s/upgrades/0.8.2-0.9.0/
 
 # Steps Before Upgrade:
+  - Apply rbac.yaml to manage permission rules `kubectl apply -f rbac.yaml` .
   - cd jiva
   - Apply cr.yaml which installs a custom resource definition for UpgradeResult custom reource. This custom resource is used to capture upgrade related information for success or failure case.
-  - Apply rbac.yaml for permission stuff.
 
 # Steps For OpenEBS jiva Volume Upgrade:
 
@@ -109,9 +109,9 @@ If your `pwd` is openebs/k8s/upgrades/0.8.2-0.9.0/
 
 # Steps Before Upgrade:
 
+  - Apply rbac.yaml to manage permission rules `kubectl apply -f rbac.yaml` .
   - cd cstor
   - Apply cr.yaml which installs a custom resource definition for UpgradeResult custom reource. This custom resource is used to capture upgrade related information for success or failure case.
-  - Apply rbac.yaml for permission stuff.
 
 # Steps For OpenEBS cStor Volume Upgrade:
 
