@@ -76,7 +76,7 @@ Even after the OpenEBS Operator has been upgraded to 0.9.0, the cStor Storage Po
 Limitations:
 - this is a preliminary jobs(will be done via CASTemplate) only intended for using on volumes where data has been backed-up.
 - please have the following link handy in case the volume gets into read-only during upgrade
-  https://docs.openebs.io/docs/next/readonlyvolumes.html
+  https://docs.openebs.io/docs/next/troubleshooting.html#recovery-readonly-when-kubelet-is-container
 - automatic rollback option is not provided. To rollback, you need to update the controller, exporter and replica pod images to the previous version
 - in the process of running the below steps, if you run into issues, you can always reach us on slack
 
