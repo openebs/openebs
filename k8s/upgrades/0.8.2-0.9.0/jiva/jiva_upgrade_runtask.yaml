@@ -16,7 +16,7 @@ spec:
   - name: baseVersion
     value: "0.8.2"
   - name: targetVersion
-    value: "v0.9.x-ci"
+    value: "0.9.0-RC3"
   - name: successStatus
     value: "Success"
   - name: failStatus
