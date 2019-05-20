@@ -174,7 +174,7 @@ spec:
     objectName: {{ .UpgradeItem.name }}
     runNamespace: {{ .UpgradeItem.namespace }}
   post: |
-    {{- jsonpath .JsonResult "{.metadata.annotations.openebs\\.io/cas-type}" | trim | saveAs "getPVDetails.volCASType" .TaskResult | noop -}}
+    {{- jsonpath .JsonResult "{.metadata.labels.openebs\\.io/cas-type}" | trim | saveAs "getPVDetails.volCASType" .TaskResult | noop -}}
     {{- .TaskResult.getPVDetails.volCASType | notFoundErr "volume CAS type not found" | saveIf "getPVDetails.notFoundErr" .TaskResult | noop -}}
 
     {{- jsonpath .JsonResult "{.spec.storageClassName}" | trim | saveAs "getPVDetails.storageClassName" .TaskResult | noop -}}
