@@ -513,7 +513,7 @@ spec:
     action: rolloutstatus
     objectName: {{ .TaskResult.listTargetDeployment.deploymentName }}
     runNamespace: {{ .UpgradeItem.namespace }}
-    retry: "25,4s"
+    retry: "20,2s"
   post: |
     {{- $rolledOut := jsonpath .JsonResult "{.isRolledout}" | trim | saveAs "postCheckCtrlDeploymentStatusLatestVersion.rolledOutStatus" .TaskResult -}}
     {{- $rolloutMessage := jsonpath .JsonResult "{.message}" | trim | saveAs "postCheckCtrlDeploymentStatusLatestVersion.msg" .TaskResult -}}
@@ -533,6 +533,7 @@ spec:
     {{- else }}
     {{- $status = .Config.failStatus.value -}}
     {{- $message = printf "target deployment: {%s} rollout status: failed" .TaskResult.listTargetDeployment.deploymentName -}}
+    {{- "waiting for target deployment rollout" | saveAs "postCheckCtrlDeploymentStatusLatestVersion.verifyErr" .TaskResult | noop -}}
     {{- end }}
 
     {{- $taskStatus := upgradeResultWithTaskStatus $status -}}
