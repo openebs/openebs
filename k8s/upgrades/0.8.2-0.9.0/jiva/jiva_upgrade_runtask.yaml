@@ -803,7 +803,7 @@ spec:
 
     {{- $URName := upgradeResultWithTaskOwnerName .UpgradeItem.upgradeResultName -}}
     {{- $URNamespace := upgradeResultWithTaskOwnerNamespace .UpgradeItem.upgradeResultNamespace -}}
-    {{- $taskName := upgradeResultWithTaskName "upgrade-jiva-volume-0.8.2-0.9.0-post-check-rep-deployment-image" -}}
+    {{- $taskName := upgradeResultWithTaskName "upgrade-jiva-volume-0.8.2-0.9.0-post-check-ctrl-svc" -}}
     {{- $taskStartTime := upgradeResultWithTaskStartTime now -}}
     {{- $taskEndTime := upgradeResultWithTaskEndTime now -}}
     {{- $status := "" -}}
