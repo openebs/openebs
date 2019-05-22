@@ -80,20 +80,20 @@ Limitations:
 - in the process of running the below steps, if you run into issues, you can always reach us on slack
 
 
-# OpenEBS Upgrade Via CAS Templates From 0.8.2 to 0.9.0
+# OpenEBS upgrade via CASTemplates from 0.8.2 to 0.9.0
 **NOTE: Upgrade via these CAS Templates is ony supported for OpenEBS in version 0.8.2. Trying to upgrade a OpenEBS version other than 0.8.2 to 0.9.0 using these CAS templates can result in undesired behaviours. If you are having any OpenEBS version lower than 0.8.2, first upgrade it ot 0.8.2 and then these CAS templates can be used safely for 0.9.0 upgrade.**
 
-## Upgrade the Jiva based OpenEBS PV
+## Upgrade Jiva based volumes
 
 Make sure your current directory is openebs/k8s/upgrades/0.8.2-0.9.0/
 
-### Steps Before Upgrade:
+### Steps before upgrade:
   - Make sure that all pods related to volume are in running state.
   - Apply rbac.yaml to manage permission rules `kubectl apply -f rbac.yaml`
   - cd jiva
   - Apply cr.yaml which installs a custom resource definition for UpgradeResult custom reource. This custom resource is used to capture upgrade related information for success or failure case.
 
-### Steps For OpenEBS jiva Volume Upgrade:
+### Steps For Jiva volume upgrade:
 
   - Apply jiva_upgrade_runtask.yaml using `kubectl apply`
   - Edit volume-upgrade-job.yaml and add the PV names which need to be upgraded.
@@ -101,17 +101,17 @@ Make sure your current directory is openebs/k8s/upgrades/0.8.2-0.9.0/
   - Logs can be seen from the pod which is launched by upgrade job. Do a `kubectl get pod` to find the upgrade job pod and `kubectl logs` command to see the logs.
   - `kubectl get upgraderesult -o yaml` can be done to check the status of upgrade of each item.
 
-## Upgrade cStor Pools
+## Upgrade cStor based volumes
 
 Make sure your current directory is openebs/k8s/upgrades/0.8.2-0.9.0/
 
-### Steps Before Upgrade:
+### Steps before upgrade:
   - Make sure that all pods related to pool and volume are in running state.
   - Apply rbac.yaml to manage permission rules `kubectl apply -f rbac.yaml`
   - cd cstor
   - Apply cr.yaml which installs a custom resource definition for UpgradeResult custom reource. This custom resource is used to capture upgrade related information for success or failure case.
 
-### Steps For OpenEBS cStor Pool Upgrade:
+### Steps For cStor pool upgrade:
 
   - Apply cstor-pool-update-082-090.yaml
   - Edit pool-upgrade-job.yaml and add the cstorpool resource names which need to be upgraded.
@@ -119,7 +119,7 @@ Make sure your current directory is openebs/k8s/upgrades/0.8.2-0.9.0/
   - Logs can be seen from the pod which is launched by upgrade job. Do a `kubectl get pod` to find the upgrade job pod and `kubectl logs` command to see the logs.
   - `kubectl get upgraderesult -o yaml` can be done to check the status of upgrade of each item.
 
-### Steps For OpenEBS cStor Volume Upgrade:
+### Steps For cStor volume upgrade:
 
   - Apply cstor-volume-update-082-090.yaml
   - Edit volume-upgrade-job.yaml and add the cstorvolume resource names which need to be upgraded.
@@ -130,4 +130,4 @@ Make sure your current directory is openebs/k8s/upgrades/0.8.2-0.9.0/
 ## Post upgrade steps:
 
   - Delete ServiceAccount, ClusterRole and ClusterRoleBindings that are created for upgrade using
-`kubectl delete -f rbac.yaml`
+`kubectl delete -f rbac.yaml` from openebs/k8s/upgrades/0.8.2-0.9.0/ directory.
