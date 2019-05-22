@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: upgrade-config
+  name: cstor-upgrade-config
   namespace: default
 data:
   upgrade: |
@@ -12,15 +12,15 @@ data:
 
       # Also, the name of cstorvolume custom resource and
       # pv is same. So one can enter the pv name also
-      # Command: kubectl get pv 
-    - name: pvc-273352ab-7881-11e9-a8d4-42010a80004f 
+      # Command: kubectl get pv
+    - name: pvc-273352ab-7881-11e9-a8d4-42010a80004f
       kind: cstor-volume
       namespace: openebs
 ---
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: volume-upgrade
+  name: cstor-volume-upgrade
 spec:
   template:
     spec:
@@ -45,5 +45,5 @@ spec:
       volumes:
       - name: config
         configMap:
-          name: upgrade-config
+          name: cstor-upgrade-config
       restartPolicy: Never

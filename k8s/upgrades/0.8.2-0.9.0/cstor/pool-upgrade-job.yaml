@@ -12,16 +12,16 @@ data:
     # You can choose to upgrade either one cStor pool
     # or more than 1
     resources:
-      # Put the name of cstor pool resource that you 
+      # Put the name of cstor pool resource that you
       # want to upgrade.
       # Command to view the cstorpool resource :
-      # `kubectl get csp` 
-    - name: cstor-sparse-pool-dwc3 
+      # `kubectl get csp`
+    - name: cstor-sparse-pool-dwc3
       kind: cStorPool
       namespace: openebs
       # Similiary, you can fill details below for other cstorpool
       # upgrades.
-      # If not required, delete it.     
+      # If not required, delete it.
     - name: cstor-sparse-pool-efx5
       kind: cStorPool
       namespace: openebs
@@ -33,14 +33,14 @@ data:
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: spc-cstor-sparse-pool-upgrade
+  name: spc-cstor-pool-upgrade
 spec:
   template:
     spec:
       serviceAccountName: super-admin
       containers:
       - name:  upgrade
-        image: openebs/m-upgrade:ci
+        image: openebs/m-upgrade:0.9.0-RC4
         volumeMounts:
         - name: config
           mountPath: /etc/config
