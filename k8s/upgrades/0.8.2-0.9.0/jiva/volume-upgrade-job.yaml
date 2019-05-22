@@ -8,7 +8,7 @@ data:
     casTemplate: jiva-volume-update-0.8.2-0.9.0
     # Enter the jiva volume name(pv name) and namespace to upgrade to 0.9.0
 
-    # Command to get volume name kubectl get pv and update the name and
+    # Command to get volume name: kubectl get pv and update the name and
     # namespace values
     resources:
     - name: pvc-3d290e5f-7ada-11e9-b8a5-54e1ad4a9dd4
