@@ -651,7 +651,7 @@ spec:
       metadata:
         labels:
           {{- if eq .TaskResult.listCStorVolumeReplica.isCloned "true" }}
-          openebs\.io/source-volume: {{ .TaskResult.listCStorVolumeReplica.sourceVolume }}
+          openebs.io/source-volume: {{ .TaskResult.listCStorVolumeReplica.sourceVolume }}
           {{- end }}
           openebs.io/version: {{ .Config.targetVersion.value }}
   post: |
