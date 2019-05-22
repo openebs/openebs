@@ -8,7 +8,7 @@
   - Apply cr.yaml which installs a custom resource definition for UpgradeResult custom reource. This custom resource is used to capture upgrade related information for success or failure case.
   - Apply rbac.yaml for permission stuff.
 
-# Steps For OpenEBS cStor Volume Upgrade:
+# Steps For OpenEBS cStor Pool Upgrade:
 
   - Apply cstor-pool-update-082-090.yaml
   - Open pool-upgrade-job.yaml and put the name of cstorpool resource which you want to upgrade. Some comments itself is written in the yaml for clarity.

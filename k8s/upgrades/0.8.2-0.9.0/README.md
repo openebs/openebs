@@ -91,6 +91,7 @@ Limitations:
 If your `pwd` is openebs/k8s/upgrades/0.8.2-0.9.0/
 
 # Steps Before Upgrade:
+  - Make sure that all volume related pods are in running state.
   - Apply rbac.yaml to manage permission rules `kubectl apply -f rbac.yaml` .
   - cd jiva
   - Apply cr.yaml which installs a custom resource definition for UpgradeResult custom reource. This custom resource is used to capture upgrade related information for success or failure case.
@@ -109,11 +110,12 @@ If your `pwd` is openebs/k8s/upgrades/0.8.2-0.9.0/
 
 # Steps Before Upgrade:
 
+  - Make sure that all pool & volume related pods are in running state.
   - Apply rbac.yaml to manage permission rules `kubectl apply -f rbac.yaml` .
   - cd cstor
   - Apply cr.yaml which installs a custom resource definition for UpgradeResult custom reource. This custom resource is used to capture upgrade related information for success or failure case.
 
-# Steps For OpenEBS cStor Volume Upgrade:
+# Steps For OpenEBS cStor Pool Upgrade:
 
   - Apply cstor-pool-update-082-090.yaml
   - Open pool-upgrade-job.yaml and put the name of cstorpool resource which you want to upgrade. Some comments itself is written in the yaml for clarity.
