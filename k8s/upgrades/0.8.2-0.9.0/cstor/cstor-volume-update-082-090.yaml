@@ -123,6 +123,18 @@ spec:
      # Runtask #18
      # This runtask will delete the stale cStor target deployment.
      - upgrade-cstor-volume-082-090-delete-stale-replicaset-target
+
+     # Runtask #19
+     # This runtask will list the snapshots related to this volume
+     - upgrade-cstor-volume-082-090-list-volumesnapshot
+
+     # Runtask #20
+     # This runtask will patched the snapshotdata with capacity
+     - upgrade-cstor-volume-082-090-patch-volumesnapshotdatadata
+
+     # Runtask #21
+     # This runtask will post check the patched snapshotdata
+     - upgrade-cstor-volume-082-090-post-check-volumesnapshotdata
   taskNamespace: default
 ---
 # Runtask #1
@@ -186,6 +198,8 @@ spec:
     {{- jsonpath .JsonResult "{.spec.claimRef.name}" | trim | saveAs "getPVDetails.pvcName" .TaskResult | noop -}}
     {{- .TaskResult.getPVDetails.pvcName | notFoundErr "pvc name not found for given volume" | saveIf "getPVDetails.notFoundErr" .TaskResult | noop -}}
 
+    {{- jsonpath .JsonResult "{.spec.capacity.storage}" | trim | saveAs "getVolDetails.pvCapacity" .TaskResult | noop -}}
+    {{- .TaskResult.getVolDetails.pvCapacity | notFoundErr "pv capacity not for given volume" | saveIf "getVolDetails.notFoundErr" .TaskResult | noop -}}
 
     {{- $message := printf "Successfully got details of PV {%s}." .UpgradeItem.name -}}
     {{- $status :=.Config.successStatus.value }}
@@ -891,3 +905,116 @@ spec:
     {{- $taskEndTime := upgradeResultWithTaskEndTime now -}}
     {{- upgradeResultUpdateTasks $taskStartTime $URName $URNamespace $taskName $taskStatus $taskMessage $taskEndTime -}}
 ---
+apiVersion: openebs.io/v1alpha1
+kind: RunTask
+metadata:
+  name: upgrade-cstor-volume-082-090-list-volumesnapshot
+  namespace: default
+spec:
+  meta: |
+    id: listVolumeSnapshotDetails
+    apiVersion: v1
+    kind: VolumeSnapshot
+    action: list
+    options: |-
+      labelSelector: SnapshotMetadata-PVName={{ .UpgradeItem.name }}
+  post: |
+    {{- jsonpath .JsonResult "{.items[*].spec.snapshotDataName}" | trim | saveAs "listVolumeSnapshotDetails.snapshotDataNames" .TaskResult | noop -}}
+
+    {{- .TaskResult.listVolumeSnapshotDetails.snapshotDataNames | toString | saveAs "listVolumeSnapshotDetails.volumeSnapshotData" .TaskResult | noop -}}
+    {{- if eq .TaskResult.listVolumeSnapshotDetails.volumeSnapshotData "" }}
+    {{- printf "false" | saveAs "listVolumeSnapshotDetails.isExist" .TaskResult }}
+    {{- else }}
+    {{- printf "true" | saveAs "listVolumeSnapshotDetails.isExist" .TaskResult }}
+    {{- end }}
+
+    {{- $message := printf "details of volumesnapshotdata {%s} for volume: {%s}" .TaskResult.listVolumeSnapshotDetails.snapshotDataNames .UpgradeItem.name -}}
+    {{- $status :=.Config.successStatus.value -}}
+
+    {{- $URName := upgradeResultWithTaskOwnerName .UpgradeItem.upgradeResultName -}}
+    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace .UpgradeItem.upgradeResultNamespace -}}
+    {{- $taskName := upgradeResultWithTaskName "upgrade-cstor-volume-082-090-list-volumesnapshot" -}}
+    {{- $taskStatus := upgradeResultWithTaskStatus $status -}}
+    {{- $taskMessage := upgradeResultWithTaskMessage $message -}}
+    {{- $taskStartTime := upgradeResultWithTaskStartTime now -}}
+    {{- $taskEndTime := upgradeResultWithTaskEndTime now -}}
+    {{- upgradeResultUpdateTasks $taskStartTime $URName $URNamespace $taskName $taskStatus $taskMessage $taskEndTime -}}
+---
+apiVersion: openebs.io/v1alpha1
+kind: RunTask
+metadata:
+  name: upgrade-cstor-volume-082-090-patch-volumesnapshotdatadata
+  namespace: default
+spec:
+  meta: |
+    {{- $snapshotDataList := .TaskResult.listVolumeSnapshotDetails.snapshotDataNames | default "" | splitList " " -}}
+    id: patchSnapData
+    apiVersion: v1
+    kind: VolumeSnapshotData
+    action: patch
+    disable: {{ eq .TaskResult.listVolumeSnapshotDetails.isExist "false" }}
+    repeatWith:
+      metas:
+      {{- range $k, $snapData := $snapshotDataList }}
+      - objectName: {{ $snapData }}
+      {{- end }}
+  task: |-
+    type: merge
+    pspec: |-
+      spec:
+        openebsVolume:
+          capacity: {{ .TaskResult.getVolDetails.pvCapacity }}
+  post: |
+    {{- $message := printf "volume snapshotdatas are patched with capacity: {%s}" .TaskResult.getVolDetails.pvCapacity -}}
+    {{- $status := .Config.successStatus.value -}}
+
+    {{- $URName := upgradeResultWithTaskOwnerName .UpgradeItem.upgradeResultName -}}
+    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace .UpgradeItem.upgradeResultNamespace -}}
+    {{- $taskName := upgradeResultWithTaskName "upgrade-cstor-volume-082-090-patch-volumesnapshotdatadata" -}}
+    {{- $taskStatus := upgradeResultWithTaskStatus $status -}}
+    {{- $taskMessage := upgradeResultWithTaskMessage $message -}}
+    {{- $taskStartTime := upgradeResultWithTaskStartTime now -}}
+    {{- $taskEndTime := upgradeResultWithTaskEndTime now -}}
+    {{- upgradeResultUpdateTasks $taskStartTime $URName $URNamespace $taskName $taskStatus $taskMessage $taskEndTime -}}
+---
+apiVersion: openebs.io/v1alpha1
+kind: RunTask
+metadata:
+  name: upgrade-cstor-volume-082-090-post-check-volumesnapshotdata
+  namespace: default
+spec:
+  meta: |
+    {{- $snapshotDataList := .TaskResult.listVolumeSnapshotDetails.snapshotDataNames | default "" | splitList " " -}}
+    id: getVolumeSnapshotDataDetails
+    apiVersion: v1
+    kind: VolumeSnapshotData
+    action: get
+    disable: {{ eq .TaskResult.listVolumeSnapshotDetails.isExist "false" }}
+    repeatWith:
+      metas:
+      {{- range $k, $snapData := $snapshotDataList }}
+      - objectName: {{ $snapData }}
+      {{- end }}
+  post: |
+    {{- jsonpath .JsonResult "{.spec.openebsVolume.capacity}" | trim | saveAs "getVolumeSnapshotDataDetails.capacity" .TaskResult | noop -}}
+
+    {{- $URName := upgradeResultWithTaskOwnerName .UpgradeItem.upgradeResultName -}}
+    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace .UpgradeItem.upgradeResultNamespace -}}
+    {{- $taskName := upgradeResultWithTaskName "upgrade-cstor-volume-082-090-post-check-volumesnapshotdata" -}}
+    {{- $taskStartTime := upgradeResultWithTaskStartTime now -}}
+    {{- $taskEndTime := upgradeResultWithTaskEndTime now -}}
+
+    {{- $status := "" -}}
+    {{- $message := "" -}}
+
+    {{- if eq .TaskResult.getVolumeSnapshotDataDetails.capacity .TaskResult.getVolDetails.pvCapacity }}
+    {{- $status = .Config.successStatus.value -}}
+    {{- $message = printf "patched volume snapshot data successfully" -}}
+    {{- else }}
+    {{- $status = .Config.failStatus.value -}}
+    {{- $message = printf "failed to patch volume snapshot data" -}}
+    {{- end }}
+
+    {{- $taskStatus := upgradeResultWithTaskStatus $status -}}
+    {{- $taskMessage := upgradeResultWithTaskMessage $message -}}
+    {{- upgradeResultUpdateTasks $taskStartTime $URName $URNamespace $taskName $taskStatus $taskMessage $taskEndTime -}}
