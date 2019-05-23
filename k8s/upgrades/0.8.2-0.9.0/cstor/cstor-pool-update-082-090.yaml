@@ -9,13 +9,13 @@ spec:
   - name: baseVersion
     value: "0.8.2"
   - name: targetVersion
-    value: "0.9.0-RC4"
+    value: "0.9.0"
   - name: cstorPoolImageTag
-    value: "0.9.0-RC4"
+    value: "0.9.0"
   - name: cstorPoolMgmtImageTag
-    value: "0.9.0-RC4"
+    value: "0.9.0"
   - name: mExporterImageTag
-    value: "0.9.0-RC4"
+    value: "0.9.0"
   - name: successStatus
     value: "Success"
   - name: failStatus
