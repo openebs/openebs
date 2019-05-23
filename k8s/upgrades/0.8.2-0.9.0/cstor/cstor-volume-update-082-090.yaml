@@ -39,6 +39,8 @@ spec:
      # is developed on the same assumption
      - upgrade-cstor-volume-082-090-list-target-deployment
 
+     - upgrade-cstor-volume-082-090-pre-check-target-pod-phase
+
      # Runtask #4
      # This runtask will get the details cStor target service and verify its current version
      # is in expected base version.
@@ -231,8 +233,11 @@ spec:
   post: |
     {{- jsonpath .JsonResult "{.items[*].metadata.name}" | trim | saveAs "listTargetDeployment.targetDeploymentName" .TaskResult | noop -}}
     {{- .TaskResult.listTargetDeployment.targetDeploymentName | notFoundErr "volume target deployment not found" | saveIf "listTargetDeployment.notFoundErr" .TaskResult | noop -}}
-    {{- jsonpath .JsonResult "{.items[0].metadata.labels.openebs\\.io/version}" | trim | saveAs "listTargetDeployment.labels" .TaskResult | noop -}}
-    {{- jsonpath .JsonResult "{.items[0].metadata.labels.openebs\\.io/persistent-volume-claim}" | trim | saveAs "listTargetDeployment.pvcName" .TaskResult | noop -}}
+    {{- jsonpath .JsonResult "{.items[*].metadata.labels.openebs\\.io/version}" | trim | saveAs "listTargetDeployment.labels" .TaskResult | noop -}}
+    {{- jsonpath .JsonResult "{.items[*].metadata.labels.openebs\\.io/persistent-volume-claim}" | trim | saveAs "listTargetDeployment.pvcName" .TaskResult | noop -}}
+
+    {{- jsonpath .JsonResult "{.items[*].spec.replicas}" | trim | saveAs "listTargetDeployment.replicaCount" .TaskResult | noop -}}
+    {{- .TaskResult.listTargetDeployment.replicaCount | notFoundErr "unknown no.of replicas in cstor-target deployment" | saveIf "listTargetDeployment.notFoundErr" .TaskResult | noop -}}
 
     {{- $message := printf "the target deployment for this PV {%s} is : {%s}" .UpgradeItem.name .TaskResult.listTargetDeployment.targetDeploymentName -}}
     {{- $status :="" }}
@@ -258,6 +263,45 @@ spec:
     {{- if eq $status .Config.failStatus.value }}
     {{- verifyErr $verifyErrMessage true | saveAs "listTargetDeployment.verifyErr" .TaskResult | noop -}}
     {{- end }}
+---
+apiVersion: openebs.io/v1alpha1
+kind: RunTask
+metadata:
+  name: upgrade-cstor-volume-082-090-pre-check-target-pod-phase
+  namespace: default
+spec:
+  meta: |
+    id: targetPodList
+    apiVersion: v1
+    kind: Pod
+    action: list
+    runNamespace: {{ .UpgradeItem.namespace }}
+    options: |-
+      labelSelector: openebs.io/persistent-volume={{ .UpgradeItem.name }},openebs.io/target=cstor-target
+  post: |
+    {{- $CustomJsonPath := printf "{.items[?(@.status.phase=='Running')].metadata.name}" -}}
+    {{- $ErrMsg := printf "target pod corresponding to volume: {%s} not in running phase" .UpgradeItem.name -}}
+
+    {{- jsonpath .JsonResult $CustomJsonPath | trim | saveAs "targetPodList.podName" .TaskResult | noop -}}
+    {{- .TaskResult.targetPodList.podName | notFoundErr $ErrMsg | saveIf "targetPodList.notFoundErr" .TaskResult | noop -}}
+
+    {{- .TaskResult.poolPodList.podName | default "" | splitList " " | len | saveAs "poolPodList.actualRunningPodCount" .TaskResult -}}
+
+    {{- $expectedPodCount := .TaskResult.poolDeployment.replicaCount | int -}}
+    {{- $msg := printf "expected %v no of running replica pod(s), found only %v replica pod(s)" $expectedPodCount .TaskResult.poolPodList.actualRunningPodCount -}}
+    {{- .TaskResult.poolPodList.podName | default "" | splitList " " | isLen $expectedPodCount | not | verifyErr $msg | saveIf "poolPodList.verifyErr" .TaskResult | noop -}}
+
+    {{- $message := printf "target pods are in running phase for volume: {%s}" .UpgradeItem.name -}}
+    {{- $status := .Config.successStatus.value -}}
+
+    {{- $URName := upgradeResultWithTaskOwnerName .UpgradeItem.upgradeResultName -}}
+    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace .UpgradeItem.upgradeResultNamespace -}}
+    {{- $taskName := upgradeResultWithTaskName "upgrade-cstor-pool-082-090-pre-check-pool-pod-phase" -}}
+    {{- $taskStatus := upgradeResultWithTaskStatus $status -}}
+    {{- $taskMessage := upgradeResultWithTaskMessage $message -}}
+    {{- $taskStartTime := upgradeResultWithTaskStartTime now -}}
+    {{- $taskEndTime := upgradeResultWithTaskEndTime now -}}
+    {{- upgradeResultUpdateTasks $taskStartTime $URName $URNamespace $taskName $taskStatus $taskMessage $taskEndTime -}}
 ---
 # Runtask #4
 apiVersion: openebs.io/v1alpha1

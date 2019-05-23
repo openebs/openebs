@@ -18,7 +18,7 @@ The upgrade of OpenEBS is a two step process:
 
 *All steps described in this document need to be performed on the Kubernetes master or from a machine that has access to Kubernetes master*
 
-### Download the upgrade scripts
+### Download the upgrade yamls
 
 The easiest way to get all the upgrade yamls is via git clone.
 
