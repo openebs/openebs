@@ -27,7 +27,7 @@ spec:
       serviceAccountName: super-admin
       containers:
       - name:  upgrade
-        image: openebs/m-upgrade:ci
+        image: openebs/m-upgrade:0.9.0
         imagePullPolicy: Always
         volumeMounts:
         - name: config
