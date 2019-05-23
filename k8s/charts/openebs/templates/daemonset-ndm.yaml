@@ -10,19 +10,20 @@ metadata:
     component: ndm
     openebs.io/component-name: ndm
 spec:
+  updateStrategy:
+    type: "RollingUpdate"
   selector:
     matchLabels:
       app: {{ template "openebs.name" . }}
       release: {{ .Release.Name }}
       component: ndm
-  updateStrategy:
-    type: "RollingUpdate"
   template:
     metadata:
       labels:
         app: {{ template "openebs.name" . }}
         release: {{ .Release.Name }}
         component: ndm
+        openebs.io/version: {{ .Values.release.version }}
     spec:
       serviceAccountName: {{ template "openebs.serviceAccountName" . }}
       hostNetwork: true
