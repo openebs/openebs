@@ -22,17 +22,21 @@ spec:
     value: "Fail"
   run:
     tasks:
-    # Runtask #1
     # upgrade-cstor-pool-082-090-get-cstorpool fetches the details of
     # CStorPool CR. These details are used in other runtask(s) later.
     # This should always run.
     - upgrade-cstor-pool-082-090-get-cstorpool
 
-    # Runtask #2
+    # This runtask gets the storagepoolclaim details
+    - upgrade-cstor-pool-082-090-get-storagepoolclaim
+
     # This runtask gets the cstorpool deployment and verifies it.
     - upgrade-cstor-pool-082-090-get-deployment
 
-    # Runtask #3
+    # This runtask checks whether the pool pod is in running state if not fails
+    # the upgrade
+    - upgrade-cstor-pool-082-090-pre-check-pool-pod-phase
+
     # This runtask gets the storagepool custom resource and verifies it.
     - upgrade-cstor-pool-082-090-get-storagepool
 
@@ -114,12 +118,17 @@ spec:
     objectName: {{ .UpgradeItem.name }}
   post: |
     {{- jsonpath .JsonResult "{.metadata.uid}" | trim | saveAs "CStorPool.uid" .TaskResult | noop -}}
+    {{- .TaskResult.CStorPool.uid | notFoundErr "csp uid not found" | saveIf "CStorPool.notFoundErr" .TaskResult | noop -}}
+
     {{- jsonpath .JsonResult "{.metadata.labels.openebs\\.io/version}" | trim | saveAs "CStorPool.version" .TaskResult | noop -}}
+
+    {{- jsonpath .JsonResult "{.metadata.labels.openebs\\.io/storage-pool-claim}" | trim | saveAs "CStorPool.spcName" .TaskResult | noop -}}
+    {{- .TaskResult.CStorPool.spcName | notFoundErr "spc name not found" | saveIf "CStorPool.notFoundErr" .TaskResult | noop -}}
 
     {{- $message :="" }}
     {{- $status :="" }}
-    {{- $successMessage := printf "Successfully got details of CStorPool {%s}." .UpgradeItem.name -}}
-    {{- $errMessageInvalidVersion := printf "CStorPool {%s}, version is not in {%s}." .UpgradeItem.name .Config.baseVersion.value -}}
+    {{- $successMessage := printf "Successfully got details of CStorPool {%s}" .UpgradeItem.name -}}
+    {{- $errMessageInvalidVersion := printf "CStorPool {%s}, version is not in {%s}" .UpgradeItem.name .Config.baseVersion.value -}}
 
     {{- $isBaseVersion := eq .TaskResult.CStorPool.version .Config.baseVersion.value }}
     {{- $isTargetVersion := eq .TaskResult.CStorPool.version .Config.targetVersion.value }}
@@ -145,6 +154,33 @@ spec:
     {{- verifyErr $errMessageInvalidVersion true | saveAs "CStorPool.verifyErr" .TaskResult | noop -}}
     {{- end }}
 ---
+apiVersion: openebs.io/v1alpha1
+kind: RunTask
+metadata:
+  name: upgrade-cstor-pool-082-090-get-storagepoolclaim
+  namespace: default
+spec:
+  meta: |
+    id: StoragePoolClaim
+    apiVersion: openebs.io/v1alpha1
+    kind: StoragePoolClaim
+    action: get
+    objectName: {{ .TaskResult.CStorPool.spcName }}
+  post: |
+    {{- jsonpath .JsonResult "{.metadata.uid}" | trim | saveAs "StoragePoolClaim.uid" .TaskResult | noop -}}
+    {{- .TaskResult.StoragePoolClaim.uid | notFoundErr "spc uid not found" | saveIf "StoragePoolClaim.notFoundErr" .TaskResult | noop -}}
+
+    {{- $status := .Config.successStatus.value }}
+    {{- $message := printf "Successfully got details of StoragePoolClaim {%s}" .TaskResult.CStorPool.spcName -}}
+    {{- $taskStatus := upgradeResultWithTaskStatus $status -}}
+    {{- $taskMessage := upgradeResultWithTaskMessage $message -}}
+    {{- $taskName := upgradeResultWithTaskName "upgrade-cstor-pool-082-090-get-storagepoolclaim" -}}
+    {{- $URName := upgradeResultWithTaskOwnerName .UpgradeItem.upgradeResultName -}}
+    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace .UpgradeItem.upgradeResultNamespace -}}
+    {{- $taskStartTime := upgradeResultWithTaskStartTime now -}}
+    {{- $taskEndTime := upgradeResultWithTaskEndTime now -}}
+    {{- upgradeResultUpdateTasks $taskStartTime $URName $URNamespace $taskName $taskStatus $taskMessage $taskEndTime -}}
+---
 # Runtask #2
 apiVersion: openebs.io/v1alpha1
 kind: RunTask
@@ -163,6 +199,9 @@ spec:
     {{- jsonpath .JsonResult "{.spec.template.spec.containers[?(@.name=='cstor-pool')].image}" | trim | saveAs "poolDeployment.cstorpoolimage" .TaskResult | noop -}}
     {{- jsonpath .JsonResult "{.spec.template.spec.containers[?(@.name=='cstor-pool-mgmt')].image}" | trim | saveAs "poolDeployment.cstorpoolmgmtimage" .TaskResult | noop -}}
     {{- jsonpath .JsonResult "{.metadata.labels.openebs\\.io/version}" | trim | saveAs "poolDeployment.version" .TaskResult | noop -}}
+
+    {{- jsonpath .JsonResult "{.spec.replicas}" | trim | saveAs "poolDeployment.replicaCount" .TaskResult | noop -}}
+    {{- .TaskResult.poolDeployment.replicaCount | notFoundErr "replicas not found for cstor target deployment" | saveIf "poolDeployment.notFoundErr" .TaskResult | noop -}}
 
     {{- $message :="" }}
     {{- $status :="" }}
@@ -193,6 +232,45 @@ spec:
     {{- verifyErr $errMessageInvalidVersion true | saveAs "poolDeployment.verifyErr" .TaskResult | noop -}}
     {{- end }}
 ---
+apiVersion: openebs.io/v1alpha1
+kind: RunTask
+metadata:
+  name: upgrade-cstor-pool-082-090-pre-check-pool-pod-phase
+  namespace: default
+spec:
+  meta: |
+    id: poolPodList
+    apiVersion: v1
+    kind: Pod
+    action: list
+    runNamespace: {{ .UpgradeItem.namespace }}
+    options: |-
+      labelSelector: app=cstor-pool,openebs.io/storage-pool-claim={{ .TaskResult.CStorPool.spcName }}
+  post: |
+    {{- $CustomJsonPath := printf "{.items[?(@.status.phase=='Running')].metadata.name}" -}}
+    {{- $ErrMsg := printf "No running pods found for csp {%s}" .UpgradeItem.name -}}
+
+    {{- jsonpath .JsonResult $CustomJsonPath | trim | saveAs "poolPodList.podName" .TaskResult | noop -}}
+    {{- .TaskResult.poolPodList.podName | notFoundErr $ErrMsg | saveIf "poolPodList.notFoundErr" .TaskResult | noop -}}
+
+    {{- .TaskResult.poolPodList.podName | default "" | splitList " " | len | saveAs "poolPodList.actualRunningPodCount" .TaskResult -}}
+
+    {{- $expectedPodCount := .TaskResult.poolDeployment.replicaCount | int -}}
+    {{- $msg := printf "expected %v no of running replica pod(s), found only %v replica pod(s)" $expectedPodCount .TaskResult.poolPodList.actualRunningPodCount -}}
+    {{- .TaskResult.poolPodList.podName | default "" | splitList " " | isLen $expectedPodCount | not | verifyErr $msg | saveIf "poolPodList.verifyErr" .TaskResult | noop -}}
+
+    {{- $message := printf "pool pods are in running phase for csp: {%s}" .UpgradeItem.name -}}
+    {{- $status := .Config.successStatus.value -}}
+
+    {{- $URName := upgradeResultWithTaskOwnerName .UpgradeItem.upgradeResultName -}}
+    {{- $URNamespace := upgradeResultWithTaskOwnerNamespace .UpgradeItem.upgradeResultNamespace -}}
+    {{- $taskName := upgradeResultWithTaskName "upgrade-cstor-pool-082-090-pre-check-pool-pod-phase" -}}
+    {{- $taskStatus := upgradeResultWithTaskStatus $status -}}
+    {{- $taskMessage := upgradeResultWithTaskMessage $message -}}
+    {{- $taskStartTime := upgradeResultWithTaskStartTime now -}}
+    {{- $taskEndTime := upgradeResultWithTaskEndTime now -}}
+    {{- upgradeResultUpdateTasks $taskStartTime $URName $URNamespace $taskName $taskStatus $taskMessage $taskEndTime -}}
+---
 # Runtask #3
 apiVersion: openebs.io/v1alpha1
 kind: RunTask
@@ -204,10 +282,14 @@ spec:
     id: StoragePool
     apiVersion: openebs.io/v1alpha1
     kind: StoragePool
-    action: get
-    objectName: {{ .UpgradeItem.name }}
+    action: list
+    options: |-
+      labelselector: openebs.io/cstor-pool={{ .UpgradeItem.name }},openebs.io/storage-pool-claim={{ .TaskResult.CStorPool.spcName }}
   post: |
-    {{- jsonpath .JsonResult "{.metadata.labels.openebs\\.io/version}" | trim | saveAs "StoragePool.labels" .TaskResult | noop -}}
+    {{- jsonpath .JsonResult "{.items[*].metadata.name}" | trim | saveAs "StoragePool.name" .TaskResult | noop -}}
+    {{- .TaskResult.StoragePool.name | notFoundErr "storagepool name not found" | saveIf "StoragePool.notFoundErr" .TaskResult | noop -}}
+
+    {{- jsonpath .JsonResult "{.items[*].metadata.labels.openebs\\.io/version}" | trim | saveAs "StoragePool.labels" .TaskResult | noop -}}
 
     {{- $message :="" }}
     {{- $status :="" }}
@@ -446,13 +528,20 @@ spec:
     apiVersion: openebs.io/v1alpha1
     kind: StoragePool
     action: patch
-    objectName: {{ .UpgradeItem.name }}
+    objectName: {{ .TaskResult.StoragePool.name }}
   task: |-
     type: merge
     pspec: |-
       metadata:
         labels:
           openebs.io/version: {{ .Config.targetVersion.value }}
+        ownerReferences:
+        - apiVersion: openebs.io/v1alpha1
+          blockOwnerDeletion: true
+          controller: true
+          kind: CStorPool
+          name: {{ .UpgradeItem.name }}
+          uid: {{ .TaskResult.CStorPool.uid }}
   post: |-
     {{- $message := printf "version label successfully patched StoragePool {%s}." .UpgradeItem.name -}}
 
@@ -479,7 +568,7 @@ spec:
     apiVersion: openebs.io/v1alpha1
     kind: StoragePool
     action: get
-    objectName: {{ .UpgradeItem.name }}
+    objectName: {{ .TaskResult.StoragePool.name }}
   post: |
     {{- jsonpath .JsonResult "{.metadata.labels.openebs\\.io/version}" | trim | saveAs "postCheckStoragePoolVersionPatch.version" .TaskResult | noop -}}
 
@@ -522,6 +611,13 @@ spec:
       metadata:
         labels:
           openebs.io/version: {{ .Config.targetVersion.value }}
+        ownerReferences:
+        - apiVersion: openebs.io/v1alpha1
+          blockOwnerDeletion: true
+          controller: true
+          kind: StoragePoolClaim
+          name: {{ .TaskResult.CStorPool.spcName }}
+          uid: {{ .TaskResult.StoragePoolClaim.uid }}
   post: |-
     {{- $message := printf "version label successfully patched CStorPool {%s}." .UpgradeItem.name -}}
 
@@ -593,6 +689,13 @@ spec:
       metadata:
         labels:
           openebs.io/version: {{ .Config.targetVersion.value }}
+        ownerReferences:
+        - apiVersion: openebs.io/v1alpha1
+          blockOwnerDeletion: true
+          controller: true
+          kind: CStorPool
+          name: {{ .UpgradeItem.name }}
+          uid: {{ .TaskResult.CStorPool.uid }}
   post: |-
     {{- $message := printf "version label successfully patched Pool Deployment {%s} in {%s} namespace." .UpgradeItem.name .UpgradeItem.namespace -}}
 
@@ -659,7 +762,7 @@ spec:
     action: list
     runNamespace: {{ .UpgradeItem.namespace }}
     options: |-
-      labelSelector: app=cstor-pool,openebs.io/storage-pool-claim=cstor-sparse-pool
+      labelSelector: app=cstor-pool,openebs.io/storage-pool-claim={{ .TaskResult.CStorPool.spcName }}
   post: |
     {{- $CustomJsonpath := printf "{range .items[?(@.metadata.ownerReferences[0].name== '%s')]}{@.metadata.name} {end}" .UpgradeItem.name -}}
     {{- jsonpath .JsonResult $CustomJsonpath | trim | replace " " "," | saveAs "replicaSetList.list" .TaskResult | noop -}}
@@ -690,7 +793,7 @@ spec:
     action: list
     runNamespace: {{ .UpgradeItem.namespace }}
     options: |-
-      labelSelector: app=cstor-pool,openebs.io/storage-pool-claim=cstor-sparse-pool
+      labelSelector: app=cstor-pool,openebs.io/storage-pool-claim={{ .TaskResult.CStorPool.spcName }}
   post: |
     {{- $CustomJsonpath := printf "{range .items[?(@.metadata.ownerReferences[0].name== '%s')]}{@.metadata.name}{end}" .TaskResult.newReplicaset.name -}}
     {{- $podrsPairs := jsonpath .JsonResult "{range .items[*]}{@.metadata.name},{@.metadata.ownerReferences[0].name} {end}" | trim | default "" | splitList " " -}}

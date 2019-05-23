@@ -18,7 +18,7 @@ The upgrade of OpenEBS is a two step process:
 
 *All steps described in this document need to be performed on the Kubernetes master or from a machine that has access to Kubernetes master*
 
-### Download the upgrade scripts
+### Download the upgrade yamls
 
 The easiest way to get all the upgrade yamls is via git clone.
 
@@ -107,6 +107,7 @@ Make sure your current directory is openebs/k8s/upgrades/0.8.2-0.9.0/
 
 ### Steps before upgrade:
   - Make sure that all pods related to pool and volume are in running state.
+  - If cstor volumes are resized manually then make sure that PV is patched with latest size.
   - Apply rbac.yaml to manage permission rules `kubectl apply -f rbac.yaml`
   - cd cstor
   - Apply cr.yaml which installs a custom resource definition for UpgradeResult custom reource. This custom resource is used to capture upgrade related information for success or failure case.
