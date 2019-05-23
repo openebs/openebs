@@ -237,7 +237,7 @@ spec:
     {{- jsonpath .JsonResult "{.items[*].metadata.labels.openebs\\.io/persistent-volume-claim}" | trim | saveAs "listTargetDeployment.pvcName" .TaskResult | noop -}}
 
     {{- jsonpath .JsonResult "{.items[*].spec.replicas}" | trim | saveAs "listTargetDeployment.replicaCount" .TaskResult | noop -}}
-    {{- .TaskResult.listTargetDeployment.replicaCount | notFoundErr "unknown no.of replicas in cstor-target deployment" | saveIf "listTargetDeployment.notFoundErr" .TaskResult | noop -}}
+    {{- .TaskResult.listTargetDeployment.replicaCount | notFoundErr "replicas not found for cstor target deployment" | saveIf "listTargetDeployment.notFoundErr" .TaskResult | noop -}}
 
     {{- $message := printf "the target deployment for this PV {%s} is : {%s}" .UpgradeItem.name .TaskResult.listTargetDeployment.targetDeploymentName -}}
     {{- $status :="" }}
@@ -280,7 +280,7 @@ spec:
       labelSelector: openebs.io/persistent-volume={{ .UpgradeItem.name }},openebs.io/target=cstor-target
   post: |
     {{- $CustomJsonPath := printf "{.items[?(@.status.phase=='Running')].metadata.name}" -}}
-    {{- $ErrMsg := printf "target pod corresponding to volume: {%s} not in running phase" .UpgradeItem.name -}}
+    {{- $ErrMsg := printf "No running pods found for cstor volume: {%s}" .UpgradeItem.name -}}
 
     {{- jsonpath .JsonResult $CustomJsonPath | trim | saveAs "targetPodList.podName" .TaskResult | noop -}}
     {{- .TaskResult.targetPodList.podName | notFoundErr $ErrMsg | saveIf "targetPodList.notFoundErr" .TaskResult | noop -}}

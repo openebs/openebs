@@ -234,7 +234,7 @@ spec:
     {{- .TaskResult.listTargetDeployment.version | notFoundErr "unknown openebs version" | saveIf "listTargetDeployment.notFoundErr" .TaskResult | noop -}}
 
     {{- jsonpath .JsonResult "{.items[*].spec.replicas}" | trim | saveAs "listTargetDeployment.replicaCount" .TaskResult | noop -}}
-    {{- .TaskResult.listTargetDeployment.replicaCount | notFoundErr "unknown no.of replicas in target deployment" | saveIf "listTargetDeployment.notFoundErr" .TaskResult | noop -}}
+    {{- .TaskResult.listTargetDeployment.replicaCount | notFoundErr "replicas not found for jiva controller deployment" | saveIf "listTargetDeployment.notFoundErr" .TaskResult | noop -}}
 
     {{- $message := "" -}}
     {{- $status := "" -}}
@@ -285,7 +285,7 @@ spec:
     {{- .TaskResult.listTargetDeployment.version | notFoundErr "unknown openebs version" | saveIf "listReplicaDeployment.notFoundErr" .TaskResult | noop -}}
 
     {{- jsonpath .JsonResult "{.items[*].spec.replicas}" | trim | saveAs "listReplicaDeployment.replicaCount" .TaskResult | noop -}}
-    {{- .TaskResult.listReplicaDeployment.replicaCount | notFoundErr "unknown no.of replicas in replica deployment" | saveIf "listReplicaDeployment.notFoundErr" .TaskResult | noop -}}
+    {{- .TaskResult.listReplicaDeployment.replicaCount | notFoundErr "replicas not found for jiva replica deployment" | saveIf "listReplicaDeployment.notFoundErr" .TaskResult | noop -}}
 
     {{- $message := "" -}}
     {{- $status := "" -}}
@@ -330,9 +330,10 @@ spec:
       labelSelector: openebs.io/persistent-volume={{ .UpgradeItem.name }},openebs.io/controller=jiva-controller
   post: |
     {{- $CustomJsonPath := printf "{.items[?(@.status.phase=='Running')].metadata.name}" -}}
+    {{- $ErrMsg := printf "No running controller pods found for volume: {%s}" .UpgradeItem.name -}}
 
     {{- jsonpath .JsonResult $CustomJsonPath | trim | saveAs "listCtrlPods.podName" .TaskResult | noop -}}
-    {{- .TaskResult.listCtrlPods.podName | notFoundErr "controller pod is not in running phase" | saveIf "listCtrlPods.notFoundErr" .TaskResult | noop -}}
+    {{- .TaskResult.listCtrlPods.podName | notFoundErr $ErrMsg | saveIf "listCtrlPods.notFoundErr" .TaskResult | noop -}}
 
     {{- .TaskResult.listCtrlPods.podName | default "" | splitList " " | len | saveAs "listCtrlPods.actualRunningPodCount" .TaskResult -}}
 
@@ -368,9 +369,10 @@ spec:
       labelSelector: openebs.io/persistent-volume={{ .UpgradeItem.name }},openebs.io/replica=jiva-replica
   post: |
     {{- $CustomJsonPath := printf "{.items[?(@.status.phase=='Running')].spec.nodeName}" -}}
+    {{- $ErrMsg := printf "No running replica pods found for volume: {%s}" .UpgradeItem.name -}}
 
     {{- jsonpath .JsonResult $CustomJsonPath | trim | saveAs "listReplicaPods.nodeNames" .TaskResult | noop -}}
-    {{- .TaskResult.listReplicaPods.nodeNames | notFoundErr "replica pods nodeNames are not found" | saveIf "listReplicaPods.notFoundErr" .TaskResult | noop -}}
+    {{- .TaskResult.listReplicaPods.nodeNames | notFoundErr $ErrMsg | saveIf "listReplicaPods.notFoundErr" .TaskResult | noop -}}
 
     {{- .TaskResult.listReplicaPods.nodeNames | default "" | splitList " " | len | saveAs "listReplicaPods.actualRunningPodCount" .TaskResult -}}
 

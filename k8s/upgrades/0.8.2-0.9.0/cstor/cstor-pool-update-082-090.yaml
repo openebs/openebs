@@ -201,7 +201,7 @@ spec:
     {{- jsonpath .JsonResult "{.metadata.labels.openebs\\.io/version}" | trim | saveAs "poolDeployment.version" .TaskResult | noop -}}
 
     {{- jsonpath .JsonResult "{.spec.replicas}" | trim | saveAs "poolDeployment.replicaCount" .TaskResult | noop -}}
-    {{- .TaskResult.poolDeployment.replicaCount | notFoundErr "unknown no.of replicas in pool deployment" | saveIf "poolDeployment.notFoundErr" .TaskResult | noop -}}
+    {{- .TaskResult.poolDeployment.replicaCount | notFoundErr "replicas not found for cstor target deployment" | saveIf "poolDeployment.notFoundErr" .TaskResult | noop -}}
 
     {{- $message :="" }}
     {{- $status :="" }}
@@ -248,7 +248,7 @@ spec:
       labelSelector: app=cstor-pool,openebs.io/storage-pool-claim={{ .TaskResult.CStorPool.spcName }}
   post: |
     {{- $CustomJsonPath := printf "{.items[?(@.status.phase=='Running')].metadata.name}" -}}
-    {{- $ErrMsg := printf "pool pod corresponding to csp: {%s} not in running phase" .UpgradeItem.name -}}
+    {{- $ErrMsg := printf "No running pods found for csp {%s}" .UpgradeItem.name -}}
 
     {{- jsonpath .JsonResult $CustomJsonPath | trim | saveAs "poolPodList.podName" .TaskResult | noop -}}
     {{- .TaskResult.poolPodList.podName | notFoundErr $ErrMsg | saveIf "poolPodList.notFoundErr" .TaskResult | noop -}}
@@ -497,7 +497,7 @@ spec:
   post: |-
     {{- jsonpath .JsonResult "{.spec.template.spec.containers[?(@.name=='cstor-pool')].image}" | trim | saveAs "postCheckDeploymentImagePatch.cstorpoolimage" .TaskResult | noop -}}
     {{- jsonpath .JsonResult "{.spec.template.spec.containers[?(@.name=='cstor-pool-mgmt')].image}" | trim | saveAs "postCheckDeploymentImagePatch.cstorpoolmgmtimage" .TaskResult | noop -}}
-    {{- jsonpath .JsonResuluidate.spec.containers[?(@.name=='maya-exporter')].image}" | trim | saveAs "postCheckDeploymentImagePatch.mayaexporterimage" .TaskResult | noop -}}
+    {{- jsonpath .JsonResult "{.spec.template.spec.containers[?(@.name=='maya-exporter')].image}" | trim | saveAs "postCheckDeploymentImagePatch.mayaexporterimage" .TaskResult | noop -}}
 
     {{ $isNewCStorPool := contains .Config.targetVersion.value .TaskResult.postCheckDeploymentImagePatch.cstorpoolimage }}
     {{ $isNewCStorPoolMGMT := contains .Config.targetVersion.value .TaskResult.postCheckDeploymentImagePatch.cstorpoolmgmtimage }}
