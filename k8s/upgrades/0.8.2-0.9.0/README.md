@@ -131,4 +131,6 @@ Make sure your current directory is openebs/k8s/upgrades/0.8.2-0.9.0/
 ## Post upgrade steps:
 
   - Delete ServiceAccount, ClusterRole and ClusterRoleBindings that are created for upgrade using
-`kubectl delete -f rbac.yaml` from openebs/k8s/upgrades/0.8.2-0.9.0/ directory.
+    `kubectl delete -f rbac.yaml` from openebs/k8s/upgrades/0.8.2-0.9.0/ directory.
+  - Delete all the resources, jobs created above as part of upgrade using
+    respected yamls.
