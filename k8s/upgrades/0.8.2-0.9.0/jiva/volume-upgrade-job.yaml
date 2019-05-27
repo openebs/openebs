@@ -19,6 +19,7 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: jiva-volume-upgrade
+  namespace: default
 spec:
   template:
     spec:
