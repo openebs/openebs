@@ -35,7 +35,7 @@ spec:
 
     # This runtask checks whether the pool pod is in running state if not fails
     # the upgrade
-    - upgrade-cstor-pool-082-090-pre-check-pool-pod-phase
+    #- upgrade-cstor-pool-082-090-pre-check-pool-pod-phase
 
     # This runtask gets the storagepool custom resource and verifies it.
     - upgrade-cstor-pool-082-090-get-storagepool
