@@ -6,7 +6,10 @@
 # NOTES: Obtain the pool deployments to perform upgrade operation         #
 ###########################################################################
 
-##TODO: Need to Update the function names
+##TODO:
+##1) Need to Update the function names
+##2) verify the return status of all the kubectl commands
+##3) code comments will be updated
 
 pool_upgrade_version="0.1.0"
 current_version="0.9.0"
@@ -117,7 +120,11 @@ function make_csp_disk_list() {
     fi
 }
 
-## Starting point
+########################################################################
+#                                                                      #
+#                          Starting point                              #
+#                                                                      #
+########################################################################
 if [ "$#" -ne 2 ]; then
     usage
 fi
@@ -157,8 +164,8 @@ for csp_name in `echo $csp_list | tr ":" " "`; do
     rc=$?
     if [ $rc -ne 0 ]; then
         exit 1
-   # elif [ $version == $pool_upgrade_version ]; then
-        #continue
+    elif [ $version == $pool_upgrade_version ]; then
+        continue
     fi
 
     ## Get disk info from corresponding sp ##
@@ -174,21 +181,17 @@ for csp_name in `echo $csp_list | tr ":" " "`; do
          fi
          csp_disk_list=$(make_csp_disk_list "$csp_disk_list" "$device_id" "$disk_name")
     done
-#    echo "DISK groups $csp_disk_list"
     sed "s|@pool_version@|$pool_upgrade_version|g" csp-patch.tpl.json | sed "s|@disk_list@|$csp_disk_list|g" > csp-patch.json
-    echo "FILE OUTPUT"
-    cat csp-patch.json
     kubectl patch csp $csp_name -p "$(cat csp-patch.json)" --type=merge
     rc=$?; if [ $rc -ne 0 ]; then echo "Error occured while upgrading the csp: $csp_name Exit Code: $rc"; exit; fi
 done
 
 rm csp-patch.json
 
-### Make node_disklist which contains map of nodeName & disks attached to the node
+### Make node_disklist contains map of nodeName & disks attached to corresponding node
 get_disk_list_for_spc $spc $sp_list
 
-##TODO for testing purpose and below snippet will be removed after WIP tag
-# removed ####
+##TODO: for testing added below snippet and it will be removed after removing WIP tag####
 echo "node disk list${!node_disklist[@]}"
 
 for key in `echo ${!node_disklist[@]}`; do
