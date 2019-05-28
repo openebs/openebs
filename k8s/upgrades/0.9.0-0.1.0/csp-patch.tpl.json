@@ -1,0 +1,19 @@
+{
+  "metadata": {
+     "labels": {
+        "openebs.io/version": "@pool_version@",
+        "openebs.io/cas-type": "cstor",
+        "openebs.io/upgrade": "true"
+     }
+  },
+  "spec": {
+     "disks": null,
+     "group": [
+        {
+           "disk": [
+              @disk_list@
+           ]
+        }
+     ]
+  }
+}
