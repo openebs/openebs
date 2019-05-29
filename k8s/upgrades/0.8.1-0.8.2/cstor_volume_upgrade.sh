@@ -37,7 +37,7 @@ fi
 cas_type=`kubectl get pv $pv -o jsonpath="{.metadata.annotations.openebs\.io/cas-type}"`
 if [ $cas_type != "cstor" ]; then
     echo "Cstor volume not found";exit 1;
-elif [ $cas_type == "cstor"]; then
+elif [ $cas_type == "cstor" ]; then
 	  echo "$pv is a cstor volume"
 else
 	  echo "Volume is neither cstor or cstor"; exit 1;
