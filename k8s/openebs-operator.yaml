@@ -461,7 +461,7 @@ spec:
   template:
     metadata:
       labels:
-        name: admission-webhook
+        app: admission-webhook
         openebs.io/version: dev
         openebs.io/component: admission-server
     spec:
