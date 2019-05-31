@@ -429,17 +429,17 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: node-disk-operator
+  name: openebs-ndm-operator
   namespace: openebs
 spec:
   replicas: 1
   selector:
     matchLabels:
-      name: node-disk-operator
+      name: openebs-ndm-operator
   template:
     metadata:
       labels:
-        name: node-disk-operator
+        name: openebs-ndm-operator
         openebs.io/component-name: ndm-operator
         openebs.io/version: dev
     spec:
