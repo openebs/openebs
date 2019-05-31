@@ -98,6 +98,7 @@ The following table lists the configurable parameters of the OpenEBS chart and t
 | `ndm.sparse.size`                       | Size of the sparse file in bytes              | `10737418240`                             |
 | `ndm.sparse.count`                      | Number of sparse files to be created          | `1`                                       |
 | `ndm.filters.excludeVendors`            | Exclude devices with specified vendor         | `CLOUDBYT,OpenEBS`                        |
+| `ndm.filters.includePaths`              | Include devices with specified path patterns  | `""`                                      |
 | `ndm.filters.excludePaths`              | Exclude devices with specified path patterns  | `loop,fd0,sr0,/dev/ram,/dev/dm-,/dev/md`  |
 | `jiva.image`                            | Image for Jiva                                | `quay.io/openebs/jiva`                    |
 | `jiva.imageTag`                         | Image Tag for Jiva                            | `0.9.0`                                   |
