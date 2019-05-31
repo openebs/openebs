@@ -453,9 +453,6 @@ kind: Deployment
 metadata:
   name: openebs-admission-server
   namespace: openebs
-  labels:
-    app: admission-webhook
-    openebs.io/component: admission-server
 spec:
   replicas: 1
   selector:
@@ -464,8 +461,9 @@ spec:
   template:
     metadata:
       labels:
-        app: admission-webhook
+        name: admission-webhook
         openebs.io/version: dev
+        openebs.io/component: admission-server
     spec:
       serviceAccountName: openebs-maya-operator
       containers:
