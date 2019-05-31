@@ -440,6 +440,8 @@ spec:
     metadata:
       labels:
         name: node-disk-operator
+        openebs.io/component-name: ndm-operator
+        openebs.io/version: dev
     spec:
       serviceAccountName: openebs-maya-operator
       containers:
