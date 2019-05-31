@@ -74,7 +74,7 @@ snapshotOperator:
 
 ndm:
   image: "quay.io/openebs/node-disk-manager-amd64"
-  imageTag: "v0.3.5"
+  imageTag: "ci"
   sparse:
     path: "/var/openebs/sparse"
     size: "10737418240"
@@ -86,6 +86,16 @@ ndm:
   healthCheck:
     initialDelaySeconds: 30
     periodSeconds: 60
+
+ndmOperator:
+  image: "quay.io/openebs/node-disk-operator-amd64"
+  imageTag: "ci"
+  replicas: 1
+  upgradeStrategy: Recreate
+  readinessCheck:
+    initialDelaySeconds: 4
+    periodSeconds: 10
+    failureThreshold: 1
 
 webhook:
   image: "quay.io/openebs/admission-server"
