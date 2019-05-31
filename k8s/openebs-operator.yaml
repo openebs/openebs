@@ -430,6 +430,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: node-disk-operator
+  namespace: openebs
 spec:
   replicas: 1
   selector:
