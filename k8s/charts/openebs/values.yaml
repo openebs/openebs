@@ -92,6 +92,8 @@ ndmOperator:
   imageTag: "ci"
   replicas: 1
   upgradeStrategy: Recreate
+  nodeSelector: {}
+  tolerations: []
   readinessCheck:
     initialDelaySeconds: 4
     periodSeconds: 10
