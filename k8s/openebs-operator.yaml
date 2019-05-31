@@ -420,6 +420,46 @@ spec:
         hostPath:
           path: /var/openebs/sparse
 ---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: node-disk-operator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: node-disk-operator
+  template:
+    metadata:
+      labels:
+        name: node-disk-operator
+    spec:
+      serviceAccountName: openebs-maya-operator
+      containers:
+        - name: node-disk-operator
+          # Replace this with the built image name
+          image: openebs/node-disk-operator-amd64:ci
+          imagePullPolicy: Always
+          readinessProbe:
+            exec:
+              command:
+                - stat
+                - /tmp/operator-sdk-ready
+            initialDelaySeconds: 4
+            periodSeconds: 10
+            failureThreshold: 1
+          env:
+            - name: WATCH_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: OPERATOR_NAME
+              value: "node-disk-operator"
+---
 apiVersion: v1
 kind: Secret
 metadata:
