@@ -438,7 +438,7 @@ spec:
       containers:
         - name: node-disk-operator
           # Replace this with the built image name
-          image: openebs/node-disk-operator-amd64:ci
+          image: quay.io/openebs/node-disk-operator-amd64:ci
           imagePullPolicy: Always
           readinessProbe:
             exec:
