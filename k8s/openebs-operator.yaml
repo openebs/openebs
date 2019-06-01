@@ -36,7 +36,7 @@ rules:
   resources: ["customresourcedefinitions"]
   verbs: [ "get", "list", "create", "update", "delete"]
 - apiGroups: ["*"]
-  resources: [ "disks"]
+  resources: [ "disks", "blockdevices", "blockdeviceclaims"]
   verbs: ["*" ]
 - apiGroups: ["*"]
   resources: [ "cstorpoolclusters", "storagepoolclaims", "storagepoolclaims/finalizers", "storagepools"]
@@ -363,8 +363,8 @@ spec:
       hostNetwork: true
       containers:
       - name: node-disk-manager
-        image: quay.io/openebs/node-disk-manager-amd64:v0.3.5
-        imagePullPolicy: IfNotPresent
+        image: quay.io/openebs/node-disk-manager-amd64:ci
+        imagePullPolicy: Always
         securityContext:
           privileged: true
         volumeMounts:
@@ -380,6 +380,12 @@ spec:
         - name: sparsepath
           mountPath: /var/openebs/sparse
         env:
+        # namespace in which NDM is installed will be passed to NDM Daemonset
+        # as environment variable
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
         # pass hostname as env variable using downward API to the NDM container
         - name: NODE_NAME
           valueFrom:
@@ -419,6 +425,50 @@ spec:
       - name: sparsepath
         hostPath:
           path: /var/openebs/sparse
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: openebs-ndm-operator
+  namespace: openebs
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      name: openebs-ndm-operator
+  template:
+    metadata:
+      labels:
+        name: openebs-ndm-operator
+        openebs.io/component-name: ndm-operator
+        openebs.io/version: dev
+    spec:
+      serviceAccountName: openebs-maya-operator
+      containers:
+        - name: node-disk-operator
+          image: quay.io/openebs/node-disk-operator-amd64:ci
+          imagePullPolicy: Always
+          readinessProbe:
+            exec:
+              command:
+                - stat
+                - /tmp/operator-sdk-ready
+            initialDelaySeconds: 4
+            periodSeconds: 10
+            failureThreshold: 1
+          env:
+            - name: WATCH_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: OPERATOR_NAME
+              value: "node-disk-operator"
 ---
 apiVersion: v1
 kind: Secret
