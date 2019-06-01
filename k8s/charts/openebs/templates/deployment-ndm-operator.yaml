@@ -53,7 +53,7 @@ spec:
         - name: OPERATOR_NAME
           value: "node-disk-operator"
 {{- if .Values.ndmOperator.nodeSelector }}
-      nodeSelector:
+     nodeSelector:
 {{ toYaml .Values.ndmOperator.nodeSelector | indent 8 }}
 {{- end }}
 {{- if .Values.ndmOperator.tolerations }}
