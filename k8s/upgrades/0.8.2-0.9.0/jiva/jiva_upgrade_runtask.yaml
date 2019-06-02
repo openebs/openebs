@@ -59,18 +59,6 @@ spec:
       # replica deployment
       - upgrade-jiva-volume-0.8.2-0.9.0-get-list-rep-old-rs
 
-      # This runtask will patch the jiva target deployment containers with the
-      # target version and other required things for upgrade.
-      - upgrade-jiva-volume-0.8.2-0.9.0-patch-ctrl-deployment-latest-version
-
-      # This runtask will verify that the jiva target deployment containers after
-      # the patch has been rolled out successfully.
-      - upgrade-jiva-volume-0.8.2-0.9.0-post-check-ctrl-deployment-status-latest-version
-
-      # This runtask will verify that the jiva target deployment containers
-      # that are running successfully has the appropriate target version.
-      - upgrade-jiva-volume-0.8.2-0.9.0-post-check-ctrl-deployment-image
-
       # This runtask will patch the jiva replica deployment containers with the
       # target version and other required things for upgrade.
       - upgrade-jiva-volume-0.8.2-0.9.0-patch-rep-deployment-latest-version
@@ -83,6 +71,21 @@ spec:
       # that are running successfully has the appropriate target version.
       - upgrade-jiva-volume-0.8.2-0.9.0-post-check-rep-deployment-image
 
+      # This runtask will delete the stale jiva replica deployment replicaset
+      - upgrade-jiva-volume-0.8.2-0.9.0-delete-old-rep-rs
+
+      # This runtask will patch the jiva target deployment containers with the
+      # target version and other required things for upgrade.
+      - upgrade-jiva-volume-0.8.2-0.9.0-patch-ctrl-deployment-latest-version
+
+      # This runtask will verify that the jiva target deployment containers after
+      # the patch has been rolled out successfully.
+      - upgrade-jiva-volume-0.8.2-0.9.0-post-check-ctrl-deployment-status-latest-version
+
+      # This runtask will verify that the jiva target deployment containers
+      # that are running successfully has the appropriate target version.
+      - upgrade-jiva-volume-0.8.2-0.9.0-post-check-ctrl-deployment-image
+
       # This runtask will patch the jiva target service
       # with the version label of target version.
       - upgrade-jiva-volume-0.8.2-0.9.0-patch-ctrl-svc
@@ -93,9 +96,6 @@ spec:
 
       # This runtask will delete the stale jiva target deployment replicaset
       - upgrade-jiva-volume-0.8.2-0.9.0-delete-old-ctrl-rs
-
-      # This runtask will delete the stale jiva replica deployment replicaset
-      - upgrade-jiva-volume-0.8.2-0.9.0-delete-old-rep-rs
 
       # This runtask will list the snapshots related to this volume
       - upgrade-jiva-volume-0.8.2-0.9.0-list-volumesnapshot
