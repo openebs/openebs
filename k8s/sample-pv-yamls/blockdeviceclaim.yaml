@@ -1,7 +1,7 @@
 apiVersion: openebs.io/v1alpha1
 kind: BlockDeviceClaim
 metadata:
-  name: test-blockdeviceclaim
+  name: sparse-blockdeviceclaim
   namespace: openebs
 spec:
   ## driveType is a type of the disk attached to the node
@@ -9,7 +9,7 @@ spec:
   driveType: "sparse"
   ## blockDeviceName should be specified with block device name
   ## if driveType is sparse
-  blockDeviceName: "blockdevice-1234"
+  blockDeviceName: "sparse-1234"
   ## hostName is the name of the node where block device is available
   ## value should be provided if driveType is other than sparse
   hostName: ""
