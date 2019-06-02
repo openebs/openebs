@@ -50,6 +50,7 @@ function dumpMayaAPIServerLogs() {
 
 waitForDeployment maya-apiserver openebs
 waitForDeployment openebs-provisioner openebs
+waitForDeployment openebs-ndm-operator openebs
 dumpMayaAPIServerLogs 200
 
 kubectl get pods --all-namespaces
@@ -68,7 +69,19 @@ sleep 10
 #echo "------------------ Deploy Pre-release features ---------------------------"
 #kubectl apply -f https://raw.githubusercontent.com/openebs/openebs/master/k8s/openebs-pre-release-features.yaml
 
-echo "------------------------ Create sparse storagepoolclaim --------------- "
+echo "------------------------ Create block device claim --------------- "
+##TODO: Remove below snippet once manual BDC is supported to create cStor pools
+#### Get name of blockdevice to claim the blockdevice ####
+block_device_name=$(kubectl get blockdevice -n ${NS} -o jsonpath='{.items[*].metadata.name}')
+wget https://raw.githubusercontent.com/openebs/openebs/master/k8s/blockdeviceclaim.yaml -O temp_bdc.yaml
+sed "s|sparse-1234|$block_device_name|g" temp_bdc.yaml > bdc.yaml
+kubectl apply -f bdc.yaml
+sleep 15
+block_device_status=$(kubectl get blockdevice -n ${NS} -o jsonpath='{.items[*].status.claimState}')
+echo "BlockDevice: ${block_device_name} Claimstate: ${block_device_status}"
+rm temp_bdc.yaml
+
+echo "------------------------ Create block device storagepoolclaim --------------- "
 # delete the storagepoolclaim created earlier and create new spc with min/max pool
 # count 1
 kubectl delete spc --all
@@ -115,6 +128,8 @@ kubectl get deploy -n openebs -l openebs.io/target=cstor-target
 kubectl get cstorvolume
 kubectl get service
 
+## To fix intermittent travis failure
+sleep 20
 CSTORTARGET=$(kubectl get deploy -l openebs.io/persistent-volume-claim=openebs-pvc-in-custom-ns --no-headers | awk {'print $1'})
 echo $CSTORTARGET
 waitForDeployment ${CSTORTARGET} default
