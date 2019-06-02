@@ -73,7 +73,7 @@ echo "------------------------ Create block device claim --------------- "
 ##TODO: Remove below snippet once manual BDC is supported to create cStor pools
 #### Get name of blockdevice to claim the blockdevice ####
 block_device_name=$(kubectl get blockdevice -n ${NS} -o jsonpath='{.items[*].metadata.name}')
-wget https://raw.githubusercontent.com/openebs/openebs/master/k8s/blockdeviceclaim.yaml -O temp_bdc.yaml
+wget https://raw.githubusercontent.com/openebs/openebs/master/k8s/sample-pv-yamls/blockdeviceclaim.yaml -O temp_bdc.yaml
 sed "s|sparse-1234|$block_device_name|g" temp_bdc.yaml > bdc.yaml
 kubectl apply -f bdc.yaml
 sleep 15
