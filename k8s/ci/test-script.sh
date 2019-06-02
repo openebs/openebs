@@ -72,15 +72,14 @@ sleep 10
 echo "------------------------ Create block device claim --------------- "
 ##TODO: Remove below snippet once manual BDC is supported to create cStor pools
 #### Get name of blockdevice to claim the blockdevice ####
-block_device_name=$(kubectl get blockdevicename -n ${NS} -o jsonpath='{.items[*].metadata.name}')
+block_device_name=$(kubectl get blockdevice -n ${NS} -o jsonpath='{.items[*].metadata.name}')
 wget https://raw.githubusercontent.com/openebs/openebs/master/k8s/blockdeviceclaim.yaml -O temp_bdc.yaml
-sed "s|blockDevice-1234|$block_device_name|g" temp_bdc.yaml > bdc.yaml
+sed "s|blockdevice-1234|$block_device_name|g" temp_bdc.yaml > bdc.yaml
 kubectl apply -f bdc.yaml
-sleep 10
-block_device_status=$(kubectl get blockdevicename -n ${NS} -o jsonpath='{.items[*].status.claimState}')
+sleep 15
+block_device_status=$(kubectl get blockdevice -n ${NS} -o jsonpath='{.items[*].status.claimState}')
 echo "BlockDevice: ${block_device_name} Status: ${block_device_status}"
 rm temp_bdc.yaml
-sleep 5
 
 echo "------------------------ Create block device storagepoolclaim --------------- "
 # delete the storagepoolclaim created earlier and create new spc with min/max pool
