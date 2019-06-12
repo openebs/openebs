@@ -5,7 +5,7 @@ metadata:
   name: sparse-claim-auto
 spec:
   name: sparse-claim-auto
-  type: blockdevice
+  type: sparse
   maxPools: 1
   minPools: 1
   poolSpec:
