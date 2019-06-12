@@ -21,7 +21,6 @@
     "spec": {
         "blockDeviceName": "@bd_name@",
         "deviceType": "",
-        "hostName": "@node_name@",
-        "capacity": "10G"
+        "hostName": "@node_name@"
     }
 }
