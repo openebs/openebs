@@ -1,0 +1,132 @@
+#!/bin/bash
+
+###############################################################################
+# STEP 1: Get all block devices present on the cluster and corresponding disk #
+# STEP 2: Create block device claim to claim corresponding block device       #
+# STEP 3: Patch SPC to stop reconciliation                                    #
+#                                                                             #
+###############################################################################
+function usage() {
+    echo
+    echo "Usage:"
+    echo
+    echo "$0 <openebs-namespace>"
+    echo
+    echo "  <openebs-namespace> Get the namespace where openebs setup is running"
+    exit 1
+}
+
+#function check_exit_status() {
+#    exit_status=$1
+#    msg=$2
+#}
+
+## get_csp_list accepts spc_name as a argument and returns csp list
+## corresponding to csp
+function get_csp_list() {
+    local csp_list=""
+    local spc_name=$1
+
+    csp_list=$(kubectl get csp \
+               -l openebs.io/storage-pool-claim=$spc_name \
+               -o jsonpath="{range .items[*]}{@.metadata.name}:{end}")
+    rc=$?
+    if [ $rc -ne 0 ]; then
+        echo "Failed to get csp related to spc $spc"
+        exit 1
+    fi
+    echo $csp_list
+}
+
+## create_bdc_claim_bd accepts spc and disk names as a argument and create block
+## device claims to claim corresponding block device
+function create_bdc_claim_bd() {
+    local spc_name=$1
+    local disk_name=$2
+    local bd_name=$(echo $disk_name | sed 's|disk|blockdevice|')
+
+    ## Below command will get the output as below format
+    ## nodename:bdc-123454321
+    local bd_details=$(kubectl get disk $bd_name \
+                       -o jsonpath='{.metadata.labels.kubernetes\.io/hostname}:bdc-{.metadata.uid}')
+    rc=$?; if [ $rc -ne 0 ]; then echo "Failed to get disk: $disk_name details Exit Code: $rc"; exit; fi
+
+    local node_name=$(echo $bd_details | cut -d ":" -f 1)
+    local bdc_name=$(echo $bd_details | cut -d ":" -f 2)
+
+    local spc_uid=$(kubectl get spc $spc_name -o jsonpath='{.metadata.uid}')
+    rc=$?; if [ $rc -ne 0 ]; then echo "Failed to get spc: $spc_name UID Exit Code: $rc"; exit; fi
+    echo "SPC UID: $spc_uid"
+
+    sed "s|@spc_name@|$spc_name|g" bdc-create.tpl.json | \
+                        sed "s|@bdc_name@|$bdc_name|g" | \
+                        sed "s|@bdc_namespace@|$ns|g" | \
+                        sed "s|@spc_uid@|$spc_uid|g" | \
+                        sed "s|@bd_name@|$bd_name|g" | \
+                        sed "s|@node_name@|$node_name|g" > bdc-create.json
+
+    ## Create block device claim
+    kubectl apply -f bdc-create.json
+    rc=$?; if [ $rc -ne 0 ]; then echo "Failed to create bdc: $bdc_name in namespace $ns Exit Code: $rc"; exit; fi
+
+    ## cleanup temporary file
+    rm bdc-create.json
+}
+
+## claim_blockdevices_sp accepts spc and sp names as a parameters
+function claim_blockdevices_sp() {
+    local spc_name=$1
+    local sp_name=$2
+    ## kubectl command get output in below format
+    ## [sparse-37a7de580322f43a sparse-5a92ced3e2ee21 sparse-5e508018b4dd2c8]
+    ## and then converts to below format
+    ## sparse-37a7de580322f43a,sparse-5a92ced3e2ee21,sparse-5e508018b4dd2c8
+    sp_disk_list=$(kubectl get sp $sp_name \
+                   -o jsonpath="{.spec.disks.diskList}" | sed 's|\[||g; s|\]||g; s| |,|g')
+    rc=$?; if [ $rc -ne 0 ]; then echo "Failed to list disks related to sp: $sp_name Exit Code: $rc"; exit; fi
+
+    for disk_name in `echo $sp_disk_list | tr "," " "`; do
+        create_bdc_claim_bd $spc_name $disk_name
+    done
+}
+
+## claim_blockdevices_csp accepts spc name and csp list as a parameters
+function claim_blockdevices_csp() {
+    local spc_name=$1
+    local csp_list=$2
+    local sp_name=""
+    for csp_name in `echo $csp_list | tr ":" " "`; do
+        sp_name=$(kubectl get sp \
+                  -l openebs.io/cstor-pool=$csp_name \
+                  -o jsonpath="{.items[*].metadata.name}")
+        rc=$?; if [ $rc -ne 0 ]; then echo "Failed to get sp related to csp: $csp_name Exit Code: $rc"; exit; fi
+
+        claim_blockdevices_sp $spc_name $sp_name
+    done
+}
+
+
+## Starting point
+if [ "$#" -ne 1 ]; then
+    usage
+fi
+ns=$1
+
+## Apply blockdeviceclaim crd yaml to create CR
+kubectl apply -f blockdeviceclaim_crd.yaml
+rc=$?; if [ $rc -ne 0 ]; then echo "Failed to create blockdevice crd Exit Code: $rc"; exit; fi
+
+
+### Get the spc list which are present in the cluster ###
+spc_list=$(kubectl get spc -o jsonpath="{range .items[*]}{@.metadata.name}:{end}")
+rc=$?; if [ $rc -ne 0 ]; then echo "Failed to list spc present in cluster Exit Code: $rc"; exit; fi
+
+#### Get required info from current spc and use the info to claim block device ####
+for spc_name in `echo $spc_list | tr ":" " "`; do
+    csp_list=$(get_csp_list $spc_name)
+    claim_blockdevices_csp $spc_name $csp_list
+
+    ## Patching the spc resource with label
+    kubectl patch spc $spc_name -p "$(cat spc-patch.tpl.json)" --type=merge
+    rc=$?; if [ $rc -ne 0 ]; then echo "Failed to patch spc: $spc_name with reconcile label Exit Code: $rc"; exit; fi
+done
