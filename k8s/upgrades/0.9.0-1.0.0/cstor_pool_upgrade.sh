@@ -43,8 +43,9 @@ function verify_openebs_version() {
 function get_csp_list() {
     local csp_list=""
     local spc_name=$1
-    csp_list=$(kubectl get csp -l openebs.io/storage-pool-claim=$spc_name \
-             -o jsonpath="{range .items[*]}{@.metadata.name}:{end}")
+    csp_list=$(kubectl get csp \
+               -l openebs.io/storage-pool-claim=$spc_name \
+               -o jsonpath="{range .items[*]}{@.metadata.name}:{end}")
     rc=$?
     if [ $rc -ne 0 ]; then
         echo "Failed to get csp related to spc $spc"
@@ -93,19 +94,21 @@ function get_disk_list_for_sp_list() {
     echo $disk_list
 }
 
-## get_disk_list_for_spc get the disks related to spc
-function get_disk_list_for_spc() {
+## patch_blockdevice_list_for_spc to patch block device changes related to spc
+function patch_blockdevice_list_for_spc() {
     local spc_name=$1
     local sp_list=$2
-    local disk_list=$(kubectl get spc $spc_name -o jsonpath='{.spec.disks.diskList}')
-    disk_list=$(echo $disk_list | sed  's|\[||g; s|\]||g; s| |,|g')
+    local disk_list=$(kubectl get spc $spc_name \
+                      -o jsonpath='{.spec.disks.diskList}' | \
+                      sed  's|\[||g; s|\]||g; s| |,|g')
+
     if [ -n "$disk_list" ]; then
         disk_list=$(get_disk_list_for_sp_list $sp_list)
-        make_map_node_disk_list $disk_list
-    else
-        disk_list=$(echo $disk_list | sed  's|\[||g; s|\]||g; s| |,|g')
-        make_map_node_disk_list $disk_list
     fi
+}
+
+function make_spc_bd_list() {
+    local block_device_list=$1
 }
 
 ## make_csp_disk_list will return the jsonpath required to update the csp
@@ -149,8 +152,9 @@ fi
 csp_list=$(get_csp_list $spc)
 
 ### Get the sp list which are related to the given spc ###
-sp_list=$(kubectl get sp -l openebs.io/cas-type=cstor,openebs.io/storage-pool-claim=$spc \
-        -o jsonpath="{range .items[*]}{@.metadata.name}:{end}")
+sp_list=$(kubectl get sp \
+          -l openebs.io/cas-type=cstor,openebs.io/storage-pool-claim=$spc \
+          -o jsonpath="{range .items[*]}{@.metadata.name}:{end}")
 rc=$?
 if [ $rc -ne 0 ]; then
     echo "Failed to get sp related to spc $spc"
@@ -169,19 +173,26 @@ for csp_name in `echo $csp_list | tr ":" " "`; do
     fi
 
     ## Get disk info from corresponding sp ##
-    sp_name=$(kubectl get sp -l openebs.io/cstor-pool=$csp_name \
-                  -o jsonpath="{.items[*].metadata.name}")
-    sp_disk_list=$(kubectl get sp $sp_name -o jsonpath="{.spec.disks.diskList}" | sed 's|\[||g; s|\]||g; s| |,|g')
+    sp_name=$(kubectl get sp \
+              -l openebs.io/cstor-pool=$csp_name \
+              -o jsonpath="{.items[*].metadata.name}")
+
+    sp_disk_list=$(kubectl get sp $sp_name \
+                   -o jsonpath="{.spec.disks.diskList}" | \
+                    sed 's|\[||g; s|\]||g; s| |,|g')
+
     csp_disk_list="init"
     for disk_name in `echo $sp_disk_list | tr "," " "`; do
-         ## TODO: Assuming device Id present in first index
+         ## Assuming device Id present in first index
          device_id=$(kubectl get disk $disk_name -o jsonpath="{.spec.devlinks[0].links[0]}")
          if [ -z device_id ]; then
              device_id=$(kubectl get disk $disk_name -o jsonpath="{.spec.path}")
          fi
          csp_disk_list=$(make_csp_disk_list "$csp_disk_list" "$device_id" "$disk_name")
     done
-    sed "s|@pool_version@|$pool_upgrade_version|g" csp-patch.tpl.json | sed "s|@disk_list@|$csp_disk_list|g" > csp-patch.json
+    sed "s|@pool_version@|$pool_upgrade_version|g" csp-patch.tpl.json | \
+                sed "s|@blockDevice_list@|$csp_disk_list|g" > csp-patch.json
+
     kubectl patch csp $csp_name -p "$(cat csp-patch.json)" --type=merge
     rc=$?; if [ $rc -ne 0 ]; then echo "Error occured while upgrading the csp: $csp_name Exit Code: $rc"; exit; fi
 done
