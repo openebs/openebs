@@ -16,11 +16,6 @@ function usage() {
     exit 1
 }
 
-#function check_exit_status() {
-#    exit_status=$1
-#    msg=$2
-#}
-
 ## get_csp_list accepts spc_name as a argument and returns csp list
 ## corresponding to csp
 function get_csp_list() {
@@ -56,7 +51,6 @@ function create_bdc_claim_bd() {
 
     local spc_uid=$(kubectl get spc $spc_name -o jsonpath='{.metadata.uid}')
     rc=$?; if [ $rc -ne 0 ]; then echo "Failed to get spc: $spc_name UID Exit Code: $rc"; exit; fi
-    echo "SPC UID: $spc_uid"
 
     sed "s|@spc_name@|$spc_name|g" bdc-create.tpl.json | \
                         sed "s|@bdc_name@|$bdc_name|g" | \
@@ -130,3 +124,43 @@ for spc_name in `echo $spc_list | tr ":" " "`; do
     kubectl patch spc $spc_name -p "$(cat spc-patch.tpl.json)" --type=merge
     rc=$?; if [ $rc -ne 0 ]; then echo "Failed to patch spc: $spc_name with reconcile label Exit Code: $rc"; exit; fi
 done
+
+## Below snippet will remove the openebs.io/version label from
+## deployment.spec.selector.matchLabels
+
+## Remove openebs.io/version from maya-apiserver
+## Get maya-apiserver deployment name
+maya_deploy_name=$(kubectl get deploy \
+                   -l name=maya-apiserver -n $ns\
+                   -o jsonpath='{.items[0].metadata.name}')
+
+kubectl patch deploy $maya_deploy_name -p "$(cat deploy-patch.json)" -n $ns
+
+## Remove openebs.io/version from admission-server
+## Get admission-server deployment name
+admission_deploy_name=$(kubectl get deploy \
+                   -l app=admission-webhook -n $ns\
+                   -o jsonpath='{.items[0].metadata.name}')
+
+kubectl patch deploy $admission_deploy_name -p "$(cat deploy-patch.json)" -n $ns
+
+## Remove openebs.io/version from openebs-provisioner
+## Get openebs-provisioner deployment name
+provisioner_deploy_name=$(kubectl get deploy \
+                   -l name=openebs-provisioner -n $ns\
+                   -o jsonpath='{.items[0].metadata.name}')
+kubectl patch deploy $provisioner_deploy_name -p "$(cat deploy-patch.json)" -n $ns
+
+## Remove openebs.io/version from snapshot-provisioner
+## Get snapshot-provisioner deployment name
+snapshot_deploy_name=$(kubectl get deploy \
+                   -l name=openebs-snapshot-operator -n $ns\
+                   -o jsonpath='{.items[0].metadata.name}')
+kubectl patch deploy $snapshot_deploy_name -p "$(cat deploy-patch.json)" -n $ns
+
+## Remove openebs.io/version from local-pvprovisioner
+## Get local-pvprovisioner deployment name
+local_pvprovisioner_deploy_name=$(kubectl get deploy \
+                   -l name=openebs-localpv-provisioner -n $ns\
+                   -o jsonpath='{.items[0].metadata.name}')
+kubectl patch deploy $local_pvprovisioner_deploy_name -p "$(cat deploy-patch.json)" -n $ns
