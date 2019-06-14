@@ -76,7 +76,15 @@ kind: Deployment
 metadata:
   name: maya-apiserver
   namespace: openebs
+  labels:
+    name: maya-apiserver
+    openebs.io/component-name: maya-apiserver
+    openebs.io/version: dev
 spec:
+  selector:
+    matchLabels:
+      name: maya-apiserver
+      openebs.io/component-name: maya-apiserver
   replicas: 1
   template:
     metadata:
@@ -189,7 +197,15 @@ kind: Deployment
 metadata:
   name: openebs-provisioner
   namespace: openebs
+  labels:
+    name: openebs-provisioner
+    openebs.io/component-name: openebs-provisioner
+    openebs.io/version: dev
 spec:
+  selector:
+    matchLabels:
+      name: openebs-provisioner
+      openebs.io/component-name: openebs-provisioner
   replicas: 1
   template:
     metadata:
@@ -241,7 +257,15 @@ kind: Deployment
 metadata:
   name: openebs-snapshot-operator
   namespace: openebs
+  labels:
+    name: openebs-snapshot-operator
+    openebs.io/component-name: openebs-snapshot-operator
+    openebs.io/version: dev
 spec:
+  selector:
+    matchLabels:
+      name: openebs-snapshot-operator
+      openebs.io/component-name: openebs-snapshot-operator
   replicas: 1
   strategy:
     type: Recreate
@@ -340,7 +364,15 @@ kind: DaemonSet
 metadata:
   name: openebs-ndm
   namespace: openebs
+  labels:
+    name: openebs-ndm
+    openebs.io/component-name: ndm
+    openebs.io/version: dev
 spec:
+  selector:
+    matchLabels:
+      name: openebs-ndm
+      openebs.io/component-name: ndm
   updateStrategy:
     type: RollingUpdate
   template:
@@ -431,7 +463,15 @@ kind: Deployment
 metadata:
   name: openebs-ndm-operator
   namespace: openebs
+  labels:
+    name: openebs-ndm-operator
+    openebs.io/component-name: ndm-operator
+    openebs.io/version: dev
 spec:
+  selector:
+    matchLabels:
+      name: openebs-ndm-operator
+      openebs.io/component-name: ndm-operator
   replicas: 1
   strategy:
     type: Recreate
@@ -503,6 +543,10 @@ kind: Deployment
 metadata:
   name: openebs-admission-server
   namespace: openebs
+  labels:
+    app: admission-webhook
+    openebs.io/component-name: admission-server
+    openebs.io/version: dev
 spec:
   replicas: 1
   selector:
@@ -512,8 +556,8 @@ spec:
     metadata:
       labels:
         app: admission-webhook
+        openebs.io/component-name: admission-server
         openebs.io/version: dev
-        openebs.io/component: admission-server
     spec:
       serviceAccountName: openebs-maya-operator
       containers:
@@ -541,7 +585,7 @@ metadata:
   name: validation-webhook-cfg
   labels:
     app: admission-webhook
-    openebs.io/component: admission-server
+    openebs.io/component-name: admission-server
 webhooks:
   - name: admission-webhook.openebs.io
     clientConfig:
@@ -561,7 +605,15 @@ kind: Deployment
 metadata:
   name: openebs-localpv-provisioner
   namespace: openebs
+  labels:
+    name: openebs-localpv-provisioner
+    openebs.io/component-name: openebs-localpv-provisioner
+    openebs.io/version: dev
 spec:
+  selector:
+    matchLabels:
+      name: openebs-localpv-provisioner
+      openebs.io/component-name: openebs-localpv-provisioner
   replicas: 1
   strategy:
     type: Recreate
