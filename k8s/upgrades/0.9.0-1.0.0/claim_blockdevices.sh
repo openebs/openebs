@@ -84,12 +84,50 @@ function claim_blockdevices_sp() {
     done
 }
 
+## Output of below command
+## kubectl exec cstor-sparse-d9r7-66cd7b798c-4qjnt -n openebs -c cstor-pool -- zpool list -v -H -P | awk '{print $1}'
+## cstor-49a012ee-8f1a-11e9-8773-54e1ad4a9dd4
+## mirror
+## /var/openebs/sparse/3-ndm-sparse.img
+## /var/openebs/sparse/0-ndm-sparse.img
+## from the above output extracting disk names
+function get_underlying_disks() {
+    local pod_name=$1
+    local pool_type=$2
+    local zpool_disk_list=$(kubectl exec $pod_name -n $ns -c cstor-pool \
+                          -- zpool list -v -H -P | \
+                          awk '{print $1}' | grep -v cstor | grep -v ${map_pool_type[$pool_type]} | sort)
+    echo $zpool_disk_list
+}
+
 ## claim_blockdevices_csp accepts spc name and csp list as a parameters
 function claim_blockdevices_csp() {
     local spc_name=$1
     local csp_list=$2
     local sp_name=""
+    local pool_pod_name=""
     for csp_name in `echo $csp_list | tr ":" " "`; do
+        pool_pod_name=$(kubectl get pod -n $ns \
+                        -l app=cstor-pool,openebs.io/cstor-pool=$csp_name,openebs.io/storage-pool-claim=$spc_name \
+                        -o jsonpath="{.items[0].metadata.name}")
+
+        pool_type=$(kubectl get csp $csp_name \
+                    -o jsonpath='{.spec.poolSpec.poolType}')
+
+
+        csp_disk_list=$(kubectl get csp $csp_name \
+                        -o jsonpath='{.spec.disks.diskList}' | \
+                        sed 's|\[||g; s|\]||g; s| |,|g'  | tr , "\n" | sort)
+        ## csp_disk_list holds the same format for commparision with
+        ## zpool_disk_list
+        csp_disk_list=$(echo $csp_disk_list)
+
+        zpool_disk_list=$(get_underlying_disks $pool_pod_name $pool_type)
+
+        if [ "$csp_disk_list" != "$zpool_disk_list" ]; then
+            echo "missmatch of disks in csp $csp_name"
+            exit 1
+        fi
         sp_name=$(kubectl get sp \
                   -l openebs.io/cstor-pool=$csp_name \
                   -o jsonpath="{.items[*].metadata.name}")
@@ -105,6 +143,11 @@ if [ "$#" -ne 1 ]; then
     usage
 fi
 ns=$1
+declare -A map_pool_type
+map_pool_type["mirrored"]="mirror"
+map_pool_type["striped"]="striped"
+map_pool_type["raidz"]="raidz"
+map_pool_type["raidz2"]="raidz2"
 
 ## Apply blockdeviceclaim crd yaml to create CR
 kubectl apply -f blockdeviceclaim_crd.yaml
@@ -164,3 +207,8 @@ local_pvprovisioner_deploy_name=$(kubectl get deploy \
                    -l name=openebs-localpv-provisioner -n $ns\
                    -o jsonpath='{.items[0].metadata.name}')
 kubectl patch deploy $local_pvprovisioner_deploy_name -p "$(cat deploy-patch.json)" -n $ns
+
+daemonset_name=$(kubectl get daemonset \
+                   -l name=openebs-ndm,openebs.io/component-name=ndm -n $ns \
+                   -o jsonpath='{.items[0].metadata.name}')
+kubectl patch daemonset $daemonset_name -p "$(cat deploy-patch.json)" -n $ns
