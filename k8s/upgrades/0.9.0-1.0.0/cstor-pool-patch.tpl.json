@@ -1,0 +1,28 @@
+{
+  "metadata": {
+     "labels": {
+        "openebs.io/version": "@pool_version@"
+     }
+  },
+  "spec": {
+     "template": {
+        "metadata": {
+           "labels": {
+              "openebs.io/version": "@pool_version@"
+           }
+        },
+        "spec": {
+           "containers": [
+              {
+                 "name": "cstor-pool",
+                 "image": "quay.io/openebs/cstor-pool:@pool_version@"
+              },
+              {
+                "name": "cstor-pool-mgmt",
+                "image": "quay.io/openebs/cstor-pool-mgmt:@pool_version@"
+              }
+          ]
+        }
+     }
+  }
+}

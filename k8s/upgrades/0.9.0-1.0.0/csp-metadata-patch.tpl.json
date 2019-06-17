@@ -1,0 +1,8 @@
+{
+  "metadata": {
+     "labels": {
+        "openebs.io/version": "@pool_version@",
+        "openebs.io/cas-type": "cstor"
+     }
+  }
+}

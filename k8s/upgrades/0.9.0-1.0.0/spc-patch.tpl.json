@@ -1,7 +1,15 @@
 {
     "metadata": {
         "annotations": {
-            "reconcile.openebs.io/disable": "true"
+            "reconcile.openebs.io/disable": null
+        }
+    },
+    "spec": {
+        "disks": null,
+        "blockDevices": {
+             "blockDeviceList": [
+              @blockdevice_list@
+            ]
         }
     }
 }

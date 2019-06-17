@@ -1,0 +1,12 @@
+{
+  "spec": {
+     "disks": null,
+     "group": [
+        {
+           "blockDevice": [
+              @blockDevice_list@
+           ]
+        }
+     ]
+  }
+}
