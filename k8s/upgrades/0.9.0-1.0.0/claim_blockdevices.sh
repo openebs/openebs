@@ -42,7 +42,7 @@ function create_bdc_claim_bd() {
 
     ## Below command will get the output as below format
     ## nodename:bdc-123454321
-    local bd_details=$(kubectl get disk $bd_name \
+    local bd_details=$(kubectl get disk $disk_name \
                        -o jsonpath='{.metadata.labels.kubernetes\.io/hostname}:bdc-{.metadata.uid}')
     rc=$?; if [ $rc -ne 0 ]; then echo "Failed to get disk: $disk_name details Exit Code: $rc"; exit; fi
 
@@ -106,6 +106,7 @@ function claim_blockdevices_csp() {
     local csp_list=$2
     local sp_name=""
     local pool_pod_name=""
+    local found=0
     for csp_name in `echo $csp_list | tr ":" " "`; do
         pool_pod_name=$(kubectl get pod -n $ns \
                         -l app=cstor-pool,openebs.io/cstor-pool=$csp_name,openebs.io/storage-pool-claim=$spc_name \
@@ -124,10 +125,22 @@ function claim_blockdevices_csp() {
 
         zpool_disk_list=$(get_underlying_disks $pool_pod_name $pool_type)
 
-        if [ "$csp_disk_list" != "$zpool_disk_list" ]; then
-            echo "missmatch of disks in csp $csp_name"
-            exit 1
-        fi
+        ## In some platforms we are getting some suffix to the zpool_disk_list
+        ## TODO: Get better suggestions from revice comments
+        for csp_disk in $csp_disk_list; do
+            found=0
+            for zpool_disk in $zpool_disk_list; do
+                if [[ "$zpool_disk" == "$csp_disk"* ]]; then
+                    found=1
+                    break
+                fi
+            done
+            if [ $found == 0 ]; then
+                echo "missmatch of disks in csp $csp_name"
+                exit 1
+            fi
+        done
+
         sp_name=$(kubectl get sp \
                   -l openebs.io/cstor-pool=$csp_name \
                   -o jsonpath="{.items[*].metadata.name}")
@@ -179,13 +192,7 @@ maya_deploy_name=$(kubectl get deploy \
 
 kubectl patch deploy $maya_deploy_name -p "$(cat deploy-patch.json)" -n $ns
 
-## Remove openebs.io/version from admission-server
-## Get admission-server deployment name
-admission_deploy_name=$(kubectl get deploy \
-                   -l app=admission-webhook -n $ns\
-                   -o jsonpath='{.items[0].metadata.name}')
-
-kubectl patch deploy $admission_deploy_name -p "$(cat deploy-patch.json)" -n $ns
+### admission-server has label selector in deployment file so no need to patch
 
 ## Remove openebs.io/version from openebs-provisioner
 ## Get openebs-provisioner deployment name
