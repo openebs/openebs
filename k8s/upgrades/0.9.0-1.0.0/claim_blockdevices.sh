@@ -54,9 +54,9 @@ function create_bdc_claim_bd() {
 
     sed "s|@spc_name@|$spc_name|g" bdc-create.tpl.json | \
                         sed "s|@bdc_name@|$bdc_name|g" | \
-                        sed "s|@bdc_namespace@|$ns|g" | \
-                        sed "s|@spc_uid@|$spc_uid|g" | \
-                        sed "s|@bd_name@|$bd_name|g" | \
+                        sed "s|@bdc_namespace@|$ns|g"  | \
+                        sed "s|@spc_uid@|$spc_uid|g"   | \
+                        sed "s|@bd_name@|$bd_name|g"   | \
                         sed "s|@node_name@|$node_name|g" > bdc-create.json
 
     ## Create block device claim
@@ -126,7 +126,7 @@ function claim_blockdevices_csp() {
         zpool_disk_list=$(get_underlying_disks $pool_pod_name $pool_type)
 
         ## In some platforms we are getting some suffix to the zpool_disk_list
-        ## TODO: Get better suggestions from revice comments
+        ## TODO: Get better suggestions from review comments
         for csp_disk in $csp_disk_list; do
             found=0
             for zpool_disk in $zpool_disk_list; do
