@@ -1,0 +1,28 @@
+{
+   "metadata": {
+      "labels": {
+         "openebs.io/version": "@target_version@"
+      }
+   },
+   "spec": {
+      "template": {
+          "metadata": {
+              "labels":{
+                  "openebs.io/version": "@target_version@"
+              }
+          },
+         "spec": {
+            "containers": [
+               {
+                  "name": "@c_name@",
+                  "image": "quay.io/openebs/jiva:@target_version@"
+               },
+               {
+                  "name": "maya-volume-exporter",
+                  "image": "quay.io/openebs/m-exporter:@target_version@"
+               }
+            ]
+         }
+      }
+   }
+}
