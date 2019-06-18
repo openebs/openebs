@@ -7,7 +7,8 @@
 #                                                                             #
 ###############################################################################
 function error_msg() {
-    echo "Pre-upgrade step failed. Please make sure that pre-upgrade should be successful before going to next step"
+    echo -n "Pre-upgrade script failed. Please make sure pre-upgrade script is "
+    echo -n "successful before continuing for next step. Contact OpenEBS team over slack for any further help."
 }
 
 function usage() {
@@ -16,7 +17,7 @@ function usage() {
     echo
     echo "$0 <openebs-namespace>"
     echo
-    echo "  <openebs-namespace> Get the namespace where openebs setup is running"
+    echo "  <openebs-namespace> Namespace in which openebs control plane components are installed"
     exit 1
 }
 
@@ -78,22 +79,6 @@ function create_bdc_claim_bd() {
     rm bdc-create.json
 }
 
-## claim_blockdevices_sp accepts spc and sp names as a parameters
-function claim_blockdevices_sp() {
-    local spc_name=$1
-    local sp_name=$2
-    ## kubectl command get output in below format
-    ## [sparse-37a7de580322f43a sparse-5a92ced3e2ee21 sparse-5e508018b4dd2c8]
-    ## and then converts to below format
-    ## sparse-37a7de580322f43a,sparse-5a92ced3e2ee21,sparse-5e508018b4dd2c8
-    sp_disk_list=$(kubectl get sp $sp_name \
-                   -o jsonpath="{.spec.disks.diskList}" | tr "[]" " ")
-
-    for disk_name in $sp_disk_list; do
-        create_bdc_claim_bd $spc_name $disk_name
-    done
-}
-
 ## Output of below command
 ## kubectl exec cstor-sparse-d9r7-66cd7b798c-4qjnt -n openebs -c cstor-pool -- zpool list -v -H -P | awk '{print $1}'
 ## cstor-49a012ee-8f1a-11e9-8773-54e1ad4a9dd4
@@ -117,6 +102,11 @@ function claim_blockdevices_csp() {
     local sp_name=""
     local pool_pod_name=""
     local found=0
+    local csp_disk_len=0
+    local sp_disk_len=0
+    local csp_disk_list=""
+    local zpool_disk_list=""
+    local sp_disk_list=""
     for csp_name in `echo $csp_list | tr ":" " "`; do
         pool_pod_name=$(kubectl get pod -n $ns \
                         -l app=cstor-pool,openebs.io/cstor-pool=$csp_name,openebs.io/storage-pool-claim=$spc_name \
@@ -131,8 +121,21 @@ function claim_blockdevices_csp() {
         csp_disk_list=$(kubectl get csp $csp_name \
                         -o jsonpath='{.spec.disks.diskList}' | \
                         tr "[]" " ")
+        csp_disk_len=$(echo $csp_disk_list | wc -w)
 
         zpool_disk_list=$(get_underlying_disks $pool_pod_name $pool_type)
+
+        if [ -z "$zpool_disk_list" ]; then
+            echo "zpool disk list is empty: $zpool_disk_list"
+            error_msg
+            exit 1
+        fi
+
+        if [ $csp_disk_len == 0 ]; then
+            echo "csp disk list is empty: $csp_disk_list"
+            error_msg
+            exit 1
+        fi
 
         ## In some platforms we are getting some suffix to the zpool_disk_list
         for zpool_disk in $zpool_disk_list; do
@@ -155,7 +158,24 @@ function claim_blockdevices_csp() {
                   -o jsonpath="{.items[*].metadata.name}")
         rc=$?; if [ $rc -ne 0 ]; then echo "Failed to get sp name related to csp: $csp_name | Exit Code: $rc"; error_msg; exit 1; fi
 
-        claim_blockdevices_sp $spc_name $sp_name
+        ## kubectl command get output in below format
+        ## [sparse-37a7de580322f43a sparse-5a92ced3e2ee21 sparse-5e508018b4dd2c8]
+        ## and then converts to below format
+        ## sparse-37a7de580322f43a sparse-5a92ced3e2ee21 sparse-5e508018b4dd2c8
+        sp_disk_list=$(kubectl get sp $sp_name \
+                       -o jsonpath="{.spec.disks.diskList}" | tr "[]" " ")
+
+        sp_disk_len=$(echo $sp_disk_list | wc -w)
+
+        if [ $sp_disk_len -ne $csp_disk_len ]; then
+            echo "Length of csp disk list $csp_disk_len and sp disk list $sp_disk_len is not matched"
+            error_msg
+            exit 1
+        fi
+
+        for disk_name in $sp_disk_list; do
+            create_bdc_claim_bd $spc_name $disk_name
+        done
     done
 }
 
