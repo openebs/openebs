@@ -8,6 +8,10 @@
 target_upgrade_version="v1.0.x-ci"
 current_version="0.9.0"
 
+function error_msg() {
+    echo "Failed to upgrade volume $pv in namespace $ns. Please make sure that volume upgrade should be successful before moving to application checks"
+}
+
 function usage() {
     echo
     echo "Usage:"
@@ -30,7 +34,7 @@ ns=$2
 # Check if pv exists
 kubectl get pv $pv &>/dev/null;check_pv=$?
 if [ $check_pv -ne 0 ]; then
-    echo "$pv not found";exit 1;
+    echo "$pv not found"; error_msg; exit 1;
 fi
 
 # Check if CASType is cstor
@@ -79,45 +83,49 @@ c_rs=$(kubectl get rs -n $ns -o name -l openebs.io/persistent-volume=$pv | cut -
 # Check if openebs resources exist and provisioned version is 0.9
 
 if [[ -z $c_rs ]]; then
-    echo "Target Replica set not found"; exit 1;
+    echo "Target Replica set not found"; error_msg; exit 1;
 fi
 
 if [[ -z $c_dep ]]; then
-    echo "Target deployment not found"; exit 1;
+    echo "Target deployment not found"; error_msg; exit 1;
 fi
 
 if [[ -z $c_svc ]]; then
-    echo "Target svc not found";exit 1;
+    echo "Target svc not found"; error_msg; exit 1;
 fi
 
 if [[ -z $c_vol ]]; then
-    echo "CstorVolumes CR not found"; exit 1;
+    echo "CstorVolumes CR not found"; error_msg; exit 1;
 fi
 
 if [[ -z $c_replicas ]]; then
-    echo "Cstor Volume Replica CR not found"; exit 1;
+    echo "Cstor Volume Replica CR not found"; error_msg; exit 1;
 fi
 
 controller_version=`kubectl get deployment $c_dep -n $ns -o jsonpath='{.metadata.labels.openebs\.io/version}'`
 if [[ "$controller_version" != "$current_version" ]] && [[ "$controller_version" != "$target_upgrade_version" ]] ; then
-    echo "Current cstor target deloyment $c_dep version is not $current_version or $target_upgrade_version";exit 1;
+    echo "Current cstor target deloyment $c_dep version is not $current_version or $target_upgrade_version"
+    error_msg
+    exit 1
 fi
 
 controller_service_version=`kubectl get svc $c_svc -n $ns -o jsonpath='{.metadata.labels.openebs\.io/version}'`
 if [[ "$controller_service_version" != "$current_version" ]] && [[ "$controller_service_version" != "$target_upgrade_version" ]]; then
-    echo "Current cstor target service $c_svc version is not $current_version or $target_upgrade_version";exit 1;
+    echo "Current cstor target service $c_svc version is not $current_version or $target_upgrade_version"
+    error_msg
+    exit 1
 fi
 
 cstor_volume_version=`kubectl get cstorvolumes $c_vol -n $ns -o jsonpath='{.metadata.labels.openebs\.io/version}'`
 if [[ "$cstor_volume_version" != "$current_version" ]] && [[ "$cstor_volume_version" != "$target_upgrade_version" ]]; then
-    echo "Current cstor volume  $c_vol version is not $current_version or $target_upgrade_version";exit 1;
+    echo "Current cstor volume  $c_vol version is not $current_version or $target_upgrade_version"; error_msg; exit 1;
 fi
 
 for replica in $c_replicas
 do
     replica_version=`kubectl get cvr $replica -n $ns -o jsonpath='{.metadata.labels.openebs\.io/version}'`
     if [[ "$replica_version" != "$current_version" ]] && [[ "$replica_version" != "$target_upgrade_version" ]]; then
-        echo "CStor volume replica $replica version is not $current_version"; exit 1;
+        echo "CStor volume replica $replica version is not $current_version"; error_msg; exit 1;
     fi
 done
 
@@ -146,14 +154,14 @@ if [[ "$controller_version" != "$target_upgrade_version" ]]; then
     echo "Upgrading Target Deployment to $target_upgrade_version"
 
     kubectl patch deployment  --namespace $ns $c_dep -p "$(cat cstor-target-patch.json)"
-    rc=$?; if [ $rc -ne 0 ]; then echo "Failed to patch cstor target deployment $c_dep | Exit code: $rc"; exit; fi
+    rc=$?; if [ $rc -ne 0 ]; then echo "Failed to patch cstor target deployment $c_dep | Exit code: $rc"; error_msg; exit 1; fi
 
     kubectl delete rs $c_rs --namespace $ns
-    rc=$?; if [ $rc -ne 0 ]; then echo "Failed to delete cstor replica set $c_rs | Exit code: $rc"; exit; fi
+    rc=$?; if [ $rc -ne 0 ]; then echo "Failed to delete cstor replica set $c_rs | Exit code: $rc"; error_msg; exit 1; fi
 
     rollout_status=$(kubectl rollout status --namespace $ns  deployment/$c_dep)
     rc=$?; if [[ ($rc -ne 0) || !($rollout_status =~ "successfully rolled out") ]];
-    then echo "Failed to rollout for deployment $c_dep | Exit code: $rc"; exit; fi
+    then echo "Failed to rollout for deployment $c_dep | Exit code: $rc"; error_msg; exit 1; fi
 else
     echo "Target deployment $c_dep is already at $target_upgrade_version"
 fi
@@ -162,7 +170,7 @@ fi
 if [[ "$controller_service_version" != "$target_upgrade_version" ]]; then
     echo "Upgrading Target Service to $target_upgrade_version"
     kubectl patch service --namespace $ns $c_svc -p "$(cat cstor-target-svc-patch.json)"
-    rc=$?; if [ $rc -ne 0 ]; then echo "Failed to patch service $svc | Exit code: $rc"; exit; fi
+    rc=$?; if [ $rc -ne 0 ]; then echo "Failed to patch service $svc | Exit code: $rc"; error_msg; exit 1; fi
 else
     echo "Target service $c_svc is already at $target_upgrade_version"
 fi
@@ -171,7 +179,7 @@ fi
 if [[ "$cstor_volume_version" != "$target_upgrade_version" ]]; then
     echo "Upgrading cstor volume CR to $target_upgrade_version"
     kubectl patch cstorvolume --namespace $ns $c_vol -p "$(cat cstor-volume-patch.json)" --type=merge
-    rc=$?; if [ $rc -ne 0 ]; then echo "Failed to patch cstor volumes CR $c_vol | Exit code: $rc"; exit; fi
+    rc=$?; if [ $rc -ne 0 ]; then echo "Failed to patch cstor volumes CR $c_vol | Exit code: $rc"; error_msg; exit 1; fi
 else
     echo "CStor volume CR  $c_vol is already at $target_upgrade_version"
 fi
@@ -183,7 +191,7 @@ do
     if [[ "`kubectl get cvr $replica -n $ns -o jsonpath='{.metadata.labels.openebs\.io/version}'`" != "$target_upgrade_version" ]]; then
         echo "Upgrading cstor volume replica $replica to $target_upgrade_version"
         kubectl patch cvr $replica --namespace $ns -p "$(cat cstor-volume-replica-patch.json)" --type=merge
-        rc=$?; if [ $rc -ne 0 ]; then echo "Failed to patch CstorVolumeReplica $replica | Exit code: $rc"; exit; fi
+        rc=$?; if [ $rc -ne 0 ]; then echo "Failed to patch CstorVolumeReplica $replica | Exit code: $rc"; error_msg; exit 1; fi
         echo "Successfully updated replica: $replica"
     else
         echo "cstor replica  $replica is already at $target_upgrade_version"
