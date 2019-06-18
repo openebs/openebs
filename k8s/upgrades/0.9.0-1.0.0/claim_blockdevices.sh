@@ -7,7 +7,7 @@
 #                                                                             #
 ###############################################################################
 function error_msg() {
-    echo "Pre-upgrade step failed. Please make sure that pre-upgrade should be successfull before going to next step"
+    echo "Pre-upgrade step failed. Please make sure that pre-upgrade should be successful before going to next step"
 }
 
 function usage() {
