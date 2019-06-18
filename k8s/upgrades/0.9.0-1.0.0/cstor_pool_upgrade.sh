@@ -10,7 +10,9 @@ pool_upgrade_version="v1.0.x-ci"
 current_version="0.9.0"
 
 function error_msg() {
-    echo "Failed to upgrade pool $spc. Please make sure that the pool $spc upgrade should be successful before moving to the next step"
+    echo -n "Failed to upgrade pool $spc. Please make sure that the pool $spc "
+    echo -n "upgrade should be successful before continuing for next step. "
+    echo -n "Contact OpenEBS team over slack for any further help."
 }
 
 function usage() {
@@ -40,7 +42,8 @@ function verify_openebs_version() {
 
     if [[ $openebs_version != $current_version ]] && \
           [[ $openebs_version != $pool_upgrade_version ]]; then
-        echo "Expected version of $name_res in $resource is $current_version but got $openebs_version";exit 1;
+        echo "Expected version of $name_res in $resource is $current_version but got $openebs_version"
+        exit 1;
     fi
     echo $openebs_version
 }
@@ -154,6 +157,7 @@ for csp_name in `echo $csp_list | tr ":" " "`; do
     version=$(verify_openebs_version "csp" $csp_name)
     rc=$?
     if [ $rc -ne 0 ]; then
+        error_msg
         exit 1
     elif [ $version == $pool_upgrade_version ]; then
         continue
@@ -231,6 +235,7 @@ for csp_name in `echo $csp_list | tr ":" " "`; do
     version=$(verify_openebs_version "deploy" $pool_dep)
     rc=$?
     if [ $rc -ne 0 ]; then
+        error_msg
         exit 1
     elif [ $version == $pool_upgrade_version ]; then
         continue
