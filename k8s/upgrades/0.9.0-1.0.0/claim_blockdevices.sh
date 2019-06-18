@@ -49,13 +49,13 @@ function create_bdc_claim_bd() {
     ## nodename:bdc-123454321
     local bd_details=$(kubectl get disk $disk_name \
                        -o jsonpath='{.metadata.labels.kubernetes\.io/hostname}:bdc-{.metadata.uid}')
-    rc=$?; if [ $rc -ne 0 ]; then echo "Failed to get disk: $disk_name details Exit Code: $rc"; error_msg; exit 1; fi
+    rc=$?; if [ $rc -ne 0 ]; then echo "Failed to get disk: $disk_name details | Exit Code: $rc"; error_msg; exit 1; fi
 
     local node_name=$(echo $bd_details | cut -d ":" -f 1)
     local bdc_name=$(echo $bd_details | cut -d ":" -f 2)
 
     local spc_uid=$(kubectl get spc $spc_name -o jsonpath='{.metadata.uid}')
-    rc=$?; if [ $rc -ne 0 ]; then echo "Failed to get spc: $spc_name UID Exit Code: $rc"; error_msg; exit 1; fi
+    rc=$?; if [ $rc -ne 0 ]; then echo "Failed to get spc: $spc_name UID | Exit Code: $rc"; error_msg; exit 1; fi
 
     sed "s|@spc_name@|$spc_name|g" bdc-create.tpl.json | \
                         sed "s|@bdc_name@|$bdc_name|g" | \
@@ -68,7 +68,7 @@ function create_bdc_claim_bd() {
     kubectl apply -f bdc-create.json
     rc=$?
     if [ $rc -ne 0 ]; then
-        echo "Failed to create bdc: $bdc_name in namespace $ns Exit Code: $rc"
+        echo "Failed to create bdc: $bdc_name in namespace $ns | Exit Code: $rc"
         error_msg
         rm bdc-create.json
         exit 1
@@ -121,11 +121,11 @@ function claim_blockdevices_csp() {
         pool_pod_name=$(kubectl get pod -n $ns \
                         -l app=cstor-pool,openebs.io/cstor-pool=$csp_name,openebs.io/storage-pool-claim=$spc_name \
                         -o jsonpath="{.items[0].metadata.name}")
-        rc=$?; if [ $rc -ne 0 ]; then echo "Failed to get pool pod name for csp: $csp_name Exit Code: $rc"; error_msg; exit 1; fi
+        rc=$?; if [ $rc -ne 0 ]; then echo "Failed to get pool pod name for csp: $csp_name | Exit Code: $rc"; error_msg; exit 1; fi
 
         pool_type=$(kubectl get csp $csp_name \
                     -o jsonpath='{.spec.poolSpec.poolType}')
-        rc=$?; if [ $rc -ne 0 ]; then echo "Failed to get pool type for csp: $csp_name Exit Code: $rc"; error_msg; exit 1; fi
+        rc=$?; if [ $rc -ne 0 ]; then echo "Failed to get pool type for csp: $csp_name | Exit Code: $rc"; error_msg; exit 1; fi
 
 
         csp_disk_list=$(kubectl get csp $csp_name \
@@ -153,7 +153,7 @@ function claim_blockdevices_csp() {
         sp_name=$(kubectl get sp \
                   -l openebs.io/cstor-pool=$csp_name \
                   -o jsonpath="{.items[*].metadata.name}")
-        rc=$?; if [ $rc -ne 0 ]; then echo "Failed to get sp name related to csp: $csp_name Exit Code: $rc"; error_msg; exit 1; fi
+        rc=$?; if [ $rc -ne 0 ]; then echo "Failed to get sp name related to csp: $csp_name | Exit Code: $rc"; error_msg; exit 1; fi
 
         claim_blockdevices_sp $spc_name $sp_name
     done
@@ -173,12 +173,12 @@ map_pool_type["raidz2"]="raidz2"
 
 ## Apply blockdeviceclaim crd yaml to create CR
 kubectl apply -f blockdeviceclaim_crd.yaml
-rc=$?; if [ $rc -ne 0 ]; then echo "Failed to create blockdevice crd Exit Code: $rc"; error_msg; exit 1; fi
+rc=$?; if [ $rc -ne 0 ]; then echo "Failed to create blockdevice crd | Exit Code: $rc"; error_msg; exit 1; fi
 
 
 ### Get the spc list which are present in the cluster ###
 spc_list=$(kubectl get spc -o jsonpath="{range .items[*]}{@.metadata.name}:{end}")
-rc=$?; if [ $rc -ne 0 ]; then echo "Failed to list spc in cluster Exit Code: $rc"; error_msg; exit 1; fi
+rc=$?; if [ $rc -ne 0 ]; then echo "Failed to list spc in cluster | Exit Code: $rc"; error_msg; exit 1; fi
 
 #### Get required info from current spc and use the info to claim block device ####
 for spc_name in `echo $spc_list | tr ":" " "`; do
@@ -187,7 +187,7 @@ for spc_name in `echo $spc_list | tr ":" " "`; do
 
     ## Patching the spc resource with label
     kubectl patch spc $spc_name -p "$(cat spc-patch.tpl.json)" --type=merge
-    rc=$?; if [ $rc -ne 0 ]; then echo "Failed to patch spc: $spc_name with reconcile annotation Exit Code: $rc"; error_msg; exit 1; fi
+    rc=$?; if [ $rc -ne 0 ]; then echo "Failed to patch spc: $spc_name with reconcile annotation | Exit Code: $rc"; error_msg; exit 1; fi
 done
 
 ./patch_deployment.sh $ns
