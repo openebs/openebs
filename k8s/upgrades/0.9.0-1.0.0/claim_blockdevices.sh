@@ -6,6 +6,10 @@
 # STEP 3: Patch SPC to stop reconciliation                                    #
 #                                                                             #
 ###############################################################################
+function error_msg() {
+    echo "Pre-upgrade step failed. Please make sure that pre-upgrade should be successfull before going to next step"
+}
+
 function usage() {
     echo
     echo "Usage:"
@@ -28,6 +32,7 @@ function get_csp_list() {
     rc=$?
     if [ $rc -ne 0 ]; then
         echo "Failed to get csp related to spc $spc"
+        error_msg
         exit 1
     fi
     echo $csp_list
@@ -44,13 +49,13 @@ function create_bdc_claim_bd() {
     ## nodename:bdc-123454321
     local bd_details=$(kubectl get disk $disk_name \
                        -o jsonpath='{.metadata.labels.kubernetes\.io/hostname}:bdc-{.metadata.uid}')
-    rc=$?; if [ $rc -ne 0 ]; then echo "Failed to get disk: $disk_name details Exit Code: $rc"; exit; fi
+    rc=$?; if [ $rc -ne 0 ]; then echo "Failed to get disk: $disk_name details Exit Code: $rc"; error_msg; exit 1; fi
 
     local node_name=$(echo $bd_details | cut -d ":" -f 1)
     local bdc_name=$(echo $bd_details | cut -d ":" -f 2)
 
     local spc_uid=$(kubectl get spc $spc_name -o jsonpath='{.metadata.uid}')
-    rc=$?; if [ $rc -ne 0 ]; then echo "Failed to get spc: $spc_name UID Exit Code: $rc"; exit; fi
+    rc=$?; if [ $rc -ne 0 ]; then echo "Failed to get spc: $spc_name UID Exit Code: $rc"; error_msg; exit 1; fi
 
     sed "s|@spc_name@|$spc_name|g" bdc-create.tpl.json | \
                         sed "s|@bdc_name@|$bdc_name|g" | \
@@ -61,7 +66,13 @@ function create_bdc_claim_bd() {
 
     ## Create block device claim
     kubectl apply -f bdc-create.json
-    rc=$?; if [ $rc -ne 0 ]; then echo "Failed to create bdc: $bdc_name in namespace $ns Exit Code: $rc"; exit; fi
+    rc=$?
+    if [ $rc -ne 0 ]; then
+        echo "Failed to create bdc: $bdc_name in namespace $ns Exit Code: $rc"
+        error_msg
+        rm bdc-create.json
+        exit 1
+    fi
 
     ## cleanup temporary file
     rm bdc-create.json
@@ -76,10 +87,9 @@ function claim_blockdevices_sp() {
     ## and then converts to below format
     ## sparse-37a7de580322f43a,sparse-5a92ced3e2ee21,sparse-5e508018b4dd2c8
     sp_disk_list=$(kubectl get sp $sp_name \
-                   -o jsonpath="{.spec.disks.diskList}" | sed 's|\[||g; s|\]||g; s| |,|g')
-    rc=$?; if [ $rc -ne 0 ]; then echo "Failed to list disks related to sp: $sp_name Exit Code: $rc"; exit; fi
+                   -o jsonpath="{.spec.disks.diskList}" | tr "[]" " ")
 
-    for disk_name in `echo $sp_disk_list | tr "," " "`; do
+    for disk_name in $sp_disk_list; do
         create_bdc_claim_bd $spc_name $disk_name
     done
 }
@@ -96,7 +106,7 @@ function get_underlying_disks() {
     local pool_type=$2
     local zpool_disk_list=$(kubectl exec $pod_name -n $ns -c cstor-pool \
                           -- zpool list -v -H -P | \
-                          awk '{print $1}' | grep -v cstor | grep -v ${map_pool_type[$pool_type]} | sort)
+                          awk '{print $1}' | grep -v cstor | grep -v ${map_pool_type[$pool_type]})
     echo $zpool_disk_list
 }
 
@@ -111,32 +121,31 @@ function claim_blockdevices_csp() {
         pool_pod_name=$(kubectl get pod -n $ns \
                         -l app=cstor-pool,openebs.io/cstor-pool=$csp_name,openebs.io/storage-pool-claim=$spc_name \
                         -o jsonpath="{.items[0].metadata.name}")
+        rc=$?; if [ $rc -ne 0 ]; then echo "Failed to get pool pod name for csp: $csp_name Exit Code: $rc"; error_msg; exit 1; fi
 
         pool_type=$(kubectl get csp $csp_name \
                     -o jsonpath='{.spec.poolSpec.poolType}')
+        rc=$?; if [ $rc -ne 0 ]; then echo "Failed to get pool type for csp: $csp_name Exit Code: $rc"; error_msg; exit 1; fi
 
 
         csp_disk_list=$(kubectl get csp $csp_name \
                         -o jsonpath='{.spec.disks.diskList}' | \
-                        sed 's|\[||g; s|\]||g; s| |,|g'  | tr , "\n" | sort)
-        ## csp_disk_list holds the same format for commparision with
-        ## zpool_disk_list
-        csp_disk_list=$(echo $csp_disk_list)
+                        tr "[]" " ")
 
         zpool_disk_list=$(get_underlying_disks $pool_pod_name $pool_type)
 
         ## In some platforms we are getting some suffix to the zpool_disk_list
-        ## TODO: Get better suggestions from review comments
-        for csp_disk in $csp_disk_list; do
+        for zpool_disk in $zpool_disk_list; do
             found=0
-            for zpool_disk in $zpool_disk_list; do
+            for csp_disk in $csp_disk_list; do
                 if [[ "$zpool_disk" == "$csp_disk"* ]]; then
                     found=1
                     break
                 fi
             done
             if [ $found == 0 ]; then
-                echo "missmatch of disks in csp $csp_name"
+                echo "zpool disk: $zpool_disk is not found in csp: $csp_name disk list: {$csp_disk_list}"
+                error_msg
                 exit 1
             fi
         done
@@ -144,7 +153,7 @@ function claim_blockdevices_csp() {
         sp_name=$(kubectl get sp \
                   -l openebs.io/cstor-pool=$csp_name \
                   -o jsonpath="{.items[*].metadata.name}")
-        rc=$?; if [ $rc -ne 0 ]; then echo "Failed to get sp related to csp: $csp_name Exit Code: $rc"; exit; fi
+        rc=$?; if [ $rc -ne 0 ]; then echo "Failed to get sp name related to csp: $csp_name Exit Code: $rc"; error_msg; exit 1; fi
 
         claim_blockdevices_sp $spc_name $sp_name
     done
@@ -164,12 +173,12 @@ map_pool_type["raidz2"]="raidz2"
 
 ## Apply blockdeviceclaim crd yaml to create CR
 kubectl apply -f blockdeviceclaim_crd.yaml
-rc=$?; if [ $rc -ne 0 ]; then echo "Failed to create blockdevice crd Exit Code: $rc"; exit; fi
+rc=$?; if [ $rc -ne 0 ]; then echo "Failed to create blockdevice crd Exit Code: $rc"; error_msg; exit 1; fi
 
 
 ### Get the spc list which are present in the cluster ###
 spc_list=$(kubectl get spc -o jsonpath="{range .items[*]}{@.metadata.name}:{end}")
-rc=$?; if [ $rc -ne 0 ]; then echo "Failed to list spc present in cluster Exit Code: $rc"; exit; fi
+rc=$?; if [ $rc -ne 0 ]; then echo "Failed to list spc in cluster Exit Code: $rc"; error_msg; exit 1; fi
 
 #### Get required info from current spc and use the info to claim block device ####
 for spc_name in `echo $spc_list | tr ":" " "`; do
@@ -178,44 +187,13 @@ for spc_name in `echo $spc_list | tr ":" " "`; do
 
     ## Patching the spc resource with label
     kubectl patch spc $spc_name -p "$(cat spc-patch.tpl.json)" --type=merge
-    rc=$?; if [ $rc -ne 0 ]; then echo "Failed to patch spc: $spc_name with reconcile label Exit Code: $rc"; exit; fi
+    rc=$?; if [ $rc -ne 0 ]; then echo "Failed to patch spc: $spc_name with reconcile annotation Exit Code: $rc"; error_msg; exit 1; fi
 done
 
-## Below snippet will remove the openebs.io/version label from
-## deployment.spec.selector.matchLabels
-
-## Remove openebs.io/version from maya-apiserver
-## Get maya-apiserver deployment name
-maya_deploy_name=$(kubectl get deploy \
-                   -l name=maya-apiserver -n $ns\
-                   -o jsonpath='{.items[0].metadata.name}')
-
-kubectl patch deploy $maya_deploy_name -p "$(cat deploy-patch.json)" -n $ns
-
-### admission-server has label selector in deployment file so no need to patch
-
-## Remove openebs.io/version from openebs-provisioner
-## Get openebs-provisioner deployment name
-provisioner_deploy_name=$(kubectl get deploy \
-                   -l name=openebs-provisioner -n $ns\
-                   -o jsonpath='{.items[0].metadata.name}')
-kubectl patch deploy $provisioner_deploy_name -p "$(cat deploy-patch.json)" -n $ns
-
-## Remove openebs.io/version from snapshot-provisioner
-## Get snapshot-provisioner deployment name
-snapshot_deploy_name=$(kubectl get deploy \
-                   -l name=openebs-snapshot-operator -n $ns\
-                   -o jsonpath='{.items[0].metadata.name}')
-kubectl patch deploy $snapshot_deploy_name -p "$(cat deploy-patch.json)" -n $ns
-
-## Remove openebs.io/version from local-pvprovisioner
-## Get local-pvprovisioner deployment name
-local_pvprovisioner_deploy_name=$(kubectl get deploy \
-                   -l name=openebs-localpv-provisioner -n $ns\
-                   -o jsonpath='{.items[0].metadata.name}')
-kubectl patch deploy $local_pvprovisioner_deploy_name -p "$(cat deploy-patch.json)" -n $ns
-
-daemonset_name=$(kubectl get daemonset \
-                   -l name=openebs-ndm,openebs.io/component-name=ndm -n $ns \
-                   -o jsonpath='{.items[0].metadata.name}')
-kubectl patch daemonset $daemonset_name -p "$(cat deploy-patch.json)" -n $ns
+./patch_deployment.sh $ns
+rc=$?
+if [ $rc -ne 0 ]; then
+    echo "Failed to patch control plane deployments"
+    error_msg
+    exit 1
+fi
