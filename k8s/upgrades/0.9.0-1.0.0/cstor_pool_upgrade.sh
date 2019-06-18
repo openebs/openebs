@@ -51,21 +51,39 @@ function get_csp_list() {
     echo $csp_list
 }
 
+function make_spc_blockdevice_list() {
+    local spc_bd_list=$1
+    local disk_name=$2
+    local bd_name=$(echo $disk_name | sed 's|disk-|blockdevice-|g')
+
+    if [ -z $spc_bd_list ]; then
+        echo "\"$bd_name\""
+    else
+        echo "$spc_bd_list,\"$bd_name\""
+    fi
+}
+
 ## patch_blockdevice_list_for_spc to patch block device changes related to spc
 function patch_blockdevice_list_for_spc() {
     local spc_name=$1
 
-    ## Get spc yaml and replace disk related info with block device
-    kubectl get spc $spc_name -o yaml | \
-                   sed 's|disks|blockDevices|g' | \
-                   sed 's|diskList|blockDeviceList|g' | \
-                   sed 's|disk-|blockdevice-|g' > spc-patch.json
-    rc=$?; if [ $rc -ne 0 ]; then echo "Failed to get spc: $spc_name yaml Exit Code: $rc"; exit; fi
+    local spc_disk_list=$(kubectl get spc $spc_name \
+                          -o jsonpath='{.spec.disks.diskList}' | \
+                          sed 's|\[||g; s|\]||g')
+    local spc_bd_list=""
 
-    kubectl apply -f spc-patch.json
-    rc=$?; if [ $rc -ne 0 ]; then echo "Failed to patch spc: $spc_name with block deivce info Exit Code: $rc"; exit; fi
+    ##TODO: Make a proper check ex: disk count
+    if [ ! -z "$spc_disk_list" ]; then
+        for disk_name in $spc_disk_list; do
+             spc_bd_list=$(make_spc_blockdevice_list "$spc_bd_list" "$disk_name")
+        done
+        sed "s|@blockdevice_list@|$spc_bd_list|g" spc-patch.tpl.json > spc-patch.json
 
-    rm spc-patch.json
+        kubectl patch spc $spc_name -p "$(cat spc-patch.json)" --type=merge
+        rc=$?; if [ $rc -ne 0 ]; then echo "Failed to upgrade spc: $spc_name Exit Code: $rc"; exit; fi
+
+        rm spc-patch.json
+    fi
 }
 
 ## make_csp_disk_list will return the jsonpath required to update the csp
@@ -134,7 +152,7 @@ for csp_name in `echo $csp_list | tr ":" " "`; do
     rc=$?; if [ $rc -ne 0 ]; then echo "Failed to get disks related to sp: $sp_name Exit Code: $rc"; exit; fi
 
     ## Below snippet will get related info regarding block device and format
-    ## the information in below format and save it with corresponding csp name
+    ## information in below format and save it to corresponding csp name
     ## "group": [
     ##    {
     ##         "blockDevice": [
@@ -219,8 +237,5 @@ done
 ## Delete sp realated to the spc
 kubectl delete sp -l openebs.io/cas-type=cstor,openebs.io/storage-pool-claim=$spc
 rc=$?; if [ $rc -ne 0 ]; then echo "Failed to delete sp related to spc: $spc_name Exit Code: $rc"; exit; fi
-
-## Remove the reconcile.openebs.io/disable annotation from spc
-kubectl patch spc $spc -p "$(cat annotation-remove.json)" --type=merge
 
 echo "Successfully upgrade $spc to $pool_upgrade_version Please run volume upgrade scripts."
