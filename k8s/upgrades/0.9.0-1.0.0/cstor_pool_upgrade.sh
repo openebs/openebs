@@ -9,6 +9,10 @@
 pool_upgrade_version="v1.0.x-ci"
 current_version="0.9.0"
 
+function error_msg() {
+    echo "Failed to upgrade pool $spc. Please make sure that the pool $spc upgrade should be successful before moving to the next step"
+}
+
 function usage() {
     echo
     echo "Usage:"
@@ -27,7 +31,12 @@ function verify_openebs_version() {
     local name_res=$2
     local openebs_version=$(kubectl get $resource $name_res -n $ns \
                  -o jsonpath="{.metadata.labels.openebs\.io/version}")
-    rc=$?; if [ $rc -ne 0 ]; then echo "Failed to get version from $resource: $name_res Exit Code: $rc"; exit; fi
+    rc=$?
+    if [ $rc -ne 0 ]; then
+        echo "Failed to get version from $resource: $name_res | Exit Code: $rc"
+        error_msg
+        exit 1
+    fi
 
     if [[ $openebs_version != $current_version ]] && \
           [[ $openebs_version != $pool_upgrade_version ]]; then
@@ -46,6 +55,7 @@ function get_csp_list() {
     rc=$?
     if [ $rc -ne 0 ]; then
         echo "Failed to get csp related to spc $spc"
+        error_msg
         exit 1
     fi
     echo $csp_list
@@ -54,6 +64,7 @@ function get_csp_list() {
 function make_spc_blockdevice_list() {
     local spc_bd_list=$1
     local disk_name=$2
+    ## For sparse block device name looks like sparse-1234567
     local bd_name=$(echo $disk_name | sed 's|disk-|blockdevice-|g')
 
     if [ -z $spc_bd_list ]; then
@@ -69,18 +80,25 @@ function patch_blockdevice_list_for_spc() {
 
     local spc_disk_list=$(kubectl get spc $spc_name \
                           -o jsonpath='{.spec.disks.diskList}' | \
-                          sed 's|\[||g; s|\]||g')
+                          tr "[]" " ")
     local spc_bd_list=""
+    local no_of_blockdevices=$(echo $spc_disk_list | wc -w)
 
-    ##TODO: Make a proper check ex: disk count
-    if [ ! -z "$spc_disk_list" ]; then
+    ##Patch SPC only if it is manual provisioning
+    if [ $no_of_blockdevices != 0 ]; then
         for disk_name in $spc_disk_list; do
              spc_bd_list=$(make_spc_blockdevice_list "$spc_bd_list" "$disk_name")
         done
         sed "s|@blockdevice_list@|$spc_bd_list|g" spc-patch.tpl.json > spc-patch.json
 
         kubectl patch spc $spc_name -p "$(cat spc-patch.json)" --type=merge
-        rc=$?; if [ $rc -ne 0 ]; then echo "Failed to upgrade spc: $spc_name Exit Code: $rc"; exit; fi
+        rc=$?
+        if [ $rc -ne 0 ]; then
+            echo "Failed to patch spc: $spc_name with block device information | Exit Code: $rc"
+            error_msg
+            rm spc-patch.json
+            exit 1
+        fi
 
         rm spc-patch.json
     fi
@@ -91,7 +109,7 @@ function make_csp_disk_list() {
     local csp_disk_list=$1
     local disk_device_id=$2
     local disk_name=$3
-    if [ "$csp_disk_list" == "init" ]; then
+    if [ -z "$csp_disk_list" ]; then
         echo "{\"deviceID\": \"$disk_device_id\",\"inUseByPool\": true,\"name\": \"$disk_name\"}"
     else
         echo "$csp_disk_list,{\"deviceID\": \"$disk_device_id\",\"inUseByPool\": true,\"name\": \"$disk_name\"}"
@@ -115,12 +133,13 @@ declare -A csp_blockdevice_list
 pending_pods=$(kubectl get po -n $ns \
     -l app=cstor-pool,openebs.io/storage-pool-claim=$spc \
     -o jsonpath='{.items[?(@.status.phase!="Running")].metadata.name}')
-rc=$?; if [ $rc -ne 0 ]; then echo "Failed to get pods related to spc: $spc Exit Code: $rc"; exit; fi
+rc=$?; if [ $rc -ne 0 ]; then echo "Failed to get pool pods related to spc: $spc | Exit Code: $rc"; error_msg; exit 1; fi
 
 
 ## If any deployments pods are in not running state then exit the upgrade process ###
 if [ $(echo $pending_pods | wc -w) -ne 0 ]; then
     echo "To continue with upgrade script make sure all the pool deployment pods corresponding to $spc must be in running state"
+    error_msg
     exit 1
 fi
 
@@ -144,12 +163,14 @@ for csp_name in `echo $csp_list | tr ":" " "`; do
     sp_name=$(kubectl get sp \
               -l openebs.io/cstor-pool=$csp_name \
               -o jsonpath="{.items[*].metadata.name}")
-    rc=$?; if [ $rc -ne 0 ]; then echo "Failed to get sp related to csp: $csp_name Exit Code: $rc"; exit; fi
+    rc=$?; if [ $rc -ne 0 ]; then echo "Failed to get sp related to csp: $csp_name | Exit Code: $rc"; error_msg; exit 1; fi
 
+    ## Below command will give the output in form of
+    ## [disk-1 disk-2 disk-3 disk-4]
     sp_disk_list=$(kubectl get sp $sp_name \
                    -o jsonpath="{.spec.disks.diskList}" | \
-                    sed 's|\[||g; s|\]||g; s| |,|g')
-    rc=$?; if [ $rc -ne 0 ]; then echo "Failed to get disks related to sp: $sp_name Exit Code: $rc"; exit; fi
+                    tr "[]" " ")
+    rc=$?; if [ $rc -ne 0 ]; then echo "Failed to get disks related to sp: $sp_name | Exit Code: $rc"; error_msg; exit 1; fi
 
     ## Below snippet will get related info regarding block device and format
     ## information in below format and save it to corresponding csp name
@@ -169,8 +190,8 @@ for csp_name in `echo $csp_list | tr ":" " "`; do
     ##         ]
     ##    }
     ## ]
-    csp_disk_list="init"
-    for disk_name in `echo $sp_disk_list | tr "," " "`; do
+    csp_disk_list=""
+    for disk_name in $sp_disk_list; do
          ## Assuming device Id present in first index
          device_id=$(kubectl get disk $disk_name -o jsonpath="{.spec.devlinks[0].links[0]}")
          if [ -z $device_id ]; then
@@ -182,7 +203,13 @@ for csp_name in `echo $csp_list | tr ":" " "`; do
     sed "s|@pool_version@|$pool_upgrade_version|g" csp-metadata-patch.tpl.json > csp-patch.json
 
     kubectl patch csp $csp_name -p "$(cat csp-patch.json)" --type=merge
-    rc=$?; if [ $rc -ne 0 ]; then echo "Error occured while upgrading the csp: $csp_name Exit Code: $rc"; exit; fi
+    rc=$?
+    if [ $rc -ne 0 ]; then
+        echo "Failed to patch csp: $csp_name with openebs version labels | Exit Code: $rc"
+        error_msg
+        rm csp-patch.json
+        exit 1
+    fi
 
 done
 
@@ -194,7 +221,12 @@ for csp_name in `echo $csp_list | tr ":" " "`; do
     pool_dep=$(kubectl get deploy -n $ns \
         -l app=cstor-pool,openebs.io/storage-pool-claim=$spc \
         -o jsonpath="{.items[?(@.metadata.labels.openebs\.io/cstor-pool=='$csp_name')].metadata.name}")
-    rc=$?; if [ $rc -ne 0 ]; then echo "Failed to get deployment related to csp: $csp_name Exit Code: $rc"; exit; fi
+    rc=$?
+    if [ $rc -ne 0 ]; then
+        echo "Failed to get deployment related to csp: $csp_name | Exit Code: $rc"
+        error_msg
+        exit 1
+    fi
 
     version=$(verify_openebs_version "deploy" $pool_dep)
     rc=$?
@@ -215,10 +247,10 @@ for csp_name in `echo $csp_list | tr ":" " "`; do
 
     ## Patch the deployment file ###
     kubectl patch deployment --namespace $ns $pool_dep -p "$(cat cstor-pool-patch.json)"
-    rc=$?; if [ $rc -ne 0 ]; then echo "ERROR: Failed to patch $pool_dep $rc"; exit; fi
+    rc=$?; if [ $rc -ne 0 ]; then echo "ERROR: Failed to patch $pool_dep"; error_msg; rm cstor-pool-patch.json ;exit 1; fi
     rollout_status=$(kubectl rollout status --namespace $ns deployment/$pool_dep)
     rc=$?; if [[ ($rc -ne 0) || !($rollout_status =~ "successfully rolled out") ]];
-    then echo "ERROR: Failed to rollout status for $pool_dep error: $rc"; exit; fi
+    then echo "ERROR: Failed to rollout status for $pool_dep error: $rc"; error_msg; rm cstor-pool-patch.json; exit 1; fi
 
     ## Deleting the old replica set corresponding to deployment
     kubectl delete rs $pool_rs --namespace $ns
@@ -227,7 +259,13 @@ for csp_name in `echo $csp_list | tr ":" " "`; do
     ## device information to csp
     sed "s|@blockDevice_list@|${csp_blockdevice_list[$csp_name]}|g" csp-spec-patch.tpl.json > csp-spec-patch.json
     kubectl patch csp $csp_name -p "$(cat csp-spec-patch.json)" --type=merge
-    rc=$?; if [ $rc -ne 0 ]; then echo "Failed to patch spec and annotation for csp: $csp Exit Code: $rc"; exit; fi
+    rc=$?
+    if [ $rc -ne 0 ]; then
+        echo "Failed to patch spec and annotation for csp: $csp | Exit Code: $rc"
+        error_msg
+        rm csp-spec-patch.json
+        exit 1
+    fi
 
     ## Cleaning the temporary patch file
     rm cstor-pool-patch.json
@@ -236,6 +274,6 @@ done
 
 ## Delete sp realated to the spc
 kubectl delete sp -l openebs.io/cas-type=cstor,openebs.io/storage-pool-claim=$spc
-rc=$?; if [ $rc -ne 0 ]; then echo "Failed to delete sp related to spc: $spc_name Exit Code: $rc"; exit; fi
+rc=$?; if [ $rc -ne 0 ]; then echo "Failed to delete sp related to spc: $spc_name Exit Code: $rc"; error_msg; exit 1; fi
 
 echo "Successfully upgrade $spc to $pool_upgrade_version Please run volume upgrade scripts."

@@ -6,6 +6,11 @@
    },
    "spec": {
       "template": {
+         "metadata": {
+            "labels": {
+               "openebs.io/version": "@pool_version@"
+            }
+         },
          "spec": {
             "containers": [
                {
