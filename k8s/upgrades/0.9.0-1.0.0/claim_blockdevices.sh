@@ -197,3 +197,5 @@ if [ $rc -ne 0 ]; then
     error_msg
     exit 1
 fi
+
+echo "Pre-Upgrade is successfull Please update openebs components"
