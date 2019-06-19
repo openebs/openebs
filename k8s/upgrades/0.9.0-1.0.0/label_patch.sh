@@ -77,8 +77,8 @@ rc=$?; if [ $rc -ne 0 ]; then echo "Failed to get ndm daemonset name \
 | Exit code: $rc"; exit; fi
 
 kubectl patch daemonset "$daemonset_name" -p "$(cat deploy-patch.json)" -n "$ns"
-rc=$?; if [ $rc -ne 0 ]; then echo "Failed to patch daemonset $daemonset_name \     
+rc=$?; if [ $rc -ne 0 ]; then echo "Failed to patch daemonset $daemonset_name \
 | Exit code: $rc"; exit; fi
 
-echo "Successfully removed label selectors from openebs deployments."
+echo "Successfully removed label selectors from openebs deployments"
 exit 0
