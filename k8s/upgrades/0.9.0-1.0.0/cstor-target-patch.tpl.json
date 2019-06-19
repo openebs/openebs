@@ -1,0 +1,32 @@
+{
+   "metadata": {
+      "labels": {
+         "openebs.io/version": "@target_version@"
+      }
+   },
+   "spec": {
+      "template": {
+         "metadata": {
+            "labels": {
+               "openebs.io/version": "@target_version@"
+            }
+         },
+         "spec": {
+            "containers": [
+               {
+                  "name": "cstor-istgt",
+                  "image": "quay.io/openebs/cstor-istgt:@target_version@"
+               },
+               {
+                  "name": "maya-volume-exporter",
+                  "image": "quay.io/openebs/m-exporter:@target_version@"
+               },
+               {
+                  "name": "cstor-volume-mgmt",
+                  "image": "quay.io/openebs/cstor-volume-mgmt:@target_version@"
+               }
+            ]
+         }
+      }
+   }
+}

@@ -1,0 +1,10 @@
+{
+    "metadata": {
+        "finalizers": [
+          "cstorvolumereplica.openebs.io/finalizer"
+        ],
+        "labels": {
+            "openebs.io/version": "@target_version@"
+        }
+    }
+}
