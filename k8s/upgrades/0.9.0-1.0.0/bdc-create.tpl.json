@@ -1,0 +1,26 @@
+{
+    "apiVersion": "openebs.io/v1alpha1",
+    "kind": "BlockDeviceClaim",
+    "metadata": {
+        "labels": {
+            "openebs.io/storage-pool-claim": "@spc_name@"
+        },
+        "name": "@bdc_name@",
+        "namespace": "@bdc_namespace@",
+        "ownerReferences": [
+            {
+                "apiVersion": "openebs.io/v1alpha1",
+                "blockOwnerDeletion": true,
+                "controller": true,
+                "kind": "StoragePoolClaim",
+                "name": "@spc_name@",
+                "uid": "@spc_uid@"
+            }
+        ]
+    },
+    "spec": {
+        "blockDeviceName": "@bd_name@",
+        "deviceType": "",
+        "hostName": "@node_name@"
+    }
+}
