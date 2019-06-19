@@ -210,7 +210,7 @@ for spc_name in `echo $spc_list | tr ":" " "`; do
     rc=$?; if [ $rc -ne 0 ]; then echo "Failed to patch spc: $spc_name with reconcile annotation | Exit Code: $rc"; error_msg; exit 1; fi
 done
 
-./patch_deployment.sh $ns
+./label_patch.sh $ns
 rc=$?
 if [ $rc -ne 0 ]; then
     echo "Failed to patch control plane deployments"
