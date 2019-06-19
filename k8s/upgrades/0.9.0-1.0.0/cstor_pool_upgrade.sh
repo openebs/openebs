@@ -229,24 +229,32 @@ for csp_name in `echo $csp_list | tr ":" " "`; do
         continue
     fi
 
-    ## Get the replica set corresponding to the deployment ##
-    pool_rs=$(kubectl get rs -n $ns \
-        -l openebs.io/cstor-pool=$csp_name -o jsonpath='{.items[0].metadata.name}')
-    echo "$pool_dep -> rs is $pool_rs"
+    version=$(verify_openebs_version "deploy" $pool_dep)
+    rc=$?
+    if [ $rc -ne 0 ]; then
+        error_msg
+        exit 1
+    fi
+    if [ $version == $current_version ]; then
+        ## Get the replica set corresponding to the deployment ##
+        pool_rs=$(kubectl get rs -n $ns \
+            -l openebs.io/cstor-pool=$csp_name -o jsonpath='{.items[0].metadata.name}')
+        echo "$pool_dep -> rs is $pool_rs"
 
 
-    ## Modifies the cstor-pool-patch template with the original values ##
-    sed "s/@pool_version@/$pool_upgrade_version/g" cstor-pool-patch.tpl.json > cstor-pool-patch.json
+        ## Modifies the cstor-pool-patch template with the original values ##
+        sed "s/@pool_version@/$pool_upgrade_version/g" cstor-pool-patch.tpl.json > cstor-pool-patch.json
 
-    ## Patch the deployment file ###
-    kubectl patch deployment --namespace $ns $pool_dep -p "$(cat cstor-pool-patch.json)"
-    rc=$?; if [ $rc -ne 0 ]; then echo "ERROR: Failed to patch $pool_dep"; error_msg; rm cstor-pool-patch.json ;exit 1; fi
-    rollout_status=$(kubectl rollout status --namespace $ns deployment/$pool_dep)
-    rc=$?; if [[ ($rc -ne 0) || !($rollout_status =~ "successfully rolled out") ]];
-    then echo "ERROR: Failed to rollout status for $pool_dep error: $rc"; error_msg; rm cstor-pool-patch.json; exit 1; fi
+        ## Patch the deployment file ###
+        kubectl patch deployment --namespace $ns $pool_dep -p "$(cat cstor-pool-patch.json)"
+        rc=$?; if [ $rc -ne 0 ]; then echo "ERROR: Failed to patch $pool_dep"; error_msg; rm cstor-pool-patch.json ;exit 1; fi
+        rollout_status=$(kubectl rollout status --namespace $ns deployment/$pool_dep)
+        rc=$?; if [[ ($rc -ne 0) || !($rollout_status =~ "successfully rolled out") ]];
+        then echo "ERROR: Failed to rollout status for $pool_dep error: $rc"; error_msg; rm cstor-pool-patch.json; exit 1; fi
 
-    ## Deleting the old replica set corresponding to deployment
-    kubectl delete rs $pool_rs --namespace $ns
+        ## Deleting the old replica set corresponding to deployment
+        kubectl delete rs $pool_rs --namespace $ns
+    fi
 
     ## Remove the reconcile.openebs.io/disable annotation and patch with block
     ## device information to csp

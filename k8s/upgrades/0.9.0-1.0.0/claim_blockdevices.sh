@@ -206,7 +206,7 @@ for spc_name in `echo $spc_list | tr ":" " "`; do
     claim_blockdevices_csp $spc_name $csp_list
 
     ## Patching the spc resource with label
-    kubectl patch spc $spc_name -p "$(cat spc-patch.tpl.json)" --type=merge
+    kubectl patch spc $spc_name -p "$(cat stop-reconcile-patch.json)" --type=merge
     rc=$?; if [ $rc -ne 0 ]; then echo "Failed to patch spc: $spc_name with reconcile annotation | Exit Code: $rc"; error_msg; exit 1; fi
 done
 
