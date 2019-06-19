@@ -204,20 +204,7 @@ for csp_name in `echo $csp_list | tr ":" " "`; do
          csp_disk_list=$(make_csp_disk_list "$csp_disk_list" "$device_id" "$disk_name")
     done
     csp_blockdevice_list[$csp_name]=$csp_disk_list
-    sed "s|@pool_version@|$pool_upgrade_version|g" csp-metadata-patch.tpl.json > csp-patch.json
-
-    kubectl patch csp $csp_name -p "$(cat csp-patch.json)" --type=merge
-    rc=$?
-    if [ $rc -ne 0 ]; then
-        echo "Failed to patch csp: $csp_name with openebs version labels | Exit Code: $rc"
-        error_msg
-        rm csp-patch.json
-        exit 1
-    fi
-
 done
-
-rm csp-patch.json
 
 echo "Patching Pool Deployment with new image"
 for csp_name in `echo $csp_list | tr ":" " "`; do
@@ -232,7 +219,8 @@ for csp_name in `echo $csp_list | tr ":" " "`; do
         exit 1
     fi
 
-    version=$(verify_openebs_version "deploy" $pool_dep)
+    ## We are patching csp after deployment so checking csp version is good
+    version=$(verify_openebs_version "csp" $csp_name)
     rc=$?
     if [ $rc -ne 0 ]; then
         error_msg
@@ -243,7 +231,7 @@ for csp_name in `echo $csp_list | tr ":" " "`; do
 
     ## Get the replica set corresponding to the deployment ##
     pool_rs=$(kubectl get rs -n $ns \
-        -o jsonpath="{range .items[?(@.metadata.ownerReferences[0].name=='$pool_dep')]}{@.metadata.name}{end}")
+        -l openebs.io/cstor-pool=$csp_name -o jsonpath='{.items[0].metadata.name}')
     echo "$pool_dep -> rs is $pool_rs"
 
 
@@ -262,19 +250,20 @@ for csp_name in `echo $csp_list | tr ":" " "`; do
 
     ## Remove the reconcile.openebs.io/disable annotation and patch with block
     ## device information to csp
-    sed "s|@blockDevice_list@|${csp_blockdevice_list[$csp_name]}|g" csp-spec-patch.tpl.json > csp-spec-patch.json
-    kubectl patch csp $csp_name -p "$(cat csp-spec-patch.json)" --type=merge
+    sed "s|@blockdevice_list@|${csp_blockdevice_list[$csp_name]}|g" csp-patch.tpl.json | sed "s|@pool_version@|$pool_upgrade_version|g" > csp-patch.json
+    kubectl patch csp $csp_name -p "$(cat csp-patch.json)" --type=merge
     rc=$?
     if [ $rc -ne 0 ]; then
         echo "Failed to patch spec and annotation for csp: $csp | Exit Code: $rc"
         error_msg
-        rm csp-spec-patch.json
+        rm csp-patch.json
+        rm cstor-pool-patch.json
         exit 1
     fi
 
     ## Cleaning the temporary patch file
     rm cstor-pool-patch.json
-    rm csp-spec-patch.json
+    rm csp-patch.json
 done
 
 ## Delete sp realated to the spc

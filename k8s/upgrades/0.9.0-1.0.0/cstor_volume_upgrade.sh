@@ -70,11 +70,11 @@ c_vol=$(kubectl get cstorvolumes \
         -l openebs.io/persistent-volume=$pv -n $ns \
         -o jsonpath="{.items[*].metadata.name}")
 c_replicas=$(kubectl get cvr -n $ns \
-             -l openebs.io/persistent-volume=$pv \
-             -o jsonpath="{range .items[*]}{@.metadata.name};{end}" | tr ";" "\n")
+        -l openebs.io/persistent-volume=$pv \
+        -o jsonpath="{range .items[*]}{@.metadata.name};{end}" | tr ";" "\n")
 
 # Fetch the older target and replica - ReplicaSet objects which need to be
-# deleted before upgrading. If not deleted, the new pods will be stuck in
+# deleted after upgrading. If not deleted, the new pods will be stuck in
 # creating state - due to affinity rules.
 
 c_rs=$(kubectl get rs -n $ns -o name -l openebs.io/persistent-volume=$pv | cut -d '/' -f 2)
