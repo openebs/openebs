@@ -475,9 +475,6 @@ spec:
   replicas: 1
   strategy:
     type: Recreate
-  selector:
-    matchLabels:
-      name: openebs-ndm-operator
   template:
     metadata:
       labels:
@@ -509,6 +506,8 @@ spec:
                   fieldPath: metadata.name
             - name: OPERATOR_NAME
               value: "node-disk-operator"
+            - name: CLEANUP_JOB_IMAGE
+              value: "quay.io/openebs/linux-utils:3.9"
 ---
 apiVersion: v1
 kind: Secret

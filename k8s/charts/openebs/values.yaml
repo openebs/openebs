@@ -99,6 +99,8 @@ ndmOperator:
     initialDelaySeconds: 4
     periodSeconds: 10
     failureThreshold: 1
+  cleanupImage: "quay.io/openebs/linux-utils"
+  cleanupImageTag: "3.9"
 
 webhook:
   image: "quay.io/openebs/admission-server"
