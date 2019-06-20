@@ -475,9 +475,6 @@ spec:
   replicas: 1
   strategy:
     type: Recreate
-  selector:
-    matchLabels:
-      name: openebs-ndm-operator
   template:
     metadata:
       labels:
