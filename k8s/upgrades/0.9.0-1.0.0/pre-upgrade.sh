@@ -1,5 +1,7 @@
 #!/bin/bash
 
+echo "---------upgrade logs----------" > log.txt
+
 ###############################################################################
 # STEP 1: Get all block devices present on the cluster and corresponding disk #
 # STEP 2: Create block device claim to claim corresponding block device       #
@@ -108,6 +110,8 @@ function claim_blockdevices_csp() {
     local zpool_disk_list=""
     local sp_disk_list=""
     for csp_name in `echo $csp_list | tr ":" " "`; do
+        echo "-----------------CSP $csp_name----------------" >> log.txt
+        kubectl get csp $csp_name -o yaml >> log.txt
         pool_pod_name=$(kubectl get pod -n $ns \
                         -l app=cstor-pool,openebs.io/cstor-pool=$csp_name,openebs.io/storage-pool-claim=$spc_name \
                         -o jsonpath="{.items[0].metadata.name}")
@@ -157,6 +161,9 @@ function claim_blockdevices_csp() {
                   -l openebs.io/cstor-pool=$csp_name \
                   -o jsonpath="{.items[*].metadata.name}")
         rc=$?; if [ $rc -ne 0 ]; then echo "Failed to get sp name related to csp: $csp_name | Exit Code: $rc"; error_msg; exit 1; fi
+        echo "- - - - - - SP $sp_name- - - - - -" >> log.txt
+        kubectl get sp $sp_name -o yaml >> log.txt
+        echo "- - - - - - - - - - - - - - - - - " >> log.txt
 
         ## kubectl command get output in below format
         ## [sparse-37a7de580322f43a sparse-5a92ced3e2ee21 sparse-5e508018b4dd2c8]
@@ -174,8 +181,12 @@ function claim_blockdevices_csp() {
         fi
 
         for disk_name in $sp_disk_list; do
+            echo "######disk $disk_name#######" >> log.txt
+            kubectl get disk $disk_name -o yaml >> log.txt
+            echo "############################" >> log.txt
             create_bdc_claim_bd $spc_name $disk_name
         done
+        echo "---------------------------------------------" >> log.txt
     done
 }
 
@@ -195,6 +206,13 @@ map_pool_type["raidz2"]="raidz2"
 kubectl apply -f blockdeviceclaim_crd.yaml
 rc=$?; if [ $rc -ne 0 ]; then echo "Failed to create blockdevice crd | Exit Code: $rc"; error_msg; exit 1; fi
 
+kubectl get nodes -n $ns --show-labels >> log.txt
+echo >> log.txt
+echo >> log.txt
+
+kubectl get pods -n $ns --show-labels >> log.txt
+echo >> log.txt
+echo >> log.txt
 
 ### Get the spc list which are present in the cluster ###
 spc_list=$(kubectl get spc -o jsonpath="{range .items[*]}{@.metadata.name}:{end}")
@@ -202,8 +220,11 @@ rc=$?; if [ $rc -ne 0 ]; then echo "Failed to list spc in cluster | Exit Code: $
 
 #### Get required info from current spc and use the info to claim block device ####
 for spc_name in `echo $spc_list | tr ":" " "`; do
+    echo "========================SPC $spc_name==========================" >> log.txt
+    kubectl get spc $spc_name -o yaml >> log.txt
     csp_list=$(get_csp_list $spc_name)
     claim_blockdevices_csp $spc_name $csp_list
+    echo "==============================================================" >> log.txt
 
     ## Patching the spc resource with label
     kubectl patch spc $spc_name -p "$(cat stop-reconcile-patch.json)" --type=merge
