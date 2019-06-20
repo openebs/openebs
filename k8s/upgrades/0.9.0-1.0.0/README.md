@@ -7,7 +7,7 @@ This document describes the steps for upgrading OpenEBS from 0.9.0 to 1.0.0
 The upgrade of OpenEBS is a three step process:
 - *Step 1* - Prerequisites
 - *Step 2* - Upgrade the OpenEBS Operator
-- *Step 3* - Upgrade the OpenEBS Volumes from previous versions (0.9.0)
+- *Step 3* - Upgrade the OpenEBS Pools and Volumes from previous versions (0.9.0)
 
 #### Note: It is mandatory to make sure to that all OpenEBS control plane components and volumes are running with version 0.9.0 before the upgrade.
 
@@ -30,7 +30,7 @@ $ cd openebs/k8s/upgrades/0.9.0-1.0.0/
 
 *All steps described in this document need to be performed on the Kubernetes master or from a machine that has access to Kubernetes master*
 
- - Run below command to update OpenEBS control plane components labels.  
+ - Run below command to perform pre-upgrade operations on OpenEBS related components.
     ```sh
     $ ./pre-upgrade.sh <openebs_namespace>
     ``` 
@@ -43,9 +43,11 @@ Note: It is mandatory to make sure to that all OpenEBS control plane components 
 
 ### Upgrading OpenEBS Operator CRDs and Deployments:
 
-The upgrade steps vary depending on the way OpenEBS was installed, select one of the following:
+Upgrade steps vary depending on the way OpenEBS was installed. Below are the possible ways:
 
-##### Install/Upgrade using kubectl (using openebs-operator.yaml):
+#### Upgrade using kubectl (using openebs-operator.yaml):
+
+**Use this mode of upgrade only if OpenEBS was installed using openebs-operator.yaml.**
 
 **The sample steps below will work if you have installed OpenEBS without modifying the default values in openebs-operator.yaml. If you have customized it for your cluster, you will have to download the 1.0.0 openebs-operator.yaml and customize it again**
 
@@ -54,7 +56,7 @@ The upgrade steps vary depending on the way OpenEBS was installed, select one of
 $ kubectl apply -f https://openebs.github.io/charts/openebs-operator-1.0.0.yaml
 ```
 
-#### Install/Upgrade using helm chart (using stable/openebs, openebs-charts repo, etc.,):
+#### Upgrade using helm chart (using stable/openebs, openebs-charts repo, etc.,):
 
 **The sample steps below will work if you have installed openebs with default values provided by stable/    openebs helm chart.**
 
@@ -74,7 +76,7 @@ After updating the YAML or helm chart or helm chart values, you can use the abov
 
 ## Step 3: Upgrade the OpenEBS Pools and Volumes
 
-Even after the OpenEBS Operator has been upgraded to 1.0.0, the cStor Storage Pools and volumes (both jiva and cStor)  will continue to work with older versions. Use the following steps in the same order to upgrade cStor Pools and volumes.
+Even after the OpenEBS Operator has been upgraded to 1.0.0, the Storage Pools and Volumes (both jiva and cStor)  will continue to work with older versions. Use the following steps in the same order to upgrade Pools and Volumes.
 
 *Note: Upgrade functionality is still under active development. It is highly recommended to schedule a downtime for the application using the OpenEBS PV while performing this upgrade. Also, make sure you have taken a backup of the data before starting the below upgrade procedure.*
 
@@ -111,8 +113,10 @@ cstor-sparse-pool   24m
 
 ```sh
 $ cd cstor
-$ ./cstor_pool_upgrade.sh cstor-sparse-pool openebs
+$ ./cstor_pool_upgrade.sh cstor-sparse-pool <openebs_namespace>
 ```
+Where `<openebs_namespace>` is the namespace where OpenEBS control plane components are installed.
+
 Make sure that this step completes successfully before proceeding to next step.
 
 
@@ -127,5 +131,6 @@ pvc-1085415d-f84c-11e8-aadf-42010a8000bb   5G         RWO            Delete     
 
 ```sh
 $ cd cstor
-$ ./cstor_volume_upgrade.sh pvc-1085415d-f84c-11e8-aadf-42010a8000bb openebs
+$ ./cstor_volume_upgrade.sh pvc-1085415d-f84c-11e8-aadf-42010a8000bb <openebs_namespace>
 ```
+Where `<openebs_namespace>` is the namespace where OpenEBS control plane components are installed.
