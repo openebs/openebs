@@ -49,6 +49,8 @@ spec:
               fieldPath: spec.nodeName
         # OPENEBS_IO_BASE_PATH is the environment variable that provides the
         # default base path on the node where host-path PVs will be provisioned.
+        - name: OPENEBS_IO_ENABLE_ANALYTICS
+          value: "{{ .Values.analytics.enabled }}"
         - name: OPENEBS_IO_BASE_PATH
           value: "{{ .Values.localprovisioner.basePath }}"
         livenessProbe:
