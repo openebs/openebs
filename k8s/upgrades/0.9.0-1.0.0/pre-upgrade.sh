@@ -8,7 +8,7 @@ echo "---------pre-upgrade logs----------" > log.txt
 # STEP 3: Patch SPC to stop reconciliation                                    #
 #                                                                             #
 ###############################################################################
-updated_version="1.0.0-RC3"
+updated_version="1.0.0"
 current_version="0.9.0"
 
 function error_msg() {
@@ -20,11 +20,11 @@ function usage() {
     echo
     echo "Usage:"
     echo
-    echo "$0 <openebs-namespace> <helm/operator>"
+    echo "$0 <openebs-namespace> <installation_mode>"
     echo
     echo "  <openebs-namespace> Namespace in which openebs control plane components are installed"
-    echo "  <helm/operator> If OpenEBS is installed via \"helm\" pass \"helm\" as second argument"
-    echo "  If OpenEBS is installed via \"operator\" pass \"operator\" as second argument"
+    echo "  <installation_mode> installation_mode would be \"helm\" if OpenEBS"
+    echo "  is installed using \"helm\" charts (or) \"operator\" if OpenEBS is installed using \"operator yaml\""
     exit 1
 }
 
@@ -158,87 +158,88 @@ function claim_blockdevices_csp() {
         if [ $csp_version != $updated_version ] && [ $csp_version != $current_version ]; then
             echo -n "csp $csp_name is not in current version $current_version or "
             echo "updated version $updated_version"
+            exit 1
+        fi
+
+        if [ $csp_version == $updated_version ]; then
             continue
         fi
+        pool_pod_name=$(kubectl get pod -n $ns \
+                        -l app=cstor-pool,openebs.io/cstor-pool=$csp_name,openebs.io/storage-pool-claim=$spc_name \
+                        -o jsonpath="{.items[0].metadata.name}")
+        rc=$?; if [ $rc -ne 0 ]; then echo "Failed to get pool pod name for csp: $csp_name | Exit Code: $rc"; error_msg; exit 1; fi
 
-        if [ $csp_version == $current_version ]; then
-            pool_pod_name=$(kubectl get pod -n $ns \
-                            -l app=cstor-pool,openebs.io/cstor-pool=$csp_name,openebs.io/storage-pool-claim=$spc_name \
-                            -o jsonpath="{.items[0].metadata.name}")
-            rc=$?; if [ $rc -ne 0 ]; then echo "Failed to get pool pod name for csp: $csp_name | Exit Code: $rc"; error_msg; exit 1; fi
-
-            pool_type=$(kubectl get csp $csp_name \
-                        -o jsonpath='{.spec.poolSpec.poolType}')
-            rc=$?; if [ $rc -ne 0 ]; then echo "Failed to get pool type for csp: $csp_name | Exit Code: $rc"; error_msg; exit 1; fi
+        pool_type=$(kubectl get csp $csp_name \
+                    -o jsonpath='{.spec.poolSpec.poolType}')
+        rc=$?; if [ $rc -ne 0 ]; then echo "Failed to get pool type for csp: $csp_name | Exit Code: $rc"; error_msg; exit 1; fi
 
 
-            csp_disk_list=$(kubectl get csp $csp_name \
-                            -o jsonpath='{.spec.disks.diskList}' | \
-                            tr "[]" " ")
-            csp_disk_len=$(echo $csp_disk_list | wc -w)
+        csp_disk_list=$(kubectl get csp $csp_name \
+                        -o jsonpath='{.spec.disks.diskList}' | \
+                        tr "[]" " ")
+        csp_disk_len=$(echo $csp_disk_list | wc -w)
 
-            zpool_disk_list=$(get_underlying_disks $pool_pod_name $pool_type)
+        zpool_disk_list=$(get_underlying_disks $pool_pod_name $pool_type)
 
-            if [ -z "$zpool_disk_list" ]; then
-                echo "zpool disk list is empty"
-                error_msg
-                exit 1
-            fi
+        if [ -z "$zpool_disk_list" ]; then
+            echo "zpool disk list is empty"
+            error_msg
+            exit 1
+        fi
 
-            if [ $csp_disk_len == 0 ]; then
-                echo "csp disk list is empty"
-                error_msg
-                exit 1
-            fi
+        if [ $csp_disk_len == 0 ]; then
+            echo "csp disk list is empty"
+            error_msg
+            exit 1
+        fi
 
-            ## In some platforms we are getting some suffix to the zpool_disk_list
-            for zpool_disk in $zpool_disk_list; do
-                found=0
-                for csp_disk in $csp_disk_list; do
-                    if [[ "$zpool_disk" == "$csp_disk"* ]]; then
-                        found=1
-                        break
-                    fi
-                done
-                if [ $found == 0 ]; then
-                    echo "zpool disk: $zpool_disk is not found in csp: $csp_name disk list: {$csp_disk_list}"
-                    error_msg
-                    exit 1
+        ## In some platforms we are getting some suffix to the zpool_disk_list
+        for zpool_disk in $zpool_disk_list; do
+            found=0
+            for csp_disk in $csp_disk_list; do
+                if [[ "$zpool_disk" == "$csp_disk"* ]]; then
+                    found=1
+                    break
                 fi
             done
-
-            sp_name=$(kubectl get sp \
-                      -l openebs.io/cstor-pool=$csp_name \
-                      -o jsonpath="{.items[*].metadata.name}")
-            rc=$?; if [ $rc -ne 0 ]; then echo "Failed to get sp name related to csp: $csp_name | Exit Code: $rc"; error_msg; exit 1; fi
-            echo "- - - - - - SP $sp_name- - - - - -" >> log.txt
-            kubectl get sp $sp_name -o yaml >> log.txt
-            echo "- - - - - - - - - - - - - - - - - " >> log.txt
-
-            ## kubectl command get output in below format
-            ## [sparse-37a7de580322f43a sparse-5a92ced3e2ee21 sparse-5e508018b4dd2c8]
-            ## and then converts to below format
-            ## sparse-37a7de580322f43a sparse-5a92ced3e2ee21 sparse-5e508018b4dd2c8
-            sp_disk_list=$(kubectl get sp $sp_name \
-                           -o jsonpath="{.spec.disks.diskList}" | tr "[]" " ")
-
-            sp_disk_len=$(echo $sp_disk_list | wc -w)
-
-            if [ $sp_disk_len -ne $csp_disk_len ]; then
-                echo "Length of csp disk list $csp_disk_len and sp disk list $sp_disk_len is not matched"
+            if [ $found == 0 ]; then
+                echo "zpool disk: $zpool_disk is not found in csp: $csp_name disk list: {$csp_disk_list}"
                 error_msg
                 exit 1
             fi
+        done
 
+        sp_name=$(kubectl get sp \
+                  -l openebs.io/cstor-pool=$csp_name \
+                  -o jsonpath="{.items[*].metadata.name}")
+        rc=$?; if [ $rc -ne 0 ]; then echo "Failed to get sp name related to csp: $csp_name | Exit Code: $rc"; error_msg; exit 1; fi
+        echo "- - - - - - SP $sp_name- - - - - -" >> log.txt
+        kubectl get sp $sp_name -o yaml >> log.txt
+        echo "- - - - - - - - - - - - - - - - - " >> log.txt
 
-            for disk_name in $sp_disk_list; do
-                echo "######disk $disk_name#######" >> log.txt
-                kubectl get disk $disk_name -o yaml >> log.txt
-                echo "############################" >> log.txt
-                create_bdc_claim_bd $spc_name $disk_name
-            done
-            echo "---------------------------------------------" >> log.txt
+        ## kubectl command get output in below format
+        ## [sparse-37a7de580322f43a sparse-5a92ced3e2ee21 sparse-5e508018b4dd2c8]
+        ## and then converts to below format
+        ## sparse-37a7de580322f43a sparse-5a92ced3e2ee21 sparse-5e508018b4dd2c8
+        sp_disk_list=$(kubectl get sp $sp_name \
+                       -o jsonpath="{.spec.disks.diskList}" | tr "[]" " ")
+
+        sp_disk_len=$(echo $sp_disk_list | wc -w)
+
+        if [ $sp_disk_len -ne $csp_disk_len ]; then
+            echo "Length of csp disk list $csp_disk_len and sp disk list $sp_disk_len is not matched"
+            error_msg
+            exit 1
         fi
+
+
+        for disk_name in $sp_disk_list; do
+            echo "######disk $disk_name#######" >> log.txt
+            kubectl get disk $disk_name -o yaml >> log.txt
+            echo "############################" >> log.txt
+            create_bdc_claim_bd $spc_name $disk_name
+        done
+        echo "---------------------------------------------" >> log.txt
     done
 }
 

@@ -49,7 +49,7 @@ $ cd openebs/k8s/upgrades/0.9.0-1.0.0/
      mode as operator if OpenEBS is installed via operator yaml
 
 Note:
- - No new spc should be created after this step until the upgrade is complete. If created the `pre-upgrade.sh` script needs to be executed again.
+ - No new spc should be created after this step until the upgrade is complete. If created, execute `pre-upgrade.sh` again.
  - It is mandatory to make sure that all OpenEBS control plane components are running at version 0.9.0 before the upgrade
 
 

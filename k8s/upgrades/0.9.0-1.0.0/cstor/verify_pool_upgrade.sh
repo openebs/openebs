@@ -33,6 +33,7 @@ fi
 spc=$1
 ns=$2
 is_upgrade_failed=0
+echo "Verifying pool $spc upgrade..."
 
 csp_list=$(get_csp_list $spc)
 
@@ -116,12 +117,15 @@ sp_list=$(kubectl get sp -l openebs.io/storage-pool-claim=$spc \
 sp_count=$(echo $sp_list | wc -w)
 
 if [ $sp_count != 0 ]; then
-    echo "SP is depricated for cStor but stil it is available in cluster. SP {$sp_list} list"
+    echo "SP is deprecated for cStor but stil it is available in cluster. SP {$sp_list} list"
     is_upgrade_failed=1
 fi
 
 if [ $is_upgrade_failed == 0 ]; then
-    echo "pool upgrade $spc is successful"
+    echo "pool upgrade $spc verification is successful"
 else
-    echo "Upgrade is pending on pool $spc. Please Upgrade pool $spc before continuing to next step"
+    echo -n "validation steps are failed on pool $spc. This might be"
+    echo "due to ongoing upgrade or errors during upgrade."
+    echo -n "Please Re Run ./verify_pool_upgrade.sh <spc_name> <namespace> after "
+    echo "some time. If issue still exist Contact OpenEBS team over slack for any further help."
 fi
