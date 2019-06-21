@@ -6,8 +6,10 @@
 # NOTES: Obtain the pool deployments to perform upgrade operation         #
 ###########################################################################
 
-pool_upgrade_version="1.0.0"
+upgrade_version="1.0.0"
 current_version="0.9.0"
+
+source util.sh
 
 function error_msg() {
     echo -n "Failed to upgrade pool $spc. Please make sure that the pool $spc "
@@ -27,41 +29,25 @@ function usage() {
     exit 1
 }
 
-##Checking the version of OpenEBS ####
-function verify_openebs_version() {
-    local resource=$1
-    local name_res=$2
-    local openebs_version=$(kubectl get $resource $name_res -n $ns \
-                 -o jsonpath="{.metadata.labels.openebs\.io/version}")
+function pre_check() {
+    local ns=$1
+    local pod_version=""
+    ## name=maya-apiserver label is common for both helm and operator yaml
+    maya_pod_name=$(kubectl get pod -n $ns \
+                 -l name=maya-apiserver    \
+                 -o jsonpath='{.items[0].metadata.name}')
+    rc=$?; if [ $rc -ne 0 ]; then echo "Failed to get maya apiserver pod name | Exit code: $rc"; exit 1; error_msg; fi
+    pod_version=$(verify_openebs_version "pod" $maya_pod_name $ns)
     rc=$?
     if [ $rc -ne 0 ]; then
-        echo "Failed to get version from $resource: $name_res | Exit Code: $rc"
         error_msg
         exit 1
     fi
-
-    if [[ $openebs_version != $current_version ]] && \
-          [[ $openebs_version != $pool_upgrade_version ]]; then
-        echo "Expected version of $name_res in $resource is $current_version but got $openebs_version"
-        exit 1;
-    fi
-    echo $openebs_version
-}
-
-## get_csp_list will return the csp list related corresponding spc
-function get_csp_list() {
-    local csp_list=""
-    local spc_name=$1
-    csp_list=$(kubectl get csp \
-               -l openebs.io/storage-pool-claim=$spc_name \
-               -o jsonpath="{range .items[*]}{@.metadata.name}:{end}")
-    rc=$?
-    if [ $rc -ne 0 ]; then
-        echo "Failed to get csp related to spc $spc"
+    if [ $pod_version != $upgrade_version ]; then
+        echo "Pre-checks failed. Please upgrade OpenEBS control components before upgrading the pool"
         error_msg
         exit 1
     fi
-    echo $csp_list
 }
 
 function make_spc_blockdevice_list() {
@@ -132,8 +118,16 @@ spc=$1
 ns=$2
 declare -A csp_blockdevice_list
 
+## Assumption OpenEBS control plane components will be in same namespace where
+pre_check $ns
+rc=$?
+if [ $rc -ne 0 ]; then
+    error_msg
+    exit 1
+fi
+
 ### Get the deployment pods which are in not running state that are related to provided spc ###
-pending_pods=$(kubectl get po -n $ns \
+pending_pods=$(kubectl get pod -n $ns \
     -l app=cstor-pool,openebs.io/storage-pool-claim=$spc \
     -o jsonpath='{.items[?(@.status.phase!="Running")].metadata.name}')
 rc=$?; if [ $rc -ne 0 ]; then echo "Failed to get pool pods related to spc: $spc | Exit Code: $rc"; error_msg; exit 1; fi
@@ -154,12 +148,13 @@ csp_list=$(get_csp_list $spc)
 #### Get required info from current csp and use the info while upgrading ####
 for csp_name in `echo $csp_list | tr ":" " "`; do
     ## Check CSP version ##
-    version=$(verify_openebs_version "csp" $csp_name)
+    version=$(verify_openebs_version "csp" $csp_name $ns)
     rc=$?
     if [ $rc -ne 0 ]; then
         error_msg
         exit 1
-    elif [ $version == $pool_upgrade_version ]; then
+    fi
+    if [ $version == $upgrade_version ]; then
         continue
     fi
 
@@ -220,16 +215,17 @@ for csp_name in `echo $csp_list | tr ":" " "`; do
     fi
 
     ## We are patching csp after deployment so checking csp version is good
-    version=$(verify_openebs_version "csp" $csp_name)
+    version=$(verify_openebs_version "csp" $csp_name $ns)
     rc=$?
     if [ $rc -ne 0 ]; then
         error_msg
         exit 1
-    elif [ $version == $pool_upgrade_version ]; then
+    fi
+    if [ $version == $upgrade_version ]; then
         continue
     fi
 
-    version=$(verify_openebs_version "deploy" $pool_dep)
+    version=$(verify_openebs_version "deploy" $pool_dep $ns)
     rc=$?
     if [ $rc -ne 0 ]; then
         error_msg
@@ -243,13 +239,13 @@ for csp_name in `echo $csp_list | tr ":" " "`; do
 
 
         ## Modifies the cstor-pool-patch template with the original values ##
-        sed "s/@pool_version@/$pool_upgrade_version/g" cstor-pool-patch.tpl.json > cstor-pool-patch.json
+        sed "s/@pool_version@/$upgrade_version/g" cstor-pool-patch.tpl.json > cstor-pool-patch.json
 
         ## Patch the deployment file ###
         kubectl patch deployment --namespace $ns $pool_dep -p "$(cat cstor-pool-patch.json)"
         rc=$?; if [ $rc -ne 0 ]; then echo "ERROR: Failed to patch $pool_dep"; error_msg; rm cstor-pool-patch.json ;exit 1; fi
         rollout_status=$(kubectl rollout status --namespace $ns deployment/$pool_dep)
-        rc=$?; if [[ ($rc -ne 0) || !($rollout_status =~ "successfully rolled out") ]];
+        rc=$?; if [[ ($rc -ne 0) || ! ($rollout_status =~ "successfully rolled out") ]];
         then echo "ERROR: Failed to rollout status for $pool_dep error: $rc"; error_msg; rm cstor-pool-patch.json; exit 1; fi
 
         ## Deleting the old replica set corresponding to deployment
@@ -258,7 +254,7 @@ for csp_name in `echo $csp_list | tr ":" " "`; do
 
     ## Remove the reconcile.openebs.io/disable annotation and patch with block
     ## device information to csp
-    sed "s|@blockdevice_list@|${csp_blockdevice_list[$csp_name]}|g" csp-patch.tpl.json | sed "s|@pool_version@|$pool_upgrade_version|g" > csp-patch.json
+    sed "s|@blockdevice_list@|${csp_blockdevice_list[$csp_name]}|g" csp-patch.tpl.json | sed "s|@pool_version@|$upgrade_version|g" > csp-patch.json
     kubectl patch csp $csp_name -p "$(cat csp-patch.json)" --type=merge
     rc=$?
     if [ $rc -ne 0 ]; then
@@ -278,4 +274,4 @@ done
 kubectl delete sp -l openebs.io/cas-type=cstor,openebs.io/storage-pool-claim=$spc
 rc=$?; if [ $rc -ne 0 ]; then echo "Failed to delete sp related to spc: $spc_name Exit Code: $rc"; error_msg; exit 1; fi
 
-echo "Successfully upgrade $spc to $pool_upgrade_version Please run volume upgrade scripts."
+echo "Successfully upgrade $spc to $upgrade_version Please run volume upgrade scripts."
