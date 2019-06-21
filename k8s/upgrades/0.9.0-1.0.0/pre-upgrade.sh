@@ -21,6 +21,29 @@ function usage() {
     exit 1
 }
 
+function patch_disk() {
+    disk=$1
+    currentFS=$(kubectl get disk $disk -o jsonpath="{.spec.fileSystem}")
+    rc=$?; if [ $rc -ne 0 ]; then echo "Failed to get FS details of $disk : $rc"; exit 1; fi
+    currentPartition=$(kubectl get disk $disk -o jsonpath="{.spec.partitionDetails}")
+    rc=$?; if [ $rc -ne 0 ]; then echo "Failed to get Partition details of $disk : $rc"; exit 1; fi
+
+
+    # if current filesystem is not nil, patch and remove the field
+    if [ ! -z "$currentFS" ]; then
+        kubectl patch disk --type json ${disk} -p "$(cat patch-remove-filesystem.json)"
+        rc=$?; if [ $rc -ne 0 ]; then echo "ERRORFS: $disk : $rc"; exit 1; fi
+        echo "FS of ${disk} patched"
+    fi
+
+    # if current partition struct is not nil, patch and remove the field
+    if [ ! -z "$currentPartition" ]; then
+        kubectl patch disk --type json ${disk} -p "$(cat patch-remove-partition.json)"
+        rc=$?; if [ $rc -ne 0 ]; then echo "ERRORPT: $disk : $rc"; exit 1; fi
+        echo "Partition of ${disk} patched"
+    fi
+}
+
 ## get_csp_list accepts spc_name as a argument and returns csp list
 ## corresponding to csp
 function get_csp_list() {
@@ -217,5 +240,12 @@ if [ $rc -ne 0 ]; then
     error_msg
     exit 1
 fi
+
+disk_list=$(kubectl get disks -o jsonpath="{range .items[*]}{.metadata.name}:{end}")
+rc=$?; if [ $rc -ne 0 ]; then echo "Failed to get disk list : $rc"; exit 1; fi
+
+for disk_name in `echo $disk_list | tr ":" " "`; do
+    patch_disk $disk_name
+done
 
 echo "Pre-Upgrade is successfull Please update openebs components"
