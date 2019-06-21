@@ -5,8 +5,10 @@
 #                                                              #
 # NOTES: Obtain the pv to upgrade via "kubectl get pv"         #
 ################################################################
-target_upgrade_version="1.0.0"
+upgrade_version="1.0.0"
 current_version="0.9.0"
+
+source util.sh
 
 function error_msg() {
     echo "Failed to upgrade volume $pv in namespace $ns. Please make sure that volume upgrade should be successful before moving to application checks"
@@ -22,6 +24,41 @@ function usage() {
     echo "  <openebs-namespace> Get the namespace where openebs"
     echo "  pods are installed"
     exit 1
+}
+
+function pre_check() {
+    local pv=$1
+    local ns=$2
+    local pod_version=""
+    local csp_name=""
+    local pod_name=""
+    local csp_list=""
+    local spc_name=""
+    csp_list=$(kubectl get cvr -n $ns \
+          -l openebs.io/persistent-volume=$pv \
+          -o jsonpath="{range .items[*]}{@.metadata.labels.cstorpool\.openebs\.io/name};{end}" | tr ";" " ")
+    rc=$?; if [ $rc -ne 0 ]; then echo "Failed to get csp list | Exit code: $rc"; exit 1; error_msg; fi
+
+    for csp_name in $csp_list; do
+        pod_name=$(kubectl get pod -n $ns \
+              -l app=cstor-pool,openebs.io/cstor-pool=$csp_name \
+              -o jsonpath="{.items[0].metadata.name}")
+        rc=$?; if [ $rc -ne 0 ]; then echo "Failed to get pool pod name of csp: $csp_name | Exit code: $rc"; exit 1; error_msg; fi
+
+        pod_version=$(verify_openebs_version "pod" "$pod_name" "$ns")
+        rc=$?
+        if [ $rc -ne 0 ]; then
+            error_msg
+            exit 1
+        fi
+        if [ $pod_version != $upgrade_version ]; then
+            spc_name=$(kubectl get csp $csp_name \
+                  -o jsonpath="{.metadata.labels.openebs\.io/storage-pool-claim}")
+            echo "Pre-checks failed. Please upgrade pool: $spc_name before upgrading the volume $pv in namespace $ns"
+            error_msg
+            exit 1
+        fi
+    done
 }
 
 if [ "$#" -ne 2 ]; then
@@ -47,9 +84,6 @@ else
     echo "Volume is neither cstor or cstor"; exit 1;
 fi
 
-sc_ns=`kubectl get pv $pv -o jsonpath="{.spec.claimRef.namespace}"`
-sc_name=`kubectl get pv $pv -o jsonpath="{.spec.storageClassName}"`
-sc_res_ver=`kubectl get sc $sc_name -n $sc_ns -o jsonpath="{.metadata.resourceVersion}"`
 pvc_name=`kubectl get pv $pv -o jsonpath="{.spec.claimRef.name}"`
 pvc_namespace=`kubectl get pv $pv -o jsonpath="{.spec.claimRef.namespace}"`
 #################################################################
@@ -103,28 +137,28 @@ if [[ -z $c_replicas ]]; then
 fi
 
 controller_version=`kubectl get deployment $c_dep -n $ns -o jsonpath='{.metadata.labels.openebs\.io/version}'`
-if [[ "$controller_version" != "$current_version" ]] && [[ "$controller_version" != "$target_upgrade_version" ]] ; then
-    echo "Current cstor target deloyment $c_dep version is not $current_version or $target_upgrade_version"
+if [[ "$controller_version" != "$current_version" ]] && [[ "$controller_version" != "$upgrade_version" ]] ; then
+    echo "Current cstor target deloyment $c_dep version is not $current_version or $upgrade_version"
     error_msg
     exit 1
 fi
 
 controller_service_version=`kubectl get svc $c_svc -n $ns -o jsonpath='{.metadata.labels.openebs\.io/version}'`
-if [[ "$controller_service_version" != "$current_version" ]] && [[ "$controller_service_version" != "$target_upgrade_version" ]]; then
-    echo "Current cstor target service $c_svc version is not $current_version or $target_upgrade_version"
+if [[ "$controller_service_version" != "$current_version" ]] && [[ "$controller_service_version" != "$upgrade_version" ]]; then
+    echo "Current cstor target service $c_svc version is not $current_version or $upgrade_version"
     error_msg
     exit 1
 fi
 
 cstor_volume_version=`kubectl get cstorvolumes $c_vol -n $ns -o jsonpath='{.metadata.labels.openebs\.io/version}'`
-if [[ "$cstor_volume_version" != "$current_version" ]] && [[ "$cstor_volume_version" != "$target_upgrade_version" ]]; then
-    echo "Current cstor volume  $c_vol version is not $current_version or $target_upgrade_version"; error_msg; exit 1;
+if [[ "$cstor_volume_version" != "$current_version" ]] && [[ "$cstor_volume_version" != "$upgrade_version" ]]; then
+    echo "Current cstor volume  $c_vol version is not $current_version or $upgrade_version"; error_msg; exit 1;
 fi
 
 for replica in $c_replicas
 do
     replica_version=`kubectl get cvr $replica -n $ns -o jsonpath='{.metadata.labels.openebs\.io/version}'`
-    if [[ "$replica_version" != "$current_version" ]] && [[ "$replica_version" != "$target_upgrade_version" ]]; then
+    if [[ "$replica_version" != "$current_version" ]] && [[ "$replica_version" != "$upgrade_version" ]]; then
         echo "CStor volume replica $replica version is not $current_version"; error_msg; exit 1;
     fi
 done
@@ -138,10 +172,10 @@ done
 # previous step                                                #
 ################################################################
 
-sed "s/@target_version@/$target_upgrade_version/g" cstor-target-patch.tpl.json > cstor-target-patch.json
-sed "s/@target_version@/$target_upgrade_version/g" cstor-target-svc-patch.tpl.json > cstor-target-svc-patch.json
-sed "s/@target_version@/$target_upgrade_version/g" cstor-volume-patch.tpl.json > cstor-volume-patch.json
-sed "s/@target_version@/$target_upgrade_version/g" cstor-volume-replica-patch.tpl.json> cstor-volume-replica-patch.json
+sed "s/@target_version@/$upgrade_version/g" cstor-target-patch.tpl.json > cstor-target-patch.json
+sed "s/@target_version@/$upgrade_version/g" cstor-target-svc-patch.tpl.json > cstor-target-svc-patch.json
+sed "s/@target_version@/$upgrade_version/g" cstor-volume-patch.tpl.json > cstor-volume-patch.json
+sed "s/@target_version@/$upgrade_version/g" cstor-volume-replica-patch.tpl.json> cstor-volume-replica-patch.json
 
 #################################################################################
 # STEP: Patch OpenEBS volume deployments (cstor-target, cstor-svc)              #
@@ -150,8 +184,8 @@ sed "s/@target_version@/$target_upgrade_version/g" cstor-volume-replica-patch.tp
 
 # #### PATCH TARGET DEPLOYMENT ####
 
-if [[ "$controller_version" != "$target_upgrade_version" ]]; then
-    echo "Upgrading Target Deployment to $target_upgrade_version"
+if [[ "$controller_version" != "$upgrade_version" ]]; then
+    echo "Upgrading Target Deployment to $upgrade_version"
 
     kubectl patch deployment  --namespace $ns $c_dep -p "$(cat cstor-target-patch.json)"
     rc=$?; if [ $rc -ne 0 ]; then echo "Failed to patch cstor target deployment $c_dep | Exit code: $rc"; error_msg; exit 1; fi
@@ -163,38 +197,38 @@ if [[ "$controller_version" != "$target_upgrade_version" ]]; then
     rc=$?; if [[ ($rc -ne 0) || !($rollout_status =~ "successfully rolled out") ]];
     then echo "Failed to rollout for deployment $c_dep | Exit code: $rc"; error_msg; exit 1; fi
 else
-    echo "Target deployment $c_dep is already at $target_upgrade_version"
+    echo "Target deployment $c_dep is already at $upgrade_version"
 fi
 
 # #### PATCH TARGET SERVICE ####
-if [[ "$controller_service_version" != "$target_upgrade_version" ]]; then
-    echo "Upgrading Target Service to $target_upgrade_version"
+if [[ "$controller_service_version" != "$upgrade_version" ]]; then
+    echo "Upgrading Target Service to $upgrade_version"
     kubectl patch service --namespace $ns $c_svc -p "$(cat cstor-target-svc-patch.json)"
     rc=$?; if [ $rc -ne 0 ]; then echo "Failed to patch service $svc | Exit code: $rc"; error_msg; exit 1; fi
 else
-    echo "Target service $c_svc is already at $target_upgrade_version"
+    echo "Target service $c_svc is already at $upgrade_version"
 fi
 
 # #### PATCH CSTOR Volume CR ####
-if [[ "$cstor_volume_version" != "$target_upgrade_version" ]]; then
-    echo "Upgrading cstor volume CR to $target_upgrade_version"
+if [[ "$cstor_volume_version" != "$upgrade_version" ]]; then
+    echo "Upgrading cstor volume CR to $upgrade_version"
     kubectl patch cstorvolume --namespace $ns $c_vol -p "$(cat cstor-volume-patch.json)" --type=merge
     rc=$?; if [ $rc -ne 0 ]; then echo "Failed to patch cstor volumes CR $c_vol | Exit code: $rc"; error_msg; exit 1; fi
 else
-    echo "CStor volume CR  $c_vol is already at $target_upgrade_version"
+    echo "CStor volume CR  $c_vol is already at $upgrade_version"
 fi
 
 # #### PATCH CSTOR Volume Replica CR ####
 
 for replica in $c_replicas
 do
-    if [[ "`kubectl get cvr $replica -n $ns -o jsonpath='{.metadata.labels.openebs\.io/version}'`" != "$target_upgrade_version" ]]; then
-        echo "Upgrading cstor volume replica $replica to $target_upgrade_version"
+    if [[ "`kubectl get cvr $replica -n $ns -o jsonpath='{.metadata.labels.openebs\.io/version}'`" != "$upgrade_version" ]]; then
+        echo "Upgrading cstor volume replica $replica to $upgrade_version"
         kubectl patch cvr $replica --namespace $ns -p "$(cat cstor-volume-replica-patch.json)" --type=merge
         rc=$?; if [ $rc -ne 0 ]; then echo "Failed to patch CstorVolumeReplica $replica | Exit code: $rc"; error_msg; exit 1; fi
         echo "Successfully updated replica: $replica"
     else
-        echo "cstor replica  $replica is already at $target_upgrade_version"
+        echo "cstor replica  $replica is already at $upgrade_version"
     fi
 done
 
@@ -204,5 +238,5 @@ rm cstor-target-svc-patch.json
 rm cstor-volume-patch.json
 rm cstor-volume-replica-patch.json
 
-echo "Successfully upgraded $pv to $target_upgrade_version Please run your application checks."
+echo "Successfully upgraded $pv to $upgrade_version Please run your application checks."
 exit 0

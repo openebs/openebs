@@ -8,6 +8,9 @@ echo "---------pre-upgrade logs----------" > log.txt
 # STEP 3: Patch SPC to stop reconciliation                                    #
 #                                                                             #
 ###############################################################################
+updated_version="1.0.0"
+current_version="0.9.0"
+
 function error_msg() {
     echo -n "Pre-upgrade script failed. Please make sure pre-upgrade script is "
     echo -n "successful before continuing for next step. Contact OpenEBS team over slack for any further help."
@@ -17,9 +20,11 @@ function usage() {
     echo
     echo "Usage:"
     echo
-    echo "$0 <openebs-namespace>"
+    echo "$0 <openebs-namespace> <installation_mode>"
     echo
     echo "  <openebs-namespace> Namespace in which openebs control plane components are installed"
+    echo "  <installation_mode> installation_mode would be \"helm\" if OpenEBS"
+    echo "  is installed using \"helm\" charts (or) \"operator\" if OpenEBS is installed using \"operator yaml\""
     exit 1
 }
 
@@ -43,6 +48,17 @@ function patch_disk() {
         kubectl patch disk --type json ${disk} -p "$(cat patch-remove-partition.json)"
         rc=$?; if [ $rc -ne 0 ]; then echo "ERRORPT: $disk : $rc"; exit 1; fi
         echo "Partition of ${disk} patched"
+    fi
+}
+
+function is_annotation_patch_continue() {
+    local spc_name=$1
+    local reconcile_value=$(kubectl get spc $spc_name \
+              -o jsonpath='{.metadata.annotations.reconcile\.openebs\.io/disable}')
+    if [ -z "$reconcile_value" ]; then
+        echo "true"
+    else
+        echo "false"
     fi
 }
 
@@ -135,6 +151,19 @@ function claim_blockdevices_csp() {
     for csp_name in `echo $csp_list | tr ":" " "`; do
         echo "-----------------CSP $csp_name----------------" >> log.txt
         kubectl get csp $csp_name -o yaml >> log.txt
+
+        local csp_version=$(kubectl get csp $csp_name \
+                        -o jsonpath="{.metadata.labels.openebs\.io/version}")
+        rc=$?; if [ $rc -ne 0 ]; then echo "Failed to get csp: $csp_name version | Exit Code: $rc"; error_msg; exit 1; fi
+        if [ $csp_version != $updated_version ] && [ $csp_version != $current_version ]; then
+            echo -n "csp $csp_name is not in current version $current_version or "
+            echo "updated version $updated_version"
+            exit 1
+        fi
+
+        if [ $csp_version == $updated_version ]; then
+            continue
+        fi
         pool_pod_name=$(kubectl get pod -n $ns \
                         -l app=cstor-pool,openebs.io/cstor-pool=$csp_name,openebs.io/storage-pool-claim=$spc_name \
                         -o jsonpath="{.items[0].metadata.name}")
@@ -153,13 +182,13 @@ function claim_blockdevices_csp() {
         zpool_disk_list=$(get_underlying_disks $pool_pod_name $pool_type)
 
         if [ -z "$zpool_disk_list" ]; then
-            echo "zpool disk list is empty: $zpool_disk_list"
+            echo "zpool disk list is empty"
             error_msg
             exit 1
         fi
 
         if [ $csp_disk_len == 0 ]; then
-            echo "csp disk list is empty: $csp_disk_list"
+            echo "csp disk list is empty"
             error_msg
             exit 1
         fi
@@ -203,6 +232,7 @@ function claim_blockdevices_csp() {
             exit 1
         fi
 
+
         for disk_name in $sp_disk_list; do
             echo "######disk $disk_name#######" >> log.txt
             kubectl get disk $disk_name -o yaml >> log.txt
@@ -215,15 +245,23 @@ function claim_blockdevices_csp() {
 
 
 ## Starting point
-if [ "$#" -ne 1 ]; then
+if [ "$#" -ne 2 ]; then
     usage
 fi
 ns=$1
+install_option=$2
+
+if [ "$install_option" != "operator" ] && [ "$install_option" != "helm" ]; then
+    echo "Second argument must be either \"operator\" or \"helm\""
+    exit 1
+fi
+
 declare -A map_pool_type
 map_pool_type["mirrored"]="mirror"
 map_pool_type["striped"]="striped"
 map_pool_type["raidz"]="raidz"
 map_pool_type["raidz2"]="raidz2"
+
 
 ## Apply blockdeviceclaim crd yaml to create CR
 kubectl apply -f blockdeviceclaim_crd.yaml
@@ -249,15 +287,28 @@ for spc_name in `echo $spc_list | tr ":" " "`; do
     claim_blockdevices_csp $spc_name $csp_list
     echo "==============================================================" >> log.txt
 
-    ## Patching the spc resource with label
-    kubectl patch spc $spc_name -p "$(cat stop-reconcile-patch.json)" --type=merge
-    rc=$?; if [ $rc -ne 0 ]; then echo "Failed to patch spc: $spc_name with reconcile annotation | Exit Code: $rc"; error_msg; exit 1; fi
+    is_patch=$(is_annotation_patch_continue $spc_name)
+    if [ $is_patch == "true" ]; then
+        ## Patching the spc resource with label
+        kubectl patch spc $spc_name -p "$(cat stop-reconcile-patch.json)" --type=merge
+        rc=$?; if [ $rc -ne 0 ]; then echo "Failed to patch spc: $spc_name with reconcile annotation | Exit Code: $rc"; error_msg; exit 1; fi
+    fi
 done
 
-./label_patch.sh $ns
-rc=$?
-if [ $rc -ne 0 ]; then
-    echo "Failed to patch control plane deployments"
+ds_name=$(kubectl get pod -n $ns -l openebs.io/component-name=ndm \
+         -o jsonpath='{.items[0].metadata.ownerReferences[?(@.kind=="DaemonSet")].name}')
+rc=$?; if [ $rc -ne 0 ]; then echo "Failed to get ndm daemonset name in namespace: $ns | Exit Code: $rc"; error_msg; exit 1; fi
+
+desired_count=$(kubectl get daemonset $ds_name -n $ns \
+         -o jsonpath='{.status.desiredNumberScheduled}')
+rc=$?; if [ $rc -ne 0 ]; then echo "Failed to get desired scheduled pod count from $ds_name in namespace: $ns | Exit Code: $rc"; error_msg; exit 1; fi
+
+current_count=$(kubectl get daemonset $ds_name -n $ns \
+         -o jsonpath='{.status.currentNumberScheduled}')
+rc=$?; if [ $rc -ne 0 ]; then echo "Failed to get current scheduled pod count from $ds_name in namespace: $ns | Exit Code: $rc"; error_msg; exit 1; fi
+
+if [ $desired_count != $current_count ]; then
+    echo "Daemonset desired pod count: $desired_count is not matched with current pod count: $current_count"
     error_msg
     exit 1
 fi
@@ -268,5 +319,15 @@ rc=$?; if [ $rc -ne 0 ]; then echo "Failed to get disk list : $rc"; exit 1; fi
 for disk_name in `echo $disk_list | tr ":" " "`; do
     patch_disk $disk_name
 done
+
+if [ $install_option == "operator" ]; then
+    ./label_patch.sh $ns
+    rc=$?
+    if [ $rc -ne 0 ]; then
+        echo "Failed to patch control plane deployments"
+        error_msg
+        exit 1
+    fi
+fi
 
 echo "Pre-Upgrade is successfull Please update openebs components"

@@ -1,7 +1,7 @@
 {
     "metadata": {
         "annotations": {
-            "reconcile.openebs.io/disable": null
+            "reconcile.openebs.io/disable": "false"
         }
     },
     "spec": {
