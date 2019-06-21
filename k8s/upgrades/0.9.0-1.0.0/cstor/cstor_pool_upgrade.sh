@@ -98,10 +98,11 @@ function make_csp_disk_list() {
     local csp_disk_list=$1
     local disk_device_id=$2
     local disk_name=$3
+    local bd_name=$(echo $disk_name | sed 's|disk-|blockdevice-|g')
     if [ -z "$csp_disk_list" ]; then
-        echo "{\"deviceID\": \"$disk_device_id\",\"inUseByPool\": true,\"name\": \"$disk_name\"}"
+        echo "{\"deviceID\": \"$disk_device_id\",\"inUseByPool\": true,\"name\": \"$bd_name\"}"
     else
-        echo "$csp_disk_list,{\"deviceID\": \"$disk_device_id\",\"inUseByPool\": true,\"name\": \"$disk_name\"}"
+        echo "$csp_disk_list,{\"deviceID\": \"$disk_device_id\",\"inUseByPool\": true,\"name\": \"$bd_name\"}"
     fi
 }
 
