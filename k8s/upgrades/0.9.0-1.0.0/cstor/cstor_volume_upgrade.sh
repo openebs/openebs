@@ -54,7 +54,7 @@ function pre_check() {
         if [ $pod_version != $upgrade_version ]; then
             spc_name=$(kubectl get csp $csp_name \
                   -o jsonpath="{.metadata.labels.openebs\.io/storage-pool-claim}")
-            echo "Pre-checks failed. Please upgrade Pool: $spc_name before upgrading the volume $pv in namespace $ns"
+            echo "Pre-checks failed. Please upgrade pool: $spc_name before upgrading the volume $pv in namespace $ns"
             error_msg
             exit 1
         fi

@@ -120,12 +120,8 @@ ns=$2
 declare -A csp_blockdevice_list
 
 ## Assumption OpenEBS control plane components will be in same namespace where
+## pool pods are running
 pre_check $ns
-rc=$?
-if [ $rc -ne 0 ]; then
-    error_msg
-    exit 1
-fi
 
 ### Get the deployment pods which are in not running state that are related to provided spc ###
 pending_pods=$(kubectl get pod -n $ns \
