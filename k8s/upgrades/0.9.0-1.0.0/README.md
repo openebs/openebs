@@ -47,8 +47,8 @@ $ cd openebs/k8s/upgrades/0.9.0-1.0.0/
     Where `<openebs_namespace>` is the namespace where OpenEBS control plane components are installed.
 
 Note:
- - No new spc should be created after this step untill the upgrade is complete. If created the `pre-upgrade.sh` script needs to be executed again. 
- - It is mandatory to make sure to that all OpenEBS control plane components are running at version 0.9.0 before the upgrade
+ - No new spc should be created after this step until the upgrade is complete. If created the `pre-upgrade.sh` script needs to be executed again. 
+ - It is mandatory to make sure that all OpenEBS control plane components are running at version 0.9.0 before the upgrade
 
 
 ## Step 2: Upgrade the OpenEBS Operator
