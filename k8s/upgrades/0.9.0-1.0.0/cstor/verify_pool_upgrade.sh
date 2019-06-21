@@ -10,7 +10,7 @@ source util.sh
 
 function error_msg() {
     echo -n "Upgrade pool $spc is in pending or failed. Please make sure that the pool $spc "
-    echo -n "upgrade should be successful before continuing for next step. "
+    echo -n "upgrade is successful before continuing for next step. "
     echo -n "Contact OpenEBS team over slack for any further help."
 }
 
@@ -124,8 +124,8 @@ fi
 if [ $is_upgrade_failed == 0 ]; then
     echo "pool upgrade $spc verification is successful"
 else
-    echo -n "validation steps are failed on pool $spc. This might be"
+    echo -n "Validation steps are failed on pool $spc. This might be"
     echo "due to ongoing upgrade or errors during upgrade."
-    echo -n "Please Re Run ./verify_pool_upgrade.sh <spc_name> <namespace> after "
-    echo "some time. If issue still exist Contact OpenEBS team over slack for any further help."
+    echo -n "Please Re run ./verify_pool_upgrade.sh <spc_name> <namespace> after "
+    echo "some time. If issue still persist, contact OpenEBS team over slack for any further help."
 fi
