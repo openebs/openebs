@@ -5,7 +5,7 @@
 #                                                              #
 # NOTES: Obtain the pv to upgrade via "kubectl get pv"         #
 ################################################################
-target_upgrade_version="v1.0.x-ci"
+target_upgrade_version="1.0.0"
 current_version="0.9.0"
 
 function error_msg() {

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "---------upgrade logs----------" > log.txt
+echo "---------pre-upgrade logs----------" > log.txt
 
 ###############################################################################
 # STEP 1: Get all block devices present on the cluster and corresponding disk #
