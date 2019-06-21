@@ -1,6 +1,6 @@
 #!/bin/bash
 
-upgrade_version="1.0.0-RC3"
+upgrade_version="1.0.0"
 current_version="0.9.0"
 
 
@@ -21,7 +21,7 @@ function usage() {
     echo "$0 <spc-name> <openebs-namespace>"
     echo
     echo "  <spc-name> Get the SPC name using: kubectl get spc"
-    echo "  <openebs-namespace> Get the namespace where pool pods"
+    echo "  <openebs-namespace> namespace where pool pods"
     echo "    corresponding to SPC are deployed"
     exit 1
 }

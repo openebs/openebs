@@ -30,7 +30,7 @@ $ cd openebs/k8s/upgrades/0.9.0-1.0.0/
 
 *All steps described in this document need to be performed on the Kubernetes master or from a machine that has access to Kubernetes master*
 
- - Before proceeding with below steps please make sure the daemonset `DESIRED` count is equal to `CURRENT` count. 
+ - Before proceeding with below steps please make sure the daemonset `DESIRED` count is equal to `CURRENT` count.
     ```sh
     $ kubectl get ds openebs-ndm -n <openebs-namespace>
     NAME          DESIRED   CURRENT   READY   UP-TO-DATE   AVAILABLE   NODE SELECTOR   AGE
@@ -40,14 +40,16 @@ $ cd openebs/k8s/upgrades/0.9.0-1.0.0/
    - If any NodeSelector has been used to deploy openebs related pods.
    - Master or any Node has been tainted in k8s cluster.
 
- - Run below command to update OpenEBS control plane components labels.  
+ - Run below command to update OpenEBS control plane components labels.
     ```sh
-    $ ./pre-upgrade.sh <openebs_namespace>
-    ``` 
+    $ ./pre-upgrade.sh <openebs_namespace> <mode>
+    ```
     `<openebs_namespace>` is the namespace where OpenEBS control plane components are installed.
+    `<mode>` provide mode as helm if OpenEBS is installed via helm (or) provide
+     mode as operator if OpenEBS is installed via operator yaml
 
 Note:
- - No new spc should be created after this step until the upgrade is complete. If created the `pre-upgrade.sh` script needs to be executed again. 
+ - No new spc should be created after this step until the upgrade is complete. If created the `pre-upgrade.sh` script needs to be executed again.
  - It is mandatory to make sure that all OpenEBS control plane components are running at version 0.9.0 before the upgrade
 
 
