@@ -6,7 +6,7 @@
 # NOTES: Obtain the pool deployments to perform upgrade operation         #
 ###########################################################################
 
-pool_upgrade_version="v1.0.x-ci"
+pool_upgrade_version="1.0.0"
 current_version="0.9.0"
 
 function error_msg() {
