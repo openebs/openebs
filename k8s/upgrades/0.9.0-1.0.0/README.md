@@ -44,7 +44,7 @@ $ cd openebs/k8s/upgrades/0.9.0-1.0.0/
     ```sh
     $ ./pre-upgrade.sh <openebs_namespace>
     ``` 
-    Where `<openebs_namespace>` is the namespace where OpenEBS control plane components are installed.
+    `<openebs_namespace>` is the namespace where OpenEBS control plane components are installed.
 
 Note:
  - No new spc should be created after this step until the upgrade is complete. If created the `pre-upgrade.sh` script needs to be executed again. 
@@ -127,7 +127,7 @@ cstor-sparse-pool   24m
 $ cd cstor
 $ ./cstor_pool_upgrade.sh cstor-sparse-pool <openebs_namespace>
 ```
-Where `<openebs_namespace>` is the namespace where OpenEBS control plane components are installed.
+`<openebs_namespace>` is the namespace where OpenEBS control plane components are installed.
 
 Make sure that this step completes successfully before proceeding to next step.
 
@@ -145,4 +145,4 @@ pvc-1085415d-f84c-11e8-aadf-42010a8000bb   5G         RWO            Delete     
 $ cd cstor
 $ ./cstor_volume_upgrade.sh pvc-1085415d-f84c-11e8-aadf-42010a8000bb <openebs_namespace>
 ```
-Where `<openebs_namespace>` is the namespace where OpenEBS control plane components are installed.
+`<openebs_namespace>` is the namespace where OpenEBS control plane components are installed.
