@@ -295,7 +295,7 @@ for spc_name in `echo $spc_list | tr ":" " "`; do
     fi
 done
 
-ds_name=$(kubectl get pod -n $ns -l openebs.io/component-name=ndm \
+ds_name=$(kubectl get pod -n $ns -l component=ndm \
          -o jsonpath='{.items[0].metadata.ownerReferences[?(@.kind=="DaemonSet")].name}')
 rc=$?; if [ $rc -ne 0 ]; then echo "Failed to get ndm daemonset name in namespace: $ns | Exit Code: $rc"; error_msg; exit 1; fi
 
