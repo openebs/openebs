@@ -36,10 +36,12 @@ $ cd openebs/k8s/upgrades/0.9.0-1.0.0/
     NAME          DESIRED   CURRENT   READY   UP-TO-DATE   AVAILABLE   NODE SELECTOR   AGE
     openebs-ndm   3         3         3       3            3           <none>          7m6s
     ```
-    This may happen due in following cases:
+    Sometimes, the `DESIRED` count may not be equal to the `CURRENT` count. This may happen due to following cases:
    - If any NodeSelector has been used to deploy openebs related pods.
    - Master or any Node has been tainted in k8s cluster.
-
+ 
+ - If OpenEBS is installed using stable helm chart, ensure that you are in the latest OpenEBS helm chart version 0.9.2. If not, upgrade to the 0.9.2 helm chart version.
+ 
  - Run below command to update OpenEBS control plane components labels.
     ```sh
     $ ./pre-upgrade.sh <openebs_namespace> <mode>
@@ -97,7 +99,7 @@ Even after the OpenEBS Operator has been upgraded to 1.0.0, the Storage Pools an
 Limitations:
 - this is a preliminary script only intended for using on volumes where data has been backed-up.
 - please have the following link handy in case the volume gets into read-only during upgrade
-  https://docs.openebs.io/docs/next/readonlyvolumes.html
+  https://docs.openebs.io/docs/next/troubleshooting.html#recovery-readonly-when-kubelet-is-container
 - automatic rollback option is not provided. To rollback, you need to update the controller, exporter and replica pod images to the previous version
 - in the process of running the below steps, if you run into issues, you can always reach us on slack
 
