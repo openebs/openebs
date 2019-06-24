@@ -29,6 +29,27 @@ $ cd openebs/k8s/upgrades/0.9.0-1.0.0/
 ## Step 1: Prerequisites
 
 *All steps described in this document need to be performed on the Kubernetes master or from a machine that has access to Kubernetes master*
+- If OpenEBS has been deployed using openebs helm charts, it has to be in chart version `0.9.2` . Run `helm list` to verify the chart version.
+   If not, we have to update openebs chart version using below commands.
+
+    - Firstly we have to delete the `admission-server` secret, which will be deployed again once we upgrade charts to `0.9.2` version using below command:
+      ```sh
+      $ kubectl delete secret admission-server-certs -n openebs
+      ```
+
+    - Upgrade OpenEBS chart version to 0.9.2 using below command:
+      ```sh
+      $ helm repo update
+
+      $ helm upgrade <release-name> stable/openebs --version 0.9.2
+      ```
+
+    - Run `helm list` to verify deployed OpenEBS chart version:
+      ```sh
+      $ helm list
+      NAME    REVISION        UPDATED                         STATUS          CHART           APP VERSION     NAMESPACE
+      openebs 3               Mon Jun 24 20:57:05 2019        DEPLOYED        openebs-0.9.2   0.9.0           openebs
+      ```
 
  - Before proceeding with below steps please make sure the daemonset `DESIRED` count is equal to `CURRENT` count.
     ```sh
@@ -39,9 +60,7 @@ $ cd openebs/k8s/upgrades/0.9.0-1.0.0/
     Sometimes, the `DESIRED` count may not be equal to the `CURRENT` count. This may happen due to following cases:
    - If any NodeSelector has been used to deploy openebs related pods.
    - Master or any Node has been tainted in k8s cluster.
- 
- - If OpenEBS is installed using stable helm chart, ensure that you are in the latest OpenEBS helm chart version 0.9.2. If not, upgrade to the 0.9.2 helm chart version.
- 
+
  - Run below command to update OpenEBS control plane components labels.
     ```sh
     $ ./pre-upgrade.sh <openebs_namespace> <mode>
@@ -77,6 +96,7 @@ $ kubectl apply -f https://openebs.github.io/charts/openebs-operator-1.0.0.yaml
 **The sample steps below will work if you have installed openebs with default values provided by stable/    openebs helm chart.**
 
 Before upgrading using helm, please review the default values available with latest stable/openebs chart. (https://raw.githubusercontent.com/helm/charts/master/stable/openebs/values.yaml).
+
 
 - If the default values seem appropriate, you can use the `helm upgrade --reset-values <release name> stable/openebs`.
 - If not, customize the values into your copy (say custom-values.yaml), by copying the content from above default yamls and edit the values to suite your environment. You can upgrade using your custom values using:
