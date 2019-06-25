@@ -216,17 +216,20 @@ orchestrator.
 ```
 [PVC]--1-->(CSI Provisioner)--2-->(OpenEBS CSI Driver)--3--> 
                  |
-                 |7
+                 |4
                 \|/
                [PV]
 
                                       [CStorVolumeConfigClass]
-                                                /|\
-                                                 |5
                                                  |
---3-->[CStorVolumeClaim]--4-->(CStorVolumeClaimController)--6-->
+                                                 |6
+                                                \|/
+--3-->[CStorVolumeClaim]--5-->(CStorVolumeClaimController)
 
---6-->[CStorVolume + ConfigInjector + Deployment + Service + CStorVolumeReplica(s)]
+
+[Mount]--7-->(CSI Node)--8-->[CStorVolumeClaim]--9-->(CStorVolumeClaimController)--10-->
+
+--10-->[CStorVolume + ConfigInjector + Deployment + Service + CStorVolumeReplica(s)]
 ```
 
 Below represents owner and owned resources
