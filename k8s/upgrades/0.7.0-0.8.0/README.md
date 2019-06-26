@@ -54,9 +54,14 @@ kubectl apply -f https://openebs.github.io/charts/openebs-operator-0.8.0.yaml
 
 Before upgrading using helm, please review the default values available with latest stable/openebs chart. (https://raw.githubusercontent.com/helm/charts/master/stable/openebs/values.yaml).
 
-- If the default values seem appropriate, you can use the `helm upgrade --reset-values <release name> stable/openebs`.
+- If the default values seem appropriate, you can use the below commands to update OpenEBS. [More](https://hub.helm.sh/charts/stable/openebs) details about the specific chart version.
+  ```sh
+  $ helm upgrade --reset-values <release name> stable/openebs --version 0.8.1
+  ```
 - If not, customize the values into your copy (say custom-values.yaml), by copying the content from above default yamls and edit the values to suite your environment. You can upgrade using your custom values using:
-`helm upgrade <release name> stable/openebs -f custom-values.yaml`
+  ```sh
+  $ helm upgrade <release name> stable/openebs --version 0.8.1 -f custom-values.yaml`
+  ```
 
 ##### Note: 0.8.1 is the helm chart version that corresponds to OpenEBS 0.8.0 version. All available openebs helm charts can be found here https://hub.kubeapps.com/charts/stable/openebs.
 
