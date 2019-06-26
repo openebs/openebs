@@ -24,9 +24,22 @@ else
    del_cmd="kubectl exec -it $ctrl_pod_name -n $application_namespace -- jivactl snapshot rm $snapshot_name"
    eval $del_cmd
    count=$((count+1))
+   validate_snap_delete $snapshot_name
  done
 fi
 }
+
+validate_snap_delete()
+{
+del_snapshot_name=$1
+validate_cmd='kubectl exec -it $ctrl_pod_name -n $application_namespace -- jivactl snapshot ls | grep $del_snapshot_name'
+eval $validate_cmd
+if [ $? == "0" ]; then
+ echo "Unable to delete $del_snapshot_name"
+ exit 1;
+fi
+}
+
 
 if [ $# -ne 3 ]; then
     usage
