@@ -238,5 +238,8 @@ rm cstor-target-svc-patch.json
 rm cstor-volume-patch.json
 rm cstor-volume-replica-patch.json
 
+echo "Verifying volume $pv upgrade in namespace $ns..."
+./verify_volume_upgrade.sh $pv $ns
+
 echo "Successfully upgraded $pv to $upgrade_version Please run your application checks."
 exit 0
