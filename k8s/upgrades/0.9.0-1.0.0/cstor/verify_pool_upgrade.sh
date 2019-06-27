@@ -126,7 +126,7 @@ if [ $is_upgrade_failed == 0 ]; then
 else
     echo -n "Validation steps are failed on pool $spc. This might be"
     echo "due to ongoing upgrade or errors during upgrade."
-    echo -n "Please Re-run ./verify_pool_upgrade.sh <spc_name> <namespace> after "
+    echo -n "Please run ./verify_pool_upgrade.sh <spc_name> <namespace> again after "
     echo "some time. If issue still persist, contact OpenEBS team over slack for any further help."
     exit 1
 fi
