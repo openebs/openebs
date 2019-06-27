@@ -99,7 +99,7 @@ for csp_name in `echo $csp_list | tr ":" " "`; do
     for bd_name in `echo $bd_list | tr ":" " "`; do
         claim_state=$(kubectl get bd $bd_name -n $ns \
                   -o jsonpath='{.status.claimState}')
-        if [ $claim_state != "Claimed" ]; then
+        if [ "$claim_state" != "Claimed" ]; then
              echo "blockdevice: $bd_name is not yet claimed"
              is_upgrade_failed=1
         fi
@@ -128,4 +128,6 @@ else
     echo "due to ongoing upgrade or errors during upgrade."
     echo -n "Please Re run ./verify_pool_upgrade.sh <spc_name> <namespace> after "
     echo "some time. If issue still persist, contact OpenEBS team over slack for any further help."
+    exit 1
 fi
+exit 0

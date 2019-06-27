@@ -194,7 +194,7 @@ if [[ "$controller_version" != "$upgrade_version" ]]; then
     rc=$?; if [ $rc -ne 0 ]; then echo "Failed to delete cstor replica set $c_rs | Exit code: $rc"; error_msg; exit 1; fi
 
     rollout_status=$(kubectl rollout status --namespace $ns  deployment/$c_dep)
-    rc=$?; if [[ ($rc -ne 0) || !($rollout_status =~ "successfully rolled out") ]];
+    rc=$?; if [[ ($rc -ne 0) || ! ($rollout_status =~ "successfully rolled out") ]];
     then echo "Failed to rollout for deployment $c_dep | Exit code: $rc"; error_msg; exit 1; fi
 else
     echo "Target deployment $c_dep is already at $upgrade_version"
@@ -238,8 +238,10 @@ rm cstor-target-svc-patch.json
 rm cstor-volume-patch.json
 rm cstor-volume-replica-patch.json
 
-echo "Verifying volume $pv upgrade in namespace $ns..."
-./verify_volume_upgrade.sh $pv $ns
+echo "Successfully upgraded $pv to $upgrade_version"
 
-echo "Successfully upgraded $pv to $upgrade_version Please run your application checks."
-exit 0
+./verify_volume_upgrade.sh $pv $ns
+rc=$?
+if [ $rc -eq 0 ]; then
+    echo "Verification of volume $pv upgrade is successful Please run your application checks"
+fi

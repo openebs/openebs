@@ -31,6 +31,7 @@ fi
 pv=$1
 ns=$2
 is_upgrade_failed=0
+echo "Verifying volume $pv upgrade in namespace $ns..."
 
 # Check if pv exists
 kubectl get pv $pv &>/dev/null;check_pv=$?
@@ -129,4 +130,6 @@ else
     echo "due to ongoing upgrade or errors during upgrade."
     echo -n "Please Re run ./verify_volume_upgrade.sh <pv_name> <namespace> after "
     echo "some time. If issue still persist, contact OpenEBS team over slack for any further help."
+    exit 1
 fi
+exit 0

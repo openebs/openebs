@@ -271,8 +271,11 @@ done
 kubectl delete sp -l openebs.io/cas-type=cstor,openebs.io/storage-pool-claim=$spc
 rc=$?; if [ $rc -ne 0 ]; then echo "Failed to delete sp related to spc: $spc_name Exit Code: $rc"; error_msg; exit 1; fi
 
+echo "Successfully upgrade $spc to $upgrade_version"
+
 echo "Verifying pool $spc upgrade..."
 ./verify_pool_upgrade.sh $spc $ns
-
-echo "Successfully upgrade $spc to $upgrade_version Please run volume upgrade scripts."
-
+rc=$?
+if [ $rc -eq 0 ]; then
+    echo "Verification of pool $spc upgrade is successful Please run volume upgrade scripts"
+fi
