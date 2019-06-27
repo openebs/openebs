@@ -176,11 +176,11 @@ sed -u "s/@target_version@/$target_upgrade_version/g" jiva-target-svc-patch.tpl.
 
 #Fetch replica count before upgrade
 container_name=$(echo "$pv""-ctrl-con")
-replication_factor=$(kubectl get deploy "$c_deploy_name" \
+replication_factor=$(kubectl get deploy "$c_deploy_name" -n "$ns" \
 -o jsonpath="{.spec.template.spec.containers[?(@.name=='$container_name')].env[?(@.name=='REPLICATION_FACTOR')].value}")
 
 #Fetch replica pod node names
-before_node_names=$(kubectl get pods \
+before_node_names=$(kubectl get pods -n "$ns" \
     -l openebs.io/replica=jiva-replica,openebs.io/persistent-volume="$pv" \
     -o jsonpath='{range .items[*]}{@.spec.nodeName}:{end}')
 
@@ -305,7 +305,7 @@ for image in $(echo "$replica_images" | tr "?" " "); do
 done
 
 #Verifying running status of controller and replica pods
-running_ctrl_pod_count=$(kubectl get pods \
+running_ctrl_pod_count=$(kubectl get pods -n "$ns" \
 -l openebs.io/controller=jiva-controller,openebs.io/persistent-volume="$pv" \
 --no-headers | wc -l)
 if [ "$running_ctrl_pod_count" != 1 ]; then
@@ -313,7 +313,7 @@ if [ "$running_ctrl_pod_count" != 1 ]; then
     exit 1
 fi
 
-running_rep_pod_count=$(kubectl get pods \
+running_rep_pod_count=$(kubectl get pods -n "$ns" \
 -l openebs.io/replica=jiva-replica,openebs.io/persistent-volume="$pv" \
 --no-headers | wc -l)
 if [ "$running_rep_pod_count" != "$replication_factor" ]; then
@@ -331,7 +331,7 @@ do
         -o jsonpath="{.items[*].metadata.name}" \
     )
     
-    replica_count=$(kubectl exec -it "$ctr_pod" --container "$container_name" \
+    replica_count=$(kubectl exec -it "$ctr_pod" -n "$ns" --container "$container_name" \
         -- bash -c "curl -s http://localhost:9501/v1/volumes" \
         | grep -oP '("replicaCount":)[0-9]' | cut -d ':' -f 2
     )
@@ -346,7 +346,7 @@ if [ "$replica_count" != "$replication_factor" ]; then
 fi
 
 #Checking node stickiness
-after_node_names=$(kubectl get pods \
+after_node_names=$(kubectl get pods -n "$ns" \
     -l openebs.io/replica=jiva-replica,openebs.io/persistent-volume="$pv" \
     -o jsonpath='{range .items[*]}{@.spec.nodeName}:{end}')
 
