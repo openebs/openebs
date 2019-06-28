@@ -1,5 +1,5 @@
 This folder contains sample YAMLs for running bench marking tests
-using fio scripts present at [logdna/dbench](https://github.com/logdna/dbench/). 
+using fio scripts present at [openebs/fbench](https://github.com/openebs/fbench/). 
 
 To get optimal performance, it is essential to tune the storage settings for the
 type of workload and as well as customize the storage to run along side 

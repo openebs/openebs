@@ -1,13 +1,27 @@
 ---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: dbench-lpv-hd-claim
+spec:
+  storageClassName: openebs-device
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+---
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: dbench-hp
+  name: dbench-hd
 spec:
   template:
     spec:
+      #nodeSelector:
+      #  kubernetes.io/hostname: gke-kmova-helm-default-pool-2fc7a594-gtbb
       containers:
-      - name: dbench-hp
+      - name: dbench-hd
         image: openebs/fbench:latest
         imagePullPolicy: Always
         env:
@@ -27,6 +41,6 @@ spec:
       restartPolicy: Never
       volumes:
       - name: dbench-pv
-        hostPath:
-          path: /var/openebs/dbench-data
+        persistentVolumeClaim:
+          claimName: dbench-lpv-hd-claim
   backoffLimit: 4

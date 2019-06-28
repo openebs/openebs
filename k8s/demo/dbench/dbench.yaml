@@ -25,7 +25,7 @@ spec:
     spec:
       containers:
       - name: dbench
-        image: logdna/dbench:latest
+        image: openebs/fbench:latest
         imagePullPolicy: Always
         env:
           - name: DBENCH_MOUNTPOINT

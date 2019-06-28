@@ -31,7 +31,7 @@ spec:
         kubernetes.io/hostname: gke-kmova-perf-default-pool-8691dea0-512r
       containers:
       - name: dbench-jd
-        image: logdna/dbench:latest
+        image: openebs/fbench:latest
         imagePullPolicy: Always
         env:
           - name: DBENCH_MOUNTPOINT
