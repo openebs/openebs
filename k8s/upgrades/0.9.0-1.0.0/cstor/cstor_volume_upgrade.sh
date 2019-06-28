@@ -238,10 +238,10 @@ rm cstor-target-svc-patch.json
 rm cstor-volume-patch.json
 rm cstor-volume-replica-patch.json
 
-echo "Upgrade steps are done on volume $pv. Volume $pv is in OpenEBS version $upgrade_version"
+echo "Upgrade steps are done on volume $pv"
 
 ./verify_volume_upgrade.sh $pv $ns
 rc=$?
 if [ $rc -eq 0 ]; then
-    echo "Verification of volume $pv upgrade is successful Please run your application checks"
+    echo "Verification of volume $pv upgrade is successful. Please run your application checks"
 fi
