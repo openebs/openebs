@@ -164,20 +164,15 @@ if [[ "$controller_svc_version" != "$current_version" ]] && \
     exit 1
 fi
 
-sed -u "s/@r_name@/$r_con_name/g" jiva-replica-patch.tpl.json \
-    | sed -u "s/@target_version@/$target_upgrade_version/g" \
-    | sed -u "s/@pv_name@/$pv/g" \
+sed "s/@r_name@/$r_con_name/g" jiva-replica-patch.tpl.json \
+    | sed "s/@target_version@/$target_upgrade_version/g" \
+    | sed "s/@pv_name@/$pv/g" \
     > jiva-replica-patch.json
-sed -u "s/@c_name@/$c_con_name/g" jiva-target-patch.tpl.json \
-    | sed -u "s/@target_version@/$target_upgrade_version/g" \
+sed "s/@c_name@/$c_con_name/g" jiva-target-patch.tpl.json \
+    | sed "s/@target_version@/$target_upgrade_version/g" \
     > jiva-target-patch.json
-sed -u "s/@target_version@/$target_upgrade_version/g" jiva-target-svc-patch.tpl.json \
+sed "s/@target_version@/$target_upgrade_version/g" jiva-target-svc-patch.tpl.json \
     > jiva-target-svc-patch.json
-
-#Fetch replica count before upgrade
-container_name=$(echo "$pv""-ctrl-con")
-replication_factor=$(kubectl get deploy "$c_deploy_name" -n "$ns" \
--o jsonpath="{.spec.template.spec.containers[?(@.name=='$container_name')].env[?(@.name=='REPLICATION_FACTOR')].value}")
 
 #Fetch replica pod node names
 before_node_names=$(kubectl get pods -n "$ns" \
@@ -261,90 +256,6 @@ else
     echo "controller service $c_svc_name is already at $target_upgrade_version"
 fi
 
-#Verifying the upgraded deployment versions
-controller_version=$(kubectl get deployment "$c_deploy_name" -n "$ns" \
-        -o jsonpath='{.metadata.labels.openebs\.io/version}')
-if [ "$controller_version" != "$target_upgrade_version" ]; then
-    echo "Failed to upgrade target deployment $c_deploy_name labels"
-    exit 1
-fi
-replica_version=$(kubectl get deployment "$r_deploy_name" -n "$ns" \
-        -o jsonpath='{.metadata.labels.openebs\.io/version}')
-if [ "$replica_version" != "$target_upgrade_version" ]; then
-    echo "Failed to upgrade Replica deployment $r_deploy_name labels"
-    exit 1
-fi
-
-#Verifying the upgraded service versions
-controller_svc_version=$(kubectl get svc "$c_svc_name" -n "$ns" \
-        -o jsonpath='{.metadata.labels.openebs\.io/version}')
-if [ "$controller_svc_version" != "$target_upgrade_version" ] ; then
-    echo "Failed to upgrade target service $c_svc_name labels"
-    exit 1
-fi
-
-#Verifying the upgraded deployment images
-controller_images=$(kubectl get deployment "$c_deploy_name" -n "$ns" \
-        -o jsonpath='{range .spec.template.spec.containers[*]}{@.image}?{end}')
-for image in $(echo "$controller_images" | tr "?" " "); do
-    image_version=$(echo "$image" | cut -d ':' -f 2) 
-    if [ "$image_version" != "$target_upgrade_version" ] ; then
-        echo "Failed to upgrade controller deployment $c_deploy_name images"
-        exit 1 
-    fi
-done
-
-replica_images=$(kubectl get deployment "$r_deploy_name" -n "$ns" \
-        -o jsonpath='{range .spec.template.spec.containers[*]}{@.image}?{end}')
-for image in $(echo "$replica_images" | tr "?" " "); do 
-    image_version=$(echo "$image" | cut -d ':' -f 2)
-    if [ "$image_version" != "$target_upgrade_version" ] ; then
-        echo "Failed to upgrade Replica deployment $r_deploy_name images"
-        exit 1
-    fi
-done
-
-#Verifying running status of controller and replica pods
-running_ctrl_pod_count=$(kubectl get pods -n "$ns" \
--l openebs.io/controller=jiva-controller,openebs.io/persistent-volume="$pv" \
---no-headers | wc -l)
-if [ "$running_ctrl_pod_count" != 1 ]; then
-    echo "Failed to upgrade controller pod not running"
-    exit 1
-fi
-
-running_rep_pod_count=$(kubectl get pods -n "$ns" \
--l openebs.io/replica=jiva-replica,openebs.io/persistent-volume="$pv" \
---no-headers | wc -l)
-if [ "$running_rep_pod_count" != "$replication_factor" ]; then
-    echo "Failed to upgrade replica pods not running"
-    exit 1 
-fi
-
-#Verifying registered replica count
-retry=0
-replica_count=0
-while [[ "$replica_count" != "$replication_factor" && $retry -lt 60 ]]
-do 
-    ctr_pod=$(kubectl get pod -n "$ns" \
-        -l openebs.io/persistent-volume="$pv",openebs.io/controller=jiva-controller \
-        -o jsonpath="{.items[*].metadata.name}" \
-    )
-    
-    replica_count=$(kubectl exec -it "$ctr_pod" -n "$ns" --container "$container_name" \
-        -- bash -c "curl -s http://localhost:9501/v1/volumes" \
-        | grep -oP '("replicaCount":)[0-9]' | cut -d ':' -f 2
-    )
-    
-    retry=$(( retry+1 ))
-    sleep 5
-done
-
-if [ "$replica_count" != "$replication_factor" ]; then
-    echo "Failed to upgrade jiva replicas not registered"
-    exit 1
-fi
-
 #Checking node stickiness
 after_node_names=$(kubectl get pods -n "$ns" \
     -l openebs.io/replica=jiva-replica,openebs.io/persistent-volume="$pv" \
@@ -361,7 +272,13 @@ for after_node in $(echo "$after_node_names" | tr ":" " "); do
         echo "Node stickiness failed after upgrade"
         exit 1
     fi 
-done           
+done
 
-echo "Successfully upgraded $pv to $target_upgrade_version Please run your application checks."
-exit 0
+echo "Upgrade steps are done on volume $pv"
+
+./verify_volume_upgrade.sh "$pv"
+
+rc=$?
+if [ $rc -eq 0 ]; then
+    echo "Verification of volume $pv upgrade is successful. Please run your application checks"
+fi
