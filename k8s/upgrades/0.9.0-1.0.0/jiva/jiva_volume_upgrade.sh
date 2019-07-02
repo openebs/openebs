@@ -164,14 +164,14 @@ if [[ "$controller_svc_version" != "$current_version" ]] && \
     exit 1
 fi
 
-sed -u "s/@r_name@/$r_con_name/g" jiva-replica-patch.tpl.json \
-    | sed -u "s/@target_version@/$target_upgrade_version/g" \
-    | sed -u "s/@pv_name@/$pv/g" \
+sed "s/@r_name@/$r_con_name/g" jiva-replica-patch.tpl.json \
+    | sed "s/@target_version@/$target_upgrade_version/g" \
+    | sed "s/@pv_name@/$pv/g" \
     > jiva-replica-patch.json
-sed -u "s/@c_name@/$c_con_name/g" jiva-target-patch.tpl.json \
-    | sed -u "s/@target_version@/$target_upgrade_version/g" \
+sed "s/@c_name@/$c_con_name/g" jiva-target-patch.tpl.json \
+    | sed "s/@target_version@/$target_upgrade_version/g" \
     > jiva-target-patch.json
-sed -u "s/@target_version@/$target_upgrade_version/g" jiva-target-svc-patch.tpl.json \
+sed "s/@target_version@/$target_upgrade_version/g" jiva-target-svc-patch.tpl.json \
     > jiva-target-svc-patch.json
 
 #Fetch replica pod node names
