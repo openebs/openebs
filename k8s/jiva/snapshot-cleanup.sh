@@ -18,6 +18,7 @@ snapshot_name_cmd='kubectl exec -it $ctrl_pod_name -n $application_namespace -- 
 if [ $(eval $snapshot_list_cmd) -le $((number_of_snapshot)) ]; then
  echo "Provided number of snapshots are not present"
 else
+ block_service
  while [ $count -lt $number_of_snapshot ]
  do 
    snapshot_name=$(eval $snapshot_name_cmd | tr -d '\r')
@@ -26,9 +27,29 @@ else
    count=$((count+1))
    validate_snap_delete $snapshot_name
  done
+ unblock_service
 fi
 }
 
+#This fuction is changeing the selector field the of controller service to block connection requests.
+block_service()
+{
+ctrl_service_name=$(kubectl get service -n $application_namespace -l openebs.io/controller-service=jiva-controller-svc -o jsonpath='{.items[0].metadata.name}')
+ctrl_val=$(kubectl get svc $ctrl_service_name -n $application_namespace -o jsonpath='{.spec.selector.openebs\.io/controller}')
+pv_name=$(kubectl get svc $ctrl_service_name -n $application_namespace -o jsonpath='{.spec.selector.openebs\.io/persistent-volume}')
+  
+kubectl patch svc $ctrl_service_name -n $application_namespace -p '{"spec":{"selector":{"openebs.io/persistent-volume": "snap-del"}}}'
+kubectl patch svc $ctrl_service_name -n $application_namespace -p '{"spec":{"selector":{"openebs.io/controller": "snap-del"}}}'
+}
+
+#This fuction is restoring the selector field of the controller service.
+unblock_service()
+{
+kubectl patch svc $ctrl_service_name -n $application_namespace -p "{\"spec\":{\"selector\":{\"openebs.io/persistent-volume\": \"$pv_name\"}}}"
+kubectl patch svc $ctrl_service_name -n $application_namespace -p "{\"spec\":{\"selector\":{\"openebs.io/controller\": \"$ctrl_val\"}}}"
+}
+
+#This function validates for snapshot deletetion using jivactl
 validate_snap_delete()
 {
 del_snapshot_name=$1
@@ -36,6 +57,7 @@ validate_cmd='kubectl exec -it $ctrl_pod_name -n $application_namespace -- jivac
 eval $validate_cmd
 if [ $? == "0" ]; then
  echo "Unable to delete $del_snapshot_name"
+ unblock_service ;
  exit 1;
 fi
 }
