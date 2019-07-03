@@ -35,18 +35,15 @@ fi
 block_service()
 {
 ctrl_service_name=$(kubectl get service -n $application_namespace -l openebs.io/controller-service=jiva-controller-svc -o jsonpath='{.items[0].metadata.name}')
-ctrl_val=$(kubectl get svc $ctrl_service_name -n $application_namespace -o jsonpath='{.spec.selector.openebs\.io/controller}')
-pv_name=$(kubectl get svc $ctrl_service_name -n $application_namespace -o jsonpath='{.spec.selector.openebs\.io/persistent-volume}')
-  
-kubectl patch svc $ctrl_service_name -n $application_namespace -p '{"spec":{"selector":{"openebs.io/persistent-volume": "snap-del"}}}'
-kubectl patch svc $ctrl_service_name -n $application_namespace -p '{"spec":{"selector":{"openebs.io/controller": "snap-del"}}}'
+kubectl patch svc $ctrl_service_name -n $application_namespace --type merge -p "$(cat patch.json)" 
 }
 
 #This fuction is restoring the selector field of the controller service.
 unblock_service()
 {
 kubectl patch svc $ctrl_service_name -n $application_namespace -p "{\"spec\":{\"selector\":{\"openebs.io/persistent-volume\": \"$pv_name\"}}}"
-kubectl patch svc $ctrl_service_name -n $application_namespace -p "{\"spec\":{\"selector\":{\"openebs.io/controller\": \"$ctrl_val\"}}}"
+kubectl patch svc $ctrl_service_name -n $application_namespace --type merge -p "$(cat patch.json)" 
+sed -i 's/3260/3261/g' patch.json
 }
 
 #This function validates for snapshot deletetion using jivactl
