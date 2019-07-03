@@ -45,7 +45,7 @@ rules:
   resources: [ "castemplates", "runtasks"]
   verbs: ["*" ]
 - apiGroups: ["*"]
-  resources: [ "cstorpools", "cstorpools/finalizers", "cstorvolumereplicas", "cstorvolumes"]
+  resources: [ "cstorpools", "cstorpools/finalizers", "cstorvolumereplicas", "cstorvolumes", "cstorvolumeclaims"]
   verbs: ["*" ]
 - apiGroups: ["*"]
   resources: [ "cstorbackups", "cstorrestores", "cstorcompletedbackups"]
