@@ -1,5 +1,5 @@
 ---
-oep-number: draft CSI 20190606
+oep-number: CSI Volume Provisioning 20190606
 title: CSI Volume Provisioning
 authors:
   - "@amitkumardas"
@@ -8,7 +8,7 @@ owners:
   - "@vishnuitta"
 editor: "@amitkumardas"
 creation-date: 2019-06-06
-last-updated: 2019-13-06
+last-updated: 2019-07-04
 status: provisional
 see-also:
   - NA
@@ -44,6 +44,7 @@ superseded-by:
       * [ConfigInjector -- new custom resource](#configinjector----new-custom-resource)
       * [CStorVolume -- existing custom resource](#cstorvolume----existing-custom-resource)
       * [CStorVolumeReplica -- existing custom resource](#cstorvolumereplica----existing-custom-resource)
+    * [CVC Controller Patterns](#cvc-controller-patterns)
     * [Risks and Mitigations](#risks-and-mitigations)
 * [Graduation Criteria](#graduation-criteria)
 * [Implementation History](#implementation-history)
@@ -456,6 +457,56 @@ spec:
 #### CStorVolume -- existing custom resource
 
 #### CStorVolumeReplica -- existing custom resource
+
+### CVC Controller Patterns
+These are some of the controller patterns that can be followed while implementing
+controllers.
+
+- Status.Phase of a CStorVolumeClaim (CVC) resource can have following:
+  - Pending
+  - Bound
+- Status.Phase is only set during creation
+  - Once the phase is Bound it should never revert to Pending
+- Status.Conditions will be used to track an on-going operation or sub status-es
+  - It will be an array
+  - It will have ConditionStatus as a field which can have below values:
+    - True
+    - False
+    - Unknown
+  - An item within a condition can be added, updated & deleted by the resource’s own controller
+  - An item within a condition can be updated by a separate controller
+    - The resource’s own controller still holds the right to delete this condition item
+
+Below is a sample schema snippet for `CStorVolumeClaimStatus` resource
+```go
+type CStorVolumeClaimStatus struct {
+  Phase      CStorVolumeClaimPhase       `json:"phase"`
+  Conditions []CStorVolumeClaimCondition `json:"conditions"`
+}
+
+type CStorVolumeClaimCondition struct {
+  Type                CStorVolumeClaimConditionType   `json:"type"`
+  Status              CStorVolumeClaimConditionStatus `json:"status"`
+  LastTransitionTime  metav1.Time                     `json:"lastTransitionTime"`
+  LastUpdateTime      metav1.Time                     `json:"lastUpdateTime"`
+  Reason              string                          `json:"reason"`
+  Message             string                          `json:"message"`
+}
+
+type CStorVolumeClaimConditionType string
+
+const (
+  CVCConditionResizing CStorVolumeClaimConditionType = "resizing"
+)
+
+type CStorVolumeClaimConditionStatus string
+
+const (
+  CVCConditionStatusTrue    CStorVolumeClaimConditionStatus = "true"
+  CVCConditionStatusFalse   CStorVolumeClaimConditionStatus = "false"
+  CVCConditionStatusUnknown CStorVolumeClaimConditionStatus = "unknown"
+)
+```
 
 ### Risks and Mitigations
 
