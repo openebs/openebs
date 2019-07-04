@@ -3,9 +3,9 @@
            "ports": [
                 {
                     "name": "iscsi",
-                    "port": 3260,
+                    "port": 50000,
                     "protocol": "TCP",
-                    "targetPort": 3260
+                    "targetPort": 50000
                 },
                 {
                     "name": "api",
