@@ -1,0 +1,36 @@
+---
+apiVersion: openebs.io/v1alpha1
+kind: StoragePoolClaim
+metadata:
+  name: sparse-claim-auto
+  annotations:
+    cas.openebs.io/config: |
+      - name: PoolResourceRequests
+        value: |-
+            memory: 1Gi
+            cpu: 100m
+      - name: PoolResourceLimits
+        value: |-
+            memory: 2Gi
+      - name: AuxResourceLimits
+        value: |-
+            memory: 0.5Gi 
+            cpu: 50m
+spec:
+  name: sparse-claim-auto
+  type: sparse
+  maxPools: 3
+  poolSpec:
+    poolType: striped
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: openebs-cstor-sparse
+  annotations:
+    openebs.io/cas-type: cstor
+    cas.openebs.io/config: |
+      - name: StoragePoolClaim
+        value: "sparse-claim-auto"
+provisioner: openebs.io/provisioner-iscsi
+---
