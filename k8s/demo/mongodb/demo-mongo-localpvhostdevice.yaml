@@ -1,0 +1,62 @@
+# Headless service for stable DNS entries of StatefulSet members.
+apiVersion: v1
+kind: Service
+metadata:
+ name: mongo
+ labels:
+   app: mongo
+spec:
+ ports:
+ - port: 27017
+   targetPort: 27017
+ clusterIP: None
+ selector:
+   role: mongo
+---
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+ name: mongo
+ labels: 
+   app: mongo
+spec:
+ serviceName: "mongo"
+ replicas: 3
+ template:
+   metadata:
+     labels:
+       app: mongo
+       role: mongo
+       environment: test
+   spec:
+     terminationGracePeriodSeconds: 10
+     containers:
+       - name: mongo
+         image: mongo
+         command:
+                 #    - mongod
+                 #    - "--replSet"
+                 #    - rs0
+                 #    - "--smallfiles"
+                 #    - "--noprealloc"
+                 #    - "--bind_ip_all"
+         ports:
+           - containerPort: 27017
+         volumeMounts:
+           - name: mongo-pvc
+             mountPath: /data/db
+       - name: mongo-sidecar
+         image: cvallance/mongo-k8s-sidecar
+         env:
+           - name: MONGO_SIDECAR_POD_LABELS
+             value: "role=mongo,environment=test"
+ volumeClaimTemplates:
+ - metadata:
+     name: mongo-pvc
+   spec:
+     storageClassName: openebs-device
+     accessModes:
+       - ReadWriteOnce
+     resources:
+       requests:
+         storage: 5G
