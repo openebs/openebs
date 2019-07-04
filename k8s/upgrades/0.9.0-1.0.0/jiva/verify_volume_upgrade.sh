@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash 
 
 target_upgrade_version=1.0.0
 is_upgrade_failed=0
@@ -94,7 +94,7 @@ done
 #Verifying running status of controller and replica pods
 running_ctrl_pod_count=$(kubectl get pods -n "$ns" \
 -l openebs.io/controller=jiva-controller,openebs.io/persistent-volume="$pv" \
---no-headers | wc -l)
+--no-headers | wc -l | tr -d [:blank:])
 if [ "$running_ctrl_pod_count" != 1 ]; then
     echo "Failed validation for controller pod not running"
     is_upgrade_failed=1
@@ -102,7 +102,7 @@ fi
 
 running_rep_pod_count=$(kubectl get pods -n "$ns" \
 -l openebs.io/replica=jiva-replica,openebs.io/persistent-volume="$pv" \
---no-headers | wc -l)
+--no-headers | wc -l | tr -d [:blank:])
 if [ "$running_rep_pod_count" != "$replication_factor" ]; then
     echo "Failed validation for replica pods not running"
     is_upgrade_failed=1 
@@ -120,7 +120,7 @@ do
     
     replica_count=$(kubectl exec -it "$ctr_pod" -n "$ns" --container "$container_name" \
         -- bash -c "curl -s http://localhost:9501/v1/volumes" \
-        | grep -oP '("replicaCount":)[0-9]' | cut -d ':' -f 2
+        | grep -oE '("replicaCount":)[0-9]' | cut -d ':' -f 2
     )
     
     retry=$(( retry+1 ))
