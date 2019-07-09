@@ -506,3 +506,11 @@ NA
 
 - Availability of github.com/openebs/csi repo 
 - Enable integration with Travis as the minimum CI tool
+
+## Missing parameters for feature parity with older implementations:
+
+ - Resource limits for target pods
+ - Target pod affinity
+ - Target pod tolerations
+ - Replica anti-affinity
+ - Preferred replica anti-affinity
