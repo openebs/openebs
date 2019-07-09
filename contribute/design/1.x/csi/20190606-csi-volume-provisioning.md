@@ -312,6 +312,7 @@ metadata:
 spec:
   targetDeployment:
     spec:
+      monitoring: true
       containers:
       - name: cstor-istgt
         env:
@@ -331,6 +332,7 @@ spec:
     spec:
       labels:
       annotations:
+      zvolWorkers:
 ```
 
 ##### NOTES
@@ -371,11 +373,12 @@ metadata:
   namespace: <openebs system namespace>
   labels:
   annotations:
-    openebs.io/config-class: 
+    openebs.io/cstor-volume-config-class: 
     openebs.io/volume-id:
 spec:
   capacity:
   claimRef:
+  replicationFactor:
 publish:
   nodeId:
 status:
