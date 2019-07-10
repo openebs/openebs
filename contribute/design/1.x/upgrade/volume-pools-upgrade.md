@@ -32,11 +32,6 @@ superseded-by:
     * [Design Constraints](#design-constraints)
     * [Proposed Implementation](#proposed-implementation)
     * [High Level Design](#high-level-design)
-      * [CStorVolumeConfigClass -- new custom resource](#cstorvolumeconfigclass----new-custom-resource)
-      * [CStorVolumeClaim -- new custom resource](#cstorvolumeclaim----new-custom-resource)
-      * [ConfigInjector -- new custom resource](#configinjector----new-custom-resource)
-      * [CStorVolume -- existing custom resource](#cstorvolume----existing-custom-resource)
-      * [CStorVolumeReplica -- existing custom resource](#cstorvolumereplica----existing-custom-resource)
     * [Risks and Mitigations](#risks-and-mitigations)
 * [Graduation Criteria](#graduation-criteria)
 * [Implementation History](#implementation-history)
@@ -87,6 +82,9 @@ of pools and volumes via Kubernetes Job.
 - As an cluster administrator - I want to automate the upgrades of 
   OpenEBS on thousands of Edge Clusters that are running in my 
   organization. 
+- As an OpenEBS user - I want the upgrade steps to be standardized, 
+  so that I don't need to learn how to upgrade, everytime there is a 
+  new release.
 - As an developer of managed kubernetes platform - I want to provide 
   an option for my end-user (cluster administrator) an user-interface 
   to easily select the volumes and pools and schedule an upgrade. 
@@ -143,6 +141,36 @@ The workflow followed by administrator is as follows:
   UpgradeTask details. 
 - Administrator can query the UpgradeTask to check the status 
   and result of the upgrade.
+
+### Design Choices/Decisions
+
+This section captures some of the alternative design considered
+and the reasoning behind selecting a certain approach. 
+
+- A generic UpgradeTask CR vs task specific ones like JivaUpgradeTask,
+  CStorVolumeUpgradeTask, etc. Having specific tasks has the following
+  advantages:
+  * Each tasks can have its own spec. the fields may vary depending
+    on the resource being upgraded.
+  * Writing specific operators for each upgrade that operates on a
+    given type of task will make the upgrades more modular. 
+  
+  However, this also means that every time a new resource type is
+  added, another CR needs to be introduced, managed and learned by 
+  the user. This may still be ok. But a similar pattern where 
+  different specs are required is already addressed by the PVC. To 
+  keep the resources management at a minimum, the PVC type, sub-resource
+  spec pattern will be used to specifiy different resources under
+  a generic UpgradeTask CR. 
+
+  Note that, selecting the Generic Task - doesn't preclude from 
+  writing specific upgrade task operators and upgrades task CRs as long
+  as the management of these specific upgrade tasks are completely 
+  management by the operators and user need not interact with them. One
+  possible future implementation could be: The upgrade-operator can 
+  look at the upgrade task (consider it as a claim) and create a 
+  specific upgrade task and bind it. Then the specific upgrade 
+  operator will operate on the their own resources.  
 
 
 ### High Level Design
