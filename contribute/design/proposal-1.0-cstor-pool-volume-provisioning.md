@@ -1,38 +1,104 @@
-# Managing cStor based OpenEBS Volumes. 
+# Provisioning cStor Pools and Volumes
 
-This document provides the design details on how the OpenEBS Control Plane will create OpenEBS StoragePools and Volumes using OpenEBS cStor storage-engine. 
+This document provides the design details on how the OpenEBS 
+Control Plane will create OpenEBS StoragePools and Volumes using 
+OpenEBS cStor storage-engine. 
 
 ## Prerequisites
-- Container Attached Storage or storage for containers in containers. [Introduction to OpenEBS](https://docs.google.com/presentation/d/1XPZZx7DYv2ah0Yy_A_CwTVVhZj3Sc0XkSsdQc7BG72I/edit#slide=id.p)
+- Container Attached Storage or storage for containers in containers. 
+  [Introduction to OpenEBS](https://docs.google.com/presentation/d/1XPZZx7DYv2ah0Yy_A_CwTVVhZj3Sc0XkSsdQc7BG72I/edit#slide=id.p)
 - Knowledge about Kubernetes [CRDs](https://kubernetes.io/docs/concepts/api-extension/custom-resources/)
 - Knowledge about Kubernetes [Resource limits and requests for CPU and Memory](https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/#resource-requests-and-limits-of-pod-and-container)
-- Knowledge about Kubernetes concepts like Custom Controllers, initializers and reconciliation loop that wait on objects to move from actual to desired state.
+- Knowledge about Kubernetes concepts like Custom Controllers, 
+  initializers and reconciliation loop that wait on objects to 
+  move from actual to desired state.
 - Familiar with Kubernetes and OpenEBS Storage Concepts:
-  * PersistentVolume(PV) and PersistentVolumeClaim(PVC) are standard Kubernetes terms used to associate volumes to a given workload. A PVC will be watched by a dynamic provisioner, which will in turn spin-up OpenEBS Volume Containers and create a PV (iSCSI) to be used by the workload.
-  * Disks and DiskClaims(DCs) are used to represent and identify the storage (a disk) attached to a Kubernetes Node. DiskClaims are created by the User and node-disk-manager will use that information to discover disks matching the criteria mentioned in DC to create the Disks. It is also possible that the User will directly create Disk representing a storage attached to a node. Each Disk will be represented by a cluster wide unique identifier like -- rs://host:nodea/device:/dev/disk-by-id/avcd-121312-hfjgdf. Disk and DiskClaims are managed by [OpenEBS Node Disk Manager](https://github.com/openebs/node-disk-manager/blob/master/docs/design.md)
-  * StoragePool(SP) and StoragePoolClaim(SPC) are used to represent and identify a pool of storage that is created using one more Disks. Each StoragePool can be used to then serve one or more OpenEBS Volume Replicas. The StoragePools can be of different types depending on how the underlying disks/storage are aggregated and how the pool is exposed. Till 0.6, OpenEBS supported storage pools of type (file-system), which where basically either a hostDirectory or ext4 mount of a single block disk. From 0.7, OpenEBS will support creation of storage pools that expose blocks. These block type pools are implemented using cStor storage-engine. 
+  * PersistentVolume(PV) and PersistentVolumeClaim(PVC) are 
+    standard Kubernetes terms used to associate volumes to a 
+    given workload. A PVC will be watched by a dynamic provisioner, 
+    and helps with provisioning a new PV and binding to PVC. In 
+    case of OpenEBS, provisoining a PV involves launching OpenEBS 
+    Volume Containers (aka iSCSI Target Service) and creating a 
+    in-tree iSCSI PV.
+  * BlockDevices(BDs) and BlockDeviceClaims(BDCs) are Kubernetes 
+    custom resources, used to represent and identify the storage 
+    (a disk) attached to a Kubernetes Node. BlockDiskClaims are 
+    used by the cStor Pool Operator to claim a BlockDevice before
+    using it to create a Pool. Each BlockDevice will be represented 
+    by a cluster wide unique identifier. BlockDevice and 
+    BlockDeviceClaims are managed by [OpenEBS Node Disk Manager](https://github.com/openebs/node-disk-manager/blob/master/docs/design.md)
+  * StoragePoolClaim(SPC) is a custom resource, that can be used to 
+    claim creation of cStor Pools. Unlike, PVC/PV - SPC can result in 
+    more than one cStor Pool. Think of SPC as more of a Deployment
+    Kind or Statefulset Kind with replica count. 
+- Familiar with cStor Data Engine. cStor Data Engine comprises of 
+  two components - cStor Target (aka iSCSI frontend) and cStor Pool. 
+  cStor Target recieves the IO from the application and it interacts
+  with one or more cStor Pools to serve the IO. A single cStor Volume
+  comprises of a cStor target and the logical replicas that are 
+  provisioned on a set of cStor Pools. The replicas are called as 
+  cStor Volume Replicas. The cStor Pool and Replica functionality 
+  is containerized and is available in `openebs/cstor-pool`. 
+  The target functionality is available under `openebs/cstor-istgt`.
+  Each of these expose a CLI that can be accessed via UXD.
+
+## Design Constraints / Considerations
+- The dynamic provisioner will be implemented using the 
+  kubernetes-incubator/external-provisioner, which is already 
+  used for Jiva volumes. At the time of this writing CSI was 
+  still under heavy development. In future, the external-provisioner
+  can be replaced with CSI. 
+- Creation of cStor Pools and cStor Volume Replicas will follow
+  the Kubernetes reconciliation pattern - where a custom resource 
+  is defined and the operator will eventually provision the objects. 
+  This approach was picked over - an API based approach - because:
+  * The cStor Pool and Target pods only support CLI that can 
+    be accessed via UXD. Write a higher level operator requires 
+    API to be exposed.  
+  * The reconciliation has the advantage of removing the dependency
+    on control plane once provisioned - for cases like node/pool 
+    not being ready to receive the requests. Recover from chaos 
+    generated within the cluster - without having to depend on a 
+    higher level operator.
 
 
-## Proposed Workflow
+## High Level Design and Proposed Workflow
 
-The workflow is split into two steps:
-- creation of storage pools using cStor Storage Engine and 
-- creating OpenEBS Volumes using the cStor Storage engine. 
+To make use of the cStor Volumes, users will have to select a 
+StorageClass - that indicates the volumes should be created using 
+a certain set of cStor Pools. As part of setting up the cluster, 
+the administrator will have to create cStor Pools and a corresponding
+StorageClass. 
 
-The workflow uses CRDs to store the disk, pool and volume related information and to pass it across different components. 
-
-This workflow requires that the node-disk-manager is already setup and openebs components are installed. The following CRDs will already be available.
-- Disk and DiskClaim
-- StoragePool and StoragePoolClaim
+At a high level, the provisioning can be divided into two steps:
+- Administrator - creating cStor Storage Pool and StorageClass (and)
+- Users - request for cStor Volume via PVC and cStor StorageClass. 
 
 As part of implementing the cStor, the following new CRDs are loaded:
+- StoragePoolClaim
 - CStorPool
 - CStorVolume
 - CStorVolumeReplica
 
-### Workflow for creating cStor StoragePools:
+The following new operators/controllers are created to watch for the
+new CRs:
+- cstor-pool-operator ( embedded in the maya-apiserver), will watch
+  for SPC and helps with creating and deleting the cStor Pools. 
+- cstor-pool-mgmt ( deployed as a side-car to the cStor Pool Pod
+  will help with watching the cStorPool - to create uZFS Pool using
+  the provided block devices. Will also watch for the cStorVolumeReplica
+  to create uZFS Volumes (aks zvol) to be assicated with cStor Volume.
+- cstor-volume-mgmt ( deployed as a side-car to the cStor Target Pod
+  will help with reading the target parameters and setting them on
+  cStor Target.)
 
-   * Admin will create StoragePoolClaim(SPC) with type=cstor and the SPC will contains information like:
+Also, this workflow assumes that BlockDevice and BlockDevice claims
+are available. 
+
+### Workflow for creating cStor Pools:
+
+   * Admin will create StoragePoolClaim(SPC) with type=cstor and 
+     the SPC will contains information like:
      ```
      apiVersion: openebs.io/v1alpha1
      kind: StoragePoolClaim
