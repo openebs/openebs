@@ -175,6 +175,71 @@ and the reasoning behind selecting a certain approach.
 
 ### High Level Design
 
+#### UpgradeTask CR Example
+
+Here is an example of UpgradeTask for upgrading Jiva Volume. The 
+conditions are added by the Upgrade Job
+
+```
+apiVersion: openebs.io/v1alpha1
+kind: UpgradeTask
+metadata:
+  name: upgrade-jiva-pv-001
+  namespace: openebs
+spec:
+  fromVersion: 0.9.0
+  toVersion: 1.0.0
+  jivaVolume:
+    pvName: pvc-3d290e5f-7ada-11e9-b8a5-54e1ad4a9dd4
+status:
+  phase: #INIT, STARTED and ERROR can be the supported phases
+  # conditions represent current reconciliation
+  # activities
+  conditions:
+  - stage:   # Upgrade Stage - PRE_UPGRADE, TARGET_UPGRADE, ...
+    type:    # info, error
+    message: 
+    createdAt:
+    lastUpdatedAt:
+    count:
+```
+
+The upgrade job will pass the name of the upgrade task as ENV. A
+sample upgrade job will look like:
+
+```
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: upgrade-jiva-pv-001-job
+  namespace: openebs
+spec:
+  template:
+    spec:
+      #If running in openebs, openebs-maya-operator can be used as 
+      #service account.
+      serviceAccountName: super-admin
+      containers:
+      - name:  upgrade
+        image: openebs/upgrade-executor:latest
+        env:
+        - name: UPGRADE_TASK_CR_NAME
+          value: "upgrade-jiva-pv-001"
+        - name: JOB_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: JOB_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        #In case the upgrade tasks are installed in another namespace.
+        - name: OPENEBS_NAMESPACE
+          value: "openebs"
+      restartPolicy: Never
+```
+
+
 ### Risks and Mitigations
 
 ## Graduation Criteria
