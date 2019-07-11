@@ -9,6 +9,8 @@ metadata:
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
     component: ndm-operator
+    openebs.io/component-name: ndm-operator
+    openebs.io/version: {{ .Values.release.version }}
     name: ndm-operator
 spec:
   replicas: {{ .Values.ndmOperator.replicas }}

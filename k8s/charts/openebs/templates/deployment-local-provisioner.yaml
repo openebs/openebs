@@ -9,6 +9,7 @@ metadata:
     heritage: {{ .Release.Service }}
     component: localpv-provisioner
     openebs.io/component-name: openebs-localpv-provisioner
+    openebs.io/version: {{ .Values.release.version }}
 spec:
   replicas: {{ .Values.provisioner.replicas }}
   selector:
@@ -21,6 +22,8 @@ spec:
         app: {{ template "openebs.name" . }}
         release: {{ .Release.Name }}
         component: localpv-provisioner
+        name: openebs-localpv-provisioner
+        openebs.io/component-name: openebs-localpv-provisioner
         openebs.io/version: {{ .Values.release.version }}
     spec:
       serviceAccountName: {{ template "openebs.serviceAccountName" . }}
@@ -54,7 +57,7 @@ spec:
         - name: OPENEBS_IO_BASE_PATH
           value: "{{ .Values.localprovisioner.basePath }}"
         - name: OPENEBS_IO_HELPER_IMAGE
-          value: "{{ .Values.localprovisioner.helperImage }}"
+          value: "{{ .Values.localprovisioner.helperImage }}:{{ .Values.localprovisioner.helperImageTag }}"
         - name: OPENEBS_IO_INSTALLER_TYPE
           value: "charts-helm"
         livenessProbe:
