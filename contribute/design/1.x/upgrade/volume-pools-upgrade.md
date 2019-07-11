@@ -83,9 +83,9 @@ of pools and volumes via Kubernetes Job.
   OpenEBS on thousands of Edge Clusters that are running in my 
   organization. 
 - As an OpenEBS user - I want the upgrade steps to be standardized, 
-  so that I don't need to learn how to upgrade, everytime there is a 
+  so that I don't need to learn how to upgrade, every time there is a 
   new release.
-- As an developer of managed kubernetes platform - I want to provide 
+- As an developer of managed Kubernetes platform - I want to provide 
   an option for my end-user (cluster administrator) an user-interface 
   to easily select the volumes and pools and schedule an upgrade. 
   
@@ -113,7 +113,7 @@ While the above approach was good enough to be automated via `kubectl`,
 the steps that can be executed as part of upgrade were limited
 by the features or constructs available within the CAST/RunTasks. 
 
-Another short-comming of the CAST/RunTasks is the lack of developer
+Another short-coming of the CAST/RunTasks is the lack of developer
 friendly constructs for rapidly writing new CAST/RunTasks. This was
 severely impacting the time taken to push out new releases. 
 
@@ -128,7 +128,7 @@ entrypoint script that will invoke the right scripts depending on
 the object being upgraded. 
 
 A custom resource called `UpgradeTask` will be defined with the 
-details of the object being upgraded, and will in trun be updated
+details of the object being upgraded, and will in turn be updated
 with the status of the upgrade by the upgrade-container scripts.  
 
 OpenEBS team will release an openebs-upgrade-tools container 
@@ -157,10 +157,10 @@ and the reasoning behind selecting a certain approach.
   
   However, this also means that every time a new resource type is
   added, another CR needs to be introduced, managed and learned by 
-  the user. This may still be ok. But a similar pattern where 
+  the user. This may still be OK. But a similar pattern where 
   different specs are required is already addressed by the PVC. To 
   keep the resources management at a minimum, the PVC type, sub-resource
-  spec pattern will be used to specifiy different resources under
+  spec pattern will be used to specify different resources under
   a generic UpgradeTask CR. 
 
   Note that, selecting the Generic Task - doesn't preclude from 
@@ -189,19 +189,52 @@ metadata:
 spec:
   fromVersion: 0.9.0
   toVersion: 1.0.0
-  jivaVolume:
-    pvName: pvc-3d290e5f-7ada-11e9-b8a5-54e1ad4a9dd4
+  #flags can be used to change the default behavior 
+  flags: 
+    #maximum seconds to wait at any given step in the upgrade
+    timeout: 0 #wait forever
+  #the resource represents the type of resource being upgraded. 
+  #some examples are jivaVolume, cstorVolume, cstorPool, cstorPoolClaim
+  #and so forth. Each resource may pass a different set of parameters
+  #to uniquely identify the resource being upgraded. 
+  resourceType: 
+    jivaVolume:
+      pvName: pvc-3d290e5f-7ada-11e9-b8a5-54e1ad4a9dd4
+      #flags can be used to change the default behaviour 
+      flags: 
+        #specify the steps that can be ignored on error.
+        #ignoreStepsOnError: 
+        # - PRE_CHECK
 status:
-  phase: #INIT, STARTED and ERROR can be the supported phases
-  # conditions represent current reconciliation
-  # activities
-  conditions:
-  - stage:   # Upgrade Stage - PRE_UPGRADE, TARGET_UPGRADE, ...
-    type:    # info, error
-    message: 
-    createdAt:
+  phase: #STARTED, SUCCESS or ERROR can be the supported phases
+  #timestamp when the upgrade job started. Set the phase to STARTED
+  startTime: 2019-07-11T17:39:01Z
+  #timestamp when the phase changed to DONE or ERROR
+  completedTime: 2019-07-11T17:40:01Z
+  # upgrade statuses represent the various stages in the upgrade
+  # and the current state of each stage.
+  upgradeDetailedStatuses:
+  #Upgrade can comprise of a series of steps like PRE_UPGRADE, 
+  # TARGET_UPGRADE, REPLICA_UPGRADE, VERIFY, ROLLBACK and so forth
+  # depending on the resource being upgraded.
+  - step:   # Upgrade Stage - PRE_UPGRADE, TARGET_UPGRADE, ...,VERIFY
+    startTime:
+    #state represents the current state of the step. The 
+    #state can be waiting, errored or completed. lastUpdatedAt
+    #will contain the timestamp at which the current state is updated.
     lastUpdatedAt:
-    count:
+    state:
+      #The state can be on one of the following 
+      waiting:
+        message: Initiated rollout of "deployment/pvc-dep-name"
+      errored:
+        #extract the error message and reason from kubectl
+        message: Unable to patch "deployment/pvc-dep-name"
+        reason: ErrorRollout
+      completed:
+        #include the details like which resource was patched
+        message: patched "deployment/pvc-dep-name"
+
 ```
 
 The upgrade job will pass the name of the upgrade task as ENV. A
