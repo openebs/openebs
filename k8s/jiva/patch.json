@@ -1,0 +1,24 @@
+{
+    "spec": {
+           "ports": [
+                {
+                    "name": "iscsi",
+                    "port": 50000,
+                    "protocol": "TCP",
+                    "targetPort": 50000
+                },
+                {
+                    "name": "api",
+                    "port": 9501,
+                    "protocol": "TCP",
+                    "targetPort": 9501
+                },
+                {
+                    "name": "exporter",
+                    "port": 9500,
+                    "protocol": "TCP",
+                    "targetPort": 9500
+                }
+           ]
+        }
+    }
