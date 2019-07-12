@@ -184,6 +184,8 @@ kind: Service
 metadata:
   name: maya-apiserver-service
   namespace: openebs
+  labels:
+    openebs.io/component-name: maya-apiserver-svc
 spec:
   ports:
   - name: api
@@ -330,6 +332,8 @@ kind: ConfigMap
 metadata:
   name: openebs-ndm-config
   namespace: openebs
+  labels:
+    openebs.io/component-name: ndm-config
 data:
   # udev-probe is default or primary probe which should be enabled to run ndm
   # filterconfigs contails configs of filters - in their form fo include
@@ -518,7 +522,7 @@ metadata:
   namespace: openebs
   labels:
     app: admission-webhook
-    openebs.io/component: admission-server
+    openebs.io/component-name: admission-webhook
 type: Opaque
 data:
   cert.pem: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUQ3VENDQXRXZ0F3SUJBZ0lVYk84NS9JR0ZXYTA2Vm11WVdTWjdxaTUybmRRd0RRWUpLb1pJaHZjTkFRRUwKQlFBd1hERUxNQWtHQTFVRUJoTUNlSGd4Q2pBSUJnTlZCQWdNQVhneENqQUlCZ05WQkFjTUFYZ3hDakFJQmdOVgpCQW9NQVhneENqQUlCZ05WQkFzTUFYZ3hDekFKQmdOVkJBTU1BbU5oTVJBd0RnWUpLb1pJaHZjTkFRa0JGZ0Y0Ck1CNFhEVEU1TURNd01qQTNNek13TUZvWERUSXdNRE13TVRBM01qYzFNbG93S3pFcE1DY0dBMVVFQXhNZ1lXUnQKYVhOemFXOXVMWE5sY25abGNpMXpkbU11YjNCbGJtVmljeTV6ZG1Nd2dnRWlNQTBHQ1NxR1NJYjNEUUVCQVFVQQpBNElCRHdBd2dnRUtBb0lCQVFERk5MRE1xKzd6eFZidDNPcnFhaVUyOFB6K25ZeFRCblA0NVhFWGFjSUpPWG1aClM1c2ZjMjM3WVNWS0I5Tlp4cXNYT08wcXpWb0xtNlZ0UDJjREpWZGZIVUQ0QXBZSC94UVBVTktrcFg3K0NVTFEKZ3VBNWowOXozdkFaeDJidXBTaXFFdE1mVldqNkh5V0Jyd2FuZW9IaVVXVVdpbmtnUXpCQzR1SWtiRkE2djYrZwp4ZzAwS09TY2NFRWY3eU5McjBvejBKVHRpRm1aS1pVVVBwK3N3WTRpRTZ3RER5bVVnTmY4SW8wUEExVkQ1TE9vCkFwQ0l2WDJyb1RNd3VkR1VrZUc1VTA2OWIrMWtQMEJsUWdDZk9TQTBmZEN3Snp0aWE1aHpaUlVIWGxFOVArN0kKekgyR0xXeHh1aHJPTlFmT25HcVRiUE13UmowekZIdmcycUo1azJ2VkFnTUJBQUdqZ2Rjd2dkUXdEZ1lEVlIwUApBUUgvQkFRREFnV2dNQk1HQTFVZEpRUU1NQW9HQ0NzR0FRVUZCd01CTUF3R0ExVWRFd0VCL3dRQ01BQXdIUVlEClZSME9CQllFRklnOVFSOSsyVW12THQwQXY4MlYwZml0bU81WE1COEdBMVVkSXdRWU1CYUFGTU5HNkZ4aUxhYWYKMWV3bDVEN3VJcmIrRStIT01GOEdBMVVkRVFSWU1GYUNGR0ZrYldsemMybHZiaTF6WlhKMlpYSXRjM1pqZ2h4aApaRzFwYzNOcGIyNHRjMlZ5ZG1WeUxYTjJZeTV2Y0dWdVpXSnpnaUJoWkcxcGMzTnBiMjR0YzJWeWRtVnlMWE4yCll5NXZjR1Z1WldKekxuTjJZekFOQmdrcWhraUc5dzBCQVFzRkFBT0NBUUVBSlpJRzd2d0RYaWxhWUFCS1Brc0oKZVJtdml4ZnYybTRVTVdzdlBKVVVJTXhHbzhtc1J6aWhBRjVuTExzaURKRDl4MjhraXZXaGUwbWE4aWVHYjY5Sgp1U1N4bys0OStaV3NVaTB3UlRDMi9ZWGlkWS9xNDU2c1g4ck9qQURDZlFUcFpYc2ZyekVWa2Q4NE0zdU5GTmhnCnMyWmxJMnNDTWljYXExNWxIWEh3akFkY2FqZit1VklwOXNHUElsMUhmZFcxWVFLc0NoU3dhdi80NUZJcFlMSVYKM3hiS2ZIbmh2czhJck5ZbTVIenAvVVdvcFN1Tm5tS1IwWGo3cXpGcllUYzV3eHZ3VVZrKzVpZFFreWMwZ0RDcApGbkFVdEdmaUVUQnBhU3pISjQ4STZqUFpneVE0NzlZMmRxRUtXcWtyc0RkZ2tVcXlnNGlQQ0YwWC9YVU9YU3VGClNnPT0KLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo=
@@ -531,7 +535,7 @@ metadata:
   namespace: openebs
   labels:
     app: admission-webhook
-    openebs.io/component: admission-server
+    openebs.io/component-name: admission-webhook-svc
 spec:
   ports:
   - port: 443
@@ -546,7 +550,7 @@ metadata:
   namespace: openebs
   labels:
     app: admission-webhook
-    openebs.io/component-name: admission-server
+    openebs.io/component-name: admission-webhook
     openebs.io/version: dev
 spec:
   replicas: 1
@@ -557,7 +561,7 @@ spec:
     metadata:
       labels:
         app: admission-webhook
-        openebs.io/component-name: admission-server
+        openebs.io/component-name: admission-webhook
         openebs.io/version: dev
     spec:
       serviceAccountName: openebs-maya-operator
@@ -586,7 +590,7 @@ metadata:
   name: validation-webhook-cfg
   labels:
     app: admission-webhook
-    openebs.io/component-name: admission-server
+    openebs.io/component-name: admission-webhook
 webhooks:
   - name: admission-webhook.openebs.io
     clientConfig:
@@ -663,3 +667,4 @@ spec:
           initialDelaySeconds: 30
           periodSeconds: 60
 ---
+
