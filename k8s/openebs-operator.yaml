@@ -341,7 +341,7 @@ data:
         state: true
       - key: seachest-probe
         name: seachest probe
-        state: true
+        state: false
       - key: smart-probe
         name: smart probe
         state: true
