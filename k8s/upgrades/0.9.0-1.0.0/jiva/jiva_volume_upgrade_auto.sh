@@ -29,17 +29,19 @@ function usage() {
     echo
     echo "Usage:"
     echo
-    echo "$0 <pv-name>"
+    echo "$0 <pv-name> <openebs-namespace>"
     echo
     echo "  <pv-name> Get the PV name using: kubectl get pv"
+    echo "  <openebs-namespace> Get the namespace where openebs control plane components are installed"
     exit 1
 }
 
-if [ "$#" -ne 1 ]; then
+if [ "$#" -ne 2 ]; then
     usage
 fi
 
 pv=$1
+OpenEBS_ns=$2
 
 export pv
 
@@ -66,7 +68,7 @@ fi
 
 
 #In case of DeployInOpenEBSNamespace is set to "true" check for pvc deployment in openebs namespace
-ns=$OPENEBS_NAMESPACE
+ns=$OpenEBS_ns
 count=$(kubectl get deploy -n "$ns" \
         -l openebs.io/persistent-volume="$pv" | wc -l)
 if [ $count -eq 0 ]; then
