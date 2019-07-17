@@ -15,7 +15,7 @@ if [[ "$controller_svc_version" != "$upgrade_version" ]]; then
     
     if [ $rc -ne 0 ]; then 
         reason=$(echo $patch_status | tr --delete ":")
-        patch_upgrade_task_error "$upgrade_task" "SERVICE_UPRADE" "failed to patch the service $c_svc_name" "$reason"
+        patch_upgrade_task_error  "SERVICE_UPRADE" "failed to patch the service $c_svc_name" "$reason"
         exit 1
     fi
 else

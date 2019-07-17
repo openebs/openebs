@@ -24,7 +24,7 @@ if [[ "$replica_version" != "$upgrade_version" ]]; then
     
     if [ $rc -ne 0 ]; then 
         reason=$(echo $patch_status | tr --delete ":")
-        patch_upgrade_task_error "$upgrade_task" "REPLICA_UPRADE" "failed to patch the deployment $r_deploy_name" "$reason"
+        patch_upgrade_task_error  "REPLICA_UPRADE" "failed to patch the deployment $r_deploy_name" "$reason"
         exit 1
     fi
 
@@ -33,7 +33,7 @@ if [[ "$replica_version" != "$upgrade_version" ]]; then
 
         if [ $rc -ne 0 ]; then 
             reason=$(echo $delete_status | tr --delete ":")
-            patch_upgrade_task_error "$upgrade_task" "REPLICA_UPRADE" "failed to delete replicaset $r_rs" "$reason"
+            patch_upgrade_task_error  "REPLICA_UPRADE" "failed to delete replicaset $r_rs" "$reason"
             exit 1
         fi
     done
@@ -42,7 +42,7 @@ if [[ "$replica_version" != "$upgrade_version" ]]; then
     rc=$?; 
     if [[ ($rc -ne 0) || ! ($rollout_status =~ "successfully rolled out") ]]; then
         reason=$(echo $patch_status | tr --delete ":")
-        patch_upgrade_task_error "$upgrade_task" "REPLICA_UPRADE" " rollout for deployment $r_deploy_name failed" "$reason"
+        patch_upgrade_task_error  "REPLICA_UPRADE" " rollout for deployment $r_deploy_name failed" "$reason"
         exit 1
     fi
 else

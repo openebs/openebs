@@ -29,7 +29,7 @@ if [[ "$controller_version" != "$upgrade_version" ]]; then
     
     if [ $rc -ne 0 ]; then 
         reason=$(echo "$patch_status" | tr --delete ":")
-        patch_upgrade_task_error "$upgrade_task" "TARGET_UPRADE" "failed to patch deployment "$c_deploy_name"" "$reason"
+        patch_upgrade_task_error  "TARGET_UPRADE" "failed to patch deployment "$c_deploy_name"" "$reason"
         exit 1
     fi
 
@@ -37,7 +37,7 @@ if [[ "$controller_version" != "$upgrade_version" ]]; then
     rc=$?
     if [ $rc -ne 0 ]; then 
         reason=$(echo "$delete_status" | tr --delete ":")
-        patch_upgrade_task_error "$upgrade_task" "TARGET_UPRADE" "failed to delete replicaset "$c_rs_old"" "$reason"
+        patch_upgrade_task_error  "TARGET_UPRADE" "failed to delete replicaset "$c_rs_old"" "$reason"
         exit 1
     fi
 
@@ -45,7 +45,7 @@ if [[ "$controller_version" != "$upgrade_version" ]]; then
     rc=$?; 
     if [[ ($rc -ne 0) || ! ($rollout_status =~ "successfully rolled out") ]]; then
         reason=$(echo "$rollout_status" | tr --delete ":")
-        patch_upgrade_task_error "$upgrade_task" "TARGET_UPRADE" "rollout for deployment $c_deploy_name failed" "$reason"
+        patch_upgrade_task_error  "TARGET_UPRADE" "rollout for deployment $c_deploy_name failed" "$reason"
         exit 1
     fi
 else

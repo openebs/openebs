@@ -51,19 +51,27 @@ function verify_pod_image_tag() {
 }
 
 function patch_upgrade_task_error() {
-    local upgrade_task=$1
-    local step=$2
-    local message=$3
-    local reason=$4
-    kubectl -n openebs patch ut "$upgrade_task" --type='json'\
-        -p='[{"op": "add", "path": "/status/upgradeDetailedStatuses/0", "value": {"step": '"$step"', "state": {'"errored"': {"message": '"$message"', "reason":'"$reason"'}}}}]'
+    local step=$1
+    local message=$2
+    local reason=$3
+    if [ -z "$UPGRADE_TASK_CR_NAME" ]; then
+        echo "$message"
+        echo "$reason"
+    else
+        kubectl -n "$JOB_NAMESPACE" patch ut "$UPGRADE_TASK_CR_NAME" --type='json'\
+            -p='[{"op": "add", "path": "/status/upgradeDetailedStatuses/0", "value": {"step": '"$step"', "state": {'"errored"': {"message": '"$message"', "reason":'"$reason"'}}}}]'
+   
+    fi
 }
 
 function patch_upgrade_task() {
-    local upgrade_task=$1
-    local step=$2
-    local state=$3
-    local message=$4
-    kubectl -n openebs patch ut "$upgrade_task" --type='json'\
-        -p='[{"op": "add", "path": "/status/upgradeDetailedStatuses/0", "value": {"step": "'$step'", "state": {"'$state'": {"message": '"$message"'}}}}]'
+    local step=$1
+    local state=$2
+    local message=$3
+     if [ -z "$UPGRADE_TASK_CR_NAME" ]; then
+        echo "$message"
+    else    
+        kubectl -n "$JOB_NAMESPACE" patch ut "$UPGRADE_TASK_CR_NAME" --type='json'\
+            -p='[{"op": "add", "path": "/status/upgradeDetailedStatuses/0", "value": {"step": "'$step'", "state": {"'$state'": {"message": '"$message"'}}}}]'
+    fi
 }
