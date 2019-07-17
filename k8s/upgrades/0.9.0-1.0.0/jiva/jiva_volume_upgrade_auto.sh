@@ -6,7 +6,10 @@
 # NOTES: Obtain the pv to upgrade via "kubectl get pv"         #
 ################################################################
 
-source ../util.sh
+SOURCE="${BASH_SOURCE[0]}"
+while [ -h "$SOURCE" ] ; do SOURCE="$(readlink "$SOURCE")"; done
+DIR="$( cd -P "$( dirname "$SOURCE" )/../" && pwd )"
+source $DIR/util.sh
 
 mkdir upgrade_tmp
 
@@ -45,19 +48,30 @@ export upgrade_task
 get_status=$(kubectl get pv "$pv" 2>&1);check_pv=$?
 if [ $check_pv -ne 0 ]; then
     reason=$(echo $get_status | tr --delete ":")
-    patch_upgrade_task_error "$upgrade_task" "PRE_UPGRADE" "failed to upgrade $pv" "$reason"; 
+    patch_upgrade_task_error "$upgrade_task" "PRE_UPGRADE" "failed to get pv" "$reason"
     exit 1
 fi
 
 # Check if CASType is jiva
-cas_type=$(kubectl get pv "$pv" -o jsonpath="{.metadata.annotations.openebs\.io/cas-type}")
+cas_type=$(kubectl get pv "$pv" -o jsonpath="{.metadata.annotations.openebs\.io/cas-type}" 2>&1)
+rc=$?
+if [ $rc -ne 0 ]; then
+    reason=$(echo $cas_type | tr --delete ":")
+    patch_upgrade_task_error "$upgrade_task" "PRE_UPGRADE" "failed to get cas type for pv $pv" "$reason"
+    exit 1
+fi
 if [ "$cas_type" != "jiva" ]; then
-    reason=$(echo $get_status | tr --delete ":")
-    patch_upgrade_task_error "$upgrade_task" "PRE_UPGRADE" "failed to upgrade $pv" "invalid castype $cas_type"; 
+    patch_upgrade_task_error "$upgrade_task" "PRE_UPGRADE" "failed to verify cas type for pv $pv" "invalid castype $cas_type"
     exit 1
 fi
 
-ns=$(kubectl get pv "$pv" -o jsonpath="{.spec.claimRef.namespace}")
+ns=$(kubectl get pv "$pv" -o jsonpath="{.spec.claimRef.namespace}" 2>&1)
+rc=$?
+if [ $rc -ne 0 ]; then
+    reason=$(echo $ns | tr --delete ":")
+    patch_upgrade_task_error "$upgrade_task" "PRE_UPGRADE" "failed to get namespace for pv $pv" "$reason"
+    exit 1
+fi 
 export ns
 
 #pre checks for replica
@@ -68,11 +82,11 @@ r_deploy_name=$(kubectl get deploy -n "$ns" \
 rc=$?
 if [[ $rc -ne 0 ]]; then
     reason=$(echo $r_deploy_name | tr --delete ":")
-    patch_upgrade_task_error "$upgrade_task" "PRE_UPGRADE" "failed to upgrade $pv" "$reason"; 
+    patch_upgrade_task_error "$upgrade_task" "PRE_UPGRADE" "failed to upgrade $pv" "$reason"
     exit 1
 fi
 if [[ -z $r_deploy_name ]]; then
-    patch_upgrade_task_error "$upgrade_task" "PRE_UPGRADE" "failed to upgrade $pv" "replica deployment not found"; 
+    patch_upgrade_task_error "$upgrade_task" "PRE_UPGRADE" "failed to upgrade $pv" "replica deployment not found"
     exit 1 
 fi
 export r_deploy_name
@@ -83,11 +97,11 @@ r_con_name=$(kubectl get deploy -n "$ns" "$r_deploy_name" \
 rc=$?
 if [[ $rc -ne 0 ]]; then
     reason=$(echo $r_con_name | tr --delete ":")
-    patch_upgrade_task_error "$upgrade_task" "PRE_UPGRADE" "failed to upgrade $pv" "$reason"; 
+    patch_upgrade_task_error "$upgrade_task" "PRE_UPGRADE" "failed to upgrade $pv" "$reason"
     exit 1
 fi
 if [[ -z $r_con_name ]]; then
-    patch_upgrade_task_error "$upgrade_task" "PRE_UPGRADE" "failed to upgrade $pv" "replica conatiner not found"; 
+    patch_upgrade_task_error "$upgrade_task" "PRE_UPGRADE" "failed to upgrade $pv" "replica conatiner not found"
     exit 1 
 fi
 export r_con_name
@@ -98,7 +112,7 @@ r_rs_old_list=$(kubectl get rs -o name --namespace "$ns" \
 rc=$?
 if [[ $rc -ne 0 ]]; then
     reason=$(echo $r_rs_old_list | tr --delete ":")
-    patch_upgrade_task_error "$upgrade_task" "PRE_UPGRADE" "failed to upgrade $pv" "$reason"; 
+    patch_upgrade_task_error "$upgrade_task" "PRE_UPGRADE" "failed to upgrade $pv" "$reason"
     exit 1
 fi
 for r_rs in $(echo "$r_rs_old_list" | tr ":" " "); do
@@ -113,7 +127,7 @@ replica_version=$(kubectl get deployment "$r_deploy_name" -n "$ns" \
         -o jsonpath='{.metadata.labels.openebs\.io/version}')
 if [[ "$replica_version" != "$current_version" ]] && \
     [[ "$replica_version" != "$upgrade_version" ]]; then
-    patch_upgrade_task_error "$upgrade_task" "PRE_UPGRADE" "failed to upgrade $pv" "Current Replica deployment $r_deploy_name version is not $current_version or $upgrade_version"
+    patch_upgrade_task_error "$upgrade_task" "PRE_UPGRADE" "failed to upgrade $pv" "Current Replica deployment $r_deploy_name version $replica_version is not $current_version or $upgrade_version"
     exit 1
 fi
 export replica_version
@@ -126,7 +140,7 @@ c_deploy_name=$(kubectl get deploy -n "$ns" \
 rc=$?
 if [[ $rc -ne 0 ]]; then
     reason=$(echo $c_deploy_name | tr --delete ":")
-    patch_upgrade_task_error "$upgrade_task" "PRE_UPGRADE" "failed to upgrade $pv" "$reason"; 
+    patch_upgrade_task_error "$upgrade_task" "PRE_UPGRADE" "failed to upgrade $pv" "$reason"
     exit 1
 fi
 if [[ -z $c_deploy_name ]]; then
@@ -136,12 +150,12 @@ fi
 export c_deploy_name
 
 c_con_name=$(kubectl get deploy -n "$ns" "$c_deploy_name" \
-        -o jsonpath="{range .spec.template.spec.containers[*]}{@.name}{'\n'}{end}" \
-        | grep "ctrl-con" 2>&1)
+        -o jsonpath="{range .spec.template.spec.containers[*]}{@.name}{'\n'}{end}"2>&1 \
+        | grep "ctrl-con" )
 rc=$?
 if [[ $rc -ne 0 ]]; then
     reason=$(echo $c_con_name | tr --delete ":")
-    patch_upgrade_task_error "$upgrade_task" "PRE_UPGRADE" "failed to upgrade $pv" "$reason"; 
+    patch_upgrade_task_error "$upgrade_task" "PRE_UPGRADE" "failed to upgrade $pv" "$reason"
     exit 1
 fi
 if [[ -z $c_con_name ]]; then
@@ -151,12 +165,12 @@ fi
 export c_con_name
 
 c_rs_old=$(kubectl get rs -o name --namespace "$ns" \
-        -l openebs.io/persistent-volume="$pv",openebs.io/controller=jiva-controller \
-        | cut -d '/' -f 2 2>&1)
+        -l openebs.io/persistent-volume="$pv",openebs.io/controller=jiva-controller 2>&1 \
+        | cut -d '/' -f 2 )
 rc=$?
 if [[ $rc -ne 0 ]]; then
     reason=$(echo $c_rs_old | tr --delete ":")
-    patch_upgrade_task_error "$upgrade_task" "PRE_UPGRADE" "failed to upgrade $pv" "$reason"; 
+    patch_upgrade_task_error "$upgrade_task" "PRE_UPGRADE" "failed to upgrade $pv" "$reason"
     exit 1
 fi
 if [[ -z $c_rs_old ]]; then
@@ -169,7 +183,7 @@ controller_version=$(kubectl get deployment "$c_deploy_name" -n "$ns" \
         -o jsonpath='{.metadata.labels.openebs\.io/version}')
 if [[ "$controller_version" != "$current_version" ]] && \
     [[ "$controller_version" != "$upgrade_version" ]]; then
-    patch_upgrade_task_error "$upgrade_task" "PRE_UPGRADE" "failed to upgrade $pv" "Current target deployment $c_deploy_name version is not $current_version or $upgrade_version"
+    patch_upgrade_task_error "$upgrade_task" "PRE_UPGRADE" "failed to upgrade $pv" "Current target deployment $c_deploy_name version $controller_version is not $current_version or $upgrade_version"
     exit 1
 fi
 export controller_version
@@ -181,7 +195,7 @@ c_svc_name=$(kubectl get svc -n "$ns" \
 rc=$?
 if [[ $rc -ne 0 ]]; then
     reason=$(echo $c_svc_name | tr --delete ":")
-    patch_upgrade_task_error "$upgrade_task" "PRE_UPGRADE" "failed to upgrade $pv" "$reason"; 
+    patch_upgrade_task_error "$upgrade_task" "PRE_UPGRADE" "failed to upgrade $pv" "$reason"
     exit 1
 fi
 if [[ -z $c_svc_name ]]; then
@@ -194,7 +208,7 @@ controller_svc_version=$(kubectl get svc "$c_svc_name" -n "$ns" \
         -o jsonpath='{.metadata.labels.openebs\.io/version}')
 if [[ "$controller_svc_version" != "$current_version" ]] && \
     [[ "$controller_svc_version" != "$upgrade_version" ]] ; then
-    patch_upgrade_task_error "$upgrade_task" "PRE_UPGRADE" "failed to upgrade $pv" "Current target service $c_svc_name version is not $current_version or $upgrade_version"
+    patch_upgrade_task_error "$upgrade_task" "PRE_UPGRADE" "failed to upgrade $pv" "Current target service $c_svc_name version $controller_svc_version is not $current_version or $upgrade_version"
     exit 1
 fi
 export controller_svc_version

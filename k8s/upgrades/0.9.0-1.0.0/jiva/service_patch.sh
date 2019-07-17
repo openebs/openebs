@@ -1,6 +1,9 @@
 #!/bin/bash
 
-source ../util.sh
+SOURCE="${BASH_SOURCE[0]}"
+while [ -h "$SOURCE" ] ; do SOURCE="$(readlink "$SOURCE")"; done
+DIR="$( cd -P "$( dirname "$SOURCE" )/../" && pwd )"
+source $DIR/util.sh
 
 sed "s|@target_version@|$upgrade_version|g" jiva-target-svc-patch.tpl.json \
     > upgrade_tmp/jiva-target-svc-patch.json

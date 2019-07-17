@@ -1,6 +1,9 @@
 #!/bin/bash
 
-source ../util.sh
+SOURCE="${BASH_SOURCE[0]}"
+while [ -h "$SOURCE" ] ; do SOURCE="$(readlink "$SOURCE")"; done
+DIR="$( cd -P "$( dirname "$SOURCE" )/../" && pwd )"
+source $DIR/util.sh
 
 replica_image=$(kubectl get deploy -n "$ns" "$r_deploy_name" \
     -o jsonpath="{range .spec.template.spec.containers[*]}{@.image}{'\n'}{end}" \
@@ -21,7 +24,7 @@ if [[ "$replica_version" != "$upgrade_version" ]]; then
     
     if [ $rc -ne 0 ]; then 
         reason=$(echo $patch_status | tr --delete ":")
-        patch_upgrade_task_error "$upgrade_task" "REPLICA_UPRADE" "failed to patch the deployment $r_deploy_name" "$reason"; 
+        patch_upgrade_task_error "$upgrade_task" "REPLICA_UPRADE" "failed to patch the deployment $r_deploy_name" "$reason"
         exit 1
     fi
 
@@ -30,7 +33,7 @@ if [[ "$replica_version" != "$upgrade_version" ]]; then
 
         if [ $rc -ne 0 ]; then 
             reason=$(echo $delete_status | tr --delete ":")
-            patch_upgrade_task_error "$upgrade_task" "REPLICA_UPRADE" "failed to delete replicaset $r_rs" "$reason"; 
+            patch_upgrade_task_error "$upgrade_task" "REPLICA_UPRADE" "failed to delete replicaset $r_rs" "$reason"
             exit 1
         fi
     done

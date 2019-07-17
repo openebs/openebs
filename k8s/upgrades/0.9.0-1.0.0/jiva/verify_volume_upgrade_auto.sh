@@ -2,7 +2,10 @@
 
 is_upgrade_failed=0
 
-source ../util.sh
+SOURCE="${BASH_SOURCE[0]}"
+while [ -h "$SOURCE" ] ; do SOURCE="$(readlink "$SOURCE")"; done
+DIR="$( cd -P "$( dirname "$SOURCE" )/../" && pwd )"
+source $DIR/util.sh
 
 #Fetch REPLICATIONFACTOR from deployment
 container_name=$(echo "$pv-ctrl-con")

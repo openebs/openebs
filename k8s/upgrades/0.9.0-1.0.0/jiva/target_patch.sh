@@ -1,6 +1,9 @@
 #!/bin/bash
 
-source ../util.sh
+SOURCE="${BASH_SOURCE[0]}"
+while [ -h "$SOURCE" ] ; do SOURCE="$(readlink "$SOURCE")"; done
+DIR="$( cd -P "$( dirname "$SOURCE" )/../" && pwd )"
+source $DIR/util.sh
 
 target_image_1=$(kubectl get deploy -n "$ns" "$c_deploy_name" \
      -o jsonpath="{range .spec.template.spec.containers[0]}{@.image}{'\n'}{end}" \
