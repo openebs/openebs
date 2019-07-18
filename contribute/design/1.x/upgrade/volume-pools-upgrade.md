@@ -124,7 +124,7 @@ out on several test and production developments, we decided to re-use
 the shell scripts to perform the upgrade tasks. 
 
 The upgrade scripts will be packaged into upgrade container, with an 
-entrypoint script that will invoke the right scripts depending on 
+entrypoint script that will invoke the required scripts depending on 
 the object being upgraded. 
 
 A custom resource called `UpgradeTask` will be defined with the 
@@ -141,6 +141,20 @@ The workflow followed by administrator is as follows:
   UpgradeTask details. 
 - Administrator can query the UpgradeTask to check the status 
   and result of the upgrade.
+
+The upgrade scripts will be enhanced to work directly from the
+command-line - in which case the error/info messages will be logged
+to console; or invoked from within the container - which will update
+the error/info messages to the UpgradeTask status spec.
+
+### Backward Compatibility
+
+Since this design re-uses the upgrade scripts, the users will 
+have the option to upgrade the pools and volumes via the same 
+procedure followed in earlier scripts. 
+
+In addition, there will be an option to upgrade via `kubectl` 
+using the steps detailed below. 
 
 ### Design Choices/Decisions
 
@@ -172,6 +186,18 @@ and the reasoning behind selecting a certain approach.
   specific upgrade task and bind it. Then the specific upgrade 
   operator will operate on the their own resources.  
 
+- Should the UpgradeTask have a provision to perform upgrades on 
+  multiple resources of the same kind. For example, can a list of 
+  jiva volumes be specified in a single UpgradeTask. Adding multiple
+  jobs will result in adding additional status objects, which in 
+  turn will make the co-relation of the object to its result harder
+  to get. UpgradeTask CR provides a basic building block for 
+  constructing higher order automation. In the future, a BulkUpgrade
+  CR can be launched that can take multiple objects - probably 
+  even based a namespace group or pv labels etc. The controller
+  watching the BulkUpgrade can then launch individual UpgradeTasks. 
+
+   
 
 ### High Level Design
 
