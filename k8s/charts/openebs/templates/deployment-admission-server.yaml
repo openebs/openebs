@@ -20,6 +20,7 @@ spec:
       labels:
         app: admission-webhook
         name: admission-webhook
+        release: {{ .Release.Name }}
         openebs.io/version: {{ .Values.release.version }}
         openebs.io/component-name: admission-webhook
     spec:
