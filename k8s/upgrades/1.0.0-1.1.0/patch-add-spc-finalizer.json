@@ -1,0 +1,3 @@
+[
+  {"op": "add", "path": "/metadata/finalizers", "value": ["storagepoolclaim.openebs.io/finalizer"]}
+]
