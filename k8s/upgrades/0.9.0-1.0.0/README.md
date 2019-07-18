@@ -139,7 +139,7 @@ pvc-48fb36a2-947f-11e8-b1f3-42010a800004   5G         RWO            Delete     
 
 ```
 $ cd jiva
-$ ./jiva_volume_upgrade.sh pvc-48fb36a2-947f-11e8-b1f3-42010a800004
+$ ./jiva_volume_upgrade.sh pvc-48fb36a2-947f-11e8-b1f3-42010a800004 <openebs_namespace>
 ```
 
 ### Upgrade cStor Pools

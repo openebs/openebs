@@ -41,7 +41,7 @@ if [[ "$replica_version" != "$upgrade_version" ]]; then
     rollout_status=$(kubectl rollout status --namespace "$ns" deployment/"$r_deploy_name" 2>&1)
     rc=$?; 
     if [[ ($rc -ne 0) || ! ($rollout_status =~ "successfully rolled out") ]]; then
-        reason=$(echo $patch_status | tr --delete ":")
+        reason=$(echo $rollout_status | tr --delete ":")
         patch_upgrade_task_error  "REPLICA_UPRADE" " rollout for deployment $r_deploy_name failed" "$reason"
         exit 1
     fi
