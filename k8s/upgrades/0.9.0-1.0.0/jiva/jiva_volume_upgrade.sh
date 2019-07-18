@@ -36,6 +36,33 @@ function usage() {
     exit 1
 }
 
+function pre_check() {
+    local ns=$1
+    local pod_version=""
+    ## name=maya-apiserver label is common for both helm and operator yaml
+    maya_pod_name=$(kubectl get pod -n $ns \
+                 -l name=maya-apiserver    \
+                 -o jsonpath='{.items[0].metadata.name}' 2>&1)
+    rc=$?; 
+    if [ $rc -ne 0 ]; then 
+        reason=$(echo "$maya_pod_name" | tr --delete ":" )
+        patch_upgrade_task_error "PRE_UPGRADE" "failed to get maya apiserver pod name" "$reason" 
+        exit 1;
+    fi
+    pod_version=$(verify_openebs_version "pod" $maya_pod_name $ns 2>&1)
+    rc=$?
+    if [ $rc -ne 0 ]; then
+        reason=$(echo "$pod_version" | tr --delete ":" )
+        patch_upgrade_task_error "PRE_UPGRADE" "failed to get maya apiserver pod name" "$reason"
+        exit 1
+    fi
+    if [ $pod_version != $upgrade_version ]; then
+        reason="expected version $upgrade_version but got $pod_version"
+        patch_upgrade_task_error "PRE_UPGRADE" "failed to verify OpenEBS control components" "$reason"
+        exit 1
+    fi
+}
+
 if [ "$#" -ne 2 ]; then
     usage
 fi
@@ -44,6 +71,8 @@ pv=$1
 OpenEBS_ns=$2
 
 export pv
+
+pre_check $OpenEBS_ns
 
 # Check if pv exists
 get_status=$(kubectl get pv "$pv" 2>&1);check_pv=$?
@@ -262,7 +291,7 @@ else
 fi
 
 #### VERFIRY VOLUME UPGRADE ####
-x=$(bash verify_volume_upgrade_auto.sh) ; rc=$?
+x=$(bash verify_volume_upgrade.sh) ; rc=$?
 
 if [ $rc -eq 0 ]; then
     patch_upgrade_task  "VERIFY_UPGRADE" "complete" "$x"
