@@ -10,6 +10,7 @@ metadata:
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
     component: ndm-config
+    openebs.io/component-name: ndm-config
 data:
   # udev-probe is default or primary probe which should be enabled to run ndm
   # filterconfigs contains configs of filters - in the form of include

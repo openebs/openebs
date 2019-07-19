@@ -8,8 +8,8 @@ metadata:
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
     component: admission-webhook
-    name: admission-webhook
-    openebs.io/component-name: maya-apiserver
+    openebs.io/component-name: admission-webhook
+    openebs.io/version: {{ .Values.release.version }}
 spec:
   replicas: {{ .Values.webhook.replicas }}
   selector:
@@ -19,7 +19,10 @@ spec:
     metadata:
       labels:
         app: admission-webhook
+        name: admission-webhook
+        release: {{ .Release.Name }}
         openebs.io/version: {{ .Values.release.version }}
+        openebs.io/component-name: admission-webhook
     spec:
 {{- if .Values.webhook.nodeSelector }}
       nodeSelector:

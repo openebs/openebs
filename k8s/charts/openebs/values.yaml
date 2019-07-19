@@ -47,7 +47,8 @@ provisioner:
 localprovisioner:
   image: "quay.io/openebs/provisioner-localpv"
   imageTag: "1.0.0"
-  helperImage: "quay.io/openebs/openebs-tools:3.8"
+  helperImage: "quay.io/openebs/openebs-tools"
+  helperImageTag: "3.8"
   replicas: 1
   basePath: "/var/openebs/local"
   nodeSelector: {}
