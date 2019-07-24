@@ -1,15 +1,11 @@
 This document will help to delete the auto-generated snapshots created during Jiva replica restart or when a new replica is added to the Jiva controller. The steps for deleting the auto-generated snapshots are as follows:
 
-Get the details of Jiva controller pod using the following command.
+Get the details of Jiva controller pod using the following command. It will show the Jiva pods details running in `default` namespace. 
 
 ```
-kubectl get pod -n <PVC_namespace>
+kubectl get pod -n default
 ```
-Example: 
-```
-kubectl get pod
-```
-Example Output:
+Example output:
 ```
 NAME                                                            READY   STATUS    RESTARTS   AGE
 percona-7b64956695-kd9q4                                        1/1     Running   0          105s
@@ -19,23 +15,16 @@ pvc-d01e90d9-a921-11e9-93c2-42010a8000ab-rep-795d8c5cb8-gfxg9   1/1     Running 
 pvc-d01e90d9-a921-11e9-93c2-42010a8000ab-rep-795d8c5cb8-n4cfq   1/1     Running   1          101s
 ```
 
-Login to the Jiva controller pod using the following command. Use namespace where Jiva pods are running.
+List all internal snapshots created inside corresponding Jiva controller using the following command.
 ```
-kubectl exec -it <jiva_controller_pod> -n <namespace> bash 
+kubectl exec -it <jiva_controller_pod> -n <namespace> jivactl snapshot ls
 ```
 
 For Example:
 ```
-kubectl exec -it pvc-d01e90d9-a921-11e9-93c2-42010a8000ab-ctrl-df9c749cf-jp6mg bash
+kubectl exec -it pvc-d01e90d9-a921-11e9-93c2-42010a8000ab-ctrl-df9c749cf-jp6mg -n default jivactl snapshot ls
 ```
 
-In the above case, Jiva pods are running in `default` namespace.
-
-Once logged into the container , list all the internal snapshots using the following command.
-
-```
-jivactl snapshot ls
-```
 Example output:
 ```
 ID
@@ -68,11 +57,17 @@ Download the files for deleting Jiva snapshots from Jiva repository using the fo
 wget https://raw.githubusercontent.com/openebs/openebs/master/k8s/jiva/patch.json
 wget https://raw.githubusercontent.com/openebs/openebs/master/k8s/jiva/snapshot-cleanup.sh
 ```
+Ensure that `snapshot-cleanup.sh` has execute permission. If not, make it execuatble by running `chmod +x snapshot-cleanup.sh` from the  downloaded folder.
 
 Now get the PV name using the following command.
 ```
 kubectl get pv | grep <PVC_name>
 ```
+Example:
+```
+kubectl get pv | grep demo-vol1-claim
+```
+
 Example Output:
 ```
 NAME                                       CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS   CLAIM                     STORAGECLASS           REASON   AGE
