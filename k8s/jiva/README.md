@@ -1,4 +1,4 @@
-This document will help to delete the auto-generated snapshots created during a Jiva replica restart or when a new replica is added to the Jiva controller. The steps for deleting the auto-generated snapshots are the following:
+This document will help to delete the auto-generated snapshots created during Jiva replica restart or when a new replica is added to the Jiva controller. The steps for deleting the auto-generated snapshots are as follows:
 
 Get the details of Jiva controller pod using the following command.
 
@@ -63,7 +63,7 @@ cd0a5074-be77-4e3b-b141-e91a6fba94d3
 
 Now exit from the container using `exit` command.
 
-Now download the files for deleting Jiva snapshots from Jiva repository using the following commands.
+Download the files for deleting Jiva snapshots from Jiva repository using the following commands.
 ```
 wget https://raw.githubusercontent.com/openebs/openebs/master/k8s/jiva/patch.json
 wget https://raw.githubusercontent.com/openebs/openebs/master/k8s/jiva/snapshot-cleanup.sh
@@ -71,7 +71,7 @@ wget https://raw.githubusercontent.com/openebs/openebs/master/k8s/jiva/snapshot-
 
 Now get the PV name using the following command.
 ```
-kubectl get pv
+kubectl get pv | grep <PVC_name>
 ```
 Example Output:
 ```
@@ -79,11 +79,11 @@ NAME                                       CAPACITY   ACCESS MODES   RECLAIM POL
 pvc-d01e90d9-a921-11e9-93c2-42010a8000ab   5G         RWO            Delete           Bound    default/demo-vol1-claim   openebs-jiva-default            10m
 ```
 
-The following script will execute when number of Jiva auto-generated snapshots are more than 5. Else it will exit. 
+The following script will execute when number of Jiva auto-generated snapshots are more than 5. Else, it will exit. 
 
 **Note:**
 
-Snapshot cleanup involves disconnecting the application from the storage. Ensure application is not being used and the connectivity to the Kubernetes Clusters is active while performing the snapshot cleanup process. To ensure that application is not connected to the storage, it is recommended to scale down the application.
+Snapshot cleanup process involves disconnecting the application from its storage. Ensure that the application is not being used and the connectivity to the Kubernetes Cluster is active while performing the snapshot cleanup process. To ensure that the application is not connected to the storage, it is recommended to scale down the application.
 
 Delete the auto-generated internal snapshots using the following command.
 
