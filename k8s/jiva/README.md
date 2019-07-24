@@ -74,7 +74,7 @@ NAME                                       CAPACITY   ACCESS MODES   RECLAIM POL
 pvc-d01e90d9-a921-11e9-93c2-42010a8000ab   5G         RWO            Delete           Bound    default/demo-vol1-claim   openebs-jiva-default            10m
 ```
 
-The following script will execute when number of Jiva auto-generated snapshots are more than 5. Else, it will exit. 
+The following script will execute when number of Jiva auto-generated snapshots are more than 5. Else, it will exit. This means, minimum availble snapshot will be always more than 5. For example, if total number of Jiva auto-generated snapshots are 20 and required number of snapshot to be deleted is 15, then this script will not work. In this case, the script will work if you give 14 instead of 15 as the number of snapshots to be deleted.
 
 **Note:**
 
