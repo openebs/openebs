@@ -1,4 +1,4 @@
-This document will help to delete the auto-generated snapshots created when a Jiva replica restart happened or new replica got added to the Jiva controller. The steps for deleting the auto-generated snapshots  are the following:
+This document will help to delete the auto-generated snapshots created during a Jiva replica restart or when a new replica is added to the Jiva controller. The steps for deleting the auto-generated snapshots are the following:
 
 Get the details of Jiva controller pod using the following command.
 
@@ -83,7 +83,8 @@ The following script will execute when number of Jiva auto-generated snapshots a
 
 **Note:**
 
-Snapshot cleanup involves disconnecting the application from the storage. Ensure application is not being used and the connectivity to the Kubernetes Clusters is active while performing the snapshot cleanup process.
+Snapshot cleanup involves disconnecting the application from the storage. Ensure application is not being used and the connectivity to the Kubernetes Clusters is active while performing the snapshot cleanup process. To ensure that application is not connected to the storage, it is recommended to scale down the application.
+
 Delete the auto-generated internal snapshots using the following command.
 
 ```
@@ -103,22 +104,4 @@ In the above example, 12 snapshots will be deleted from the total number of the 
 ./snapshot-cleanup.sh <pv-name> restore_service
 ```
 
-The latest snapshot details can be obtained after logging into the container running inside Jiva controller pod. List all the internal snapshots using the following command.
-```
-jivactl snapshot ls
-```
-
-Example output:
-```
-ID
-64610cb4-ba17-4e0c-a35e-4e072f331429
-9b3e35c1-4ec6-4e8c-aa94-547f43f92050
-f1b68e2a-5a3d-4737-85d0-b34c1452db7c
-1e5441ff-ec75-4618-a5f0-d5de25eca1b2
-4ec87701-6faf-4c72-816b-d81885c67263
-02617eeb-2147-4adf-8e6b-0317c7fad79d
-fb1bac27-bd46-41be-831a-12ebe5421d23
-c4556aff-6da2-4fb3-ba8c-a0d7bfad67bb
-1bb0cf11-1a6c-45d4-8638-daac561baf0d
-b9261581-6713-45cb-a87f-bafefa2fd6ee
-```
+You can use the steps described above to list the current snapshots available on jiva.
