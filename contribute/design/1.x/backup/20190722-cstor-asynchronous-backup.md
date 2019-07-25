@@ -27,6 +27,7 @@ status: provisional
     * [Maya-ApiServer REST Interface](#new-rest-interface)
     * [Uploading of snapshot](#handling-of-backup-cr-at-csp)
       * [Handling of upload failure](#handling-of-error)
+* [Upgrade](#upgrade)
 
 ## Summary
 
@@ -141,4 +142,10 @@ Once the uploading is done, CSP will update the status of CStorBackup CR and
 update the `PrevSnapName` in relevant CStorCompletedBackup CR.
 
 
+## Upgrade
+
+For this proposal, no additional steps required for upgrade.
+
+This proposal also supports synchronous backup, in old way, so it will not break
+the old configuration.
 
