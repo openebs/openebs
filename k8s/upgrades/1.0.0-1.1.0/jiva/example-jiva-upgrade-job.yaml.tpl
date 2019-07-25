@@ -10,7 +10,7 @@ spec:
       serviceAccountName: <@openebs-service-account>
       containers:
       - name:  upgrade
-        image: openebs/m-upgrade:ci
+        image: openebs/m-upgrade:ci-1.1.x-072501
         args: 
         - "<@from-version>"
         - "<@to-version>"
