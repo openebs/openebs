@@ -52,6 +52,10 @@ spec:
           value: "{{ .Values.apiserver.sparse.enabled }}"
         - name: OPENEBS_IO_CSTOR_POOL_SPARSE_DIR
           value: "{{ .Values.ndm.sparse.path }}"
+        - name: OPENEBS_IO_CREATE_DEFAULT_STORAGE_CONFIG
+          value: "{{ .Values.defaultStorageConfig.enabled }}"
+        - name: OPENEBS_IO_CSTOR_TARGET_DIR
+          value: "{{ .Values.ndm.sparse.path }}"
         # OPENEBS_NAMESPACE provides the namespace of this deployment as an
         # environment variable
         - name: OPENEBS_NAMESPACE

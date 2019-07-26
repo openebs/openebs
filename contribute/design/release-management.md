@@ -12,14 +12,15 @@ The release process involves the following stages:
 Release Candidate Builds
 On reaching the feature freeze date, the repositories are tagged with "Release-Name-RC1" tag. (Example 1.0.0-RC1).
 The release tags are applied in the following order:
-- openebs/libstor
+- openebs/libcstor
 - openebs/cstor
 - openebs/istgt
 - openebs/jiva
-- openebs/ndm
+- openebs/node-disk-manager
 - openebs/external-storage
 - openebs/velero-plugin
 - openebs/maya
+- openebs/csi
 
 The e2e pipeline and exploratory tests are executed using the RC tagged images. Any issues identified during this RC testing are tagged as release blockers.
 After the issues are fixed and verified by the CI, next RC is triggered.(Example: 1.0.0-RC2)
