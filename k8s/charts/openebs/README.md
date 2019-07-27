@@ -93,15 +93,16 @@ The following table lists the configurable parameters of the OpenEBS chart and t
 | `snapshotOperator.controller.imageTag`  | Image Tag for Snapshot Controller             | `1.0.0`                                   |
 | `snapshotOperator.replicas`             | Number of Snapshot Operator Replicas          | `1`                                       |
 | `ndm.image`                             | Image for Node Disk Manager                   | `quay.io/openebs/node-disk-manager-amd64` |
-| `ndm.imageTag`                          | Image Tag for Node Disk Manager               | `v0.4.0`                              |
+| `ndm.imageTag`                          | Image Tag for Node Disk Manager               | `v0.4.0`                                  |
 | `ndm.sparse.path`                       | Directory where Sparse files are created      | `/var/openebs/sparse`                     |
 | `ndm.sparse.size`                       | Size of the sparse file in bytes              | `10737418240`                             |
 | `ndm.sparse.count`                      | Number of sparse files to be created          | `1`                                       |
 | `ndm.filters.excludeVendors`            | Exclude devices with specified vendor         | `CLOUDBYT,OpenEBS`                        |
 | `ndm.filters.includePaths`              | Include devices with specified path patterns  | `""`                                      |
 | `ndm.filters.excludePaths`              | Exclude devices with specified path patterns  | `loop,fd0,sr0,/dev/ram,/dev/dm-,/dev/md`  |
+| `ndm.probes.enableSeachest`             | Enable Seachest probe for NDM                 | `false`                                   |
 | `ndmOperator.image`                     | Image for NDM Operator                        | `quay.io/openebs/node-disk-operator-amd64`|
-| `ndmOperator.imageTag`                  | Image Tag for NDM Operator                    | `v0.4.0`                              |
+| `ndmOperator.imageTag`                  | Image Tag for NDM Operator                    | `v0.4.0`                                  |
 | `jiva.image`                            | Image for Jiva                                | `quay.io/openebs/jiva`                    |
 | `jiva.imageTag`                         | Image Tag for Jiva                            | `1.0.0`                                   |
 | `jiva.replicas`                         | Number of Jiva Replicas                       | `3`                                       |
