@@ -127,7 +127,7 @@ spec:
       serviceAccountName: openebs-maya-operator 
       containers:
       - name:  upgrade
-        image: openebs/m-upgrade:dev-1000110RC2-072606
+        image: openebs/m-upgrade:dev-1000110RC2-072703
         args:
         - "jiva-volume"
         - "--from-version=1.0.0"
@@ -176,7 +176,7 @@ spec:
       serviceAccountName: openebs-maya-operator 
       containers:
       - name:  upgrade
-        image: openebs/m-upgrade:dev-1000110RC2-072606
+        image: openebs/m-upgrade:dev-1000110RC2-072703
         args:
         - "cstor-spc"
         - "--from-version=1.0.0"
@@ -213,7 +213,7 @@ spec:
       serviceAccountName: openebs-maya-operator 
       containers:
       - name:  upgrade
-        image: openebs/m-upgrade:dev-1000110RC2-072606
+        image: openebs/m-upgrade:dev-1000110RC2-072703
         args:
         - "cstor-volume"
         - "--from-version=1.0.0"
