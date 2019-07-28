@@ -108,13 +108,13 @@ the OpenEBS Control Plane components.
 **Note: Upgrade functionality is still under active development. 
 It is highly recommended to schedule a downtime for the application using the 
 OpenEBS PV while performing this upgrade. Also, make sure you have taken a 
-backup of the data before starting the below upgrade procedure.
+backup of the data before starting the below upgrade procedure.**
 
 - please have the following link handy in case the volume gets into read-only during upgrade
   https://docs.openebs.io/docs/next/troubleshooting.html#recovery-readonly-when-kubelet-is-container
 
 - automatic rollback option is not provided. To rollback, you need to update 
-  the controller, exporter and replica pod images to the previous version**
+  the controller, exporter and replica pod images to the previous version
 
 **Note: Before proceeding with the upgrade of the OpenEBS Data Plane components 
 like cStor or Jiva, verify that OpenEBS Control plane is indeed in 1.1.0-RC2 version**
@@ -124,7 +124,7 @@ like cStor or Jiva, verify that OpenEBS Control plane is indeed in 1.1.0-RC2 ver
   $ kubectl get pods -n openebs -l openebs.io/version=1.1.0-RC2
   ```
 
-  The above command should show that the control plane componets are upgrade. 
+  The above command should show that the control plane components are upgrade. 
   The output should look like below:
   ```sh
   NAME                                           READY   STATUS    RESTARTS   AGE
@@ -151,7 +151,7 @@ You can use the below steps for upgrading cstor and jiva components.
 
 Starting with 1.1.0-RC2, the upgrade steps have been changed to eliminate the
 need for downloading scripts. You can use `kubectl` to trigger an upgrade job 
-using Kubernetes Job spec. The following instructions provide detials on how
+using Kubernetes Job spec. The following instructions provide details on how
 to create your Upgrade Job specs. 
 
 ### Upgrade the OpenEBS Jiva PV
