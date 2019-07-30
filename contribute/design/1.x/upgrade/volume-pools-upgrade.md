@@ -144,7 +144,7 @@ pools and volumes are upgraded.
 
 This design proposes the following key changes:
 
-(a) Control Plane components can handle the older versions of 
+1.  Control Plane components can handle the older versions of 
     data plane components. This design enforces that the control
     plane component that manage a resource has to take care of
     either: 
@@ -176,7 +176,7 @@ This design proposes the following key changes:
 
     Status: Available in 1.1
 
-(b) Data plane components have an interdependence on each other and
+2.  Data plane components have an interdependence on each other and
     upgrading a volume typeically invovles upgrading multiple related
     components at once. For example upgrading a jiva volume invovles
     upgrading the target and replica deployments. The functionality 
@@ -208,7 +208,7 @@ This design proposes the following key changes:
     Status: Available in 1.1 and supports upgrading of Jiva Volumes,
     cStor Volumes and cStor pools from 1.0 to 1.1
 
-(c) A custom resource called `UpgradeTask` will be defined with the 
+3.  A custom resource called `UpgradeTask` will be defined with the 
     details of the object being upgraded, and will in turn be updated
     with the status of the upgrade by the upgrade-container. This 
     will allow for tools to be written to capture the status of the
@@ -218,8 +218,8 @@ This design proposes the following key changes:
 
     Status: Under Development, planned for 1.2
 
-(d) Improvements to the backward compatibility checks added to the 
-    OpenEBS Control Plane in (a). The backward compatibility checks
+4.  Improvements to the backward compatibility checks added to the 
+    OpenEBS Control Plane in (1). The backward compatibility checks
     will involve checking for multiple resources and this process
     is triggered on a restart. This process will be optimized to 
     use a flag to check if the backward compatibility checks are 
@@ -230,7 +230,7 @@ This design proposes the following key changes:
     ```
     versionDetails:
       #Indicates if the resource should be auto upgraded 
-      #More on this below (f). Default is false.
+      #More on this below (6). Default is false.
       #autoUpgrade:
       #Indicates the current version of the resource.
       currentVersion: 
@@ -246,7 +246,7 @@ This design proposes the following key changes:
   
     Status: Under Development, planned for 1.2
 
-(e) Downgrading a version. There are scenarios where the volumes will
+5.  Downgrading a version. There are scenarios where the volumes will
     have to be downgraded to earlier versions. Some of the challenegs
     around this are after upgrading a resource with a breaking change, 
     falling back to older version might make the resource un-readable. 
@@ -257,7 +257,7 @@ This design proposes the following key changes:
 
     Status: Under Development, planned for TBD
 
-(f) Automated upgrades of data plane components. OpenEBS operator 
+6.  Automated upgrades of data plane components. OpenEBS operator 
     will check for all the volumes and resources that need to be upgraded
     and will launch a Kubernetes Job for any resource that has the
     autoUpgrade set to true. In case there is a failure to upgrade, the
@@ -408,6 +408,7 @@ You can check the status of the Job using commands like:
 $ kubectl get job -n openebs
 $ kubectl get pods -n openebs #to check on the name for the job pod
 $ kubectl logs -n openebs jiva-upg-100111-pvc-713e3bb6-afd2-11e9-8e79-42010a800065-bgrhx
+```
 
 #### UpgradeTask CR Example
 
