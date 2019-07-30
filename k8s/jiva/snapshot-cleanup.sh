@@ -10,7 +10,7 @@ warning()
     echo "WARNING: Snapshot cleanup involves disconnecting the application from the storage. Also, while the snapshot cleanup is in progress - you will need to ensure that the connectivity to the Kubernetes Clusters is active. In case of unexpected disconnect, you will have to run the following command to restore the volume service. snapshot-cleanup.sh <pv-name> restore_service."
     echo "Do you want to continue (Y/N)"
     read access
-    if [ $access == "N" ]; then
+    if [ $access == "N" ] || [ $access == "n" ]; then
     exit 1;
     fi
 }
@@ -42,8 +42,13 @@ delete_jiva_snapshot()
        exit 1;
     fi
 
-    snapshot_number_cmd='kubectl exec -it $ctrl_pod_name -n $pvc_namespace -- jivactl snapshot ls | grep -v ID | wc -l'
-    snapshot_name_cmd='kubectl exec -it $ctrl_pod_name -n $pvc_namespace -- jivactl snapshot ls | grep -v ID | tail -1'
+    snapshot_number_cmd="kubectl exec -it $ctrl_pod_name -n $pvc_namespace -- jivactl snapshot ls | grep -v ID | wc -l"
+    snapshot_name_cmd="kubectl exec -it $ctrl_pod_name -n $pvc_namespace -- jivactl snapshot ls | grep -v ID | tail -1"
+    
+    if [ $(eval $snapshot_number_cmd) -le $(($min_required_snapshot + $number_of_snapshot)) ]; then
+        echo "Error: You can initiate snapshot deletion only when the volume has more than $min_required_snapshot snapshots. There are only $(eval $snapshot_number_cmd) snapshots at the moment. You need not cleanup any more snapshots."
+        exit 1;
+    fi
 
     if [ $(eval $snapshot_number_cmd) -le $((number_of_snapshot-1)) ]; then
         echo "Error: You have requested to delete $number_of_snapshot. There are only $((($(eval $snapshot_number_cmd))-1 - $min_required_snapshot)) snapshot available that can be deleted on this volume. Please re-run this command with by specifying the number of snapshots to be deleted as $(($(eval $snapshot_number_cmd) - $min_required_snapshot)) or less."
@@ -90,9 +95,9 @@ restart_ctrl()
 validate_snap_delete()
 {
     del_snapshot_name=$1
-    validate_cmd='kubectl exec -it $ctrl_pod_name -n $pvc_namespace -- jivactl snapshot ls | grep $del_snapshot_name'
+    validate_cmd="kubectl exec -it $ctrl_pod_name -n $pvc_namespace -- jivactl snapshot ls | grep $del_snapshot_name"
     eval $validate_cmd
-    if [ $? != "0" ]; then
+    if [ $? == "0" ]; then
         echo "Unable to delete $del_snapshot_name" ;
         unblock_service ;
         exit 1;
@@ -105,7 +110,7 @@ delete_snap()
     do
        snapshot_name=$(eval $snapshot_name_cmd | tr -d '\r')
        del_cmd="kubectl exec -it $ctrl_pod_name -n $pvc_namespace -- jivactl snapshot rm $snapshot_name"
-       eval $($del_cmd >> log.txt) 
+       eval $($del_cmd >> log.txt)
        count=$((count+1))
        validate_snap_delete $snapshot_name 
     done 
