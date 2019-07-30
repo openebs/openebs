@@ -8,8 +8,8 @@ owners:
   - "@vishnuitta"
 editor: "@kmova"
 creation-date: 2019-07-10
-last-updated: 2019-07-10
-status: provisional
+last-updated: 2019-07-29
+status: implementable
 see-also:
   - NA
 replaces:
@@ -41,14 +41,59 @@ superseded-by:
 
 ## Summary
 
-This proposal charts out the design details to perform pool and
-volume upgrades via a Kubernetes Job. 
+This design is aimed at providing a design for upgrading the data
+plane components via `kubectl` and also allow administrators to
+automate the upgrade process with higher level operators.
 
+This proposed design will be rolled out in phases while maintaining
+backward compatibility with the upgrade process defined in prior
+releases starting with OpenEBS 1.1. At a high level the design is
+implemented in the following phases:
+- Phase 1: Ability to perform storage pool and volume upgrades using 
+  a Kubernetes Job
+- Phase 2: Allow for saving the history of upgrades on a given pool
+  or volume on a Kubernetes custom resource called `UpgradeTask`
+  and manage the cleanup of Upgrade Jobs and UpgradeTask CRs along
+  with the resource on which they operate. 
+- Phase 3: An upgrade operator that automatically triggeres the upgrade
+  of pools and volumes when the control plane is upgraded. Ability
+  to set which pools or volumes should be automatically upgraded or
+  not. 
+  
 ## Motivation
 
-Once the OpenEBS control plane is upgraded, user has to manually 
-upgrade the pools and volumes one at a time using the upgrade 
-scripts. While this may work for smaller clusters and when upgrades 
+OpenEBS is Kubernetes native implementation comprising of a 
+set of Deployments and Custom resources - that can be divided into 
+two broad categories: control plane and data plane.
+
+The control plane components install custom resources and help with 
+provisioning and managing volumes that are backed by different 
+storage engines (aka data plane). The control plane components 
+are what an administrator installs into the cluster and creates 
+storage configuration (or uses default configuration) that includes
+stroage classes. The developers only need to know about the storage
+classes at their disposal.
+
+OpenEBS can be installed using several ways like any other Kubernetes
+application like using a `kubectl apply` or `helm` or via catalogs
+maintained by Managed Kubernetes services like Rancher, AWS market 
+place, Openshift Operator Hub and so forth.
+
+Hence upgrading of OpenEBS invovles:
+- Upgrading the OpenEBS Control plane using one of many options
+  in which Kubernetes apps are installed. 
+- Upgrading of the Data Plane components or deployments and 
+  custom resources that power the storage pools and volumes. 
+
+Up until 1.0, the process of upgrading involved a multi-step process
+of upgrading the control plane followed by:
+- upgrading the storage pools
+- upgrading the persistent volumes one at a time. 
+
+The upgrade itself involved downloading scripts out of band, 
+customizing them and executing them.
+
+While this may work for smaller clusters and when upgrades 
 are infrequent, the dependency on a manual intervention for upgrades
 becomes a bottleneck on Ops team when running thousands of clusters
 across different geographic locations.
@@ -62,18 +107,14 @@ Cluster administrators would like to automate the process of upgrade,
 with push-button access for upgrades and/or flexibility on which 
 pools and volumes are upgraded. 
 
-This design provides the necessary abstractions to perform upgrades
-of pools and volumes via Kubernetes Job. 
-
 ### Goals
 
-- Ability to upgrade jiva volume or cstor pool/volume via `kubectl`
-- Support for upgrading only a single cStor Pool from an SPC
+- Ease the process of upgrading OpenEBS control plane components. 
+- Ease the process of upgrading OpenEBS data plane components.
+- Automate the process of upgrading OpenEBS data plane components. 
 
 ### Non-Goals
-
-- Scheduling of upgrades
-- Support for upgrading all the volumes or pools at once. 
+- Autmoating the OpenEBS control plane upgrades
 
 ## Proposal
 
@@ -92,69 +133,146 @@ of pools and volumes via Kubernetes Job.
 
 ### Design Constraints
 
-This design builds on top of the initial implementation of upgrade 
-supported via kubectl for upgrading from [0.8.2 to 0.9](https://github.com/openebs/openebs/tree/master/k8s/upgrades/0.8.2-0.9.0). 
-
-
-The implementation made use of the CAS Template feature and comprised 
-of the following: 
-- Each type of upgrade - like jiva volume upgrade, cstor pool upgrade, 
-  were converted from shell to an CAS Template, with a series of  
-  upgrade tasks (aka runtasks) to be executed. 
-- A custom resource called upgraderesults was defined to capture
-  the results while executing the run tasks.
-- An upgrade agent, that can read the upgrade CAS Template and 
-  execute the run tasks on a given volume or pool.
-- Administrator will have to create a Kubernetes Job out of the
-  upgrade agent - by passing the upgrade cas template and the object
-  details via a config map. 
-
-While the above approach was good enough to be automated via `kubectl`, 
-the steps that can be executed as part of upgrade were limited
-by the features or constructs available within the CAST/RunTasks. 
-
-Another short-coming of the CAST/RunTasks is the lack of developer
-friendly constructs for rapidly writing new CAST/RunTasks. This was
-severely impacting the time taken to push out new releases. 
+- Upgrading of the OpenEBS storage components should be possible
+  via `kubectl`.
+- Upgrade of a resource should be a single command and should be 
+  idempotent. 
+- Administrators should be able to use the GitOps to manage the
+  OpenEBS configuration. 
 
 ### Proposed Implementation
 
-Since the upgrades using the scripts have been well tested and tried 
-out on several test and production developments, we decided to re-use
-the shell scripts to perform the upgrade tasks. 
+This design proposes the following key changes:
 
-The upgrade scripts will be packaged into upgrade container, with an 
-entrypoint script that will invoke the required scripts depending on 
-the object being upgraded. 
+(a) Control Plane components can handle the older versions of 
+    data plane components. This design enforces that the control
+    plane component that manage a resource has to take care of
+    either: 
+    - Support the reading of resource with old schema. This is the 
+      case where the schema (data) is user generated. 
+    - Auto upgrading of the schema to new format. This is the case
+      where resource or the attributes are created and owned by the
+      control plane component. 
 
-A custom resource called `UpgradeTask` will be defined with the 
-details of the object being upgraded, and will in turn be updated
-with the status of the upgrade by the upgrade-container scripts.  
+    For example, a cstor-operator reads a user generated resource
+    called SPC, as well as creates a resource called CSP. It is possible
+    that both of these user-facing and internal resources go through
+    a change to support some new functionality. With this design, 
+    when the cstor operator is upgraded to latest version, the following
+    will happen:
+    - The non-user facing changes in SPC are handled by the cstor 
+      operator, which could be like adding a finalizer or some 
+      annotation that will help with internal bookkeeping. It will
+      also continue to read and operate on the existing schema. If
+      there has been a user api change, the steps will be provided 
+      for the administrator to make the appropriate changes to their
+      SPC (which is probably saved in their private Git) and re-apply 
+      the YAML. 
+    - The changes to the CSP will be managed completely by the upgraded
+      cstor operator. User/Administrator need not interact with CSP. 
 
-OpenEBS team will release an openebs-upgrade-tools container 
-that contains all the upgrade scripts supported by openebs. 
+    Note: This eliminates the need for pre-upgrade scripts that were used 
+    till 1.0. 
 
-The workflow followed by administrator is as follows:
-- Define the Custom Resource and a Service account
-- Create a UpgradeTask CR for the object being upgraded 
-- Create a Kubernetes Job with upgrade-container and passing the 
-  UpgradeTask details. 
-- Administrator can query the UpgradeTask to check the status 
-  and result of the upgrade.
+    Status: Available in 1.1
 
-The upgrade scripts will be enhanced to work directly from the
-command-line - in which case the error/info messages will be logged
-to console; or invoked from within the container - which will update
-the error/info messages to the UpgradeTask status spec.
+(b) Data plane components have an interdependence on each other and
+    upgrading a volume typeically invovles upgrading multiple related
+    components at once. For example upgrading a jiva volume invovles
+    upgrading the target and replica deployments. The functionality 
+    to upgrade these various components are provided and delivered
+    in a continer hosted at `quay.openebs.io/m-upgrade`. 
 
+    A Kubernetes Job with this upgrade container can be launched to 
+    carry out the upgrade process. The upgrade job will have to run
+    in the same namespace as openebs control plane and with same
+    service account.
+
+    Upgrade of each resource will be launched as a seperate Job, that
+    will allow for parallel upgrading of resources as well as 
+    granular control on which resource is being upgraded. Upgrades
+    are almost seamless, but still have to be planned to be run 
+    at different intervals for different applications to minimize
+    the impact of unforseen events.
+
+    As the upgrades are done via Kubernete job, a pod is scheduled
+    to perform the task within the cluster, eliminating any network 
+    dependencies that might there between machine that triggers
+    the upgrade to cluster. Also the logs of the upgrade are saved
+    on the pod. 
+
+    Note: This replaces the script based upgrades from OpenEBS 1.0. 
+    Sample Kubernetes YAMLs for upgrading various resources can be
+    found [here](../../../../k8s/upgrades/1.0.0-1.1.0/).  
+
+    Status: Available in 1.1 and supports upgrading of Jiva Volumes,
+    cStor Volumes and cStor pools from 1.0 to 1.1
+
+(c) A custom resource called `UpgradeTask` will be defined with the 
+    details of the object being upgraded, and will in turn be updated
+    with the status of the upgrade by the upgrade-container. This 
+    will allow for tools to be written to capture the status of the
+    upgrades and take any correction actions. One of the consumer
+    for this UpgradeTask is openebs-operator itself that will automate
+    the upgrade of all resources. 
+
+    Status: Under Development, planned for 1.2
+
+(d) Improvements to the backward compatibility checks added to the 
+    OpenEBS Control Plane in (a). The backward compatibility checks
+    will involve checking for multiple resources and this process
+    is triggered on a restart. This process will be optimized to 
+    use a flag to check if the backward compatibility checks are 
+    indeed required. On the resource being managed, the following 
+    internal spec will be maintained that indicates if the backward
+    compatibility checks need to be maintained. 
+
+    ```
+    versionDetails:
+      #Indicates if the resource should be auto upgraded 
+      #More on this below (f). Default is false.
+      #autoUpgrade:
+      #Indicates the current version of the resource.
+      currentVersion: 
+      #Indicates the running version of the controller/component
+      #as part of the startup, this flag will be changed
+      #running version if autoUpgrade is enabled. 
+      desiredVersion: 
+      #In some cases there can be a bunch of child resources
+      #this flag will be set to "no" when current != desired. 
+      #after upgrading all the child objects, this will be changed to yes. 
+      dependentsUpgraded:
+    ```
+  
+    Status: Under Development, planned for 1.2
+
+(e) Downgrading a version. There are scenarios where the volumes will
+    have to be downgraded to earlier versions. Some of the challenegs
+    around this are after upgrading a resource with a breaking change, 
+    falling back to older version might make the resource un-readable. 
+    To avoid this, the earlier version of the resource will be saved
+    under a versioned name. When downgrading from higher (currentVersion)
+    to lower (desiredVersion), the backup copy of the resource will
+    be applied. 
+
+    Status: Under Development, planned for TBD
+
+(f) Automated upgrades of data plane components. OpenEBS operator 
+    will check for all the volumes and resources that need to be upgraded
+    and will launch a Kubernetes Job for any resource that has the
+    autoUpgrade set to true. In case there is a failure to upgrade, the
+    volume will be downgraded back to its current version.
+
+    Administrators can make use of this auto-upgrade facility 
+    as a choice. The auto-upgrade true can be set on either
+    SPC, StorageClass or the PVC and the flag will be trickled 
+    down to the corresponding resources during provisioning. 
+
+    Status: Under Development, planned for TBD
+  
 ### Backward Compatibility
 
-Since this design re-uses the upgrade scripts, the users will 
-have the option to upgrade the pools and volumes via the same 
-procedure followed in earlier scripts. 
-
-In addition, there will be an option to upgrade via `kubectl` 
-using the steps detailed below. 
+This design overrides the earlier upgrade methodology. 
 
 ### Design Choices/Decisions
 
@@ -198,8 +316,98 @@ and the reasoning behind selecting a certain approach.
   watching the BulkUpgrade can then launch individual UpgradeTasks. 
 
    
+- How does this design compared to the `kubectl` based upgrade
+  introduced for upgrading from [0.8.2 to 0.9](https://github.com/openebs/openebs/tree/master/k8s/upgrades/0.8.2-0.9.0). 
+
+  The current design proposed in this document builds on top of the
+  0.8.2 to 0.9 design, by improving on usability and agility of the 
+  upgrade code development. 
+
+  The implementation made use of the CAS Template feature and comprised 
+  of the following: 
+  - Each type of upgrade - like jiva volume upgrade, cstor pool upgrade, 
+    were converted from shell to an CAS Template, with a series of  
+    upgrade tasks (aka runtasks) to be executed. 
+  - A custom resource called upgraderesults was defined to capture
+    the results while executing the run tasks.
+  - An upgrade agent, that can read the upgrade CAS Template and 
+    execute the run tasks on a given volume or pool.
+  - Administrator will have to create a Kubernetes Job out of the
+    upgrade agent - by passing the upgrade cas template and the object
+    details via a config map. 
+
+  While the above approach was good enough to be automated via `kubectl`, 
+  the steps that can be executed as part of upgrade were limited
+  by the features or constructs available within the CAST/RunTasks. 
+
+  Another short-coming of the CAST/RunTasks is the lack of developer
+  friendly constructs for rapidly writing new CAST/RunTasks. This was
+  severely impacting the time taken to push out new releases. 
 
 ### High Level Design
+
+#### Upgrade Job Example
+
+Here is an example of Kubernetes Job spec for upgrading the jiva volume.
+```
+#This is an example YAML for upgrading jiva volume. 
+#Some of the values below needs to be changed to
+#match your openebs installation. The fields are
+#indicated with VERIFY
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  #VERIFY that you have provided a unique name for this upgrade job.
+  #The name can be any valid K8s string for name. This example uses
+  #the following convention: jiva-vol-<flattened-from-to-versions>-<pv-name>
+  name: jiva-vol-100110-pvc-713e3bb6-afd2-11e9-8e79-42010a800065
+  #VERIFY the value of namespace is same as the namespace where openebs components
+  # are installed. You can verify using the command:
+  # `kubectl get pods -n <openebs-namespace> -l openebs.io/component-name=maya-apiserver`
+  # The above command should return status of the openebs-apiserver.
+  namespace: openebs
+spec:
+  backoffLimit: 4
+  template:
+    spec:
+      #VERIFY the value of serviceAccountName is pointing to service account
+      # created within openebs namespace. Use the non-default account.
+      # by running `kubectl get sa -n <openebs-namespace>`
+      serviceAccountName: openebs-maya-operator
+      containers:
+      - name:  upgrade
+        args: 
+        - "jiva-volume"
+        - "--from-version=1.0.0"
+        - "--to-version=1.1.0-RC2"
+        #VERIFY that you have provided the correct cStor PV Name
+        - "--pv-name=pvc-713e3bb6-afd2-11e9-8e79-42010a800065"
+        #Following are optional parameters
+        #Log Level
+        - "--v=4"
+        #DO NOT CHANGE BELOW PARAMETERS
+        env:
+        - name: OPENEBS_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        tty: true 
+        image: openebs/m-upgrade:dev-1000110RC2-072703
+      restartPolicy: Never
+---
+```
+
+Execute the Upgrade Job Spec
+```
+$ kubectl apply -f jiva-vol-100110-pvc713.yaml
+```
+
+You can check the status of the Job using commands like:
+```
+$ kubectl get job -n openebs
+$ kubectl get pods -n openebs #to check on the name for the job pod
+$ kubectl logs -n openebs jiva-upg-100111-pvc-713e3bb6-afd2-11e9-8e79-42010a800065-bgrhx
 
 #### UpgradeTask CR Example
 
@@ -262,42 +470,6 @@ status:
         message: patched "deployment/pvc-dep-name"
 
 ```
-
-The upgrade job will pass the name of the upgrade task as ENV. A
-sample upgrade job will look like:
-
-```
-apiVersion: batch/v1
-kind: Job
-metadata:
-  name: upgrade-jiva-pv-001-job
-  namespace: openebs
-spec:
-  template:
-    spec:
-      #If running in openebs, openebs-maya-operator can be used as 
-      #service account.
-      serviceAccountName: super-admin
-      containers:
-      - name:  upgrade
-        image: openebs/upgrade-executor:latest
-        env:
-        - name: UPGRADE_TASK_CR_NAME
-          value: "upgrade-jiva-pv-001"
-        - name: JOB_NAME
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.name
-        - name: JOB_NAMESPACE
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.namespace
-        #In case the upgrade tasks are installed in another namespace.
-        - name: OPENEBS_NAMESPACE
-          value: "openebs"
-      restartPolicy: Never
-```
-
 
 ### Risks and Mitigations
 
