@@ -45,16 +45,16 @@ delete_jiva_snapshot()
     snapshot_number_cmd="kubectl exec -it $ctrl_pod_name -n $pvc_namespace -- jivactl snapshot ls | grep -v ID | wc -l"
     snapshot_name_cmd="kubectl exec -it $ctrl_pod_name -n $pvc_namespace -- jivactl snapshot ls | grep -v ID | tail -1"
     
-    if [ $(eval $snapshot_number_cmd) -le $(($min_required_snapshot + $number_of_snapshot)) ]; then
+    if [ $(eval $snapshot_number_cmd) -lt $min_required_snapshot ]; then
         echo "Error: You can initiate snapshot deletion only when the volume has more than $min_required_snapshot snapshots. There are only $(eval $snapshot_number_cmd) snapshots at the moment. You need not cleanup any more snapshots."
         exit 1;
     fi
 
-    if [ $(eval $snapshot_number_cmd) -le $((number_of_snapshot-1)) ]; then
-        echo "Error: You have requested to delete $number_of_snapshot. There are only $((($(eval $snapshot_number_cmd))-1 - $min_required_snapshot)) snapshot available that can be deleted on this volume. Please re-run this command with by specifying the number of snapshots to be deleted as $(($(eval $snapshot_number_cmd) - $min_required_snapshot)) or less."
+    if [ $(eval $snapshot_number_cmd) -le $number_of_snapshot ]; then
+        echo "Error: You have requested to delete $number_of_snapshot. There are only $(($(eval $snapshot_number_cmd) - $min_required_snapshot)) snapshot available that can be deleted on this volume. Please re-run this command with by specifying the number of snapshots to be deleted as $(($(eval $snapshot_number_cmd) - $min_required_snapshot)) or less."
         exit 1 ;
     else
-            if [ $(eval $snapshot_number_cmd) -gt $(($min_required_snapshot + $number_of_snapshot)) ]; then
+            if [ $(eval $snapshot_number_cmd) -ge $(($min_required_snapshot + $number_of_snapshot)) ]; then
                 block_service
                 echo "Deleting snapshots"
                 delete_snap > /dev/null 2&>1 &
@@ -64,7 +64,7 @@ delete_jiva_snapshot()
                 unblock_service
                 rm -rf log.txt
             else
-                echo "Error: You have requested to delete $number_of_snapshot. There are only $((($(eval $snapshot_number_cmd))-1 - $min_required_snapshot)) snapshot available that can be deleted on this volume. Please re-run this command with by specifying the number of snapshots to be deleted as $(($(eval $snapshot_number_cmd) - $min_required_snapshot)) or less." ;
+                echo "Error: You have requested to delete $number_of_snapshot. There are only $(($(eval $snapshot_number_cmd) - $min_required_snapshot)) snapshot available that can be deleted on this volume. Please re-run this command with by specifying the number of snapshots to be deleted as $(($(eval $snapshot_number_cmd) - $min_required_snapshot)) or less." ;
             fi
         fi
 }
