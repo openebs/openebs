@@ -8,7 +8,7 @@ owners:
   - "@vishnuitta"
 editor: "@kmova"
 creation-date: 2019-07-10
-last-updated: 2019-07-29
+last-updated: 2019-07-31
 status: implementable
 see-also:
   - NA
@@ -52,13 +52,15 @@ implemented in the following phases:
 - Phase 1: Ability to perform storage pool and volume upgrades using 
   a Kubernetes Job
 - Phase 2: Allow for saving the history of upgrades on a given pool
-  or volume on a Kubernetes custom resource called `UpgradeTask`
-  and manage the cleanup of Upgrade Jobs and UpgradeTask CRs along
+  or volume on a Kubernetes custom resource called `UpgradeTask`.
+  Manage the cleanup of Upgrade Jobs and UpgradeTask CRs along
   with the resource on which they operate. 
-- Phase 3: An upgrade operator that automatically triggers the upgrade
-  of pools and volumes when the control plane is upgraded. Ability
-  to set which pools or volumes should be automatically upgraded or
-  not. 
+- Phase 3: An upgrade operator that:
+  - Automatically trigger the upgrade of pools and volumes when the
+    control plane is upgraded. The upgrade operator will create a
+    UpgradeTask and pass that to a Upgrade Job.
+  - Ability to set which pools or volumes should be automatically 
+    upgraded or not. 
   
 ## Motivation
 
@@ -201,6 +203,11 @@ This design proposes the following key changes:
     the upgrade to cluster. Also the logs of the upgrade are saved
     on the pod. 
 
+    UpgradeJob is idempotent, in the sense it will start execution 
+    from the point where it left off and finish the job. If the
+    UpgradeJob is executed on an already upgraded resource, it will 
+    return success. 
+
     Note: This replaces the script based upgrades from OpenEBS 1.0. 
     Sample Kubernetes YAMLs for upgrading various resources can be
     found [here](../../../../k8s/upgrades/1.0.0-1.1.0/).  
@@ -217,6 +224,13 @@ This design proposes the following key changes:
     the upgrade of all resources. 
 
     The `UpgradeTask` resource will be created by the Upgrade Job. 
+
+    The UpgradeJob will also be enhanced to receive `UpgradeTask` 
+    as input will all the details of the resources included. In this
+    case, the Upgrade Job will append the results of the operation to
+    the provided UpgradeTask. This is also implemented to allow for
+    higher level operators to eliminate steps like determining 
+    what is the name of the `UpgradeTask` created by the UpgradeJob. 
 
     Status: Under Development, planned for 1.2
 
@@ -245,6 +259,9 @@ This design proposes the following key changes:
       #after upgrading all the child objects, this will be changed to yes. 
       dependentsUpgraded:
     ```
+
+    The above spec will be used as a sub-resource under all the custom
+    resource managed by OpenEBS. 
   
     Status: Under Development, planned for 1.2
 
@@ -256,6 +273,9 @@ This design proposes the following key changes:
     under a versioned name. When downgrading from higher (currentVersion)
     to lower (desiredVersion), the backup copy of the resource will
     be applied. 
+
+    Note: This section will have to be revisited for detailed design 
+    after scoping this item into a release. 
 
     Status: Under Development, planned for TBD
 
@@ -269,6 +289,9 @@ This design proposes the following key changes:
     as a choice. The auto-upgrade true can be set on either
     SPC, StorageClass or the PVC and the flag will be trickled 
     down to the corresponding resources during provisioning. 
+
+    Note: This section will have to be revisited for detailed design 
+    after scoping this item into a release. 
 
     Status: Under Development, planned for TBD
   
@@ -396,7 +419,7 @@ spec:
               fieldPath: metadata.namespace
         tty: true 
         image: openebs/m-upgrade:dev-1000110RC2-072703
-      restartPolicy: Never
+      restartPolicy: OnFailure
 ---
 ```
 
@@ -480,10 +503,10 @@ status:
 
 ## Implementation History
 
-- Owner acceptance of `Summary` and `Motivation` sections - YYYYMMDD
-- Agreement on `Proposal` section - YYYYMMDD
-- Date implementation started - YYYYMMDD
-- First OpenEBS release where an initial version of this OEP was available - YYYYMMDD
+- Owner acceptance of `Summary` and `Motivation` sections - 2090731
+- Agreement on `Proposal` section - 2090731
+- Date implementation started - 2090731
+- First OpenEBS release where an initial version of this OEP was available - 2090731 OpenEBS 1.1.0
 - Version of OpenEBS where this OEP graduated to general availability - YYYYMMDD
 - If this OEP was retired or superseded - YYYYMMDD
 
