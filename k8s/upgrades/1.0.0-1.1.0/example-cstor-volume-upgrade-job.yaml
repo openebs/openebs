@@ -28,7 +28,7 @@ spec:
         args:
         - "cstor-volume"
         - "--from-version=1.0.0"
-        - "--to-version=1.1.0-RC2"
+        - "--to-version=1.1.0"
         #VERIFY that you have provided the correct cStor PV Name
         - "--pv-name=pvc-c630f6d5-afd2-11e9-8e79-42010a800065"
         #Following are optional parameters
@@ -41,6 +41,6 @@ spec:
             fieldRef:
               fieldPath: metadata.namespace
         tty: true
-        image: openebs/m-upgrade:dev-1000110RC2-072801
-      restartPolicy: Never
+        image: quay.io/openebs/m-upgrade:1.1.0
+      restartPolicy: OnFailure
 ---

@@ -1,8 +1,8 @@
-# UPGRADE FROM OPENEBS 1.0.0 TO 1.1.0-RC2
+# UPGRADE FROM OPENEBS 1.0.0 TO 1.1.0
 
 ## Overview
 
-This document describes the steps for upgrading OpenEBS from 1.0.0 to 1.1.0-RC2
+This document describes the steps for upgrading OpenEBS from 1.0.0 to 1.1.0
 
 The upgrade of OpenEBS is a three step process:
 - *Step 1* - Prerequisites
@@ -68,11 +68,11 @@ Below are steps to upgrade using some common ways to install OpenEBS:
 **The sample steps below will work if you have installed OpenEBS without 
 modifying the default values in openebs-operator.yaml. If you have customized 
 the openebs-operator.yaml for your cluster, you will have to download the 
-1.1.0-RC2 openebs-operator.yaml and customize it again**
+1.1.0 openebs-operator.yaml and customize it again**
 
 ```
-#Upgrade to OpenEBS control plane components to version 1.1.0-RC2 
-$ kubectl apply -f https://openebs.github.io/charts/openebs-operator-1.1.0-RC2.yaml
+#Upgrade to OpenEBS control plane components to version 1.1.0 
+$ kubectl apply -f https://openebs.github.io/charts/openebs-operator-1.1.0.yaml
 ```
 
 ### Upgrade using helm chart (using stable/openebs, openebs-charts repo, etc.,):
@@ -93,11 +93,11 @@ latest stable/openebs chart.
   by copying the content from above default yamls and edit the values to 
   suite your environment. You can upgrade using your custom values using:
   ```sh
-  $ helm upgrade <release name> stable/openebs --version 1.1.0-RC2 -f custom-values.yaml`
+  $ helm upgrade <release name> stable/openebs --version 1.1.0 -f custom-values.yaml`
   ```
 
 ### Using customized operator YAML or helm chart.
-As a first step, you must update your custom helm chart or YAML with 1.1.0-RC2 
+As a first step, you must update your custom helm chart or YAML with 1.1.0 
 release tags and changes made in the values/templates. After updating the YAML 
 or helm chart or helm chart values, you can use the above procedures to upgrade 
 the OpenEBS Control Plane components.
@@ -117,11 +117,11 @@ backup of the data before starting the below upgrade procedure.**
   the controller, exporter and replica pod images to the previous version
 
 **Note: Before proceeding with the upgrade of the OpenEBS Data Plane components 
-like cStor or Jiva, verify that OpenEBS Control plane is indeed in 1.1.0-RC2 version**
+like cStor or Jiva, verify that OpenEBS Control plane is indeed in 1.1.0 version**
 
   You can use the following command to verify:
   ```sh
-  $ kubectl get pods -n openebs -l openebs.io/version=1.1.0-RC2
+  $ kubectl get pods -n openebs -l openebs.io/version=1.1.0
   ```
 
   The above command should show that the control plane components are upgrade. 
@@ -144,12 +144,12 @@ OpenEBS maintainers via [Github Issue](https://github.com/openebs/openebs/issues
 
 As you might have seen by now, control plane components and data plane components
 work independently. Even after the OpenEBS Control Plane components have been 
-upgraded to 1.1.0-RC2, the Storage Pools and Volumes (both jiva and cStor)
+upgraded to 1.1.0, the Storage Pools and Volumes (both jiva and cStor)
 will continue to work with older versions. 
 
 You can use the below steps for upgrading cstor and jiva components. 
 
-Starting with 1.1.0-RC2, the upgrade steps have been changed to eliminate the
+Starting with 1.1.0, the upgrade steps have been changed to eliminate the
 need for downloading scripts. You can use `kubectl` to trigger an upgrade job 
 using Kubernetes Job spec. The following instructions provide details on how
 to create your Upgrade Job specs. 
@@ -195,7 +195,7 @@ spec:
         args: 
         - "jiva-volume"
         - "--from-version=1.0.0"
-        - "--to-version=1.1.0-RC2"
+        - "--to-version=1.1.0"
         #VERIFY that you have provided the correct cStor PV Name
         - "--pv-name=pvc-713e3bb6-afd2-11e9-8e79-42010a800065"
         #Following are optional parameters
@@ -208,8 +208,8 @@ spec:
             fieldRef:
               fieldPath: metadata.namespace
         tty: true 
-        image: openebs/m-upgrade:dev-1000110RC2-072703
-      restartPolicy: Never
+        image: quay.io/openebs/m-upgrade:1.1.0
+      restartPolicy: OnFailure
 ---
 ```
 
@@ -267,7 +267,7 @@ spec:
         args:
         - "cstor-spc"
         - "--from-version=1.0.0"
-        - "--to-version=1.1.0-RC2"
+        - "--to-version=1.1.0"
         #VERIFY that you have provided the correct SPC Name
         - "--spc-name=cstor-sparse-pool"
         #Following are optional parameters
@@ -280,8 +280,8 @@ spec:
             fieldRef:
               fieldPath: metadata.namespace
         tty: true
-        image: openebs/m-upgrade:dev-1000110RC2-072801
-      restartPolicy: Never
+        image: quay.io/openebs/m-upgrade:1.1.0
+      restartPolicy: OnFailure
 ---
 ```
 
@@ -327,7 +327,7 @@ spec:
         args:
         - "cstor-volume"
         - "--from-version=1.0.0"
-        - "--to-version=1.1.0-RC2"
+        - "--to-version=1.1.0"
         #VERIFY that you have provided the correct cStor PV Name
         - "--pv-name=pvc-c630f6d5-afd2-11e9-8e79-42010a800065"
         #Following are optional parameters
@@ -340,7 +340,7 @@ spec:
             fieldRef:
               fieldPath: metadata.namespace
         tty: true
-        image: openebs/m-upgrade:dev-1000110RC2-072801
-      restartPolicy: Never
+        image: quay.io/openebs/m-upgrade:1.1.0
+      restartPolicy: OnFailure
 ---
 ```
