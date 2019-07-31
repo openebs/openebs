@@ -55,7 +55,7 @@ implemented in the following phases:
   or volume on a Kubernetes custom resource called `UpgradeTask`
   and manage the cleanup of Upgrade Jobs and UpgradeTask CRs along
   with the resource on which they operate. 
-- Phase 3: An upgrade operator that automatically triggeres the upgrade
+- Phase 3: An upgrade operator that automatically triggers the upgrade
   of pools and volumes when the control plane is upgraded. Ability
   to set which pools or volumes should be automatically upgraded or
   not. 
@@ -71,15 +71,15 @@ provisioning and managing volumes that are backed by different
 storage engines (aka data plane). The control plane components 
 are what an administrator installs into the cluster and creates 
 storage configuration (or uses default configuration) that includes
-stroage classes. The developers only need to know about the storage
+storage classes. The developers only need to know about the storage
 classes at their disposal.
 
 OpenEBS can be installed using several ways like any other Kubernetes
 application like using a `kubectl apply` or `helm` or via catalogs
 maintained by Managed Kubernetes services like Rancher, AWS market 
-place, Openshift Operator Hub and so forth.
+place, OpenShift Operator Hub and so forth.
 
-Hence upgrading of OpenEBS invovles:
+Hence upgrading of OpenEBS involves:
 - Upgrading the OpenEBS Control plane using one of many options
   in which Kubernetes apps are installed. 
 - Upgrading of the Data Plane components or deployments and 
@@ -114,7 +114,7 @@ pools and volumes are upgraded.
 - Automate the process of upgrading OpenEBS data plane components. 
 
 ### Non-Goals
-- Autmoating the OpenEBS control plane upgrades
+- Automating the OpenEBS control plane upgrades
 
 ## Proposal
 
@@ -177,25 +177,25 @@ This design proposes the following key changes:
     Status: Available in 1.1
 
 2.  Data plane components have an interdependence on each other and
-    upgrading a volume typeically invovles upgrading multiple related
-    components at once. For example upgrading a jiva volume invovles
+    upgrading a volume typically involves upgrading multiple related
+    components at once. For example upgrading a jiva volume involves
     upgrading the target and replica deployments. The functionality 
     to upgrade these various components are provided and delivered
-    in a continer hosted at `quay.openebs.io/m-upgrade`. 
+    in a container hosted at `quay.openebs.io/m-upgrade`. 
 
     A Kubernetes Job with this upgrade container can be launched to 
     carry out the upgrade process. The upgrade job will have to run
     in the same namespace as openebs control plane and with same
     service account.
 
-    Upgrade of each resource will be launched as a seperate Job, that
+    Upgrade of each resource will be launched as a separate Job, that
     will allow for parallel upgrading of resources as well as 
     granular control on which resource is being upgraded. Upgrades
     are almost seamless, but still have to be planned to be run 
     at different intervals for different applications to minimize
-    the impact of unforseen events.
+    the impact of unforeseen events.
 
-    As the upgrades are done via Kubernete job, a pod is scheduled
+    As the upgrades are done via Kubernetes job, a pod is scheduled
     to perform the task within the cluster, eliminating any network 
     dependencies that might there between machine that triggers
     the upgrade to cluster. Also the logs of the upgrade are saved
@@ -216,6 +216,8 @@ This design proposes the following key changes:
     for this UpgradeTask is openebs-operator itself that will automate
     the upgrade of all resources. 
 
+    The `UpgradeTask` resource will be created by the Upgrade Job. 
+
     Status: Under Development, planned for 1.2
 
 4.  Improvements to the backward compatibility checks added to the 
@@ -235,7 +237,7 @@ This design proposes the following key changes:
       #Indicates the current version of the resource.
       currentVersion: 
       #Indicates the running version of the controller/component
-      #as part of the startup, this flag will be changed
+      #as part of the start-up, this flag will be changed
       #running version if autoUpgrade is enabled. 
       desiredVersion: 
       #In some cases there can be a bunch of child resources
@@ -247,7 +249,7 @@ This design proposes the following key changes:
     Status: Under Development, planned for 1.2
 
 5.  Downgrading a version. There are scenarios where the volumes will
-    have to be downgraded to earlier versions. Some of the challenegs
+    have to be downgraded to earlier versions. Some of the challenges
     around this are after upgrading a resource with a breaking change, 
     falling back to older version might make the resource un-readable. 
     To avoid this, the earlier version of the resource will be saved
