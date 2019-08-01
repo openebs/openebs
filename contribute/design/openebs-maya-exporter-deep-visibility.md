@@ -63,9 +63,9 @@ Implement a command `istgtcontrol istgtstatus` which will gather the info from i
     - Capacity and performance stats : capacity stats consists info of used, available capacity and performance stats includes info about latency, throughput, read/write io counts. (available)
     - Status: Status of replicas such as healthy, degraded, offline, rebuilding (available)
     - Uptime: uptime of target since it started (available)
-    - Read io count (started and done): no of read io’s (lbread)
-    - Write io count (started and done): no of write io’s (lbwrite)
-    - Sync io count (started and done): no of sync io’s
+    - Read io count (started and done): no of read io’s (available)
+    - Write io count (started and done): no of write io’s (available)
+    - Sync io count (started and done): no of sync io’s (available)
     - IO timeout count (read/write/sync): no of io timeouts
     - Time taken by io’s (all opcodes): time took to complete read/write/sync io’s 
     - Mgmt connection all opcodes (started and done): snapshot, resize, list
@@ -95,6 +95,130 @@ Implement a command `istgtcontrol istgtstatus` which will gather the info from i
     - Blocked
     - … etc
 
+ ## Schema
+ ```
+ {
+  "loginReqCnt": "6",
+  "loginReqSuccessCnt": "6",
+  "logoutReqCnt": "5",
+  "logoutReqSuccessCnt": "5",
+  "discoveryReqCnt": "6",
+  "discoveryReqSuccessCnt": "6",
+  "read6Cnt": "0",
+  "read10Cnt": "749",
+  "read12Cnt": "0",
+  "read16Cnt": "0",
+  "write6Cnt": "0",
+  "write10Cnt": "1122",
+  "write12Cnt": "0",
+  "write16Cnt": "0",
+  "sync10Cnt": "70",
+  "sync16Cnt": "0",
+  "luWorkers": 6,
+  "snapshotCreateReqCnt": "321",
+  "snapshotPrepareReqCnt": "1",
+  "snapshotCreateReqSuccessCnt": "47",
+  "snapshotPrepareReqSuccessCnt": "1",
+  "startRebuildReqCnt": "4",
+  "startRebuildReqSuccessCnt": "0",
+  "prepareRebuildReqCnt": "4",
+  "prepareRebuildReqSuccessCnt": "0",
+  "maintCmdQLen": "0",
+  "maintBlockedQLen": "0",
+  "cmdQLen": "26",
+  "blockedQLen": "0",
+  "replicas": [
+    {
+      "replicaId": "6162",
+      "Address": "127.0.0.1",
+      "Mode": "Healthy",
+      "checkpointedIOSeq": "1000",
+      "inflightRead": "0",
+      "inflightWrite": "0",
+      "inflightSync": "0",
+      "quorum": "1",
+      "upTime": 379,
+      "waitQ": 0,
+      "readyQ": 0,
+      "blockedQ": 0,
+      "snapshotCreateReqCnt": "81",
+      "snapshotPrepareReqCnt": "1",
+      "snapshotCreateReqSuccessCnt": "64",
+      "snapshotPrepareReqSuccessCnt": "1",
+      "startRebuildReqCnt": "1",
+      "startRebuildReqSuccessCnt": "1",
+      "prepareRebuildReqCnt": "2",
+      "prepareRebuildReqSuccessCnt": "1"
+    },
+    {
+      "replicaId": "6163",
+      "Address": "127.0.0.1",
+      "Mode": "Healthy",
+      "checkpointedIOSeq": "1000",
+      "inflightRead": "0",
+      "inflightWrite": "0",
+      "inflightSync": "0",
+      "quorum": "1",
+      "upTime": 377,
+      "waitQ": 0,
+      "readyQ": 0,
+      "blockedQ": 0,
+      "snapshotCreateReqCnt": "81",
+      "snapshotPrepareReqCnt": "0",
+      "snapshotCreateReqSuccessCnt": "61",
+      "snapshotPrepareReqSuccessCnt": "0",
+      "startRebuildReqCnt": "1",
+      "startRebuildReqSuccessCnt": "1",
+      "prepareRebuildReqCnt": "1",
+      "prepareRebuildReqSuccessCnt": "1"
+    },
+    {
+      "replicaId": "6161",
+      "Address": "127.0.0.1",
+      "Mode": "Degraded",
+      "checkpointedIOSeq": "1000",
+      "inflightRead": "0",
+      "inflightWrite": "6",
+      "inflightSync": "0",
+      "quorum": "1",
+      "upTime": 43,
+      "waitQ": 1,
+      "readyQ": 1,
+      "blockedQ": 1,
+      "snapshotCreateReqCnt": "0",
+      "snapshotPrepareReqCnt": "0",
+      "snapshotCreateReqSuccessCnt": "0",
+      "snapshotPrepareReqSuccessCnt": "0",
+      "startRebuildReqCnt": "1",
+      "startRebuildReqSuccessCnt": "1",
+      "prepareRebuildReqCnt": "0",
+      "prepareRebuildReqSuccessCnt": "1"
+    }
+  ],
+  "errors": [
+    {
+      "mgmtConnErrCnt": "0",
+      "dataConnErrCnt": 1,
+      "poolGuid": "0"
+    },
+    {
+      "mgmtConnErrCnt": "1",
+      "dataConnErrCnt": 0,
+      "poolGuid": "0"
+    },
+    {
+      "mgmtConnErrCnt": "1",
+      "dataConnErrCnt": 0,
+      "poolGuid": "0"
+    },
+    {
+      "mgmtConnErrCnt": "0",
+      "dataConnErrCnt": 1,
+      "poolGuid": "0"
+    }
+  ]
+ }
+```
  ## Drawbacks
 - These metrics shouldn't be gathered frequently as it may impact the ongoing IO's
 
