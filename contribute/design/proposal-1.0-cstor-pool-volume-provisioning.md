@@ -17,12 +17,12 @@ OpenEBS cStor storage-engine.
     standard Kubernetes terms used to associate volumes to a 
     given workload. A PVC will be watched by a dynamic provisioner, 
     and helps with provisioning a new PV and binding to PVC. In 
-    case of OpenEBS, provisoining a PV involves launching OpenEBS 
+    case of OpenEBS, provisioning a PV involves launching OpenEBS 
     Volume Containers (aka iSCSI Target Service) and creating a 
     in-tree iSCSI PV.
   * BlockDevices(BDs) and BlockDeviceClaims(BDCs) are Kubernetes 
     custom resources, used to represent and identify the storage 
-    (a disk) attached to a Kubernetes Node. BlockDiskClaims are 
+    (a disk) attached to a Kubernetes Node. BlockDeviceClaims are 
     used by the cStor Pool Operator to claim a BlockDevice before
     using it to create a Pool. Each BlockDevice will be represented 
     by a cluster wide unique identifier. BlockDevice and 
@@ -33,7 +33,7 @@ OpenEBS cStor storage-engine.
     Kind or Statefulset Kind with replica count. 
 - Familiar with cStor Data Engine. cStor Data Engine comprises of 
   two components - cStor Target (aka iSCSI frontend) and cStor Pool. 
-  cStor Target recieves the IO from the application and it interacts
+  cStor Target receives the IO from the application and it interacts
   with one or more cStor Pools to serve the IO. A single cStor Volume
   comprises of a cStor target and the logical replicas that are 
   provisioned on a set of cStor Pools. The replicas are called as 
@@ -44,7 +44,7 @@ OpenEBS cStor storage-engine.
 
 ## Design Constraints / Considerations
 - The dynamic provisioner will be implemented using the 
-  kubernetes-incubator/external-provisioner, which is already 
+  Kubernetes-incubator/external-provisioner, which is already 
   used for Jiva volumes. At the time of this writing CSI was 
   still under heavy development. In future, the external-provisioner
   can be replaced with CSI. 
@@ -87,7 +87,7 @@ new CRs:
 - cstor-pool-mgmt ( deployed as a side-car to the cStor Pool Pod
   will help with watching the cStorPool - to create uZFS Pool using
   the provided block devices. Will also watch for the cStorVolumeReplica
-  to create uZFS Volumes (aks zvol) to be assicated with cStor Volume.
+  to create uZFS Volumes (aka zvol) to be associated with cStor Volume.
 - cstor-volume-mgmt ( deployed as a side-car to the cStor Target Pod
   will help with reading the target parameters and setting them on
   cStor Target.)
@@ -111,7 +111,7 @@ are available.
        annotations:
          cas.openebs.io/config: |
            # the resource request and limits on the 
-           # pool deployments can be passsed via this configuration
+           # pool deployments can be passed via this configuration
            # the format is similar to Kubernetes type: value. 
            - name: PoolResourceRequests
              value: |-
@@ -142,9 +142,9 @@ are available.
      block devices by replacing the `blockDevices` section with
      `maxPool: 3` as shown [here](https://github.com/openebs/openebs/blob/master/k8s/sample-pv-yamls/spc-cstor-disk-type.yaml).
      The support for automatic selection is experimental and will 
-     undergo changes in the upcoming releases. To keep clear seperation
+     undergo changes in the upcoming releases. To keep clear separation
      between the auto and manual mode of provisioning, the auto mode
-     might be repsented by a totally different CRD. 
+     might be represented by a totally different CRD. 
      
    * maya-cstor-operator (embedded into maya-apiserver), will be 
      watching for SPCs (type=cstor).
@@ -397,7 +397,7 @@ are available.
        metadata:
          labels:
            openebs.io/persistent-volume: pvc-42c47193-b6c8-11e9-93aa-42010a800035
-         # Perisistent volume name.
+         # Persistent volume name.
          name: pvc-42c47193-b6c8-11e9-93aa-42010a800035
        spec:
          capacity: 5G
@@ -544,60 +544,57 @@ are available.
 
 
 ### Design Considerations
-The previous two sections have laid out the workflow for a successful pool and volume creation. As part of the workflow, several cases need to be considered like:
+The previous two sections have laid out the workflow for a successful 
+pool and volume creation. As part of the workflow, several cases 
+need to be considered like:
 - Node hosting the CStorPool is down or not reachable. 
 - Node hosting the cStorContainer is running out of resources and cStorContainer is evicted
 - Node hosting the CStorPool is restarted
 - OpenEBS Volume with replica count = 1 and CStorPool is restarted. 
-- OpenEBS Volume with replica count = 3 and case where 1 of the 3 replica nodes, 2 of 3 replica nodes and 3 or 3 replica nodes are down
+- OpenEBS Volume with replica count = 3 and cases 
+  where 1 of the 3 replica nodes, 2 of 3 replica nodes and 3 or 3 replica nodes are down
 - All nodes are down and are restarted one by one
-- OpenEBS Volume (PVC) is accidentally deleted and user wants to get the data stored in the volume back. 
+- OpenEBS Volume (PVC) is accidentally deleted and user wants to 
+  get the data stored in the volume back. 
 - OpenEBS Volume data needs to be backed up or restored from a backup. 
-- CStorPool has a capacity of 100G and volumes are created adding up to more than 100G
+- CStorPool has a capacity of 100G and volumes are created adding up 
+  to more than 100G
 - One of the disks of the CStorPool is showing high latency
-- cStorPool has exclusive access to the disks. Can there be some kidn of lock mechnisms implemented?
-
+- cStorPool has exclusive access to the disks. 
+  Can there be some kind of lock mechanisms implemented?
 
 
 ## Implementation Plan
 
-### Phase 1
+### Phase 1 ( Part of OpenEBS 1.0) 
 - Install/Setup the CRDs used in this design
-- Container images for - cstor-pool, cstor-pool-mgmt
-- cstor-pool-mgmt sidecar interfaces between observing the CStorPool CR objects and issues - pool create and delete
+- Container images for - cstor-pool, cstor-istgt, cstor-pool-mgmt, cstor-volume-mgmt
+- cstor-pool-mgmt sidecar interfaces between observing the CStorPool CR 
+  objects and issues - pool create and delete
+- cstor-volume-mgmt sidecar interfaces between observing the CStorVolume 
+  CR objects and generates the configuration required for cstor-ctrl
+- Usage of NDM to manage access to the underlying block devices. Issue
+  claims on devices before using them. 
+- Enhance the maya-exporter to export cstor volume and pool metrics
+- Enhance openebs-provisioner and maya-apiserver to implement the 
+  workflow specified above for creation of pools and volumes. 
+- Enhance mayactl to display the details of cstor pools and volumes.
+- Support for upgrading cstor pools and volumes with newer versions.
 
-### Phase 2
-- Container images for - cstor-ctrl, cstor-ctrl-mgmt
-- cstor-pool-mgmt sidecar interfaces between observing the CStorVolumeReplica CR objects and issues - volume create and delete
-- cstor-ctrl-mgmt sidecar interfaces between observing the CStorVolume CR objects and generates the configuration required for cstor-ctrl
-- Enhance the maya-exporter to interface with cstor-pool to gather pool level metrics 
-- Enhance the maya-exporter to interface with cstor-ctrl to gather volume level metrics 
+### Phase 2 ( Part of OpenEBS 1.0) 
+- Support for Snapshot and Clones
+- Support for Backup and Restore
 
-### Phase 3
-- Enhance the maya-apiserver to observe StoragePoolClaim and create CStorPool, StoragePool and associated Kubernetes Deployments and Services
-- Enhance the maya-apiserver to create cstor based volumes - which will involve creating CStorVolumeReplica, CStorVolume and associated Kubernetes Deployments and Services.
-- Enhance the maya-apiserver to delete cstor based volumes - which will involve deleting CStorVolumeReplica, CStorVolume and associated Kubernetes Deployments and Services.
-- Enhance the maya-apiserver to observe StoragePoolClaim and delete CStorPool, StoragePool and associated Kubernetes Deployments and Services
-- Grafana Dashboard for showing the cStor Pool status and statistics
-- Grafana Dashboard for showing the cStor Volume status and statistics
-- Enhance mayactl for fetching pool status and volume status. (volume info and pool info commands)
-
-
-### Future
-- Upgrade (image version) of cstor related containers
-- Editing either the Pool or Volume related parameters
-- Replacing failed disks using a spare disk from the pool
+### Future (Implemented post 1.0)
 - Expanding the pool to add more capacity
-- Working with disks that have pools created directly on the host - that will conflict with pools from within cStorPool
-- Marking a Pool as unavailable or failed due to slow disk or to bring it down for maintenance of the underlying disks
-- Reassign the pool from one node to another by shifting the attached disks to a new node
-- User should be able to specify required values for the features available on the CStorPool and CStorVolumeReplica like compression, block size, deduplication, etc. This has to be aligned with the VolumePolicies and VolumeUpdatePolicies being implemented in OpenEBS 0.6 and 0.7 respectively.
-- Scale up/down the number of replicas associated with a cStor Volume. One of the approach to implement scale-up would be:
-  * User will specify the desired number of replicas by passing a VolumeUpdate (a CR associated with a PV/PVC along with parameters that need to modified)
-  * maya-apiserver will process with VolumeUpdate request and if the request is to scaled up the replica, a new CStorVolumeReplica CR will be created. The cstor-pool-mgmt will then create the required replica on the pool and will invoke a API on CStorVolume (cstro-ctrl), to register itself as a new replica - passing the self IP address and ID.
-  * cstor-ctrl will set the state as new replica, kick-start a resync/rebuild with already existing replicas. CStorVolume will use the IP address passed in the registration to call the API on the CStorVolumeReplica for state transitions and checking status.
-  * As part of this implementation, failure cases involving either the source replica or new replica (under sync) should be considered. 
-- QoS Policies can be implemented in two phases:
-  * Translate the QoS Policies in terms of IOPS/Throughput into resource allocation on the K8s Deployment YAMLs
-  * Allow for passing the QoS control parameters to the containers (pool or controller) via the CRs.
-  
+- Replacing failed disks using a spare disk from the pool
+- Editing either the Pool or Volume related parameters
+- Marking a Pool as unavailable or failed due to slow disk or to bring 
+  it down for maintenance of the underlying disks
+- Reassign the pool from one node to another by shifting the 
+  attached disks to a new node
+- User should be able to specify required values for the features 
+  available on the CStorPool and CStorVolumeReplica like compression, 
+  block size, de-duplication, etc. 
+- Scale up/down the number of replicas associated with a cStor Volume. 
+- Performance Testing and Tunables
