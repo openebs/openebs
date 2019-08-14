@@ -135,7 +135,7 @@ spec:
       serviceAccountName: openebs-maya-operator
       containers:
         - name: prometheus
-          image: prom/prometheus:v2.3.0
+          image: prom/prometheus:v2.11.0
           args:
             - "--config.file=/etc/prometheus/conf/prometheus.yml"
             # Metrics are stored in an emptyDir volume which
@@ -229,7 +229,7 @@ spec:
         app: openebs-grafana
     spec:
       containers:
-      - image: grafana/grafana:5.2.0
+      - image: grafana/grafana:6.3.0
         name: grafana
         ports:
         - containerPort: 3000
@@ -259,7 +259,7 @@ spec:
       name: node-exporter
     spec:
       containers:
-      - image: prom/node-exporter:v0.16.0
+      - image: prom/node-exporter:v0.18.1
         name: node-exporter
         ports:
         - containerPort: 9100
