@@ -89,6 +89,9 @@ spec:
       name: maya-apiserver
       openebs.io/component-name: maya-apiserver
   replicas: 1
+  strategy:
+    type: Recreate
+    rollingUpdate: null
   template:
     metadata:
       labels:
@@ -214,6 +217,9 @@ spec:
       name: openebs-provisioner
       openebs.io/component-name: openebs-provisioner
   replicas: 1
+  strategy:
+    type: Recreate
+    rollingUpdate: null
   template:
     metadata:
       labels:
@@ -276,6 +282,7 @@ spec:
   replicas: 1
   strategy:
     type: Recreate
+    rollingUpdate: null
   template:
     metadata:
       labels:
@@ -484,6 +491,7 @@ spec:
   replicas: 1
   strategy:
     type: Recreate
+    rollingUpdate: null
   template:
     metadata:
       labels:
@@ -562,6 +570,9 @@ metadata:
     openebs.io/version: dev
 spec:
   replicas: 1
+  strategy:
+    type: Recreate
+    rollingUpdate: null
   selector:
     matchLabels:
       app: admission-webhook
@@ -632,6 +643,7 @@ spec:
   replicas: 1
   strategy:
     type: Recreate
+    rollingUpdate: null
   template:
     metadata:
       labels:
