@@ -14,7 +14,7 @@ metadata:
 spec:
   replicas: {{ .Values.apiserver.replicas }}
   strategy:
-    type: {{ .Values.apiserver.upgradeStrategy }}
+    type: "Recreate"
     rollingUpdate: null
   selector:
     matchLabels:

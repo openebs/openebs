@@ -13,7 +13,7 @@ metadata:
 spec:
   replicas: {{ .Values.webhook.replicas }}
   strategy:
-    type: {{ .Values.webhook.upgradeStrategy }}
+    type: "Recreate"
     rollingUpdate: null
   selector:
     matchLabels:

@@ -21,7 +21,6 @@ apiserver:
   image: "quay.io/openebs/m-apiserver"
   imageTag: "1.1.0"
   replicas: 1
-  upgradeStrategy: "Recreate"
   ports:
     externalPort: 5656
     internalPort: 5656
@@ -41,7 +40,6 @@ provisioner:
   image: "quay.io/openebs/openebs-k8s-provisioner"
   imageTag: "1.1.0"
   replicas: 1
-  upgradeStrategy: "Recreate"
   nodeSelector: {}
   tolerations: []
   affinity: {}
@@ -55,7 +53,6 @@ localprovisioner:
   helperImage: "quay.io/openebs/openebs-tools"
   helperImageTag: "3.8"
   replicas: 1
-  upgradeStrategy: "Recreate"
   basePath: "/var/openebs/local"
   nodeSelector: {}
   tolerations: []
@@ -72,7 +69,6 @@ snapshotOperator:
     image: "quay.io/openebs/snapshot-provisioner"
     imageTag: "1.1.0"
   replicas: 1
-  upgradeStrategy: "Recreate"
   nodeSelector: {}
   tolerations: []
   affinity: {}
@@ -102,7 +98,6 @@ ndmOperator:
   image: "quay.io/openebs/node-disk-operator-amd64"
   imageTag: "v0.4.1"
   replicas: 1
-  upgradeStrategy: Recreate
   nodeSelector: {}
   tolerations: []
   readinessCheck:
@@ -117,7 +112,6 @@ webhook:
   imageTag: "1.1.0"
   generateTLS: true
   replicas: 1
-  upgradeStrategy: "Recreate"
   nodeSelector: {}
   tolerations: []
   affinity: {}
