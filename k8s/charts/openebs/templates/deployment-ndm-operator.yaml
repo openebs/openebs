@@ -16,7 +16,7 @@ spec:
   replicas: {{ .Values.ndmOperator.replicas }}
   strategy:
     type: "Recreate"
-    upgradeStrategy: "Recreate"
+    rollingUpdate: null
   selector:
     matchLabels:
       app: {{ template "openebs.name" . }}
