@@ -1,0 +1,99 @@
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: openebs-alertmanager-config
+  namespace: openebs
+data:
+  config.yml: |-
+    global:
+      smtp_smarthost: 'localhost:25'
+      smtp_from: 'alertmanager@openebs.io'
+      smtp_auth_username: 'alertmanager'
+      smtp_auth_password: 'password'
+
+    templates:
+    - '/etc/alertmanager-templates/*.tmpl'
+
+    route:
+      group_by: ['alertname', 'cluster', 'service']
+      group_wait: 10s
+      group_interval: 1m
+      repeat_interval: 5m  
+      receiver: default
+ 
+      routes:
+      - receiver: devops
+        continue: true
+        match:
+          team: devops
+
+    inhibit_rules:
+    - source_match:
+        severity: 'critical'
+      target_match:
+        severity: 'warning'
+      equal: ['alertname', 'cluster', 'service']
+  
+    receivers:
+    - name: 'default'
+
+    - name: 'devops'
+      email_configs:
+      - to: devops@testemail.io
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: alertmanager
+  namespace: openebs
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: alertmanager
+  template:
+    metadata:
+      name: alertmanager
+      labels:
+        app: alertmanager
+    spec:
+      containers:
+      - name: alertmanager
+        image: prom/alertmanager:v0.18.0
+        args:
+          - '--config.file=/etc/alertmanager/config.yml'
+          - '--storage.path=/alertmanager'
+        ports:
+        - name: alertmanager
+          containerPort: 9093
+        volumeMounts:
+        - name: config-volume
+          mountPath: /etc/alertmanager
+        - name: alertmanager
+          mountPath: /alertmanager
+      volumes:
+      - name: config-volume
+        configMap:
+          name: openebs-alertmanager-config
+      - name: alertmanager
+        emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    prometheus.io/scrape: 'true'
+    prometheus.io/path: '/metrics'
+  labels:
+    name: alertmanager
+  name: alertmanager
+  namespace: openebs 
+spec:
+  selector:
+    app: alertmanager
+  ports:
+  - name: alertmanager
+    protocol: TCP
+    port: 9093
+    targetPort: 9093 

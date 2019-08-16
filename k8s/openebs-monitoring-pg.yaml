@@ -24,6 +24,14 @@ data:
         slave: slave1
       scrape_interval: 5s
       evaluation_interval: 5s
+    rule_files:
+      - "/etc/prometheus-rules/*.rules"
+    alerting:
+      alertmanagers:
+        - scheme: http
+          path_prefix: /
+          static_configs:
+            - targets: ['alertmanager:9093']
     scrape_configs:
     - job_name: 'prometheus'
       scheme: http
@@ -119,6 +127,50 @@ data:
         regex: prometheus-mysql-exporter
         action: keep
 ---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: openebs-prometheus-rules
+  labels:
+    name: openebs-prometheus-rules
+  namespace: openebs
+data:
+  alert.rules: |-
+    groups:
+      - name: CPU 
+        rules:
+        - alert: High CPU Load
+          expr: 100 - (avg by(instance) (irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 85
+          for: 1m
+          labels:
+            team: devops
+          annotations:
+            summary: "High CPU load (instance {{ $labels.instance }})"
+            description: "CPU load is > 80%\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+
+      - name: Memory
+        rules:
+        - alert: High Memory Utiliation
+          expr: (node_memory_MemFree_bytes + node_memory_Cached_bytes + node_memory_Buffers_bytes) / node_memory_MemTotal_bytes * 100 < 15
+          for: 1m
+          labels:
+            team: devops
+          annotations:
+            summary: "Out of Memory (instance {{ $labels.instance }})" 
+            description: "Memory is filling up (< 10% left)\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+
+      - name: Filesystem
+        rules:
+        - alert: No Disk Space Left
+          expr: node_filesystem_free_bytes{mountpoint ="/"} / node_filesystem_size_bytes{mountpoint ="/"} * 100 < 10
+          for: 1m
+          labels:
+            team: devops
+          annotations:
+            summary: "Out of disk space (instance {{ $labels.instance }})" 
+            description: "Disk is almost full (< 10% left)\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+
+---
 # prometheus-deployment
 apiVersion: extensions/v1beta1
 kind: Deployment
@@ -173,11 +225,17 @@ spec:
             # metrics collected by prometheus will be stored at the given mountpath.
             - name: prometheus-storage-volume
               mountPath: /prometheus
+            - name: prometheus-rules-volume
+              mountPath: /etc/prometheus-rules
       volumes:
         # Prometheus Config file will be stored in this volume 
         - name: prometheus-server-volume
           configMap:
             name: openebs-prometheus-config
+        # Alert rules will be storesin this volume
+        - name: prometheus-rules-volume
+          configMap:
+            name: openebs-prometheus-rules
         # All the time series stored in this volume in form of .db file.
         - name: prometheus-storage-volume
           # containers in the Pod can all read and write the same files here.
