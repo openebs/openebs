@@ -11,7 +11,10 @@ metadata:
     openebs.io/component-name: openebs-localpv-provisioner
     openebs.io/version: {{ .Values.release.version }}
 spec:
-  replicas: {{ .Values.provisioner.replicas }}
+  replicas: {{ .Values.localprovisioner.replicas }}
+  strategy:
+    type: "Recreate"
+    rollingUpdate: null
   selector:
     matchLabels:
       app: {{ template "openebs.name" . }}

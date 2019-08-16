@@ -13,6 +13,9 @@ metadata:
     openebs.io/version: {{ .Values.release.version }}
 spec:
   replicas: {{ .Values.provisioner.replicas }}
+  strategy:
+    type: "Recreate"
+    rollingUpdate: null
   selector:
     matchLabels:
       app: {{ template "openebs.name" . }}

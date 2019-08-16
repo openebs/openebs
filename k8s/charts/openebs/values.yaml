@@ -69,7 +69,6 @@ snapshotOperator:
     image: "quay.io/openebs/snapshot-provisioner"
     imageTag: "1.1.0"
   replicas: 1
-  upgradeStrategy: "Recreate"
   nodeSelector: {}
   tolerations: []
   affinity: {}
@@ -99,7 +98,6 @@ ndmOperator:
   image: "quay.io/openebs/node-disk-operator-amd64"
   imageTag: "v0.4.1"
   replicas: 1
-  upgradeStrategy: Recreate
   nodeSelector: {}
   tolerations: []
   readinessCheck:

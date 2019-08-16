@@ -12,6 +12,9 @@ metadata:
     openebs.io/version: {{ .Values.release.version }}
 spec:
   replicas: {{ .Values.webhook.replicas }}
+  strategy:
+    type: "Recreate"
+    rollingUpdate: null
   selector:
     matchLabels:
       app: admission-webhook
