@@ -694,7 +694,7 @@ spec:
           exec:
             command:
             - pgrep
-            - ".*localpv"
+            - ".*provisioner-loc"
           initialDelaySeconds: 30
           periodSeconds: 60
 ---
