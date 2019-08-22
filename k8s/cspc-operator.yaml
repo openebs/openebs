@@ -1,0 +1,40 @@
+---
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: cspc-operator
+  namespace: openebs
+  labels:
+    name: cspc-operator
+    openebs.io/component-name: cspc-operator
+    openebs.io/version: dev
+spec:
+  selector:
+    matchLabels:
+      name: cspc-operator
+      openebs.io/component-name: cspc-operator
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        name: cspc-operator
+        openebs.io/component-name: cspc-operator
+        openebs.io/version: dev
+    spec:
+      serviceAccountName: openebs-maya-operator
+      containers:
+      - name: cspc-operator
+        imagePullPolicy: Always
+        image: quay.io/openebs/cspc-operator:ci
+        env:
+        - name: OPENEBS_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: CSPC_OPERATOR_POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+---
