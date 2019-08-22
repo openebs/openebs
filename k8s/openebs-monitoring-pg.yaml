@@ -126,7 +126,7 @@ data:
       - source_labels: [__meta_kubernetes_pod_label_app]
         regex: prometheus-mysql-exporter
         action: keep
-    - job_name: kubernetes-nodes-cadvisor
+    - job_name: 'kubernetes-nodes-cadvisor'
       scrape_interval: 10s
       scrape_timeout: 10s
       scheme: https  # remove if you want to scrape metrics on insecure port
@@ -157,6 +157,9 @@ data:
           regex: '^/system\.slice/(.+)\.service$'
           target_label: systemd_service_name
           replacement: '${1}'
+    - job_name: 'kube-state-metrics'
+      static_configs:
+        - targets: ['kube-state-metrics.openebs.svc.cluster.local:8080']
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -171,7 +174,7 @@ data:
       - name: CPU 
         rules:
         - alert: High CPU Load
-          expr: 100 - (avg by(instance) (irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 5
+          expr: 100 - (avg by(instance) (irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 85
           for: 1m
           labels:
             team: devops
@@ -182,7 +185,7 @@ data:
       - name: Memory
         rules:
         - alert: High Memory Utiliation
-          expr: (node_memory_MemFree_bytes + node_memory_Cached_bytes + node_memory_Buffers_bytes) / node_memory_MemTotal_bytes * 100 < 85
+          expr: (node_memory_MemFree_bytes + node_memory_Cached_bytes + node_memory_Buffers_bytes) / node_memory_MemTotal_bytes * 100 < 15
           for: 1m
           labels:
             team: devops
@@ -192,15 +195,44 @@ data:
 
       - name: Filesystem
         rules:
-        - alert: No Disk Space Left
-          expr: node_filesystem_free_bytes{mountpoint ="/"} / node_filesystem_size_bytes{mountpoint ="/"} * 100 < 85
+        - alert: No Root Disk Space Left
+          expr: node_filesystem_free_bytes{mountpoint ="/"} / node_filesystem_size_bytes{mountpoint ="/"} * 100 < 10
           for: 1m
           labels:
             team: devops
           annotations:
-            summary: "Out of disk space (instance {{ $labels.instance }})" 
-            description: "Disk is almost full (< 10% left)\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+            summary: "Out of disk root space (instance {{ $labels.instance }})" 
+            description: "Root Disk is almost full (< 10% left)\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+        - alert: No Mounted Disk Space Left
+          expr: node_filesystem_free_bytes{mountpoint !="/"} / node_filesystem_size_bytes{mountpoint !="/"} * 100 < 10
+          for: 1m
+          labels:
+            team: devops
+          annotations:
+            summary: "Out of mounted disk space (instance {{ $labels.instance }})" 
+            description: "Mounted Disk is almost full (< 10% left) \n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
 
+      - name: Kubernetes
+        rules:
+        - alert: Pod CrashLoopBackOff 
+          expr: kube_pod_container_status_waiting_reason{reason="CrashLoopBackOff"} > 0
+          for: 1m
+          labels:
+            team: devops
+          annotations:
+            summary: "Pod '{{$labels.pod}}' in namespace '{{$labels.namespace}}' is in CrashLoopBackOff" 
+            description: "A container named '{{$labels.container}}' in the pod '{{$labels.pod}}' in namespace '{{$labels.namespace}}' is experiencing restarts"
+            
+      - name: OpenEBS
+        rules:
+        - alert: OpenEBS Volume Not Available
+          expr: openebs_volume_status == 1 or openebs_volume_status == 4
+          for: 1m
+          labels:
+            team: devops
+          annotations:
+            summary: "Volume '{{ $labels.openebs_pv }}' created for claim '{{ $labels.openebs_pvc }}' is not available"
+            description: "Volume '{{ $labels.openebs_pv }}' if offline, either because replica quorum is not met, target is not running or backend storage is lost"
 ---
 # prometheus-deployment
 apiVersion: extensions/v1beta1
@@ -348,7 +380,14 @@ spec:
       name: node-exporter
     spec:
       containers:
-      - image: prom/node-exporter:v0.18.1
+      #- image: prom/node-exporter:v0.18.1
+      - image: quay.io/prometheus/node-exporter:v0.18.1 
+        args:
+          - --path.procfs=/host/proc
+          - --path.sysfs=/host/sys
+          - --path.rootfs=/host/root
+          - --collector.filesystem.ignored-mount-points=^/(dev|proc|sys|var/lib|run|boot|home/kubernetes/.+)($|/)
+          - --collector.filesystem.ignored-fs-types=^(autofs|binfmt_misc|cgroup|configfs|debugfs|devpts|devtmpfs|fusectl|hugetlbfs|mqueue|overlay|proc|procfs|pstore|rpc_pipefs|securityfs|sysfs|tracefs)$
         name: node-exporter
         ports:
         - containerPort: 9100
@@ -368,12 +407,16 @@ spec:
               cpu: "500m"
         volumeMounts:
         # All the application data stored in data-disk
-        - name: data-disk
-          mountPath: /data-disk
-          readOnly: true
+        - name: proc
+          mountPath: /host/proc
+          readOnly: false
         # Root disk is where OS(Node) is installed
-        - name: root-disk
-          mountPath: /root-disk
+        - name: sys
+          mountPath: /host/sys
+          readOnly: false
+        - name: root
+          mountPath: /host/root
+          mountPropagation: HostToContainer
           readOnly: true
       # The Kubernetes scheduler’s default behavior works well for most cases
       # -- for example, it ensures that pods are only placed on nodes that have 
@@ -404,10 +447,13 @@ spec:
         # running a container that needs access to Docker internals; use a hostPath 
         # of /var/lib/docker
         # running cAdvisor in a container; use a hostPath of /dev/cgroups
-        - name: data-disk
+        - name: proc
           hostPath:
-            path: /localdata
-        - name: root-disk
+            path: /proc
+        - name: sys
+          hostPath:
+            path: /sys
+        - name: root
           hostPath:
             path: /
       hostNetwork: true
