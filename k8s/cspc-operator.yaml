@@ -41,6 +41,8 @@ spec:
           value: "quay.io/openebs/cspi-mgmt:ci"
         - name: OPENEBS_IO_CSTOR_POOL_IMAGE 
           value: "quay.io/openebs/cstor-pool:ci"
+        - name:  OPENEBS_IO_CSTOR_POOL_EXPORTER_IMAGE 
+          value: "quay.io/openebs/m-exporter:ci"
         - name: RESYNC_INTERVAL
           value: "30"
 ---
