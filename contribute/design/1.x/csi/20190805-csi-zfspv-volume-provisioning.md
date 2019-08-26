@@ -27,12 +27,12 @@ last-updated: 2019-08-05
 
 ## Summary
 
-This proposal describs how OpenEBS can support dynamic provisioning of
-volumes via **CSI** using ZFS dataset that are running on local nodes.
-We should be able to create and delete a volume in a kubernetes cluster
-using CSI where the volume has to be created on the ZFS pool which is
-already running on the node and the higher order applications should be
-able to conume this volume.
+This proposal describs how a ZFS dataset will be represented/managed
+by a kubernetes resource, how OpenEBS can support dynamic provisioning
+of volumes on ZPOOL via **CSI**. We should be able to create and delete
+a volume in a kubernetes cluster using CSI where the volume has to be
+created on the ZFS pool which is already running on the node and the
+higher order applications should be able to consume this volume.
 
 ## Proposal
 
@@ -54,8 +54,8 @@ be cleand up from the ZFS pool running on the node.
 #### Volume Creation Workflow
 - CSI driver will handle CSI request for volume create
 - CSI driver will read the request parameters and create following resources:
-  - ZfsVolumeCR _(Kubernetes custom resource)_
-- ZfsVolumeCR will be watched for the property change
+  - ZfsVolume _(Kubernetes custom resource)_
+- ZfsVolume will be watched for the property change
 
 #### Volume Deletion Workflow
 - CSI driver will handle CSI request for volume delete
@@ -109,29 +109,62 @@ spec:
 ### 1. CSI create volume
 At CSI when we get a volume create request, we will create a PV object.
 The actual volume will be create at the Node publish time. We will have
-StorageClass at this point. We will create a ZfsVolumeCR with all the
-volume properties that are present in the custom resource.
+StorageClass at this point. We will create a ZfsVolume custom resource
+with all the volume properties that are present in the custom resource.
+This custom resource will be used for creating and managing the ZFS
+dataset.
 
 
 ### 2. CSI Node Publish
 
 When kubernetes schedules the application pod according the Topology mentioned in
 the StorageClass, The CSI will get a NodePublish event. It will get all the volume
-properties from ZfsVolumeCR custom resource and it will fire zfs create command
-and creates the volume. It will get the pool name from the storage class and create
-a volume on that pool with pvc name. Then it will format and mount the created zvol
-to the desired location and return.
+properties from ZfsVolume custom resource and it will fire zfs create command
+and creates the volume. It will get the pool name from the ZfsVolume custom resource
+and create a volume on that pool with pvc name. Then it will format and mount
+the created zvol to the desired location and return.
+
+- the kubernetes managed ZFS volume will look like this
+
+```yaml
+apiVersion: v1
+items:
+- apiVersion: openebs.io/v1alpha1
+  kind: ZFSVolume
+  metadata:
+    creationTimestamp: "2019-08-25T08:02:14Z"
+    generation: 2
+    name: pvc-a6855135-c70e-11e9-8fa2-42010a80012d
+    namespace: openebs
+    resourceVersion: "13735"
+    selfLink: /apis/openebs.io/v1alpha1/namespaces/openebs/zfsvolumes/pvc-a6855135-c70e-11e9-8fa2-42010a80012d
+    uid: a691916c-c70e-11e9-8fa2-42010a80012d
+  spec:
+    blocksize: 4k
+    capacity: "4294967296"
+    compression: "on"
+    dedup: "on"
+    devicePath: /dev/zvol/zfspv-pool/pvc-a6855135-c70e-11e9-8fa2-42010a80012d
+    ownerNodeID: gke-user-zfspv-default-pool-354050c7-wl8v
+    poolName: zfspv-pool
+    thinprovison: "yes"
+    volName: pvc-a6855135-c70e-11e9-8fa2-42010a80012d
+kind: List
+metadata:
+  resourceVersion: ""
+  selfLink: ""
+```
 
 ### 3. CSI delete volume
 
 When CSI will get volume destroy request, it will destroy the created zvol and also
-deletes the corresponding ZfsVolumeCR custom resource.
+deletes the corresponding ZfsVolume custom resource.
 
 ### 4. CSI ZFSPV property change
 
-There will be a watcher wathing for this ZfsVolumeCR in the agent. It will be watching
-for this custom resource for any change and apply the change to the corresponding
-volume.
+There will be a watcher wathing for this ZfsVolume custom resource in the agent.
+We can update the ZfsVolume custom resource with the desired property and the
+watcher of this custom resource will apply the changes to the corresponding volume.
 
 ## Infrastructure Needed
 
