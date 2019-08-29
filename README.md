@@ -9,8 +9,6 @@
 
 https://www.openebs.io/
  
-[![CNCF Sandbox Project](https://raw.githubusercontent.com/cncf/artwork/master/other/cncf-sandbox/horizontal/color/cncf-sandbox-horizontal-color.png)](https://landscape.cncf.io/selected=open-ebs)
-
 **OpenEBS** is the most widely deployed and easy to use open source storage solution for Kubernetes. 
 
 **OpenEBS** is the leading open source example of a category of storage solutions sometimes called [Container Attached Storage](https://www.cncf.io/blog/2018/04/19/container-attached-storage-a-primer/). **OpenEBS** is listed as an open source example in the [CNCF Storage Landscape White Paper](https://github.com/cncf/sig-storage/blob/master/CNCF%20Storage%20Landscape%20-%20White%20Paper.pdf) under the hyperconverged storage solutions.
@@ -98,6 +96,10 @@ This is a meta-repository for OpenEBS. Please start with the pinned repositories
 ## License
 
 OpenEBS is developed under Apache 2.0 license at the project level. Some components of the project are derived from other open source projects and are distributed under their respective licenses. 
+
+OpenEBS is part of the CNCF Projects.
+
+[![CNCF Sandbox Project](https://raw.githubusercontent.com/cncf/artwork/master/other/cncf-sandbox/horizontal/color/cncf-sandbox-horizontal-color.png)](https://landscape.cncf.io/selected=open-ebs)
 
 ## Commercial Offerings
 
