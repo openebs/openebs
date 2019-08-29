@@ -66,33 +66,60 @@ superseded-by:
  but this requires manual intervention from user i.e, user needs to list the snap
  shots and delete it one by one via given approaches but if number of snapshots have
  been grown significantly it will take too much time to cleanup those snapshots.
- There are following approaches which can be used to implement this feature:
 
- - Delete the n number of snapshots via cli tool jiva
-     * For exp: jivactl purge snapshot -n=10
- - Delete snapshots having size = 0 or very less amount of data is there ~ 1-5 G
- - Run a goroutine in controller to perform cleanup if number of snapshot grows to
-   more than n (maybe 10/20...50)
- - Run a goroutine in replica to perform cleanup of snapshot like above after reload
-   operation.
+ We will start a goroutine in controller, which will be started once it get signal
+ on StartAutoSnapDeletion channel after replica get added to controller. This
+ goroutine will verify the rebuild, check if the replication factor is met and other
+ prerequisites, and then snapshot deletion will be triggered in the background.
 
-NOTE: We are going with third approach, where a goroutine will be waiting on a chan,
-once replica get added to controller and verifies the rebuild, snapshot deletion will
-be triggered.
 
  ## Drawbacks
 
  - Deletion of snapshot is time taking process since data needs to be merged to
    its siblings, so larger the data in snapshot, time taken for this will grow
    significantly and may impact the current IO's.
- - Third approach and fourth approach is opening the way for many corner cases
-   and not suitable for the cluster where network issue/node maintenance is very
-   frequent, since it's possible that snapshot may not be deleted from one of the
-   replica so the snapshot become stale after the replica restart and require
-   manual cleanup + restart to rebuild again. Although this problem can be mitigated
-   by the deletion of stale snapshots which are not in the chain.
+ - There are some cases where we may have stale snapshot entries if replica is
+   restarted while snapshot deletion was in progress.
 
  ## Alternatives
 
- - `jivactl snapshot ls` to list snapshots
- - `jivactl snapshot rm <snap_name>` from above output
+ There are following approaches which can be used to implement this feature:
+
+ a) **Manual deletion**:
+ 
+ 1. Delete snapshots via cli tool jivactl
+       * `jivactl snapshot ls` to list snapshots
+       * `jivactl snapshot rm <snap_name>` from above output
+    
+    *cons*:
+       - User needs to delete the snapshots one by one by specifying snapshot name
+       - Requires manual cleanup of snapshots if replicas are restarted while
+         snapshot deletion is in progress by validating the chain and restart is
+         required to rebuild the replica to be on the safer side.
+         
+ 2. Delete v number of snapshots via cli tool jivactl
+       * `jivactl snapshot rm <n>`
+    
+    *cons*:
+       - Requires manual cleanup in case of snapshot deletion failure like above.
+
+ b) **Cleanup in background**:
+ 
+ 1. Run a goroutine in controller to perform cleanup if number of snapshot grows to
+    more than 10.
+    
+    *cons*:
+       - Requires manual cleanup, same as previous alternative.
+       
+ 2. Run a goroutine which will pick up snapshots based on its size and start
+    cleaning up the snapshots which has size less then any given size (for
+    exp < 2-5G).
+    
+    *cons*:
+       - There are less chance of snapshot deletion failure, since smaller
+         snapshots get merged to its siblings quickly. Requires manual cleanup
+         in case it has failed like above.
+
+
+
+
