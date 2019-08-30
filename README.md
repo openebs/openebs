@@ -15,9 +15,9 @@ https://www.openebs.io/
 
 Some key aspects that make OpenEBS different compared to other traditional storage solutions:
 - Built using the micro-services architecture like the applications it serves. OpenEBS is itself deployed as a set of containers on Kubernetes worker nodes. Uses Kubernetes itself to orchestrate and manage OpenEBS components
-- Built completely in userspace making it highly portable to run across any OS / platform
-- Completely intent driven, inheriting the same principles that drive the ease of use with Kubernetes
-- OpenEBS supports a range of storage engines so that developers can deploy the storage technology appropriate to their application design objectives. Distributed applications like Cassandra can use the LocalPV engine for lowest latency writes. Monolithic applications like MySQL and PostgresQL can use the ZFS engine (cStor) for resilience. Streaming applications like Kafka can use the NVMe engine (MayaStor) for best performance in edge environments. Across engine types, OpenEBS provides a consistent framework for high availability, snapshots, clones and manageability.
+- Built completely in userspace making it highly portable to run across any OS/platform
+- Completely intent-driven, inheriting the same principles that drive the ease of use with Kubernetes
+- OpenEBS supports a range of storage engines so that developers can deploy the storage technology appropriate to their application design objectives. Distributed applications like Cassandra can use the LocalPV engine for lowest latency writes. Monolithic applications like MySQL and PostgresQL can use the ZFS engine (cStor) for resilience. Streaming applications like Kafka can use the NVMe engine [MayaStor](https://github.com/openebs/MayaStor) for best performance in edge environments. Across engine types, OpenEBS provides a consistent framework for high availability, snapshots, clones and manageability.
 
 OpenEBS itself is deployed as just another container on your host and enables storage services that can be designated on a per pod, application, cluster or container level, including:
 - Automate the management of storage attached to the Kubernetes worker nodes and allow the storage to be used for Dynamically provisioning OpenEBS PVs or Local PVs.
@@ -26,9 +26,9 @@ OpenEBS itself is deployed as just another container on your host and enables st
 - A common layer so whether you are running on AKS, or your bare metal, or GKE, or AWS - your wiring and developer experience for storage services is as similar as possible.
 - Management of tiering to and from S3 and other targets.
 
-An added advantage of being a completely Kubernetes native solution is that administrators and developers can interact and manage OpenEBS using all the wonderful tooling that is available for Kubernetes like: kubectl, helm, prometheus, grafana, scope, etc.
+An added advantage of being a completely Kubernetes native solution is that administrators and developers can interact and manage OpenEBS using all the wonderful tooling that is available for Kubernetes like: kubectl, Helm, Prometheus, Grafana, Weave Scope, etc.
 
-**Our vision** is simple: let storage and storage services for persistent workloads be fully integrated into the environment so that each team and workload benefits from granularity of control and Kubernetes native behavior.
+**Our vision** is simple: let storage and storage services for persistent workloads be fully integrated into the environment so that each team and workload benefits from the granularity of control and Kubernetes native behavior.
 
 #### *Read this in [other languages](translations/TRANSLATIONS.md).*
 
