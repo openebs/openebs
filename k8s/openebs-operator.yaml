@@ -24,7 +24,7 @@ rules:
   resources: ["nodes", "nodes/proxy"]
   verbs: ["*"]
 - apiGroups: ["*"]
-  resources: ["namespaces", "services", "pods", "deployments", "replicationcontrollers", "replicasets", "events", "endpoints", "configmaps", "secrets", "jobs", "cronjobs"]
+  resources: ["namespaces", "services", "pods", "pods/exec", "deployments", "replicationcontrollers", "replicasets", "events", "endpoints", "configmaps", "secrets", "jobs", "cronjobs"]
   verbs: ["*"]
 - apiGroups: ["*"]
   resources: ["statefulsets", "daemonsets"]
