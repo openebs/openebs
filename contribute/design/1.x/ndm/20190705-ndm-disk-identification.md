@@ -9,7 +9,7 @@ owners:
   - "@vishnuitta"
 editor: "@akhilerm"
 creation-date: 2019-07-05
-last-updated: 2019-07-08
+last-updated: 2019-08-31
 status: provisional
 ---
 
@@ -37,26 +37,26 @@ status: provisional
 ## Summary
 
 This proposal brings out the design details to implement a Disk identification
-solution which can be used to uniquely identify a disk in the cluster. The main
-aim is to identify the data.
+solution which can be used to uniquely identify a disk across the cluster.
 
 ## Motivation
 
 Uniquely identifying a disk across a cluster is a major challenge which needs to 
 be tackled. The identification is necessary, due to the fact that disk can move
 from node to node and even attached to different ports on the same node. The unique
-identification solution should help the NorthBound users of NDM to track the disk
+identification solution will help the consumers of NDM to track the disk
 and thus the data movement within the cluster.
 
 ### Goals
 
-- A unique disk identification mechanism that will work within the cluster on
+- A unique disk identification mechanism that will work across the cluster on
   disks having atleast a GPT label
+- Should be able to identify same disk attached at multiple paths.
+- Should be able to generate separate IDs for partitions
 
 ### Non-Goals
 
-- Identification of disks without GPT labels
-- Identification of disks which removed the labels after claiming
+- Identification of disk attached to 2 nodes at the same time
 
 ## Proposal
 
@@ -65,7 +65,7 @@ and thus the data movement within the cluster.
 #### Identify a physical disk
 NDM should be able to generate a unqiue id for a physical disk attached to the node
 and this id should not change even if the disk is attached at a different port on the
-same host or moved to a different node.
+same host or moved to a different node or altogether moved to a different cluster.
 
 #### Identify a virtual disk
 NDM should be able to generate a unique id for Virtual Disks(which may not have all 
@@ -77,9 +77,7 @@ attaching to a different machine or a different SCSI port of the same machine.
 The implementation details for the disk identification. The current implementation 
 works well for physical disks which have a unique WWN and model assigned by the 
 manufacturer. But the implementation fails for `Virtual_disk`, because the fields
-are provider dependent and are not guaranteed to be unique. Also when the disk path
-changes, there is a high chance that the NorthBound consumers of NDM will use the
-wrong disk and possibly corrupt the data.
+are provider dependent and are not guaranteed to be unique. 
 
 #### Current Implementation
 The following data is fetched from the disk: 
@@ -110,32 +108,33 @@ claim possibly leading to data loss
 
 #### Proposed Implementation
 
-If WWN is available on the disk, then we follow the current implementation.
+1. We try to generate the UUID using the current implementation. 
 
-If WWN is not available on the disk, then the new solution needs to be applied for
-generating the UIDs
+2. If the `ID_TYPE` is empty or `ID_MODEL` is `Virtual_disk` or `EphemeralDisk` 
 
-1. Check if the disk has a GPT label available on it.
-	- If a GPT label is available we will use only that label for UID generation
-	  of the disk. This will ensure that even if the path is changed, or the disk
-	  comes up at a different node, the UID generated will be same and the disk
-	  can be uniquely identified.
-	- Once the GPT label is available, it is possible to identify partitions
-	  also on the disk (if it exists). This will work by adding the partition
-	  number along with the generated UID.
-	  eg: disk-xxxx-1 (/dev/sdX1), disk-xxxx-2 (/dev/sdX2). 
-	  This is guaranteed to be unique since the partition numbers won't change
-	  even if the device path changes
-2. If GPT label is not available on the disk, it can be logged to the user that
-   "the device couldn't be identified uniquely". Either NDM itself can take up
-   the GPT label creation part or ask the user to create a label so that the disk
-   UID can be generated 
+    1. Check if the disk has a GPT label available on it.
+    	- If a GPT label is available we will use only that label for UID generation
+    	  of the disk. This will ensure that even if the path is changed, or the disk
+    	  comes up at a different node, the UID generated will be same and the disk
+    	  can be uniquely identified.
+    	- Once the GPT label is available, it is possible to identify partitions
+    	  also on the disk (if it exists). This will work by adding the partition
+    	  number along with the generated UID.
+    	  eg: disk-xxxx-1 (/dev/sdX1), disk-xxxx-2 (/dev/sdX2). 
+    	  This is guaranteed to be unique since the partition numbers won't change
+    	  even if the device path changes
+    2. Check if the disk has a Filesystem label available on it. This is in cases where the 
+       complete disk is formatted with a filesystem without a partition table. If filesystem
+       label is available we use it for generating the UUID.
+    3. If GPT and FS label is not available on the disk, we create a GPT partition table on the disk,
+       and then create a single partition which spans the complete disk. This new partition will
+       be consumed by the users. This will help to identify a virtual disk for movements across
+       the cluster also.
 
 Data Cleanup:
 NDM takes care of data clean up, after a BD is released from a BDC. i.e. a complete
-wipe of the disk will be done `wipefs -fa`. This cause the GPT label to get erased.
-Therefore, in such cases the cleanup job by NDM should take care of recreating the GPT
-label after wiping it out, or should selectively wipe the disk.
+wipe of the disk will be done `wipefs -fa`. Since in case of NDM created GPT labels, 
+only partition is being wiped, it won't cause the labels to be removed.
 
 
 ### Risks and Mitigations
@@ -163,16 +162,9 @@ Major milestones might include
 
 ## Drawbacks [optional]
 
-- Support will be available only for either physical disks or disks having
-  a GPT label on them. This will result in many disks that currently NDM supports
-  going into a not-supported mode.
-- In cases where the complete disk is formatted with a filesystem, as in the case of
-  local SSDs in GKE, there are not GPT labels available on the disk. This will result
-  in the user having to manually create a GPT label on the disk, which can be tedious
-  process.
-- If the consumer of disk/BD provided by NDM, erases the GPT label on the disk,
-  NDM has no way to identify the disk. Therefore it should be made mandatory that
-  the users should not erase the GPT label on the disk.
+- Do not have a mechanism to identify disks that are attached in multipath mode.
+- Cannot identify disks and create BDs if the same disk is connected to 2 nodes 
+  at the same time.
 
 ## Alternatives [optional]
 
