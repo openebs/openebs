@@ -13,7 +13,7 @@ rules:
   resources: ["nodes", "nodes/proxy"]
   verbs: ["*"]
 - apiGroups: ["*"]
-  resources: ["namespaces", "services", "pods", "deployments", "events", "endpoints", "configmaps", "jobs"]
+  resources: ["namespaces", "services", "pods", "pods/exec", "deployments", "events", "endpoints", "configmaps", "jobs"]
   verbs: ["*"]
 - apiGroups: ["*"]
   resources: ["storageclasses", "persistentvolumeclaims", "persistentvolumes"]
