@@ -66,8 +66,8 @@ spec:
         livenessProbe:
           exec:
             command:
-            - pgrep
-            - ".*provisioner-loc"
+            - pgrep -f
+            - ".*provisioner-localpv"
           initialDelaySeconds: {{ .Values.localprovisioner.healthCheck.initialDelaySeconds }}
           periodSeconds: {{ .Values.localprovisioner.healthCheck.periodSeconds }}
 {{- if .Values.localprovisioner.nodeSelector }}

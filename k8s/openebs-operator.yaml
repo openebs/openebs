@@ -693,8 +693,8 @@ spec:
         livenessProbe:
           exec:
             command:
-            - pgrep
-            - ".*provisioner-loc"
+            - pgrep -f
+            - ".*provisioner-localpv"
           initialDelaySeconds: 30
           periodSeconds: 60
 ---
