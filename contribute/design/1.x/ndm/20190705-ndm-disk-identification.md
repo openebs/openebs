@@ -136,6 +136,34 @@ NDM takes care of data clean up, after a BD is released from a BDC. i.e. a compl
 wipe of the disk will be done `wipefs -fa`. Since in case of NDM created GPT labels, 
 only partition is being wiped, it won't cause the labels to be removed.
 
+#### Workflow
++-----------+
+|UID = WWN +|
+|    Model +|
+|   Serial +|
+|   Vendor  |
+|           |
++-----------+
+     |
+     |
++----v------------+        +-----------+      +-----------+      +-------------------+
+|    If           |        |  Check    |      |  Check    |      | Create GPT        |
+|ID_TYPE is empty |   Yes  | GPT label |  No  | FS label  |  No  | partition         |
+|    or           +------->+           +----->+           +----->+ table and         |
+|Virtual/Ephemeral|        |           |      |           |      | one partition     |
+|    Disk         |        |           |      |           |      | spanning the disk |
++-----------------+        +-----------+      +-----------+      +-------------------+
+     |                        |                     |                  |
+     |No                      |                     |                  |
+     v                        |Yes                  |Yes               |
++-----------+                 |                     |                  |
+| Use       |                 |                     |                  |
+| generated |<----------------v---------------------v------------------+
+| UID  or   |
+|  Label    |
+|           |
++-----------+
+
 
 ### Risks and Mitigations
 
