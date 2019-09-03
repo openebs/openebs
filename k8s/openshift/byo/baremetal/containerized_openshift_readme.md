@@ -1,4 +1,4 @@
-## Procedure to run OpenEBS on Multi-Node Cotainerized OpenShift Cluster
+## Procedure to run OpenEBS on Multi-Node Containerized OpenShift Cluster
 
 This tutorial provides detailed instructions on how to setup a multi-node BYO (Bring-Your-Own-Host) OpenShift Containerized cluster on 
 RHEL 7.5 and run applications on it with OpenEBS storage.
