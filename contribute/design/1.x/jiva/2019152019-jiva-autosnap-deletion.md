@@ -89,8 +89,8 @@ superseded-by:
  a) **Manual deletion**:
 
  - Delete snapshots via cli tool jivactl
-       * `jivactl snapshot ls` to list snapshots
-       * `jivactl snapshot rm <snap_name>` from above output
+     - `jivactl snapshot ls` to list snapshots
+     - `jivactl snapshot rm <snap_name>` from above output
 
     *cons*:
        - User needs to delete the snapshots one by one by specifying snapshot name
