@@ -106,6 +106,7 @@ The following table lists the configurable parameters of the OpenEBS chart and t
 | `jiva.image`                            | Image for Jiva                                | `quay.io/openebs/jiva`                    |
 | `jiva.imageTag`                         | Image Tag for Jiva                            | `1.1.0`                                   |
 | `jiva.replicas`                         | Number of Jiva Replicas                       | `3`                                       |
+| `jiva.defaultStoragePath`               | hostpath used by default Jiva StorageClass    | `/var/openebs`                            |
 | `cstor.pool.image`                      | Image for cStor Pool                          | `quay.io/openebs/cstor-pool`              |
 | `cstor.pool.imageTag`                   | Image Tag for cStor Pool                      | `1.1.0`                                   |
 | `cstor.poolMgmt.image`                  | Image for cStor Pool  Management              | `quay.io/openebs/cstor-pool-mgmt`         |

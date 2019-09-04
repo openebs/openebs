@@ -120,6 +120,7 @@ jiva:
   image: "quay.io/openebs/jiva"
   imageTag: "1.1.0"
   replicas: 3
+  defaultStoragePath: "/var/openebs"
 
 cstor:
   pool:
