@@ -635,6 +635,10 @@ webhooks:
         apiGroups: ["*"]
         apiVersions: ["*"]
         resources: ["persistentvolumeclaims"]
+      - operations: [ "CREATE", "UPDATE" ]
+        apiGroups: ["*"]
+        apiVersions: ["*"]
+        resources: ["cstorpoolclusters"]
 ---
 apiVersion: apps/v1beta1
 kind: Deployment
