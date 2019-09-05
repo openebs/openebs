@@ -30,7 +30,7 @@ status: provisional
       * [Current Implementation](#current-implementation)
       * [Shortcomings of current implementation](#shortcomings-of-current-implementation)
       * [Proposed Implementation](#proposed-implementation)
-      * [Workflow](#worflow)
+      * [Workflow](#workflow)
 * [Graduation Criteria](#graduation-criteria)
 * [Implementation History](#implementation-history)
 * [Drawbacks](#drawbacks)
@@ -139,6 +139,7 @@ wipe of the disk will be done `wipefs -fa`. Since in case of NDM created GPT lab
 only partition is being wiped, it won't cause the labels to be removed.
 
 ##### Workflow
+```
 +-----------+
 |UID = WWN +|
 |    Model +|
@@ -165,7 +166,7 @@ only partition is being wiped, it won't cause the labels to be removed.
 |  Label    |
 |           |
 +-----------+
-
+```
 
 ## Graduation Criteria
 
