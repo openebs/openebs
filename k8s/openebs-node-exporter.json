@@ -42,12 +42,27 @@
       }
     ]
   },
+
+
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": "-- Grafana --",
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
   "description": "This for the Node Exporter version 0.16.0 or later.",
   "editable": true,
   "gnetId": null,
   "graphTooltip": 0,
-  "id": 2,
-  "iteration": 1566449418510,
+  "id": 1,
+  "iteration": 1567684897933,
   "links": [],
   "panels": [
     {
@@ -335,6 +350,94 @@
         "x": 12,
         "y": 1
       },
+      "id": 42,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": true,
+        "total": false,
+        "values": false
+      },
+      "lines": true,
+      "linewidth": 1,
+      "nullPointMode": "null",
+      "options": {
+        "dataLinks": []
+      },
+      "percentage": false,
+      "pointradius": 2,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "expr": "((pv_utilization_bytes) *100 / pv_capacity_bytes)",
+          "interval": "10s",
+          "intervalFactor": 2,
+          "legendFormat": "{{persistentvolume}}",
+          "refId": "A"
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": null,
+      "timeRegions": [],
+      "timeShift": null,
+      "title": "Persistent Volume Utilization",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "format": "percent",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        },
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": "${DS_OPENEBS}",
+      "fill": 3,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 5,
+        "w": 24,
+        "x": 0,
+        "y": 7
+      },
       "id": 40,
       "legend": {
         "avg": false,
@@ -415,7 +518,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 7
+        "y": 12
       },
       "id": 20,
       "panels": [
@@ -442,7 +545,7 @@
             "h": 6,
             "w": 2,
             "x": 0,
-            "y": 2
+            "y": 13
           },
           "id": 26,
           "interval": null,
@@ -523,7 +626,7 @@
             "h": 6,
             "w": 10,
             "x": 2,
-            "y": 2
+            "y": 13
           },
           "id": 28,
           "legend": {
@@ -623,7 +726,7 @@
             "h": 6,
             "w": 12,
             "x": 12,
-            "y": 2
+            "y": 13
           },
           "id": 22,
           "legend": {
@@ -737,7 +840,7 @@
             "h": 8,
             "w": 12,
             "x": 0,
-            "y": 8
+            "y": 19
           },
           "id": 24,
           "legend": {
@@ -838,7 +941,7 @@
             "h": 8,
             "w": 12,
             "x": 12,
-            "y": 8
+            "y": 19
           },
           "id": 38,
           "legend": {
@@ -923,7 +1026,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 8
+        "y": 13
       },
       "id": 16,
       "panels": [
@@ -939,7 +1042,7 @@
             "h": 9,
             "w": 12,
             "x": 0,
-            "y": 3
+            "y": 14
           },
           "id": 12,
           "legend": {
@@ -1030,7 +1133,7 @@
             "h": 9,
             "w": 12,
             "x": 12,
-            "y": 3
+            "y": 14
           },
           "id": 18,
           "legend": {
@@ -1115,7 +1218,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 9
+        "y": 14
       },
       "id": 14,
       "panels": [
@@ -1134,7 +1237,7 @@
             "h": 7,
             "w": 8,
             "x": 0,
-            "y": 4
+            "y": 15
           },
           "id": 3,
           "legend": {
@@ -1231,7 +1334,7 @@
             "h": 7,
             "w": 8,
             "x": 8,
-            "y": 4
+            "y": 15
           },
           "id": 5,
           "legend": {
@@ -1325,7 +1428,7 @@
             "h": 7,
             "w": 8,
             "x": 16,
-            "y": 4
+            "y": 15
           },
           "id": 4,
           "legend": {
@@ -1419,7 +1522,7 @@
             "h": 7,
             "w": 8,
             "x": 0,
-            "y": 11
+            "y": 22
           },
           "id": 6,
           "legend": {
@@ -1513,7 +1616,7 @@
             "h": 7,
             "w": 8,
             "x": 8,
-            "y": 11
+            "y": 22
           },
           "id": 8,
           "legend": {
@@ -1608,7 +1711,7 @@
             "h": 7,
             "w": 8,
             "x": 16,
-            "y": 11
+            "y": 22
           },
           "id": 7,
           "legend": {
@@ -1693,7 +1796,7 @@
       "type": "row"
     }
   ],
-  "refresh": false,
+  "refresh": "10s",
   "schemaVersion": 19,
   "style": "dark",
   "tags": [],
@@ -1759,5 +1862,5 @@
   "timezone": "browser",
   "title": "Node  Stats",
   "uid": "CZAzyIdZk",
-  "version": 2
+  "version": 1
 }

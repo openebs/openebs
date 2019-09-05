@@ -379,6 +379,7 @@ spec:
         app: node-exporter
       name: node-exporter
     spec:
+      serviceAccount: openebs-maya-operator
       containers:
       #- image: prom/node-exporter:v0.18.1
       - image: quay.io/prometheus/node-exporter:v0.18.1 
@@ -388,6 +389,7 @@ spec:
           - --path.rootfs=/host/root
           - --collector.filesystem.ignored-mount-points=^/(dev|proc|sys|var/lib|run|boot|home/kubernetes/.+)($|/)
           - --collector.filesystem.ignored-fs-types=^(autofs|binfmt_misc|cgroup|configfs|debugfs|devpts|devtmpfs|fusectl|hugetlbfs|mqueue|overlay|proc|procfs|pstore|rpc_pipefs|securityfs|sysfs|tracefs)$
+          - --collector.textfile.directory=/shared_vol
         name: node-exporter
         ports:
         - containerPort: 9100
@@ -418,6 +420,32 @@ spec:
           mountPath: /host/root
           mountPropagation: HostToContainer
           readOnly: true
+        - name: tmpvol
+          mountPath: /shared_vol
+      - name: pv-monitor
+        image: openebs/pv-monitor:latest
+        imagePullPolicy: Always
+        env:
+          - name: TEXTFILE_PATH
+            value: /shared_vol
+          - name: COLLECT_INTERVAL 
+            value: "10"
+        command:
+        - /bin/bash
+        args:
+        - -c
+        - ./textfile_collector.sh
+        volumeMounts:
+        - mountPath: /host/proc
+          name: proc
+        - mountPath: /host/sys
+          name: sys
+        - mountPath: /host/root
+          mountPropagation: HostToContainer
+          name: root
+          readOnly: true
+        - mountPath: /shared_vol
+          name: tmpvol 
       # The Kubernetes scheduler’s default behavior works well for most cases
       # -- for example, it ensures that pods are only placed on nodes that have 
       # sufficient free resources, it ties to spread pods from the same set 
