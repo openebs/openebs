@@ -23,16 +23,18 @@ status: provisional
     * [Goals](#goals)
     * [Non-Goals](#non-goals)
 * [Proposal](#proposal)
-    * [User Stories [optional]](#user-stories-optional)
-      * [Story 1](#story-1)
-      * [Story 2](#story-2)
-    * [Implementation Details/Notes/Constraints [optional]](#implementation-detailsnotesconstraints-optional)
-    * [Risks and Mitigations](#risks-and-mitigations)
+    * [User Stories(#user-stories)
+      * [Identify a physical disk](#identify-a-physical-disk)
+      * [Identify a virtual disk](#identify-a-virtual-disk)
+    * [Implementation Details/Notes/Constraints](#implementation-detailsnotesconstraints)
+      * [Current Implementation](#current-implementation)
+      * [Shortcomings of current implementation](#shortcomings-of-current-implementation)
+      * [Proposed Implementation](#proposed-implementation)
+      * [Workflow](#worflow)
 * [Graduation Criteria](#graduation-criteria)
 * [Implementation History](#implementation-history)
-* [Drawbacks [optional]](#drawbacks-optional)
-* [Alternatives [optional]](#alternatives-optional)
-* [Infrastructure Needed [optional]](#infrastructure-needed-optional)
+* [Drawbacks](#drawbacks)
+* [Infrastructure Needed](#infrastructure-needed)
 
 ## Summary
 
@@ -136,7 +138,7 @@ NDM takes care of data clean up, after a BD is released from a BDC. i.e. a compl
 wipe of the disk will be done `wipefs -fa`. Since in case of NDM created GPT labels, 
 only partition is being wiped, it won't cause the labels to be removed.
 
-#### Workflow
+##### Workflow
 +-----------+
 |UID = WWN +|
 |    Model +|
@@ -165,10 +167,6 @@ only partition is being wiped, it won't cause the labels to be removed.
 +-----------+
 
 
-### Risks and Mitigations
-
-- 
-
 ## Graduation Criteria
 
 - NDM should be able to uniquely identify the disks, across reboots, across different
@@ -178,27 +176,20 @@ only partition is being wiped, it won't cause the labels to be removed.
 
 ## Implementation History
 
-Major milestones in the life cycle of a OEP should be tracked in `Implementation History`.
-Major milestones might include
+- Owner acceptance of `Summary` and `Motivation` sections - YYYYMMDD
+- Agreement on `Proposal` section - YYYYMMDD
+- Date implementation started - YYYYMMDD
+- First OpenEBS release where an initial version of this OEP was available - YYYYMMDD
+- Version of OpenEBS where this OEP graduated to general availability - YYYYMMDD
+- If this OEP was retired or superseded - YYYYMMDD
 
-- the `Summary` and `Motivation` sections being merged signaling owner acceptance
-- the `Proposal` section being merged signaling agreement on a proposed design
-- the date implementation started
-- the first OpenEBS release where an initial version of the OEP was available
-- the version of OpenEBS where the OEP graduated to general availability
-- when the OEP was retired or superseded
-
-## Drawbacks [optional]
+## Drawbacks
 
 - Do not have a mechanism to identify disks that are attached in multipath mode.
 - Cannot identify disks and create BDs if the same disk is connected to 2 nodes 
   at the same time.
 
-## Alternatives [optional]
-
-- NA
-
-## Infrastructure Needed [optional]
+## Infrastructure Needed
 
 - Test setup with different types of disks in different configurations to test and
   ensure the unique ID generation process.
