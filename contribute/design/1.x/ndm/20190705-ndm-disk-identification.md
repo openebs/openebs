@@ -112,7 +112,7 @@ claim possibly leading to data loss
 
 1. We try to generate the UUID using the current implementation. 
 
-2. If the `ID_TYPE` is empty or `ID_MODEL` is `Virtual_disk` or `EphemeralDisk` 
+2. If the `ID_TYPE` is empty or `ID_MODEL` is `Virtual_disk` or `EphemeralDisk` and `ID_WWN` is empty 
 
     1. Check if the disk has a GPT label available on it.
     	- If a GPT label is available we will use only that label for UID generation
@@ -149,13 +149,13 @@ only partition is being wiped, it won't cause the labels to be removed.
 +-----------+
      |
      |
-+----v------------+        +-----------+      +-----------+      +-------------------+
-|    If           |        |  Check    |      |  Check    |      | Create GPT        |
-|ID_TYPE is empty |   Yes  | GPT label |  No  | FS label  |  No  | partition         |
-|    or           +------->+           +----->+           +----->+ table and         |
-|Virtual/Ephemeral|        |           |      |           |      | one partition     |
-|    Disk         |        |           |      |           |      | spanning the disk |
-+-----------------+        +-----------+      +-----------+      +-------------------+
++----v-------------+        +-----------+      +-----------+      +-------------------+
+|    If            |        |  Check    |      |  Check    |      | Create GPT        |
+|ID_TYPE is empty  |   Yes  | GPT label |  No  | FS label  |  No  | partition         |
+|    or ID_MODEL is+------->+           +----->+           +----->+ table and         |
+|Virtual/Ephemeral |        |           |      |           |      | one partition     |
+|Disk and empty WWN|        |           |      |           |      | spanning the disk |
++------------------+        +-----------+      +-----------+      +-------------------+
      |                        |                     |                  |
      |No                      |                     |                  |
      v                        |Yes                  |Yes               |
