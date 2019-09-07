@@ -1,4 +1,4 @@
-**Company** : Clouds Sky GmbH
+**Company** : **[Clouds Sky GmbH](https://cloudssky.com)**
 
 **Stateful Applications that you are running on OpenEBS**
 1. Confluent Kafka, Strimzi Kafka
@@ -20,5 +20,5 @@ Organization
 
 **If you would like your name (as home user) or organization name to be added to the Adopters.md, please provide a preferred contact handle like github id, twitter id, linkedin id, website etc.**
 1. Organization Name: Clouds Sky GmbH
-2. Website - https://cloudssky.com/en/
-3. Twitter ID - cloudsskygmbh
+2. Website - [https://cloudssky.com/](https://cloudssky.com/en/)
+3. Twitter ID - [cloudsskygmbh](https://twitter.com/cloudsskygmbh)

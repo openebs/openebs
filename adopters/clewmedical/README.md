@@ -2,7 +2,7 @@
 
 **OpenEBS storage engine:** Jiva
 
-**Stateful applications:** Postgresql,Keycloak,RabbitMQ
+**Stateful applications:** PostgreSQL, Keycloak, RabbitMQ
 
 **Environment:** Production & Development
 

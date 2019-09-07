@@ -1,9 +1,11 @@
+### Company: [Plaid Cloud](https://github.com/PlaidCloud)
+
 ### Stateful Applications that we are running on OpenEBS
 
 - Redis
 - Prometheus
 - Elasticsearch
-- Postgresql
+- PostgreSQL
 - Some home-grown stuff
 
 ### Type of OpenEBS Storage Engines behind the above applications
@@ -31,4 +33,3 @@ Initially we used Portworx, but maintaining an external etcd cluster was trouble
 
 Definitely happy with OpenEBS so far.
 
-Preferred handle for Adopters.md would be our organization: https://github.com/PlaidCloud
