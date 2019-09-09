@@ -41,6 +41,7 @@ status: provisional
     * [Low Level Design](#low-level-design)
       * [Replica Connection](#replica-connection)
       * [Maintaining Known Replicas List](#maintaining-known-replicas-list)
+      * [Notes](#notes)
     * [Risks and Mitigations](#risks-and-mitigations)
 * [Graduation Criteria](#graduation-criteria)
 * [Implementation History](#implementation-history)
@@ -198,15 +199,13 @@ gets connected, istgt can't identify that there is missing data with replicas.
 // If a replica lost its data, either it got recreated or missed its data as it
 // got replaced, quorum should be off
 // In other cases, quorum should be on
-// control plane should never create more than initially configured RF number of
-// CVRs with quorum ‘on’. For any later creation of CVR or re-creation of volume
-// for same CVR need to be created with quorum ‘off’. 
 // At every stage of increasing RF, CF will be calculated accordingly as
 // (n/2 + 1) status of cstorvolume cr need to be updated with latest list of
 // replicas when RF is reduced
 
 Current code takes care of reconstructing data to non-quorum replica once it
-gets connected.
+does handshake with target. But, changes are required in allowing replica to
+perform handshake with target to achieve DesiredReplicationFactor.
 
 #### Replica Connection
 Below are the steps to allow replica handshake with istgt:
@@ -224,24 +223,39 @@ if it is in known lists, else reject
 
 
 #### Maintaining known replicas lists
-ReplicationFactor number of replicas are identified and are termed as 'Known Replicas'. Having these replicas connected to target makes sure that data is available.
-These replicas will have quorum property set to on.
-Note: There can be replicas whose quorum property is on, but are not part of known replicas. Such replicas need to be identified and should not be allowed to connect.
-For the case of newly created volume, all the RF number of replicas that connect to it with quorum ‘on’ can be added to known list. So,
-Add the replicas to known list by sending message to cstor-volume-mgmt if quorum is ‘on’ and its checkpointed numbers are zero
+status.ReplicaList of CStorVolume CR need to contain the replicas information
+such that data can be correctly served from these replicas.
+There should be RF number of such replicas with quorum property 'on'.
+Such replicas are termed as 'Known Replicas'.
 
+For the case of newly created volume, all the RF number of replicas that connect
+to it with quorum ‘on’ can be added to known list. So,
+- Add the newly created replicas with quorum 'on' and checkpointed numbers as
+zero to known list by sending message to cstor-volume-mgmt.
 
-To add any replaced replica or new replica, 
-Identify the case when replica turned from quorum ‘off’ to quorum ‘on’ state. Let this replica referred as R4.
-Make sure there are no pending IOs on R4
-After this, all IOs need to be verified to be successful on R4 as well
-Inform cstor-volume-mgmt with new replicas and replication factor details
-If this fails, retry after some time
-If cstor-volume-mgmt returns success, update in-memory data structures of istgt
+For the case of adding new replica or a replacment replica,
+- Identify the case when replica turned from quorum ‘off’ to quorum ‘on’ state.
+Let this replica referred as R.
+- Make sure there are no pending IOs on R (Why?)
+- All IOs need to be verified to be successful on R until updating to
+CStorVolume CR is successful. (Why?)
+- Inform cstor-volume-mgmt with new replicas and replication factor details
+- If udpating CR succeeds, update in-memory data structures of istgt
+- If updating CR fails, retry after some time
 
 Testcases:
 - Start old replica and make sure it doesn't connect
 
+#### Notes
+- Control plane should never create more than initially configured RF number of
+CVRs with quorum ‘on’.
+- Quorum should be 'off' for replicas that are later created either to
+re-create replica as data got lost or adding new replica to increase RF.
+- CF is set at Lower_Ceil(RF/2) + 1 following the formula used in control plane.
+However, data plane can take any number of CF which is less than RF.
+- I/P validation need to be done such that DRF is >= RF
+- Considering the case of reduction in RF, istgt need to update ReplicaList
+whenever in-memory list doesn't match with the list in conf file.
 
 ### Risks and Mitigations
 
@@ -266,3 +280,4 @@ NA
 
 ## Infrastructure Needed
 
+NA
