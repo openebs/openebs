@@ -1,13 +1,17 @@
-# UPGRADE FROM OPENEBS 1.0.0 TO 1.1.0
+# Upgrade OpenEBS
 
 ## Overview
 
-This document describes the steps for upgrading OpenEBS from 1.0.0 to 1.1.0
+This document describes the steps for the following OpenEBS Upgrade paths:
+
+- Upgrade from 1.0.0 to 1.1.0
+- Upgrade from 1.0.0 to 1.2.0
+- Upgrade from 1.1.0 to 1.2.0
 
 The upgrade of OpenEBS is a three step process:
 - *Step 1* - Prerequisites
 - *Step 2* - Upgrade the OpenEBS Control Plane Components
-- *Step 3* - Upgrade the OpenEBS Data Plane Components from previous version (1.0.0)
+- *Step 3* - Upgrade the OpenEBS Data Plane Components
 
 ### Terminology
 
@@ -18,7 +22,9 @@ The upgrade of OpenEBS is a three step process:
 ## Step 1: Prerequisites
 
 **Note: It is mandatory to make sure to that all OpenEBS control plane 
-and data plane components are running with version 1.0.0 before the upgrade.**
+and data plane components are running with expected version before the upgrade.
+- For upgrading to 1.1.0, the previous version should be 1.0.0
+- For upgrading to 1.2.0, the previous version should be 1.0.0 or 1.1.0**
 
 **Note: All steps described in this document need to be performed from a 
 machine that has access to Kubernetes master**
@@ -33,7 +39,7 @@ machine that has access to Kubernetes master**
   ```
   The examples in this document assume the service account name is `openebs-maya-operator`.
 
-- Verify that OpenEBS Control plane is indeed in 1.0.0 version
+- Verify that OpenEBS Control plane is indeed in expected version. Say 1.0.0
   ```sh
   $ kubectl get pods -n openebs -l openebs.io/version=1.0.0
   ```
@@ -68,11 +74,11 @@ Below are steps to upgrade using some common ways to install OpenEBS:
 **The sample steps below will work if you have installed OpenEBS without 
 modifying the default values in openebs-operator.yaml. If you have customized 
 the openebs-operator.yaml for your cluster, you will have to download the 
-1.1.0 openebs-operator.yaml and customize it again**
+desired openebs-operator.yaml and customize it again**
 
 ```
-#Upgrade to OpenEBS control plane components to version 1.1.0 
-$ kubectl apply -f https://openebs.github.io/charts/openebs-operator-1.1.0.yaml
+#Upgrade to OpenEBS control plane components to desired version. Say 1.2.0
+$ kubectl apply -f https://openebs.github.io/charts/openebs-operator-1.2.0.yaml
 ```
 
 ### Upgrade using helm chart (using stable/openebs, openebs-charts repo, etc.,):
@@ -87,17 +93,17 @@ latest stable/openebs chart.
 - If the default values seem appropriate, you can use the below commands to
   update OpenEBS. [More](https://hub.helm.sh/charts/stable/openebs) details about the specific chart version.
   ```sh
-  $ helm upgrade --reset-values <release name> stable/openebs --version 1.1.0
+  $ helm upgrade --reset-values <release name> stable/openebs --version 1.2.0
   ```
 - If not, customize the values into your copy (say custom-values.yaml), 
   by copying the content from above default yamls and edit the values to 
   suite your environment. You can upgrade using your custom values using:
   ```sh
-  $ helm upgrade <release name> stable/openebs --version 1.1.0 -f custom-values.yaml`
+  $ helm upgrade <release name> stable/openebs --version 1.2.0 -f custom-values.yaml`
   ```
 
 ### Using customized operator YAML or helm chart.
-As a first step, you must update your custom helm chart or YAML with 1.1.0 
+As a first step, you must update your custom helm chart or YAML with desired 
 release tags and changes made in the values/templates. After updating the YAML 
 or helm chart or helm chart values, you can use the above procedures to upgrade 
 the OpenEBS Control Plane components.
@@ -117,11 +123,11 @@ backup of the data before starting the below upgrade procedure.**
   the controller, exporter and replica pod images to the previous version
 
 **Note: Before proceeding with the upgrade of the OpenEBS Data Plane components 
-like cStor or Jiva, verify that OpenEBS Control plane is indeed in 1.1.0 version**
+like cStor or Jiva, verify that OpenEBS Control plane is indeed in desired version**
 
-  You can use the following command to verify:
+  You can use the following command to verify components are in 1.2.0:
   ```sh
-  $ kubectl get pods -n openebs -l openebs.io/version=1.1.0
+  $ kubectl get pods -n openebs -l openebs.io/version=1.2.0
   ```
 
   The above command should show that the control plane components are upgrade. 
@@ -144,15 +150,18 @@ OpenEBS maintainers via [Github Issue](https://github.com/openebs/openebs/issues
 
 As you might have seen by now, control plane components and data plane components
 work independently. Even after the OpenEBS Control Plane components have been 
-upgraded to 1.1.0, the Storage Pools and Volumes (both jiva and cStor)
+upgraded to 1.2.0, the Storage Pools and Volumes (both jiva and cStor)
 will continue to work with older versions. 
 
 You can use the below steps for upgrading cstor and jiva components. 
 
 Starting with 1.1.0, the upgrade steps have been changed to eliminate the
 need for downloading scripts. You can use `kubectl` to trigger an upgrade job 
-using Kubernetes Job spec. The following instructions provide details on how
-to create your Upgrade Job specs. 
+using Kubernetes Job spec. 
+
+The following instructions provide details on how to create your Upgrade Job specs. 
+Please ensure the `from` and `to` versions are as per your upgrade path. The below
+examples show upgrading from 1.0.0 to 1.2.0. 
 
 ### Upgrade the OpenEBS Jiva PV
 
@@ -176,12 +185,14 @@ metadata:
   #VERIFY that you have provided a unique name for this upgrade job.
   #The name can be any valid K8s string for name. This example uses
   #the following convention: jiva-vol-<flattened-from-to-versions>-<pv-name>
-  name: jiva-vol-100110-pvc-713e3bb6-afd2-11e9-8e79-42010a800065
+  name: jiva-vol-100120-pvc-713e3bb6-afd2-11e9-8e79-42010a800065
+
   #VERIFY the value of namespace is same as the namespace where openebs components
   # are installed. You can verify using the command:
   # `kubectl get pods -n <openebs-namespace> -l openebs.io/component-name=maya-apiserver`
   # The above command should return status of the openebs-apiserver.
   namespace: openebs
+
 spec:
   backoffLimit: 4
   template:
@@ -195,7 +206,7 @@ spec:
         args: 
         - "jiva-volume"
         - "--from-version=1.0.0"
-        - "--to-version=1.1.0"
+        - "--to-version=1.2.0"
         #VERIFY that you have provided the correct cStor PV Name
         - "--pv-name=pvc-713e3bb6-afd2-11e9-8e79-42010a800065"
         #Following are optional parameters
@@ -208,21 +219,21 @@ spec:
             fieldRef:
               fieldPath: metadata.namespace
         tty: true 
-        image: quay.io/openebs/m-upgrade:1.1.0
+        image: quay.io/openebs/m-upgrade:1.2.0
       restartPolicy: OnFailure
 ---
 ```
 
 Execute the Upgrade Job Spec
 ```
-$ kubectl apply -f jiva-vol-100110-pvc713.yaml
+$ kubectl apply -f jiva-vol-100120-pvc713.yaml
 ```
 
 You can check the status of the Job using commands like:
 ```
 $ kubectl get job -n openebs
 $ kubectl get pods -n openebs #to check on the name for the job pod
-$ kubectl logs -n openebs jiva-upg-100111-pvc-713e3bb6-afd2-11e9-8e79-42010a800065-bgrhx
+$ kubectl logs -n openebs jiva-upg-100120-pvc-713e3bb6-afd2-11e9-8e79-42010a800065-bgrhx
 ```
 
 ### Upgrade cStor Pools
@@ -248,7 +259,8 @@ metadata:
   #VERIFY that you have provided a unique name for this upgrade job.
   #The name can be any valid K8s string for name. This example uses
   #the following convention: cstor-spc-<flattened-from-to-versions>-<spc-name>
-  name: cstor-spc-100110-cstor-sparse-pool
+  name: cstor-spc-100120-cstor-sparse-pool
+
   #VERIFY the value of namespace is same as the namespace where openebs components
   # are installed. You can verify using the command:
   # `kubectl get pods -n <openebs-namespace> -l openebs.io/component-name=maya-apiserver`
@@ -267,7 +279,7 @@ spec:
         args:
         - "cstor-spc"
         - "--from-version=1.0.0"
-        - "--to-version=1.1.0"
+        - "--to-version=1.2.0"
         #VERIFY that you have provided the correct SPC Name
         - "--spc-name=cstor-sparse-pool"
         #Following are optional parameters
@@ -280,7 +292,7 @@ spec:
             fieldRef:
               fieldPath: metadata.namespace
         tty: true
-        image: quay.io/openebs/m-upgrade:1.1.0
+        image: quay.io/openebs/m-upgrade:1.2.0
       restartPolicy: OnFailure
 ---
 ```
@@ -308,12 +320,14 @@ metadata:
   #VERIFY that you have provided a unique name for this upgrade job.
   #The name can be any valid K8s string for name. This example uses
   #the following convention: cstor-vol-<flattened-from-to-versions>-<pv-name>
-  name: cstor-vol-100110-pvc-c630f6d5-afd2-11e9-8e79-42010a800065
+  name: cstor-vol-100120-pvc-c630f6d5-afd2-11e9-8e79-42010a800065
+
   #VERIFY the value of namespace is same as the namespace where openebs components
   # are installed. You can verify using the command:
   # `kubectl get pods -n <openebs-namespace> -l openebs.io/component-name=maya-apiserver`
   # The above command should return status of the openebs-apiserver.
   namespace: openebs
+
 spec:
   backoffLimit: 4
   template:
@@ -327,7 +341,7 @@ spec:
         args:
         - "cstor-volume"
         - "--from-version=1.0.0"
-        - "--to-version=1.1.0"
+        - "--to-version=1.2.0"
         #VERIFY that you have provided the correct cStor PV Name
         - "--pv-name=pvc-c630f6d5-afd2-11e9-8e79-42010a800065"
         #Following are optional parameters
@@ -340,7 +354,7 @@ spec:
             fieldRef:
               fieldPath: metadata.namespace
         tty: true
-        image: quay.io/openebs/m-upgrade:1.1.0
+        image: quay.io/openebs/m-upgrade:1.2.0
       restartPolicy: OnFailure
 ---
 ```
