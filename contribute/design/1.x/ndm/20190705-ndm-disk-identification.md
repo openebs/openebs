@@ -9,7 +9,7 @@ owners:
   - "@vishnuitta"
 editor: "@akhilerm"
 creation-date: 2019-07-05
-last-updated: 2019-08-31
+last-updated: 2019-09-09
 status: provisional
 ---
 
@@ -160,12 +160,26 @@ only partition is being wiped, it won't cause the labels to be removed.
      |No                      |                     |                  |
      v                        |Yes                  |Yes               |
 +-----------+                 |                     |                  |
-| Use       |                 |                     |                  |
-| generated |<----------------v---------------------v------------------+
-| UID  or   |
-|  Label    |
+|if DEVTYPE |                 |                     |                  |
+| equals    |                 |                     |                  |
+|"partition"|                 |                     |                  |
+|add part   |                 |                     |                  |
+|number to  |                 |                     |                  |
+|  UID      |                 |                     |                  |
++-----------+                 |                     |                  |
+     |                        |                     |                  |
+     |                        |                     |                  |
+     |                        |                     |                  |
++----v------+                 |                     |                  |
+|           |                 |                     |                  |
+|Use md5 of |                 |                     |                  |
+| generated |                 |                     |                  |
+|   UID     |<----------------+---------------------+-------------------
+|           |
 |           |
 +-----------+
+
+
 ```
 
 ## Graduation Criteria
