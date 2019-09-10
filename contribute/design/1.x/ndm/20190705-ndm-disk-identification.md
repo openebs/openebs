@@ -9,7 +9,7 @@ owners:
   - "@vishnuitta"
 editor: "@akhilerm"
 creation-date: 2019-07-05
-last-updated: 2019-09-09
+last-updated: 2019-09-10
 status: provisional
 ---
 
@@ -203,6 +203,10 @@ only partition is being wiped, it won't cause the labels to be removed.
 - Do not have a mechanism to identify disks that are attached in multipath mode.
 - Cannot identify disks and create BDs if the same disk is connected to 2 nodes 
   at the same time.
+- The partition created on the disk for identification will remain even after NDM
+  is uninstalled from the node.
+- Consumers of NDM will not be able to create a partition on blockdevices on which
+  NDM already created a partition for identification. 
 
 ## Infrastructure Needed
 
