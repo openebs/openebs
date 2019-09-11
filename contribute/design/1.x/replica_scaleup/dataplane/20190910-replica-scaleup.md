@@ -195,14 +195,6 @@ When user reduced replication factor, and later increased it, if old replicas
 gets connected, istgt can't identify that there is missing data with replicas.
 
 ### Low Level Design
-// Assumptions on quorum:
-// If a replica lost its data, either it got recreated or missed its data as it
-// got replaced, quorum should be off
-// In other cases, quorum should be on
-// At every stage of increasing RF, CF will be calculated accordingly as
-// (n/2 + 1) status of cstorvolume cr need to be updated with latest list of
-// replicas when RF is reduced
-
 Current code takes care of reconstructing data to non-quorum replica once it
 does handshake with target. But, changes are required in allowing replica to
 perform handshake with target to achieve DesiredReplicationFactor.
@@ -210,7 +202,7 @@ perform handshake with target to achieve DesiredReplicationFactor.
 #### Replica Connection
 Below are the steps to allow replica handshake with istgt:
 - If currently connected replicas count >= 5, reject this if it is non-quorum or
-another connected non-quorum replica
+another connected non-quorum replica if the new one is in quorum
 - If DesiredRF number of replicas are healthy, reject
 - Make sure connected replica is an appropriate one to the volume, by checking
 replica name with vol name
@@ -236,9 +228,12 @@ zero to known list by sending message to cstor-volume-mgmt.
 For the case of adding new replica or a replacment replica,
 - Identify the case when replica turned from quorum ‘off’ to quorum ‘on’ state.
 Let this replica referred as R.
-- Make sure there are no pending IOs on R (Why?)
+- Make sure there are no pending IOs on R [Why? If CR got updated, and there are
+pending IOs on R, CF of those IOs MAY NOT be met with new RF]
 - All IOs need to be verified to be successful on R until updating to
-CStorVolume CR is successful. (Why?)
+CStorVolume CR is successful. [Why? This is similar to above reason. CF of those
+IOs may not met with new RF. If it is made sure that CF of those IOs is met wrt
+new RF, this and above checks would become optional]
 - Inform cstor-volume-mgmt with new replicas and replication factor details
 - If udpating CR succeeds, update in-memory data structures of istgt
 - If updating CR fails, retry after some time
