@@ -27,7 +27,7 @@ last-updated: 2019-08-05
 
 ## Summary
 
-This proposal describs how a ZFS dataset will be represented/managed
+This proposal describes how a ZFS dataset will be represented/managed
 by a kubernetes resource, how OpenEBS can support dynamic provisioning
 of volumes on ZPOOL via **CSI**. We should be able to create and delete
 a volume in a kubernetes cluster using CSI where the volume has to be
@@ -108,7 +108,7 @@ spec:
 
 ### 1. CSI create volume
 At CSI when we get a volume create request, we will create a PV object.
-The actual volume will be create at the Node publish time. We will have
+The actual volume will be created at the Node publish time. We will have
 StorageClass at this point. We will create a ZfsVolume custom resource
 with all the volume properties that are present in the custom resource.
 This custom resource will be used for creating and managing the ZFS
@@ -162,7 +162,7 @@ deletes the corresponding ZfsVolume custom resource.
 
 ### 4. CSI ZFSPV property change
 
-There will be a watcher wathing for this ZfsVolume custom resource in the agent.
+There will be a watcher watching for this ZfsVolume custom resource in the agent.
 We can update the ZfsVolume custom resource with the desired property and the
 watcher of this custom resource will apply the changes to the corresponding volume.
 
