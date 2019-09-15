@@ -28,9 +28,10 @@ status: provisional
       * [Add new replica](#add-new-replica)
       * [Replace non-existing replica](#replacing-non-existing-replica)
     * [Implementation Details/Notes/Constraints](#implementation-detailsnotesconstraints)
+      * [More Info on Quorum](#more-info-on-quorum)
       * [Current Implementation -- Config](#current-implementation----config)
       * [Current Implementation](#current-implementation)
-      * [Shortcomings with Current Implementation](#shortcomings-with-current-implementation)
+      * [Shortcomings With Current Implementation](#shortcomings-with-current-implementation)
     * [Proposed Implementation](#proposed-implementation)
       * [Adding new replica](#adding-new-replica-workflow)
       * [Replacing non-existing replica](#replacing-non-existing-replica-workflow)
@@ -41,7 +42,7 @@ status: provisional
     * [Low Level Design](#low-level-design)
       * [Replica Connection](#replica-connection)
       * [Maintaining Known Replicas List](#maintaining-known-replicas-list)
-      * [Notes](#notes)
+      * [Notes](#LLDnotes)
     * [Risks and Mitigations](#risks-and-mitigations)
 * [Graduation Criteria](#graduation-criteria)
 * [Implementation History](#implementation-history)
@@ -71,6 +72,7 @@ This proposal is to enable him to add more replicas to it again.
 - Add replicas in GitOps model
 - Workflow to replace non-existing replica
 - operator that detects the need to increase ReplicationFactor
+- Adding old replicas (again) which already got replaced with different ones
 - Allow adding replicas to replace particular replica (volume distribution case)
 
 ## Proposal
@@ -100,6 +102,21 @@ cstor-pool-mgmt is the container that sets quorum property at replica.
 It sets property as 'on' if replica is created first time related to that CVR.
 Otherwise, it sets to 'off'.
 
+#### More Info on Quorum
+
+cstor-pool-mgmt creates replica with quorum as 'on' if status.Phase is Init.
+If state is 'Recreate', it creates replica (if needed) with quorum as 'off'.
+
+At cstor-istgt,
+	if quorum is off for a replica,
+		that replica won't participate in IO related consistency factor
+		checks. Its there to rebuild missing data while its taking
+		ongoing IOs.
+	if quorum is on,
+		that replica participate in deciding the fate of IOs.
+		cstor-istgt returns success/failure to client based on the
+		response from replicas in quorum list.
+
 #### Current Implementation -- Config
 - cstor-volume-mgmt reads configuration from CStorVolume CR.
   - spec.replicationFactor
@@ -121,7 +138,8 @@ replicas are healthy, other connected replicas, if any, gets disconnected.
 #### Shortcomings With Current Implementation
 - Due to misconfiguration from user, if old replica connects back instead of
 the replaced one, there are chances of serving wrong data, and can lead to
-data corruption.
+data corruption. To understand this with example, look at first point of `Is
+there a need to maintain the list of known replicas`
 - There is no data-consistent way of increasing RF and CF of CStorVolume CR.
 
 ### Proposed Implementation
@@ -136,7 +154,7 @@ In istgt.conf, DesiredReplicationFactor and ReplicaList will be added.
 
 
 #### Adding new replica
-- User will create proper CVR with other than Empty status.phase
+- User will create proper CVR with status.phase as `Recreate`.
 - User will edit CStorVolume CR to set 'DesiredReplicationFactor'
 
 #### Replacing non-existing replica
@@ -176,7 +194,7 @@ CStorVolume CR.
 
 #### Sample YAMLs
 
-#### NOTES
+#### Notes
 
 ##### Is there a need to maintain the list of known replicas:
 This can be better explained with scenarios.
@@ -241,7 +259,7 @@ new RF, this and above checks would become optional]
 Testcases:
 - Start old replica and make sure it doesn't connect
 
-#### Notes
+#### LLDNotes
 - Control plane should never create more than initially configured RF number of
 CVRs with quorum ‘on’.
 - Quorum should be 'off' for replicas that are later created either to
