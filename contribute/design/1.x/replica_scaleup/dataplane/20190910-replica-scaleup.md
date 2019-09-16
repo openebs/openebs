@@ -52,8 +52,10 @@ status: provisional
 
 ## Summary
 
-This proposal includes design for cStor data plane to allow adding new replicas
-to it so that replication factor of the volume will be increased.
+This proposal includes design for cStor data plane
+- to allow adding new replicas to it so that replication factor of the volume
+will be increased.
+- to move replica from one pool to another
 
 ## Motivation
 
@@ -61,9 +63,13 @@ There are cases arising where OpenEBS user lost multiple copies of data, and,
 working with available single copy.
 This proposal is to enable him to add more replicas to it again.
 
+This also allows OpenEBS user to distribute volume replicas
+
 ### Goals
 
 - Increase ReplicationFactor of volume by adding replicas
+- Replace a replica with other one which is used in volume distribution and
+ephemeral cases
 - Identify replicas which are allowed to connect to target
 
 ### Non-Goals
@@ -72,8 +78,6 @@ This proposal is to enable him to add more replicas to it again.
 - Add replicas in GitOps model
 - Workflow to replace non-existing replica
 - operator that detects the need to increase ReplicationFactor
-- Adding old replicas (again) which already got replaced with different ones
-- Allow adding replicas to replace particular replica (volume distribution case)
 
 ## Proposal
 
@@ -81,6 +85,9 @@ This proposal is to enable him to add more replicas to it again.
 
 #### Add new replica
 As an OpenEBS user, I should be able to add replicas to my volume.
+
+#### Move replica from one pool to another
+As an OpenEBS user, I should be able to move replica across pools.
 
 #### Replace non-existing replica
 As an OpenEBS user, I should be able to replace non-existing replica with new
@@ -138,28 +145,66 @@ replicas are healthy, other connected replicas, if any, gets disconnected.
 #### Shortcomings With Current Implementation
 - Due to misconfiguration from user, if old replica connects back instead of
 the replaced one, there are chances of serving wrong data, and can lead to
-data corruption. To understand this with example, look at first point of `Is
-there a need to maintain the list of known replicas`
+data corruption. To understand this with example, look at #notes section.
 - There is no data-consistent way of increasing RF and CF of CStorVolume CR.
 
 ### Proposed Implementation
+
+#### Increasing Replication Factor
 Increase in replication factor will be provided in declarative way.
 For replicas identification that can connect to target, replicas information
 as well need to be stored in CStorVolume CR and istgt.conf.
 
 New fields will be added to CStorVolume CR and istgt.conf.
-In CStorVolume CR, spec.DesiredReplicationFactor will be added to help in
-adding replicas, and, status.ReplicaList to store list of known replicas.
-In istgt.conf, DesiredReplicationFactor and ReplicaList will be added.
+In CStorVolume CR, `spec.DesiredReplicationFactor` will be added to help in
+adding replicas, and, `status.ReplicaList` to store list of known replicas.
+In istgt.conf, `DesiredReplicationFactor` and `ReplicaList` will be added.
 
+status.ReplicaList of CStorVolume CR need to contain the replicas information
+that are allowed to connect to target.
+There can be <= RF number of entries, which eventually becomes RF entries.
+All the replicas in this list will be with quorum property 'on'. Replicas in
+this list are termed as 'Known Replicas'.
+If RF < DRF, new replicas are allowed to connect to target. Once it becomes
+healthy, RF will be increased and new replica will be added to spec.ReplicaList.
+
+#### Replacing/Moving replica
+Replica that need to be replaced/moved will also be done in declarative way.
+
+During handshake, replicas will share `ReplicaGUID_Data` related to particular
+`ReplicaID_CVR` with target.
+`ReplicaID_CVR` is a unique number related to CVR for which replica is created
+in dataplane whose GUID is `ReplicaGUID_Data`.
+
+If replica is recreated for particular CVR, `ReplicaGUID_Data` will be changed
+but not `ReplicaID_CVR`.
+
+If replica is moved to another pool, new CVR should be created on new pool with
+`ReplicaID_CVR` same as that of old pool, and status.Phase as 'Recreate'.
+
+If new replica need to added to volume, new CVR will be created.
+So, `ReplicaID_CVR` will be new, and its `ReplicaGUID_Data` also will be new.
+
+In CStorVolumeReplica, new field `spec.ReplicaID` will be added.
+During dataset creation, cstor-pool-mgmt will set this at dataset with property
+as `io.openebs:replicaID`.
+
+### Steps to perform user stories
 
 #### Adding new replica
 - User will create proper CVR with status.phase as `Recreate`.
 - User will edit CStorVolume CR to set 'DesiredReplicationFactor'
 
 #### Replacing non-existing replica
-Assuming user has reduced RF, CF of CStorVolume CR to have volume in Online
-state, leaving the DesiredReplicationFactor as it is will increase the RF.
+Volume is available online as user reduced RF when too many replicas are lost
+(or) sufficient replicas i.e., CF are available.
+Leave the DesiredReplicationFactor as it is, and cStor increases the RF
+if descreased by user.
+
+#### Moving replica
+- User will delete CVR which is on old pool
+- User will create proper CVR with status.phase as `Recreate` on new pool and
+`spec.ReplicaID` same as the one of CVR on old pool.
 
 ### High Level Design
 cstor-volume-mgmt watches for CStorVolume CR and updates istgt.conf file if
@@ -179,16 +224,16 @@ CStorVolume CR.
 #### Components interaction:
 
 ```
-[Conf file] --->  ISTGT <--- REPLICAS
-                  |  /|\
-   (UnixSocket Conn)  |
-                  |   | 
-                  |  (istgtcontrol) 
-                 \|/  | 
-            CSTOR-VOLUME-MGMT <---->[CStorVolume CR]                          V
-                    | 
-                    | 
-                   \|/ 
+[Conf file] --->  ISTGT <---(R_ID&R_GUID)--- REPLICAS <--(R_ID)- CSTOR-POOL-MGMT
+                  |  /|\                                             /|\
+   (UnixSocket Conn)  |                                               |
+                  |   |                                               |
+                  |  (istgtcontrol)                                 (R_ID)
+                 \|/  |                                               |
+            CSTOR-VOLUME-MGMT <---->[CStorVolume CR]               [CVR CR]
+                    |
+                    |
+                   \|/
                [Conf file]
 ```
 
@@ -212,38 +257,81 @@ there is missing data with R2, R3.
 When user reduced replication factor, and later increased it, if old replicas
 gets connected, istgt can't identify that there is missing data with replicas.
 
+##### Do we need ReplicaID in CVR CR
+This is needed to identify the replica that gets moved across pools.
+
+For the case of replacement also, this is needed to identify the replica.
+Consider case of RF as 5 and CF as 3. R1, R2, R3, R4 and R5 are replicas.
+R1, R2 and R3 are online and IOs are happening. R6 connects and gets added.
+Here, 2 approaches are possible
+- one approach is to add R6 to known replicas of R1, R2, R3, R4, R5
+- (or) another approach is to replace R4 and R5 with R6.
+Later R6 also disconnected. And, after few more IOs, R1, R2, R3 also
+got disconnected.
+
+At this point
+- if first approach is followed, if R4, R5 and R6 connects, there will be data
+inconsistency.
+- if second approach is followed, there will be only 4 replicas.
+If 5th one, either R4 or R5 connects, it need to become healthy before getting
+added to to list. This would be time consuming.
+
 ### Low Level Design
 Current code takes care of reconstructing data to non-quorum replica once it
 does handshake with target. But, changes are required in allowing replica to
 perform handshake with target to achieve DesiredReplicationFactor.
 
+#### Replica list segregation
+`spec`'s `rq` need to contain only known replicas, which should be having
+quorum as 'on'. All other replicas need to get into `non_quorum_rq` (whose name
+can be changed to `unknown_rq`)
+
+There won't be any change for `healthy_rcount` and `degraded_rcount` which
+looks at `spec`'s `rq`
+
+#### Condition to start IOs
+Current implementation says that CF number of in-quorum replicas are needed.
+
+But, with addition of known replica list to achieve data consistency, CF number
+of any known replicas need to be connected.
+
 #### Replica Connection
 Below are the steps to allow replica handshake with istgt:
-- If currently connected replicas count >= 5, reject this if it is non-quorum or
-another connected non-quorum replica if the new one is in quorum
-- If DesiredRF number of replicas are healthy, reject
+- If currently connected replicas count >= DRF, reject this if it is non-quorum
+(or) another connected replica (in the order non-quorum, not-in-the-known-list)
+if the new one is part of known list with `ReplicaID_CVR` or `ReplicaGUID_Data`,
+and, raise a log/alert as too many
+replicas are connecting.
+- If DesiredRF number of known replicas are connected, i.e.,
+(`healthy_rcount` + `degraded_rcount` == DRF), reject all and raise log/alert
 - Make sure connected replica is an appropriate one to the volume, by checking
 replica name with vol name
-- If quorum is off, allow replica to connect and follow existing code flow
-(i.e, adding to non_quorum linked list etc)
-- If quorum is on, allow to connect only if it is new replica i.e.,
-its checkpointed nums are zero.
-- If quorum is on and its checkpointed nums are not zero, allow to connect only
-if it is in known lists, else reject
 
+- Allow replica if it is in known list
+- Allow replica if its `ReplicaID_CVR` is in known list, but add to unknown
+list (Replacement case)(here, quorum might be off or on. It can be on
+if this replica got disconnected during transitioning to known list)
+- Allow replica if its `ReplicaID_CVR` is NOT in known list only if RF < DRF,
+but add to unknown list [Replica addition case]
+- If RF number of known replicas are NOT available [new volume or upgrade case]
+  - Add to unknown list if quorum is off (replacement case)
+  - Add to known list if quorum is on
+- Reject otherwise
+
+Note: Make sure there is only one replica for a given `ReplicaID_CVR`
 
 #### Maintaining known replicas lists
-status.ReplicaList of CStorVolume CR need to contain the replicas information
-such that data can be correctly served from these replicas.
-There should be RF number of such replicas with quorum property 'on'.
-Such replicas are termed as 'Known Replicas'.
+When a replica completes rebuilding and turns healthy, it might be undergoing
+either replacement or addition.
 
-For the case of newly created volume, all the RF number of replicas that connect
-to it with quorum ‘on’ can be added to known list. So,
-- Add the newly created replicas with quorum 'on' and checkpointed numbers as
-zero to known list by sending message to cstor-volume-mgmt.
+If replica's `ReplicaID_CVR` is already in known list, it is replacement case.
+Replace the `ReplicaGUID_Data` with new one for `ReplicaID_CVR` in known list.
+
+If replica's `ReplicaID_CVR` is NOT in known list, it is replica addition case.
+Add `ReplicaID_CVR` with `ReplicaGUID_Data` to known replica list.
 
 For the case of adding new replica or a replacment replica,
+Steps to follow for data consistency to perform above steps:
 - Identify the case when replica turned from quorum ‘off’ to quorum ‘on’ state.
 Let this replica referred as R.
 - Make sure there are no pending IOs on R [Why? If CR got updated, and there are
@@ -256,9 +344,6 @@ new RF, this and above checks would become optional]
 - If udpating CR succeeds, update in-memory data structures of istgt
 - If updating CR fails, retry after some time
 
-Testcases:
-- Start old replica and make sure it doesn't connect
-
 #### LLDNotes
 - Control plane should never create more than initially configured RF number of
 CVRs with quorum ‘on’.
@@ -270,9 +355,26 @@ However, data plane can take any number of CF which is less than RF.
 - Considering the case of reduction in RF, istgt need to update ReplicaList
 whenever in-memory list doesn't match with the list in conf file.
 
+### Testcases:
+- Start old replica and make sure it doesn't connect
+- Not more than DRF number of quorum replicas at any time
+- No non-quorum replicas if DRF number of quorum replicas exists
+- Data consistency checks in the newly added replicas
+- Updated `ReplicaList` in CV CR when new replicas got added
+- Failure case handling to update CV CR
+- Only replicas in ReplicaList should be allowed to connect even with different
+components restarts
+- replicas that are NOT in ReplicaList should NOT be allowed to connect even
+with different components restarts
+- Upgrade cases
+- I/P values validation like smaller DRF, reducing DRF/RF
+- Start with 3 replicas and write data. Recreate 2 pools and reduce RF to 1.
+Increase it to 3 and verify data consistency.
+
 ### Risks and Mitigations
 
 ## Graduation Criteria
+All testcases mentioned in `Testcases` section need to be automated
 
 ## Implementation History
 
