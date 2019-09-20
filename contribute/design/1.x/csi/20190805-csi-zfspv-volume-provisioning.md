@@ -23,6 +23,7 @@ last-updated: 2019-08-05
       * [Volume Creation Workflow](#volume-creation-workflow)
       * [Volume Deletion Workflow](#volume-deletion-workflow)
     * [High Level Design](#high-level-design)
+* [Implementation](#implementation)
 * [Infrastructure Needed](#infrastructure-needed)
 
 ## Summary
@@ -73,8 +74,7 @@ kind: StorageClass
 apiVersion: storage.k8s.io/v1
 metadata:
   name: openebs-zfspv
-provisioner: openebs.io/openebs-csi
-allowVolumeExpansion: true
+provisioner: openebs.io/zfs
 parameters:
   blocksize: "4k"
   compression: "on"
@@ -166,7 +166,24 @@ There will be a watcher watching for this ZfsVolume custom resource in the agent
 We can update the ZfsVolume custom resource with the desired property and the
 watcher of this custom resource will apply the changes to the corresponding volume.
 
+## Implementation
+
+### Phase 1
+1. Provisioning via node selector/affinity.
+2. De-Provisioning of volume.
+3. Volume Property change support.
+
+### Phase 2
+1. Support provisioning without Node Selector/Affinity (Low priority).
+2. Monitoring of Devices and ZFS statistics.
+3. Alert based in Device and ZFS observability metrics.
+
+### Phase 3
+1. Gitlab pipeline setup to validate the software.
+2. BDD for ZFSPV.
+
 ## Infrastructure Needed
 
-- kubernetes 1.13.7+
-- node with ZFS
+- kubernetes 1.14+
+- node with ZFS 0.7 or 0.8
+- ubuntu 18.04
