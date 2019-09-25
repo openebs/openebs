@@ -272,67 +272,38 @@ smooth volume create & delete operations.
 
 #### CStorVolumeConfigClass -- new custom resource
 This is a new Kubernetes custom resource that holds config information to be
-used by cstor volume claim controller while provisioning cstor volumes.
+used by cstor volume claim controller while provisioning cstor volumes. For each 
+volume corresponding CstorVolumeConfig is created.
 
 NOTE: This resource kind does not have a controller i.e. watcher logic. It holds
 the config information to be utilized by cstor volume claim controller.
 
 Following is the proposed schema for `CStorVolumeConfigClass`:
-
 ```yaml
 kind: CStorVolumeConfigClass
 metadata:
   name: <some name -- can be same as storage class name>
   namespace: <namespace of openebs i.e. openebs system namespace>
 spec:
-  targetDeployment:
-    # this gets applied to cstor volume target
-    # deployment via ConfigInjector
-    spec:
-  targetService:
-    # this gets applied to cstor volume target
-    # service via ConfigInjector 
-    spec:
-  cv:
-    # this gets applied to CStorVolume via 
-    # ConfigInjector
-    spec:
-  cvr:
-    # this gets applied to all CStorVolumeReplicas
-    # via ConfigInjector
-    spec:
-```
-
-Detailed specifications:
-```yaml
-kind: CStorVolumeConfigClass
-metadata:
-  name: <some name -- can be same as storage class name>
-  namespace: <namespace of openebs i.e. openebs system namespace>
-spec:
-  targetDeployment:
-    spec:
-      monitoring: true
-      containers:
-      - name: cstor-istgt
-        env:
-        - name: QueueDepth
-          value: 6
-        - name: Luworkers
-          value: 3
-  targetService:
-    spec:
-      labels:
-      annotations:
-  cv:
-    spec:
-      labels:
-      annotations:
-  cvr:
-    spec:
-      labels:
-      annotations:
-      zvolWorkers:
+  # IOQueueDepth is the IO queue depth at the target pod
+  IOQueueDepth:
+  # FrontendIOWorkerThreads indicates the number of IO worker threads at target
+  FrontendIOWorkerThreads:
+  # FrontendIOWorkerThreads indicates the number of IO worker threads at replica
+  BackendIOWorkersThreads:
+  monitoring: true/false
+  characteristics:
+    targetPodAffinity: ""/preferred/required
+    replicaAffinity: ""/preferred
+    desiredReplicationFactor:
+  targetIP:
+  resources:
+    requests:
+      memory:
+      cpu:
+    limits:
+      memory:
+      cpu:
 ```
 
 ##### NOTES
