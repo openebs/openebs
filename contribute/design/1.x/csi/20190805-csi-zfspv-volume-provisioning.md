@@ -152,7 +152,7 @@ When CSI will get volume destroy request, it will destroy the created zvol and a
 ### 4. CSI ZFSPV property change
 There will be a watcher watching for this ZfsVolume custom resource in the agent. We can update the ZfsVolume custom resource with the desired property and the watcher of this custom resource will apply the changes to the corresponding volume.
 
-## Implementation
+## Implementation Plan
 
 ### Phase 1
 1. Provisioning via node selector/affinity.
