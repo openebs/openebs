@@ -15,6 +15,7 @@ last-updated: 2019-08-05
 
 * [Table of Contents](#table-of-contents)
 * [Summary](#summary)
+* [Design Constraints/Assumptions](#design-constraints/Assumptions)
 * [Proposal](#proposal)
     * [User Stories](#user-stories)
       * [Create a volume](#create-a-volume)
@@ -23,8 +24,7 @@ last-updated: 2019-08-05
       * [Volume Creation Workflow](#volume-creation-workflow)
       * [Volume Deletion Workflow](#volume-deletion-workflow)
     * [High Level Design](#high-level-design)
-* [Implementation](#implementation)
-* [Infrastructure Needed](#infrastructure-needed)
+* [Implementation Plan](#implementation-plan)
 
 ## Summary
 
