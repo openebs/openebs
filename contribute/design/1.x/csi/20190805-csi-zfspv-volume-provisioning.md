@@ -15,7 +15,7 @@ last-updated: 2019-08-05
 
 * [Table of Contents](#table-of-contents)
 * [Summary](#summary)
-* [Design Constraints/Assumptions](#design-constraints/assumptions)
+* [Design Constraints/Assumptions](#design-constraintsassumptions)
 * [Proposal](#proposal)
     * [User Stories](#user-stories)
       * [Create a volume](#create-a-volume)
