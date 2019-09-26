@@ -285,25 +285,23 @@ metadata:
   name: <some name -- can be same as storage class name>
   namespace: <namespace of openebs i.e. openebs system namespace>
 spec:
-  # IOQueueDepth is the IO queue depth at the target pod
-  IOQueueDepth:
-  # FrontendIOWorkerThreads indicates the number of IO worker threads at target
-  FrontendIOWorkerThreads:
-  # FrontendIOWorkerThreads indicates the number of IO worker threads at replica
-  BackendIOWorkersThreads:
-  monitoring: true/false
-  characteristics:
-    targetPodAffinity: ""/preferred/required
-    replicaAffinity: ""/preferred
-    desiredReplicationFactor:
-  targetIP:
-  resources:
-    requests:
-      memory:
-      cpu:
-    limits:
-      memory:
-      cpu:
+  target:
+    ioQueueDepth:
+    luWorkers:
+    monitor:  # true/false
+    affinity: # preferred/required
+    replicationFactor:
+    ipAddress:
+    resources:
+      requests:
+        memory:
+        cpu:
+      limits:
+        memory:
+        cpu:
+  replica:
+    zvolWorkers:
+    affinity:
 ```
 
 ##### NOTES
