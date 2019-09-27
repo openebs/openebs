@@ -176,7 +176,7 @@ pvc-713e3bb6-afd2-11e9-8e79-42010a800065   5G         RWO            Delete     
 ```
 
 Create a Kubernetes Job spec for upgrading the jiva volume. An example spec is as follows:
-```
+```yaml
 #This is an example YAML for upgrading jiva volume. 
 #Some of the values below needs to be changed to
 #match your openebs installation. The fields are
@@ -200,7 +200,7 @@ spec:
   backoffLimit: 4
   template:
     spec:
-      #VERIFY the value of serviceAccountName is pointing to service account
+      # VERIFY the value of serviceAccountName is pointing to service account
       # created within openebs namespace. Use the non-default account.
       # by running `kubectl get sa -n <openebs-namespace>`
       serviceAccountName: openebs-maya-operator
@@ -208,8 +208,13 @@ spec:
       - name:  upgrade
         args: 
         - "jiva-volume"
+
+        # --from-version is the current version of the volume
         - "--from-version=1.0.0"
+
+        # --to-version is the version desired upgrade version
         - "--to-version=1.2.0"
+
         #VERIFY that you have provided the correct cStor PV Name
         - "--pv-name=pvc-713e3bb6-afd2-11e9-8e79-42010a800065"
         #Following are optional parameters
@@ -222,6 +227,9 @@ spec:
             fieldRef:
               fieldPath: metadata.namespace
         tty: true 
+
+        # the image version should be same as the --to-version mentioned above
+        # in the args of the job
         image: quay.io/openebs/m-upgrade:1.2.0
       restartPolicy: OnFailure
 ---
@@ -250,7 +258,7 @@ cstor-sparse-pool   24m
 
 The Job spec for upgrade cstor pools is:
 
-```sh
+```yaml
 #This is an example YAML for upgrading cstor SPC. 
 #Some of the values below needs to be changed to
 #match your openebs installation. The fields are
@@ -281,10 +289,16 @@ spec:
       - name:  upgrade
         args:
         - "cstor-spc"
+
+        # --from-version is the current version of the pool
         - "--from-version=1.0.0"
+
+        # --to-version is the version desired upgrade version
         - "--to-version=1.2.0"
+
         #VERIFY that you have provided the correct SPC Name
         - "--spc-name=cstor-sparse-pool"
+
         #Following are optional parameters
         #Log Level
         - "--v=4"
@@ -295,6 +309,9 @@ spec:
             fieldRef:
               fieldPath: metadata.namespace
         tty: true
+
+        # the image version should be same as the --to-version mentioned above
+        # in the args of the job
         image: quay.io/openebs/m-upgrade:1.2.0
       restartPolicy: OnFailure
 ---
@@ -311,7 +328,7 @@ pvc-1085415d-f84c-11e8-aadf-42010a8000bb   5G         RWO            Delete     
 ```
 
 Create a Kubernetes Job spec for upgrading the cstor volume. An example spec is as follows:
-```
+```yaml
 #This is an example YAML for upgrading cstor volume. 
 #Some of the values below needs to be changed to
 #match your openebs installation. The fields are
@@ -343,10 +360,16 @@ spec:
       - name:  upgrade
         args:
         - "cstor-volume"
+
+        # --from-version is the current version of the volume
         - "--from-version=1.0.0"
+
+        # --to-version is the version desired upgrade version
         - "--to-version=1.2.0"
+
         #VERIFY that you have provided the correct cStor PV Name
         - "--pv-name=pvc-c630f6d5-afd2-11e9-8e79-42010a800065"
+        
         #Following are optional parameters
         #Log Level
         - "--v=4"
@@ -357,6 +380,9 @@ spec:
             fieldRef:
               fieldPath: metadata.namespace
         tty: true
+
+        # the image version should be same as the --to-version mentioned above
+        # in the args of the job
         image: quay.io/openebs/m-upgrade:1.2.0
       restartPolicy: OnFailure
 ---
