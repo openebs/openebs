@@ -122,7 +122,7 @@ method to be used. As an inital step, 3 methods will be provided
 
 1. We try to generate the UUID using the current implementation. 
 
-2. If the `ID_TYPE` is empty or `ID_MODEL` is `Virtual_disk` or `EphemeralDisk` and `ID_WWN` is empty 
+2. If the `ID_TYPE` is empty or `ID_MODEL` is `Virtual_disk` or `EphemeralDisk` or `QEMU_HARDDISK` and `ID_WWN` is empty 
 
     1. Check if the disk has a GPT label available on it.
     	- If a GPT label is available we will use only that label for UID generation
