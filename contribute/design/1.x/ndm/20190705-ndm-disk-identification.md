@@ -51,6 +51,7 @@ and thus the data movement within the cluster.
 
 ### Goals
 
+- Configurable device detection mechanism
 - A unique disk identification mechanism that will work across the cluster on
   disks having atleast a GPT label
 - Should be able to identify same disk attached at multiple paths.
@@ -110,6 +111,15 @@ claim possibly leading to data loss
 
 #### Proposed Implementation
 
+User will be able to give a configuration to NDM so that they can choose between the device identification
+method to be used. As an inital step, 3 methods will be provided
+- Ignore the disks which we are unable to uniquely identify.
+- Use the current implementation of disk identification.
+- Use the new implementation of creating GPT parition to identify the disk.
+
+
+##### Disk Identification using GPT partitions
+
 1. We try to generate the UUID using the current implementation. 
 
 2. If the `ID_TYPE` is empty or `ID_MODEL` is `Virtual_disk` or `EphemeralDisk` and `ID_WWN` is empty 
@@ -133,6 +143,9 @@ claim possibly leading to data loss
        be consumed by the users. This will help to identify a virtual disk for movements across
        the cluster also.
 
+This will be further configurable, so that users can specify how many partition to be created etc. This
+partitions will be automatically by NDM during start-up itself.
+
 Data Cleanup:
 NDM takes care of data clean up, after a BD is released from a BDC. i.e. a complete
 wipe of the disk will be done `wipefs -fa`. Since in case of NDM created GPT labels, 
@@ -140,7 +153,16 @@ only partition is being wiped, it won't cause the labels to be removed.
 
 ##### Workflow
 ```
-+-----------+
++------------+
+|check config|
+|    if GPT  |
+|  method is |
+|  selected  |
+|            |
++------------+
+     |yes
+     |
++----v-----+
 |UID = WWN +|
 |    Model +|
 |   Serial +|
@@ -185,7 +207,8 @@ only partition is being wiped, it won't cause the labels to be removed.
 ## Graduation Criteria
 
 - NDM should be able to uniquely identify the disks, across reboots, across different
-  SCSI ports and anywhere within the cluster. The unique identification can be marked
+  SCSI ports and anywhere within the cluster. NDM should be also able to create
+  N partition as per the user config. The unique identification can be marked
   successful, if NDM detects the disk, and the user is able to retrieve his data
   from the disk
 
