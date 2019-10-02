@@ -26,7 +26,7 @@ There's always scope for code to be clarified and variables or functions that ca
 
 ## Getting Started
 
-Reading the [CONTRIBUTING.md](../CONTRIBUTING.md) will help you get started with:
+Reading the [CONTRIBUTING.md](../CONTRIBUTING.md) which will help you get started with.
 
 ## Issues
 
