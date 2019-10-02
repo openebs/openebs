@@ -148,7 +148,7 @@ sed "s/@sc_name@/$sc_name/g" cstor-volume-replica-patch.tpl.json | sed "s/@sc_re
 if [[ "$controller_version" != "$target_upgrade_version" ]]; then
     echo "Upgrading Target Deployment to $target_upgrade_version"
 
-    # Setting deployment startegy to recreate
+    # Setting deployment strategy to recreate
     setDeploymentRecreateStrategy $ns $c_dep
 
     kubectl patch deployment  --namespace $ns $c_dep -p "$(cat cstor-target-patch.json)" 

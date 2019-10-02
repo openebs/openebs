@@ -330,4 +330,4 @@ if [ $install_option == "operator" ]; then
     fi
 fi
 
-echo "Pre-Upgrade is successfull Please update openebs components"
+echo "Pre-Upgrade is successful Please update openebs components"

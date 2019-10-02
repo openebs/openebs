@@ -103,7 +103,7 @@ replicaset "pvc-8cc9c06c-ea22-11e7-9112-000c298ff5fc-ctrl-59df76689f" deleted
 PV and patches the volume deployments using the ```kubectl patch deployment``` command. 
 In each case, it verifies whether the new images have been rolled out successfully, using ```kubectl rollout status deployment```
 before proceeding to the next step. Post patching, it also deletes the orphaned replicaset of the controller deployment as a 
-woraround for this issue : https://github.com/openebs/openebs/issues/1201
+workaround for this issue : https://github.com/openebs/openebs/issues/1201
 
 
 Verify that the volume controller and replica pods are running post upgrade 

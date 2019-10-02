@@ -67,7 +67,7 @@ becomes a maintainer once the pull request is merged.
 Similar to adding maintainers, new sub projects can be added to OpenEBS
 GitHub organization as long as they adhere to the OpenEBS vision and mission. 
 New projects are discussed in either the Contributor Meeting or the Community 
-slack and requires atleast 1 maintainer approval.
+slack and requires at least 1 maintainer approval.
 
 If a project is approved, a maintainer will add the project to the OpenEBS
 GitHub organization, and make an announcement on a public forum.

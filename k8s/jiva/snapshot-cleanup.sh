@@ -15,7 +15,7 @@ warning()
     fi
 }
 
-# spin prints ('|','/','-','\','|') in cyclic order while snapshot deletion is in progres.
+# spin prints ('|','/','-','\','|') in cyclic order while snapshot deletion is in progress.
 spin()
 {
     while true
@@ -86,7 +86,7 @@ unblock_service()
     rm tmp.json
 }
 
-# restart_ctrl restart the contoller pod
+# restart_ctrl restart the controller pod
 restart_ctrl()
 {
     kubectl delete pod $ctrl_pod_name -n $pvc_namespace

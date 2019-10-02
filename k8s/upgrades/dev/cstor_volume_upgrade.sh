@@ -75,7 +75,7 @@ fi
 
 ## 2. Update cstorvolume patch file with volume upgrade version.
 ##    if cstorvolume(cv_name) name is nil, update the patch file only with version
-##    details, elsse update patch file with version and source-volume lable details
+##    details, elsse update patch file with version and source-volume label details
 if [ -z $cv_name ]; then
     sed "s|\"openebs.io/source-volume\": \"@sourcevolume@\",||g" cstor-volume-patch.tpl.json |  sed "s|@target_version@|$volume_upgrade_version|g" > cstor-volume-patch.json
      else
@@ -83,7 +83,7 @@ if [ -z $cv_name ]; then
 fi
     ## 3. Patching the cstorvolume resource
     kubectl patch cstorvolume $pv -n $ns -p "$(cat cstor-volume-patch.json)" --type=merge
-    rc=$?; if [ $rc -ne 0 ]; then echo "Error occured while upgrading cstorvolume: $cv_name Exit Code: $rc"; exit; fi
+    rc=$?; if [ $rc -ne 0 ]; then echo "Error occurred while upgrading cstorvolume: $cv_name Exit Code: $rc"; exit; fi
 
     ## 4. Remove the temporary patch file
     rm cstor-volume-patch.json

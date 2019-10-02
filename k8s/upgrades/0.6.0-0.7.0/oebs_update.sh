@@ -157,7 +157,7 @@ r_rs=$(kubectl get rs -o name --namespace $ns | grep $r_dep | cut -d '/' -f 2)
 
 
 # PATCH JIVA REPLICA DEPLOYMENT ####
-echo "Remove deprecated lables from Replica Deployment"
+echo "Remove deprecated labels from Replica Deployment"
 kubectl patch deployment --namespace $ns $r_dep --type json -p "$(cat replica-patch-remove-labels.json)"
 rc=$?; if [ $rc -ne 0 ]; then echo "ERROR: $rc"; exit; fi
 
@@ -168,7 +168,7 @@ rc=$?; if [[ ($rc -ne 0) || !($rollout_status =~ "successfully rolled out") ]];
 then echo "ERROR: $rc"; exit; fi
 
 #### PATCH TARGET DEPLOYMENT ####
-echo "Remove deprecated lables from Controller Deployment"
+echo "Remove deprecated labels from Controller Deployment"
 kubectl patch deployment  --namespace $ns $c_dep --type json -p "$(cat target-patch-remove-labels.json)"
 rc=$?; if [ $rc -ne 0 ]; then echo "ERROR: $rc"; exit; fi
 

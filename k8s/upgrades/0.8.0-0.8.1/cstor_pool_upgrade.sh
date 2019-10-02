@@ -80,7 +80,7 @@ for csp in `echo $csp_list | tr ":" " "`; do
     fi
     ## Patching the csp resource
     kubectl patch csp $csp -p "$(cat cr_patch.json)" --type=merge
-    rc=$?; if [ $rc -ne 0 ]; then echo "Error occured while upgrading the csp: $csp Exit Code: $rc"; exit; fi
+    rc=$?; if [ $rc -ne 0 ]; then echo "Error occurred while upgrading the csp: $csp Exit Code: $rc"; exit; fi
 done
 
 echo "Patching Pool Deployment with new image"

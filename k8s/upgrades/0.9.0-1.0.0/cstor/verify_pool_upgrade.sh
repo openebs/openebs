@@ -4,7 +4,7 @@ upgrade_version="1.0.0"
 current_version="0.9.0"
 
 
-##  No need to catch kubectl command errors becase we need to continue with
+##  No need to catch kubectl command errors because we need to continue with
 ##  other checks
 source util.sh
 
@@ -117,7 +117,7 @@ sp_list=$(kubectl get sp -l openebs.io/storage-pool-claim=$spc \
 sp_count=$(echo $sp_list | wc -w)
 
 if [ $sp_count != 0 ]; then
-    echo "SP is deprecated for cStor but stil it is available in cluster. SP {$sp_list} list"
+    echo "SP is deprecated for cStor but still it is available in cluster. SP {$sp_list} list"
     is_upgrade_failed=1
 fi
 

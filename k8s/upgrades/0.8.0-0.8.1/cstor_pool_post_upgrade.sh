@@ -58,7 +58,7 @@ done
 
 if [ $retry == true ]; then
     echo "Post upgrade for $spc is failed."
-    echo "Please retry by runnig ./$0 $spc $ns"
+    echo "Please retry by running ./$0 $spc $ns"
     exit 1
 fi
 
