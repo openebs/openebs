@@ -533,7 +533,7 @@ spec:
     {{- jsonpath .JsonResult "{.message}" | trim | saveAs "postCheckDeploymentRollout.rolloutStatus" .TaskResult | noop -}}
 
     {{- $status := "" -}}
-    {{- $verifyErrMessage := "Target deployment roll out not successfull" -}}
+    {{- $verifyErrMessage := "Target deployment roll out not successful" -}}
 
     {{- if eq .TaskResult.postCheckDeploymentRollout.isRolledout  "true" }}
     {{- $status = .Config.successStatus.value -}}

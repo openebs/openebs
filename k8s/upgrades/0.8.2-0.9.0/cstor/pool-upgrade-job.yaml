@@ -19,7 +19,7 @@ data:
     - name: cstor-sparse-pool-dwc3
       kind: cStorPool
       namespace: openebs
-      # Similiary, you can fill details below for other cstorpool
+      # Similarity, you can fill details below for other cstorpool
       # upgrades.
       # If not required, delete it.
     - name: cstor-sparse-pool-efx5

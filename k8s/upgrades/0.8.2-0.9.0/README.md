@@ -86,7 +86,7 @@ Limitations:
 
 
 # OpenEBS upgrade via CASTemplates from 0.8.2 to 0.9.0
-**NOTE: Upgrade via these CAS Templates is ony supported for OpenEBS in version 0.8.2. Trying to upgrade a OpenEBS version other than 0.8.2 to 0.9.0 using these CAS templates can result in undesired behaviours. If you are having any OpenEBS version lower than 0.8.2, first upgrade it ot 0.8.2 and then these CAS templates can be used safely for 0.9.0 upgrade.**
+**NOTE: Upgrade via these CAS Templates is only supported for OpenEBS in version 0.8.2. Trying to upgrade a OpenEBS version other than 0.8.2 to 0.9.0 using these CAS templates can result in undesired behaviours. If you are having any OpenEBS version lower than 0.8.2, first upgrade it to 0.8.2 and then these CAS templates can be used safely for 0.9.0 upgrade.**
 
 ## Upgrade Jiva based volumes
 

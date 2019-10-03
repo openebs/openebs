@@ -4,8 +4,8 @@
 
 
 # DONOT MODIFY BELOW THIS LINE
-# Cleaning up apt and bash history before packaing the box. 
-# Cleaning up apt and bash history before packaing the box.
+# Cleaning up apt and bash history before packaging the box. 
+# Cleaning up apt and bash history before packaging the box.
 sudo mkdir -p /etc/systemd/system/apt-daily.timer.d/
 cat <<EOF | sudo tee -a /etc/systemd/system/apt-daily.timer.d/apt-daily.timer.conf > /dev/null
 [Timer]

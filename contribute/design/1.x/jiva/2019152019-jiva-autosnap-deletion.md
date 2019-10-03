@@ -1,6 +1,6 @@
 
 ---
-oep-number: draft Auto Snapshot deltion 20190715
+oep-number: draft Auto Snapshot deletion 20190715
 title: Jiva auto snapshot deletion
 authors:
   - "@utkarshmani1997"

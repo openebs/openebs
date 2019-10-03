@@ -30,7 +30,7 @@ run_snapshotdata_upgrades()
         for snapdata_name in `echo $volumesnapshotdata_list | tr ":" " "`; do
             ## patch volumesnapshotdata cr ###
             kubectl patch volumesnapshotdata $snapdata_name -p "$(cat volumesnapshotdata-patch.json)" --type=merge
-            rc=$?; if [ $rc -ne 0 ]; then echo "Error occured while upgrading volumesnapshotdata name: $snapdata_name Exit Code: $rc"; exit; fi
+            rc=$?; if [ $rc -ne 0 ]; then echo "Error occurred while upgrading volumesnapshotdata name: $snapdata_name Exit Code: $rc"; exit; fi
         done
         ## Removes temporary file
         rm volumesnapshotdata-patch.json

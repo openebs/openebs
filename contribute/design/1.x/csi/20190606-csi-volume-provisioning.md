@@ -396,7 +396,7 @@ status:
 #### ConfigInjector -- new custom resource
 This is a new Kubernetes custom resource whose object will get created by cstor
 volume claim controller. This resource gets built and applied by cstor volume 
-claim controller after refering to `CStorVolumeConfigClass`.
+claim controller after referring to `CStorVolumeConfigClass`.
 
 ConfigInjector kind has its dedicated controller residing in maya api 
 server. The job of this controller is to inject infrastructure related 

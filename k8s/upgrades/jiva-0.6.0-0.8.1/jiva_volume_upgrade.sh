@@ -209,7 +209,7 @@ kubectl annotate pv $pv openebs.io/cas-type=jiva
 
 controller_version=`kubectl get deployment $c_dep -n $ns -o jsonpath='{.metadata.labels.openebs\.io/version}'`
 if [[ "$controller_version" == "$target_upgrade_version" ]]; then
-    echo "Remove deprecated lables from Controller Deployment"
+    echo "Remove deprecated labels from Controller Deployment"
     c_rs=$(kubectl get rs -o name --namespace $ns -l openebs.io/persistent-volume=$pv,openebs.io/controller=jiva-controller | cut -d '/' -f 2)
 
     kubectl patch deployment  --namespace $ns $c_dep --type json -p "$(cat target-patch-remove-labels.json)"
@@ -225,7 +225,7 @@ fi
 
 replica_version=`kubectl get deployment $r_dep -n $ns -o jsonpath='{.metadata.labels.openebs\.io/version}'`
 if [[ "$replica_version" == "$target_upgrade_version" ]]; then
-    echo "Remove deprecated lables from Replica Deployment"
+    echo "Remove deprecated labels from Replica Deployment"
     r_rs=$(kubectl get rs -o name --namespace $ns -l openebs.io/persistent-volume=$pv,openebs.io/replica=jiva-replica | cut -d '/' -f 2)
 
     
@@ -242,7 +242,7 @@ fi
 
 controller_svc_version=`kubectl get svc $c_svc -n $ns -o jsonpath='{.metadata.labels.openebs\.io/version}'`
 if [[ "$controller_svc_version" == "$target_upgrade_version" ]] ; then
-    echo "Remove deprecated lables from Replica Deployment"
+    echo "Remove deprecated labels from Replica Deployment"
     kubectl patch service --namespace $ns $c_svc --type json -p "$(cat target-svc-patch-remove-labels.json)"
     rc=$?; if [ $rc -ne 0 ]; then echo "ERROR: $rc"; exit; fi
     kubectl label svc --namespace $ns $c_svc "vsm-"

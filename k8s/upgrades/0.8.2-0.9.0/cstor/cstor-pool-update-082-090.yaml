@@ -41,7 +41,7 @@ spec:
     - upgrade-cstor-pool-082-090-get-storagepool
 
     # Runtask #4
-    # This runtask puts result od resource into upgraderesult custom resource
+    # This runtask puts result of resource into upgraderesult custom resource
     # after getting info via above 3 runtasks.
     - upgrade-cstor-pool-082-090-patch-upgrade-result
 
@@ -450,7 +450,7 @@ spec:
 
     {{- $status := "" -}}
     {{- $message :="" -}}
-    {{- $verifyErrMessage := "Pool deployment rollout not successfull" -}}
+    {{- $verifyErrMessage := "Pool deployment rollout not successful" -}}
     {{- $rolloutStatusMessage := printf "rollout status: {%s} name: {%s} namespace: {%s}" .TaskResult.patchDeploymentImageStatus.rolloutStatus .UpgradeItem.name .UpgradeItem.namespace -}}
 
     {{- if eq .TaskResult.patchDeploymentImageStatus.isRolledout  "true" }}
