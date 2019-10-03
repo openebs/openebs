@@ -82,12 +82,12 @@ OpenEBS welcomes your feedback and contributions in any form possible.
 - [Join our community](https://openebs.io/join-our-slack-community)
   - Already signed up? Head to our discussions at [#openebs-users](https://openebs-community.slack.com/messages/openebs-users/)
 - Want to raise an issue or help with fixes and features?
-  - See [open issues](https://github.com/openebs/openebs/labels)
+  - See [open issues](https://github.com/openebs/openebs/issues)
   - See [contributing guide](./CONTRIBUTING.md)
   - Want to join our contributor community meetings, [check this out](./community/README.md). 
 - Join our OpenEBS CNCF Mailing lists
-  - For OpenEBS project updates, subscribe to https://lists.cncf.io/g/cncf-openebs-announcements
-  - For interacting with other openebs users, subscribe to https://lists.cncf.io/g/cncf-openebs-users
+  - For OpenEBS project updates, subscribe to [OpenEBS Announcements](https://lists.cncf.io/g/cncf-openebs-announcements)
+  - For interacting with other openebs users, subscribe to [OpenEBS Users](https://lists.cncf.io/g/cncf-openebs-users)
 
 ## Show me the Code
 
