@@ -42,7 +42,8 @@ OpenEBS can scale to include an arbitrarily large number of containerized storag
 
 ## Installation and Getting Started
  
-OpenEBS can be set up in a few easy steps. You can get going on your choice of Kubernetes cluster by having open-iscsi installed on the Kubernetes nodes and running the openebs-operator using kubectl. 
+OpenEBS can be set up in a few easy steps. You can get going on your choice of Kubernetes cluster by having open-iscsi installed on the Kubernetes nodes and running the openebs-operator using kubectl.
+
 
 **Start the OpenEBS Services using operator**
 ```bash
