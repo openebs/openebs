@@ -243,7 +243,7 @@ This design proposes the following key changes:
     internal spec will be maintained that indicates if the backward
     compatibility checks need to be maintained. 
 
-    ```
+    ```yaml
     versionDetails:
       #Indicates if the resource should be auto upgraded 
       #More on this below (6). Default is false.
@@ -267,6 +267,8 @@ This design proposes the following key changes:
         message: Unable to set desired replication factor to CV
         #reason is the actual error recieved by the function calls
         reason: invalid config for the volume
+        #lastUpdateTime is the time last modification of status occured
+        lastUpdateTime: "2019-10-03T14:37:03Z"
     ```
 
     The above spec will be used as a sub-resource under all the custom
