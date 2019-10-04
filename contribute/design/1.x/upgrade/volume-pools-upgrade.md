@@ -274,7 +274,7 @@ This design proposes the following key changes:
     The above spec will be used as a sub-resource under all the custom
     resource managed by OpenEBS. 
   
-    Status: Under Development, planned for 1.2
+    Status: Under Development, planned for 1.3
 
 5.  Downgrading a version. There are scenarios where the volumes will
     have to be downgraded to earlier versions. Some of the challenges
