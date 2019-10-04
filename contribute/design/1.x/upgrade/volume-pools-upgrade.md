@@ -245,19 +245,28 @@ This design proposes the following key changes:
 
     ```
     versionDetails:
-      #Indicates if the resource should be auto upgraded 
-      #More on this below (6). Default is false.
-      #autoUpgrade:
-      #Indicates the current version of the resource.
-      currentVersion: 
-      #Indicates the running version of the controller/component
-      #as part of the start-up, this flag will be changed
-      #running version if autoUpgrade is enabled. 
-      desiredVersion: 
-      #In some cases there can be a bunch of child resources
-      #this flag will be set to "no" when current != desired. 
-      #after upgrading all the child objects, this will be changed to yes. 
-      dependentsUpgraded:
+    #Indicates if the resource should be auto upgraded 
+    #More on this below (6). Default is false.
+    #autoUpgrade:
+    #Indicates the current version of the resource.
+    currentVersion: 
+    #Indicates the running version of the controller/component
+    #as part of the start-up, this flag will be changed
+    #running version if autoUpgrade is enabled. 
+    desiredVersion: 
+    #In some cases there can be a bunch of child resources
+    #this flag will be set to "no" when current != desired. 
+    #after upgrading all the child objects, this will be changed to yes. 
+    dependentsUpgraded:
+    #status gives the details about the reconciliation of the version
+    status:
+      #phase tells the phase of reconciliation of the current 
+      #and desired version.
+      phase: #STARTED, SUCCESS or ERROR can be the supported phases
+      #message is a human readable message in case of failure
+      message: Unable to set desired replication factor to CV
+      #reason is the actual error recieved by the function calls
+      reason: invalid config for the volume
     ```
 
     The above spec will be used as a sub-resource under all the custom
