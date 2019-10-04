@@ -243,7 +243,7 @@ This design proposes the following key changes:
     internal spec will be maintained that indicates if the backward
     compatibility checks need to be maintained. 
 
-    ```
+    ```yaml
     versionDetails:
       #Indicates if the resource should be auto upgraded 
       #More on this below (6). Default is false.
@@ -258,12 +258,23 @@ This design proposes the following key changes:
       #this flag will be set to "no" when current != desired. 
       #after upgrading all the child objects, this will be changed to yes. 
       dependentsUpgraded:
+      #status gives the details about the reconciliation of the version
+      status:
+        #phase tells the phase of reconciliation of the current 
+        #and desired version.
+        phase: #STARTED, SUCCESS or ERROR can be the supported phases
+        #message is a human readable message in case of failure
+        message: Unable to set desired replication factor to CV
+        #reason is the actual error recieved by the function calls
+        reason: invalid config for the volume
+        #lastUpdateTime is the time last modification of status occured
+        lastUpdateTime: "2019-10-03T14:37:03Z"
     ```
 
     The above spec will be used as a sub-resource under all the custom
     resource managed by OpenEBS. 
   
-    Status: Under Development, planned for 1.2
+    Status: Under Development, planned for 1.3
 
 5.  Downgrading a version. There are scenarios where the volumes will
     have to be downgraded to earlier versions. Some of the challenges
