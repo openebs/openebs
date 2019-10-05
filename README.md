@@ -17,7 +17,7 @@ Some key aspects that make OpenEBS different compared to other traditional stora
 - Built using the micro-services architecture like the applications it serves. OpenEBS is itself deployed as a set of containers on Kubernetes worker nodes. Uses Kubernetes itself to orchestrate and manage OpenEBS components
 - Built completely in userspace making it highly portable to run across any OS/platform
 - Completely intent-driven, inheriting the same principles that drive the ease of use with Kubernetes
-- OpenEBS supports a range of storage engines so that developers can deploy the storage technology appropriate to their application design objectives. Distributed applications like Cassandra can use the LocalPV engine for lowest latency writes. Monolithic applications like MySQL and PostgresQL can use the ZFS engine (cStor) for resilience. Streaming applications like Kafka can use the NVMe engine [MayaStor](https://github.com/openebs/MayaStor) for best performance in edge environments. Across engine types, OpenEBS provides a consistent framework for high availability, snapshots, clones and manageability.
+- OpenEBS supports a range of storage engines so that developers can deploy the storage technology appropriate to their application design objectives. Distributed applications like Cassandra can use the LocalPV engine for lowest latency writes. Monolithic applications like MySQL and PostgreSQL can use the ZFS engine (cStor) for resilience. Streaming applications like Kafka can use the NVMe engine [MayaStor](https://github.com/openebs/MayaStor) for best performance in edge environments. Across engine types, OpenEBS provides a consistent framework for high availability, snapshots, clones and manageability.
 
 OpenEBS itself is deployed as just another container on your host and enables storage services that can be designated on a per pod, application, cluster or container level, including:
 - Automate the management of storage attached to the Kubernetes worker nodes and allow the storage to be used for Dynamically provisioning OpenEBS PVs or Local PVs.
@@ -87,7 +87,7 @@ OpenEBS welcomes your feedback and contributions in any form possible.
   - Want to join our contributor community meetings, [check this out](./community/README.md). 
 - Join our OpenEBS CNCF Mailing lists
   - For OpenEBS project updates, subscribe to [OpenEBS Announcements](https://lists.cncf.io/g/cncf-openebs-announcements)
-  - For interacting with other openebs users, subscribe to [OpenEBS Users](https://lists.cncf.io/g/cncf-openebs-users)
+  - For interacting with other OpenEBS users, subscribe to [OpenEBS Users](https://lists.cncf.io/g/cncf-openebs-users)
 
 ## Show me the Code
 
