@@ -55,7 +55,16 @@ kubectl apply -f https://openebs.github.io/charts/openebs-operator.yaml
 helm repo update
 helm install --namespace openebs --name openebs stable/openebs
 ```
+## Set cluster-admin user context and RBAC
 
+For installation of OpenEBS, cluster-admin user context is a must.
+
+If there is no cluster-admin user context already present, create one and use it. Use the following command to create the new context.
+```kubectl config set-context NAME [--cluster=cluster_nickname] [--user=user_nickname] [--namespace=namespace]```
+
+-Set the existing cluster-admin user context or the newly created context by using the following command.
+ ```kubectl config use-context admin-ctx```
+ 
 You could also follow our [QuickStart Guide](https://docs.openebs.io/docs/overview.html).
 
 OpenEBS can be deployed on any Kubernetes cluster - either in cloud, on-premise or developer laptop (minikube). Note that there are no changes to the underlying kernel that are required as OpenEBS operates in userspace.  Please follow our [OpenEBS Setup](https://docs.openebs.io/docs/overview.html) documentation. Also, we have a Vagrant environment available that includes a sample Kubernetes deployment and synthetic load that you can use to simulate the performance of OpenEBS. You may also find interesting the related project called Litmus (https://www.openebs.io/litmus) which helps with chaos engineering for stateful workloads on Kubernetes.
