@@ -60,9 +60,11 @@ helm install --namespace openebs --name openebs stable/openebs
 For installation of OpenEBS, cluster-admin user context is a must.
 
 If there is no cluster-admin user context already present, create one and use it. Use the following command to create the new context.
+
 ```kubectl config set-context NAME [--cluster=cluster_nickname] [--user=user_nickname] [--namespace=namespace]```
 
 -Set the existing cluster-admin user context or the newly created context by using the following command.
+
  ```kubectl config use-context admin-ctx```
  
 You could also follow our [QuickStart Guide](https://docs.openebs.io/docs/overview.html).
