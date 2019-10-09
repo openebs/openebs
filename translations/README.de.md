@@ -20,10 +20,10 @@ https://www.openebs.io/
 
 **Unsere Vision** ist einfach: Lassen Sie die Speicher- und Speicherdienste für persistente Workloads vollständig in die Umgebung integrieren, sodass jedes Team und jeder Workload von der Granularität der Steuerung und dem nativen Verhalten von Kubernetes profitiert.
 x
-#### *Lies dies in [anderen Sprachen](translations/TRANSLATIONS.md).*
+#### *Lies dies in [anderen Sprachen](/translations/TRANSLATIONS.md).*
 
 [🇩🇪](README.de.md)
-[:uk:](../README.MD)
+[:uk:](/README.md)
 [🇷🇺](README.ru.md)
 [🇹🇷](README.tr.md)
 
@@ -65,8 +65,8 @@ OpenEBS freut sich über Ihr Feedback und Ihre Beiträge in jeder möglichen For
   - Projekt (Repository) spezifische Probleme können auch unter [issues](https://github.com/openebs/openebs/issues) angesprochen und mit den einzelnen Repository-Labels wie *repo/maya* versehen werden.
 - Möchten Sie mit Fixes und Features helfen?
   - Siehe [offene Ausgaben](https://github.com/openebs/openebs/labels)
-- Siehe [Beitragender Leitfaden](./CONTRIBUTING.md)
-  - Möchten Sie unserer Community beitreten, [check this out](./community/README.md).
+- Siehe [Beitragender Leitfaden](/CONTRIBUTING.md)
+  - Möchten Sie unserer Community beitreten, [check this out](/community/README.md).
 
 ## Zeig mir den Code
 
@@ -75,7 +75,7 @@ Dies ist ein Meta-Repository für OpenEBS. Der Quellcode ist an folgenden Orten 
 - Der Quellcode der Storage Orchestration befindet sich unter [openebs/maya](https://github.com/openebs/maya).
 - Während *jiva* und *maya* bedeutende Teile des Quellcodes enthalten, wird ein Teil des Orchestrierungs- und Automatisierungscodes auch in anderen Repositorys der OpenEBS-Organisation verteilt.
 
-Beginnen Sie mit den angehefteten Repositorys oder mit dem Dokument [OpenEBS Architecture](./contrib/design/README.md).
+Beginnen Sie mit den angehefteten Repositorys oder mit dem Dokument [OpenEBS Architecture](/contribute/design/README.md).
 
 ## Lizenz
 
