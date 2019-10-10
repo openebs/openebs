@@ -64,7 +64,7 @@ OpenEBS can be deployed on any Kubernetes cluster - either in cloud, on-premise 
 
 OpenEBS is one of the most widely used and tested Kubernetes storage infrastructures in the industry. A CNCF Sandbox project since May 2019, OpenEBS is the first and only storage system to provide a consistent set of software-defined storage capabilities on multiple backends (local, nfs, zfs, nvme) across both on-premise and cloud systems, and was the first to open source its own Chaos Engineering Framework for Stateful Workloads, the [Litmus Project](https://www.openebs.io/litmus), which the community relies on to automatically readiness assess the monthly cadence of OpenEBS versions. Enterprise customers have been using OpenEBS in production since 2018 and the project supports 2.5M+ docker pulls a week.
 
-The status of various storage engines that power the OpenEBS Persistent Volumes is provided below.
+The status of various storage engines that power the OpenEBS Persistent Volumes are provided below.
 
 | Storage Engine | Status | Details |
 |---|---|---|
