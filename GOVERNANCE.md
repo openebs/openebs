@@ -29,7 +29,7 @@ They share in reviewing issues and pull requests and their LGTM counts towards t
 required LGTM count to merge a code change into the project.
 
 Reviewers are part of the organization but do not have write access.
-Becoming a reviewer is a core aspect in the journey to becoming a maintainer.
+Becoming a reviewer is a core aspect of the journey to becoming a maintainer.
 
 ## Adding maintainers
 
