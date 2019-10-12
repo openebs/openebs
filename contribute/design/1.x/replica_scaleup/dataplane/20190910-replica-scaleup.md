@@ -324,6 +324,7 @@ but add to unknown list [Replica addition case]
 - If RF number of known replicas are NOT available [new volume or upgrade case]
   - Add to unknown list if quorum is off (replacement case)
   - Add to known list if quorum is on
+- Allow if RF < DRF, but, add to unknown list
 - Reject otherwise
 
 Note: Make sure there is only one replica for a given `ReplicaID_CVR`
@@ -338,19 +339,28 @@ Replace the `ReplicaGUID_Data` with new one for `ReplicaID_CVR` in known list.
 If replica's `ReplicaID_CVR` is NOT in known list, it is replica addition case.
 Add `ReplicaID_CVR` with `ReplicaGUID_Data` to known replica list.
 
-For the case of adding new replica or a replacment replica,
-Steps to follow for data consistency to perform above steps:
+For the case of adding new replica or a replacement replica,
+steps to follow for data consistency are:
 - Identify the case when replica turned from quorum ‘off’ to quorum ‘on’ state.
 Let this replica referred as R.
-- Make sure there are no pending IOs on R [Why? If CR got updated, and there are
-pending IOs on R, CF of those IOs MAY NOT be met with new RF]
-- All IOs need to be verified to be successful on R until updating to
-CStorVolume CR is successful. [Why? This is similar to above reason. CF of those
-IOs may not met with new RF. If it is made sure that CF of those IOs is met wrt
-new RF, this and above checks would become optional]
-- Inform cstor-volume-mgmt with new replicas and replication factor details
+- If RF number of known replicas are NOT available or `ReplicaID_CVR` is in
+known list, update CStorVolume CR and in-memory structures (Replica replacement
+or replica movement case)
+- If RF == DRF, disconnect
+- (Replica scaleup case) If there is no change in CF with increase in RF,
+update the CStorVolume CR and in-memory structures with increased RF
+- Pause IOs for few seconds, and, make sure there are no pending IOs on R
+[Why? If CR got updated, and there are pending IOs on R, CF of those IOs MAY
+NOT be met with new RF]
+- If pending IOs still exists, resume IOs and retry above steps in next
+iteration.
+- If there are no pending IOs,
+  - mark `R` as scaleup replica and resume IOs
+  - When any replica is marked as scaleup replica, all write IOs need to be
+verified to be successful with new and old consistency models.
+  - Inform cstor-volume-mgmt with new replicas and replication factor details
 - If udpating CR succeeds, update in-memory data structures of istgt
-- If updating CR fails, retry after some time
+- If updating CR fails, retry above steps after some time
 
 #### LLDNotes
 - Control plane should never create more than initially configured RF number of
