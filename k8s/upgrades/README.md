@@ -4,11 +4,8 @@
 
 This document describes the steps for the following OpenEBS Upgrade paths:
 
-- Upgrade from 1.0.0 to 1.1.0
-- Upgrade from 1.0.0 to 1.2.0
-- Upgrade from 1.1.0 to 1.2.0
-- Upgrade from 1.0.0 to 1.3.0
-- Upgrade from 1.1.0 to 1.3.0
+- Upgrade from 1.0.0 to any of 1.1.0, 1.2.0, 1.3.0
+- Upgrade from 1.1.0 to any of 1.2.0, 1.3.0
 - Upgrade from 1.2.0 to 1.3.0
 
 For other upgrade paths, please refer to the respective directories.
@@ -28,10 +25,10 @@ The upgrade of OpenEBS is a three step process:
 ## Step 1: Prerequisites
 
 **Note: It is mandatory to make sure to that all OpenEBS control plane 
-and data plane components are running with expected version before the upgrade.
-- For upgrading to 1.1.0, the previous version should be 1.0.0**
-- For upgrading to 1.2.0, the previous version should be 1.0.0 or 1.1.0**
-- For upgrading to 1.3.0, the previous version should be 1.0.0 or 1.1.0 or 1.2.0**
+and data plane components are running with expected version before the upgrade.**
+- **For upgrading to 1.1.0, the previous version should be 1.0.0**
+- **For upgrading to 1.2.0, the previous version should be 1.0.0 or 1.1.0**
+- **For upgrading to 1.3.0, the previous version should be 1.0.0 or 1.1.0 or 1.2.0**
 
 **Note: All steps described in this document need to be performed from a 
 machine that has access to Kubernetes master**
