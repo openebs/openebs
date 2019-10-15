@@ -51,19 +51,20 @@ status: provisional
 
 ## Summary
 
-This proposal includes design for building blocks of cStor which can be
-triggered by an administrator or by an operator
+This proposal includes high level design for building blocks of cStor which can
+be triggered by an administrator or by an operator
 - to add a pool to existing cStor pool cluster
 - to remove a pool from cStor pool cluster with data consistency
 either when CA adds/wants-to-remove a node (or)
 admin adds/wants-to-remove a node.
+- move pool across nodes
 
 ## Motivation
 
 User wants OpenEBS to work natively with K8S cluster autoscaler. This minimizes
 operational cost.
 More usescases are available at:
-https://docs.google.com/document/d/1z_HdF7p_BNYO1MJnfJqFAHBrXEbqCjistyRXTpLbnFg/edit
+https://docs.google.com/document/d/1z_HdF7p_BNYO1MJnfJqFAHBrXEbqCjistyRXTpLbnFg/edit?usp=sharing
 
 ### Goals
 
@@ -168,13 +169,13 @@ CSPI-MGMT deployment for newly added entry, BDCs etc.
 
 If any entry related to nodeSelector is removed, it triggers the deletion of
 deployment, CSPI CR and associated BDCs.
-
 More details of cspc-operator and above yaml are available at above mentioned
 link.
 
 Provisioning of cStor volumes are done on a CSPC by CVC controller. As part of
 volume provisioning, it creates target related CR i.e., CV, target deployment
 and replica related CRs i.e., CVRs.
+
 CVRs are created by CVC by selecting RF (replication factor) number of CSPIs of
 CSPC, and makes each CVR point to one CSPI.
 
@@ -196,7 +197,9 @@ A new field will be added to CSPI which can be read by CVC controller during
 the phase of volume provision.
 This being related to provision, field for this in CSPI is:
 `provision.status`. This can take `ONLINE` and `CORDONED` as possible values.
+
 `ONLINE` means CVC can pick the CSPI for volume provisioning.
+
 `CORDONED` means CVC SHOULD NOT pick the CSPI for any further volume
 provisioning.
 
@@ -210,13 +213,16 @@ also.
 
 Admin (or) operator drains a pool (DP) by moving replicas which are on DP to
 another pool in the same cluster. This can be in two modes.
+
 One is - by adding new replica and deleting old one
+
 Second is - by moving replica from old one to new replica
 
 Admin (or) operator need to identify the list of replicas i.e., CVRs on pool DP.
 For each identified CVR (CVR1), follow either the first mode or second.
 
-_Add a new replica and remove old one_ way:
+Add a new replica and remove old one way:
+----------------------------------------
 - Identify new pool (NP) other than DP which can take the replica
 - Perform replica scaleup steps
   - create a new CVR (CVR2) on NP
@@ -230,7 +236,8 @@ https://github.com/openebs/openebs/blob/master/contribute/design/1.x/replica_sca
 
 Steps to perform replica scale down can change as its implementation starts.
 
-_Move old replica to new one_ way:
+Move old replica to new one way:
+-------------------------------
 - Identify new pool (NP) other than DP which can take the replica
 - Delete CVR1 which is on old pool
 - Create new CVR (CVR2) on new pool with status as 'Recreate' and
