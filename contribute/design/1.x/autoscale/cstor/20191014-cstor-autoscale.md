@@ -221,8 +221,7 @@ Second is - by moving replica from old one to new replica
 Admin (or) operator need to identify the list of replicas i.e., CVRs on pool DP.
 For each identified CVR (CVR1), follow either the first mode or second.
 
-Add a new replica and remove old one way:
-----------------------------------------
+__Add a new replica and remove old one__ way:
 - Identify new pool (NP) other than DP which can take the replica
 - Perform replica scaleup steps
   - create a new CVR (CVR2) on NP
@@ -236,8 +235,7 @@ https://github.com/openebs/openebs/blob/master/contribute/design/1.x/replica_sca
 
 Steps to perform replica scale down can change as its implementation starts.
 
-Move old replica to new one way:
--------------------------------
+__Move old replica to new one__ way:
 - Identify new pool (NP) other than DP which can take the replica
 - Delete CVR1 which is on old pool
 - Create new CVR (CVR2) on new pool with status as 'Recreate' and
