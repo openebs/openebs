@@ -30,6 +30,7 @@ status: provisional
       * [Move pool from one node to another](#move-pool-from-one-node-to-another)
     * [Implementation Details/Notes/Constraints](#implementation-detailsnotesconstraints)
     * [Proposed Implementation](#proposed-implementation)
+      * [CA related information](#ca-related-information)
       * [Adding new node to existing CSPC](#adding-new-node-to-existing-cspc)
       * [Informing that a pool has been cordoned to the system](#informing-that-a-pool-has-been-cordoned-to-the-system)
       * [Draining the cordoned pool](#draining-the-cordoned-pool)
@@ -180,6 +181,15 @@ CVRs are created by CVC by selecting RF (replication factor) number of CSPIs of
 CSPC, and makes each CVR point to one CSPI.
 
 ### Proposed Implementation
+
+#### CA related information
+
+CA can scale down the node on which cStor pool pods are running. This causes
+data unavailability or data loss. So, nodes on which cStor pool pods are running
+should not be scaled down.
+This information can be passed to CA by setting
+`"cluster-autoscaler.kubernetes.io/safe-to-evict": "false"` as annotation on
+cStor pool related pods.
 
 #### Adding new node to existing CSPC
 
