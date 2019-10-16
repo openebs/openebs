@@ -7,7 +7,7 @@
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fopenebs%2Fopenebs.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fopenebs%2Fopenebs?ref=badge_shield)
 [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/1754/badge)](https://bestpractices.coreinfrastructure.org/projects/1754)
 
-https://www.openebs.io/
+https://openebs.org/
 
 **OpenEBS**, kritik işlevli, verileri kalıcı olan ve örneğin günlük oluşturma (logging) veya Prometheus gibi uygulamaların depolama ihtiyaçlarını karşılamak için kullanılır. OpenEBS konteyner depolama ve ilgili veri depolama hizmetlerini sunar.
  

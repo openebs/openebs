@@ -7,7 +7,7 @@
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fopenebs%2Fopenebs.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fopenebs%2Fopenebs?ref=badge_shield)
 [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/1754/badge)](https://bestpractices.coreinfrastructure.org/projects/1754)
 
-https://www.openebs.io/
+https://openebs.org/
 
 **OpenEBS** ermöglicht die Verwendung von Containern für geschäftskritische, persistente Workloads und für andere Stateful-Workloads, z. B. Protokollierung oder Prometheus. OpenEBS sind Container- und verwandte Speicherdienste.
  
