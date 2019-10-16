@@ -7,7 +7,7 @@
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fopenebs%2Fopenebs.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fopenebs%2Fopenebs?ref=badge_shield)
 [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/1754/badge)](https://bestpractices.coreinfrastructure.org/projects/1754)
 
-https://www.openebs.io/
+https://openebs.org/
 
 **OpenEBS** позволяет использовать контейнеры для приложений, которые требуют постоянного хранилища данных, а также для приложений, которые проверяют состояние кластера, например, Prometheus. OpenEBS предоставляет постоянное контейнерное хранилище данных и службы хранения.
  
