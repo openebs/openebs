@@ -1,7 +1,11 @@
 #!/usr/bin/env bash
 # set -x
 
-kubectl apply -f https://raw.githubusercontent.com/openebs/openebs/${CI_BRANCH}/k8s/openebs-operator.yaml
+wget https://raw.githubusercontent.com/openebs/openebs/${CI_BRANCH}/k8s/openebs-operator.yaml
+
+sed "s|@tag@|${CI_TAG}|g" openebs-operator.yaml  > tmpfile ; mv tmpfile openebs-operator.yaml
+kubectl apply -f openebs-operator.yaml
+cat openebs-operator.yaml | grep ":${CI_TAG}"
 
 function waitForDeployment() {
   DEPLOY=$1

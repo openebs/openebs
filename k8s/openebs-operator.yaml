@@ -115,7 +115,7 @@ spec:
       containers:
       - name: maya-apiserver
         imagePullPolicy: IfNotPresent
-        image: quay.io/openebs/m-apiserver:v1.2.x-ci
+        image: quay.io/openebs/m-apiserver:@tag@
         ports:
         - containerPort: 5656
         env:
@@ -186,23 +186,23 @@ spec:
         #- name: OPENEBS_IO_LOCALPV_HOSTPATH_DIR
         #  value: "/var/openebs/local"
         - name: OPENEBS_IO_JIVA_CONTROLLER_IMAGE
-          value: "quay.io/openebs/jiva:v1.2.x-ci"
+          value: "quay.io/openebs/jiva:@tag@"
         - name: OPENEBS_IO_JIVA_REPLICA_IMAGE
-          value: "quay.io/openebs/jiva:v1.2.x-ci"
+          value: "quay.io/openebs/jiva:@tag@"
         - name: OPENEBS_IO_JIVA_REPLICA_COUNT
           value: "3"
         - name: OPENEBS_IO_CSTOR_TARGET_IMAGE
-          value: "quay.io/openebs/cstor-istgt:v1.2.x-ci"
+          value: "quay.io/openebs/cstor-istgt:@tag@"
         - name: OPENEBS_IO_CSTOR_POOL_IMAGE
-          value: "quay.io/openebs/cstor-pool:v1.2.x-ci"
+          value: "quay.io/openebs/cstor-pool:@tag@"
         - name: OPENEBS_IO_CSTOR_POOL_MGMT_IMAGE
-          value: "quay.io/openebs/cstor-pool-mgmt:v1.2.x-ci"
+          value: "quay.io/openebs/cstor-pool-mgmt:@tag@"
         - name: OPENEBS_IO_CSTOR_VOLUME_MGMT_IMAGE
-          value: "quay.io/openebs/cstor-volume-mgmt:v1.2.x-ci"
+          value: "quay.io/openebs/cstor-volume-mgmt:@tag@"
         - name: OPENEBS_IO_VOLUME_MONITOR_IMAGE
-          value: "quay.io/openebs/m-exporter:v1.2.x-ci"
+          value: "quay.io/openebs/m-exporter:@tag@"
         - name: OPENEBS_IO_CSTOR_POOL_EXPORTER_IMAGE
-          value: "quay.io/openebs/m-exporter:v1.2.x-ci"
+          value: "quay.io/openebs/m-exporter:@tag@"
         # OPENEBS_IO_ENABLE_ANALYTICS if set to true sends anonymous usage
         # events to Google Analytics
         - name: OPENEBS_IO_ENABLE_ANALYTICS
@@ -276,7 +276,7 @@ spec:
       containers:
       - name: openebs-provisioner
         imagePullPolicy: IfNotPresent
-        image: quay.io/openebs/openebs-k8s-provisioner:v1.2.x-ci
+        image: quay.io/openebs/openebs-k8s-provisioner:@tag@
         env:
         # OPENEBS_IO_K8S_MASTER enables openebs provisioner to connect to K8s
         # based on this address. This is ignored if empty.
@@ -337,7 +337,7 @@ spec:
       serviceAccountName: openebs-maya-operator
       containers:
         - name: snapshot-controller
-          image: quay.io/openebs/snapshot-controller:v1.2.x-ci
+          image: quay.io/openebs/snapshot-controller:@tag@
           imagePullPolicy: IfNotPresent
           env:
           - name: OPENEBS_NAMESPACE
@@ -358,7 +358,7 @@ spec:
         #- name: OPENEBS_MAYA_SERVICE_NAME
         #  value: "maya-apiserver-apiservice"
         - name: snapshot-provisioner
-          image: quay.io/openebs/snapshot-provisioner:v1.2.x-ci
+          image: quay.io/openebs/snapshot-provisioner:@tag@
           imagePullPolicy: IfNotPresent
           env:
           - name: OPENEBS_NAMESPACE
@@ -455,7 +455,7 @@ spec:
       hostNetwork: true
       containers:
       - name: node-disk-manager
-        image: quay.io/openebs/node-disk-manager-amd64:v1.2.x-ci
+        image: quay.io/openebs/node-disk-manager-amd64:@tag@
         imagePullPolicy: Always
         securityContext:
           privileged: true
@@ -545,7 +545,7 @@ spec:
       serviceAccountName: openebs-maya-operator
       containers:
         - name: node-disk-operator
-          image: quay.io/openebs/node-disk-operator-amd64:v1.2.x-ci
+          image: quay.io/openebs/node-disk-operator-amd64:@tag@
           imagePullPolicy: Always
           readinessProbe:
             exec:
@@ -629,7 +629,7 @@ spec:
       serviceAccountName: openebs-maya-operator
       containers:
         - name: admission-webhook
-          image: quay.io/openebs/admission-server:v1.2.x-ci
+          image: quay.io/openebs/admission-server:@tag@
           imagePullPolicy: IfNotPresent
           args:
             - -tlsCertFile=/etc/webhook/certs/cert.pem
@@ -701,7 +701,7 @@ spec:
       containers:
       - name: openebs-provisioner-hostpath
         imagePullPolicy: Always
-        image: quay.io/openebs/provisioner-localpv:v1.2.x-ci
+        image: quay.io/openebs/provisioner-localpv:@tag@
         env:
         # OPENEBS_IO_K8S_MASTER enables openebs provisioner to connect to K8s
         # based on this address. This is ignored if empty.
