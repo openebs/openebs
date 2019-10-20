@@ -145,7 +145,7 @@ OpenEBS pod names are derived from the volume name, with the string before the "
 
 ## Step-5: Delete the Percona pod to force reschedule and remount
 
-- The changes caused by the snapshot restore operation on the databsae can be viewed only when the data volume is remounted.
+- The changes caused by the snapshot restore operation on the database can be viewed only when the data volume is remounted.
 This can be achieved if the pod is rescheduled. To force a reschedule, delete the pod (since Percona application has been
 launched as a Kubernetes deployment, the pod will be rescheduled/recreated on either the same OR on other nodes if available).
 

@@ -370,7 +370,7 @@ Node:
 Schema:
   Keyspace: keyspace1
   Replication Strategy: org.apache.cassandra.locator.SimpleStrategy
-  Replication Strategy Pptions: {replication_factor=1}
+  Replication Strategy Options: {replication_factor=1}
   Table Compression: null
   Table Compaction Strategy: null
   Table Compaction Strategy Options: {}
