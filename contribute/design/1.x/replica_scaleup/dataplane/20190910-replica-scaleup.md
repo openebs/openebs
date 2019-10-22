@@ -438,7 +438,7 @@ with different components restarts
 - Start with 3 replicas and write data. Recreate 2 pools and reduce RF to 1.
 Increase it to 3 and verify data consistency.
 - Migrate single replica from one pool to another pool(Make sure there shouldn't
-be any IO disruption.
+be any IO disruption).
 - ScaleDown the replica when other replicas are not healthy state.
 - ScaleDown the replicas when application is pumping the IOs.
 
