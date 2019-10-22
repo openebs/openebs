@@ -95,7 +95,7 @@ This is a meta-repository for OpenEBS. Please start with the pinned repositories
 
 ## License
 
-OpenEBS is developed under Apache 2.0 license at the project level. Some components of the project are derived from other open source projects and are distributed under their respective licenses. 
+OpenEBS is developed under [Apache License 2.0](https://github.com/openebs/openebs/blob/master/LICENSE) license at the project level. Some components of the project are derived from other open source projects and are distributed under their respective licenses. 
 
 OpenEBS is part of the CNCF Projects.
 
