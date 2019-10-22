@@ -14,7 +14,7 @@ last-updated: 2019-09-10
 status: provisional
 ---
 
-# Replica Scaleup
+# Replica Scaleup/ScaleDown
 
 ## Table of Contents
 
@@ -63,7 +63,9 @@ status: provisional
 This proposal includes design for cStor data plane
 - to allow adding new replicas to it so that replication factor of the volume
 will be increased.
-- to move replica from one pool to another
+- to move replica from one pool to another one replica at a time
+- to allow removing replica so that replication factor of the volume will be
+decreased.
 
 ## Motivation
 
@@ -79,13 +81,14 @@ This also allows OpenEBS user to distribute volume replicas
 - Replace a replica with other one which is used in volume distribution and
 ephemeral cases
 - Identify replicas which are allowed to connect to target
+- Decrease ReplicationFactor of volume by removing replica
 
 ### Non-Goals
 
-- Scaling down replicas
-- Add replicas in GitOps model
+- Add/Remove replicas in GitOps model
 - Workflow to replace non-existing replica
 - operator that detects the need to increase ReplicationFactor
+- Remove more than one replica at a time
 
 ## Proposal
 
@@ -94,12 +97,15 @@ ephemeral cases
 #### Add new replica
 As an OpenEBS user, I should be able to add replicas to my volume.
 
-#### Move replica from one pool to another
+#### Move single/multiple replica volume from one pool to another
 As an OpenEBS user, I should be able to move replica across pools.
 
 #### Replace non-existing replica
 As an OpenEBS user, I should be able to replace non-existing replica with new
 replica.
+
+#### Remove replica
+As an OpenEBS user, I should be able to remove the replica from my volume.
 
 ### Implementation Details/Notes/Constraints
 
@@ -197,6 +203,22 @@ In CStorVolumeReplica, new field `spec.ReplicaID` will be added.
 During dataset creation, cstor-pool-mgmt will set this at dataset with property
 as `io.openebs:replicaID`.
 
+#### Removing replica
+Decreasing the replicationFactor will also be done in declarative way.
+For replicas identification that can connect to target, known replicas information
+we are already storing in CStorVolume CR status and istgt.conf which are
+implemented as part of replica scaleup feature.
+
+This operation will be allowed only when RF == DRF and new field will be added
+to CStorvolume CR. In CStorVolume CR, `spec.ReplicaList` will be added to
+help in removing replicas. In istgt.conf, replica list will be filled from
+CStorVolume CR `spec.ReplicaDetails`.
+
+spec.ReplicaList and status.ReplicaList will be updated by volume-mgmt after
+receiving the request from istgt via UDS. Istgt will send request when
+replica become healthy and replica information is not present in in-memory
+KnownReplicalist.
+
 ### Steps to perform user stories
 
 #### Adding new replica
@@ -214,19 +236,24 @@ if descreased by user.
 - User will create proper CVR with status.phase as `Recreate` on new pool and
 `spec.ReplicaID` same as the one of CVR on old pool.
 
-### High Level Design
+#### Removing replica
+- User will edit CStorVolume CR to set 'DesiredReplicationFactor' and Remove
+replicaID entry in `spec.ReplicaList` related to replica which will be deleted.
+- User will delete respective CVR(whcih is removed in above step).
+
+### High Level Design of Replica Scaleup
 cstor-volume-mgmt watches for CStorVolume CR and updates istgt.conf file if
-there is any change in DesiredReplicationFactor.
+there is increased change in DesiredReplicationFactor.
 It will trigger istgtcontrol command so that istgt updates DRF during runtime.
 
 A listener will be created on UnixDomain socket in cstor-volume-mgmt container.
 istgt connects to this listener to update the replica related information if
 there is any change in the list.
-cstor-volume-mgmt updates the status.ReplicaList part of CStorVolume CR and
-sends the success/failure of CR update as reponse to istgt.
+cstor-volume-mgmt updates the spec.ReplicaList and status.ReplicaList part of
+CStorVolume CR and sends the success/failure of CR update as reponse to istgt.
 
 During start phase of cstor-volume-mgmt container, it updates the istgt.conf
-file with values from spec.DesiredReplicationFactor and status.ReplicaList of
+file with values from spec.DesiredReplicationFactor and spec.ReplicaList of
 CStorVolume CR.
 
 #### Components interaction:
@@ -244,6 +271,13 @@ CStorVolume CR.
                    \|/
                [Conf file]
 ```
+### High Level Design of Replica ScaleDown
+CStor-volume-mgmt watches for CStorVolume and update DesiredReplicationFactor
+and Replica list in istgt.conf with available replicas if there is decreased
+change in DesiredReplicationFactor. It will trigger istgtcontrol command so that
+istgt updates volume configuration during runtime. On success of istgtcontrol
+command status part of CStorVolume CR will be updated else cstor-volume-mgmt
+controller will execute same process next sync time.
 
 #### Sample YAMLs
 
@@ -284,7 +318,7 @@ inconsistency.
 If 5th one, either R4 or R5 connects, it need to become healthy before getting
 added to to list. This would be time consuming.
 
-### Low Level Design
+### Low Level Design for add/migrating replica
 Current code takes care of reconstructing data to non-quorum replica once it
 does handshake with target. But, changes are required in allowing replica to
 perform handshake with target to achieve DesiredReplicationFactor.
@@ -373,6 +407,21 @@ However, data plane can take any number of CF which is less than RF.
 - Considering the case of reduction in RF, istgt need to update ReplicaList
 whenever in-memory list doesn't match with the list in conf file.
 
+### Low Level Design for removing replica
+Current implementation takes care of scalingup replicas in declarative manner.
+But, changes are required to remove replica from volume.
+
+#### Removing replica from known replica list
+When DesiredReplicationFactor is decreased and replica detail entries are removed
+removed from spec.ReplicaList then it is case of replica scaledown.
+
+For the case of replica scaledown, steps to follow for data consistency are:
+- Pause IOs for few seconds, and, make sure there are no ongoing IOs on all the
+replicas.
+- If there are no ongoing IOs update in-memory volume configurations and mark
+removing replica as cordon for IOs.
+- Disconnect removing replica from target and Resume the IOs.
+
 ### Testcases:
 - Start old replica and make sure it doesn't connect
 - Not more than DRF number of quorum replicas at any time
@@ -388,6 +437,10 @@ with different components restarts
 - I/P values validation like smaller DRF, reducing DRF/RF
 - Start with 3 replicas and write data. Recreate 2 pools and reduce RF to 1.
 Increase it to 3 and verify data consistency.
+- Migrate single replica from one pool to another pool(Make sure there shouldn't
+be any IO disruption.
+- ScaleDown the replica when other replicas are not healthy state.
+- ScaleDown the replicas when application is pumping the IOs.
 
 ### Risks and Mitigations
 
