@@ -273,11 +273,14 @@ CStorVolume CR.
 ```
 ### High Level Design of Replica ScaleDown
 CStor-volume-mgmt watches for CStorVolume and update DesiredReplicationFactor
-and Replica list in istgt.conf with available replicas if there is decreased
-change in DesiredReplicationFactor. It will trigger istgtcontrol command so that
-istgt updates volume configuration during runtime. On success of istgtcontrol
-command status part of CStorVolume CR will be updated else cstor-volume-mgmt
-controller will execute same process next sync time.
+and Replica list in istgt.conf with available replicas. If there is decreased
+change in DesiredReplicationFactor, cstor-volume-mgmt will trigger istgtcontrol
+command so that istgt will updates volume configuration during runtime. On
+success of istgtcontrol command status part of CStorVolume CR will be updated
+else cstor-volume-mgmt controller will execute same process during next sync time.
+
+Command triggered by cstor-volume-mgmt during replica scaledown case:
+istgtcontrol drf <volume_name> <available_replica_id_list>
 
 #### Sample YAMLs
 
@@ -317,6 +320,10 @@ inconsistency.
 - if second approach is followed, there will be only 4 replicas.
 If 5th one, either R4 or R5 connects, it need to become healthy before getting
 added to to list. This would be time consuming.
+
+#### Do we need to pass available_replica_id_list to istgt during scaledown
+This is needed to identify the replica which needs to be disconnect as part of
+replica scaledown.
 
 ### Low Level Design for add/migrating replica
 Current code takes care of reconstructing data to non-quorum replica once it
@@ -416,11 +423,12 @@ When DesiredReplicationFactor is decreased and replica detail entries are remove
 removed from spec.ReplicaList then it is case of replica scaledown.
 
 For the case of replica scaledown, steps to follow for data consistency are:
-- Pause IOs for few seconds, and, make sure there are no ongoing IOs on all the
-replicas.
-- If there are no ongoing IOs update in-memory volume configurations and mark
-removing replica as cordon for IOs.
-- Disconnect removing replica from target and Resume the IOs.
+- Pause IOs for few seconds, and, make sure there are no ongoing/pending IOs on
+all the replicas(this entier operation will be done for few seconds).
+- If there are no ongoing/pending IOs update in-memory volume configurations and
+mark removing replica as cordoned for IOs.
+- If there are any ongoing/pending IOs resume the IOs and return error.
+- Disconnect the replica from target(which needs to be removed) and Resume the IOs.
 
 ### Testcases:
 - Start old replica and make sure it doesn't connect
