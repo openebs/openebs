@@ -430,6 +430,11 @@ mark removing replica as cordoned for IOs.
 - If there are any ongoing/pending IOs resume the IOs and return error.
 - Disconnect the replica from target(which needs to be removed) and Resume the IOs.
 
+#### Current Limitations for replica scaledown
+1. To perform replica scaledown there shouldn't be any ongoing scaleup/scaledown
+   process.
+2. Remaining replicas should be in healthy state other than removing replica.
+
 ### Testcases:
 - Start old replica and make sure it doesn't connect
 - Not more than DRF number of quorum replicas at any time
