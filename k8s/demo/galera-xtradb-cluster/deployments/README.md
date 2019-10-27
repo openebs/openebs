@@ -90,7 +90,7 @@ https://www.percona.com/blog/2015/06/23/percona-xtradb-cluster-pxc-how-many-node
 secondary/other nodes. Deploying all YAMLs together can cause the pods to restar repeatedly. Th reason stated in Kubernetes 
 documentation is:
 
-  *If there is a node in wsrep_clsuter_address without a backing galera node there will be nothing to obtain SST from which 
+  *If there is a node in wsrep_cluster_address without a backing galera node there will be nothing to obtain SST from which 
   will cause the node to shut itself down and the container in question to exit and relaunch.*
   
 

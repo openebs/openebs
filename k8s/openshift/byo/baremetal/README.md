@@ -18,7 +18,7 @@ run applications on it with OpenEBS storage.
   - Ansible (>= 2.3) on the local machine or any one of the hosts (typically installed on the host used as openshift-master).
   - pyYaml Python package on all the hosts.
 
-- Fucntional DNS server, with all hosts configured by appropriate domain names (Ensure *nslookup* of the hostnames is 
+- Functional DNS server, with all hosts configured by appropriate domain names (Ensure *nslookup* of the hostnames is 
 successful in resolving the machine IP addresses).
   
 - Setup passwordless SSH between the Ansible host & other hosts.

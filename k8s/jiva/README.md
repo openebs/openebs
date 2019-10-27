@@ -57,7 +57,7 @@ Download the files for deleting Jiva snapshots from Jiva repository using the fo
 wget https://raw.githubusercontent.com/openebs/openebs/master/k8s/jiva/patch.json
 wget https://raw.githubusercontent.com/openebs/openebs/master/k8s/jiva/snapshot-cleanup.sh
 ```
-Ensure that `snapshot-cleanup.sh` has execute permission. If not, make it execuatble by running `chmod +x snapshot-cleanup.sh` from the  downloaded folder.
+Ensure that `snapshot-cleanup.sh` has execute permission. If not, make it executable by running `chmod +x snapshot-cleanup.sh` from the  downloaded folder.
 
 Now get the PV name using the following command.
 ```

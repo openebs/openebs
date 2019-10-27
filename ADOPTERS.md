@@ -8,11 +8,11 @@ The list of organizations that have publicly shared the usage of OpenEBS:
 
 | Organization | Stateful Workloads | Success Story |
 | :--- | :--- | :--- |
-| [Arista Networks](https://www.arista.com/en/) | Gerrit (multiple flavors), NPM, Maven, Redis, NFS, SonarQube, Internal tools | [English](./adopters/arista/README.md) |
+| [Arista Networks](https://www.arista.com/en/) | Gerrit (multiple flavors), NPM, Maven, Redis, NFS, Sonarqube, Internal tools | [English](./adopters/arista/README.md) |
 | [CLEW Medical](https://clewmed.com/) | PostgreSQL, Keycloak, RabbitMQ | [English](./adopters/clewmedical/README.md) |
 | [Clouds Sky GmbH](https://cloudssky.com/en/) | Confluent Kafka, Strimzi Kafka, Elasticsearch, Prometheus | [English](./adopters/cloudssky/README.md) |
-| [Code Wave](https://codewave.eu/) | Bitwarden, BookStack, Allegros Ralph, LimeSurvey, Grafana, HackMD/CodiMD, MinIO, Nextcloud, Percona XtraDB Cluster Operator, SonarQube, Sentry, JupyterHub | [English](./adopters/codewave/README.md) |
-| [Comcast](https://github.com/Comcast) | Prometheus, Alertmanager, InfluxDB, Helm ChartMuseum | [English](./adopters/comcast/README.md) |
+| [Code Wave](https://codewave.eu/) | Bitwarden, Bookstack, Allegros Ralph, Limesurvey, Grafana, Hackmd/Codimd, Minio, Nextcloud, Percona XtraDB Cluster Operator, Nextcloud, Sonarqube, Sentry, Jupyterhub | [English](./adopters/codewave/README.md) |
+| [Comcast](https://github.com/Comcast) | Prometheus, Alertmanager, Influxdb, Helm Chartmuseum | [English](./adopters/comcast/README.md) |
 | [Plaid Cloud](https://github.com/PlaidCloud) | Redis, Prometheus, Elasticsearch, PostgreSQL | [English](./adopters/plaidcloud/README.md) |
 
 
