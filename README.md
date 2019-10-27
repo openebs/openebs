@@ -28,7 +28,7 @@ OpenEBS itself is deployed as just another container on your host and enables st
 
 An added advantage of being a completely Kubernetes native solution is that administrators and developers can interact and manage OpenEBS using all the wonderful tooling that is available for Kubernetes like kubectl, Helm, Prometheus, Grafana, Weave Scope, etc.
 
-**Our vision** is simple: let storage and storage services for persistent workloads be fully integrated into the environment so that each team and workload benefits from the granularity of control and Kubernetes native behavior.
+**Our vision** is simple: let storage and storage services for persistent workloads be fully integrated into the environment so that each team and workload benefits from the granularity of control and Kubernetes native behaviour.
 
 #### *Read this in [other languages](translations/TRANSLATIONS.md).*
 
@@ -58,7 +58,7 @@ helm install --namespace openebs --name openebs stable/openebs
 
 You could also follow our [QuickStart Guide](https://docs.openebs.io/docs/overview.html).
 
-OpenEBS can be deployed on any Kubernetes cluster - either in cloud, on-premise or developer laptop (minikube). Note that there are no changes to the underlying kernel that are required as OpenEBS operates in userspace.  Please follow our [OpenEBS Setup](https://docs.openebs.io/docs/overview.html) documentation. Also, we have a Vagrant environment available that includes a sample Kubernetes deployment and synthetic load that you can use to simulate the performance of OpenEBS. You may also find interesting the related project called Litmus (https://www.openebs.io/litmus) which helps with chaos engineering for stateful workloads on Kubernetes.
+OpenEBS can be deployed on any Kubernetes cluster - either in the cloud, on-premise or developer laptop (minikube). Note that there are no changes to the underlying kernel that are required as OpenEBS operates in userspace.  Please follow our [OpenEBS Setup](https://docs.openebs.io/docs/overview.html) documentation. Also, we have a Vagrant environment available that includes a sample Kubernetes deployment and synthetic load that you can use to simulate the performance of OpenEBS. You may also find interesting the related project called Litmus (https://www.openebs.io/litmus) which helps with chaos engineering for stateful workloads on Kubernetes.
 
 ## Status
 
@@ -70,7 +70,7 @@ The status of various storage engines that power the OpenEBS Persistent Volumes 
 |---|---|---|
 | Jiva | stable | Best suited for running Replicated Block Storage on nodes that make use of ephemeral storage on the Kubernetes worker nodes |
 | cStor | beta | A preferred option for running on nodes that have Block Devices. Recommended option if Snapshot and Clones are required |
-| Local Volumes | beta | Best suited for Distributed Application that needs low latency storage - direct attached storage from the Kubernetes nodes. |
+| Local Volumes | beta | Best suited for Distributed Application that need low latency storage - direct-attached storage from the Kubernetes nodes. |
 | MayaStor | alpha | A new storage engine that operates at the efficiency of Local Storage but also offers storage services like Replication. Development is underway to support Snapshots and Clones. |
 
 For more details, please refer to [OpenEBS Documentation](https://docs.openebs.io/docs/next/quickstart.html).
@@ -108,6 +108,3 @@ This is a list of third-party companies and individuals who provide products or 
 - [CodeWave](https://codewave.eu/)
 - [Gridworkz Cloud Services](https://gridworkz.com/)
 - [MayaData](https://mayadata.io/)
-
-
- 
