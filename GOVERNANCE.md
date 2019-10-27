@@ -4,7 +4,7 @@ We abide by the [Code of Conduct](./CODE_OF_CONDUCT.md) for all the projects mai
 
 For specific guidance on practical contribution steps for any OpenEBS sub-project please
 see our [CONTRIBUTING.md](./CONTRIBUTING.md) guide and the sub-project specific contributing guides 
-in the respective github repositories.
+in the respective GitHub repositories.
 
 ## Maintainership
 
@@ -126,7 +126,7 @@ way forward.
 
 In this case, maintainers can update the commits based on clause (c) of the DCO.
 The most trivial way for a contributor to allow the maintainer to do this, is to
-add a DCO signature in a pull requests's comment, or a maintainer can simply
+add a DCO signature in a pull request's comment, or a maintainer can simply
 note that the change is sufficiently trivial that it does not substantially
 change the existing contribution - i.e., a spelling change.
 

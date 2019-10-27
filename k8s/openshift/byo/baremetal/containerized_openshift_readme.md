@@ -337,7 +337,7 @@ oc apply -f openebs-operator
 oc apply -f openebs-storageclasses.yaml
 ```
 
--After applying the operator yaml, if you see pod status is in pending state and on describing the maya-apiserver pod the the following error message is found.
+-After applying the operator yaml, if you see pod status is in pending state and on describing the maya-apiserver pod the following error message is found.
 
 ```
 [root@osnode1 ~]# oc get pods -n openebs

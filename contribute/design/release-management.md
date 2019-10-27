@@ -5,7 +5,7 @@ OpenEBS Components are released as container images with versioned tags. The rel
 The release process involves the following stages:
 - Release Candidate Builds
 - Update Installer and Documentation
-- Update the charts like Helm stable and other partner charts. (Rancher, OpenShift, IBM ICP Communty Charts, Netapp NKS Trusted Charts (formerly StackPointCloud), AWS Marketplace)
+- Update the charts like Helm stable and other partner charts. (Rancher, OpenShift, IBM ICP Community Charts, Netapp NKS Trusted Charts (formerly StackPointCloud), AWS Marketplace)
 - Update the openebs-operator.yaml
 - Final Release
 

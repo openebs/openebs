@@ -11,7 +11,7 @@
 ### Type of OpenEBS Storage Engines behind the above applications
 
 - **cStor** (for "monitoring" apps like Prometheus and Elasticsearch)
-- **Local PV** (for "customer-facing" apps like Redis, Postgresql, and our own)
+- **Local PV** (for "customer-facing" apps like Redis, PostgreSQL, and our own)
 
 Initially we used cStor for all of our apps (separated into "fast" and "slow" storage pools), but recently moved our performance-sensitive workloads to use Local PVs.
 

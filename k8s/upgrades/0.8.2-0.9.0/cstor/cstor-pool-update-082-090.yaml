@@ -89,7 +89,7 @@ spec:
     - upgrade-cstor-pool-082-090-patch-deployment-version-post-check
 
     # Runtask #14
-    # This runtask list all the replicaset of the the cstorpool deployment.
+    # This runtask list all the replicaset of the cstorpool deployment.
     - upgrade-cstor-pool-082-090-list-replicaset
 
     # Runtask #15

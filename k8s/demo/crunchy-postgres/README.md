@@ -136,7 +136,7 @@ The verification procedure can be carried out using the following steps:
 
 ### Step-1: Install the PostgreSQL-Client
 
-Install the PostgreSQL CLient Utility (psql) on any of the Kubernetes machines to perform database operations 
+Install the PostgreSQL Client Utility (psql) on any of the Kubernetes machines to perform database operations 
 from the command line. 
 
 ```
