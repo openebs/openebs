@@ -18,7 +18,7 @@ There are a few simple guidelines that you need to follow before providing your 
 ## Raising Issues
 
 When raising issues, please specify the following:
-- Setup details needs to be filled as specified in the issue template clearly for the reviewer to check.
+- Setup details need to be filled as specified in the issue template clearly for the reviewer to check.
 - A scenario where the issue occurred (with details on how to reproduce it).
 - Errors and log messages that are displayed by the software.
 - Any other details that might be useful.
@@ -32,16 +32,16 @@ Getting documentation right is hard! Refer to this [page](./contribute/CONTRIBUT
 There is always something more that is required, to make it easier to suit your use-cases. Feel free to join the discussion on new features or raise a PR with your proposed change. 
 
 - [Join our community](https://openebs.io/join-our-slack-community)
- 	 - Already signed up? Head to our discussions at [#openebs-users](https://openebs-community.slack.com/messages/openebs-users/)
+      - Already signed up? Head to our discussions at [#openebs-users](https://openebs-community.slack.com/messages/openebs-users/)
 
 ## Contributing to Source Code and Bug Fixes
 
 Provide PRs with appropriate tags for bug fixes or enhancements to the source code. For a list of tags that could be used, see [this](./contribute/labels-of-issues.md).
 
 * For contributing to K8s demo, please refer to this [document](./contribute/CONTRIBUTING-TO-K8S-DEMO.md).
-	- For checking out how OpenEBS works with K8s, refer to this [document](./k8s/README.md) 
+    - For checking out how OpenEBS works with K8s, refer to this [document](./k8s/README.md) 
 - For contributing to Kubernetes OpenEBS Provisioner, please refer to this [document](./contribute/CONTRIBUTING-TO-KUBERNETES-OPENEBS-PROVISIONER.md).
-	
+    
 Refer to this [document](./contribute/design/code-structuring.md) for more information on code structuring and guidelines to follow on the same.
 
 ## Solve Existing Issues
@@ -67,4 +67,4 @@ Use your real name (sorry, no pseudonyms or anonymous contributions). If you set
 
 ## Join our community 
 
-Want to actively develop and contribute in the OpenEBS community, refer to this [document](./community/README.md).
+Want to actively develop and contribute to the OpenEBS community, refer to this [document](./community/README.md).
