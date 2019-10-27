@@ -42,11 +42,11 @@ To get started with this template:
   Aim for single topic PRs to keep discussions focused.
   If you disagree with what is already in a document, open a new PR with suggested changes.
 
-The canonical place for the latest set of instructions (and the likely source of this file) is [here](/contribute/design/oep-template.md).
+The canonical place for the latest set of instructions (and the likely source of this file) is [here](https://github.com/openebs/openebs/blob/master/contribute/process/oep-template.md).
 
 The `Metadata` section above is intended to support the creation of tooling around the OEP process.
 This will be a YAML section that is fenced as a code block.
-See the [OEP process](/contribute/design/oep-process.md) for details on each of these items.
+See the [OEP process](https://github.com/openebs/openebs/blob/master/contribute/process/oep-process.md) for details on each of these items.
 
 ## Table of Contents
 
