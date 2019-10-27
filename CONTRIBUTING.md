@@ -47,7 +47,7 @@ Refer to this [document](./contribute/design/code-structuring.md) for more infor
 ## Solve Existing Issues
 Head over to [issues](https://github.com/openebs/openebs/issues) to find issues where help is needed from contributors. See our [list of labels guide](./contribute/labels-of-issues.md) to help you find issues that you can solve faster.
 
-A person looking to contribute can take up an issue by claiming it as a comment/assign their Github ID to it. In case there is no PR or update in progress for a week on the said issue, then the issue reopens for anyone to take up again. We need to consider high priority issues/regressions where response time must be a day or so. 
+A person looking to contribute can take up an issue by claiming it as a comment/assign their GitHub ID to it. In case there is no PR or update in progress for a week on the said issue, then the issue reopens for anyone to take up again. We need to consider high priority issues/regressions where response time must be a day or so. 
 
 ---
 ### Sign your work
