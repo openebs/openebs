@@ -7,7 +7,7 @@
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fopenebs%2Fopenebs.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fopenebs%2Fopenebs?ref=badge_shield)
 [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/1754/badge)](https://bestpractices.coreinfrastructure.org/projects/1754)
 
-https://www.openebs.io/
+https://openebs.org/
 
 **OpenEBS**, kritik işlevli, verileri kalıcı olan ve örneğin günlük oluşturma (logging) veya Prometheus gibi uygulamaların depolama ihtiyaçlarını karşılamak için kullanılır. OpenEBS konteyner depolama ve ilgili veri depolama hizmetlerini sunar.
  
@@ -20,10 +20,10 @@ https://www.openebs.io/
 
 **Vizyonumuz** gayet basit: Verileri kalıcı olan uygulamalar için depolama ve depolama hizmetlerinin konteyner ekosistemine tamamen entegre olmasını sağlamak. Böylelikle her uygulama geliştirici ekibi granüler yönetim ve Kubernetes'e özgü davranışlardan yararlanır.
 
-#### *Bu dosyayı [diğer dillerde](translations/TRANSLATIONS.md) oku.*
+#### *Bu dosyayı [diğer dillerde](/translations/TRANSLATIONS.md) oku.*
 
 [🇩🇪](README.de.md)
-[:uk:](../README.MD)
+[:uk:](/README.md)
 [🇷🇺](README.ru.md)
 [🇹🇷](README.tr.md)
 
@@ -68,8 +68,8 @@ OpenEBS, her açık kaynak kodlu uygulama gibi kullanıcı katılarıyla güçle
   - Proje (repo) ile ilgili belirli konular ayrıca [sorunlar](https://github.com/openebs/openebs/issues) ve *repo/maya* gibi tek tek etiketlerle etiketlenebilir.
 - Düzeltmeler ve özellikler konusunda yardımcı olmak ister misiniz?
   - Bkz. [Açık sorunlar](https://github.com/openebs/openebs/labels)
-  - Bkz. [Katkıda bulunma rehber](./CONTRIBUTING.md)
-  - Topluluğumuza katılmak isterseniz, [buraya bakınız](./community/README.md).
+  - Bkz. [Katkıda bulunma rehber](/CONTRIBUTING.md)
+  - Topluluğumuza katılmak isterseniz, [buraya bakınız](/community/README.md).
 
 ## Bana kodu göster
 
@@ -78,7 +78,7 @@ Kaynak kodlarını aşağıdaki yerlerde bulabilirsiniz:
 - Depolama orkestrasyon kaynak kodu [openebs/maya](https://github.com/openebs/maya) altındadır.
 - *jiva* ve *maya* önemli miktarda kaynak kodu içeriyor olsa da, bazı orkestrasyon ve otomasyon kodları OpenEBS organizasyonu altında diğer depolarda da dağıtılır.
 
-Lütfen yukarıdaki repolarla veya [OpenEBS Architecture](./contrib/design/README.md) dosyasından başlayın.
+Lütfen yukarıdaki repolarla veya [OpenEBS Architecture](/contribute/design/README.md) dosyasından başlayın.
 
 ## Lisans
 
