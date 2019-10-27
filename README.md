@@ -7,7 +7,7 @@
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fopenebs%2Fopenebs.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fopenebs%2Fopenebs?ref=badge_shield)
 [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/1754/badge)](https://bestpractices.coreinfrastructure.org/projects/1754)
 
-https://www.openebs.io/
+https://openebs.org/
  
 **OpenEBS** is the most widely deployed and easy to use open-source storage solution for Kubernetes. 
 
@@ -87,7 +87,7 @@ OpenEBS welcomes your feedback and contributions in any form possible.
   - Want to join our contributor community meetings, [check this out](./community/README.md). 
 - Join our OpenEBS CNCF Mailing lists
   - For OpenEBS project updates, subscribe to [OpenEBS Announcements](https://lists.cncf.io/g/cncf-openebs-announcements)
-  - For interacting with other openebs users, subscribe to [OpenEBS Users](https://lists.cncf.io/g/cncf-openebs-users)
+  - For interacting with other OpenEBS users, subscribe to [OpenEBS Users](https://lists.cncf.io/g/cncf-openebs-users)
 
 ## Show me the Code
 
@@ -103,9 +103,8 @@ OpenEBS is part of the CNCF Projects.
 
 ## Commercial Offerings
 
-This is a list of third-party companies and individuals who provide products or services related to OpenEBS. OpenEBS is an CNCF project which does not endorse any company. The list is provided in alphabetical order.
+This is a list of third-party companies and individuals who provide products or services related to OpenEBS. OpenEBS is a CNCF project which does not endorse any company. The list is provided in alphabetical order.
 - [Clouds Sky GmbH](https://cloudssky.com/en/)
 - [CodeWave](https://codewave.eu/)
 - [Gridworkz Cloud Services](https://gridworkz.com/)
 - [MayaData](https://mayadata.io/)
-
