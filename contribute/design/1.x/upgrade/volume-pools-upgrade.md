@@ -265,9 +265,9 @@ This design proposes the following key changes:
         phase: #STARTED, SUCCESS or ERROR can be the supported phases
         #message is a human readable message in case of failure
         message: Unable to set desired replication factor to CV
-        #reason is the actual error recieved by the function calls
+        #reason is the actual error received by the function calls
         reason: invalid config for the volume
-        #lastUpdateTime is the time last modification of status occured
+        #lastUpdateTime is the time last modification of status occurred
         lastUpdateTime: "2019-10-03T14:37:03Z"
     ```
 

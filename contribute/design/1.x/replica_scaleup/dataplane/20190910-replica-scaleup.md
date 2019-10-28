@@ -223,7 +223,7 @@ A listener will be created on UnixDomain socket in cstor-volume-mgmt container.
 istgt connects to this listener to update the replica related information if
 there is any change in the list.
 cstor-volume-mgmt updates the status.ReplicaList part of CStorVolume CR and
-sends the success/failure of CR update as reponse to istgt.
+sends the success/failure of CR update as response to istgt.
 
 During start phase of cstor-volume-mgmt container, it updates the istgt.conf
 file with values from spec.DesiredReplicationFactor and status.ReplicaList of

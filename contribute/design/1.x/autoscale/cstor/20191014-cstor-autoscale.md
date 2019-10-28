@@ -213,7 +213,7 @@ This being related to provision, field for this in CSPI is:
 `CORDONED` means CVC SHOULD NOT pick the CSPI for any further volume
 provisioning.
 
-There is NO reconcilation happens for this, but, this acts as a config
+There is NO reconciliation happens for this, but, this acts as a config
 parameter.
 
 This is not added to `spec` of CSPI as `spec` is shared with CSPC controller
@@ -293,7 +293,7 @@ It excludes the CSPIs whose provision.status is NOT ONLINE for provisioning
 replicas.
 
 #### More OEPs:
-- For cStor volume's replica scale down scenario, seperate OEP need to be raised
+- For cStor volume's replica scale down scenario, separate OEP need to be raised
 or existing OEP on replica scaleup need to be updated.
 - OEP for operator that cordons and drains the node need to be raised
 
