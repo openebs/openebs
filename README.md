@@ -38,7 +38,7 @@ An added advantage of being a completely Kubernetes native solution is that admi
 
 ## Scalability
  
-OpenEBS can scale to include an arbitrarily large number of containerized storage controllers. Kubernetes is used to provide fundamental pieces such as using etcd for inventory. OpenEBS scales to the extent your Kubernetes scales.
+OpenEBS can scale to include an arbitrarily large number of containerized storage controllers. Kubernetes is used to provide fundamental pieces such as using etcd for inventory. OpenEBS scales to the extent of your Kubernetes scales.
 
 ## Installation and Getting Started
  
