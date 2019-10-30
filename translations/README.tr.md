@@ -26,6 +26,7 @@ https://openebs.org/
 [:uk:](/README.md)
 [🇷🇺](README.ru.md)
 [🇹🇷](README.tr.md)
+[🇺🇦](README.ua.md)
 
 ## Ölçeklenebilirlik
  
