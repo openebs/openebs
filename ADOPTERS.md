@@ -13,6 +13,7 @@ The list of organizations that have publicly shared the usage of OpenEBS:
 | [Clouds Sky GmbH](https://cloudssky.com/en/) | Confluent Kafka, Strimzi Kafka, Elasticsearch, Prometheus | [English](./adopters/cloudssky/README.md) |
 | [Code Wave](https://codewave.eu/) | Bitwarden, Bookstack, Allegros Ralph, Limesurvey, Grafana, Hackmd/Codimd, Minio, Nextcloud, Percona XtraDB Cluster Operator, Nextcloud, Sonarqube, Sentry, Jupyterhub | [English](./adopters/codewave/README.md) |
 | [Comcast](https://github.com/Comcast) | Prometheus, Alertmanager, Influxdb, Helm Chartmuseum | [English](./adopters/comcast/README.md) |
+| [Orange](https://www.orange.com/en/home) | Prometheus, Alertmanager, ChartMuseum, Harbor, GitLab, PostgreSQL, Redis, OpenLdap, RabbitMQ, MySQL, MinIO, Metabase, ... | [English](./adopters/orange/README.md) |
 | [Plaid Cloud](https://github.com/PlaidCloud) | Redis, Prometheus, Elasticsearch, PostgreSQL | [English](./adopters/plaidcloud/README.md) |
 
 
