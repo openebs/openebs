@@ -113,7 +113,12 @@ At CSI, when we get a Create Volume request, it will first try to find a node wh
 In CreateVolume call, we will have the list of nodes where the ZFS pools are present and the volume should be created in anyone of the node present in the list.
 
 #### 1.1 Scheduler
-At this point the ZFS driver will have list of all nodes where ZFS pools are present. It will go through the list and pick the node where less number of volumes are provisioned.
+At this point the ZFS driver will have list of all nodes where ZFS pools are present. It will go through the list and pick the appropriate node to schedule the PV.
+
+##### Volume Weighted Scheduler :-
+
+In this scheduling algorithm the scheduler will pick the node where less number of volumes are provisioned. This is the default scheduling if no scheduling algorithm is provided.
+
 Lets say there are 2 nodes node1 and node2 with below pool configuration :-
 ```
 node1 
@@ -146,6 +151,7 @@ parameters:
   compression: "on"
   dedup: "on"
   thinprovision: "yes"
+  scheduler: "VolumeWeighted"
   poolname: "pool1"
 ```
 
@@ -161,9 +167,12 @@ parameters:
   compression: "on"
   dedup: "on"
   thinprovision: "yes"
+  scheduler: "VolumeWeighted"
   poolname: "pool2"
 ```
 In case of same number of volumes on all the nodes for the given pool, it can pick any node and schedule the PV on that.
+
+In future, once ZFS pool intelligence is there, we can have Capacity Weighted scheduling algorithm also which will take the available space in ZFS pool into scheduling consideration and schedule the PV to the appropirate ZFS pool where sufficient space is available.
 
 #### 1.2  Volume Creation
 
