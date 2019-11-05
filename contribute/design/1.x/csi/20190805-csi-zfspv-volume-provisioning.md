@@ -172,7 +172,50 @@ parameters:
 ```
 In case of same number of volumes on all the nodes for the given pool, it can pick any node and schedule the PV on that.
 
-In future, once ZFS pool intelligence is there, we can have Capacity Weighted scheduling algorithm also which will take the available space in ZFS pool into scheduling consideration and schedule the PV to the appropirate ZFS pool where sufficient space is available.
+##### Capacity Weighted Scheduler :-
+In this scheduling algorithm the scheduler will account the available space in ZFS pool into scheduling consideration and schedule the PV to the appropriate ZFS pool where sufficient space is available.
+Consider the below scenario in a two node cluster setup :-
+node1
+|
+|-----> pool1 (available 1TB)
+|-----> pool2 (available 500GB)
+
+node2
+|
+|-----> pool1 (available 300 GB)
+|-----> pool2 (available 2TB)
+
+Here, if application is using pool1 then the volume will be provisioned on node1 as it has more space available than node2 for pool1.
+```yaml
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  name: openebs-zfspv
+provisioner: zfs.csi.openebs.io
+parameters:
+  blocksize: "4k"
+  compression: "on"
+  dedup: "on"
+  thinprovision: "yes"
+  scheduler: "CapacityWeighted"
+  poolname: "pool1"
+```
+If application is using pool2 then volume will be provisioned on node2 as it has more space available that node1 for pool2.
+```yaml
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  name: openebs-zfspv
+provisioner: zfs.csi.openebs.io
+parameters:
+  blocksize: "4k"
+  compression: "on"
+  dedup: "on"
+  thinprovision: "yes"
+  scheduler: "CapacityWeighted"
+  poolname: "pool2"
+```
+In case if same space is available for all the nodes, the scheduler can pick anyone and create the PV for that.
 
 #### 1.2  Volume Creation
 
