@@ -67,7 +67,7 @@ rules:
   verbs: ["get", "watch", "list", "delete", "update", "create"]
 - apiGroups: ["admissionregistration.k8s.io"]
   resources: ["validatingwebhookconfigurations", "mutatingwebhookconfigurations"]
-  verbs: ["get","create", "delete", "update", "patch"]
+  verbs: ["get", "create", "list", "delete", "update", "patch"]
 - nonResourceURLs: ["/metrics"]
   verbs: ["get"]
 - apiGroups: ["*"]
@@ -495,7 +495,7 @@ spec:
           value: "10737418240"
         # Specify the number of sparse files to be created
         - name: SPARSE_FILE_COUNT
-          value: "1"
+          value: "0"
         livenessProbe:
           exec:
             command:
