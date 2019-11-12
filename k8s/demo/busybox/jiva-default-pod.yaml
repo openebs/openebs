@@ -1,0 +1,60 @@
+# Copyright © 2019 The OpenEBS Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+# Example for launching a busybox pod using jiva.
+# 
+# This example uses the default jiva storage class installed
+# by OpenEBS. 
+#
+# Prior to running this YAML, verify that the storage class 
+# mentioned below is available. 
+#
+# You can use the below commands to verify.
+#
+# `kubectl describe sc openebs-jiva-default`
+#
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-jd
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: openebs-jiva-default
+  resources:
+    requests:
+      storage: 2Gi
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: busybox-jd
+  namespace: default
+spec:
+  containers:
+  - command:
+       - sh
+       - -c
+       - 'date > /mnt/store1/date.txt; hostname >> /mnt/store1/hostname.txt; sync; sleep 5; sync; tail -f /dev/null;'
+    image: busybox
+    imagePullPolicy: Always
+    name: busybox
+    volumeMounts:
+    - mountPath: /mnt/store1
+      name: demo-vol1
+  volumes:
+  - name: demo-vol1
+    persistentVolumeClaim:
+      claimName: pvc-jd
+---
