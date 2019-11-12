@@ -80,7 +80,7 @@ For more details, please refer to [OpenEBS Documentation](https://docs.openebs.i
  
 OpenEBS welcomes your feedback and contributions in any form possible.
  
-- [Join our community](https://openebs.io/join-our-slack-community)
+- [Join our community](https://openebs.org/community)
   - Already signed up? Head to our discussions at [#openebs-users](https://openebs-community.slack.com/messages/openebs-users/)
 - Want to raise an issue or help with fixes and features?
   - See [open issues](https://github.com/openebs/openebs/issues)

@@ -6,13 +6,13 @@ Nevertheless, find below a list of many general channels, groups, and meetings d
 
 ## Communication
 
-- [Community](https://openebs.io/join-our-slack-community) - Sign Up for Slack.
+- [Community](https://openebs.org/community) - Sign Up for Slack.
 
 - [Blog](https://blog.openebs.io) - Blogs on Containerized Storage, and DevOps.
 
 - [Twitter](https://twitter.com/openebs) - Follow.
 
-Real time discussions happen at [OpenEBS Community Slack](https://openebs-community.slack.com/).
+Real time discussions happen at [OpenEBS Community Slack](https://openebs.org/community).
 
 ## How Can I Help?
 

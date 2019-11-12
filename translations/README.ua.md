@@ -62,7 +62,7 @@ OpenEBS можна розгорнути на будь-якому Kubernetes кл
  
 Команда OpenEBS буде рада вашим відгукам, побажанням й пропозиціям:
  
-- [приєднуйтесь до нашого товариства](https://openebs.io/join-our-slack-community).
+- [приєднуйтесь до нашого товариства](https://openebs.org/community).
   - Вже зареєстровані? Приєднуйтесь до наших обговорень в [# openebs-users](https://openebs-community.slack.com/messages/openebs-users/).
 - Бажаєте задати питання?
   - Якщо ваше питання загальне (або «не зовсім певен»), ви можете задати його в  [issues](https://github.com/openebs/openebs/issues).
