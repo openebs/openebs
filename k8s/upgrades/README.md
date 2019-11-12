@@ -78,6 +78,8 @@ machine that has access to Kubernetes master**
   kubectl delete validatingwebhookconfiguration openebs-validation-webhook-cfg
   ```
 
+  **Note: The name of `validatingwebhookconfiguration` may differ as `validation-webhook-cfg` in `operator` installation and `openebs-validation-webhook-cfg` in `helm` installation.**
+
 ## Step 2: Upgrade the OpenEBS Control Plane
 
 Upgrade steps vary depending on the way OpenEBS was installed by you. 
