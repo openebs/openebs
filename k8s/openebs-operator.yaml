@@ -67,7 +67,7 @@ rules:
   verbs: ["get", "watch", "list", "delete", "update", "create"]
 - apiGroups: ["admissionregistration.k8s.io"]
   resources: ["validatingwebhookconfigurations", "mutatingwebhookconfigurations"]
-  verbs: ["get","create", "delete", "update", "patch"]
+  verbs: ["get","create", "list", "delete", "update", "patch"]
 - nonResourceURLs: ["/metrics"]
   verbs: ["get"]
 - apiGroups: ["*"]
