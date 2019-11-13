@@ -62,7 +62,7 @@ Devam eden aktif yazılım geliştirme çalışmaları ile beta aşamasına yakl
  
 OpenEBS, her açık kaynak kodlu uygulama gibi kullanıcı katılarıyla güçlenen bir projedir. Yorumlarınızlardan ve katkılarınızdan minnettarız.
  
-- [Bizim katılın topluluk](https://openebs.io/join-our-slack-community).
+- [Bizim katılın topluluk](https://openebs.org/community).
   - Eğer kayıtlıysanız tartışmalarımıza [#openebs-users](https://openebs-community.slack.com/messages/openebs-users/users) adresinden ulaşabilirsiniz.
 - Bir sorunu bildirmek ister misiniz?
   - Eğer olamadığınız genel bir sorunuz varsa, bunu  [sorunlar](https://github.com/openebs/openebs/issues) altında rapor edebilirsiniz.
