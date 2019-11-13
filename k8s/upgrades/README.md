@@ -68,18 +68,6 @@ machine that has access to Kubernetes master**
   Verify that `apiserver` is listed. If you have installed with helm charts, 
   the apiserver name may be openebs-apiserver. 
 
-  **From 1.4.0 onwards the webhook service, secret and validatingwebhookconfiguration 
-  will be managed by the admission-server once it starts. This requires removal of old 
-  configurations using below commands :**
-
-  ```sh
-  kubectl delete svc admission-server-svc -n openebs
-  kubectl delete secret admission-server-certs  -n openebs
-  kubectl delete validatingwebhookconfiguration openebs-validation-webhook-cfg
-  ```
-
-  **Note: The name of `validatingwebhookconfiguration` may differ as `validation-webhook-cfg` in `operator` installation and `openebs-validation-webhook-cfg` in `helm` installation.**
-
 ## Step 2: Upgrade the OpenEBS Control Plane
 
 Upgrade steps vary depending on the way OpenEBS was installed by you. 
