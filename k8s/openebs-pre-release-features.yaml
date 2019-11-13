@@ -1,7 +1,0 @@
-#This file includes the YAMLs that need to be applied post 
-# installing openebs. Typically this will contains YAMLS 
-# related to the feature/functionality that is currently under
-# development. Once the features are qualified, they are either
-# integrated into the operator.yaml or will be installed
-# by m-apiserver during startup. 
----
