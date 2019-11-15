@@ -32,8 +32,8 @@ The above steps will create the following docker images:
 Tag the images and push to your repo. The following steps are used to push the alpha versions of this image to openebs docker repo. 
 
 ```
-sudo docker tag openebs/node-disk-operator-arm64:ci openebs/node-disk-operator-arm64-ci:1.4.0
-sudo docker tag openebs/node-disk-manager-arm64:ci openebs/node-disk-manager-arm64-ci:1.4.0
+sudo docker tag openebs/node-disk-operator-arm64:ci openebs/node-disk-operator-arm64-ci:v0.4.4
+sudo docker tag openebs/node-disk-manager-arm64:ci openebs/node-disk-manager-arm64-ci:v0.4.4
 sudo docker push openebs/node-disk-operator-arm64-ci:1.4.0
 sudo docker push openebs/node-disk-manager-arm64-ci:1.4.0
 ```
@@ -102,13 +102,16 @@ sudo docker push openebs/provisioner-localpv-arm64-ci:1.4.0
 ```
 
 ## Future Development Items
-- Building exporter images for exporting volume metrics
-- Fix the e2e tests on Jiva Data Engine
-- Building cStor
+- Refactor the build scripts for prometheus exporter  (m-exporter)
+- Refactor the build scripts for openebs-tools used by NDM and Local Provisioner
+- Setup e2e tests on Jiva Data Engine and Local PV
+- Refactor the build scripts cStor Data Engine
+- Setup e2e tests on cStor
 - Automating commit and release builds
 - Adding e2e pipeline for ARM builds. 
 
 ## Help Required
-- Access to various flavors of ARM build nodes
-- Access to Kubernetes ARM clusters to running e2e tests.
+- Hardware access to build/test various flavors of ARM build 
+- Hardware access to setup Kubernetes ARM clusters and run e2e tests.
+- New contributors to help with above mentioned development items
 
