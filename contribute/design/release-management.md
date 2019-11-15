@@ -5,7 +5,7 @@ OpenEBS Components are released as container images with versioned tags. The rel
 The release process involves the following stages:
 - Release Candidate Builds
 - Update Installer and Documentation
-- Update the charts like Helm stable and other partner charts. (Rancher, OpenShift, IBM ICP Community Charts, Netapp NKS Trusted Charts (formerly StackPointCloud), AWS Marketplace)
+- Update the charts like Helm stable and other partner charts. (Rancher, OpenShift, IBM ICP Community Charts, Netapp NKS Trusted Charts (formerly StackPointCloud), AWS Marketplace, OperatorHub and DigitalOcean)
 - Update the openebs-operator.yaml
 - Final Release
 
@@ -20,7 +20,8 @@ The release tags are applied in the following order:
 - openebs/external-storage
 - openebs/velero-plugin
 - openebs/maya
-- openebs/csi
+- openebs/cstor-csi
+- openebs/zfs-localpv
 
 The e2e pipeline and exploratory tests are executed using the RC tagged images. Any issues identified during this RC testing are tagged as release blockers.
 After the issues are fixed and verified by the CI, next RC is triggered.(Example: 1.0.0-RC2)
