@@ -38,6 +38,17 @@ sudo docker push openebs/node-disk-operator-arm64-ci:1.4.0
 sudo docker push openebs/node-disk-manager-arm64-ci:1.4.0
 ```
 
+NDM uses linux-utils to image to launch a kubernete job to cleanup devices after being released from PV. The image can be build and pushed as follows:
+
+```
+mkdir $GOPATH/litmuschaos
+cd $GOPATH/litmuschaos
+git clone https://github.com/litmuschaos/test-tools.git
+cd linux-utils && docker build -t openebs/linux-utils .
+sudo docker tag openebs/linux-utils:latest openebs/linux-utils:arm64-1.4.0
+sudo docker push openebs/linux-utils:arm64-1.4.0
+```
+
 ## Building Jiva Provisioner
 
 ```
