@@ -6,7 +6,7 @@ metadata:
   labels:
     openebs.io/replica-anti-affinity: application-name
 spec:
-  storageClassName: openebs-standard
+  storageClassName: openebs-jiva-default
   accessModes:
     - ReadWriteOnce
   resources:
@@ -20,7 +20,7 @@ metadata:
   labels:
     openebs.io/replica-anti-affinity: application-name
 spec:
-  storageClassName: openebs-standard
+  storageClassName: openebs-jiva-default
   accessModes:
     - ReadWriteOnce
   resources:

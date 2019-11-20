@@ -10,7 +10,7 @@ metadata:
   namespace: test
   name: jiva-sc-standard-ns-test
 spec:
-  storageClassName: openebs-standard
+  storageClassName: openebs-jiva-default
   accessModes:
     - ReadWriteOnce
   resources:

@@ -3,7 +3,7 @@ apiVersion: v1
 metadata:
   name: jiva-sc-standard-ns-default
 spec:
-  storageClassName: openebs-standard
+  storageClassName: openebs-jiva-default
   accessModes:
     - ReadWriteOnce
   resources:
