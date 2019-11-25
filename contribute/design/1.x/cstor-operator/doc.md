@@ -192,7 +192,7 @@ type CStorPoolInstanceList struct {
 }
 ```
 
-## Pool Provisioning: Workflow 
+## Pool Provisioning: Workflow
 
 A user puts the cStor pool intent in a CSPC YAML and applies it to provision cStor pools.
 
@@ -205,13 +205,13 @@ A user puts the cStor pool intent in a CSPC YAML and applies it to provision cSt
 * For every CSPI CR, a corresponding ‘cspi-mgmt’ deployment will always exist. If due to some reason, a ‘cspi-mgmt’ of a corresponding CSPI CR is deleted, a new ‘cspi-mgmt’ for the same CR will come up again.
 
 
-* Similarly, if a CSPI of a given CSPC is deleted, its corresponding ‘cspi-mgmt’ will be deleted too but again a new CSPI and its corresponding ‘cspi-mgmt’ will come up again. The parent to child(left to right) structure of the resources are shown as : 
+* Similarly, if a CSPI of a given CSPC is deleted, its corresponding ‘cspi-mgmt’ will be deleted too but again a new CSPI and its corresponding ‘cspi-mgmt’ will come up again. The parent to child(left to right) structure of the resources are shown as :
 ```ascii
           |---> CSPI ---> cspi-mgmt
-CSPC--->  |---> …   ---> … 
+CSPC--->  |---> …   ---> …
           |---> CSPI ---> cspi-mgmt
 ```
-The following are a few samples of CStorPoolCluster YAMLs to go through. 
+The following are a few samples of CStorPoolCluster YAMLs to go through.
 
 1. (Pool on one node with `stripe` type)
 
@@ -232,7 +232,7 @@ spec:
       blockDevices:
       - blockDeviceName: sparse-3c1fc7491f9e4cf50053730740647318
     poolConfig:
-      cacheFile: var/openebs/disk-img-0
+      cacheFile: /tmp/pool1.cache
       defaultRaidGroupType: mirror
       overProvisioning: false
       compression: off
@@ -250,7 +250,7 @@ spec:
   - nodeSelector:
       kubernetes.io/hostName: gke-cstor-it-default-pool-1
     raidGroups:
-    - type: stripe 
+    - type: stripe
       isWriteCache:false
       isSpare: false
       isReadCache: false
@@ -263,7 +263,7 @@ spec:
 
       - blockDeviceName: sparse-54cedzcs1f9e4cf50053730740647318
     poolConfig:
-      cacheFile: var/openebs/disk-img-0
+      cacheFile: /tmp/pool1.cache
       defaultRaidGroupType: mirror
       overProvisioning: false
       compression: off
@@ -281,7 +281,7 @@ spec:
   - nodeSelector:
       kubernetes.io/hostName: gke-cstor-it-default-pool-1
     raidGroups:
-    - type: stripe 
+    - type: stripe
       isWriteCache:false
       isSpare: false
       isReadCache: false
@@ -294,7 +294,7 @@ spec:
 
       - blockDeviceName: sparse-54cedzcs1f9e4cf50053730740647318
 
-    - type: mirror 
+    - type: mirror
       isWriteCache:false
       isSpare: false
       isReadCache: false
@@ -304,7 +304,7 @@ spec:
       - blockDeviceName: sparse-5x6fc7491sdffsfs75005454373074fs
 
     poolConfig:
-      cacheFile: var/openebs/disk-img-0
+      cacheFile: /tmp/pool1.cache
       defaultRaidGroupType: mirror
       overProvisioning: false
       compression: off
@@ -344,7 +344,7 @@ spec:
       - blockDeviceName: pool-1-bd-4
 
     poolConfig:
-      cacheFile: var/openebs/disk-img-0
+      cacheFile: /tmp/pool1.cache
       defaultRaidGroupType: mirror
       overProvisioning: false
       compression: lz
@@ -367,7 +367,7 @@ spec:
       - blockDeviceName: pool-2-bd-4
 
     poolConfig:
-      cacheFile: var/openebs/disk-img-2
+      cacheFile: /tmp/pool1.cache
       defaultRaidGroupType: mirror
       overProvisioning: false
       compression: off
@@ -378,24 +378,24 @@ Following operations should be supported on CSPC manifest to carry out pool day 
 
 * A block device can be added on `striped` type raid group.`[Pool Expansion]`
 
-* A new raid group of any type can be added inside the pool 
+* A new raid group of any type can be added inside the pool
   spec (Path on CSPC: spec.pools.raidGroups).`[Pool Expansion]`
 
-* A new pool spec can be added on the CSPC. 
+* A new pool spec can be added on the CSPC.
   ( Path on CSPC: spec.pools) `[Horizontal Pool Scaling]`
 
-* Node selector can be changed on CSPC to do pool migration on 
+* Node selector can be changed on CSPC to do pool migration on
   different node. But before doing that, all the associated block
   Devices should be attached to the newer nodes. [‘Pool Migration’]
   // TODO: More POC on `Pool Migration` regarding block devices
-  // management. 
+  // management.
 
 * A block device can be replaced in raid-groups of type other than
   ‘striped’. `[Block Device Replacement]`
 
 * A pool can be deleted by removing the entire pool spec. `[Pool Deletion]`
 
-* Any other operations except those described above is invalid 
+* Any other operations except those described above is invalid
   and will be handled gracefully via error returns. This validation
   is done by CSPC admission module in the openebs-admission server.
 
@@ -409,7 +409,7 @@ Following are some invalid operations (wrt to day2 ops) on CSPC but the list may
 
 Pool Expansion
 
-* “As an OpenEBS user, I should be able to add block devices to CSPC to increase the pool capacity.” 
+* “As an OpenEBS user, I should be able to add block devices to CSPC to increase the pool capacity.”
 
 Steps To Be Performed By User:
 
@@ -442,7 +442,7 @@ spec:
       blockDevices:
       - blockDeviceName: sparse-3c1fc7491f9e4cf50053730740647318
     poolConfig:
-      cacheFile: var/openebs/disk-img-0
+      cacheFile: /tmp/pool1.cache
       defaultRaidGroupType: mirror
       overProvisioning: false
       compression: false
@@ -471,9 +471,9 @@ spec:
       - blockDeviceName: sparse-3c1fc7491f9e4cf50053730740647318
       // New block device added
       - blockDeviceName: sparse-4cf345h41f9e4cf50053730740647318
- 
+
     poolConfig:
-      cacheFile: var/openebs/disk-img-0
+      cacheFile: /tmp/pool1.cache
       defaultRaidGroupType: stripe
       overProvisioning: false
       compression: false
@@ -506,7 +506,7 @@ spec:
       - blockDeviceName: pool-1-bd-2
 
     poolConfig:
-      cacheFile: var/openebs/disk-img-0
+      cacheFile: /tmp/pool1.cache
       defaultRaidGroupType: mirror
       overProvisioning: false
       compression: false
@@ -544,11 +544,163 @@ spec:
       - blockDeviceName: pool-1-bd-4
 
     poolConfig:
-      cacheFile: var/openebs/disk-img-0
+      cacheFile: /tmp/pool1.cache
       defaultRaidGroupType: mirror
       overProvisioning: false
       compression: false
 ```
+
+Disk Replacement
+
+* “As an OpenEBS user, I should be able to replace existing block devices on CSPC to perform disk replacement operations.”
+
+Steps To Be Performed By User:
+
+1. `kubectl edit cspc your_cspc_name`
+
+2. Update the existing block devices with new block devices in the CSPC spec against the correct Kubernetes nodes.
+
+
+**Consider following example for mirror pool disk replacement**
+
+
+Current CSPC is following:
+This CSPC corresponds to a mirror pool on node `kubernetes-node1`.
+
+```yaml
+apiVersion: openebs.io/v1alpha1
+kind: CStorPoolCluster
+metadata:
+  name: cstor-pool-mirror
+spec:
+  pools:
+  - nodeSelector:
+      kubernetes.io/hostname: kubernetes-node1
+    raidGroups:
+    - type: mirror
+      isWriteCache: false
+      isSpare: false
+      isReadCache: false
+      blockDevices:
+
+      - blockDeviceName: node1-bd-1
+
+      - blockDeviceName: node1-bd-2
+
+    poolConfig:
+      cacheFile: /tmp/pool1.cache
+      defaultRaidGroupType: mirror
+      overProvisioning: false
+      compression: false
+```
+
+Replacing block devices in mirror pool -- the spec will look
+following:
+
+```yaml
+apiVersion: openebs.io/v1alpha1
+kind: CStorPoolCluster
+metadata:
+  name: cstor-pool-mirror
+spec:
+  pools:
+  - nodeSelector:
+      kubernetes.io/hostname: kubernetes-node1
+    raidGroups:
+    - type: mirror
+      isWriteCache: false
+      isSpare: false
+      isReadCache: false
+      blockDevices:
+
+      - blockDeviceName: node1-bd-3
+
+      - blockDeviceName: node1-bd-2
+
+    poolConfig:
+      cacheFile: /tmp/pool1.cache
+      defaultRaidGroupType: mirror
+      overProvisioning: false
+      compression: false
+```
+In the above CSPC spec node1-bd-1 is replaced with node1-bd-3
+
+Block Device Replacement Workflow: CSPC-Operator
+
+Work done by CStor-Operator after the user has updated the existing block device
+name with replacing block device name
+
+1. The CSPC-Operator will detect under which CSPC pool spec block device has been
+   replaced(by comparing new changes with corresponding node CSPI spec) and
+   CSPC-Operator will add annotation(openebs.io/cstor-pool-day2-ops-visa: true) on
+   block device[Why? After propagating block device changes to CSPI then CSPI-Mgmt
+   will continuously try to achieve the desired state to restrict users to use
+   same block device for different operations and take precedence] on success
+   CSPC-Operator will update the corresponding CSPI spec with updated block
+   device changes.
+
+Work done by CSPI-Mgmt after CSPC-Operator replaces block device in CSPI spec
+
+1. The CSPI-Mgmt will reconcile for the changes made to CSPI spec. CSPI-Mgmt
+   will get devlinks used by cstor and compare with devlinks of existing
+   block device if it doesn't match CSPI-Mgmt will trigger the `zpool replace`
+   command which will perform disk replacement operation by cstor. Once
+   resilvering is successful on new block device CSPI-Mgmt will remove the
+   annotation on the new block device which was added by CSPC-Operator as day2
+   operation is in progress on and unclaim the old block device(replaced block
+   device).
+
+Limitations with above design:
+
+1. Users can't perform multiple replacements in a single operation which can lead
+   to misconfigurations. (Example: In mirror raid group user replaced node1-bd1
+   with node1-bd3 let us assume that this operation is failed due to some reason
+   now the user replaced the second disk in mirror raid group node1-bd2 with
+   node1-bd4. With existing schema, there might be higher chances that `zpool
+   replace` will be triggered in following way `zpool replace <pool_name>
+   <node1-bd1> <node1-bd4>` which leads to misconfiguration if users have l2arc
+   or ZIL disks for perfomance). Since there is no mapping between replacing block
+   device and replaced block device this might cause misconfiguration issues.
+
+2. On completion of resilvering as CSPI-Mgmt how can it identify which block
+   device needs to be unclaimed?(Should we need to unclaim all the block devices
+   which are no more use by cstor pool? If yes is it good way to do lazy unclaim
+   of old block devices in error scenario?
+   `Scenario1`: Updation of resilvering status got failed in CSPI-Mgmt side mean
+   while another block device replacement request is in processing which will
+   leads to unclaim old block device after completion of new resilvering process).
+
+Proposed schema changes in words:
+
+1. Maintaining one more extra field under `CStorPoolClusterBlockDevice`
+```go
+// CStorPoolClusterBlockDevice contains the details of block devices that
+// constitutes a raid group.
+type CStorPoolClusterBlockDevice struct {
+  // BlockDeviceName is the name of the block device.
+  BlockDeviceName string `json:"blockDeviceName"`
+  // ReplacingBlockDeviceName filled by CSPC-Operator when use update the CSPC
+  // spec with block device changes
+  ReplacingBlockDeviceName string `json:"replacingBlockDeviceName"`
+  // Capacity is the capacity of the block device.
+  // It is system generated
+  Capacity string `json:"capacity"`
+  // DevLink is the dev link for block devices
+  DevLink string `json:"devLink"`
+}
+```
+
+2. Maintaining in CSPI-Status mapping of new block devices and old blockdevices
+```go
+type ReplacingBlockDevicesMap struct {
+    BlockDeviceModifyingMap map[string]string
+}
+```
+
+3. Maintaining in annotation of old block device pointing to new block
+   device(Since these are pool related operations Is these are good practice to
+   maintain?).
+
 
 ## Operations Workflow: CSPC-Operator
 ( Includes `Pool Expansion`, `Pool Deletion`, `Block Device Replacement`, and `Pool Migration`)
@@ -556,7 +708,7 @@ spec:
 Work done by CStor-operator after the user has edited the CSPC:
 
 1. The CSPC spec change as a result of the user modifying
-   CSPC and the CStor-Operator should propagate the changes to 
+   CSPC and the CStor-Operator should propagate the changes to
    corresponding CSPI(s).
 
 2. Hostname changed in the CSPC can cause following:( `Pool Migration`)
@@ -576,8 +728,11 @@ Cstor-Operator will patch the corresponding CSPI and deployment with the hostnam
 
 6. If a pool spec is added a new pool will be formed. (`Horizontal Pool Scale`)
 
+7. Block device replacement can cause the following:
+   1. Replacing a block device under spec of CSPC will trigger disk replacement.
+   Note: Disk Replacement is supported only in mirror and raidz raid group.
 
-**NOTE:** 
+**NOTE:**
 Cstor-Operator will handle the spec change in the following order. Also, the pool operations will be carried out only when there is no pending pool creation/deletion on nodes.
 
 1. Host Name Change<br/>
