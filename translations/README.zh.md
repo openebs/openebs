@@ -59,7 +59,7 @@ helm install --namespace openebs --name openebs stable/openebs
 
 同样可以参考我们的 [快速上手指南](https://docs.openebs.io/docs/overview.html)。
 
-OpenEBS 可以部署在任何 Kubernetes 集群上，可以部署在公有云、私有云或开发人员的笔记本电脑 (minikube) 上。请注意，由于OpenEBS 是在用户空间中操作的，所以不需要对底层内核进行任何更改。请遵循我们的 [OpenEBS设置](https://docs.openebs.io/docs/overview.html) 文档。另外，我们有一个 Vagrant 环境，其中包括一个 Kubernetes 部署示例和一个模拟 OpenEBS 性能的综合负载。或许您还会发现一个有趣的相关项目，称为 Litmus (https://www.openebs.io/litmus)，协助 Kubernetes 上有状态工作负载的混沌工程。
+OpenEBS 可以部署在任何 Kubernetes 集群上，可以部署在公有云、私有云或开发人员的笔记本电脑 (minikube) 上。请注意，由于OpenEBS 是在用户空间中操作的，所以不需要对底层内核进行任何更改。请遵循我们的 [OpenEBS设置](https://docs.openebs.io/docs/overview.html) 文档。另外，我们有一个 Vagrant 环境，其中包括一个 Kubernetes 部署示例和一个模拟 OpenEBS 性能的综合负载。或许您还会发现一个有趣的相关项目，称为 [Litmus](https://www.openebs.io/litmus)，协助 Kubernetes 上有状态工作负载的混沌工程。
 
 ## 项目状态
 
