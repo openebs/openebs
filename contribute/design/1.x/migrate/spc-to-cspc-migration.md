@@ -64,10 +64,63 @@ This design proposes the following key changes while migrating from a SPC to CSP
   
   4. The imported pools in each CSPI will be renamed to cstor-${CSPC uid}.
 
-  5. The CVR with CSPI labels and annotations will be replaced by CSPI labels and annotations.
+  5. The CVR with CSP labels and annotations will be replaced by CSPI labels and annotations.
 
   6. New CVC CR for the volume will be created with the CV details.
 
   7. New StorageClass with CSPC will be created and this will replace the old strageclass in the PVC of CStorVolume.
 
   8. Clean up old SPC and csp after successfull creation of CSPC and cspi objects.
+
+
+### High Level Design
+
+#### Phase 1: Migration of SPC to CSPC
+
+The migration of SPC will be performed via a job which takes SPC name as one of its argument. 
+
+This will require a new field in the PoolSpec of CSPC : 
+```go
+// OldCSPUID is used to migrate old csp to cspi. This will be the
+// old pool name which needs to imported and renamed as new pool
+OldCSPUID string `json:"oldCSPUID,omitempty"`
+```
+This field will be used to rename the pool which was named as `cstor-csuid` to `cstor-cspc-uid`. It  needs to be removed once successful import of the pool is done after migration to CSPC.
+
+The Job spec for migrating SPC is:
+```yaml
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: migrate-spc-cstor-sparse-pool
+  namespace: openebs
+spec:
+  backoffLimit: 4
+  template:
+    spec:
+      #VERIFY the value of serviceAccountName is pointing to service account
+      # created within openebs namespace. Use the non-default account.
+      # by running `kubectl get sa -n <openebs-namespace>`
+      serviceAccountName: openebs-maya-operator
+      containers:
+      - name:  migrate
+        args:
+        # name of the spc that is to be migrated
+        - "--spc-name=cstor-sparse-pool"
+
+        #Following are optional parameters
+        #Log Level
+        - "--v=4"
+        #DO NOT CHANGE BELOW PARAMETERS
+        env:
+        - name: OPENEBS_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        tty: true
+
+        image: quay.io/openebs/migrate:ci
+      restartPolicy: OnFailure
+---
+```
