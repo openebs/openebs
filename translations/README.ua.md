@@ -28,7 +28,7 @@ https://openebs.org/
 [🇺🇦](README.ua.md)
 [🇷🇺](README.ru.md)
 [🇹🇷](README.tr.md)
-[zh](README.zh.md)
+[🇨🇳](README.zh.md)
 
 ## Масштабованість
  

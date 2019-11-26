@@ -7,4 +7,4 @@
 | 🇺🇦  | [Українська](README.ua.md) |
 | :uk: | [English](../README.md) |
 | 🇹🇷 | [Türkçe](README.tr.md) |
-| zh | [中文](README.zh.md) |
+| 🇨🇳 | [中文](README.zh.md) |
