@@ -668,9 +668,11 @@ Limitations with above design:
    of old block devices in error scenario?
    `Scenario1`: Updation of resilvering status got failed in CSPI-Mgmt side mean
    while another block device replacement request is in processing which will
-   leads to unclaim old block device after completion of new resilvering process).
+   leads to unclaim the old block device after completion of new resilvering process).
 
 Proposed schema changes in words:
+
+Below are three thought process which will address above limitations
 
 1. Maintaining one more extra field under `CStorPoolClusterBlockDevice`
 ```go
@@ -690,16 +692,21 @@ type CStorPoolClusterBlockDevice struct {
 }
 ```
 
+                           (OR)
+
 2. Maintaining in CSPI-Status mapping of new block devices and old blockdevices
 ```go
-type ReplacingBlockDevicesMap struct {
+type ResilveringStatus struct {
     BlockDeviceModifyingMap map[string]string
+    ResilveredPercentage string
 }
 ```
 
-3. Maintaining in annotation of old block device pointing to new block
-   device(Since these are pool related operations Is these are good practice to
-   maintain?).
+                           (OR)
+
+3. Maintaining annotation on new block device which will hold old block device
+   name(Since these are pool related operations Is it good practice to maintain
+   on block device annotation?).
 
 
 ## Operations Workflow: CSPC-Operator
