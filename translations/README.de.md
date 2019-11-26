@@ -27,7 +27,7 @@ x
 [🇷🇺](README.ru.md)
 [🇺🇦](README.ua.md)
 [🇹🇷](README.tr.md)
-[zh](README.zh.md)
+[🇨🇳](README.zh.md)
 
 ## Skalierbarkeit
  
