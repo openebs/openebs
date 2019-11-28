@@ -82,7 +82,6 @@ For migrating non-csi volumes to csi volumes following changes are proposed:
 
   6. Update ownerreferences of CV, service with CVC and CVRs with CV.
 
-
 ### High Level Design
 
 #### Phase 1: Migration of SPC to CSPC
@@ -184,3 +183,10 @@ spec:
 ```
 
 After the successful completion of the job the applications can be scaled up to verify the migration of volumes. Once the application is up new `csivolume` CR will be generated for the volume.
+
+## Infrastructure Needed
+
+- Kubernetes version should be 1.14 or above.
+- OpenEBS version should be 1.3 or above.
+- CSPC operator should be installed.
+- CStor CSI operator should be installed.
