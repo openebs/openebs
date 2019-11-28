@@ -66,11 +66,21 @@ This design proposes the following key changes while migrating from a SPC to CSP
 
   5. The CVR with CSP labels and annotations will be replaced by CSPI labels and annotations.
 
-  6. New CVC CR for the volume will be created with the CV details.
+  6. Clean up old SPC and csp after successfull creation of CSPC and cspi objects.
 
-  7. New StorageClass with CSPC will be created and this will replace the old strageclass in the PVC of CStorVolume.
+For migrating non-csi volumes to csi volumes following changes are proposed:
 
-  8. Clean up old SPC and csp after successfull creation of CSPC and cspi objects.
+  1. New StorageClass with CSPC will be created and this will replace the old strageclass in the PVC of CStorVolume.
+
+  2. Set the PV to `Retain` reclaim policy to prevent deletion of OpenEBS resources.
+
+  3. Recreate old PV with csi spec translation.
+
+  4. Recreate old PVC with updated csi spec PV and StorageClass.
+
+  5. Create CVC CR for the volume with the CV details.
+
+  6. Update ownerreferences of CV, service with CVC and CVRs with CV.
 
 
 ### High Level Design
@@ -106,6 +116,7 @@ spec:
       containers:
       - name:  migrate
         args:
+        - "pool"
         # name of the spc that is to be migrated
         - "--spc-name=cstor-sparse-pool"
 
@@ -124,3 +135,52 @@ spec:
       restartPolicy: OnFailure
 ---
 ```
+
+After successful completion of pool migration the logs will list out all applications having volumes on the given pool.
+
+#### Phase 2: Migration of Non-CSI volume to CSI volume
+
+**Note: Before proceeding to the below steps the pool must be migrated successfully and all the applications having volumes on the pool must be scale down.**
+
+The migration of volumes will be performed via a job which takes the migrated CSPC name as one of its argument.
+
+The Job spec for migrating SPC is:
+```yaml
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: migrate-cspc-cstor-sparse-pool-volumes
+  namespace: openebs
+spec:
+  backoffLimit: 4
+  template:
+    spec:
+      # VERIFY the value of serviceAccountName is pointing to service account
+      # created within openebs namespace. Use the non-default account.
+      # by running `kubectl get sa -n <openebs-namespace>`
+      serviceAccountName: openebs-maya-operator
+      containers:
+      - name:  migrate
+        args:
+        - "volumes"
+        # name of the cspc on which volumes are provisioned
+        - "--cspc-name=cstor-sparse-pool"
+
+        #Following are optional parameters
+        #Log Level
+        - "--v=4"
+        #DO NOT CHANGE BELOW PARAMETERS
+        env:
+        - name: OPENEBS_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        tty: true
+
+        image: quay.io/openebs/migrate:ci
+      restartPolicy: OnFailure
+---
+```
+
+After the successful completion of the job the applications can be scaled up to verify the migration of volumes. Once the application is up new `csivolume` CR will be generated for the volume.
