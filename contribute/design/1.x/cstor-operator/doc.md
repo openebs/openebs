@@ -405,8 +405,6 @@ Following are some invalid operations (wrt to day2 ops) on CSPC but the list may
 2. Raid group removal.
 
 
-
-
 Pool Expansion
 
 * “As an OpenEBS user, I should be able to add block devices to CSPC to increase the pool capacity.”
@@ -631,48 +629,55 @@ Once user modifies the CSPC spec to trigger disk replacement process below are
 the validations done by the admission-server to restrict invalid changes made to
 CSPC
 
-1. Below are invalid changes to CSPC
+Below are validations on CSPC by admission server
 
-   1.1 Block devices which are already in use by same cstor pool are not allowed
-   to use for disk replacement (or) pool expansion operations [How admission
-   server can detect it? By looking at annotations on block device which were
-   added by CSPC-Operator before populating CSPI CR].
+1. Not more than one block device should be replaced simultaneously in the same
+   raid group.
 
-   1.2 Block devices which are claimed by some other CSPC (or) the third party are
-   not allowed to use in cstor pool operations.
+2. Replacing block devices should not be already in use by the same cStor pools.
 
-2. Disk Replacement is not supported in stripe raid group(i.e Replacing a block
-   device is not supported in stripe raid group).
+3. Replacing another block device in the raid group is not allowed when any
+   of the block device in the same raid group is undergoing replacement.
 
-3. Only one block device should be replaced at a time in the same raid group.
-   Admission server doesn't allow two simultaneous block device replacements in
-   the same raid group.
+4. Steps to validate whether someone(other CSPC or local PV) already claimed
+   replacing block device
 
-4. When a disk in a raid group is already undergoing resilvering no other block
-   devices are allowed to replace in the same raid group (which is undergoing
-   resilvering) until the ongoing resilvering process is completed.
+   4.1 Verify is there any claim create for replacing block device. If there are
+       no claims for replacing block device jump to step 5.
 
-5. Across the pool parallel block device replacements are allowed only when the
+   4.2 If replacing block device was already claimed and if that claim doesn't
+       have CSPC label (or) different CSPC label(i.e block device belongs to
+       some other CSPC) then reject replacement request.
+
+   4.3 If replacing block device has self CSPC label then check is that replacing
+       block device is already linked with some other block device in that same
+       CSPC(i.e a case where users try to trigger a replace with disk that is
+       undergoing resilvering at cStor pool side). If link exists reject the request
+       else jump to step 5.
+
+5. Create a claim for replacing block device with annotation
+   `openebs.io/bd-predecessor: old_block_device_name` only if claim doesn't
+   exists.
+
+6. If claim already exists for replacing block device then update annotation
+   with proper block device name(Might be a case after creating claim update to
+   etcd got failed).
+
+`NOTE:`
+1. Pool expansion and disk replacement can go in parallel.
+
+2. Across the pool parallel block device replacements are allowed only when the
    block devices belong to the different raid groups.
-
-`NOTE:` Pool expansion and disk replacement can go in parallel.
 
 Block Device Replacement Workflow: CSPC-Operator
 
 Work done by CStor-Operator after the user has updated the existing block device
-name with replacing block device name
+name with new block device name
 
 1. The CSPC-Operator will detect under which CSPC pool spec block device has been
    replaced[How it can detect? By comparing new CSPC spec changes with corresponding
-   node CSPI spec] after identifying the changes CSPC-Operator will add annotation
-   (openebs.io/old-block-device-name: oldBlockDeviceName) on new block device
-   [Why? Annotation is required to identify the old block device and to unclaim
-   it after completion of resilvering process] and other annotation (
-   openebs.io/cstor-pool-day-2-ops: true) on old block device [Why? this annotation
-   will be helpful not to allow the users to use old block device for different
-   pool operations until resilvering is completed]. After adding annotation
-   successfuly CSPC-Operator will update the corresponding node CSPI with new
-   block device changes.
+   node CSPI spec] after identifying the changes CSPC-Operator will update the
+   corresponding raid group of CSPI with replacing block device changes.
 
 Work done by CSPI-Mgmt after CSPC-Operator replaces block device name in CSPI spec
 
@@ -680,11 +685,11 @@ Work done by CSPI-Mgmt after CSPC-Operator replaces block device name in CSPI sp
    process changes in the following manner CSPI-Mgmt will get dev links that are
    in use by cstor pool and compare against all the devlinks of block device. If
    dev links don't exist in cstor pool then changes are triggered for replacement
-   operation. Now CSPI-Mgmt will trigger `zpool replace <pool_name> <old_disk>
-   <new_disk>` the command which will perform disk replacement operation by cstor.
+   operation. Now CSPI-Mgmt will execute `zpool replace <pool_name> <old_disk>
+   <new_disk>` the command which will trigger disk replacement operation by cstor.
    For every reconciliation CSPI-Mgmt will check the status of resilvering upon
-   completion of resilvering CSPI-Mgmt will remove the annotation on block
-   devices and unclaim the old block device.
+   completion of resilvering CSPI-Mgmt will remove the annotation on claim of
+   new block device and unclaim the old block device.
 
 Note: Representing resilvering status on CSPI CR(Not targeted).
 
