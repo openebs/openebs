@@ -162,9 +162,9 @@ spec:
       containers:
       - name:  migrate
         args:
-        - "volumes"
-        # name of the cspc on which volumes are provisioned
-        - "--cspc-name=cstor-sparse-pool"
+        - "cstor-volume"
+        # pv-name of the volume which has to be migrated
+        - "--pv-name=cstor-sparse-pool"
 
         #Following are optional parameters
         #Log Level
