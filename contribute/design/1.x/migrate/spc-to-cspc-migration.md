@@ -88,13 +88,15 @@ For migrating non-csi volumes to csi volumes following changes are proposed:
 
 The migration of SPC will be performed via a job which takes SPC name as one of its argument. 
 
+The CSPC CR will be with `reconcile.openebs.io/dependants` annotation to disable reconciliation of CSPI. Once all CSPI are successfully created the annotation will be removed.
+
 This will require a new field in the PoolSpec of CSPC : 
 ```go
 // OldCSPUID is used to migrate old csp to cspi. This will be the
 // old pool name which needs to imported and renamed as new pool
 OldCSPUID string `json:"oldCSPUID,omitempty"`
 ```
-This field will be used to rename the pool which was named as `cstor-csuid` to `cstor-cspc-uid`. It  needs to be removed once successful import of the pool is done after migration to CSPC.
+This field will be used to rename the pool which was named as `cstor-csp-uid` to `cstor-cspc-uid`. It  needs to be removed once the CSPI for that `poolSpec` comes into `ONLINE` phase. This field will be used to populate the `cspuid` annotation which will be added while creating CSPI CR. This annotation will be removed after successful import of the pool.
 
 The Job spec for migrating SPC is:
 ```yaml
