@@ -96,7 +96,9 @@ This will require a new field in the PoolSpec of CSPC :
 // old pool name which needs to imported and renamed as new pool
 OldCSPUID string `json:"oldCSPUID,omitempty"`
 ```
-This field will be used to rename the pool which was named as `cstor-csp-uid` to `cstor-cspc-uid`. It  needs to be removed once the CSPI for that `poolSpec` comes into `ONLINE` phase. This field will be used to populate the `cspuid` annotation which will be added while creating CSPI CR. This annotation will be removed after successful import of the pool.
+The CSPC will come up with an additional field `OldCSPUID` which will be used to import the old CSP pool. Sequentially one CSPI is taken and the corresponding CSP is found using `kubernetes/hostname` label. The CSP deployment is scaled down to avoid multiple pods trying to import the same pool. Next the all the BDC for given CSPI are updated with CSPC information. Then CSPI reconciliation will be enabled which will create the CSPI deployment which will rename and import the pool. Once the pool is imported successfully then the field `OldCSPUID` will be reset to empty string to avoid renaming of pool in future.
+
+The `OldCSPUID` field will be used to rename the pool which was named as `cstor-cspuid` to `cstor-cspcuid`. It  needs to be removed once the CSPI for that `poolSpec` comes into `ONLINE` phase. This field will be used to populate the `cspuid` annotation which will be added while creating CSPI CR. This annotation will be removed after successful import of the pool.
 
 The Job spec for migrating SPC is:
 ```yaml
