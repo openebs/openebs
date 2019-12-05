@@ -575,7 +575,7 @@ spec:
             - name: OPERATOR_NAME
               value: "node-disk-operator"
             - name: CLEANUP_JOB_IMAGE
-              value: "quay.io/openebs/linux-utils:3.9"
+              value: "quay.io/openebs/linux-utils:1.4.0"
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -666,12 +666,18 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
+        # OPENEBS_SERVICE_ACCOUNT provides the service account of this pod as
+        # environment variable
+        - name: OPENEBS_SERVICE_ACCOUNT
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.serviceAccountName
         - name: OPENEBS_IO_ENABLE_ANALYTICS
           value: "false"
         - name: OPENEBS_IO_INSTALLER_TYPE
           value: "openebs-operator"
         - name: OPENEBS_IO_HELPER_IMAGE
-          value: "quay.io/openebs/openebs-tools:3.8"
+          value: "quay.io/openebs/linux-utils:1.4.0"
         livenessProbe:
           exec:
             command:
