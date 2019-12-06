@@ -14,65 +14,122 @@ metadata:
   name: openebs-maya-operator
   namespace: openebs
 ---
-# Define Role that allows operations on K8s pods/deployments
+# Allow OpenEBS to manage all core objects in its own namespace.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: openebs-maya-operator
+  namespace: openebs
+rules:
+- apiGroups: ["*"]
+  resources:
+  - services
+  - pods
+  - deployments
+  - deployments/finalizers
+  - replicationcontrollers
+  - replicasets
+  - statefulsets
+  - daemonsets
+  - events
+  - endpoints
+  - configmaps
+  - secrets
+  - jobs
+  - cronjobs
+  verbs: ["*"]
+- apiGroups: ["*"]
+  resources: ["pods/exec"]
+  verbs: ["create"]
+- apiGroups: ["coordination.k8s.io"]
+  resources: ["leases"]
+  verbs: ["*"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: openebs-maya-operator
+  namespace: openebs
+subjects:
+- kind: ServiceAccount
+  name: openebs-maya-operator
+  namespace: openebs
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: openebs-maya-operator
+---
+apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
-apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
   name: openebs-maya-operator
 rules:
+# Allow OpenEBS read-only access to a few cluster-wide objects.
 - apiGroups: ["*"]
-  resources: ["nodes", "nodes/proxy"]
-  verbs: ["*"]
+  resources: ["nodes"]
+  verbs: ["get", "list", "watch"]
 - apiGroups: ["*"]
-  resources: ["namespaces", "services", "pods", "pods/exec", "deployments", "deployments/finalizers", "replicationcontrollers", "replicasets", "events", "endpoints", "configmaps", "secrets", "jobs", "cronjobs"]
-  verbs: ["*"]
-- apiGroups: ["*"]
-  resources: ["statefulsets", "daemonsets"]
-  verbs: ["*"]
-- apiGroups: ["*"]
-  resources: ["resourcequotas", "limitranges"]
-  verbs: ["list", "watch"]
-- apiGroups: ["*"]
-  resources: ["ingresses", "horizontalpodautoscalers", "verticalpodautoscalers", "poddisruptionbudgets", "certificatesigningrequests"]
-  verbs: ["list", "watch"]
-- apiGroups: ["*"]
-  resources: ["storageclasses", "persistentvolumeclaims", "persistentvolumes"]
-  verbs: ["*"]
-- apiGroups: ["volumesnapshot.external-storage.k8s.io"]
-  resources: ["volumesnapshots", "volumesnapshotdatas"]
-  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
-- apiGroups: ["apiextensions.k8s.io"]
-  resources: ["customresourcedefinitions"]
-  verbs: [ "get", "list", "create", "update", "delete", "patch"]
-- apiGroups: ["*"]
-  resources: [ "disks", "blockdevices", "blockdeviceclaims"]
-  verbs: ["*" ]
-- apiGroups: ["*"]
-  resources: [ "cstorpoolclusters", "storagepoolclaims", "storagepoolclaims/finalizers", "cstorpoolclusters/finalizers", "storagepools"]
-  verbs: ["*" ]
-- apiGroups: ["*"]
-  resources: [ "castemplates", "runtasks"]
-  verbs: ["*" ]
-- apiGroups: ["*"]
-  resources: [ "cstorpools", "cstorpools/finalizers", "cstorvolumereplicas", "cstorvolumes", "cstorvolumeclaims"]
-  verbs: ["*" ]
-- apiGroups: ["*"]
-  resources: [ "cstorpoolinstances", "cstorpoolinstances/finalizers"]
-  verbs: ["*" ]
-- apiGroups: ["*"]
-  resources: [ "cstorbackups", "cstorrestores", "cstorcompletedbackups"]
-  verbs: ["*" ]
-- apiGroups: ["coordination.k8s.io"]
-  resources: ["leases"]
-  verbs: ["get", "watch", "list", "delete", "update", "create"]
-- apiGroups: ["admissionregistration.k8s.io"]
-  resources: ["validatingwebhookconfigurations", "mutatingwebhookconfigurations"]
-  verbs: ["get", "create", "list", "delete", "update", "patch"]
-- nonResourceURLs: ["/metrics"]
+  resources: ["nodes/proxy"]
   verbs: ["get"]
 - apiGroups: ["*"]
-  resources: [ "upgradetasks"]
-  verbs: ["*" ]
+  resources: ["namespaces"]
+  verbs: ["get", "watch"]
+# Allow OpenEBS to manage persistent storage cluster-wide.
+- apiGroups: ["*"]
+  resources:
+  - storageclasses
+  - persistentvolumeclaims
+  - persistentvolumes
+  verbs: ["*"]
+# Allow OpenEBS to create events.
+- apiGroups: ["*"]
+  resources:
+  - events
+  verbs: ["create"]
+# Allow OpenEBS to register its custom objects.
+- apiGroups: ["apiextensions.k8s.io"]
+  resources: ["customresourcedefinitions"]
+  verbs: ["*"]
+# Allow OpenEBS to manage its own custom objects cluster-wide.
+- apiGroups: ["*"]
+  resources:
+  - disks
+  - blockdevices
+  - blockdeviceclaims
+  - cstorpoolclusters
+  - storagepoolclaims
+  - storagepoolclaims/finalizers
+  - cstorpoolclusters/finalizers
+  - storagepools
+  - castemplates
+  - runtasks
+  - upgradetasks
+  - cstorpools
+  - cstorpools/finalizers
+  - cstorvolumereplicas
+  - cstorvolumes
+  - cstorvolumeclaims
+  - cstorpoolinstances
+  - cstorpoolinstances/finalizers
+  - cstorbackups
+  - cstorrestores
+  - cstorcompletedbackups
+  verbs: ["*"]
+- apiGroups: ["volumesnapshot.external-storage.k8s.io"]
+  resources:
+  - volumesnapshots
+  - volumesnapshotdatas
+  verbs: ["*"]
+# Allow OpenEBS to install and manage its own admission webhooks.
+- apiGroups: ["admissionregistration.k8s.io"]
+  resources: ["validatingwebhookconfigurations"]
+  verbs: ["list", "create"]
+- apiGroups: ["admissionregistration.k8s.io"]
+  resources: ["validatingwebhookconfigurations"]
+  resourceNames: ["openebs-validation-webhook-cfg"]
+  verbs: ["*"]
+- nonResourceURLs: ["/metrics"]
+  verbs: ["get"]
 ---
 # Bind the Service Account with the Role Privileges.
 # TODO: Check if default account also needs to be there
@@ -686,4 +743,3 @@ spec:
           initialDelaySeconds: 30
           periodSeconds: 60
 ---
-

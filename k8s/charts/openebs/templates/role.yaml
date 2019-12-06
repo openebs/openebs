@@ -1,0 +1,36 @@
+{{- if .Values.rbac.create }}
+# Allow OpenEBS to manage all core objects in its own namespace.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ template "openebs.fullname" . }}
+  labels:
+    app: {{ template "openebs.name" . }}
+    chart: {{ template "openebs.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+rules:
+- apiGroups: ["*"]
+  resources:
+  - services
+  - pods
+  - deployments
+  - deployments/finalizers
+  - replicationcontrollers
+  - replicasets
+  - statefulsets
+  - daemonsets
+  - events
+  - endpoints
+  - configmaps
+  - secrets
+  - jobs
+  - cronjobs
+  verbs: ["*"]
+- apiGroups: ["*"]
+  resources: ["pods/exec"]
+  verbs: ["create"]
+- apiGroups: ["coordination.k8s.io"]
+  resources: ["leases"]
+  verbs: ["*"]
+{{- end }}

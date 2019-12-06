@@ -9,57 +9,70 @@ metadata:
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
 rules:
+# Allow OpenEBS read-only access to a few cluster-wide objects.
 - apiGroups: ["*"]
-  resources: ["nodes", "nodes/proxy"]
+  resources: ["nodes"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["*"]
+  resources: ["nodes/proxy"]
+  verbs: ["get"]
+- apiGroups: ["*"]
+  resources: ["namespaces"]
+  verbs: ["get", "watch"]
+# Allow OpenEBS to manage persistent storage cluster-wide.
+- apiGroups: ["*"]
+  resources:
+  - storageclasses
+  - persistentvolumeclaims
+  - persistentvolumes
   verbs: ["*"]
+# Allow OpenEBS to create events.
 - apiGroups: ["*"]
-  resources: ["namespaces", "services", "pods", "pods/exec", "deployments", "deployments/finalizers", "replicationcontrollers", "replicasets", "events", "endpoints", "configmaps", "secrets",  "jobs", "cronjobs" ]
-  verbs: ["*"]
-- apiGroups: ["*"]
-  resources: ["statefulsets", "daemonsets"]
-  verbs: ["*"]
-- apiGroups: ["*"]
-  resources: ["resourcequotas", "limitranges"]
-  verbs: ["list", "watch"]
-- apiGroups: ["*"]
-  resources: ["ingresses", "horizontalpodautoscalers", "verticalpodautoscalers", "poddisruptionbudgets", "certificatesigningrequests"]
-  verbs: ["list", "watch"]
-- apiGroups: ["*"]
-  resources: ["storageclasses", "persistentvolumeclaims", "persistentvolumes"]
-  verbs: ["*"]
-- apiGroups: ["volumesnapshot.external-storage.k8s.io"]
-  resources: ["volumesnapshots", "volumesnapshotdatas"]
-  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  resources:
+  - events
+  verbs: ["create"]
+# Allow OpenEBS to register its custom objects.
 - apiGroups: ["apiextensions.k8s.io"]
   resources: ["customresourcedefinitions"]
-  verbs: [ "get", "list", "create", "update", "delete", "patch"]
+  verbs: ["*"]
+# Allow OpenEBS to manage its own custom objects cluster-wide.
 - apiGroups: ["*"]
-  resources: [ "disks", "blockdevices", "blockdeviceclaims"]
-  verbs: ["*" ]
-- apiGroups: ["*"]
-  resources: [ "cstorpoolclusters", "storagepoolclaims", "storagepoolclaims/finalizers", "cstorpoolclusters/finalizers", "storagepools"]
-  verbs: ["*" ]
-- apiGroups: ["*"]
-  resources: [ "castemplates", "runtasks"]
-  verbs: ["*" ]
-- apiGroups: ["*"]
-  resources: [ "cstorpools", "cstorpools/finalizers", "cstorvolumereplicas", "cstorvolumes", "cstorvolumeclaims"]
-  verbs: ["*" ]
-- apiGroups: ["*"]
-  resources: [ "cstorpoolinstances", "cstorpoolinstances/finalizers"]
-  verbs: ["*" ]
-- apiGroups: ["*"]
-  resources: [ "cstorbackups", "cstorrestores", "cstorcompletedbackups"]
-  verbs: ["*" ]
-- apiGroups: ["*"]
-  resources: [ "upgradetasks"]
-  verbs: ["*" ]
-- apiGroups: ["coordination.k8s.io"]
-  resources: ["leases"]
-  verbs: ["get", "watch", "list", "delete", "update", "create"]
+  resources:
+  - disks
+  - blockdevices
+  - blockdeviceclaims
+  - cstorpoolclusters
+  - storagepoolclaims
+  - storagepoolclaims/finalizers
+  - cstorpoolclusters/finalizers
+  - storagepools
+  - castemplates
+  - runtasks
+  - upgradetasks
+  - cstorpools
+  - cstorpools/finalizers
+  - cstorvolumereplicas
+  - cstorvolumes
+  - cstorvolumeclaims
+  - cstorpoolinstances
+  - cstorpoolinstances/finalizers
+  - cstorbackups
+  - cstorrestores
+  - cstorcompletedbackups
+  verbs: ["*"]
+- apiGroups: ["volumesnapshot.external-storage.k8s.io"]
+  resources:
+  - volumesnapshots
+  - volumesnapshotdatas
+  verbs: ["*"]
+# Allow OpenEBS to install and manage its own admission webhooks.
 - apiGroups: ["admissionregistration.k8s.io"]
-  resources: ["validatingwebhookconfigurations", "mutatingwebhookconfigurations"]
-  verbs: ["get", "create", "list", "delete", "update", "patch"]
+  resources: ["validatingwebhookconfigurations"]
+  verbs: ["list", "create"]
+- apiGroups: ["admissionregistration.k8s.io"]
+  resources: ["validatingwebhookconfigurations"]
+  resourceNames: ["openebs-validation-webhook-cfg"]
+  verbs: ["*"]
 - nonResourceURLs: ["/metrics"]
   verbs: ["get"]
 {{- end }}
