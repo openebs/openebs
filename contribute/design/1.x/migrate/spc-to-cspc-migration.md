@@ -35,19 +35,19 @@ superseded-by:
 ## Summary
 
 This design is aimed at providing a design for migrating SPC to CSPC
-via kubernetes job which will take SPC-name as input. 
+via kubernetes job which will take SPC-name as input.
 
 This proposed design will be rolled out in phases. At a high level the design is
 implemented in the following phases:
-- Phase 1: Ability to perform migration from SPC to CSPC using 
+- Phase 1: Ability to perform migration from SPC to CSPC using
   a Kubernetes Job.
-- Phase 2: Allow for migration of old CStor volumes to CSI CStor volumes. 
+- Phase 2: Allow for migration of old CStor volumes to CSI CStor volumes.
 
 ## Motivation
 
 ### Goals
 
-- Ease the process of migrating SPC to CSPC by automating it via kubernetes job. 
+- Ease the process of migrating SPC to CSPC by automating it via kubernetes job.
 - Enable day 2 operations on CStor Volumes by migrating them to CSI volumes.
 
 ## Proposal
@@ -61,7 +61,7 @@ This design proposes the following key changes while migrating from a SPC to CSP
   2. New CSPI CRs will be created which will replace the CSP for given SPC.
 
   3. The BDC with SPC label and finalizer will be replaced by CSPC label and finalizer.
-  
+
   4. The imported pools in each CSPI will be renamed to cstor-${CSPC uid}.
 
   5. The CVR with CSP labels and annotations will be replaced by CSPI labels and annotations.
@@ -86,19 +86,13 @@ For migrating non-csi volumes to csi volumes following changes are proposed:
 
 #### Phase 1: Migration of SPC to CSPC
 
-The migration of SPC will be performed via a job which takes SPC name as one of its argument. 
+The migration of SPC will be performed via a job which takes SPC name as one of its argument.
 
 The CSPC CR will be with `reconcile.openebs.io/dependants` annotation to disable reconciliation of CSPI. Once all CSPI are successfully created the annotation will be removed.
 
-This will require a new field in the PoolSpec of CSPC : 
-```go
-// OldCSPUID is used to migrate old csp to cspi. This will be the
-// old pool name which needs to imported and renamed as new pool
-OldCSPUID string `json:"oldCSPUID,omitempty"`
-```
-The CSPC will come up with an additional field `OldCSPUID` which will be used to import the old CSP pool. Sequentially one CSPI is taken and the corresponding CSP is found using `kubernetes/hostname` label. The CSP deployment is scaled down to avoid multiple pods trying to import the same pool. Next the all the BDC for given CSPI are updated with CSPC information. Then CSPI reconciliation will be enabled which will create the CSPI deployment which will rename and import the pool. Once the pool is imported successfully then the field `OldCSPUID` will be reset to empty string to avoid renaming of pool in future.
+Sequentially one CSPI is taken and the corresponding CSP is found using `kubernetes/hostname` label. The CSP deployment is scaled down to avoid multiple pods trying to import the same pool. Next the all the BDC for given CSPI are updated with CSPC information. The CSPI will be patched with the annotation `cstorpoolinstance.openebs.io/oldname`. Then CSPI reconciliation will be enabled which will create the CSPI deployment which will rename and import the pool. Once the pool is imported successfully then the field `OldCSPUID` will be reset to empty string to avoid renaming of pool in future.
 
-The `OldCSPUID` field will be used to rename the pool which was named as `cstor-cspuid` to `cstor-cspcuid`. It  needs to be removed once the CSPI for that `poolSpec` comes into `ONLINE` phase. This field will be used to populate the `cspuid` annotation which will be added while creating CSPI CR. This annotation will be removed after successful import of the pool.
+The `cstorpoolinstance.openebs.io/oldname` annotation will be used to rename the pool which was named as `cstor-cspuid` to `cstor-cspcuid`. This annotation will be removed after successful import of the pool.
 
 The Job spec for migrating SPC is:
 ```yaml
@@ -168,7 +162,7 @@ spec:
         args:
         - "cstor-volume"
         # pv-name of the volume which has to be migrated
-        - "--pv-name=cstor-sparse-pool"
+        - "--pv-name=pvc-b265427e-6a62-470a-a841-5a36be371e14"
 
         #Following are optional parameters
         #Log Level
