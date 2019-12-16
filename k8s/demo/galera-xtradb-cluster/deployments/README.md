@@ -83,11 +83,11 @@ pxc-node3-82203929-mh5p9                                         1/1       Runni
 
 ## Deployment Guidelines
 
-- OpenEBS recommends creating the Galera cluster with at least 3 nodes/replicas. SGo to the following URL for details:
+- OpenEBS recommends creating the Galera cluster with at least 3 nodes/replicas. Go to the following URL for details:
 https://www.percona.com/blog/2015/06/23/percona-xtradb-cluster-pxc-how-many-nodes-do-you-need/.
 
 - It is important to deploy the service/pod for primary node first and wait for it to be processed before starting the 
-secondary/other nodes. Deploying all YAMLs together can cause the pods to restar repeatedly. Th reason stated in Kubernetes 
+secondary/other nodes. Deploying all YAMLs together can cause the pods to restart repeatedly. Th reason stated in Kubernetes 
 documentation is:
 
   *If there is a node in wsrep_cluster_address without a backing galera node there will be nothing to obtain SST from which 

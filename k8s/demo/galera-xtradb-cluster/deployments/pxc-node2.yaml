@@ -18,7 +18,7 @@ spec:
     node: pxc-node2 
 
 ---
-apiVersion: apps/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: pxc-node2 
@@ -26,6 +26,9 @@ metadata:
     name: pxc-node2
 spec:
   replicas: 1
+  selector:
+    matchLabels:
+      node: pxc-node2
   template:
     metadata:
       labels:

@@ -1,6 +1,6 @@
 # Running percona pod on OpenEBS
 
-This tutorial provides detailed instructions on how to run a percona-mysql 
+This tutorial provides detailed instructions on how to run percona-mysql 
 application pod on OpenEBS storage in a kubernetes cluster and uses a mysql-client
 container to generate some load (in the form of insert & select DB queries) in 
 order to illustrate I/O traffic on the storage. 
@@ -9,18 +9,16 @@ order to illustrate I/O traffic on the storage.
 
 Pre-requisites include the following: 
 
-- A fully configured kubernetes cluster (versions 1.6.3/4/6 & 1.7.0 have been 
-tested) with kube master and at least one kube minion. This maybe created on 
-cloud platforms like GKE, on-premise virtual machines (vagrant/VMware/Hyper-V) 
-or bare-metal boxes
+- A fully configured kubernetes cluster with kubernetes master and at least one node. This may be created on 
+cloud platforms like GKE, on-premise virtual machines (vagrant/VMware/Hyper-V) or bare-metal boxes
 
   Note: 
 
-  - It is recommended to use a 3-node cluster, with one master and two minions, 
-  as this will aid creation of storage replicas on separate  minion nodes. This 
+  - It is recommended to use a 3-node cluster, with one master and two nodes, 
+  as this will aid creation of storage replicas on separate nodes. This 
   is especially helpful to maintain redundancy and data availability.
 
-  - If you are using gcp, view the appendix in this 
+  - If you are using GCP, view the appendix in this 
   [tutorial](https://github.com/openebs/openebs/blob/master/k8s/hyperconverged/tutorial-configure-openebs-gke.md)
   for additional steps for setting cluster admin context and using it 
   
@@ -34,12 +32,12 @@ or bare-metal boxes
   mayamaster   Ready     5d        v1.6.3
   ```
   
-- Sufficient resources on the minions to host the openebs storage pods & percona
+- Sufficient resources on the nodes to host the OpenEBS storage pods & percona
 application pods. This includes sufficient disk space, as, in this example, 
-physical storage for the pvolume containers shall be carved out from local storage
+physical storage for the volume containers shall be carved out from local storage.
 
-- iSCSI support on the minions. This is needed to be able to consume the iSCSI 
-target exposed by the openebs volume container (i.e., VSM). In ubuntu, the iSCSI
+- iSCSI support on all the nodes. This is needed to be able to consume the iSCSI 
+target exposed by the OpenEBS volume container. In ubuntu, the iSCSI
 initiator can be installed using the procedure below : 
   
   ```
@@ -107,7 +105,7 @@ openebs-jupyter   openebs.io/provisioner-iscsi
 openebs-percona   openebs.io/provisioner-iscsi
 ```
 
-## Step-2: Run percona-mysql pod with openebs storage
+## Step-2: Run percona-mysql pod with OpenEBS storage
 
 Use OpenEBS as persistent storage for the percona pod by selecting an OpenEBS 
 storage class in the persistent volume claim. A sample percona pod yaml (with 
@@ -121,7 +119,7 @@ cd demo/percona
 kubectl apply -f demo-percona-mysql-pvc.yaml
 ```
 
-Verify that the openebs storage pods, i.e., the jiva controller and jiva replicas
+Verify that the OpenEBS storage pods, i.e., the jiva controller and jiva replicas
 are created and the percona pod is running successfully
 
 ```

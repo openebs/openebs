@@ -1,5 +1,5 @@
 {
-  "apiVersion": "apps/v1beta1",
+  "apiVersion": "apps/v1",
   "kind": "StatefulSet",
   "metadata": {
     "name": "pgset"
@@ -7,6 +7,11 @@
   "spec": {
     "serviceName": "pgset",
     "replicas": 2,
+    "selector": {
+       "matchLabels": {
+	  "app": "pgset"
+       }
+     },
     "template": {
       "metadata": {
         "labels": {

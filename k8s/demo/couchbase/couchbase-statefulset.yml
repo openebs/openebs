@@ -1,10 +1,13 @@
-apiVersion: apps/v1beta1
+apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: couchbase
 spec:
   serviceName: "couchbase"
   replicas: 2
+  selector:
+    matchLabels:
+      app: couchbase
   template:
     metadata:
       labels:

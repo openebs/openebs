@@ -33,13 +33,16 @@ spec:
   selector:
     app: rabbitmq
 ---
-apiVersion: apps/v1beta1
+apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: rabbitmq
 spec:
   serviceName: "rabbitmq"
   replicas: 3
+  selector:
+    matchLabels:
+      app: rabbitmq
   template:
     metadata:
       labels:
