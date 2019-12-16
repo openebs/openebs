@@ -42,7 +42,7 @@ spec:
       app: zk
   minAvailable: 2
 ---
-apiVersion: apps/v1beta1
+apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: zk
@@ -50,6 +50,9 @@ metadata:
 spec:
   serviceName: zk-headless
   replicas: 3
+  selector:
+    matchLabels:
+      app: zk
   template:
     metadata:
       labels:

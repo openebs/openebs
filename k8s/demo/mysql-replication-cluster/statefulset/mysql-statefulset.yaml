@@ -1,4 +1,4 @@
-apiVersion: apps/v1beta1
+apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: mysql
@@ -167,7 +167,7 @@ spec:
   - metadata:
       name: maya-database
       annotations:
-        volume.beta.kubernetes.io/storage-class: openebs-standard
+        volume.beta.kubernetes.io/storage-class: openebs-jiva-default
     spec:
       accessModes: ["ReadWriteOnce"]
       resources:

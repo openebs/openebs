@@ -11,12 +11,15 @@ spec:
     requests:
       storage: 5G
 ---
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
  name: jenkins
 spec:
  replicas: 1
+ selector:
+   matchLabels:
+     app: jenkins-app
  template:
   metadata:
    labels:

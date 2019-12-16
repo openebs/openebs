@@ -14,10 +14,18 @@ A fully configured (preferably, multi-node) Kubernetes cluster configured with t
 storage classes.
 
 ```
-test@Master:~/crunchy-postgres$ kubectl get pods
-NAME                                                             READY     STATUS    RESTARTS   AGE
-maya-apiserver-2245240594-ktfs2                                  1/1       Running   0          3h
-openebs-provisioner-4230626287-t8pn9                             1/1       Running   0          3h
+test@Master:~/crunchy-postgres$ kubectl get pods -n openebs
+NAME                                          READY   STATUS    RESTARTS   AGE
+cspc-operator-5569b48f6d-qr5r5                1/1     Running   0          6d21h
+maya-apiserver-7d5b667cc-x6qsb                1/1     Running   0          6d21h
+openebs-admission-server-7b85697d8d-26nqw     1/1     Running   0          6d21h
+openebs-localpv-provisioner-9844ffcd5-mrbtr   1/1     Running   0          6d21h
+openebs-ndm-8fkl6                             1/1     Running   0          6d4h
+openebs-ndm-j9hcz                             1/1     Running   0          6d4h
+openebs-ndm-operator-7c955ff9c9-7lcl8         1/1     Running   0          6d21h
+openebs-ndm-r8dfk                             1/1     Running   0          6d4h
+openebs-provisioner-64ccdd9c54-jxrrq          1/1     Running   0          6d21h
+openebs-snapshot-operator-8ffc4ffdd-8zzpb     2/2     Running   0          6d21h
 ```
 
 ## Deploy the Crunchy-Postgres StatefulSet with OpenEBS Storage
@@ -30,7 +38,7 @@ a startup script which decides the role based on ordinality assigned to the pod.
 
 ```
 {
-  "apiVersion": "apps/v1beta1",
+  "apiVersion": "apps/v1",
   "kind": "StatefulSet",
   "metadata": {
     "name": "pgset"
@@ -38,6 +46,11 @@ a startup script which decides the role based on ordinality assigned to the pod.
   "spec": {
     "serviceName": "pgset",
     "replicas": 2,
+    "selector": {
+       "matchLabels": {
+          "app": "pgset"
+        }
+      }, 
     "template": {
       "metadata": {
         "labels": {
