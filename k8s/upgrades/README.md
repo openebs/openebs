@@ -236,6 +236,7 @@ spec:
         # the image version should be same as the --to-version mentioned above
         # in the args of the job
         image: quay.io/openebs/m-upgrade:1.5.0
+	imagePullPolicy: Always
       restartPolicy: OnFailure
 ---
 ```
@@ -318,6 +319,7 @@ spec:
         # the image version should be same as the --to-version mentioned above
         # in the args of the job
         image: quay.io/openebs/m-upgrade:1.5.0
+        imagePullPolicy: Always
       restartPolicy: OnFailure
 ---
 ```
@@ -390,6 +392,7 @@ spec:
         # the image version should be same as the --to-version mentioned above
         # in the args of the job
         image: quay.io/openebs/m-upgrade:1.5.0
+        imagePullPolicy: Always
       restartPolicy: OnFailure
 ---
 ```
