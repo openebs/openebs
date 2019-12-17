@@ -204,20 +204,19 @@ During dataset creation, cstor-pool-mgmt will set this at dataset with property
 as `io.openebs:replicaID`.
 
 #### Removing replica
-Decreasing the replicationFactor will also be done in declarative way.
-For replicas identification that can connect to target, known replicas information
-we are already storing in CStorVolume CR status and istgt.conf which are
-implemented as part of replica scaleup feature.
+Decreasing the replicationFactor also can be done in declarative way. cStor target
+can identify the replica based on known replica information that exists in
+istgt.conf file, basically known replica information is persisted on cStorVolume
+CR when replicas connected to the target and this known replica information is propogated
+to istgt.conf file by volume-mgmt(which was implemented as part of replica scaleup
+feature).
 
-This operation will be allowed only when RF == DRF and new field will be added
-to CStorvolume CR. In CStorVolume CR, `spec.ReplicaList` will be added to
-help in removing replicas. In istgt.conf, replica list will be filled from
-CStorVolume CR `spec.ReplicaDetails`.
-
-spec.ReplicaList and status.ReplicaList will be updated by volume-mgmt after
-receiving the request from istgt via UDS. Istgt will send request when
-replica become healthy and replica information is not present in in-memory
-KnownReplicalist.
+Removing replica operation will be allowed only when RF == DRF and new field
+will be added to cStorvolume CR in to perform scale down operation. In CStorVolume
+CR, `spec.ReplicaList` is added to identify removed replica. Known replica
+information on cStorVolume spec and status will be updated by volume-mgmt upon
+request from istgt (istgt will request volume-mgmt to persist known replica
+information on cStorVolume CR).
 
 ### Steps to perform user stories
 
@@ -238,7 +237,7 @@ if descreased by user.
 
 #### Removing replica
 - User will edit CStorVolume CR to set 'DesiredReplicationFactor' and Remove
-replicaID entry in `spec.ReplicaList` related to replica which will be deleted.
+replicaID entry from `spec.ReplicaList` related to replica which needs to be deleted.
 - User will delete respective CVR(whcih is removed in above step).
 
 ### High Level Design of Replica Scaleup
@@ -272,12 +271,13 @@ CStorVolume CR.
                [Conf file]
 ```
 ### High Level Design of Replica ScaleDown
-CStor-volume-mgmt watches for CStorVolume and update DesiredReplicationFactor
-and Replica list in istgt.conf with available replicas. If there is decreased
-change in DesiredReplicationFactor, cstor-volume-mgmt will trigger istgtcontrol
-command so that istgt will updates volume configuration during runtime. On
-success of istgtcontrol command status part of CStorVolume CR will be updated
-else cstor-volume-mgmt controller will execute same process during next sync time.
+CStor-volume-mgmt watches for CStorVolume CR and update DesiredReplicationFactor
+and known replica list in istgt.conf with available replicas only when user modifes the
+CStorvolume CR. If there is decreased change in DesiredReplicationFactor,
+cstor-volume-mgmt will update istgt.conf file and trigger istgtcontrol command so
+that istgt will updates volume configuration during runtime. On success of
+istgtcontrol command status part of CStorVolume CR will be updated else
+cstor-volume-mgmt controller will execute same process during next sync time.
 
 Command triggered by cstor-volume-mgmt during replica scaledown case:
 istgtcontrol drf <volume_name> <available_replica_id_list>
@@ -322,8 +322,8 @@ If 5th one, either R4 or R5 connects, it need to become healthy before getting
 added to to list. This would be time consuming.
 
 #### Do we need to pass available_replica_id_list to istgt during scaledown
-This is needed to identify the replica which needs to be disconnect as part of
-replica scaledown.
+This information is needed to target to identify the replica which needs to be
+disconnect as part of replica scaledown.
 
 ### Low Level Design for add/migrating replica
 Current code takes care of reconstructing data to non-quorum replica once it
@@ -419,8 +419,8 @@ Current implementation takes care of scalingup replicas in declarative manner.
 But, changes are required to remove replica from volume.
 
 #### Removing replica from known replica list
-When DesiredReplicationFactor is decreased and replica detail entries are removed
-removed from spec.ReplicaList then it is case of replica scaledown.
+When DesiredReplicationFactor is decreased and removed replica entries from
+spec.ReplicaList then it is identified as replica scaledown.
 
 For the case of replica scaledown, steps to follow for data consistency are:
 - Pause IOs for few seconds, and, make sure there are no ongoing/pending IOs on
