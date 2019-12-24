@@ -25,23 +25,20 @@ superseded-by:
 
 ## Table of Contents
 
-* [Table of Contents](#table-of-contents)
-* [Summary](#summary)
-* [Motivation](#motivation)
-    * [Goals](#goals)
-* [Proposal](#proposal)
-    * [User Stories](#user-stories)
-      * [Resize cStor Volume](#resize-cstor-volume)
-    * [Implementation Details](#implementation-details)
-    * [Custom Resources used to resize cStor volume](#custom-resource-used-to-resize)
-    * [Current Implementation](#current-implementation)
-      * [High Level cStor Volume Resize Workflow](#high-level-cStor-volume-resize-workflow)
-    * [High Level Design](#high-level-design)
-      * [CStorVolumeClaim -- existing custom resource](#cstorvolumeclaim----existing-custom-resource)
-      * [CStorVolume -- existing custom resource](#cstorvolume----existing-custom-resource)
-      * [CStorVolumeReplica -- existing custom resource](#cstorvolumereplica----existing-custom-resource)
-* [Drawbacks](#drawbacks)
-* [Alternatives](#alternatives)
+- [cStor Volume Resize](#cstor-volume-resize)
+  - [Table of Contents](#table-of-contents)
+  - [Summary](#summary)
+  - [Motivation](#motivation)
+    - [Goals](#goals)
+  - [Proposal](#proposal)
+    - [User Stories](#user-stories)
+      - [Resize cStor Volume:](#resize-cstor-volume)
+    - [Implementation Details](#implementation-details)
+    - [Custom Resources used to resize cStor volume](#custom-resources-used-to-resize-cstor-volume)
+      - [Current Implementation -- Volume Resize](#current-implementation----volume-resize)
+  - [High Level cStor Volume Resize Workflow](#high-level-cstor-volume-resize-workflow)
+  - [Drawbacks](#drawbacks)
+  - [Alternatives](#alternatives)
 
 ## Summary
 
@@ -349,7 +346,7 @@ Once resize operation is succeed at OpenEBS side CSI node plugin(/kubelet) will
 trigger resize operation on filesystem level as part of online resizing.
 
 ## High Level cStor Volume Resize Workflow
-    ![Resize Workflow](Resize_work_flow.png)
+  ![Resize Workflow](Resize_work_flow.png)
 
 ## Drawbacks
 
