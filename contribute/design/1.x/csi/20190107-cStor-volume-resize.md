@@ -34,8 +34,10 @@ superseded-by:
     - [User Stories](#user-stories)
       - [Resize cStor Volume:](#resize-cstor-volume)
     - [Implementation Details](#implementation-details)
-    - [Custom Resources used to resize cStor volume](#custom-resources-used-to-resize-cstor-volume)
       - [Current Implementation -- Volume Resize](#current-implementation----volume-resize)
+      - [Custom Resources used to resize cStor volume](#custom-resources-used-to-resize-cstor-volume)
+        - [cStorVolumeClaim](#cstorvolumeclaim)
+        - [cStorVolume](#cstorvolume)
   - [High Level cStor Volume Resize Workflow](#high-level-cstor-volume-resize-workflow)
   - [Drawbacks](#drawbacks)
   - [Alternatives](#alternatives)
@@ -146,7 +148,104 @@ means resize is in progress).
 The sections below can be assumed to be specific to `cStor` unless mentioned
 otherwise.
 
-### Custom Resources used to resize cStor volume
+#### Current Implementation -- Volume Resize
+
+- CSI controller will get gRPC resize request from kubernetes-csi external-resizer
+  controller(when pvc storage field is updated).
+- CSI controller acquire lease and checks is there any ongoing resize on requested
+  volume if yes then CSI controller will return error. If volume size is upto
+  date (i.e cvc.spec.capacity == cvc.status.capacity) then CSI controller updates
+  CVC spec capacity with latest size.
+  Example status: status of CVC when resize request is in progress.
+```yaml
+      Status:
+        capacity:
+          storage: 5Gi
+        Conditions:
+          - Type: Resizing
+            Status: InProgress
+            LastProbeTime: date
+            LastTransitionTime: (update only when there is a change in size)
+            Reason: Capacity changed
+            Message: Resize pending
+```
+   Note: Please refer [cStorVolumeClaim](#cStorVolumeClaim) under Custom Resources used to resize cStor volume section for entier CVC.
+- Based on the status capacity of CVC CSI will respond to the gRPC request(request
+  is from kubernetes-csi).
+- CVC controller present in maya-apiserver will get update event on corresponding
+  CVC CR. Update event will process below steps
+  - Check is there any ongoing resize on cstorvolume(CV) if so return.
+    Example status: CV status when resize is in progress
+```yaml
+      Status:
+        capacity: 5Gi
+        Conditions:
+          - Type: Resizing
+            Status: InProgress
+            LastProbeTime: date
+            LastTransitionTime: (update value by picking it from CVC LastTransitionTime)
+            Reason: Capacity changed
+            Message: Resize pending
+```
+   Note: Please refer [cStorVolume](#cStorVolume) under Custom Resources used to resize cStor volume section for entier CV.
+  - Check if there is any increased changes in capacity of CV and CVC object if
+    so update spec capacity field of CV object with latest size.
+  - During reconciliation time Check is there any resize is pending on CVC if
+    so check corresponding CV resize status if it is success take a lease and
+    check is there any capacity difference in CV and CVC if there is no change
+    then update CVC status condition as resize success and release the lease.
+    If capacity change is noticed after taking lease, repeat this step after
+    releasing lease(left as is reconciliation will do rework).
+
+    Example status: CVC status when resize is success
+```yaml
+      Status:
+        capacity: 10Gi
+        Conditions:
+          - Type: Resizing
+            Status: Success
+            LastProbeTime: date
+            LastTransitionTime: (update while updating resize condition status)
+            Reason: Capacity changed
+            Message: Resize Success
+```
+   Note: Please refer [cStorVolumeClaim](#cStorVolumeClaim) under Custom Resources used to resize cStor volume section for entier CVC.
+
+- Cstor-volume-mgmt container as a target side car which is already having a
+  volume-controller watching on CV object will get update event (if event is missed
+  volume controller will process during sync event) then volume-controller will process
+  the request with following steps
+    - Volume-controller will executes `istgtcontrol resize <size_unit>`
+      command(rpc call) if there is any resize status is pending on that
+      volume(based on resize status condition).
+    - If above rpc call success volume-controller will updates istgt.conf file
+      alone but not CVR capacity[why? CVR capacity is treated initial volume
+      capacity and maintaining initial capacity will be helpful in ephemeral
+      case]. If volume controller succeed in updating istgt.conf file then update
+      status capacity and success status for resize condition on CV.
+    - If it is a failure response from rpc then generate kubernetes events and
+      do nothing just return(reconciliation will take care of doing the above
+      process again).
+- When cstor-istgt get a resize request it will trigger a resize request to replica
+  and return a success response to cstor-volume-mgmt[why? cstor-istgt will not concern
+  whether resize request is success or failure. If resize request succeed then
+  there is no problem. If resize request fails and if replica gets IO greater
+  than it's size then IO will be failed on that replica and cstor-istgt will
+  disconnect IO failure replica. As part of replica's data connection, target
+  will exchange the size information with replica. During data connection replica
+  checks if it is single replica volume then it will resize main volume else it
+  will resize the internal rebuild clone volume].
+  Note: Processing `istgtcontrol resize` is a blocking call.
+
+- zfs will receives the resize request, it will resize the corresponding volume
+  and sent back the response to cstor-istgt(aka target).
+
+Once resize operation is succeed at OpenEBS side CSI node plugin(/kubelet) will
+trigger resize operation on filesystem level as part of online resizing.
+
+#### Custom Resources used to resize cStor volume
+
+##### cStorVolumeClaim
 
 Sample CVC yaml when resize is in progress
 ```yaml
@@ -197,6 +296,8 @@ Sample CVC yaml when resize is in progress
       lastUpdateTime: null
       state: ""
 ```
+
+##### cStorVolume
 
 Sample cstorvolume yaml when resize is in progress
 ```yaml
@@ -249,104 +350,9 @@ status:
 When resize is in progress spec and status capacity will vary. Resize conditions
 will be available to know the status of resize.
 
-#### Current Implementation -- Volume Resize
-- CSI controller will get gRPC resize request from kubernetes-csi external-resizer
-  controller(when pvc storage field is updated).
-- CSI controller acquire lease and checks is there any ongoing resize on requested
-  volume if yes then CSI controller will return error. If volume size is upto
-  date (i.e cvc.spec.capacity == cvc.status.capacity) then CSI controller updates
-  CVC spec capacity with latest size.
-  Example status: status of CVC when resize request is in progress.
-```yaml
-      Status:
-        capacity:
-          storage: 5Gi
-        Conditions:
-          - Type: Resizing
-            Status: InProgress
-            LastProbeTime: date
-            LastTransitionTime: (update only when there is a change in size)
-            Reason: Capacity changed
-            Message: Resize pending
-```
-   Note: Please refer CVC under Custom Resources used to resize cStor volume section for entier CVC.
-- Based on the status capacity of CVC CSI will respond to the gRPC request(request
-  is from kubernetes-csi).
-- CVC controller present in maya-apiserver will get update event on corresponding
-  CVC CR. Update event will process below steps
-  - Check is there any ongoing resize on cstorvolume(CV) if so return.
-    Example status: CV status when resize is in progress
-```yaml
-      Status:
-        capacity: 5Gi
-        Conditions:
-          - Type: Resizing
-            Status: InProgress
-            LastProbeTime: date
-            LastTransitionTime: (update value by picking it from CVC LastTransitionTime)
-            Reason: Capacity changed
-            Message: Resize pending
-```
-   Note: Please refer CV under Custom Resources used to resize cStor volume
-        section for entier CV.
-  - Check if there is any increased changes in capacity of CV and CVC object if
-    so update spec capacity field of CV object with latest size.
-  - During reconciliation time Check is there any resize is pending on CVC if
-    so check corresponding CV resize status if it is success take a lease and
-    check is there any capacity difference in CV and CVC if there is no change
-    then update CVC status condition as resize success and release the lease.
-    If capacity change is noticed after taking lease, repeat this step after
-    releasing lease(left as is reconciliation will do rework).
-
-    Example status: CVC status when resize is success
-```yaml
-      Status:
-        capacity: 10Gi
-        Conditions:
-          - Type: Resizing
-            Status: Success
-            LastProbeTime: date
-            LastTransitionTime: (update while updating resize condition status)
-            Reason: Capacity changed
-            Message: Resize Success
-```
-   Note: Please refer CVC under Custom Resources used to resize cStor volume section
-         for entier CVC.
-
-- Cstor-volume-mgmt container as a target side car which is already having a
-  volume-controller watching on CV object will get update event (if event is missed
-  volume controller will process during sync event) then volume-controller will process
-  the request with following steps
-    - Volume-controller will executes `istgtcontrol resize <size_unit>`
-      command(rpc call) if there is any resize status is pending on that
-      volume(based on resize status condition).
-    - If above rpc call success volume-controller will updates istgt.conf file
-      alone but not CVR capacity[why? CVR capacity is treated initial volume
-      capacity and maintaining initial capacity will be helpful in ephemeral
-      case]. If volume controller succeed in updating istgt.conf file then update
-      status capacity and success status for resize condition on CV.
-    - If it is a failure response from rpc then generate kubernetes events and
-      do nothing just return(reconciliation will take care of doing the above
-      process again).
-- When cstor-istgt get a resize request it will trigger a resize request to replica
-  and return a success response to cstor-volume-mgmt[why? cstor-istgt will not concern
-  whether resize request is success or failure. If resize request succeed then
-  there is no problem. If resize request fails and if replica gets IO greater
-  than it's size then IO will be failed on that replica and cstor-istgt will
-  disconnect IO failure replica. As part of replica's data connection, target
-  will exchange the size information with replica. During data connection replica
-  checks if it is single replica volume then it will resize main volume else it
-  will resize the internal rebuild clone volume].
-  Note: Processing `istgtcontrol resize` is a blocking call.
-
-- zfs will receives the resize request, it will resize the corresponding volume
-  and sent back the response to cstor-istgt(aka target).
-
-Once resize operation is succeed at OpenEBS side CSI node plugin(/kubelet) will
-trigger resize operation on filesystem level as part of online resizing.
 
 ## High Level cStor Volume Resize Workflow
-  ![Resize Workflow](Resize_work_flow.png)
+  ![Resize Workflow](./Resize_work_flow.png)
 
 ## Drawbacks
 
