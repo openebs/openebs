@@ -349,7 +349,7 @@ Once resize operation is succeed at OpenEBS side CSI node plugin(/kubelet) will
 trigger resize operation on filesystem level as part of online resizing.
 
 ## High Level cStor Volume Resize Workflow
-    ![Resize Workflow](Resize_work_flow.png)
+    ![Resize Workflow](/Resize_work_flow.png)
 
 ## Drawbacks
 
