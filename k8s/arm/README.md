@@ -40,21 +40,22 @@ The above steps create the following docker images:
 Tag the images and push to your repo. The following steps are used to push the alpha versions of this image to openebs docker repo. 
 
 ```
-sudo docker tag openebs/node-disk-operator-arm64:ci openebs/node-disk-operator-arm64-ci:v0.4.4
-sudo docker tag openebs/node-disk-manager-arm64:ci openebs/node-disk-manager-arm64-ci:v0.4.4
-sudo docker push openebs/node-disk-operator-arm64-ci:v0.4.4
-sudo docker push openebs/node-disk-manager-arm64-ci:v0.4.4
+sudo docker tag openebs/node-disk-operator-arm64:ci openebs/node-disk-operator-arm64-ci:v0.4.5
+sudo docker tag openebs/node-disk-manager-arm64:ci openebs/node-disk-manager-arm64-ci:v0.4.5
+sudo docker push openebs/node-disk-operator-arm64-ci:v0.4.5
+sudo docker push openebs/node-disk-manager-arm64-ci:v0.4.5
 ```
 
 NDM uses `linux-utils` to image to launch a Kubernetes job to cleanup devices after being released from PV. This image can be built and pushed as follows:
 
 ```
-mkdir $GOPATH/litmuschaos
-cd $GOPATH/litmuschaos
-git clone https://github.com/litmuschaos/test-tools.git
-cd test-tools/linux-utils && docker build -t openebs/linux-utils .
-sudo docker tag openebs/linux-utils:latest openebs/linux-utils:arm64-1.4.0
-sudo docker push openebs/linux-utils:arm64-1.4.0
+mkdir $GOPATH/openebs
+cd $GOPATH/openebs
+git clone https://github.com/openebs/linux-utils.git
+cd linux-utils
+make image
+sudo docker tag openebs/linux-utils-arm64:ci openebs/linux-utils-arm64-ci:1.5.0
+sudo docker push openebs/linux-utils-arm64-ci:1.5.0
 ```
 
 ## Building Jiva Provisioner
@@ -70,8 +71,8 @@ cd openebs; export BASE_DOCKER_IMAGEARM64=arm64v8/ubuntu:16.04; make image.arm64
 Tag the provisioner image and push to your repo. 
 
 ```
-sudo docker tag openebs/openebs-k8s-provisioner-arm64:ci openebs/openebs-k8s-provisioner-arm64-ci:1.4.0
-sudo docker push openebs/openebs-k8s-provisioner-arm64-ci:1.4.0
+sudo docker tag openebs/openebs-k8s-provisioner-arm64:ci openebs/openebs-k8s-provisioner-arm64-ci:1.5.0
+sudo docker push openebs/openebs-k8s-provisioner-arm64-ci:1.5.0
 ```
 
 ## Building Jiva Data Engine
@@ -92,8 +93,8 @@ sudo docker images | grep jiva
 
 Let us say the image is `openebs/jiva-arm64:dev-7fcc4cd`. Tag and push this image to your repo. 
 ```
-sudo docker tag openebs/jiva-arm64:dev-7fcc4cd openebs/jiva-arm64-ci:1.4.0
-sudo docker push openebs/jiva-arm64-ci:1.4.0
+sudo docker tag openebs/jiva-arm64:dev-7fcc4cd openebs/jiva-arm64-ci:1.5.0
+sudo docker push openebs/jiva-arm64-ci:1.5.0
 ```
 
 
@@ -114,10 +115,10 @@ The above steps will create the following docker images:
 Tag and push to your repo. 
 
 ```
-sudo docker tag openebs/m-apiserver-arm64:ci openebs/m-apiserver-arm64-ci:1.4.0
-sudo docker tag openebs/provisioner-localpv-arm64:ci openebs/provisioner-localpv-arm64-ci:1.4.0
-sudo docker push openebs/m-apiserver-arm64-ci:1.4.0
-sudo docker push openebs/provisioner-localpv-arm64-ci:1.4.0
+sudo docker tag openebs/m-apiserver-arm64:ci openebs/m-apiserver-arm64-ci:1.5.0
+sudo docker tag openebs/provisioner-localpv-arm64:ci openebs/provisioner-localpv-arm64-ci:1.5.0
+sudo docker push openebs/m-apiserver-arm64-ci:1.5.0
+sudo docker push openebs/provisioner-localpv-arm64-ci:1.5.0
 ```
 
 ## Future Development Items
