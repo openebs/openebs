@@ -4,7 +4,7 @@ This document provides information on OpenEBS development in current and upcomin
 
 ## OpenEBS Lean Roadmap
 
-OpenEBS follows lean project management approach by splitting the development items into current, near term and future categories. We use GitHub [Projects](https://github.com/orgs/openebs/projects) and [Milestones](https://github.com/openebs/openebs/milestones) for tracking the feature developement. This document is reviewed and updated based in the [monthly community call](https://github.com/openebs/openebs/tree/master/community#regular-monthly-product-meetings). 
+OpenEBS follows a lean project management approach by splitting the development items into current, near term and future categories. We use GitHub [Projects](https://github.com/orgs/openebs/projects) and [Milestones](https://github.com/openebs/openebs/milestones) for tracking the feature development. This document is reviewed and updated based on the [monthly community call](https://github.com/openebs/openebs/tree/master/community#regular-monthly-product-meetings). 
 
 ## Current
 
@@ -29,7 +29,7 @@ While the following are planned items, higher priority is given to usability and
   * Automated install and upgrades  
 * [NDM Enhancements](https://github.com/orgs/openebs/projects/2)
   * Enhance the discovery probes to support partitions, lvms and so forth
-  * Support prometheus exporter on block device metrics
+  * Support Prometheus exporter on block device metrics
   * Add gRPC API layer around NDM capabilities
 * MayaStor 
   * Replication across multiple nodes
