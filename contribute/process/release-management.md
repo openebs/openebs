@@ -64,7 +64,7 @@ https://hub.docker.com/r/openebs/openebs-k8s-provisioner/tags
 
 ## Post Release Activities
 - Blogs on new features are published
-- Update the news letter contents
+- Update the newsletter contents
 - Release Webinar
 - Update blogs, documentation with new content or examples. For example update the readme with change in status or process. 
 - Update the charts like Helm stable and other partner charts. (Rancher, OpenShift, IBM ICP Community Charts, Netapp NKS Trusted Charts (formerly StackPointCloud), AWS Marketplace, OperatorHub and DigitalOcean)
