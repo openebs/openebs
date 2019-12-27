@@ -22,6 +22,7 @@ The list of users that have publicly shared the usage of OpenEBS.
 | User | Stateful Workloads | Success Story |
 | :--- | :--- | :--- |
 | [proegssilb](https://github.com/proegssilb) | PostgreSQL, Redis, Factorio (video game server) | [English](./adopters/users/proegssilb/README.md)  | 
+| [radicand](https://github.com/radicand) | Wordpress, MariaDB on ARM64 cluster | [English](./adopters/users/radicand/README.md) | 
 | [tardich](https://github.com/tardich) | Postfix Mail Relay, NextCloud, Nexus Repository, Plex | [English](./adopters/users/tardich/README.md)  | 
 
 
