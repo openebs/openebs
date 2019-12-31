@@ -8,7 +8,7 @@ We are always looking for new contributions. [CONTRIBUTING.md](../CONTRIBUTING.m
 
 ## Reporting an Issue
 
-If you have a question about OpenEBS or have a problem using it, please check the [troubleshooting guide](https://docs.openebs.io/docs/troubleshooting.html).
+If you have a question about OpenEBS or have a problem using it, please check the [troubleshooting guide](https://docs.openebs.io/docs/next/troubleshooting.html).
 If that does not answer your questions, or if you think you found a bug, please [file an issue](https://github.com/openebs/openebs/issues).
 
 ## Contact
