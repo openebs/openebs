@@ -71,8 +71,11 @@ rules:
 - nonResourceURLs: ["/metrics"]
   verbs: ["get"]
 - apiGroups: ["*"]
-  resources: [ "upgradetasks"]
-  verbs: ["*" ]
+  resources: ["upgradetasks"]
+  verbs: ["*"]
+- apiGroups: ["*"]
+  resources: ["poddisruptionbudgets"]
+  verbs: ["get", "list", "create", "delete"]
 ---
 # Bind the Service Account with the Role Privileges.
 # TODO: Check if default account also needs to be there
