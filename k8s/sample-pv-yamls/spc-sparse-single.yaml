@@ -11,4 +11,4 @@ spec:
   poolSpec:
     poolType: striped
     cacheFile: /var/openebs/sparse/sparse-claim-auto.cache
-    overProvisioning: false
+    overProvisioning: true
