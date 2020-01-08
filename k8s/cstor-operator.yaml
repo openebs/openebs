@@ -60,6 +60,13 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
+        # OPENEBS_IO_CSTOR_POOL_SPARSE_DIR can be used to specify the hostpath
+        # to be used for saving the shared content between the side cars
+        # of cstor pool pod. This ENV is also used to indicate the location
+        # of the sparse devices.
+        # The default path used is /var/openebs/sparse
+        #- name: OPENEBS_IO_CSTOR_POOL_SPARSE_DIR
+        #  value: "/var/openebs/sparse"
         - name: OPENEBS_IO_CSPI_MGMT_IMAGE
           value: "quay.io/openebs/cspi-mgmt:ci"
         - name: OPENEBS_IO_CSTOR_POOL_IMAGE
@@ -99,6 +106,11 @@ spec:
         imagePullPolicy: IfNotPresent
         image: quay.io/openebs/cvc-operator:ci
         env:
+        # OPENEBS_IO_CSTOR_TARGET_DIR can be used to specify the hostpath
+        # that to be used for saving the core dump of cstor volume pod.
+        # The default path used is /var/openebs/sparse
+        #- name: OPENEBS_IO_CSTOR_TARGET_DIR
+        #  value: "/var/openebs/sparse"
         - name: OPENEBS_NAMESPACE
           valueFrom:
             fieldRef:
