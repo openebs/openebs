@@ -17,8 +17,9 @@
 # This example uses the default localpv with hostdevice 
 # storage class installed by OpenEBS. 
 #
-# Prior to running this YAML, verify that the storage class 
-# mentioned below is available. 
+# Prior to running this YAML, verify that:
+# -  the storage class mentioned below is available.  
+# -  storage devices matching the claim is attached to the node. 
 #
 # You can use the below commands to verify.
 #
