@@ -104,7 +104,7 @@ spec:
         # This value takes effect only if OPENEBS_IO_CREATE_DEFAULT_STORAGE_CONFIG
         # is set to true
         - name: OPENEBS_IO_LOCALPV_HOSTPATH_DIR
-          value: "{{ .Values.localprovisioner.basePath }}"
+          value: "{{ .Values.persistentStoragePath.baseDir }}"
         # OPENEBS_IO_BASE_DIR used to specify base directory to store OpenEBS
         # related files
         - name: OPENEBS_IO_BASE_DIR
