@@ -13,6 +13,9 @@ serviceAccount:
 release:
   # "openebs.io/version" label for control plane components
   version: "1.5.0"
+  # baseDir is the value used to store openebs related files in this base
+  # directory
+  baseDir: "/var/openebs"
 
 image:
   pullPolicy: IfNotPresent
