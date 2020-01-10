@@ -37,6 +37,11 @@ apiserver:
 defaultStorageConfig:
   enabled: "true"
 
+persistentStoragePath:
+  # baseDir is the value used to store openebs related files in this base
+  # directory
+  baseDir: "/var/openebs"
+
 provisioner:
   enabled: true
   image: "quay.io/openebs/openebs-k8s-provisioner"
