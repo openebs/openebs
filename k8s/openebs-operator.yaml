@@ -188,6 +188,10 @@ spec:
         # is set to true
         #- name: OPENEBS_IO_LOCALPV_HOSTPATH_DIR
         #  value: "/var/openebs/local"
+        # OPENEBS_IO_BASE_DIR can be used to specify the base directory to store
+        # the OpenEBS components related files currently on host machine
+        #- name: OPENEBS_IO_BASE_DIR
+        #  value: "/var/openebs"
         - name: OPENEBS_IO_JIVA_CONTROLLER_IMAGE
           value: "quay.io/openebs/jiva:ci"
         - name: OPENEBS_IO_JIVA_REPLICA_IMAGE
@@ -474,6 +478,8 @@ spec:
           readOnly: true
         - name: sparsepath
           mountPath: /var/openebs/sparse
+        - name: basepath
+          mountPath: /var/openebs
         env:
         # namespace in which NDM is installed will be passed to NDM Daemonset
         # as environment variable
@@ -520,6 +526,10 @@ spec:
       - name: sparsepath
         hostPath:
           path: /var/openebs/sparse
+      - name: basepath
+        hostPath:
+          path: /var/openebs
+          type: DirectoryOrCreate
 ---
 apiVersion: apps/v1
 kind: Deployment
