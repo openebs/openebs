@@ -72,10 +72,6 @@ the same from inner workings of a container orchestrator.
 
 ### Non-Goals
 
-- Providing tunables w.r.t creating and deleting a volume
-- Ability to resize a volume
-- Ability to take volume snapshots
-- Ability to clone a volume
 - Handling high availability in cases of node restarts
 - Handling volume placement related requirements
 
@@ -321,7 +317,7 @@ type ReplicaSpec struct {
 
 ##### NOTES
 - Default cstorVolumePolicy yamls will be present in case the user doesn't provide one.
-- App based default csstorVolumePolicies will also be present for users to pick one.
+- App based default cstorVolumePolicies will also be present for users to pick one.
 - Whenever a user provides a cstorVolumePolicy, the empty feilds will be autofilled by webhook from the default cstorVolumePolicy yaml.
 
 #### CStorVolumeConfig -- new custom resource
@@ -329,7 +325,7 @@ This resource is built & created by the CSI driver on a volume create request.
 This resource will be the trigger to get the desired i.e. requested cstor volume
 into the actual state in Kubernetes cluster. CStorVolumeConfig controller will 
 reconcile this config into actual resources. CStorVolumeConfig controller will 
-operate from within the maya-apiserver pod. Once all the below resources are 
+operate from within the cvc-controller pod. Once all the below resources are
 created successfully, the CstorVolumeConfig phase is marked as Bound.
 
 CStorVolumeConfig will be reconciled into following owned resources:
@@ -364,7 +360,7 @@ spec:
         ...
   
   // CStorVolumeRef contains the reference to CStorVolume i.e. CstorVolume Name
-  // This field will be updated by maya after cstor Volume has been
+  // This field will be updated by cvc operator after cstor Volume has been
   // provisioned
   CStorVolumeRef *corev1.ObjectReference `json:"cstorVolumeRef,omitempty"`
   
@@ -392,7 +388,7 @@ status:
     lastUpdatedAt:
     count:
 ```
-Whenever a policy is changed by the user, webhook inturrupts and updates the phase as reconciling.
+Whenever a cstor volume policy field is changed by the user, webhook inturrupts and updates the phase as reconciling.
 It is assumed if webhook server is not running, the editing of the resource would not be allowed.
 On detecting the phase as reconciling, the CVC controller will reverify all the policies and update the change to the corresponding resource. After successful changes, phase is updated back to bound.
 
@@ -407,6 +403,7 @@ controllers.
 - Status.Phase of a CStorVolumeConfig (CVC) resource can have following:
   - Pending
   - Bound
+  - Reconciling
 - Status.Phase is only set during creation
   - Once the phase is Bound it should never revert to Pending
 - Status.Conditions will be used to track an on-going operation or sub status-es
