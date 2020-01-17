@@ -96,7 +96,7 @@ Example:
 - Now, when 'n' no.of HA volumes are provisioned(with replica count as 3) then
   volume replicas can be schedule in any available cStor pools.
 - After volume replicas are placed then cStorVolumeConfig controller will
-  create PDB among those cStor pools.
+  create PDB among those cStor pools if one such PDB doesn't exists.
 - After successful creation of PDB corresponding cStorVolumeConfig will be
   updated with PDB label.
 
