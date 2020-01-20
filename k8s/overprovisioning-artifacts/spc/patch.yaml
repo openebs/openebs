@@ -1,0 +1,16 @@
+# Openebs-operator yaml in ci branch has by default SPARSE_FILE_COUNT set to 1.
+
+# In order to run overprovisioning test for SPC, a SPC needs to be provisioned 
+# and hence requires a free block device.
+
+# This patch files sets SPARSE_FILE_COUNT to 2 from 1 so that the SPC provisioning
+# can happen successfully 
+spec:
+  template:
+    spec:
+      containers:
+      - name: node-disk-manager
+        env:
+        - name: SPARSE_FILE_COUNT
+          value: "2"
+

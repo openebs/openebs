@@ -1,0 +1,14 @@
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: test-pvc-1gig
+  labels:
+    app: test-app-1gig
+spec:
+  storageClassName: cstor-sc-overprovisioning-disabled 
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1G

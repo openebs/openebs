@@ -1,0 +1,13 @@
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: cstor-sc-overprovisioning-disabled
+  annotations:
+    openebs.io/cas-type: cstor
+    cas.openebs.io/config: |
+      - name: ReplicaCount
+        value: "1"
+      - name: StoragePoolClaim
+        value: "overprovisioning-disabled-sparse-pool"
+provisioner: openebs.io/provisioner-iscsi
