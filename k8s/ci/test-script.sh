@@ -79,6 +79,71 @@ sleep 10
 echo "--------------- Maya apiserver later logs -----------------------------"
 dumpMayaAPIServerLogs 200
 
+echo "---------------Run overprovisioning test case for SPC volumes -----------------------------"
+# runVolumeOverProvisioningTest function deploys overprovisioning artifacts for test
+# and verify the test case for success/failure
+runVolumeOverProvisioningTest(){
+deployVolumeOverProvisioningArtifacts
+checkForPVC1GStatus
+checkForPVC10GStatus
+}
+
+# deployVolumeOverProvisioningArtifacts deploys overprovisioning artifacts
+deployVolumeOverProvisioningArtifacts(){
+echo "------------------------ Create block device sparse storagepoolclaim(overprovisioning-disabled-sparse-pool) with overprovisioning restriction on --------------- "
+kubectl apply -f https://raw.githubusercontent.com/openebs/openebs/master/k8s/overprovisioning-artifacts/spc/overprovisioning-disabled-sparse-pool.yaml 
+echo "------------------------ Create storage class referring to spc overprovisioning-disabled-sparse-pool------------------------------------------------------------ "
+kubectl apply -f https://raw.githubusercontent.com/openebs/openebs/master/k8s/overprovisioning-artifacts/spc/cstor-sc-overprovisioning-disabled.yaml 
+
+echo "------------------------ Patch ndm daemonset to set SPARSE_FILE_COUNT to 2 --------------- "
+kubectl patch ds openebs-ndm -n openebs --patch "$(cat patch.yaml)"
+
+sleep 10
+
+echo "Create PVC with 1G capacity request "
+kubectl apply -f https://raw.githubusercontent.com/openebs/openebs/master/k8s/overprovisioning-artifacts/spc/pvc1g.yaml
+echo "Create PVC with 10G capacity request "
+kubectl apply -f https://raw.githubusercontent.com/openebs/openebs/master/k8s/overprovisioning-artifacts/spc/pvc10g.yaml
+}
+
+checkForPVC1GStatus(){
+PVC1G_MAX_RETRY=5
+for i in $(seq 1 $PVC1G_MAX_RETRY) ; do
+	PVC1GStatus=$(kubectl get pvc test-pvc-1gig --output="jsonpath={.status.phase}")
+		if [ "$PVC1GStatus" == "Bound" ]; then
+			echo "PVC test-pvc-1gig bound successfully"
+			break
+		else
+      			echo "Waiting for PVC test-pvc-1gig to be bound"
+                        kubectl get pvc test-pvc-1gig
+			if [ "$i" == "$PVC1G_MAX_RETRY" ] && [ "$PVC1GStatus" != "Bound" ]; then
+				echo "PVC test-pvc-1gig NOT bound"
+				exit 1
+			fi
+		fi
+      			sleep 5
+		done
+}
+checkForPVC10GStatus(){
+PVC10G_MAX_RETRY=5
+for i in $(seq 1 $PVC10G_MAX_RETRY) ; do
+	PVC1GStatus=$(kubectl get pvc test-pvc-10gigs --output="jsonpath={.status.phase}")
+		if [ "$PVC1GStatus" == "Bound" ]; then
+			echo "PVC test-pvc-10gigs should NOT bound successfully due to overprovisioning restriction but got bound"
+                        kubectl get pvc test-pvc-10gigs
+			exit 1
+		else
+      			echo "Waiting for few iterations to check that PVC test-pvc-10gigs does not get bound after sometime"
+                        kubectl get pvc test-pvc-10gigs
+			if [ "$i" == "$PVC10G_MAX_RETRY" ] && [ "$PVC1GStatus" != "Bound" ]; then
+				echo "PVC test-pvc-10gigs NOT bound and hence test case passed"
+			fi
+		fi
+      			sleep 5
+		done
+}
+runVolumeOverProvisioningTest
+
 echo "--------------- Create Cstor and Jiva PersistentVolume ------------------"
 #kubectl create -f https://raw.githubusercontent.com/openebs/openebs/master/k8s/sample-pv-yamls/pvc-jiva-sc-1r.yaml
 kubectl create -f https://raw.githubusercontent.com/openebs/openebs/master/k8s/demo/pvc-single-replica-jiva.yaml
