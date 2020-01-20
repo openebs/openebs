@@ -91,9 +91,11 @@ checkForPVC10GStatus
 # deployVolumeOverProvisioningArtifacts deploys overprovisioning artifacts
 deployVolumeOverProvisioningArtifacts(){
 echo "------------------------ Create block device sparse storagepoolclaim(overprovisioning-disabled-sparse-pool) with overprovisioning restriction on --------------- "
-kubectl apply -f https://raw.githubusercontent.com/openebs/openebs/master/k8s/overprovisioning-artifacts/spc/overprovisioning-disabled-sparse-pool.yaml 
+kubectl apply -f https://raw.githubusercontent.com/openebs/openebs/master/k8s/ci/overprovisioning/overprovisioning-disabled-sparse-pool.yaml 
 echo "------------------------ Create storage class referring to spc overprovisioning-disabled-sparse-pool------------------------------------------------------------ "
-kubectl apply -f https://raw.githubusercontent.com/openebs/openebs/master/k8s/overprovisioning-artifacts/spc/cstor-sc-overprovisioning-disabled.yaml 
+kubectl apply -f https://raw.githubusercontent.com/openebs/openebs/master/k8s/ci/overprovisioning/cstor-sc-overprovisioning-disabled.yaml 
+
+wget https://raw.githubusercontent.com/openebs/openebs/master/k8s/ci/overprovisioning/patch.yaml
 
 echo "------------------------ Patch ndm daemonset to set SPARSE_FILE_COUNT to 2 --------------- "
 kubectl patch ds openebs-ndm -n openebs --patch "$(cat patch.yaml)"
@@ -101,12 +103,13 @@ kubectl patch ds openebs-ndm -n openebs --patch "$(cat patch.yaml)"
 sleep 10
 
 echo "Create PVC with 1G capacity request "
-kubectl apply -f https://raw.githubusercontent.com/openebs/openebs/master/k8s/overprovisioning-artifacts/spc/pvc1g.yaml
+kubectl apply -f https://raw.githubusercontent.com/openebs/openebs/master/k8s/ci/overprovisioning/pvc1g.yaml
 echo "Create PVC with 10G capacity request "
-kubectl apply -f https://raw.githubusercontent.com/openebs/openebs/master/k8s/overprovisioning-artifacts/spc/pvc10g.yaml
+kubectl apply -f https://raw.githubusercontent.com/openebs/openebs/master/k8s/ci/overprovisioning/pvc10g.yaml
 }
 
 checkForPVC1GStatus(){
+PVC_NAME=$1
 PVC1G_MAX_RETRY=5
 for i in $(seq 1 $PVC1G_MAX_RETRY) ; do
 	PVC1GStatus=$(kubectl get pvc test-pvc-1gig --output="jsonpath={.status.phase}")
