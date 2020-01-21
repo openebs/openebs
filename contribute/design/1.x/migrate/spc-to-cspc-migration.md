@@ -90,7 +90,7 @@ The migration of SPC will be performed via a job which takes SPC name as one of 
 
 The CSPC CR will be with `reconcile.openebs.io/dependants` annotation to disable reconciliation of CSPI. Once all CSPI are successfully created the annotation will be removed.
 
-Sequentially one CSPI is taken and the corresponding CSP is found using `kubernetes/hostname` label. The CSP deployment is scaled down to avoid multiple pods trying to import the same pool. Next the all the BDC for given CSPI are updated with CSPC information. The CSPI will be patched with the annotation `cstorpoolinstance.openebs.io/oldname`. Then CSPI reconciliation will be enabled which will create the CSPI deployment which will rename and import the pool. Once the pool is imported successfully then the field `OldCSPUID` will be reset to empty string to avoid renaming of pool in future.
+Sequentially one CSPI is taken and the corresponding CSP is found using `kubernetes/hostname` label. The CSP deployment is scaled down to avoid multiple pods trying to import the same pool. Next the all the BDC for given CSPI are updated with CSPC information. The CSPI will be patched with the annotation `cstorpoolinstance.openebs.io/oldname`. Then CSPI reconciliation will be enabled which will create the CSPI deployment which will rename and import the pool.
 
 The `cstorpoolinstance.openebs.io/oldname` annotation will be used to rename the pool which was named as `cstor-cspuid` to `cstor-cspcuid`. This annotation will be removed after successful import of the pool.
 
@@ -147,7 +147,7 @@ The Job spec for migrating SPC is:
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: migrate-cspc-cstor-sparse-pool-volumes
+  name: migrate-cstor-volume-pvc-b265427e-6a62-470a-a841-5a36be371e14
   namespace: openebs
 spec:
   backoffLimit: 4
