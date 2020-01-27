@@ -402,13 +402,16 @@ type CStorPoolClusterStatus struct {
 	
 	// HealthyNumberInstances is the number of Healthy CSPI present in the system.
 	HealthyNumberInstances int32 `json:"healthyNumberInstances"`
+
+	// Current state of CSPC.
+	Conditions []CStorPoolClusterCondition 
 }
 
 type CSPCConditionType string
 
 // CStorPoolClusterCondition describes the state of a CSPC at a certain point.
 type CStorPoolClusterCondition struct {
-	// Type of deployment condition.
+	// Type of CSPC condition.
 	Type CSPCConditionType `json:"type" protobuf:"bytes,1,opt,name=type,casttype=DeploymentConditionType"`
 	// Status of the condition, one of True, False, Unknown.
 	Status corev1.ConditionStatus `json:"status" protobuf:"bytes,2,opt,name=status,casttype=k8s.io/api/core/v1.ConditionStatus"`
@@ -429,4 +432,119 @@ type CStorPoolClusterList struct {
 
 	Items []CStorPoolCluster `json:"items"`
 }
+
 ```
+
+### CSPI Schema
+
+The CSPI resuses the CSPC schema and following is the current schema in go struct.
+
+```go
+// CStorPoolInstance describes a cstor pool instance resource created as custom resource.
+type CStorPoolInstance struct {
+	metav1.TypeMeta   `json:",inline"`
+	metav1.ObjectMeta `json:"metadata,omitempty"`
+
+	Spec           CStorPoolInstanceSpec `json:"spec"`
+	Status         CStorPoolStatus       `json:"status"`
+	VersionDetails VersionDetails        `json:"versionDetails"`
+}
+
+// CStorPoolInstanceSpec is the spec listing fields for a CStorPoolInstance resource.
+type CStorPoolInstanceSpec struct {
+	// HostName is the name of kubernetes node where the pool
+	// should be created.
+	HostName string `json:"hostName"`
+	// NodeSelector is the labels that will be used to select
+	// a node for pool provisioning.
+	// Required field
+	NodeSelector map[string]string `json:"nodeSelector"`
+	// PoolConfig is the default pool config that applies to the
+	// pool on node.
+	PoolConfig PoolConfig `json:"poolConfig"`
+	// RaidGroups is the group containing block devices
+	RaidGroups []RaidGroup `json:"raidGroup"`
+}
+
+// CStorPoolStatus is for handling status of pool.
+type CStorPoolStatus struct {
+	Phase    CStorPoolPhase        `json:"phase"`
+	Capacity CStorPoolCapacityAttr `json:"capacity"`
+	// LastTransitionTime refers to the time when the phase changes
+	LastTransitionTime metav1.Time `json:"lastTransitionTime,omitempty"`
+	LastUpdateTime     metav1.Time `json:"lastUpdateTime,omitempty"`
+	Message            string      `json:"message,omitempty"`
+}
+
+// CStorPoolCapacityAttr stores the pool capacity related attributes.
+type CStorPoolCapacityAttr struct {
+	Total string `json:"total"`
+	Free  string `json:"free"`
+	Used  string `json:"used"`
+}
+
+// CStorPoolInstanceList is a list of CStorPoolInstance resources
+type CStorPoolInstanceList struct {
+	metav1.TypeMeta `json:",inline"`
+	metav1.ListMeta `json:"metadata"`
+
+	Items []CStorPoolInstance `json:"items"`
+}
+
+```
+
+Following improvments can be made to the schema :
+- The capacity fields ( i.e. Total, Free and Used) can be made to use Qunatity type that is helpful in capacity parsing and comparisons.
+- Status can be improved to include `Conditions` which can describe the state of pool in more detail.
+
+Following the the proposed schema for Status and Capacity (i.e. CStorPoolStatus and CStorPoolCapacityAttr struct ).
+(Also renaming th struct CStorPoolStatus to CStorPoolInstanceStatus and CStorPoolCapacityAttr to CStorPoolInstanceCapacity)
+
+```go
+
+// CStorPoolInstanceStatus is for handling status of pool.
+type CStorPoolInstanceStatus struct {
+	
+	// Current state of CSPI with details.
+	Conditions []CStorPoolInstanceCondition 
+	//  The phase of a CStorPool is a simple, high-level summary of the pool state on the 
+	//  node.  
+	Phase    CStorPoolPhase        `json:"phase"`
+	// Capacity describes the capacity details of a cstor pool 
+	Capacity CStorPoolCapacityAttr `json:"capacity"`
+	LastTransitionTime metav1.Time `json:"lastTransitionTime,omitempty"`
+	LastUpdateTime     metav1.Time `json:"lastUpdateTime,omitempty"`
+	// A human readable message indicating details about why the CSPI is in this
+    // condition.
+	Message            string      `json:"message,omitempty"`
+}
+
+// CStorPoolCapacityAttr stores the pool capacity related attributes.
+type CStorPoolCapacityAttr struct {
+	Total resource.Qunatity `json:"total"`
+	Free  resource.Qunatity `json:"free"`
+	Used  resource.Qunatity `json:"used"`
+}
+
+type CSPIConditionType string
+
+// CSPIConditionType describes the state of a CSPI at a certain point.
+type CStorPoolInstanceCondition struct {
+	// Type of CSPI condition.
+	Type CSPIConditionType `json:"type" protobuf:"bytes,1,opt,name=type,casttype=DeploymentConditionType"`
+	// Status of the condition, one of True, False, Unknown.
+	Status corev1.ConditionStatus `json:"status" protobuf:"bytes,2,opt,name=status,casttype=k8s.io/api/core/v1.ConditionStatus"`
+	// The last time this condition was updated.
+	LastUpdateTime metav1.Time `json:"lastUpdateTime,omitempty" protobuf:"bytes,6,opt,name=lastUpdateTime"`
+	// Last time the condition transitioned from one status to another.
+	LastTransitionTime metav1.Time `json:"lastTransitionTime,omitempty" protobuf:"bytes,7,opt,name=lastTransitionTime"`
+	// The reason for the condition's last transition.
+	Reason string `json:"reason,omitempty" protobuf:"bytes,4,opt,name=reason"`
+	// A human readable message indicating details about the transition.
+	Message string `json:"message,omitempty" protobuf:"bytes,5,opt,name=message"`
+}
+
+```
+Above schema has following advantages over the older one :
+- Capacity parsing and comparison is easy.
+- More details about the state of a pool.
