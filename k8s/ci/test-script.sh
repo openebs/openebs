@@ -91,9 +91,9 @@ checkForPVC10GStatus
 # deployVolumeOverProvisioningArtifacts deploys overprovisioning artifacts
 deployVolumeOverProvisioningArtifacts(){
 echo "------------------------ Create block device sparse storagepoolclaim(overprovisioning-disabled-sparse-pool) with overprovisioning restriction on --------------- "
-kubectl apply -f https://raw.githubusercontent.com/openebs/openebs/master/k8s/ci/overprovisioning/overprovisioning-disabled-sparse-pool.yaml 
+kubectl apply -f https://raw.githubusercontent.com/openebs/openebs/master/k8s/ci/overprovisioning/overprovisioning-disabled-sparse-pool.yaml
 echo "------------------------ Create storage class referring to spc overprovisioning-disabled-sparse-pool------------------------------------------------------------ "
-kubectl apply -f https://raw.githubusercontent.com/openebs/openebs/master/k8s/ci/overprovisioning/cstor-sc-overprovisioning-disabled.yaml 
+kubectl apply -f https://raw.githubusercontent.com/openebs/openebs/master/k8s/ci/overprovisioning/cstor-sc-overprovisioning-disabled.yaml
 
 wget https://raw.githubusercontent.com/openebs/openebs/master/k8s/ci/overprovisioning/patch.yaml
 
@@ -160,15 +160,24 @@ kubectl get pods --all-namespaces
 
 kubectl get deploy -l openebs.io/controller=jiva-controller
 JIVACTRL=$(kubectl get deploy -l openebs.io/controller=jiva-controller --no-headers | awk {'print $1'})
-waitForDeployment ${JIVACTRL} default
+for ctrl in "${JIVACTRL[@]}"
+do
+waitForDeployment ${ctrl} default
+done
 
 kubectl get deploy -l openebs.io/replica=jiva-replica
 JIVAREP=$(kubectl get deploy -l openebs.io/replica=jiva-replica --no-headers | awk {'print $1'})
-waitForDeployment ${JIVAREP} default
+for rep in "${JIVAREP[@]}"
+do
+waitForDeployment ${rep} default
+done
 
 kubectl get deploy -n openebs -l openebs.io/target=cstor-target
 CSTORTARGET=$(kubectl get deploy -n openebs -l openebs.io/target=cstor-target --no-headers | awk {'print $1'})
-waitForDeployment ${CSTORTARGET} openebs
+for target in "${CSTORTARGET[@]}"
+do
+waitForDeployment ${target} openebs
+done
 
 echo "---------------Testing deployment in pvc namespace---------------"
 kubectl create -f https://raw.githubusercontent.com/openebs/openebs/master/k8s/ci/maya/volume/cstor/service-account.yaml
