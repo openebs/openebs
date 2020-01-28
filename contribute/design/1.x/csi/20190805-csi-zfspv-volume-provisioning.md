@@ -246,9 +246,6 @@ spec:
   capacity: "4294967296"
   compression: "on"
   dedup: "on"
-  encryption: ""
-  keyformat: ""
-  keylocation: ""
   ownerNodeID: gke-pawan-zfspv-default-pool-8b577544-5wgl
   poolName: zfspv-pool
   thinProvison: "yes"
@@ -260,6 +257,123 @@ When CSI will get volume destroy request, it will destroy the created zvol and a
 
 ### 4. CSI ZFSPV property change
 There will be a watcher watching for this ZFSVolume custom resource in the agent. We can update the ZFSVolume custom resource with the desired property and the watcher of this custom resource will apply the changes to the corresponding volume.
+
+### 5. CSI SnapShot
+
+When ZFS CSI controller gets a snapshot create request :-
+
+```yaml
+apiVersion: snapshot.storage.k8s.io/v1beta1
+kind: VolumeSnapshot
+metadata:
+  name: zfspv-snap
+  namespace: openebs
+spec:
+  volumeSnapshotClassName: zfspv-snapclass
+  source:
+    persistentVolumeClaimName: zfspv-pvc
+```
+
+it will create a ZFSSnapshot custom resource. This custom resuorce will get all the details from the ZFSVolume CR, ownerNodeID will be same here as snapshot will also be there on same node where the original volume is there. The controller will create the request with status as Pending and set a label "openebs.io/volname" to the volume name from where the snapshot has to be created.
+
+```yaml
+apiVersion: openebs.io/v1alpha1
+kind: ZFSSnapshot
+metadata:
+  name: zfspv-snap
+  namespace: openebs
+  labels:
+    openebs.io/volname: pvc-34133838-0d0d-11ea-96e3-42010a800114
+spec:
+  blocksize: 4k
+  capacity: "4294967296"
+  compression: "on"
+  dedup: "on"
+  ownerNodeID: zfspv-node1
+  poolName: zfspv-pool
+  status: Pending
+```
+
+The watcher of this resource will be the ZFS node agent. The agent running on ownerNodeID node will check this event and create a snapshot with the given name. Once the node agent is able to create the snapshot, it will add a finalizer "zfs.openebs.io/finalizer" to this resource. Also, it will update the status field to Ready, so that the controller can check this and return successful for the snap create request, the final snapshot object will be :-
+
+```yaml
+apiVersion: openebs.io/v1alpha1
+kind: ZFSSnapshot
+metadata:
+  name: zfspv-snap
+  namespace: openebs
+  Finalizers:
+    zfs.openebs.io/finalizer
+  labels:
+    openebs.io/volname: pvc-34133838-0d0d-11ea-96e3-42010a800114
+spec:
+  blocksize: 4k
+  capacity: "4294967296"
+  compression: "on"
+  dedup: "on"
+  ownerNodeID: zfspv-node1
+  poolName: zfspv-pool
+  status: Ready
+```
+
+### 6. CSI Clone
+
+When ZFS CSI controller gets a clone create request :-
+
+```yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: zfspv-clone
+spec:
+  dataSource:
+    name: zfspv-snap
+    kind: VolumeSnapshot
+    apiGroup: snapshot.storage.k8s.io
+  accessModes:
+    - ReadWriteOnce
+```
+
+it will create a ZFSVolume custom resource with same spec as snapshot object. Since clone will be on the same node where snapshot exist so ownerNodeID will also be same. The controller will create the clone request with status as Pending.
+
+```yaml
+apiVersion: openebs.io/v1alpha1
+kind: ZFSVolume
+metadata:
+  name: zfspv-clone
+  namespace: openebs
+spec:
+  blocksize: 4k
+  capacity: "4294967296"
+  compression: "on"
+  dedup: "on"
+  ownerNodeID: zfspv-node1
+  poolName: zfspv-pool
+  snapName: zfspp-snap
+  status: Pending
+```
+The watcher of this resource will be the ZFS node agent. The agent running on ownerNodeID node will check this event and create a clone from the snapshot with the given name. Once the node agent is able to create the clone from the given snapshot, it will add a finalizer "zfs.openebs.io/finalizer" to this resource. Also, it will update the status field to Ready, so that the controller can check this and return successful for the snap create request, the final snapshot object will be :-
+
+
+```yaml
+apiVersion: openebs.io/v1alpha1
+kind: ZFSVolume
+metadata:
+  name: zfspv-clone
+  namespace: openebs
+  Finalizers:
+    zfs.openebs.io/finalizer
+spec:
+  blocksize: 4k
+  capacity: "4294967296"
+  compression: "on"
+  dedup: "on"
+  ownerNodeID: zfspv-node1
+  poolName: zfspv-pool
+  snapName: zfspp-snap
+  status: Ready
+```
+Note that if ZFSVolume CR does not have snapName, then a normal volume will be created, the snapName field will specify whether we have to create a volume or clone.
 
 ## Implementation Plan
 
