@@ -7,6 +7,7 @@
 * [Non-Goals](#non-goals)
 * [Current State of Things](#current-state-of-things)
 * [CSPC Schema Proposal](#cspc-schema-proposal)
+* [CRD Migration](#crd-migration)
 
 ## Introduction
 
@@ -256,9 +257,9 @@ Consider following improvement points :
 
 
 - The status field of CSPC should have following fields :
-    - **currentNumberInstances:** Indicates the number of CSPI(s) present in the system.
-    - **desiredNumberInstance:** Indicates the desired number of CSPI(s) that should be present in the system.
-    - **healthyNumberInstances:** Indicates the number of healthy CSPI(s) that are present in the system.
+    - **currentProvisionedInstances:** Indicates the number of CSPI(s) present in the system.
+	- **runningInstances:** Indicates the number of CSPI(s) that are not healthy but in degraded,rebuilding etc mode.
+    - **healthyInstances:** Indicates the desired number of healthy CSPI(s) present in the system.
     - **conditions:** Represents the latest available observations of a CSPC’s current state. It is an array that can represent various conditions as an when required and hence will give more flexibility in terms of improving in areas of information and debuggability as and when required.
 
 
@@ -319,7 +320,7 @@ type PoolConfig struct {
 	// used.
 	CacheFile string `json:"cacheFile"`
 	// DefaultRaidGroupType is the default raid type which applies
-	// to all the pools if raid type is not specified there
+	// to all the raid groups of a pool if type is not specified there (see RaidGroup struct)
 	// Compulsory field if any raidGroup is not given Type
 	DefaultRaidGroupType string `json:"defaultRaidGroupType"`
 
@@ -362,13 +363,13 @@ type RaidGroup struct {
 	// Optional -- defaults to `defaultRaidGroupType` present in `PoolConfig`
 	Type string `json:"type"`
 
-	// LoadType can have following values :
+	// Designation can have following values :
 	// readCache -- The raid group is a read cache.
 	// writeCache -- The raid group is a write cache.
 	// spare -- The raid group is spare.
 	// "" -- Empty value means this will be used a regular vdev to form pool.
 	// What about default value ? Can this be changed after some point of time.
-	LoadType string `json:"load_type"`
+	Designation string `json:"designation"`
 	// BlockDevices contains a list of block devices that
 	// constitute this raid group.
 
@@ -394,14 +395,14 @@ type CStorPoolClusterBlockDevice struct {
 
 // CStorPoolClusterStatus represents the latest available observations of a CSPC's current state.
 type CStorPoolClusterStatus struct {
-	// CurrentNumberInstances is the the number of CSPI present at the current state. 
-	CurrentNumberInstances int32 `json:"currentNumberInstances"`
+	// CurrentProvisionedInstances is the the number of CSPI present at the current state. 
+	CurrentProvisionedInstances int32 `json:"currentProvisionedInstances"`
 	
-	// DesiredNumberInstances is the number of CSPI that should be present in the system.
-	DesiredNumberInstances int32 `json:"desiredNumberInstances"`
-	
-	// HealthyNumberInstances is the number of Healthy CSPI present in the system.
-	HealthyNumberInstances int32 `json:"healthyNumberInstances"`
+	// RunningInstances is the number of CSPI(s) that are not healthy but in degraded,rebuilding etc mode.
+	RunningInstances int32 `json:"runningInstances"`
+
+	// HealthyInstances is the number of CSPI(s) that are healthy.
+	HealthyInstances int32 `json:"healthyInstances"`
 
 	// Current state of CSPC.
 	Conditions []CStorPoolClusterCondition 
@@ -453,11 +454,10 @@ type CStorPoolInstance struct {
 // CStorPoolInstanceSpec is the spec listing fields for a CStorPoolInstance resource.
 type CStorPoolInstanceSpec struct {
 	// HostName is the name of kubernetes node where the pool
-	// should be created.
+	// should be created. This is filled by CSPC-operator.
 	HostName string `json:"hostName"`
-	// NodeSelector is the labels that will be used to select
-	// a node for pool provisioning.
-	// Required field
+	// NodeSelector is the labels that is filled by CSPC-operator, only
+	// for informational purpose.
 	NodeSelector map[string]string `json:"nodeSelector"`
 	// PoolConfig is the default pool config that applies to the
 	// pool on node.
@@ -548,3 +548,11 @@ type CStorPoolInstanceCondition struct {
 Above schema has following advantages over the older one :
 - Capacity parsing and comparison is easy.
 - More details about the state of a pool.
+
+
+### CR Migration from v1alpha1 to v1
+
+- CRD will ensure that `v1alpha1` as well as `v1` is served but `v1` is the only storage version.
+
+- A conversion webhook server will be deployed to support back and forth conversion of resources for the served version i.e. `v1alpha1` and `v1`.
+
