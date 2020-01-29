@@ -11,4 +11,4 @@ spec:
   poolSpec:
     poolType: striped
     cacheFile: /var/openebs/pool1.cache
-    overProvisioning: false
+    thickProvisioning: true
