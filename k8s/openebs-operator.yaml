@@ -33,7 +33,7 @@ rules:
   resources: ["resourcequotas", "limitranges"]
   verbs: ["list", "watch"]
 - apiGroups: ["*"]
-  resources: ["ingresses", "horizontalpodautoscalers", "verticalpodautoscalers", "poddisruptionbudgets", "certificatesigningrequests"]
+  resources: ["ingresses", "horizontalpodautoscalers", "verticalpodautoscalers", "certificatesigningrequests"]
   verbs: ["list", "watch"]
 - apiGroups: ["*"]
   resources: ["storageclasses", "persistentvolumeclaims", "persistentvolumes"]
@@ -71,8 +71,11 @@ rules:
 - nonResourceURLs: ["/metrics"]
   verbs: ["get"]
 - apiGroups: ["*"]
-  resources: [ "upgradetasks"]
-  verbs: ["*" ]
+  resources: ["upgradetasks"]
+  verbs: ["*"]
+- apiGroups: ["*"]
+  resources: ["poddisruptionbudgets"]
+  verbs: ["get", "list", "create", "delete", "watch"]
 ---
 # Bind the Service Account with the Role Privileges.
 # TODO: Check if default account also needs to be there
