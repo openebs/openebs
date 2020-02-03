@@ -51,18 +51,10 @@ The CSPC API has the following capabilities :
 
 - Stripe, mirror, raidz1, and raidz2 are the only supported raid topologies.
 
-
-- A single cStor pool on a node can have any number of raid groups. API schema can support heterogeneous raid topologies. ( e.g One raid group of mirror other of raidz and so on). ( Not sure if it works from the data plane side and can be of niche or trivial use case )
-
-
 - A stripe raid group can have any number of block devices but not less than 1.
 
 
 - A mirror, raidz and raidz2 raid group can only have exactly 2, 3 and 6 block devices only.  
-
-
-- A raid group can be designated to be a write cache, read cache or spare, apart from regular vdev in a pool.
-
 
 - CSPC has the capability to specify a cache file for faster imports.
 
@@ -305,8 +297,12 @@ type PoolSpec struct {
 	// a node for pool provisioning.
 	// Required field
 	NodeSelector map[string]string `json:"nodeSelector"`
-	// RaidConfig is the raid group configuration for the given pool.
-	RaidGroups []RaidGroup `json:"raidGroups"`
+	// DataRaidConfig is the raid group configuration for the given pool.
+	DataRaidGroups []RaidGroup `json:"dataRaidGroups"`
+
+	// WriteCacheGroups is the write cache given pool.
+	WriteCacheGroups []RaidGroup `json:"writeCacheGroups"`
+
 	// PoolConfig is the default pool config that applies to the
 	// pool on node.
 	PoolConfig PoolConfig `json:"poolConfig"`
@@ -315,28 +311,31 @@ type PoolSpec struct {
 // PoolConfig is the default pool config that applies to the
 // pool on node.
 type PoolConfig struct {
-	// Cachefile is used for faster pool imports
-	// optional -- if not specified or left empty cache file is not
-	// used.
-	CacheFile string `json:"cacheFile"`
-	// DefaultRaidGroupType is the default raid type which applies
-	// to all the raid groups of a pool if type is not specified there (see RaidGroup struct)
-	// Compulsory field if any raidGroup is not given Type
-	DefaultRaidGroupType string `json:"defaultRaidGroupType"`
+	// DataRaidGroupType is the data raid group raid type 
+	// Supported values are : stripe, mirror, raidz and raidz2
+	DataRaidGroupType string `json:"dataRaidGroupType"`
 
-	// OverProvisioning to enable over provisioning
+	// WriteCacheRaidGroupType is the write cachce raid type 
+	// Supported values are : stripe, mirror, raidz and raidz2
+	WriteCacheRaidGroupType string `json:"writeCacheRaidGroupType"`
+
+	// ThickProvisioning to enable over thick provisioning
 	// Optional -- defaults to false
-	OverProvisioning bool `json:"overProvisioning"`
+	ThickProvisioning bool `json:"thickProvisioning"`
+
 	// Compression to enable compression
 	// Optional -- defaults to off
 	// Possible values : lz, off
 	Compression string `json:"compression"`
+
 	// Resources are the compute resources required by the cstor-pool
 	// container.
 	Resources *corev1.ResourceRequirements `json:"resources"`
+
 	// AuxResources are the compute resources required by the cstor-pool pod
 	// side car containers.
 	AuxResources *corev1.ResourceRequirements `json:"auxResources"`
+	
 	// Tolerations, if specified, the pool pod's tolerations.
 	Tolerations []corev1.Toleration `json:"tolerations"`
 
@@ -349,35 +348,6 @@ type PoolConfig struct {
 
 // RaidGroup contains the details of a raid group for the pool
 type RaidGroup struct {
-	// Type is the raid group type
-	// Supported values are : stripe, mirror, raidz and raidz2
-
-	// stripe -- stripe is a raid group which divides data into blocks and
-	// spreads the data blocks across multiple block devices.
-
-	// mirror -- mirror is a raid group which does redundancy
-	// across multiple block devices.
-
-	// raidz -- RAID-Z is a data/parity distribution scheme like RAID-5, but uses dynamic stripe width.
-	// radiz2 -- TODO
-	// Optional -- defaults to `defaultRaidGroupType` present in `PoolConfig`
-	Type string `json:"type"`
-
-	// Designation can have following values :
-	// readCache -- The raid group is a read cache.
-	// writeCache -- The raid group is a write cache.
-	// spare -- The raid group is spare.
-	// "" -- Empty value means this will be used a regular vdev to form pool.
-	// What about default value ? Can this be changed after some point of time.
-	Designation string `json:"designation"`
-	// BlockDevices contains a list of block devices that
-	// constitute this raid group.
-
-	// DiskCount applies to raidz1 and raidz2 topology only.
-	// For raidz1 a valid DiskCount value is 2^n +1 where n>0
-	// For raidz2 a valid diskCount value is 2^n+2 where n>1
-	DiskCount int `json:"disk_count"`
-
 	BlockDevices []CStorPoolClusterBlockDevice `json:"blockDevices"`
 }
 
