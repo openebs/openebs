@@ -60,6 +60,10 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
+        # OPENEBS_IO_BASE_DIR is used to configure base directory for openebs on host path.
+        # Where OpenEBS can store required files. Default base path will be /var/openebs
+        # - name: OPENEBS_IO_BASE_DIR
+        #   value: "/var/openebs"
         # OPENEBS_IO_CSTOR_POOL_SPARSE_DIR can be used to specify the hostpath
         # to be used for saving the shared content between the side cars
         # of cstor pool pod. This ENV is also used to indicate the location
@@ -106,6 +110,10 @@ spec:
         imagePullPolicy: IfNotPresent
         image: quay.io/openebs/cvc-operator:ci
         env:
+        # OPENEBS_IO_BASE_DIR is used to configure base directory for openebs on host path.
+        # Where OpenEBS can store required files. Default base path will be /var/openebs
+        # - name: OPENEBS_IO_BASE_DIR
+        #   value: "/var/openebs"
         # OPENEBS_IO_CSTOR_TARGET_DIR can be used to specify the hostpath
         # that to be used for saving the core dump of cstor volume pod.
         # The default path used is /var/openebs/sparse
