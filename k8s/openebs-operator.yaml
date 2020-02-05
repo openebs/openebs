@@ -479,6 +479,8 @@ spec:
         - name: procmount
           mountPath: /host/proc
           readOnly: true
+        - name: basepath
+          mountPath: /var/openebs/ndm
         - name: sparsepath
           mountPath: /var/openebs/sparse
         env:
@@ -524,6 +526,10 @@ spec:
         hostPath:
           path: /proc
           type: Directory
+      - name: basepath
+        hostPath:
+          path: /var/openebs/ndm
+          type: DirectoryOrCreate
       - name: sparsepath
         hostPath:
           path: /var/openebs/sparse

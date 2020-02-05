@@ -85,7 +85,7 @@ spec:
           mountPath: /host/proc
           readOnly: true
         - name: basepath
-          mountPath: /var/openebs
+          mountPath: /var/openebs/ndm
 {{- if .Values.ndm.sparse }}
 {{- if .Values.ndm.sparse.path }}
         - name: sparsepath
