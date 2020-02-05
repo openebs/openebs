@@ -272,14 +272,17 @@ type CStorPoolClusterSpec struct {
 	// Pools is the spec for pools for various nodes
 	// where it should be created.
 	Pools []PoolSpec `json:"pools"`
+
 	// DefaultResources are the compute resources required by the cstor-pool
 	// container.
 	// If the resources at PoolConfig is not specified, this is written
 	// to CSPI PoolConfig.
 	DefaultResources *corev1.ResourceRequirements `json:"resources"`
+
 	// AuxResources are the compute resources required by the cstor-pool pod
 	// side car containers.
 	DefaultAuxResources *corev1.ResourceRequirements `json:"auxResources"`
+
 	// Tolerations, if specified, are the pool pod's tolerations
 	// If tolerations at PoolConfig is empty, this is written to
 	// CSPI PoolConfig.
@@ -297,6 +300,7 @@ type PoolSpec struct {
 	// a node for pool provisioning.
 	// Required field
 	NodeSelector map[string]string `json:"nodeSelector"`
+
 	// DataRaidConfig is the raid group configuration for the given pool.
 	DataRaidGroups []RaidGroup `json:"dataRaidGroups"`
 
@@ -335,7 +339,7 @@ type PoolConfig struct {
 	// AuxResources are the compute resources required by the cstor-pool pod
 	// side car containers.
 	AuxResources *corev1.ResourceRequirements `json:"auxResources"`
-	
+
 	// Tolerations, if specified, the pool pod's tolerations.
 	Tolerations []corev1.Toleration `json:"tolerations"`
 
@@ -356,6 +360,7 @@ type RaidGroup struct {
 type CStorPoolClusterBlockDevice struct {
 	// BlockDeviceName is the name of the block device.
 	BlockDeviceName string `json:"blockDeviceName"`
+	
 	// Capacity is the capacity of the block device.
 	// It is system generated
 	Capacity string `json:"capacity"`
@@ -504,10 +509,6 @@ type CStorPoolInstanceCondition struct {
 	Type CSPIConditionType `json:"type" protobuf:"bytes,1,opt,name=type,casttype=DeploymentConditionType"`
 	// Status of the condition, one of True, False, Unknown.
 	Status corev1.ConditionStatus `json:"status" protobuf:"bytes,2,opt,name=status,casttype=k8s.io/api/core/v1.ConditionStatus"`
-	// The last time this condition was updated.
-	LastUpdateTime metav1.Time `json:"lastUpdateTime,omitempty" protobuf:"bytes,6,opt,name=lastUpdateTime"`
-	// Last time the condition transitioned from one status to another.
-	LastTransitionTime metav1.Time `json:"lastTransitionTime,omitempty" protobuf:"bytes,7,opt,name=lastTransitionTime"`
 	// The reason for the condition's last transition.
 	Reason string `json:"reason,omitempty" protobuf:"bytes,4,opt,name=reason"`
 	// A human readable message indicating details about the transition.
