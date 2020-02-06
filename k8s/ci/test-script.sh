@@ -110,7 +110,7 @@ kubectl apply -f https://raw.githubusercontent.com/openebs/openebs/master/k8s/ci
 
 checkForPVC1GStatus(){
 PVC_NAME=$1
-PVC1G_MAX_RETRY=5
+PVC1G_MAX_RETRY=10
 for i in $(seq 1 $PVC1G_MAX_RETRY) ; do
 	PVC1GStatus=$(kubectl get pvc test-pvc-1gig --output="jsonpath={.status.phase}")
 		if [ "$PVC1GStatus" == "Bound" ]; then
