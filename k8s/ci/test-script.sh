@@ -110,7 +110,7 @@ kubectl apply -f https://raw.githubusercontent.com/openebs/openebs/master/k8s/ci
 
 checkForPVC1GStatus(){
 PVC_NAME=$1
-PVC1G_MAX_RETRY=5
+PVC1G_MAX_RETRY=10
 for i in $(seq 1 $PVC1G_MAX_RETRY) ; do
 	PVC1GStatus=$(kubectl get pvc test-pvc-1gig --output="jsonpath={.status.phase}")
 		if [ "$PVC1GStatus" == "Bound" ]; then
@@ -130,8 +130,8 @@ for i in $(seq 1 $PVC1G_MAX_RETRY) ; do
 checkForPVC10GStatus(){
 PVC10G_MAX_RETRY=5
 for i in $(seq 1 $PVC10G_MAX_RETRY) ; do
-	PVC1GStatus=$(kubectl get pvc test-pvc-10gigs --output="jsonpath={.status.phase}")
-		if [ "$PVC1GStatus" == "Bound" ]; then
+	PVC10GStatus=$(kubectl get pvc test-pvc-10gigs --output="jsonpath={.status.phase}")
+		if [ "$PVC10GStatus" == "Bound" ]; then
 			echo "PVC test-pvc-10gigs should NOT bound successfully due to overprovisioning restriction but got bound"
                         kubectl get pvc test-pvc-10gigs
 			exit 1
@@ -145,7 +145,9 @@ for i in $(seq 1 $PVC10G_MAX_RETRY) ; do
       			sleep 5
 		done
 }
+## Running OverProvisioning before general tests
 runVolumeOverProvisioningTest
+
 
 echo "--------------- Create Cstor and Jiva PersistentVolume ------------------"
 #kubectl create -f https://raw.githubusercontent.com/openebs/openebs/master/k8s/sample-pv-yamls/pvc-jiva-sc-1r.yaml
@@ -160,21 +162,21 @@ kubectl get pods --all-namespaces
 
 kubectl get deploy -l openebs.io/controller=jiva-controller
 JIVACTRL=$(kubectl get deploy -l openebs.io/controller=jiva-controller --no-headers | awk {'print $1'})
-for ctrl in "${JIVACTRL[@]}"
+for ctrl in `echo "${JIVACTRL[@]}" | tr "\n" " "`;
 do
 waitForDeployment ${ctrl} default
 done
 
 kubectl get deploy -l openebs.io/replica=jiva-replica
 JIVAREP=$(kubectl get deploy -l openebs.io/replica=jiva-replica --no-headers | awk {'print $1'})
-for rep in "${JIVAREP[@]}"
+for rep in `echo "${JIVAREP[@]}" | tr "\n" " "`;
 do
 waitForDeployment ${rep} default
 done
 
 kubectl get deploy -n openebs -l openebs.io/target=cstor-target
 CSTORTARGET=$(kubectl get deploy -n openebs -l openebs.io/target=cstor-target --no-headers | awk {'print $1'})
-for target in "${CSTORTARGET[@]}"
+for target in `echo  "${CSTORTARGET[@]}" | tr "\n" " "`;
 do
 waitForDeployment ${target} openebs
 done
