@@ -100,8 +100,6 @@ wget https://raw.githubusercontent.com/openebs/openebs/master/k8s/ci/overprovisi
 echo "------------------------ Patch ndm daemonset to set SPARSE_FILE_COUNT to 2 --------------- "
 kubectl patch ds openebs-ndm -n openebs --patch "$(cat patch.yaml)"
 
-kubectl apply -f https://raw.githubusercontent.com/openebs/openebs/master/k8s/sample-pv-yamls/spc-sparse-single.yaml
-
 sleep 10
 
 echo "Create PVC with 1G capacity request "
