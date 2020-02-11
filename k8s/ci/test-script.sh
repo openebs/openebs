@@ -100,6 +100,8 @@ wget https://raw.githubusercontent.com/openebs/openebs/master/k8s/ci/overprovisi
 echo "------------------------ Patch ndm daemonset to set SPARSE_FILE_COUNT to 2 --------------- "
 kubectl patch ds openebs-ndm -n openebs --patch "$(cat patch.yaml)"
 
+kubectl apply -f https://raw.githubusercontent.com/openebs/openebs/master/k8s/sample-pv-yamls/spc-sparse-single.yaml
+
 sleep 10
 
 echo "Create PVC with 1G capacity request "
@@ -180,6 +182,16 @@ for target in `echo  "${CSTORTARGET[@]}" | tr "\n" " "`;
 do
 waitForDeployment ${target} openebs
 done
+
+echo "-------------------- Checking RO threshold limit for CSP ----------------"
+cspList=( $(kubectl get csp  -o jsonpath='{.items[?(@.metadata.labels.openebs\.io/storage-pool-claim=="sparse-claim-auto")].metadata.name}') )
+csp=${cspList[0]}
+cspROThreshold=$(kubectl get csp  -o jsonpath='{.items[?(@.metadata.labels.openebs\.io/storage-pool-claim=="sparse-claim-auto")].spec.poolSpec.roThresholdLimit}')
+spcROThreshold=$(kubectl get spc sparse-claim-auto    --output="jsonpath={.spec.poolSpec.roThresholdLimit}")
+if [ $cspROThreshold != $spcROThreshold ]; then
+	echo "mismatch between SPC($spcROThreshold) and CSP($cspROThreshold) read-only threshold limit"
+	exit 1
+fi
 
 echo "---------------Testing deployment in pvc namespace---------------"
 kubectl create -f https://raw.githubusercontent.com/openebs/openebs/master/k8s/ci/maya/volume/cstor/service-account.yaml
@@ -423,3 +435,47 @@ if [ "$hashjiva1" != "" ] && [ "$hashcstor1" != "" ] && [ "$hashjiva1" == "$hash
 else
     echo "Md5Sum Check: FAILED"; exit 1
 fi
+
+testPoolReadOnly() {
+	for i in 1 2 3 ; do
+		kubectl exec -it busybox-cstor -- sh  -c "dd if=/dev/urandom of=/mnt/store1/$RANDOM count=10000 bs=4k && sync"
+	done
+	kubectl get csp
+
+	# update csp readonly threshold to 1%
+	kubectl patch  csp ${csp} --type='json' -p='[{"op":"replace", "path":"/spec/poolSpec/roThresholdLimit", "value":1}]'
+	# default sync period for csp is 30 second
+	sleep 60
+
+	readOnly=$(kubectl get csp ${csp} -o jsonpath='{.status.readOnly}')
+	if [ $readOnly == "false" ]; then
+		echo "CSP should be readonly"
+		exit 2
+	fi
+
+	cspPod=`kubectl get pods  -o jsonpath="{.items[?(@.metadata.labels.openebs\.io/cstor-pool=='$csp')].metadata.name}" -n openebs`
+	readOnly=$(kubectl exec -it ${cspPod} -n openebs -ccstor-pool -- zpool get io.openebs:readonly -Hp -ovalue)
+	if [ $readOnly == "off" ]; then
+		echo "Pool should be readonly"
+		exit 2
+	fi
+
+	# update csp readonly threshold to 90%
+	kubectl patch  csp ${csp} --type='json' -p='[{"op":"replace", "path":"/spec/poolSpec/roThresholdLimit", "value":90}]'
+	# default sync period for csp is 30 second
+	sleep 60
+
+	readOnly=$(kubectl get csp ${csp} -o jsonpath='{.status.readOnly}')
+	if [ $readOnly == "true" ]; then
+		echo "CSP should not be readonly"
+		exit 2
+	fi
+
+	readOnly=$(kubectl exec -it ${cspPod} -n openebs -ccstor-pool -- zpool get io.openebs:readonly -Hp -ovalue)
+	if [ $readOnly == "on" ]; then
+		echo "Pool should not be readonly"
+		exit 2
+	fi
+}
+# check pool read threshold limit
+testReadOnly

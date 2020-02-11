@@ -12,3 +12,4 @@ spec:
     poolType: striped
     cacheFile: /var/openebs/sparse/sparse-claim-auto.cache
     thickProvisioning: false
+    roThresholdLimit: 80
