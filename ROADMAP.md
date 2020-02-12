@@ -8,9 +8,9 @@ OpenEBS follows a lean project management approach by splitting the development 
 
 ## Current
 
-These are some of the areas under active development planned to be completed within 3 releases. OpenEBS follows a monthly release cadence with a new release on 15 of every month. 
+These are some of the areas under active development planned to be completed within three releases. OpenEBS follows a monthly release cadence with a new release on the 15th of every month. 
 
-While the following are planned items, higher priority is given to usability and stability issues reported by the community. For the most up-to-date and issue plan and status check out the [release milestones](https://github.com/openebs/openebs/milestones). 
+While the following are planned items, a higher priority is given to usability and stability issues reported by the community. For the most current issue plan and status check out the [release milestones](https://github.com/openebs/openebs/milestones). 
 
 * [Jiva](https://github.com/orgs/openebs/projects/1)
   * Optimizations to the replica rebuild process
@@ -20,12 +20,12 @@ While the following are planned items, higher priority is given to usability and
   * New cStor API schema with automated Day 2 operations. 
   * CSI Driver
   * Support migration from SPC (older schema) to CSPC (new schema)
-* [Local PV - hostpath and device](https://github.com/orgs/openebs/projects/11)
+* [OpenEBS Local PV - hostpath and device](https://github.com/orgs/openebs/projects/11)
   * Generating Metrics 
   * Capacity based scheduling 
-* [Local PV - ZFS](https://github.com/orgs/openebs/projects/10)
+* [OpenEBS ZFS Local PV](https://github.com/orgs/openebs/projects/10)
   * Generating metrics
-  * Integration and End-to-end tests
+  * Integration and end-to-end tests
   * Automated install and upgrades  
 * [NDM Enhancements](https://github.com/orgs/openebs/projects/2)
   * Enhance the discovery probes to support partitions, lvms and so forth
@@ -33,7 +33,7 @@ While the following are planned items, higher priority is given to usability and
   * Add gRPC API layer around NDM capabilities
 * MayaStor 
   * Replication across multiple nodes
-  * Integration and End-to-end tests
+  * Integration and end-to-end tests
   * Setup CI
 * ARM based builds for OpenEBS [#1295](https://github.com/openebs/openebs/issues/1295)
 
@@ -44,14 +44,14 @@ Typically the items under this category fall under 3 to 6 months roadmap.
 There are several enhancements planned under each of the storage engines tracked under the respective GitHub Projects. The high level goals for each storage engine are as follows:
 * cStor with new schema (stable). [Project Tracker](https://github.com/orgs/openebs/projects/9)
 * NDM (stable). [Project Tracker](https://github.com/orgs/openebs/projects/2)
-* Local PV - ZFS (stable). [Project Tracker](https://github.com/orgs/openebs/projects/10)
-* Local PV - hostpath and device (stable). [Project Tracker](https://github.com/orgs/openebs/projects/11)
-* MayaStor (beta)
+* OpenEBS ZFS Local PV (stable). [Project Tracker](https://github.com/orgs/openebs/projects/10)
+* OpenEBS Local PV - hostpath and device (stable). [Project Tracker](https://github.com/orgs/openebs/projects/11)
+* Mayastor (beta)
 
 ## Future
 
 As the name suggests this bucket contains items that are planned for future. Some times the items are related to adapting to the changes coming in the Kubernetes or other related projects. Some of the items currently planned include: 
-* MayaStor (stable)
+* Mayastor (stable)
 * Support for working with multiple network interfaces. 
 
 For a full list of issues, check out the [future backlog](https://github.com/openebs/openebs/milestone/11). 

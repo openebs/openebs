@@ -33,11 +33,12 @@ OpenEBS Components are released as container images with versioned tags.
 
 OpenEBS components are spread across various repositories. Creating a release tag on the repository will trigger the build, integration tests and pushing of the docker image to [docker hub](https://hub.docker.com/u/openebs) and [quay](https://quay.io/organization/openebs/) container repositories. 
 
-The format of the release tag is either "Release-Name-RC1" or "Release-Name" depending on whether the tag is a release candidate or a release. (Example: 1.0.0-RC1 is a github release tag for OpenEBS release candidate build. 1.0.0 is the release tag that is created after the release criteria is satisfied by the release candidate builds.)
+The format of the release tag is either "Release-Name-RC1" or "Release-Name" depending on whether the tag is a release candidate or a release. (Example: 1.0.0-RC1 is a GitHub release tag for OpenEBS release candidate build. 1.0.0 is the release tag that is created after the release criteria are satisfied by the release candidate builds.)
 
-Each of the repository has the automation scripts setup to push in the container images to docker and quay container repositories. 
+Each repository has the automation scripts setup to push in the container images to docker and quay container repositories. 
 
 The release tags are applied in the following order:
+- openebs/linux-utils
 - openebs/libcstor
 - openebs/cstor
 - openebs/istgt
@@ -47,6 +48,8 @@ The release tags are applied in the following order:
 - openebs/velero-plugin
 - openebs/maya
 - openebs/cstor-csi
+- openebs/jiva-csi
+- openebs/jiva-operator
 - openebs/zfs-localpv
 
 Once the release is triggered, Travis build process has to be monitored. Once Travis builds are passed images are pushed to docker hub and quay.io. Images can be verified by going through docker hub and quay.io. Also the images shouldn't have any high level vulnerabilities.
@@ -54,13 +57,25 @@ Example:
 https://quay.io/repository/openebs/cstor-pool?tab=tags
 https://hub.docker.com/r/openebs/openebs-k8s-provisioner/tags
 
+Once a release is created on a repository, update the release description with commit log. The following commands can be used:
+```
+git checkout <release-branch>
+git log --pretty=format:'- %s (%h) (@%an)' --date=short  --since="1 month"
+```
+
+In case there are no changes, update it with "No changes"
+
+For RC tags, update the commit log with changes since the last tag. 
+For Release tag, update the commit log with changes since the last release tag. This will ideally be sum of all the commits from the RC tags.  
+
 ## Final Release Checklist
 - There are no release blockers identified in the [Release Candidate Verification Checklist](#release-candidate-verification-checklist) on the final release tagged images.
 - The updated Install and Feature documentation are verified. 
 - Release notes with changes summary, changelog are updated. 
+- Verify that releases under each individual repository are updated with commit and CHANGELOG.
 - openebs-operator and helm charts are published.
 - Release is tagged on openebs/openebs repository.
-- Release is announced on slack, distribution lists and social media
+- Release is announced on slack, distribution lists and social media.
 
 ## Post Release Activities
 - Blogs on new features are published
