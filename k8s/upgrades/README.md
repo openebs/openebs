@@ -10,6 +10,7 @@ This document describes the steps for the following OpenEBS Upgrade paths:
 - Upgrade from 1.3.0 to any of 1.4.0, 1.5.0, 1.6.0, 1.7.0
 - Upgrade from 1.4.0 to 1.5.0, 1.6.0, 1.7.0
 - Upgrade from 1.5.0 to 1.6.0, 1.7.0
+- Upgrade from 1.6.0 to 1.7.0
 
 For other upgrade paths, please refer to the respective directories.
 Example, the steps to upgrade from 0.9.0 to 1.0.0 will be under [0.9.0-1.0.0](./0.9.0-1.0.0/).
