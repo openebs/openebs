@@ -43,8 +43,8 @@ type CStorVolume struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 	Spec              CStorVolumeSpec   `json:"spec"`
-	Status            CStorVolumeStatus `json:"status"`
 	VersionDetails    VersionDetails    `json:"versionDetails"`
+  Status            CStorVolumeStatus `json:"status"`
 }
 
 // CStorVolumeSpec is the spec for a CStorVolume resource
@@ -198,11 +198,20 @@ type CStorVolumeReplica struct {
 // CStorVolumeReplicaSpec is the spec for a CStorVolumeReplica resource
 type CStorVolumeReplicaSpec struct {
 	TargetIP string `json:"targetIP"`
-	Capacity string `json:"capacity"`
-	// ZvolWorkers represents number of threads that executes client IOs
-	ZvolWorkers string `json:"zvolWorkers"`
-	// ReplicaID is unique number to identify the replica
-	ReplicaID string `json:"replicaid"`
+
+  Capacity string `json:"capacity"`
+
+  // ZvolWorkers represents number of threads that executes client IOs
+  ZvolWorkers *int32 `json:"zvolWorkers"`
+
+  // ReplicaID is unique number to identify the replica
+  ReplicaID string `json:"replicaid"`
+
+  // BlockSize size of data block. The blocksize cannot be changed once
+  // the volume has been written, so it should be set at volume creation
+  // time.The default blocksize for volumes is 4 Kbytes. Any power of 2 
+  // from 512 bytes to 128 Kbytes is valid.
+	BlockSize string `json:"blockSize"`
 }
 
 // CStorVolumeReplicaPhase is to hold result of action.
