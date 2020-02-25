@@ -207,14 +207,15 @@ for pool_pod in $(echo "$cstor_pool_pods" | tr ":" " "); do
 	#################################################################
 
 	## Fetching device name from above output(first row and first column)
-	device_name=$(echo "$device_list" | awk 'NR==1{print $1}')
+	device_name=$(echo "$device_list" | grep disk | awk 'NR==1{print $1}')
 
 	echo "Verifying whether '$device_name' is initilized by udev or not"
 	output=$(kubectl exec -it -n openebs "$pool_pod" -c cstor-pool -- ./var/openebs/sparse/udev_checks/udev_check "$device_name")
+	rc=$?
 	echo "$output"
 
-	## If output contains not initialized by udev then exit the process
-	if [[ "$output" == *"is not initialized by udev"* ]]; then
+	## If exit code was not 0 then exit the process
+	if [ $rc != 0 ]; then
 		echo "Printing pool pod yaml output"
 		kubectl get pod "$pool_pod" -n openebs -o yaml
 		exit 1
