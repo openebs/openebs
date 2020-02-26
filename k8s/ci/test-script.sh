@@ -191,7 +191,51 @@ if [ $cspROThreshold != $spcROThreshold ]; then
 	exit 1
 fi
 
+echo "-------------- Verifying the existence of udev inside the cstor pool container--------"
+cstor_pool_pods=$(kubectl get pods -n openebs -l app=cstor-pool -o jsonpath="{range .items[*]}{@.metadata.name}:{end}")
+rc=$?
+if [ $rc != 0 ]; then
+	echo "Error occured while getting the cstor pool pod names; exit code: $rc"
+	exit $rc
+fi
+
+for pool_pod in $(echo "$cstor_pool_pods" | tr ":" " "); do
+
+	echo "======================================="
+	echo "Running lsblk command inside the cstor pool pod: $pool_pod to get device names"
+	device_list=$(kubectl exec -it -n openebs "$pool_pod" -c cstor-pool -- lsblk --noheadings --list)
+	echo "Device list $device_list"
+
+	############### lsblk --noheadings --list #######################
+	##      sdb     8:16   0   10G  0 disk                         ##
+	##	sdb9    8:25   0    8M  0 part                         ##
+	##	sdb1    8:17   0   10G  0 part                         ##
+	##	sda     8:0    0  100G  0 disk                         ##
+	##	sda14   8:14   0    4M  0 part                         ##
+	##	sda15   8:15   0  106M  0 part                         ##
+	##	sda1    8:1    0 99.9G  0 part /var/openebs/sparse     ##
+	#################################################################
+
+	## Fetching device name from above output(first row and first column)
+	device_name=$(echo "$device_list" | grep disk | awk 'NR==1{print $1}')
+
+	echo "Verifying whether '$device_name' is initilized by udev or not"
+	output=$(kubectl exec -it -n openebs "$pool_pod" -c cstor-pool -- ./var/openebs/sparse/udev_checks/udev_check "$device_name")
+	rc=$?
+	echo "$output"
+
+	## If exit code was not 0 then exit the process
+	if [ $rc != 0 ]; then
+		echo "Printing pool pod yaml output"
+		kubectl get pod "$pool_pod" -n openebs -o yaml
+		exit 1
+	fi
+	echo "======================================="
+	break
+done
+
 echo "---------------Testing deployment in pvc namespace---------------"
+
 kubectl create -f https://raw.githubusercontent.com/openebs/openebs/master/k8s/ci/maya/volume/cstor/service-account.yaml
 
 kubectl create -f https://raw.githubusercontent.com/openebs/openebs/master/k8s/ci/maya/volume/cstor/sc_app_ns.yaml
@@ -476,4 +520,4 @@ testPoolReadOnly() {
 	fi
 }
 # check pool read threshold limit
-testReadOnly
+testPoolReadOnly
