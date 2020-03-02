@@ -71,9 +71,9 @@ type CStorVolumeConfigSpec struct {
 	// is created from.
 	CStorVolumeRef *corev1.ObjectReference `json:"cstorVolumeRef,omitempty"`
 	
-  // CstorVolumeSource contains the source volumeName@snapShotname
+  // CStorVolumeSource contains the source volumeName@snapShotname
 	// combaination.  This will be filled only if it is a clone creation.
-	CstorVolumeSource string `json:"cstorVolumeSource,omitempty"`
+	CStorVolumeSource string `json:"cstorVolumeSource,omitempty"`
 	
   // Policy contains volume specific required policies target and replicas
 	Policy CStorVolumePolicySpec `json:"policy"`
@@ -105,7 +105,7 @@ const (
   //CStorVolumeConfigPhaseReconcile indicates that the changes currently
 	//reconclied based on the cstor volume policy changes to achieve the desired
 	//state
-	CStorVolumeConfigPhaseReconcile CStorVolumeConfigPhase = "Reconile"
+	CStorVolumeConfigPhaseReconcile CStorVolumeConfigPhase = "Reconcile"
 
 )
 
@@ -245,8 +245,8 @@ type TargetSpec struct {
 	// Tolerations, if specified, are the target pod's tolerations
 	Tolerations []corev1.Toleration `json:"tolerations,omitempty"`
 
-	// Affinity if specified, are the target pod's affinities
-	Affinity *corev1.PodAffinity `json:"affinity,omitempty"`
+	// PodAffinity if specified, are the target pod's affinities
+	PodAffinity *corev1.PodAffinity `json:"affinity,omitempty"`
 
 	// NodeSelector is the labels that will be used to select
 	// a node for target pod scheduleing
@@ -262,8 +262,6 @@ type TargetSpec struct {
 type ReplicaSpec struct {
 	// ZvolWorkers represents number of threads that executes client IOs
 	ZvolWorkers *int32 `json:"zvolWorkers,omitempty"`
-	// Affinity if specified, are the replica affinities
-	Affinity *corev1.PodAffinity `json:"affinity,omitempty"`
 }
 
 // Provision represents volume provisioning configuration
