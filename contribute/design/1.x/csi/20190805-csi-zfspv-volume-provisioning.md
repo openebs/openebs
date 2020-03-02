@@ -327,13 +327,18 @@ spec:
 status:
   state: Ready
 ```
+### 5.1 Alternate Design
 
 We can use GRPC call also to create the snapshot, The controller plugin will call node plugin's grpc server to create the snapshot. Creating a ZFSSnapshot custom resource has advantages :-
 
 - Even if Node plugin is down we can get the info about snapshots
 - No need to do zfs call everytime to get the list of snapshots
 - Controller plugin and Node plugin can run without knowledge of each other
-- Reconciliation is easy to manage
+- Reconciliation is easy to manage as K8s only supports a reconciliation based snapshots as of today. For example, the operation to create a snapshot is triggered via K8s CR. Post that, K8s will be re-trying till a successful snapshot is created. In this case, having an API doesn't add much value.
+
+However, there will be use cases where snapshots have to be taken while the file system is frozen to get an application-consistent snapshot. This can required that a snapshot API should be available with blocking API calls that can be aborted after an upper time limit.
+
+Maybe, in a future version, we should add a wrapper around the snapshot functionality and expose it through node agent API. This can be tracked in the backlogs.
 
 ### 6. CSI Clone
 
