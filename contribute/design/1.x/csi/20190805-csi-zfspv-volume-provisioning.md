@@ -246,9 +246,6 @@ spec:
   capacity: "4294967296"
   compression: "on"
   dedup: "on"
-  encryption: ""
-  keyformat: ""
-  keylocation: ""
   ownerNodeID: gke-pawan-zfspv-default-pool-8b577544-5wgl
   poolName: zfspv-pool
   thinProvison: "yes"
@@ -260,6 +257,146 @@ When CSI will get volume destroy request, it will destroy the created zvol and a
 
 ### 4. CSI ZFSPV property change
 There will be a watcher watching for this ZFSVolume custom resource in the agent. We can update the ZFSVolume custom resource with the desired property and the watcher of this custom resource will apply the changes to the corresponding volume.
+
+### 5. CSI SnapShot
+
+When ZFS CSI controller gets a snapshot create request :-
+
+```yaml
+kind: VolumeSnapshotClass
+apiVersion: snapshot.storage.k8s.io/v1beta1
+metadata:
+  name: zfspv-snapclass
+  annotations:
+    snapshot.storage.kubernetes.io/is-default-class: "true"
+driver: zfs.csi.openebs.io
+deletionPolicy: Delete
+```
+
+```yaml
+apiVersion: snapshot.storage.k8s.io/v1beta1
+kind: VolumeSnapshot
+metadata:
+  name: zfspv-snap
+  namespace: openebs
+spec:
+  volumeSnapshotClassName: zfspv-snapclass
+  source:
+    persistentVolumeClaimName: zfspv-pvc
+```
+
+it will create a ZFSSnapshot custom resource. This custom resuorce will get all the details from the ZFSVolume CR, ownerNodeID will be same here as snapshot will also be there on same node where the original volume is there. The controller will create the request with status as Pending and set a label "openebs.io/volname" to the volume name from where the snapshot has to be created.
+
+```yaml
+apiVersion: openebs.io/v1alpha1
+kind: ZFSSnapshot
+metadata:
+  name: snapshot-ead3b8ab-306a-4003-8cc2-4efdbb7a9306
+  namespace: openebs
+  labels:
+    openebs.io/persistence-volum: pvc-34133838-0d0d-11ea-96e3-42010a800114
+spec:
+  blocksize: 4k
+  capacity: "4294967296"
+  compression: "on"
+  dedup: "on"
+  ownerNodeID: zfspv-node1
+  poolName: zfspv-pool
+  status: Pending
+```
+
+The watcher of this resource will be the ZFS node agent. The agent running on ownerNodeID node will check this event and create a snapshot with the given name. Once the node agent is able to create the snapshot, it will add a finalizer "zfs.openebs.io/finalizer" to this resource. Also, it will update the status field to Ready, so that the controller can check this and return successful for the snap create request, the final snapshot object will be :-
+
+```yaml
+apiVersion: openebs.io/v1alpha1
+kind: ZFSSnapshot
+metadata:
+  name: zfspv-snap
+  namespace: openebs
+  Finalizers:
+    zfs.openebs.io/finalizer
+  labels:
+    openebs.io/persistence-volume: pvc-34133838-0d0d-11ea-96e3-42010a800114
+spec:
+  blocksize: 4k
+  capacity: "4294967296"
+  compression: "on"
+  dedup: "on"
+  ownerNodeID: zfspv-node1
+  poolName: zfspv-pool
+status:
+  state: Ready
+```
+### 5.1 Alternate Design
+
+We can use GRPC call also to create the snapshot, The controller plugin will call node plugin's grpc server to create the snapshot. Creating a ZFSSnapshot custom resource has advantages :-
+
+- Even if Node plugin is down we can get the info about snapshots
+- No need to do zfs call everytime to get the list of snapshots
+- Controller plugin and Node plugin can run without knowledge of each other
+- Reconciliation is easy to manage as K8s only supports a reconciliation based snapshots as of today. For example, the operation to create a snapshot is triggered via K8s CR. Post that, K8s will be re-trying till a successful snapshot is created. In this case, having an API doesn't add much value.
+
+However, there will be use cases where snapshots have to be taken while the file system is frozen to get an application-consistent snapshot. This can required that a snapshot API should be available with blocking API calls that can be aborted after an upper time limit.
+
+Maybe, in a future version, we should add a wrapper around the snapshot functionality and expose it through node agent API. This can be tracked in the backlogs.
+
+### 6. CSI Clone
+
+When ZFS CSI controller gets a clone create request :-
+
+```yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: zfspv-clone
+spec:
+  dataSource:
+    name: zfspv-snap
+    kind: VolumeSnapshot
+    apiGroup: snapshot.storage.k8s.io
+  accessModes:
+    - ReadWriteOnce
+```
+
+it will create a ZFSVolume custom resource with same spec as snapshot object. Since clone will be on the same node where snapshot exist so ownerNodeID will also be same.
+
+```yaml
+apiVersion: openebs.io/v1alpha1
+kind: ZFSVolume
+metadata:
+  name: zfspv-clone
+  namespace: openebs
+spec:
+  blocksize: 4k
+  capacity: "4294967296"
+  compression: "on"
+  dedup: "on"
+  ownerNodeID: zfspv-node1
+  poolName: zfspv-pool
+  snapName: pvc-34133838-0d0d-11ea-96e3-42010a800114@snapshot-ead3b8ab-306a-4003-8cc2-4efdbb7a9306
+```
+
+The watcher of this resource will be the ZFS node agent. The agent running on ownerNodeID node will check this event and create a clone from the snapshot with the given name. Once the node agent is able to create the clone from the given snapshot, it will add a finalizer "zfs.openebs.io/finalizer" to this resource. the final clone ZFSVolume object will be :-
+
+
+```yaml
+apiVersion: openebs.io/v1alpha1
+kind: ZFSVolume
+metadata:
+  name: pvc-e1230d2c-b32a-48f7-8b76-ca335b253dcd
+  namespace: openebs
+  Finalizers:
+    zfs.openebs.io/finalizer
+spec:
+  blocksize: 4k
+  capacity: "4294967296"
+  compression: "on"
+  dedup: "on"
+  ownerNodeID: zfspv-node1
+  poolName: zfspv-pool
+  snapName: pvc-34133838-0d0d-11ea-96e3-42010a800114@snapshot-ead3b8ab-306a-4003-8cc2-4efdbb7a9306
+```
+Note that if ZFSVolume CR does not have snapName, then a normal volume will be created, the snapName field will specify whether we have to create a volume or clone.
 
 ## Implementation Plan
 
