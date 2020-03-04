@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #####################################################################
 # NOTES: This script finds unlabeled volume resources of openebs   #
 #####################################################################
@@ -20,7 +20,7 @@ fi
 currentVersion=$1
 echo $currentVersion
 
-echo "#!/bin/bash" > label.sh
+echo "#!/usr/bin/env bash" > label.sh
 echo "set -e" >> label.sh
 
 echo "##### Creating the tag script #####"

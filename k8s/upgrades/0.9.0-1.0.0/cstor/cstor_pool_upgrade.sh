@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 ###########################################################################
 # STEP: Get SPC name and namespace where OpenEBS is deployed as arguments #

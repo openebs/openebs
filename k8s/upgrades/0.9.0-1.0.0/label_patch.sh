@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 ## Below snippet will remove the openebs.io/version label from
 ## deployment.spec.selector.matchLabels
 
