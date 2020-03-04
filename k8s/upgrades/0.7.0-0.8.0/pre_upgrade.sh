@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 ################################################################
 # STEP: Verify if upgrade needs to be performed                #

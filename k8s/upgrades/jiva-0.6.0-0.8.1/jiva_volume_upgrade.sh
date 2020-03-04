@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 set -x
 ################################################################
 # STEP: Get Persistent Volume (PV) name as argument            #

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 upgrade_version="1.0.0"
 current_version="0.9.0"

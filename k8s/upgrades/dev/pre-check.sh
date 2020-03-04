@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #####################################################################
 # NOTES: This script finds unlabeled volume resources of openebs   #
 #####################################################################

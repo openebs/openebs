@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 ################################################################
 # STEP: Get PV name as argument                               #

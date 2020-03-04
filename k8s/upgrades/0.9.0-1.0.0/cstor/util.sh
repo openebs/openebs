@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 ##Checking the version of OpenEBS ####
 function verify_openebs_version() {

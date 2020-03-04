@@ -1,4 +1,4 @@
-#!/bin/bash 
+#!/usr/bin/env bash
 
 target_upgrade_version=1.0.0
 is_upgrade_failed=0
