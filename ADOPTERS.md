@@ -11,6 +11,7 @@ The list of organizations that have publicly shared the usage of OpenEBS:
 | [Arista Networks](https://www.arista.com/en/) | Gerrit (multiple flavors), NPM, Maven, Redis, NFS, Sonarqube, Internal tools | [English](./adopters/arista/README.md) |
 | [CLEW Medical](https://clewmed.com/) | PostgreSQL, Keycloak, RabbitMQ | [English](./adopters/clewmedical/README.md) |
 | [Clouds Sky GmbH](https://cloudssky.com/en/) | Confluent Kafka, Strimzi Kafka, Elasticsearch, Prometheus | [English](./adopters/cloudssky/README.md) |
+| [CNCF, The Linux Foundation](https://www.linuxfoundation.org/) | PostgreSQL, MariaDB, ElasticSearch, Redis, DevStats | [English](./adopters/cncf/README.md) |
 | [Code Wave](https://codewave.eu/) | Bitwarden, Bookstack, Allegros Ralph, Limesurvey, Grafana, Hackmd/Codimd, Minio, Nextcloud, Percona XtraDB Cluster Operator, Nextcloud, Sonarqube, Sentry, Jupyterhub | [English](./adopters/codewave/README.md) |
 | [Comcast](https://github.com/Comcast) | Prometheus, Alertmanager, Influxdb, Helm Chartmuseum | [English](./adopters/comcast/README.md) |
 | [Orange](https://www.orange.com/en/home) | Prometheus, Alertmanager, ChartMuseum, Harbor, GitLab, PostgreSQL, Redis, OpenLdap, RabbitMQ, MySQL, MinIO, Metabase, ... | [English](./adopters/orange/README.md) |
