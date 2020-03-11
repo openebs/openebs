@@ -43,6 +43,7 @@ At a high level, the objective of this document is to introduce:
 
 ### CSPC Schema
 Following is the proposed CSPC schema in go struct:
+
 ``` go
 // CStorPoolCluster describes a CStorPoolCluster custom resource.
 type CStorPoolCluster struct {
@@ -69,10 +70,10 @@ type CStorPoolClusterSpec struct {
 	// side car containers.
 	DefaultAuxResources *corev1.ResourceRequirements `json:"auxResources"`
 
-	// Tolerations, if specified, are the pool pod's tolerations
+	// DefaultTolerations, if specified, are the pool pod's tolerations
 	// If tolerations at PoolConfig is empty, this is written to
 	// CSPI PoolConfig.
-	Tolerations []corev1.Toleration `json:"tolerations"`
+	DefaultTolerations []corev1.Toleration `json:"tolerations"`
 
 	// DefaultPriorityClassName if specified applies to all the pool pods
 	// in the pool spec if the priorityClass at the pool level is
@@ -90,10 +91,10 @@ type PoolSpec struct {
 	// DataRaidConfig is the raid group configuration for the given pool.
 	DataRaidGroups []RaidGroup `json:"dataRaidGroups"`
 
-	// WriteCacheGroups is the write cache given pool.
+	// WriteCacheGroups is the write cache for the given pool.
 	WriteCacheGroups []RaidGroup `json:"writeCacheGroups"`
 
-	// PoolConfig is the default pool config that applies to the
+	// PoolConfig is the pool config that applies to the
 	// pool on node.
 	PoolConfig PoolConfig `json:"poolConfig"`
 }
@@ -105,11 +106,12 @@ type PoolConfig struct {
 	// Supported values are : stripe, mirror, raidz and raidz2
 	DataRaidGroupType string `json:"dataRaidGroupType"`
 
-	// WriteCacheRaidGroupType is the write cachce raid type 
+	// WriteCacheRaidGroupType is the write cache raid type 
 	// Supported values are : stripe, mirror, raidz and raidz2
 	WriteCacheRaidGroupType string `json:"writeCacheRaidGroupType"`
 
-	// ThickProvisioning to enable over thick provisioning
+	// ThickProvisioning will provision the volumes, only if capacity is available on the pool.
+	// Setting this to true will disable over-provisioning of the pool.
 	// Optional -- defaults to false
 	ThickProvisioning bool `json:"thickProvisioning"`
 
