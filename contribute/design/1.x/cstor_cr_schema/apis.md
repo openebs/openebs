@@ -53,14 +53,11 @@ The CSPC API has the following capabilities :
 
 - A stripe raid group can have any number of block devices but not less than 1.
 
-
 - A mirror, raidz and raidz2 raid group can only have exactly 2, 3 and 6 block devices only.  
 
 - CSPC has the capability to specify a cache file for faster imports.
 
-
 - CSPC has the capability to specify for overprovisioning and compression.
-
 
 - CSPC has the capability to specify a default raid group type for a pool spec at the node level. If the raid group spec does not have a type -- this default raid group type is used.
 
@@ -81,12 +78,9 @@ https://github.com/openebs/maya/pull/1549
 
 - CSPC can be used to do block device replacement.
 
-
 - CSPC can be used to do pool expansion.
 
-
 - CSPC can be used to create a pool on a new brought up node. ( Horizontal scale )
-
 
 Following is the current CSPC schema in go struct : 
 

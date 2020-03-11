@@ -216,10 +216,10 @@ type CStorPoolInstance struct {
 // CStorPoolInstanceSpec is the spec listing fields for a CStorPoolInstance resource.
 type CStorPoolInstanceSpec struct {
   // HostName is the name of kubernetes node where the pool
-	// should be created. This is filled by CSPC-operator.
+  // should be created. This is filled by CSPC-operator.
   HostName string `json:"hostName"`
-	// NodeSelector is the labels that is filled by CSPC-operator, only
-	// for informational purpose.
+  // NodeSelector is the labels that is filled by CSPC-operator, only
+  // for informational purpose.
   NodeSelector map[string]string `json:"nodeSelector"`
   // PoolConfig is the default pool config that applies to the
   // pool on node.
