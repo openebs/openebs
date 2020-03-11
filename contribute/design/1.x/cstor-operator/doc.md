@@ -140,30 +140,30 @@ type PoolConfig struct {
 
 // RaidGroup contains the details of a raid group for the pool
 type RaidGroup struct {
-	BlockDevices []CStorPoolClusterBlockDevice `json:"blockDevices"`
+	CStorPoolInstanceBlockDevices []CStorPoolInstanceBlockDevice `json:"cspiBlockDevices"`
 }
 
-// CStorPoolClusterBlockDevice contains the details of block devices that
+// CStorPoolInstanceBlockDevice contains the details of block devices that
 // constitutes a raid group.
-type CStorPoolClusterBlockDevice struct {
+type CStorPoolInstanceBlockDevice struct {
 	// BlockDeviceName is the name of the block device.
 	BlockDeviceName string `json:"blockDeviceName"`
 
 	// Capacity is the capacity of the block device.
 	// It is system generated
 	Capacity string `json:"capacity"`
-	
+
 	// DevLink is the dev link for block devices
 	DevLink string `json:"devLink"`
 }
 
 // CStorPoolClusterStatus represents the latest available observations of a CSPC's current state.
 type CStorPoolClusterStatus struct {
-	// CurrentProvisionedInstances is the the number of CSPI present at the current state. 
-	CurrentProvisionedInstances int32 `json:"currentProvisionedInstances"`
+	// ProvisionedInstances is the the number of CSPI present at the current state. 
+	ProvisionedInstances int32 `json:"provisionedInstances"`
 	
-	// RunningInstances is the number of CSPI(s) that are not healthy but in degraded,rebuilding etc mode.
-	RunningInstances int32 `json:"runningInstances"`
+	// DesiredInstances is the number of CSPI(s) that should be provisioned.
+	DesiredInstances int32 `json:"runningInstances"`
 
 	// HealthyInstances is the number of CSPI(s) that are healthy.
 	HealthyInstances int32 `json:"healthyInstances"`
