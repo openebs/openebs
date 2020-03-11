@@ -177,17 +177,17 @@ type CSPCConditionType string
 // CStorPoolClusterCondition describes the state of a CSPC at a certain point.
 type CStorPoolClusterCondition struct {
 	// Type of CSPC condition.
-	Type CSPCConditionType `json:"type" protobuf:"bytes,1,opt,name=type,casttype=DeploymentConditionType"`
+	Type CSPCConditionType `json:"type"`
 	// Status of the condition, one of True, False, Unknown.
-	Status corev1.ConditionStatus `json:"status" protobuf:"bytes,2,opt,name=status,casttype=k8s.io/api/core/v1.ConditionStatus"`
+	Status corev1.ConditionStatus `json:"status"`
 	// The last time this condition was updated.
-	LastUpdateTime metav1.Time `json:"lastUpdateTime,omitempty" protobuf:"bytes,6,opt,name=lastUpdateTime"`
+	LastUpdateTime metav1.Time `json:"lastUpdateTime,omitempty"`
 	// Last time the condition transitioned from one status to another.
-	LastTransitionTime metav1.Time `json:"lastTransitionTime,omitempty" protobuf:"bytes,7,opt,name=lastTransitionTime"`
+	LastTransitionTime metav1.Time `json:"lastTransitionTime,omitempty"`
 	// The reason for the condition's last transition.
-	Reason string `json:"reason,omitempty" protobuf:"bytes,4,opt,name=reason"`
+	Reason string `json:"reason,omitempty"`
 	// A human readable message indicating details about the transition.
-	Message string `json:"message,omitempty" protobuf:"bytes,5,opt,name=message"`
+	Message string `json:"message,omitempty"`
 }
 
 // CStorPoolClusterList is a list of CStorPoolCluster resources
@@ -231,42 +231,32 @@ type CStorPoolInstanceSpec struct {
 
 // CStorPoolInstanceStatus is for handling status of pool.
 type CStorPoolInstanceStatus struct {
-	
 	// Current state of CSPI with details.
 	Conditions []CStorPoolInstanceCondition 
-	//  The phase of a CStorPool is a simple, high-level summary of the pool state on the 
-	//  node.  
+	// The phase of a CStorPool is a simple, high-level summary of the pool state on the node. 
 	Phase    CStorPoolPhase        `json:"phase"`
 	// Capacity describes the capacity details of a cstor pool 
-	Capacity CStorPoolCapacityAttr `json:"capacity"`
-	// A human readable message indicating details about why the CSPI is in this
-  // condition.
-	Message            string      `json:"message,omitempty"`
+	Capacity CStorPoolInstanceCapacity `json:"capacity"`
 }
 
-// CStorPoolCapacityAttr stores the pool capacity related attributes.
-type CStorPoolCapacityAttr struct {
-	Total resource.Qunatity `json:"total"`
-	Free  resource.Qunatity `json:"free"`
-	Used  resource.Qunatity `json:"used"`
+// CStorPoolInstanceCapacity stores the pool capacity related attributes.
+type CStorPoolInstanceCapacity struct {
+	Total resource.Quantity `json:"total"`
+	Free  resource.Quantity `json:"free"`
+	Used  resource.Quantity `json:"used"`
 }
-
 type CSPIConditionType string
 
 // CSPIConditionType describes the state of a CSPI at a certain point.
 type CStorPoolInstanceCondition struct {
 	// Type of CSPI condition.
-	Type CSPIConditionType `json:"type" protobuf:"bytes,1,opt,name=type,casttype=DeploymentConditionType"`
+	Type CSPIConditionType `json:"type"`
 	// Status of the condition, one of True, False, Unknown.
-	Status corev1.ConditionStatus `json:"status" protobuf:"bytes,2,opt,name=status,casttype=k8s.io/api/core/v1.ConditionStatus"`
-	// The last time this condition was updated.
-	LastUpdateTime metav1.Time `json:"lastUpdateTime,omitempty" protobuf:"bytes,6,opt,name=lastUpdateTime"`
-	// Last time the condition transitioned from one status to another.
-	LastTransitionTime metav1.Time `json:"lastTransitionTime,omitempty" protobuf:"bytes,7,opt,name=lastTransitionTime"`
+	Status corev1.ConditionStatus `json:"status"`
 	// The reason for the condition's last transition.
-	Reason string `json:"reason,omitempty" protobuf:"bytes,4,opt,name=reason"`
+	Reason string `json:"reason,omitempty"`
 	// A human readable message indicating details about the transition.
-	Message string `json:"message,omitempty" protobuf:"bytes,5,opt,name=message"`
+	Message string `json:"message,omitempty"`
 }
 
 // CStorPoolInstanceList is a list of CStorPoolInstance resources
