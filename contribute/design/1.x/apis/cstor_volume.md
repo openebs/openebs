@@ -136,8 +136,10 @@ type ReplicaStatus struct {
 
 // CStorVolumeCondition contains details about state of cstorvolume
 type CStorVolumeCondition struct {
+	// Type is a different valid value of CStorVolumeCondition
 	Type   CStorVolumeConditionType `json:"type" protobuf:"bytes,1,opt,name=type,casttype=CStorVolumeConditionType"`
-	Status ConditionStatus          `json:"status" protobuf:"bytes,2,opt,name=status,casttype=ConditionStatus"`
+	
+	Status ConditionStatus `json:"status" protobuf:"bytes,2,opt,name=status,casttype=ConditionStatus"`
 	// Last time we probed the condition.
 	// +optional
 	LastProbeTime metav1.Time `json:"lastProbeTime,omitempty" protobuf:"bytes,3,opt,name=lastProbeTime"`
@@ -176,7 +178,7 @@ const (
 ```
 # Changes to existing types
 
-- Remvoe the `Status` field of the `CStorvolumeSpec`. This should not be too problematic but `Status` filed has been used to   set the initial `init` state of `CStorVolume` to be used in other SAAS application like openebs-director etc.
+- Remove the `Spec.Status` field of the `CStorvolumeSpec`. `Status` field has been used to set the initial `init` state of `CStorVolume` in case of openebs-director.
 
 ## `CStorVolumeReplicas` APIs
 
@@ -204,10 +206,10 @@ type CStorVolumeReplicaSpec struct {
 	// ReplicaID is unique number to identify the replica
 	ReplicaID string `json:"replicaid"`
 
-  // BlockSize size of data block. The blocksize cannot be changed once
-  // the volume has been written, so it should be set at volume creation
-  // time.The default blocksize for volumes is 4 Kbytes. Any power of 2 
-  // from 512 bytes to 128 Kbytes is valid.
+    // BlockSize size of data block. The blocksize cannot be changed once
+    // the volume has been written, so it should be set at volume creation
+    // time.The default blocksize for volumes is 4 Kbytes. Any power of 2 
+    // from 512 bytes to 128 Kbytes is valid.
 	BlockSize string `json:"blockSize"`
 }
 
@@ -270,11 +272,14 @@ const (
 
 // CStorVolumeReplicaStatus is for handling status of cvr.
 type CStorVolumeReplicaStatus struct {
+	// Phase represents different states of CStorVolumeReplicas
 	Phase    CStorVolumeReplicaPhase `json:"phase"`
-
-  Capacity CStorVolumeCapacityDetails `json:"capacity"`
 	
-  // LastTransitionTime refers to the time when the phase changes
+	// CStorVolumeCapacityDetails represents capacity information releated to volume
+    // replica
+    Capacity CStorVolumeCapacityDetails `json:"capacity"`
+	
+    // LastTransitionTime refers to the time when the phase changes
 	LastTransitionTime metav1.Time `json:"lastTransitionTime,omitempty"`
 	LastUpdateTime     metav1.Time `json:"lastUpdateTime,omitempty"`
 	Message            string      `json:"message,omitempty"`
@@ -285,9 +290,9 @@ type CStorVolumeReplicaStatus struct {
 // replica
 type CStorVolumeCapacityDetails struct {
 	// The amount of space consumed by this volume replica and all its descendents
-	Total string `json:"totalAllocated"`
+	Total string `json:"total"`
 	
-  // The amount of space that is "logically" accessible by this dataset. The logical
+    // The amount of space that is "logically" accessible by this dataset. The logical
 	// space ignores the effect of the compression and copies properties, giving a
 	// quantity closer to the amount of data that applications see.  However, it does
 	// include space consumed by metadata
@@ -304,6 +309,11 @@ type CStorVolumeReplicaList struct {
 	Items []CStorVolumeReplica `json:"items"`
 }
 ```
+
+# Changes to existing types
+- Rename `CStorVolumeCapacityAttr` to `CStorVolumeCapacityDetails`
+- Rename `TotalAllocated` to `Total` under `CStorVolumeCapacityDetails` referenced to `used` zfs get property
+- `Used` field under `CStorVolumeCapacityDetails.Used` will be referenced to `logicalreferenced` zfs get property.
 
 # Risks and Mitigations
 
