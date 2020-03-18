@@ -1,74 +1,73 @@
 # For k8s versions before 1.9.0 use apps/v1beta2  and before 1.8.0 use extensions/v1beta1
-apiVersion: v1
-kind: Service
-metadata:
-  name: minio
-  labels:
-    app: minio
-spec:
-  clusterIP: None
-  ports:
-    - port: 9000
-      name: minio
-  selector:
-    app: minio
----
 apiVersion: apps/v1
-kind: StatefulSet
+kind: Deployment
 metadata:
-  name: minio
+  # This name uniquely identifies the Deployment
+  name: minio-deployment
 spec:
   selector:
     matchLabels:
       app: minio
-  serviceName: minio
-  replicas: 4
+  strategy:
+    type: Recreate
   template:
     metadata:
       labels:
+        # Label is used as selector in the service.
         app: minio
     spec:
+      # Refer to the PVC 
+      volumes:
+      - name: storage
+        persistentVolumeClaim:
+          # Name of the PVC created earlier
+          claimName: minio-pv-claim
       containers:
       - name: minio
+        # Pulls the default Minio image from Docker Hub
+        image: minio/minio:latest
+        args:
+        - server
+        - /storage
         env:
+        # Minio access key and secret key
         - name: MINIO_ACCESS_KEY
           value: "minio"
         - name: MINIO_SECRET_KEY
           value: "minio123"
-        image: minio/minio
-        args:
-        - server
-        - http://minio-{0...3}.minio.default.svc.cluster.local/data
         ports:
         - containerPort: 9000
-        # These volume mounts are persistent. Each pod in the PetSet
-        # gets a volume mounted based on this field.
+          hostPort: 9000
+        # Mount the volume into the pod
         volumeMounts:
-        - name: data
-          mountPath: /data
-  # These are converted to volume claims by the controller
-  # and mounted at the paths mentioned above.
-  volumeClaimTemplates:
-  - metadata:
-      name: data
-    spec:
-      accessModes:
-        - ReadWriteOnce
-      resources:
-        requests:
-          storage: 10Gi
-      # Uncomment and add storageClass specific to your requirements below. Read more https://kubernetes.io/docs/concepts/storage/persistent-volumes/#class-1
-      #storageClassName:
+        - name: storage # must match the volume name, above
+          mountPath: "/storage"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: minio-pv-claim
+  labels:
+    app: minio-storage-claim
+spec:
+  storageClassName: openebs-jiva-default
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10G
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: minio-service
 spec:
-  type: LoadBalancer
+#  type: LoadBalancer
   ports:
     - port: 9000
-      targetPort: 9000
+      nodePort: 32701
       protocol: TCP
   selector:
     app: minio
+  sessionAffinity: None
+  type: NodePort
