@@ -242,7 +242,10 @@ cspList=$(kubectl get csp  -o jsonpath='{.items[?(@.metadata.labels.openebs\.io/
 csp=${cspList[0]}
 finalizer_found=0
 for i in $(seq 1 $retry_cnt) ; do
+	## Below command will give [openebs.io/pool-protection,openebs.io/storage-pool-claim].
 	finalizers=$(kubectl get csp $csp -o jsonpath='{.metadata.finalizers}')
+	## Below one will remove the square brackets around the output so it will be converted into
+	## openebs.io/pool-protection,openebs.io/storage-pool-claim
 	finalizerList=$(echo "${finalizers:1:${#finalizers}-2}")
 	## Iterate over all the finalizers and verify for existence of pool protection
 	## finalizer.
