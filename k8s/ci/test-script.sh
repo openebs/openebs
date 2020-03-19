@@ -191,6 +191,7 @@ if [ $cspROThreshold != $spcROThreshold ]; then
 	exit 1
 fi
 
+
 echo "-------------- Verifying the existence of udev inside the cstor pool container--------"
 cstor_pool_pods=$(kubectl get pods -n openebs -l app=cstor-pool -o jsonpath="{range .items[*]}{@.metadata.name}:{end}")
 rc=$?
@@ -233,6 +234,38 @@ for pool_pod in $(echo "$cstor_pool_pods" | tr ":" " "); do
 	echo "======================================="
 	break
 done
+
+echo "-------------------- Checking Finalizer Existence On CSP -------------------------"
+## 5 retry count is good enough since the cstor-pool-mgmt container is already in Running State
+retry_cnt=5
+cspList=$(kubectl get csp  -o jsonpath='{.items[?(@.metadata.labels.openebs\.io/storage-pool-claim=="sparse-claim-auto")].metadata.name}')
+csp=${cspList[0]}
+finalizer_found=0
+for i in $(seq 1 $retry_cnt) ; do
+	## Below command will give [openebs.io/pool-protection,openebs.io/storage-pool-claim].
+	finalizers=$(kubectl get csp $csp -o jsonpath='{.metadata.finalizers}')
+	## Below one will remove the square brackets around the output so it will be converted into
+	## openebs.io/pool-protection,openebs.io/storage-pool-claim
+	finalizerList=$(echo "${finalizers:1:${#finalizers}-2}")
+	## Iterate over all the finalizers and verify for existence of pool protection
+	## finalizer.
+	for finalizer in $(echo "$finalizerList" | tr "," " "); do
+		if [ "$finalizer" == "openebs.io/pool-protection" ]; then
+			finalizer_found=1
+			break
+		fi
+	done
+	if [ $finalizer_found -eq 1 ]; then
+		break
+	fi
+	sleep 1
+done
+
+if [ $finalizer_found -eq 0 ]; then
+	echo "Error: Finalizer: openebs.io/pool-protection not found on CSP: ${csp} finalizerList: ${finalizerList}"
+	exit 1
+fi
+echo "---------------- Finalizer Exists On CSP -----------------------"
 
 echo "---------------Testing deployment in pvc namespace---------------"
 
