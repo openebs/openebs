@@ -1,6 +1,6 @@
 ---
 oep-number: NDM 0002
-title: Uniquely accessing disk in cluster
+title: Fixed access path to disks for NDM consumers
 authors:
   - "@mittachaitu"
 owners:
@@ -11,14 +11,14 @@ owners:
   - "@akhilerm"
 editor: "@mittachaitu"
 creation-date: 2020-02-19
-last-updated: 2020-02-19
+last-updated: 2020-03-23
 ---
 
-# Disk Identification using NDM
+# Disk Accessing using NDM
 
 ## Table of Contents
 
-- [Disk Identification using NDM](#disk-identification-using-ndm)
+- [Disk Accessing using NDM](#disk-accessing-using-ndm)
   - [Table of Contents](#table-of-contents)
   - [Summary](#summary)
   - [Motivation](#motivation)
@@ -31,6 +31,7 @@ last-updated: 2020-02-19
       - [Proposed Implementation](#proposed-implementation)
         - [Workflow](#workflow)
         - [Advantages](#advantages)
+        - [Alternative Approach(Partial solution)](#alternative-approachpartial-solution)
   - [Graduation Criteria](#graduation-criteria)
   - [Implementation History](#implementation-history)
   - [Drawbacks](#drawbacks)
@@ -65,6 +66,10 @@ access the disks uniquely even if path got changed.
 
 - As an NDM user, I should be able to access devices uniquely even if the device
   doesn't have any unique identification from the manufacturer.
+
+- Removing the requirement to run in Privileged mode for NDM consumers.
+
+- Removing the need for restart of pod to access disks that are attached after non-privileged pod came up.
 
 #### Current Implementation
 
@@ -160,6 +165,56 @@ Current accessing of disk has following shortcomings
 - Application consuming multiple blockdevices no need to mount all of them (or)
   no need to mount the /dev directory inside the application.
 
+TODO: Before merging make sure there should be only one approach.
+
+##### Alternative Approach(Partial solution)
+
+- This approach explains how we can make use of cgroups feature [Whitelist Device Controllers](https://www.kernel.org/doc/Documentation/cgroup-v1/devices.txt) to achieve requirements specified in user stories. Here
+  I will try to explain how I achieved them with one of the container runtime(docker):
+  - Started the ubuntu container with below command
+    CMD: docker run --privileged=true -v /dev:/dev -it ubuntu:latest bash
+
+  - Now I am inside the container and verified that container can access any
+    device present in the machine
+    CMD:    cat /sys/fs/cgroup/devices/devices.list
+    Output: a \*:\* rwm
+    In the above output since it doesn't have any rules related to block files,
+    so it can access any device.
+
+ -  Different runtime containers provided a different ways to specify cgroup
+    device rules(Ex runtimes: docker, containerd and cri-o) while creating container
+    CMD: sudo docker run -v /dev:/dev --device-cgroup-rule='b \*:\* m' --device-cgroup-rule='b 8:16 rwm' -it ubuntu:latest bash
+    Output:
+    ```sh
+    c 1:5 rwm
+    c 1:3 rwm
+    c 1:9 rwm
+    c 1:8 rwm
+    c 5:0 rwm
+    c 5:1 rwm
+    b *:* m
+    b 8:16 rwm
+    c *:* m
+    c 1:7 rwm
+    c 136:* rwm
+    c 5:2 rwm
+    c 10:200 rwm
+    ```
+    Above command ran without privileged mode and I am able to access the block device
+    which has Maj:Min *8 and 16*. Like this we can specify list of block devices that
+    can accessable inside the container.
+    Note: We can change above device list at runtime by overwriting the host path
+          /sys/fs/cgroup/devices/docker/<container_id>/devices.allow
+    CMD: echo 'type Maj:Min rwm' > /sys/fs/cgroup/devices/docker/<container_id>/devices.allow
+
+  - Declaring device group list from Kubernetes is not yet supported because CRI
+    doesn't have device rule API. Even though If CRI implements device-rule API
+    we might have following limitation:
+    - If any container runtime doesn't support device rules specification then such
+      kind of runtime become limitation to use OpenEBS cStor.
+    - Pod will be restarted whenever device rules got modified since device rules configuration
+      will exist at container level(configuration exist at container level make sense).
+
 ## Graduation Criteria
 
 - NDM should be able to uniquely access the disks, across reboots, across different
@@ -182,3 +237,5 @@ NA
 
 - Test setup with different types of Linux OS Distributions in different
   configurations to test and ensure the unique accessing the disk.
+
+
