@@ -609,10 +609,9 @@ function retry_command_execution() {
     success=0
 
     ## Retrying 3 times to execute the command is good enough
-    for i in $(seq 1 $retry_cnt) ; do
+    for i in $(seq 1 $retry_count) ; do
         $command
-        rc=$?
-        if [ $rc == 0 ]; then
+        if [ $? == 0 ]; then
             success=1
             break
         fi
@@ -635,8 +634,7 @@ pool_dep=${pool_dep_list[0]}
 ## Enable the feature gates by patching the deployment with corresponding feature gates
 ## NOTE: If deployment already patched then exit code will be 0
 kubectl patch deployment --namespace openebs ${pool_dep} --patch='{"spec": {"template": {"spec": {"containers": [{"name": "cstor-pool-mgmt","env": [{"name": "REBUILD_ESTIMATES", "value": "true"}]}]}}}}'
-rc=$?
-if [ $rc != 0 ]; then
+if [ $? != 0 ]; then
     echo "Failed to patch ${pool_dep} deployment to enable REBUILD_ESTIMATE feature gates"
     exit 1
 fi
@@ -646,32 +644,28 @@ rollout_status=$(kubectl rollout status --namespace openebs deployment/$pool_dep
 rc=$?; if [[ ($rc -ne 0) || ! (${rollout_status} =~ "successfully rolled out") ]];
     then echo "ERROR: Failed to rollout status for $pool_dep error: $rc"; exit; fi
 
-## Get volume snapshot data name
+## As part of the test we already created snapshot for Volume here we are fetching volumesnapshotdata name from existing snapshot
 volume_snapshot_data_name=$(kubectl get volumesnapshot snapshot-demo-cstor -ojsonpath='{.spec.snapshotDataName}')
-rc=$?
-if [ $rc != 0 ]; then
+if [ $? != 0 ]; then
     echo "Failed to get volumesnapshotdata name for volumesnapshot: ${volumeSnapshotDataName}"
     exit 1
 fi
 
 ## Get Snapshot name from volume snapshot data
 k8s_snapshot_name=$(kubectl get volumesnapshotdata ${volume_snapshot_data_name} -ojsonpath='{.spec.openebsVolume.snapshotId}')
-rc=$?
-if [ $rc != 0 ]; then
+if [ $? != 0 ]; then
     echo "Failed to get snapshot name for volumesnapshot data: ${volume_snapshot_data_name}"
     exit 1
 fi
 
 pv_name=$(kubectl get pvc cstor-vol1-1r-claim -o jsonpath='{.spec.volumeName}')
-rc=$?
-if [ $rc != 0 ]; then
+if [ $? != 0 ]; then
     echo "Failed to get PV name for PVC: cstor-vol1-1r-claim"
     exit 1
 fi
 
 cvr_list=$(kubectl get cvr -n openebs -l openebs.io/persistent-volume=${pv_name} -o jsonpath='{.items[*].metadata.name}')
-rc=$?
-if [ $rc != 0 ]; then
+if [ $? != 0 ]; then
     echo "Failed to list CVRs of PV: ${pv_name}"
     exit 1
 fi
@@ -680,8 +674,7 @@ cvr_name=${cvr_list[0]}
 verify_snapshot_list_on_cvr "${cvr_name}" "openebs" "1" "${k8s_snapshot_name}"
 
 cstor_target_pod_list=$(kubectl get pod -n openebs -l openebs.io/persistent-volume=${pv_name},openebs.io/target=cstor-target -o jsonpath='{.items[*].metadata.name}')
-rc=$?
-if [ $rc != 0 ]; then
+if [ $? != 0 ]; then
     echo "Failed to list cStor target pods of PV: ${pv_name}"
     exit 1
 fi
