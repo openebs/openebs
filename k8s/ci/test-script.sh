@@ -608,7 +608,7 @@ function retry_command_execution() {
     retry_count=5
     success=0
 
-    ## Retrying 3 times to execute the command is good enough
+    ## Retrying 5 times to execute the command is good enough
     for i in $(seq 1 $retry_count) ; do
         $command
         if [ $? == 0 ]; then
