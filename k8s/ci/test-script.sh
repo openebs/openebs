@@ -554,3 +554,142 @@ testPoolReadOnly() {
 }
 # check pool read threshold limit
 testPoolReadOnly
+
+## NOTE: Pass arguments to this function with ""
+## verify_snapshot_list_on_cvr "<cvr_name>" "<namespace>" "<no.of_snapshots>" "<snapshot_list>"
+function verify_snapshot_list_on_cvr() {
+    cvr_name=$1
+    cvr_namespace=$2
+    desired_snapshot_count=$3
+    desired_snapshot_list=$4
+    is_snapshot_count_matched=false
+
+    ### Trying for 90 seconds which means max of 3 updates can happen because default RESYNC_INTERVAL is 30 seconds
+    retry_cnt=18
+    for i in $(seq 1 $retry_cnt) ; do
+        ## Below Command is used to get the only snapshot names using jq
+        ## output will be istgt_snap1 istgt_snap2 istgt_snap3
+        got_snapshot_list=$(kubectl get cvr -n ${cvr_namespace} ${cvr_name} -o json | jq -r '.status.snapshots | keys[] as $k| "\($k)"')
+        got_snapshot_count=$(echo ${got_snapshot_list} | wc -w)
+        if [ $got_snapshot_count -eq $desired_snapshot_count ]; then
+            is_snapshot_count_matched=true
+            break
+        fi
+
+        echo "Waiting for snapshots to exists on CVR: ${cvr_name} expected snapshot count: ${desired_snapshot_count} got snapshot count: ${got_snapshot_count}"
+        sleep 5
+    done
+
+    ## Verify snapshot count
+    if [ "$is_snapshot_count_matched" == false ]; then
+        echo "Snapshot list was not updated on CVR: ${cvr_name} expected snapshot count: ${desired_snapshot_count} current snapshot count: ${got_snapshot_count}"
+        exit 1
+    fi
+
+    ## Verify Snapshot names
+    for snap_name in `echo ${got_snapshot_list}`; do
+        local is_snap_exist=false
+        for desired_snap_name in `echo ${desired_snapshot_list}`; do
+            if [ ${snap_name} == ${desired_snap_name} ]; then
+                is_snap_exist=true
+                break
+            fi
+        done
+        if [ "$is_snap_exist" == false ]; then
+            echo "Snapshot $snap_name exist in CVR ${cvr_name} but doesn't exist in desired snapshot list: ${desired_snapshot_list}"
+            exit 1
+        fi
+    done
+}
+
+## retry_command_execution will execute the command
+function retry_command_execution() {
+    command=$1
+    retry_count=5
+    success=0
+
+    ## Retrying 5 times to execute the command is good enough
+    for i in $(seq 1 $retry_count) ; do
+        $command
+        if [ $? == 0 ]; then
+            success=1
+            break
+        fi
+        sleep 5
+    done
+
+    if [ $success == 0 ]; then
+        echo "Failed to execute the command $command"
+        exit 1
+    fi
+    echo "Command $command executed successfully"
+}
+
+
+echo "===========Testing Snapshots On CVR By Enabling Feature Gate On CStor Pools ============="
+## Get the deployment name of CSP
+pool_dep_list=( $(kubectl get deployment -l app=cstor-pool -o jsonpath='{.items[?(@.metadata.labels.openebs\.io/storage-pool-claim=="sparse-claim-auto")].metadata.name}' -n openebs))
+pool_dep=${pool_dep_list[0]}
+
+## Enable the feature gates by patching the deployment with corresponding feature gates
+## NOTE: If deployment already patched then exit code will be 0
+kubectl patch deployment --namespace openebs ${pool_dep} --patch='{"spec": {"template": {"spec": {"containers": [{"name": "cstor-pool-mgmt","env": [{"name": "REBUILD_ESTIMATES", "value": "true"}]}]}}}}'
+if [ $? != 0 ]; then
+    echo "Failed to patch ${pool_dep} deployment to enable REBUILD_ESTIMATE feature gates"
+    exit 1
+fi
+
+## If Deployment patched checking the rollout status
+rollout_status=$(kubectl rollout status --namespace openebs deployment/$pool_dep)
+rc=$?; if [[ ($rc -ne 0) || ! (${rollout_status} =~ "successfully rolled out") ]];
+    then echo "ERROR: Failed to rollout status for $pool_dep error: $rc"; exit; fi
+
+## As part of the test we already created snapshot for Volume here we are fetching volumesnapshotdata name from existing snapshot
+volume_snapshot_data_name=$(kubectl get volumesnapshot snapshot-demo-cstor -ojsonpath='{.spec.snapshotDataName}')
+if [ $? != 0 ]; then
+    echo "Failed to get volumesnapshotdata name for volumesnapshot: ${volumeSnapshotDataName}"
+    exit 1
+fi
+
+## Get Snapshot name from volume snapshot data
+k8s_snapshot_name=$(kubectl get volumesnapshotdata ${volume_snapshot_data_name} -ojsonpath='{.spec.openebsVolume.snapshotId}')
+if [ $? != 0 ]; then
+    echo "Failed to get snapshot name for volumesnapshot data: ${volume_snapshot_data_name}"
+    exit 1
+fi
+
+pv_name=$(kubectl get pvc cstor-vol1-1r-claim -o jsonpath='{.spec.volumeName}')
+if [ $? != 0 ]; then
+    echo "Failed to get PV name for PVC: cstor-vol1-1r-claim"
+    exit 1
+fi
+
+cvr_list=$(kubectl get cvr -n openebs -l openebs.io/persistent-volume=${pv_name} -o jsonpath='{.items[*].metadata.name}')
+if [ $? != 0 ]; then
+    echo "Failed to list CVRs of PV: ${pv_name}"
+    exit 1
+fi
+cvr_name=${cvr_list[0]}
+
+verify_snapshot_list_on_cvr "${cvr_name}" "openebs" "1" "${k8s_snapshot_name}"
+
+cstor_target_pod_list=$(kubectl get pod -n openebs -l openebs.io/persistent-volume=${pv_name},openebs.io/target=cstor-target -o jsonpath='{.items[*].metadata.name}')
+if [ $? != 0 ]; then
+    echo "Failed to list cStor target pods of PV: ${pv_name}"
+    exit 1
+fi
+cstor_target_pod_name=${cstor_target_pod_list[0]}
+
+snapshot_command=$(echo "kubectl exec -n openebs ${cstor_target_pod_name} -c cstor-istgt -- istgtcontrol snapcreate ${pv_name} istgt_snap1")
+
+retry_command_execution "$snapshot_command"
+
+verify_snapshot_list_on_cvr "${cvr_name}" "openebs" "2" "${k8s_snapshot_name} istgt_snap1"
+
+snapshot_command=$(echo "kubectl exec -n openebs ${cstor_target_pod_name} -c cstor-istgt -- istgtcontrol snapdestroy ${pv_name} istgt_snap1")
+
+retry_command_execution "$snapshot_command"
+
+verify_snapshot_list_on_cvr "${cvr_name}" "openebs" "1" "${k8s_snapshot_name}"
+
+echo "===========Testing Snapshots On CVR By Enabling Feature Gate On CStor Pools Is Done Successfully ============="
