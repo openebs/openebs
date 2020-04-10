@@ -316,6 +316,7 @@ spec:
           exec:
             command:
             - pgrep
+            - -f
             - ".*openebs"
           initialDelaySeconds: 30
           periodSeconds: 60
@@ -358,6 +359,7 @@ spec:
             exec:
               command:
               - pgrep
+              - -f
               - ".*controller"
             initialDelaySeconds: 30
             periodSeconds: 60
@@ -695,6 +697,7 @@ spec:
           exec:
             command:
             - pgrep
+            - -f
             - ".*localpv"
           initialDelaySeconds: 30
           periodSeconds: 60
