@@ -387,6 +387,7 @@ spec:
             exec:
               command:
               - pgrep
+              - -f
               - ".*provisioner"
             initialDelaySeconds: 30
             periodSeconds: 60
@@ -511,6 +512,7 @@ spec:
           exec:
             command:
             - pgrep
+            - -f
             - ".*ndm"
           initialDelaySeconds: 30
           periodSeconds: 60
