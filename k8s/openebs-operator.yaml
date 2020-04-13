@@ -315,8 +315,10 @@ spec:
         livenessProbe:
           exec:
             command:
-            - pgrep
-            - "^openebs-provisi.*"
+            - sh
+            - -c
+            - pcount=$(pgrep "^openebs-provisi.*" | wc -l); if [ $pcount != 1 ]; then exit
+              1; else exit 0; fi;
           initialDelaySeconds: 30
           periodSeconds: 60
 ---
@@ -357,8 +359,10 @@ spec:
           livenessProbe:
             exec:
               command:
-              - pgrep
-              - "^snapshot-contro.*"
+              - sh
+              - -c
+              - pcount=$(pgrep "^snapshot-contro.*" | wc -l); if [ $pcount != 1 ]; then exit
+                1; else exit 0; fi;
             initialDelaySeconds: 30
             periodSeconds: 60
         # OPENEBS_MAYA_SERVICE_NAME provides the maya-apiserver K8s service name,
@@ -384,8 +388,10 @@ spec:
           livenessProbe:
             exec:
               command:
-              - pgrep
-              - "^snapshot-provis.*"
+              - sh
+              - -c
+              - pcount=$(pgrep "^snapshot-provis.*" | wc -l); if [ $pcount != 1 ]; then exit
+                1; else exit 0; fi;
             initialDelaySeconds: 30
             periodSeconds: 60
 ---
@@ -509,7 +515,7 @@ spec:
           exec:
             command:
             - pgrep
-            - "^ndm.*"
+            - "ndm"
           initialDelaySeconds: 30
           periodSeconds: 60
       volumes:
@@ -694,8 +700,10 @@ spec:
         livenessProbe:
           exec:
             command:
-            - pgrep
-            - "^provisioner-loc.*"
+            - sh
+            - -c
+            - pcount=$(pgrep "^provisioner-loc.*" | wc -l); if [ $pcount != 1 ]; then exit
+              1; else exit 0; fi;
           initialDelaySeconds: 30
           periodSeconds: 60
 ---
