@@ -316,8 +316,7 @@ spec:
           exec:
             command:
             - pgrep
-            - -f
-            - ".*openebs"
+            - "^openebs-provisi.*"
           initialDelaySeconds: 30
           periodSeconds: 60
 ---
@@ -359,8 +358,7 @@ spec:
             exec:
               command:
               - pgrep
-              - -f
-              - ".*controller"
+              - "^snapshot-contro.*"
             initialDelaySeconds: 30
             periodSeconds: 60
         # OPENEBS_MAYA_SERVICE_NAME provides the maya-apiserver K8s service name,
@@ -387,8 +385,7 @@ spec:
             exec:
               command:
               - pgrep
-              - -f
-              - ".*provisioner"
+              - "^snapshot-provis.*"
             initialDelaySeconds: 30
             periodSeconds: 60
 ---
@@ -512,8 +509,7 @@ spec:
           exec:
             command:
             - pgrep
-            - -f
-            - ".*ndm"
+            - "^ndm.*"
           initialDelaySeconds: 30
           periodSeconds: 60
       volumes:
@@ -699,8 +695,7 @@ spec:
           exec:
             command:
             - pgrep
-            - -f
-            - ".*localpv"
+            - "^provisioner-loc.*"
           initialDelaySeconds: 30
           periodSeconds: 60
 ---
