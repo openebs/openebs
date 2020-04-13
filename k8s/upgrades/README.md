@@ -181,7 +181,7 @@ examples show upgrading from 1.0.0 to 1.9.0.
 
 ### Upgrade the OpenEBS Jiva PV
 
-**Note:Scaling down the application will speed up the upgrade process. It is highly recommended to scale down the application if upgrading from 1.5.0 or earlier versions of the volume.**
+**Note:Scaling down the application will speed up the upgrade process and prevent any read only issues. It is highly recommended to scale down the application if upgrading from 1.8.0 or earlier versions of the volume.**
 
 Extract the PV name using `kubectl get pv`
 
