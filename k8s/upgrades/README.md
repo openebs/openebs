@@ -181,7 +181,7 @@ examples show upgrading from 1.0.0 to 1.9.0.
 
 ### Upgrade the OpenEBS Jiva PV
 
-**Note:Scaling down the application will speed up the upgrade process and prevent any read only issues. It is highly recommended to scale down the application if upgrading from 1.8.0 or earlier versions of the volume.**
+**Note:Scaling down the application will speed up the upgrade process and prevent any read only issues. It is highly recommended to scale down the application upgrading from 1.8.0 or earlier versions of the volume.**
 
 Extract the PV name using `kubectl get pv`
 
@@ -234,7 +234,8 @@ spec:
         - "--to-version=1.9.0"
 
         # VERIFY that you have provided the correct jiva PV Name
-        - "--pv-name=pvc-713e3bb6-afd2-11e9-8e79-42010a800065"
+        # The pv-name flag is required till 1.8.0 upgrades
+        # - "--pv-name=pvc-713e3bb6-afd2-11e9-8e79-42010a800065"
         # From 1.9.0 onwards the pv-name flag is not required and 
         # more than one pv name can be provided in a single job
         - "pvc-1bc3b45a-3023-4a8e-a94b-b457cf9529b4"
@@ -320,10 +321,12 @@ spec:
         # --to-version is the version desired upgrade version
         - "--to-version=1.9.0"
 
-        #VERIFY that you have provided the correct SPC Name
-        - "--spc-name=cstor-sparse-pool"
+        # VERIFY that you have provided the correct SPC Name
+        # The spc-name flag is required till 1.8.0 upgrades
+        # - "--spc-name=cstor-sparse-pool"
         # From 1.9.0 onwards the spc-name flag is not required and 
         # more than one spc can be provided in a single job
+        - "cstor-sparse-pool"
         - "cstor-disk-pool"
 
         #Following are optional parameters
@@ -398,9 +401,11 @@ spec:
         - "--to-version=1.9.0"
 
         #VERIFY that you have provided the correct cStor PV Name
-        - "--pv-name=pvc-c630f6d5-afd2-11e9-8e79-42010a800065"
+        # The pv-name flag is required till 1.8.0 upgrades
+        # - "--pv-name=pvc-c630f6d5-afd2-11e9-8e79-42010a800065"
         # From 1.9.0 onwards the pv-name flag is not required and 
         # more than one pv name can be provided in a single job
+        - "pvc-c630f6d5-afd2-11e9-8e79-42010a800065"
         - "pvc-a4aba0e9-8ad3-4d18-9b34-5e6e7cea2eb3"
 
         #Following are optional parameters
