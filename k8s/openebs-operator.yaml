@@ -315,7 +315,7 @@ spec:
          # Process name used for matching is limited to the 15 characters
          # present in the pgrep output.
          # So fullname can't be used here with pgrep (>15 chars).A regular expression
-         # that matches the enter command name has to specified.
+         # that matches the entire command name has to specified.
          # Anchor `^` : matches any string that starts with `openebs-provis`
          # `.*`: matches any string that has `openebs-provis` followed by zero or more char
         livenessProbe:
@@ -323,8 +323,7 @@ spec:
             command:
             - sh
             - -c
-            - pcount=$(pgrep "^openebs-provisi.*" | wc -l); if [ $pcount != 1 ]; then exit
-              1; else exit 0; fi;
+            - test `pgrep -c "^openebs-provisi.*"` = 1
           initialDelaySeconds: 30
           periodSeconds: 60
 ---
@@ -365,7 +364,7 @@ spec:
          # Process name used for matching is limited to the 15 characters
          # present in the pgrep output.
          # So fullname can't be used here with pgrep (>15 chars).A regular expression
-         # that matches the enter command name has to specified.
+         # that matches the entire command name has to specified.
          # Anchor `^` : matches any string that starts with `snapshot-contro`
          # `.*`: matches any string that has `snapshot-contro` followed by zero or more char
           livenessProbe:
@@ -373,8 +372,7 @@ spec:
               command:
               - sh
               - -c
-              - pcount=$(pgrep "^snapshot-contro.*" | wc -l); if [ $pcount != 1 ]; then exit
-                1; else exit 0; fi;
+              - test `pgrep -c "^snapshot-contro.*"` = 1
             initialDelaySeconds: 30
             periodSeconds: 60
         # OPENEBS_MAYA_SERVICE_NAME provides the maya-apiserver K8s service name,
@@ -400,7 +398,7 @@ spec:
          # Process name used for matching is limited to the 15 characters
          # present in the pgrep output.
          # So fullname can't be used here with pgrep (>15 chars).A regular expression
-         # that matches the enter command name has to specified.
+         # that matches the entire command name has to specified.
          # Anchor `^` : matches any string that starts with `snapshot-provis`
          # `.*`: matches any string that has `snapshot-provis` followed by zero or more char
           livenessProbe:
@@ -408,8 +406,7 @@ spec:
               command:
               - sh
               - -c
-              - pcount=$(pgrep "^snapshot-provis.*" | wc -l); if [ $pcount != 1 ]; then exit
-                1; else exit 0; fi;
+              - test `pgrep -c "^snapshot-provis.*"` = 1
             initialDelaySeconds: 30
             periodSeconds: 60
 ---
@@ -672,14 +669,13 @@ spec:
           # So fullname can't be used here with pgrep (>15 chars).A regular expression
           # Anchor `^` : matches any string that starts with `admission-serve`
           # `.*`: matche any string that has `admission-serve` followed by zero or more char
-          # that matches the enter command name has to specified.
+          # that matches the entire command name has to specified.
           livenessProbe:
             exec:
               command:
               - sh
               - -c
-              - pcount=$(pgrep "^admission-serve.*" | wc -l); if [ $pcount != 1 ]; then exit
-                1; else exit 0; fi;
+              - test `pgrep -c "^admission-serve.*"` = 1
             initialDelaySeconds: 30
             periodSeconds: 60
 ---
@@ -746,7 +742,7 @@ spec:
         # Process name used for matching is limited to the 15 characters
         # present in the pgrep output.
         # So fullname can't be used here with pgrep (>15 chars).A regular expression
-        # that matches the enter command name has to specified.
+        # that matches the entire command name has to specified.
         # Anchor `^` : matches any string that starts with `provisioner-loc`
         # `.*`: matches any string that has `provisioner-loc` followed by zero or more char
         livenessProbe:
@@ -754,8 +750,7 @@ spec:
             command:
             - sh
             - -c
-            - pcount=$(pgrep "^provisioner-loc.*" | wc -l); if [ $pcount != 1 ]; then exit
-              1; else exit 0; fi;
+            - test `pgrep -c "^provisioner-loc.*"` = 1
           initialDelaySeconds: 30
           periodSeconds: 60
 ---
