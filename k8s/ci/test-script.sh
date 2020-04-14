@@ -110,7 +110,7 @@ kubectl apply -f https://raw.githubusercontent.com/openebs/openebs/master/k8s/ci
 
 checkForPVC1GStatus(){
 PVC_NAME=$1
-PVC1G_MAX_RETRY=10
+PVC1G_MAX_RETRY=15
 for i in $(seq 1 $PVC1G_MAX_RETRY) ; do
 	PVC1GStatus=$(kubectl get pvc test-pvc-1gig --output="jsonpath={.status.phase}")
 		if [ "$PVC1GStatus" == "Bound" ]; then
@@ -140,14 +140,13 @@ for i in $(seq 1 $PVC10G_MAX_RETRY) ; do
                         kubectl get pvc test-pvc-10gigs
 			if [ "$i" == "$PVC10G_MAX_RETRY" ] && [ "$PVC1GStatus" != "Bound" ]; then
 				echo "PVC test-pvc-10gigs NOT bound and hence test case passed"
+				### Deleteting the 10GB PVC
+				kubectl delete -f https://raw.githubusercontent.com/openebs/openebs/master/k8s/ci/overprovisioning/pvc10g.yaml
 			fi
 		fi
       			sleep 5
 		done
 }
-## Running OverProvisioning before general tests
-runVolumeOverProvisioningTest
-
 
 echo "--------------- Create Cstor and Jiva PersistentVolume ------------------"
 #kubectl create -f https://raw.githubusercontent.com/openebs/openebs/master/k8s/sample-pv-yamls/pvc-jiva-sc-1r.yaml
@@ -693,3 +692,7 @@ retry_command_execution "$snapshot_command"
 verify_snapshot_list_on_cvr "${cvr_name}" "openebs" "1" "${k8s_snapshot_name}"
 
 echo "===========Testing Snapshots On CVR By Enabling Feature Gate On CStor Pools Is Done Successfully ============="
+
+## Running OverProvisioning after all the tests
+runVolumeOverProvisioningTest
+
