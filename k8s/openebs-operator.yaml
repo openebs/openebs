@@ -312,6 +312,12 @@ spec:
         # This is supported for openebs provisioner version 0.5.3-RC1 onwards
         #- name: OPENEBS_MAYA_SERVICE_NAME
         #  value: "maya-apiserver-apiservice"
+         # Process name used for matching is limited to the 15 characters
+         # present in the pgrep output.
+         # So fullname can't be used here with pgrep (>15 chars).A regular expression
+         # that matches the enter command name has to specified.
+         # Anchor `^` : matches any string that starts with `openebs-provis`
+         # `.*`: matches any string that has `openebs-provis` followed by zero or more char
         livenessProbe:
           exec:
             command:
@@ -356,6 +362,12 @@ spec:
             valueFrom:
               fieldRef:
                 fieldPath: metadata.namespace
+         # Process name used for matching is limited to the 15 characters
+         # present in the pgrep output.
+         # So fullname can't be used here with pgrep (>15 chars).A regular expression
+         # that matches the enter command name has to specified.
+         # Anchor `^` : matches any string that starts with `snapshot-contro`
+         # `.*`: matches any string that has `snapshot-contro` followed by zero or more char
           livenessProbe:
             exec:
               command:
@@ -385,6 +397,12 @@ spec:
         # This is supported for openebs provisioner version 0.5.3-RC1 onwards
         #- name: OPENEBS_MAYA_SERVICE_NAME
         #  value: "maya-apiserver-apiservice"
+         # Process name used for matching is limited to the 15 characters
+         # present in the pgrep output.
+         # So fullname can't be used here with pgrep (>15 chars).A regular expression
+         # that matches the enter command name has to specified.
+         # Anchor `^` : matches any string that starts with `snapshot-provis`
+         # `.*`: matches any string that has `snapshot-provis` followed by zero or more char
           livenessProbe:
             exec:
               command:
@@ -511,6 +529,9 @@ spec:
         # Specify the number of sparse files to be created
         - name: SPARSE_FILE_COUNT
           value: "1"
+        # Process name used for matching is limited to the 15 characters
+        # present in the pgrep output.
+        # So fullname can be used here with pgrep (cmd is < 15 chars).
         livenessProbe:
           exec:
             command:
@@ -595,6 +616,16 @@ spec:
               value: "node-disk-operator"
             - name: CLEANUP_JOB_IMAGE
               value: "quay.io/openebs/linux-utils:1.4.0"
+          # Process name used for matching is limited to the 15 characters
+          # present in the pgrep output.
+          # So fullname can be used here with pgrep (cmd is < 15 chars).
+          livenessProbe:
+            exec:
+              command:
+              - pgrep
+              - "ndo"
+            initialDelaySeconds: 30
+            periodSeconds: 60
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -636,6 +667,21 @@ spec:
                   fieldPath: metadata.namespace
             - name: ADMISSION_WEBHOOK_NAME
               value: "openebs-admission-server"
+          # Process name used for matching is limited to the 15 characters
+          # present in the pgrep output.
+          # So fullname can't be used here with pgrep (>15 chars).A regular expression
+          # Anchor `^` : matches any string that starts with `admission-serve`
+          # `.*`: matche any string that has `admission-serve` followed by zero or more char
+          # that matches the enter command name has to specified.
+          livenessProbe:
+            exec:
+              command:
+              - sh
+              - -c
+              - pcount=$(pgrep "^admission-serve.*" | wc -l); if [ $pcount != 1 ]; then exit
+                1; else exit 0; fi;
+            initialDelaySeconds: 30
+            periodSeconds: 60
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -697,6 +743,12 @@ spec:
           value: "openebs-operator"
         - name: OPENEBS_IO_HELPER_IMAGE
           value: "quay.io/openebs/linux-utils:1.4.0"
+        # Process name used for matching is limited to the 15 characters
+        # present in the pgrep output.
+        # So fullname can't be used here with pgrep (>15 chars).A regular expression
+        # that matches the enter command name has to specified.
+        # Anchor `^` : matches any string that starts with `provisioner-loc`
+        # `.*`: matches any string that has `provisioner-loc` followed by zero or more char
         livenessProbe:
           exec:
             command:
