@@ -4,14 +4,15 @@
 
 This document describes the steps for the following OpenEBS Upgrade paths:
 
-- Upgrade from 1.0.0 to any of 1.1.0, 1.2.0, 1.3.0, 1.4.0, 1.5.0, 1.6.0, 1.7.0, 1.8.0
-- Upgrade from 1.1.0 to any of 1.2.0, 1.3.0, 1.4.0, 1.5.0, 1.6.0, 1.7.0, 1.8.0
-- Upgrade from 1.2.0 to any of 1.3.0, 1.4.0, 1.5.0, 1.6.0, 1.7.0, 1.8.0
-- Upgrade from 1.3.0 to any of 1.4.0, 1.5.0, 1.6.0, 1.7.0, 1.8.0
-- Upgrade from 1.4.0 to 1.5.0, 1.6.0, 1.7.0, 1.8.0
-- Upgrade from 1.5.0 to 1.6.0, 1.7.0, 1.8.0
-- Upgrade from 1.6.0 to 1.7.0, 1.8.0
-- Upgrade from 1.7.0 to 1.8.0
+- Upgrade from 1.0.0 to any of 1.1.0, 1.2.0, 1.3.0, 1.4.0, 1.5.0, 1.6.0, 1.7.0, 1.8.0, 1.9.0
+- Upgrade from 1.1.0 to any of 1.2.0, 1.3.0, 1.4.0, 1.5.0, 1.6.0, 1.7.0, 1.8.0, 1.9.0
+- Upgrade from 1.2.0 to any of 1.3.0, 1.4.0, 1.5.0, 1.6.0, 1.7.0, 1.8.0, 1.9.0
+- Upgrade from 1.3.0 to any of 1.4.0, 1.5.0, 1.6.0, 1.7.0, 1.8.0, 1.9.0
+- Upgrade from 1.4.0 to 1.5.0, 1.6.0, 1.7.0, 1.8.0, 1.9.0
+- Upgrade from 1.5.0 to 1.6.0, 1.7.0, 1.8.0, 1.9.0
+- Upgrade from 1.6.0 to 1.7.0, 1.8.0, 1.9.0
+- Upgrade from 1.7.0 to 1.8.0, 1.9.0
+- Upgrade from 1.8.0 to 1.9.0
 
 For other upgrade paths, please refer to the respective directories.
 Example, the steps to upgrade from 0.9.0 to 1.0.0 will be under [0.9.0-1.0.0](./0.9.0-1.0.0/).
@@ -39,6 +40,7 @@ and data plane components are running with expected version before the upgrade.*
 - **For upgrading to 1.6.0, the previous version should be 1.0.0 or 1.1.0 or 1.2.0 or 1.3.0 or 1.4.0 or 1.5.0**
 - **For upgrading to 1.7.0, the previous version should be 1.0.0 or 1.1.0 or 1.2.0 or 1.3.0 or 1.4.0 or 1.5.0 or 1.6.0**
 - **For upgrading to 1.8.0, the previous version should be 1.0.0 or 1.1.0 or 1.2.0 or 1.3.0 or 1.4.0 or 1.5.0 or 1.6.0 or 1.7.0**
+- **For upgrading to 1.9.0, the previous version should be 1.0.0 or 1.1.0 or 1.2.0 or 1.3.0 or 1.4.0 or 1.5.0 or 1.6.0 or 1.7.0 or 1.8.0**
 
 **Note: All steps described in this document need to be performed from a
 machine that has access to Kubernetes master**
@@ -91,8 +93,8 @@ the openebs-operator.yaml for your cluster, you will have to download the
 desired openebs-operator.yaml and customize it again**
 
 ```
-#Upgrade to OpenEBS control plane components to desired version. Say 1.8.0
-$ kubectl apply -f https://openebs.github.io/charts/openebs-operator-1.8.0.yaml
+#Upgrade to OpenEBS control plane components to desired version. Say 1.9.0
+$ kubectl apply -f https://openebs.github.io/charts/openebs-operator-1.9.0.yaml
 ```
 
 ### Upgrade using helm chart (using stable/openebs, openebs-charts repo, etc.,):
@@ -107,13 +109,13 @@ latest stable/openebs chart.
 - If the default values seem appropriate, you can use the below commands to
   update OpenEBS. [More](https://hub.helm.sh/charts/stable/openebs) details about the specific chart version.
   ```sh
-  $ helm upgrade --reset-values <release name> stable/openebs --version 1.8.0
+  $ helm upgrade --reset-values <release name> stable/openebs --version 1.9.0
   ```
 - If not, customize the values into your copy (say custom-values.yaml),
   by copying the content from above default yamls and edit the values to
   suite your environment. You can upgrade using your custom values using:
   ```sh
-  $ helm upgrade <release name> stable/openebs --version 1.8.0 -f custom-values.yaml`
+  $ helm upgrade <release name> stable/openebs --version 1.9.0 -f custom-values.yaml`
   ```
 
 ### Using customized operator YAML or helm chart.
@@ -139,9 +141,9 @@ backup of the data before starting the below upgrade procedure.**
 **Note: Before proceeding with the upgrade of the OpenEBS Data Plane components
 like cStor or Jiva, verify that OpenEBS Control plane is indeed in desired version**
 
-  You can use the following command to verify components are in 1.8.0:
+  You can use the following command to verify components are in 1.9.0:
   ```sh
-  $ kubectl get pods -n openebs -l openebs.io/version=1.8.0
+  $ kubectl get pods -n openebs -l openebs.io/version=1.9.0
   ```
 
   The above command should show that the control plane components are upgrade.
@@ -164,7 +166,7 @@ OpenEBS maintainers via [Github Issue](https://github.com/openebs/openebs/issues
 
 As you might have seen by now, control plane components and data plane components
 work independently. Even after the OpenEBS Control Plane components have been
-upgraded to 1.8.0, the Storage Pools and Volumes (both jiva and cStor)
+upgraded to 1.9.0, the Storage Pools and Volumes (both jiva and cStor)
 will continue to work with older versions.
 
 You can use the below steps for upgrading cstor and jiva components.
@@ -175,17 +177,20 @@ using Kubernetes Job spec.
 
 The following instructions provide details on how to create your Upgrade Job specs.
 Please ensure the `from` and `to` versions are as per your upgrade path. The below
-examples show upgrading from 1.0.0 to 1.8.0.
+examples show upgrading from 1.0.0 to 1.9.0.
 
 ### Upgrade the OpenEBS Jiva PV
 
-**Note: Scaling down the application will speed up the upgrade process. It is highly recommended to scale down the application if upgrading from 1.5.0 or earlier versions of the volume.**
+**Note:Scaling down the application will speed up the upgrade process and prevent any read only issues. It is highly recommended to scale down the application upgrading from 1.8.0 or earlier versions of the volume.**
 
 Extract the PV name using `kubectl get pv`
 
 ```
 NAME                                       CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS   CLAIM                 STORAGECLASS           REASON   AGE
 pvc-713e3bb6-afd2-11e9-8e79-42010a800065   5G         RWO            Delete           Bound    default/bb-jd-claim   openebs-jiva-default            46m
+pvc-80c120e8-bd09-4c5e-aaeb-3c37464240c5   4G         RWO            Delete           Bound    default/jiva-vol3     jiva-1r                         13m
+pvc-82a2d097-c666-4f29-820d-6b7e41541c11   4G         RWO            Delete           Bound    default/jiva-vol2     jiva-1r                         43m
+
 ```
 
 Create a Kubernetes Job spec for upgrading the jiva volume. An example spec is as follows:
@@ -200,8 +205,8 @@ kind: Job
 metadata:
   #VERIFY that you have provided a unique name for this upgrade job.
   #The name can be any valid K8s string for name. This example uses
-  #the following convention: jiva-vol-<flattened-from-to-versions>-<pv-name>
-  name: jiva-vol-100180-pvc-713e3bb6-afd2-11e9-8e79-42010a800065
+  #the following convention: jiva-vol-<flattened-from-to-versions>
+  name: jiva-vol-100190
 
   #VERIFY the value of namespace is same as the namespace where openebs components
   # are installed. You can verify using the command:
@@ -226,10 +231,18 @@ spec:
         - "--from-version=1.0.0"
 
         # --to-version is the version desired upgrade version
-        - "--to-version=1.8.0"
+        - "--to-version=1.9.0"
 
-        #VERIFY that you have provided the correct cStor PV Name
-        - "--pv-name=pvc-713e3bb6-afd2-11e9-8e79-42010a800065"
+        # Bulk upgrade is supported from 1.9
+        # To make use of it, please provide the list of PVs
+        # as mentioned below
+        - "pvc-1bc3b45a-3023-4a8e-a94b-b457cf9529b4"
+        - "pvc-82a2d097-c666-4f29-820d-6b7e41541c11"
+        # For upgrades lesser than 1.9.0, use
+        # '--pv-name=<pv_name> format as
+        # below commented line
+        # - "--pv-name=pvc-1bc3b45a-3023-4a8e-a94b-b457cf9529b4"
+        
         #Following are optional parameters
         #Log Level
         - "--v=4"
@@ -243,7 +256,7 @@ spec:
 
         # the image version should be same as the --to-version mentioned above
         # in the args of the job
-        image: quay.io/openebs/m-upgrade:1.8.0
+        image: quay.io/openebs/m-upgrade:1.9.0
         imagePullPolicy: Always
       restartPolicy: OnFailure
 ---
@@ -251,14 +264,14 @@ spec:
 
 Execute the Upgrade Job Spec
 ```sh
-$ kubectl apply -f jiva-vol-100180-pvc713.yaml
+$ kubectl apply -f jiva-vol-100190.yaml
 ```
 
 You can check the status of the Job using commands like:
 ```sh
 $ kubectl get job -n openebs
 $ kubectl get pods -n openebs #to check on the name for the job pod
-$ kubectl logs -n openebs jiva-upg-100180-pvc-713e3bb6-afd2-11e9-8e79-42010a800065-bgrhx
+$ kubectl logs -n openebs jiva-upg-100190-bgrhx
 ```
 
 ### Upgrade cStor Pools
@@ -267,6 +280,7 @@ Extract the SPC name using `kubectl get spc`
 
 ```sh
 NAME                AGE
+cstor-disk-pool     26m
 cstor-sparse-pool   24m
 ```
 
@@ -283,8 +297,8 @@ kind: Job
 metadata:
   #VERIFY that you have provided a unique name for this upgrade job.
   #The name can be any valid K8s string for name. This example uses
-  #the following convention: cstor-spc-<flattened-from-to-versions>-<spc-name>
-  name: cstor-spc-100180-cstor-sparse-pool
+  #the following convention: cstor-spc-<flattened-from-to-versions>
+  name: cstor-spc-100190
 
   #VERIFY the value of namespace is same as the namespace where openebs components
   # are installed. You can verify using the command:
@@ -308,10 +322,17 @@ spec:
         - "--from-version=1.0.0"
 
         # --to-version is the version desired upgrade version
-        - "--to-version=1.8.0"
+        - "--to-version=1.9.0"
 
-        #VERIFY that you have provided the correct SPC Name
-        - "--spc-name=cstor-sparse-pool"
+        # Bulk upgrade is supported from 1.9
+        # To make use of it, please provide the list of SPCs
+        # as mentioned below
+        - "cstor-sparse-pool"
+        - "cstor-disk-pool"
+        # For upgrades lesser than 1.9.0, use
+        # '--spc-name=<spc_name> format as
+        # below commented line
+        # - "--spc-name=cstor-sparse-pool"
 
         #Following are optional parameters
         #Log Level
@@ -326,7 +347,7 @@ spec:
 
         # the image version should be same as the --to-version mentioned above
         # in the args of the job
-        image: quay.io/openebs/m-upgrade:1.8.0
+        image: quay.io/openebs/m-upgrade:1.9.0
         imagePullPolicy: Always
       restartPolicy: OnFailure
 ---
@@ -341,6 +362,7 @@ Extract the PV name using `kubectl get pv`
 $ kubectl get pv
 NAME                                       CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS    CLAIM                                  STORAGECLASS           REASON    AGE
 pvc-1085415d-f84c-11e8-aadf-42010a8000bb   5G         RWO            Delete           Bound     default/demo-cstor-sparse-vol1-claim   openebs-cstor-sparse             22m
+pvc-a4aba0e9-8ad3-4d18-9b34-5e6e7cea2eb3   4G         RWO            Delete           Bound    default/cstor-disk-vol   openebs-cstor-disk            53s
 ```
 
 Create a Kubernetes Job spec for upgrading the cstor volume. An example spec is as follows:
@@ -355,8 +377,8 @@ kind: Job
 metadata:
   #VERIFY that you have provided a unique name for this upgrade job.
   #The name can be any valid K8s string for name. This example uses
-  #the following convention: cstor-vol-<flattened-from-to-versions>-<pv-name>
-  name: cstor-vol-100180-pvc-c630f6d5-afd2-11e9-8e79-42010a800065
+  #the following convention: cstor-vol-<flattened-from-to-versions>
+  name: cstor-vol-100190
 
   #VERIFY the value of namespace is same as the namespace where openebs components
   # are installed. You can verify using the command:
@@ -381,10 +403,17 @@ spec:
         - "--from-version=1.0.0"
 
         # --to-version is the version desired upgrade version
-        - "--to-version=1.8.0"
+        - "--to-version=1.9.0"
 
-        #VERIFY that you have provided the correct cStor PV Name
-        - "--pv-name=pvc-c630f6d5-afd2-11e9-8e79-42010a800065"
+        # Bulk upgrade is supported from 1.9
+        # To make use of it, please provide the list of PVs
+        # as mentioned below
+        - "pvc-c630f6d5-afd2-11e9-8e79-42010a800065"
+        - "pvc-a4aba0e9-8ad3-4d18-9b34-5e6e7cea2eb3"
+        # For upgrades lesser than 1.9.0, use
+        # '--pv-name=<pv_name> format as
+        # below commented line
+        # - "--pv-name=pvc-c630f6d5-afd2-11e9-8e79-42010a800065"
 
         #Following are optional parameters
         #Log Level
@@ -399,7 +428,7 @@ spec:
 
         # the image version should be same as the --to-version mentioned above
         # in the args of the job
-        image: quay.io/openebs/m-upgrade:1.8.0
+        image: quay.io/openebs/m-upgrade:1.9.0
         imagePullPolicy: Always
       restartPolicy: OnFailure
 ---
