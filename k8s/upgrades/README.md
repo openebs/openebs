@@ -233,13 +233,16 @@ spec:
         # --to-version is the version desired upgrade version
         - "--to-version=1.9.0"
 
-        # VERIFY that you have provided the correct jiva PV Name
-        # The pv-name flag is required till 1.8.0 upgrades
-        # - "--pv-name=pvc-713e3bb6-afd2-11e9-8e79-42010a800065"
-        # From 1.9.0 onwards the pv-name flag is not required and 
-        # more than one pv name can be provided in a single job
+        # Bulk upgrade is supported from 1.9
+        # To make use of it, please provide the list of PVs
+        # as mentioned below
         - "pvc-1bc3b45a-3023-4a8e-a94b-b457cf9529b4"
         - "pvc-82a2d097-c666-4f29-820d-6b7e41541c11"
+        # For upgrades lesser than 1.9.0, use
+        # '--pv-name=<pv_name> format as
+        # below commented line
+        # - "--pv-name=pvc-1bc3b45a-3023-4a8e-a94b-b457cf9529b4"
+        
         #Following are optional parameters
         #Log Level
         - "--v=4"
@@ -321,13 +324,15 @@ spec:
         # --to-version is the version desired upgrade version
         - "--to-version=1.9.0"
 
-        # VERIFY that you have provided the correct SPC Name
-        # The spc-name flag is required till 1.8.0 upgrades
-        # - "--spc-name=cstor-sparse-pool"
-        # From 1.9.0 onwards the spc-name flag is not required and 
-        # more than one spc can be provided in a single job
+        # Bulk upgrade is supported from 1.9
+        # To make use of it, please provide the list of SPCs
+        # as mentioned below
         - "cstor-sparse-pool"
         - "cstor-disk-pool"
+        # For upgrades lesser than 1.9.0, use
+        # '--spc-name=<spc_name> format as
+        # below commented line
+        # - "--spc-name=cstor-sparse-pool"
 
         #Following are optional parameters
         #Log Level
@@ -400,13 +405,15 @@ spec:
         # --to-version is the version desired upgrade version
         - "--to-version=1.9.0"
 
-        #VERIFY that you have provided the correct cStor PV Name
-        # The pv-name flag is required till 1.8.0 upgrades
-        # - "--pv-name=pvc-c630f6d5-afd2-11e9-8e79-42010a800065"
-        # From 1.9.0 onwards the pv-name flag is not required and 
-        # more than one pv name can be provided in a single job
+        # Bulk upgrade is supported from 1.9
+        # To make use of it, please provide the list of PVs
+        # as mentioned below
         - "pvc-c630f6d5-afd2-11e9-8e79-42010a800065"
         - "pvc-a4aba0e9-8ad3-4d18-9b34-5e6e7cea2eb3"
+        # For upgrades lesser than 1.9.0, use
+        # '--pv-name=<pv_name> format as
+        # below commented line
+        # - "--pv-name=pvc-c630f6d5-afd2-11e9-8e79-42010a800065"
 
         #Following are optional parameters
         #Log Level
