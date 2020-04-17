@@ -88,7 +88,7 @@ type CStorPoolInstanceBlockDevice struct {
 
 	// Capacity is the capacity of the block device.
     // This field will be populated by CSPI controller.
-	Capacity string `json:"capacity"`
+	Capacity uint64 `json:"capacity"`
 
 	// DevLink is the dev link for block devices.
     // This field will be populated by CSPI controller.
@@ -102,20 +102,15 @@ type CStorPoolInstanceBlockDevice struct {
 
 #### Pool Expansion Steps:
 
-Step1: Remove the buffering partition if exists which was created by cstor-pool container(ex: sdb9).
+Step1: Execute `zpool online -e <pool_name> <disk_name>` [Why zpool online command? This will help to fix `GPT PMBR size mismatch` complaints raised by kernel].
 
-Step2: Expand the existing partition by executing following comamnd
-       ```sh
-       parted </disk> resizepart <partition_number> 100%
-       ```
+Step2: Reload the partition table by executing `partprobe <path_to_disk>`
 
 Step3: Inform the pool saying disk was expanded by triggering following command
        ```sh
        zpool online -e <pool_name> <disk_name>
        ```
-Step4: If above steps are successfull then `Capacity` field in CStorPoolInstanceBlockDevice will be updated with latest size.
-
-NOTE: Above steps automates the steps mentioned in [doc](https://github.com/openebs/openebs-docs/blob/day_2_ops/docs/resize-single-disk-pool.md).
+Step4: If above steps are successfull then update the `Capacity` field in CStorPoolInstanceBlockDevice with latest size.
 
 ### Low Level Design
 
