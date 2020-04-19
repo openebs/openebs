@@ -6,11 +6,20 @@
 # Each of the OpenEBS sub project may have one or more of the 
 # following maintainers and list of reviewers who are 
 # in the process of becoming maintainers. 
+# 
+#
+# Each reviewer can be part of one or more GitHub 
+# team aliases created for maintaining sub projects. 
+# Current active team aliases for sub projects are:
+# - control-plane-maintainers
+# - jiva-maintainers
+# - cstor-maintainers
+# - e2e-maintainers
+# - content-maintainers
 #
 # Please keep the below list sorted in ascending order.
 #
 #Maintainers
-
 "Amit Kumar Das",@AmitKumarDas,MayaData
 "Jeffry Molanus",@gila,MayaData
 "Karthik Satchitanand",@ksatchit,MayaData
@@ -20,8 +29,23 @@
 "Vishnu Itta",@vishnuitta,MayaData
 
 #Reviewers
-"Evan Powell",@epowell101,MayaData
-"Prateek Pandey",@prateekpandey14,MayaData
-"Uma Mukkara",@umamukkara,MayaData
-"Utkarsh Mani Tripathi",@utkarshmani1997,MayaData
+"Akhil Mohan",@akhilerm,MayaData #control-plane-maintainers
+"Ashutosh Kumar",@sonasingh46,MayaData #control-plane-maintainers
+"Evan Powell",@epowell101,MayaData #content-maintainers
+"Giri",@gprasath,MayaData #e2e-maintainers
+"Glenn Bullingham GlennBullingham",@GlennBullingham,MayaData #mayastor-maintainers
+"Jan Kryl",@jkryl,MayaData #cstor-engine-maintainers, mayastor-maintainers
+"Jonathan Teh",@jonathan-teh,MayaData #mayastor-maintainers
+"Mayank",@mynktl,MayaData #control-plane-maintainers, cstor-engine-maintainers
+"Pawan Prakash Sharma",@pawanpraka1,MayaData #control-plane-maintainers, cstor-engine-maintainers
+"Payes Anand",@payes,MayaData #control-plane-maintainers, cstor-engine-maintainers, jiva-engine-maintainers
+"Prateek Pandey",@prateekpandey14,MayaData #control-plane-maintainers
+"Ranjith R",@ranjithwingrider,MayaData #content-maintainers
+"Sagar Kumar",@sagarkrsd,MayaData #content-maintainers
+"Sai Chaithanya",@mittachaitu,MayaData #control-plane-maintainers
+"Shubham Bajpai",@shubham14bajpai,MayaData #control-plane-maintainers
+"Uma Mukkara",@umamukkara,MayaData #content-maintainers, e2e-maintainers
+"Utkarsh Mani Tripathi",@utkarshmani1997,MayaData #control-plane-maintainers, jiva-engine-maintainers
 
+#Retired Reviewers or Maintainers due to change in project priorities. 
+#"Satbir Singh satbirchhikara",@satbirchhikara,MayaData #cstor-engine-maintainers
