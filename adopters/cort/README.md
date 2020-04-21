@@ -4,7 +4,7 @@
 - Magento
 - Elasticsearch
 - MariaDB
-- NFS-server-provision
+- NFS-server-provisioner
 
 ### Type of OpenEBS Storage Engine(s)
 cStor 
@@ -19,4 +19,3 @@ Using for the organization
 OpenEBS has been very helpful and reliable. We are happy with the support and commitment provided by the community to resolve the issues reported in a timely manner. 
 
 We are planning to use OpenEBS in production once we have completed additional testing around Backup and Restore using OpenEBS Director and Velero. 
-
