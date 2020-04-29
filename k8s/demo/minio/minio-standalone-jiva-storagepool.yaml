@@ -49,7 +49,7 @@ metadata:
     openebs.io/target-affinity: minio      
     app: minio-storage-claim1
 spec:
-  storageClassName: openebs-jiva-gpd-3repl
+  storageClassName: openebs-jiva-3rep
   accessModes:
     - ReadWriteOnce
   resources:
