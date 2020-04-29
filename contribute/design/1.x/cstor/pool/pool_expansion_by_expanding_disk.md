@@ -76,7 +76,7 @@ Below is high-level info to explain the Day2 operations that are currently suppo
 - [What if cStor is consuming part of partitioned disk/entire partitioned disk? The User has to extend the partition manually after that NDM will update the capacity on the corresponding blockdevice CR. Once NDM updates the capacity on BlockDevice in next reconciliation of CSPI Pool Expansion will be triggered].
 - [What if only one blockdevice got expanded in case of raid/mirror configuration? Pool expansion operation will be triggered but there won't be any change in the size of the pool].
 
-NOTE: During the cStor pool creation time and pool import time `autoexpand` property will be configured to `on`(configuring during import time will support for pools which were migrated from SPC to CSPC).
+NOTE: During the cStor pool creation time and pool import time `autoexpand` property will be configured to `on`(configuring during import time will support for pools which were migrated from SPC to CSPC). Setting `autoexpand` property to `on` will help in pool expansion when a disk is replaced with larger disk or the disks in the pool are replaced with larger disks.
 
 Currently CstorPoolInstanceBlockDevice holds below configurations 
 ```go
