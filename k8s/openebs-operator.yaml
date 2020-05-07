@@ -487,6 +487,11 @@ spec:
       containers:
       - name: node-disk-manager
         image: quay.io/openebs/node-disk-manager-amd64:ci
+        args:
+          - -v=4
+        # The feature-gate is used to enable the new UUID algorithm.
+        # This is a feature currently in Alpha state
+        #  - --feature-gates="GPTBasedUUID"
         imagePullPolicy: Always
         securityContext:
           privileged: true
@@ -612,7 +617,7 @@ spec:
             - name: OPERATOR_NAME
               value: "node-disk-operator"
             - name: CLEANUP_JOB_IMAGE
-              value: "quay.io/openebs/linux-utils:1.4.0"
+              value: "quay.io/openebs/linux-utils:1.9.0"
           # Process name used for matching is limited to the 15 characters
           # present in the pgrep output.
           # So fullname can be used here with pgrep (cmd is < 15 chars).
