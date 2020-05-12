@@ -18,27 +18,36 @@ status: provisional
 
 ## Table of Contents
 
-* [Table of Contents](#table-of-contents)
-* [Summary](#summary)
-* [Motivation](#motivation)
-    * [Goals](#goals)
-    * [Non-Goals](#non-goals)
-* [Proposal](#proposal)
-    * [User Stories](#user-stories)
-    * [Proposed Implementation](#proposed-implementation)
-      * [OpenEBS Velero Plugin](#openebs-veleroplugin)
-      * [CVC-Operator REST Interface](#new-rest-interface)
-    * [Steps to perform user stories](#steps-to-perform-user-stories)
-    * [Low Level Design](#low-level-design)
-      * [Work Flow](#work-flow)
-      * [Notes:](#notes)
-    * [Testcases](#testcases)
-    * [Risks and Mitigations](#risks-and-mitigations)
-* [Graduation Criteria](#graduation-criteria)
-* [Implementation History](#implementation-history)
-* [Drawbacks](#drawbacks)
-* [Alternatives](#alternatives)
-* [Infrastructure Needed](#infrastructure-needed)
+- [Backup and Restore for V1 version of CStorVolumes](#backup-and-restore-for-v1-version-of-cstorvolumes)
+  - [Table of Contents](#table-of-contents)
+  - [Summary](#summary)
+  - [Motivation](#motivation)
+    - [Goals](#goals)
+    - [Non-Goals](#non-goals)
+  - [Proposal](#proposal)
+    - [User Stories](#user-stories)
+      - [Create a backup for CStorVolumes](#create-a-backup-for-cstorvolumes)
+      - [Create a restore for backuped CStorVolumes](#create-a-restore-for-backuped-cstorvolumes)
+      - [Scheduled backup of CStorVolumes](#scheduled-backup-of-cstorvolumes)
+    - [Proposed Implementation](#proposed-implementation)
+      - [OpenEBS Velero Plugin](#openebs-velero-plugin)
+      - [CVC-Operator REST Interface](#cvc-operator-rest-interface)
+    - [Steps to perform user stories](#steps-to-perform-user-stories)
+    - [Low Level Design](#low-level-design)
+      - [Work Flow](#work-flow)
+        - [Velero Server sends CreateSnapshot Request](#velero-server-sends-createsnapshot-request)
+        - [Velero Server Sends DeleteSnapshot Request](#velero-server-sends-deletesnapshot-request)
+        - [Velero Server Sends CreateVolumeFromSnapshot Request](#velero-server-sends-createvolumefromsnapshot-request)
+        - [Velero Server Sends DeleteSnapshot Request](#velero-server-sends-deletesnapshot-request-1)
+        - [Work flow in backup controller](#work-flow-in-backup-controller)
+        - [Work flow in restore controller](#work-flow-in-restore-controller)
+  - [Design Details](#design-details)
+    - [CStorBackup Schema](#cstorbackup-schema)
+    - [CStorRestore Schema](#cstorrestore-schema)
+    - [CStorCompletedBackup Schema](#cstorcompletedbackup-schema)
+  - [Drawbacks](#drawbacks)
+  - [Alternatives](#alternatives)
+  - [Infrastructure Needed](#infrastructure-needed)
 
 ## Summary
 
@@ -115,7 +124,7 @@ Velero server sends CreateSnapshot API with volumeID to create the snapshot. Vel
 
 Velero server sends `DeleteSnapshot` API of Velero Interface to delete the backup/snapshot with argument `snapshotID`. This snapshotID is generated during the backup creation of this snapshot. Velero Interface will execute the DeleteSnapshot API of cStor backup/restore module. cStor backup/restore module is responsible for performing below steps:
 1. Delete the PVC object for this backup from the cloud provider.
-2. Execute REST API(`latest/backups/delete`) of the CVC-Operater to delete the resources created for this particular backup.
+2. Execute REST API(`latest/backups/`) of the CVC-Operater to delete the resources created for this particular backup.
     2.1 Delete the CStorCompleteBackup resources if it is not a complete backup or if that is the only backup exists for that volume(So next backup will be complete backup).
     2.2 Delete the snapshot created for that backup.
     2.3 Delete the CStorBackUp resource.
@@ -162,12 +171,12 @@ NOTE: ip_address and port are the IP Address and port of snapshot sender/receive
 ### CStorBackup Schema
 Following is the existing CStorBackup schema in go struct:
 ```go
-// CStorPoolCluster describes a CStorPoolCluster custom resource.
-type CStorPoolCluster struct {
-  metav1.TypeMeta   `json:",inline"`
-  metav1.ObjectMeta `json:"metadata,omitempty"`
-  Spec              CStorPoolClusterSpec   `json:"spec"`
-  Status            CStorPoolClusterStatus `json:"status"`
+// CStorBackup describes a cstor backup resource created as a custom resource
+type CStorBackup struct {
+	metav1.TypeMeta   `json:",inline"`
+	metav1.ObjectMeta `json:"metadata,omitempty"`
+	Spec              CStorBackupSpec   `json:"spec"`
+	Status            CStorBackupStatus `json:"status"`
 }
 
 // CStorBackupSpec is the spec for a CStorBackup resource
