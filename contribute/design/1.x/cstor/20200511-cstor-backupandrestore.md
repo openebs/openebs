@@ -1,0 +1,245 @@
+---
+oep-number: CStor Backup and Restore REV1
+title: Backup and Restore for V1 version of CStorVolumes
+authors:
+  - "@mynktl"
+  - "@mittachaitu"
+owners:
+  - "@kmova"
+  - "@vishnuitta"
+  - "@mynktl"
+editor: "@mittachaitu"
+creation-date: 2020-05-11
+last-updated: 2020-05-11
+status: provisional
+---
+
+# Backup and Restore for V1 version of CStorVolumes
+
+## Table of Contents
+
+* [Table of Contents](#table-of-contents)
+* [Summary](#summary)
+* [Motivation](#motivation)
+    * [Goals](#goals)
+    * [Non-Goals](#non-goals)
+* [Proposal](#proposal)
+    * [User Stories](#user-stories)
+    * [Proposed Implementation](#proposed-implementation)
+      * [OpenEBS Velero Plugin](#openebs-veleroplugin)
+      * [CVC-Operator REST Interface](#new-rest-interface)
+    * [Steps to perform user stories](#steps-to-perform-user-stories)
+    * [Low Level Design](#low-level-design)
+      * [Work Flow](#work-flow)
+      * [Notes:](#notes)
+    * [Testcases](#testcases)
+    * [Risks and Mitigations](#risks-and-mitigations)
+* [Graduation Criteria](#graduation-criteria)
+* [Implementation History](#implementation-history)
+* [Drawbacks](#drawbacks)
+* [Alternatives](#alternatives)
+* [Infrastructure Needed](#infrastructure-needed)
+
+## Summary
+
+This proposal brings out the design details to implement backup and restore
+solution for V1 version of CStorVolumes.
+
+## Motivation
+
+- Create a backup of the cStor persistent volume to the desired storage location(
+  this can be AWS, GCP or any storage provider). This backup will be either on-demand or scheduled backup.
+- Restore this backup to the same cluster or another cluster.
+
+### Goals
+
+- Solution to create an on-demand backup of cStor persistent volumes.
+- Solution to create an on-demand restore of backuped up cStor persistent volumes.
+- Solution to create a scheduled backup of cStor persistent volumes.
+- Solution to create an incremental/differential backup of cStor persistent volumes. With incremental/differential backup, the user will be able to save backup storage space and it 
+
+### Non-Goals
+
+- Supporting local backup and restore.
+
+## Proposal
+
+### User Stories
+
+#### Create a backup for CStorVolumes
+As an OpenEBS user, I should be able create a backup for CStorVolumes.
+
+#### Create a restore for backuped CStorVolumes
+As an OpenEBS user, I should be restore a backuped CStorVolumes.
+
+#### Scheduled backup of CStorVolumes
+As an OpenEBS user, I should be able to create a scheduled backups for CStorVolumes.
+
+### Proposed Implementation
+
+#### OpenEBS Velero Plugin
+
+TODO: @vishnuitta to fill plugin side approach.
+
+#### CVC-Operator REST Interface
+
+The volume management api like create, delete, snapshot, clone etc have moved from m-apiserver to CVC-Operator as part of supporting the CSI Driver. The backup/restore of volume API also should be moved to the CVC Operator as the backup/restore api in turn depends on the volume snapshot, clone implementations. Currently CVC Operator only supports declarative API via CRs, but plugin requires imperative API(REST API). The proposal is to implement a REST server within CVC-Operator to perform backup/restore operations. The CStor backup/restore module should identify the type of the volume and forward the REST API requests to the CVC Operator.
+
+As mentioned [above](#openebs-veleroplugin) velero-plugin triggers different REST API calls based on the type of request from velero-server.
+
+### Steps to perform user stories
+
+- User can create backup using velero CLI
+  Ex: velero backup create <BACKUP_NAME> --include-namespaces=<NAME_SPACE> --snapshot-volumes –volume-snapshot-locations=<SNAPSHOT_LOCATION>
+- User can resotre backuped using velero CLI
+  Ex: velero restore create --from-backup <BACKUP_NAME> --restore-volumes=true
+
+### Low Level Design
+
+#### Work Flow
+
+##### Velero Server sends CreateSnapshot Request
+
+Velero server sends CreateSnapshot API with volumeID to create the snapshot. Velero Interface will `CreateSnapshot` API of the cStor backup/restore controller. cStor backup/restore controller is responsible for executing below steps:
+1. BackUp the relevant PVC object to the cloud provider.
+2. Execute the REST API(POST `/latest/backups`) of CVC-Operator (This object will include the IP Address of snapshot receiver/sender module) to create backup.
+    2.1 Create a snapshot using volume name and snapshot name(which will get during the CreateSnapshot request).
+    2.2 Find the Healthy cStorVolumeReplica if it doesn't exist return error.
+    2.3 Create CStorCompleteBackUp resources if it doesn’t exist(Intention of creating this resource is used for incremental backup purpose).
+    2.4 Create CStorBackUp resource by populating the current snapshot name and previous snapshot name(if exists from CStorCompleteBackUp) with Healthy CStorVolumeReplica pool UID.
+    2.5 Corresponding backup controllers exist in pool-manager will responsible for sending the snapshot data from pool to velero-plugin.         and velero-plugin will write this stream to cloud-provider.
+3. Call cloud interface API `UploadSnapshot` which will upload the backup to the cloud provider.
+4. This API will return the unique ‘snapshotID’ (volumeID + "-velero-bkp-" + backupName) to the velero server. This ‘snapshotID’ will be used to refer to the backup snapshot.
+
+##### Velero Server Sends DeleteSnapshot Request
+
+Velero server sends `DeleteSnapshot` API of Velero Interface to delete the backup/snapshot with argument `snapshotID`. This snapshotID is generated during the backup creation of this snapshot. Velero Interface will execute the DeleteSnapshot API of cStor backup/restore module. cStor backup/restore module is responsible for performing below steps:
+1. Delete the PVC object for this backup from the cloud provider.
+2. Execute REST API(`latest/backups/delete`) of the CVC-Operater to delete the resources created for this particular backup.
+    2.1 Delete the CStorCompleteBackup resources if it is not a complete backup or if that is the only backup exists for that volume(So next backup will be complete backup).
+    2.2 Delete the snapshot created for that backup.
+    2.3 Delete the CStorBackUp resource.
+3. Execute the `RemoveSnapshot` API of the cloud interface to delete the snapshot from the cloud provider.
+
+##### Velero Server Sends CreateVolumeFromSnapshot Request
+
+Velero Server will execute the `CreateVolumeFromSnapshot` API of the velero interface to restore the backup with the argument (snapshotID, volumeType). Velero interface will execute `CreateVolumeFromSnapshot` API of cStor backup/restore module. cStor backup/restore module will perform following below steps:
+1. Download the PVC object from the cloud provider through a cloud interface and deploy the PVC. If PVC already exists in the cluster then skip the PVC creation(only for remote restore).
+2. Check If PVC status is bounded.
+3. Execute the REST API(`latest/restore`) with CVC-Operator restore details(includes the IP address of snapshot receiver/sender module) to initiate the restore of the snapshot.
+   3.1 Create CVC if it doesn't exist in the cluster.
+   3.2 Wait till CVC comes to Bound state.
+   3.3 Create a replica count number of restore CR’s which will be responsible for dumping backup data into the volume dataset.
+4. Call cloud interface API `RestoreSnapshot` to download the snapshot from the cloud provider.
+
+##### Velero Server Sends DeleteSnapshot Request
+
+Restore delete will delete restore resource object onlu.
+Note: It will not delete the resources restored in that restore(ex: PVC).
+
+##### Work flow in backup controller
+
+When REST API `/latest/backups` is executed it creates CStorBackUp CR. Backup controller which present in pool-manager will get event and perform the following operations:
+1. Update the Status of CStorBackUp resource as `InProgress`(Which will help to understand the backup process is started).
+2. Execute the below command and ZFS will send the data to `sender/receiver module`(blocking call and this command execution will be retried for 50 seconds at interval of 5 seconds in case of errors).
+CMD:
+   1. If request is for full backup then command is `zfs send <snapshot_dataset_name> | nc -w 3 <ip_address> <port>`
+   2. If request is for incremental backup then command is `zfs send -i <old_snapshot_dataset_name> <new_snapshot_dataset_name> | nc -w 3 <ip_address> <port>`
+
+NOTE: ip_address and port are the IP Address and port of snapshot sender/receiver module.
+
+##### Work flow in restore controller
+
+When REST API `/latest/restore` is executed it creates CStorRestore CR. Restore controller which present in pool-manager will get event and perform the following operations:
+1. Update the status of CStorRestore resource as `InProgress`(Which will help to understand the restore process is started).
+2. Execute the below command and ZFS will receive the data from `sender/receiver module`(blocking call and this command execution will be ).
+CMD: `nc -w 3 <ip_address> <port> | zfs recv -F <volume_datasetname>`
+
+NOTE: ip_address and port are the IP Address and port of snapshot sender/receiver module.
+
+## Design Details
+
+### CStorBackup Schema
+Following is the existing CStorBackup schema in go struct:
+```go
+// CStorPoolCluster describes a CStorPoolCluster custom resource.
+type CStorPoolCluster struct {
+  metav1.TypeMeta   `json:",inline"`
+  metav1.ObjectMeta `json:"metadata,omitempty"`
+  Spec              CStorPoolClusterSpec   `json:"spec"`
+  Status            CStorPoolClusterStatus `json:"status"`
+}
+
+// CStorBackupSpec is the spec for a CStorBackup resource
+type CStorBackupSpec struct {
+	// BackupName is a name of the backup or scheduled backup
+	BackupName string `json:"backupName"`
+
+	// VolumeName is a name of the volume for which this backup is destined
+	VolumeName string `json:"volumeName"`
+
+	// SnapName is a name of the current backup snapshot
+	SnapName string `json:"snapName"`
+
+	// PrevSnapName is the last completed-backup's snapshot name
+	PrevSnapName string `json:"prevSnapName"`
+
+	// BackupDest is the remote address for backup transfer
+	BackupDest string `json:"backupDest"`
+
+	// LocalSnap is flag to enable local snapshot only
+	LocalSnap bool `json:"localSnap"`
+}
+
+// CStorBackupStatus is to hold status of backup
+type CStorBackupStatus string
+```
+
+### CStorRestore Schema
+Following is the existing CStorRestore schema in go struct:
+```go
+// CStorRestore describes a cstor restore resource created as a custom resource
+type CStorRestore struct {
+	metav1.TypeMeta   `json:",inline"`
+	metav1.ObjectMeta `json:"metadata,omitempty"` // set name to restore name + volume name + something like csp tag
+	Spec              CStorRestoreSpec            `json:"spec"`
+	Status            CStorRestoreStatus          `json:"status"`
+}
+
+// CStorRestoreSpec is the spec for a CStorRestore resource
+type CStorRestoreSpec struct {
+	RestoreName   string            `json:"restoreName"` // set restore name
+	VolumeName    string            `json:"volumeName"`
+    // RestoreSrc can be ip:port in case of restore from remote or volumeName in case of local restore
+	RestoreSrc    string            `json:"restoreSrc"`
+	MaxRetryCount int               `json:"maxretrycount"`
+	RetryCount    int               `json:"retrycount"`
+	StorageClass  string            `json:"storageClass,omitempty"`
+	Size          resource.Quantity `json:"size,omitempty"`
+    // Local will be helpful to identify whether restore is from local (or) backup/snapshot
+	Local         bool              `json:"localRestore,omitempty"`
+}
+
+// CStorRestoreStatus is to hold result of action.
+type CStorRestoreStatus string
+```
+
+### CStorCompletedBackup Schema
+Following is the existing CStorCompletedBackup schema in go struct:
+```go
+// CStorCompletedBackup describes a cstor completed-backup resource created as custom resource
+type CStorCompletedBackup struct {
+    metav1.TypeMeta   `json:",inline"`
+    metav1.ObjectMeta `json:"metadata,omitempty"`
+    Spec              CStorBackupSpec `json:"spec"`
+}
+```
+
+## Drawbacks
+
+
+
+## Alternatives
+
+
+## Infrastructure Needed
