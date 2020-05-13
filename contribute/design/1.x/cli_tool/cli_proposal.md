@@ -60,24 +60,24 @@ openebs install/inject test.yml --verbose  - | kubectl apply -f -
 ```
 
 Some other commands could be :
-  -install                  => Install OpenEBS
-  -upgrade                  => Upgrade OpenEBS components
-  -version                  => Print the OpenEBS version and associated images
+  - install                  => Install OpenEBS
+  - upgrade                  => Upgrade OpenEBS components
+  - version                  => Print the OpenEBS version and associated images
   
-  -verify iSCSI service     => A required prerequisite of OpenEBS
-  -verify permissions       => Verify weather OpenEBS can be configured onto the cluster
-  -discover                 => list the possible deployment options to the user leveraging ndm
-  -status                   => Print the readiness of various components, verify prerequisites are met to run Openebs pools and volumes.
-  -<resource-name> describe => gives info about the resource configuration
+  - verify iSCSI service     => A required prerequisite of OpenEBS
+  - verify permissions       => Verify weather OpenEBS can be configured onto the cluster
+  - discover                 => list the possible deployment options to the user leveraging ndm
+  - status                   => Print the readiness of various components, verify prerequisites are met to run Openebs pools and volumes.
+  - <resource-name> describe => gives info about the resource configuration
   
-  -create                   => Create OpenEBS resources ( like cStor Pools, Storage Classes)
-  -launch                   => Launch OpenEBS resources
-  -edit_config              => Edit configuration (i.e configure limits of related pods)
-  -list_config              => lists the configuration of the stack
+  - create                   => Create OpenEBS resources ( like cStor Pools, Storage Classes)
+  - launch                   => Launch OpenEBS resources
+  - edit_config              => Edit configuration (i.e configure limits of related pods)
+  - list_config              => lists the configuration of the stack
   
   -delete                   => Delete OpenEBS resources 
 
--for each of these commands we could have simple flags like: --help, --version, 
+- for each of these commands we could have simple flags like: --help, --version, 
 --verbose, --log level, --trace
 
 - it should allow a yaml file to be injected which specifies the users deployment.
@@ -89,6 +89,7 @@ Some other commands could be :
 
 Keeping the file structure simple like :
 
+```
 CLI
 |__cmd
 |   |__install.go
@@ -97,7 +98,7 @@ CLI
 |   |__edit_config.go
 |
 |__main.go
-
+```
 
 the main.go file should be simple and clean like so :
 ```go
@@ -150,8 +151,3 @@ return &installOptions{
   // return other options	
 }
 ```
-
-
-
-
-
