@@ -23,6 +23,5 @@ _Home Lab - 6 Nodes_
 - Home cluster mix of Arm and Intel i3 based. 
 - 2x Intel NUC (i3)
 - 3x Raspberry pi (4GB memory)
-- 1x  Raspberry pi (4GB memory)
-- NAS/Custom build machine
+- 1x NAS/Custom build machine
 
