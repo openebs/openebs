@@ -8,6 +8,7 @@ The list of organizations that have publicly shared the usage of OpenEBS:
 
 | Organization | Stateful Workloads | Success Story |
 | :--- | :--- | :--- |
+| [Agnes Intelligence](https://www.agnesintel.com/) | Apache Kafka, Apache Solr, NFS | [English](./adopters/agnesintel/README.md) |
 | [Arista Networks](https://www.arista.com/en/) | Gerrit (multiple flavors), NPM, Maven, Redis, NFS, Sonarqube, Internal tools | [English](./adopters/arista/README.md) |
 | [CLEW Medical](https://clewmed.com/) | PostgreSQL, Keycloak, RabbitMQ | [English](./adopters/clewmedical/README.md) |
 | [Clouds Sky GmbH](https://cloudssky.com/en/) | Confluent Kafka, Strimzi Kafka, Elasticsearch, Prometheus | [English](./adopters/cloudssky/README.md) |
@@ -27,7 +28,7 @@ The list of users that have publicly shared the usage of OpenEBS.
 | [proegssilb](https://github.com/proegssilb) | PostgreSQL, Redis, Factorio (video game server) | [English](./adopters/users/proegssilb/README.md)  | 
 | [radicand](https://github.com/radicand) | Wordpress, MariaDB on ARM64 cluster | [English](./adopters/users/radicand/README.md) | 
 | [tardich](https://github.com/tardich) | Postfix Mail Relay, NextCloud, Nexus Repository, Plex | [English](./adopters/users/tardich/README.md)  | 
-
+| [V. Aretakis](https://github.com/aretakisv) | Percona, OpenZwave, Traefik, librenms, Multiple MQTT brokers, private applications, Unifi, multiple other stateful applications | [English](./adopters/users/aretakisv/README.md)  |
 
 
 
