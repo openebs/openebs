@@ -31,7 +31,7 @@ While the following are planned items, a higher priority is given to usability a
   * Enhance the discovery probes to support partitions, lvms and so forth
   * Support Prometheus exporter on block device metrics
   * Add gRPC API layer around NDM capabilities
-* MayaStor 
+* [Mayastor](https://github.com/openebs/Mayastor)
   * Replication across multiple nodes
   * Integration and end-to-end tests
   * Setup CI

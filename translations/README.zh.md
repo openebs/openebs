@@ -17,7 +17,7 @@ OpenEBS 与其他传统存储解决方案的一些关键区别如下:
 - 遵循与其所服务的应用程序类似的微服务架构。OpenEBS 本身作为一组容器部署在 Kubernetes 工作节点上。使用 Kubernetes 自身的能力来编排管理 OpenEBS 组件。
 - 完全构建于用户空间，以其高度可移植性可运行在任何操作系统/平台下。
 - 完全的意图驱动模型，继承了与 Kubernetes 相同的驱动易用性原则。
-- OpenEBS 支持一系列存储引擎，以便开发人员能够部署适合其应用程序设计目标的存储技术。像 Cassandra 这样的分布式应用程序可以使用 LocalPV 引擎实现最低延迟的写操作。像 MySQL 和 PostgreSQL 这样的独立应用程序可以使用 ZFS 引擎 (cStor) 进行恢复。像 Kafka 这样的流媒体应用程序可以使用 NVMe 引擎 [MayaStor](https://github.com/openebs/MayaStor) 在边缘环境中获得最佳性能。在各种引擎类型中，OpenEBS 为高可用性、快照、克隆和易管理性提供了一致的框架。
+- OpenEBS 支持一系列存储引擎，以便开发人员能够部署适合其应用程序设计目标的存储技术。像 Cassandra 这样的分布式应用程序可以使用 LocalPV 引擎实现最低延迟的写操作。像 MySQL 和 PostgreSQL 这样的独立应用程序可以使用 ZFS 引擎 (cStor) 进行恢复。像 Kafka 这样的流媒体应用程序可以使用 NVMe 引擎 [Mayastor](https://github.com/openebs/Mayastor) 在边缘环境中获得最佳性能。在各种引擎类型中，OpenEBS 为高可用性、快照、克隆和易管理性提供了一致的框架。
 
 OpenEBS 本身被部署为主机上的另一个容器，支持在每个pod、应用程序、集群或容器级别上指定存储服务，包括:
 - 将附加到 Kubernetes 工作节点的存储管理自动化，并能够将存储用于动态提供 OpenEBS pv 或本地 pv。
@@ -72,7 +72,7 @@ OpenEBS 是业界最广泛使用和测试的 Kubernetes 存储基础设施之一
 | Jiva | stable | 最适合在使用临时存储的 Kubernetes 工作节点上运行 Replicated Block Storage |
 | cStor | beta | 在具有块设备的节点上的首选。如果需要快照和克隆，建议使用此选项 |
 | Local Volumes | beta | Best suited for Distributed Application that need low latency storage - direct-attached storage from the Kubernetes nodes. Kubernetes 节点上的本地存储-最适合需要低延迟存储的分布式应用程序。|
-| MayaStor | alpha | 一种全新的存储引擎，比肩本地存储的工作效率，同时也提供复制等存储服务。快照和克隆的功能支持正在开发中。|
+| Mayastor | alpha | 一种全新的存储引擎，比肩本地存储的工作效率，同时也提供复制等存储服务。快照和克隆的功能支持正在开发中。|
 
 更多详情请参阅 [OpenEBS 文档](https://docs.openebs.io/docs/next/quickstart.html).
  
