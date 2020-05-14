@@ -1,0 +1,73 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  # This name uniquely identifies the Deployment
+  name: minio-deployment
+spec:
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        # Label is used as selector in the service.
+        app: minio
+        openebs.io/target-affinity: minio
+    spec:
+      # Refer to the PVC created earlier
+      volumes:
+      - name: storage1
+        persistentVolumeClaim:
+          # Name of the PVC created earlier
+                claimName: minio-pv-claim1
+      containers:
+      - name: minio
+        # Pulls the default Minio image from Docker Hub
+        image: minio/minio
+        args:
+        - server
+        - /storage1
+        env:
+        # Minio access key and secret key
+        - name: MINIO_ACCESS_KEY
+          value: "minio"
+        - name: MINIO_SECRET_KEY
+          value: "minio123"
+        - name: MINIO_PROMETHEUS_AUTH_TYPE
+          value: "public"          
+        ports:
+        - containerPort: 9000
+        # Mount the volume into the pod
+        volumeMounts:
+        - name: storage1 # must match the volume name, above
+          mountPath: "/storage1"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: minio-pv-claim1
+  labels:
+    openebs.io/target-affinity: minio      
+    app: minio-storage-claim1
+spec:
+  storageClassName: openebs-jiva-3rep
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi  
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: minio-service
+  labels:
+    app: minio
+spec:
+  ports:
+    - port: 9000
+      nodePort: 32701
+      protocol: TCP
+  selector:
+    app: minio
+  sessionAffinity: None
+  type: NodePort
