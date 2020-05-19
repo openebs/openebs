@@ -492,7 +492,7 @@ spec:
         # The feature-gate is used to enable the new UUID algorithm.
         # This is a feature currently in Alpha state
         #  - --feature-gates="GPTBasedUUID"
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         securityContext:
           privileged: true
         volumeMounts:
@@ -591,7 +591,7 @@ spec:
       containers:
         - name: node-disk-operator
           image: quay.io/openebs/node-disk-operator-amd64:ci
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
           readinessProbe:
             exec:
               command:
@@ -711,7 +711,7 @@ spec:
       serviceAccountName: openebs-maya-operator
       containers:
       - name: openebs-provisioner-hostpath
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         image: quay.io/openebs/provisioner-localpv:ci
         env:
         # OPENEBS_IO_K8S_MASTER enables openebs provisioner to connect to K8s
