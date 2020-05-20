@@ -10,7 +10,7 @@ owners:
   - "@mynktl"
 editor: "@mittachaitu"
 creation-date: 2020-05-11
-last-updated: 2020-05-11
+last-updated: 2020-05-20
 status: provisional
 ---
 
@@ -140,6 +140,11 @@ Velero Server will execute the `CreateVolumeFromSnapshot` API of the velero inte
    3.2 Wait till CVC comes to Bound state.
    3.3 Create a replica count number of restore CR’s which will be responsible for dumping backup data into the volume dataset.
 4. Call cloud interface API `RestoreSnapshot` to download the snapshot from the cloud provider.
+
+##### Accessing CVC REST Endpoint
+
+- One can access the REST endpoint of CVC by fetching the details of CVC-Operator service. Below command will be help to get the CVC-Operator service
+  kubectl get service -n <openebs_namespace> -l openebs.io/component-name: cvc-operator-svc
 
 ##### Velero Server Sends DeleteSnapshot Request
 
