@@ -88,9 +88,19 @@ For migrating non-csi volumes to csi volumes following changes are proposed:
 
 The migration of SPC will be performed via a job which takes SPC name as one of its argument.
 
-The CSPC CR will be with `reconcile.openebs.io/dependants` annotation to disable reconciliation of CSPI. Once all CSPI are successfully created the annotation will be removed.
+The CSPC CR created via job will have `reconcile.openebs.io/disable-dependants` annotation set to  `true`. This will help in disabling reconciliation of on all CSPIs created for the CSPC. The reconciliation is set off on CSPIs to avoid import while the old CSP pods are still running. Once all CSPI are successfully created the annotation will be removed.
 
-Sequentially one CSPI is taken and the corresponding CSP is found using `kubernetes/hostname` label. The CSP deployment is scaled down to avoid multiple pods trying to import the same pool. Next the all the BDC for given CSPI are updated with CSPC information. The CSPI will be patched with the annotation `cstorpoolinstance.openebs.io/oldname`. Then CSPI reconciliation will be enabled which will create the CSPI deployment which will rename and import the pool.
+Sequentially one CSPI is taken and the corresponding CSP is found using `kubernetes/hostname` label. The CSP deployment is scaled down to avoid multiple pods trying to import the same pool. Next the all the BDC for given CSPI are updated with CSPC information. The CSPI will be patched with the annotation `cstorpoolinstance.openebs.io/oldname`. Then CSPI reconciliation will be enabled which will create the CSPI deployment which will rename and import the pool. 
+
+The import command will be modified to import with or without the oldname. For example for renaming the command would look like:
+```sh
+/usr/local/bin/zpool import  -o cachefile=/var/openebs/cstor-poolpool.cache  -d /var/openebs/sparse cstor-08bfced5-6a28-4a63-a76b-c48c69be6ad5 cstor-6b3bbf9e-451d-4333-b119-1bb5217e5bc2
+```
+For importing without renaming the command would look like:
+```sh
+/usr/local/bin/zpool import  -o cachefile=/var/openebs/cstor-poolpool.cache  -d /var/openebs/sparse cstor-6b3bbf9e-451d-4333-b119-1bb5217e5bc2
+```
+
 
 The `cstorpoolinstance.openebs.io/oldname` annotation will be used to rename the pool which was named as `cstor-cspuid` to `cstor-cspcuid`. This annotation will be removed after successful import of the pool.
 
