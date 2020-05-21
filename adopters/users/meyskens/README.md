@@ -7,5 +7,4 @@ _backup solution for home laptop_
 - Jiva
 
 **A brief description of the use case or details on how OpenEBS is helping your projects.**
-- Restic uploads my laptop to Minio running on my home k8s cluster (powered by openebs). A “mc mirror” pod then uploads it to the cloud. I get full speed backups on my laptop and still have a cloud copy
-
+- Restic uploads my laptop to Minio running on my home Kubernetes cluster. Minio runs on a 2 replica OpenEBS cStor PV . A `mc mirror` pod then watches the bucket and uploads it's content to the cloud. I get full speed backups on my laptop and still have a cloud copy
