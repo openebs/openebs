@@ -9,7 +9,7 @@ owners:
   - "@kmova"
 editor: "@shubham14bajpai"
 creation-date: 2019-11-15
-last-updated: 2019-11-15
+last-updated: 2020-05-21
 status: implementable
 see-also:
   - NA
@@ -56,17 +56,22 @@ implemented in the following phases:
 
 This design proposes the following key changes while migrating from a SPC to CSPC:
 
-  1. New CSPC CR will be created for the migrating SPC.
+  1. The SPC label and finalizer on BDCs will be replaced by CSPC label and finalizer. This is done to avoid webhook validation failure while creating equivalent CSPC.
 
-  2. New CSPI CRs will be created which will replace the CSP for given SPC.
+  2. Equivalent CSPC CR will be created for the migrating SPC.
 
-  3. The BDC with SPC label and finalizer will be replaced by CSPC label and finalizer.
+  3. Equivalent CSPI CRs will be created by operator which will replace the CSP for given SPC. The CSPI will reconcile disabled to avoid double import.
 
-  4. The imported pools in each CSPI will be renamed to cstor-${CSPC uid}.
+  4. The SPC owner reference on the BDCs will be replaced by equivalent CSPC owner reference.
 
-  5. The CVR with CSP labels and annotations will be replaced by CSPI labels and annotations.
+  5. Sequentially for each CSP
 
-  6. Clean up old SPC and csp after successfull creation of CSPC and cspi objects.
+      1. Old CSP deployment will be scaled down and sync will be enabled on equivalent CSPI.
+      2. Old pool will be imported by renaming it from `cstor-cspuid` to `cstor-cspcuid`.
+      3. The CVR with CSP labels and annotations will be replaced by CSPI labels and annotations.
+      4. Finalizers from CSP will be removed to for proper cleanup.
+
+  6. Clean up old SPC and CSP after successfull creation of CSPC and CSPI objects.
 
 For migrating non-csi volumes to csi volumes following changes are proposed:
 
