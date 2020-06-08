@@ -31,8 +31,8 @@
 
 为了适应不同的使用场景，新需求总是源源不断。您可以自由地加入关于新特性的讨论，或者提交您所提议特性的 PR。
 
-- [加入我们的社区](https://openebs.org/community)
-      - 已经注册? 前往我们的讨论组 [#openebs-users](https://openebs-community.slack.com/messages/openebs-users/)
+- [加入我们的社区](https://kubernetes.slack.com)
+      - 已经注册? 前往我们的讨论组 [#openebs](https://kubernetes.slack.com/messages/openebs/).
 
 ## 贡献代码和问题修复
 

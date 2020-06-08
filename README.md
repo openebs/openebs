@@ -1,13 +1,13 @@
 # OpenEBS
 
 [![Releases](https://img.shields.io/github/release/openebs/openebs/all.svg?style=flat-square)](https://github.com/openebs/openebs/releases)
-[![Slack](https://img.shields.io/badge/chat!!!-slack-ff1493.svg?style=flat-square)]( https://openebs-community.slack.com)
+[![Slack channel #openebs](https://img.shields.io/badge/slack-openebs-brightgreen.svg?logo=slack)](https://kubernetes.slack.com/messages/openebs)
 [![Twitter](https://img.shields.io/twitter/follow/openebs.svg?style=social&label=Follow)](https://twitter.com/intent/follow?screen_name=openebs)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](https://github.com/openebs/openebs/blob/master/CONTRIBUTING.md)
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fopenebs%2Fopenebs.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fopenebs%2Fopenebs?ref=badge_shield)
 [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/1754/badge)](https://bestpractices.coreinfrastructure.org/projects/1754)
 
-https://openebs.org/
+https://openebs.io/
  
 **OpenEBS** is the most widely deployed and easy to use open-source storage solution for Kubernetes. 
 
@@ -85,8 +85,8 @@ For more details, please refer to [OpenEBS Documentation](https://docs.openebs.i
  
 OpenEBS welcomes your feedback and contributions in any form possible.
  
-- [Join our community](https://openebs.org/community)
-  - Already signed up? Head to our discussions at [#openebs-users](https://openebs-community.slack.com/messages/openebs-users/)
+- [Join OpenEBS community on Kubernetes Slack](https://kubernetes.slack.com)
+  - Already signed up? Head to our discussions at [#openebs](https://kubernetes.slack.com/messages/openebs/)
 - Want to raise an issue or help with fixes and features?
   - See [open issues](https://github.com/openebs/openebs/issues)
   - See [contributing guide](./CONTRIBUTING.md)

@@ -31,8 +31,8 @@ Getting documentation right is hard! Refer to this [page](./contribute/CONTRIBUT
 
 There is always something more that is required, to make it easier to suit your use-cases. Feel free to join the discussion on new features or raise a PR with your proposed change. 
 
-- [Join our community](https://openebs.org/community)
-      - Already signed up? Head to our discussions at [#openebs-users](https://openebs-community.slack.com/messages/openebs-users/)
+- [Join OpenEBS community on Kubernetes Slack](https://kubernetes.slack.com)
+	- Already signed up? Head to our discussions at [#openebs](https://kubernetes.slack.com/messages/openebs/)
 
 ## Contributing to Source Code and Bug Fixes
 

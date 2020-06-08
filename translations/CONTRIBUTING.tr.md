@@ -31,8 +31,8 @@ Doğru belgelerin alınması zor! Buna bakın [sayfa](../contribute/CONTRIBUTING
 
 Kullanım durumlarınıza uymayı kolaylaştırmak için her zaman gereken daha çok şey vardır. Yeni özelliklerle ilgili tartışmaya katılmaktan çekinmeyin veya önerilen değişikliğinizle birlikte bir PR çekin.
 
-- [Bizim katılın topluluk](https://openebs.org/community)
- 	 - Zaten kayıtlı mısınız? Tartışmalarımıza yönelin [#openebs-users](https://openebs-community.slack.com/messages/openebs-users/)
+- [Bizim katılın topluluk](https://kubernetes.slack.com).
+ 	 - Zaten kayıtlı mısınız? Tartışmalarımıza yönelin [#openebs](https://kubernetes.slack.com/messages/openebs/).
 
 ## Kaynak Kod ve Hata Düzeltmelerine Katkı Sağlamak
 
