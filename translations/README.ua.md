@@ -1,13 +1,13 @@
 # OpenEBS
 
 [![Releases](https://img.shields.io/github/release/openebs/openebs/all.svg?style=flat-square)](https://github.com/openebs/openebs/releases)
-[![Slack](https://img.shields.io/badge/chat!!!-slack-ff1493.svg?style=flat-square)]( https://openebs-community.slack.com)
+[![Slack channel #openebs](https://img.shields.io/badge/slack-openebs-brightgreen.svg?logo=slack)](https://kubernetes.slack.com/messages/openebs)
 [![Twitter](https://img.shields.io/twitter/follow/openebs.svg?style=social&label=Follow)](https://twitter.com/intent/follow?screen_name=openebs)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](https://github.com/openebs/openebs/blob/master/CONTRIBUTING.md)
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fopenebs%2Fopenebs.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fopenebs%2Fopenebs?ref=badge_shield)
 [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/1754/badge)](https://bestpractices.coreinfrastructure.org/projects/1754)
 
-https://openebs.org/
+https://openebs.io/
 
 **OpenEBS** дозволяє використовувати контейнери для додатків, які потребують постійного сховища даних, а також для додатків, які перевіряють стан кластеру, наприклад, Prometheus. OpenEBS надає постійне контейнерне сховище даних та служби схову.
  
@@ -63,8 +63,8 @@ OpenEBS можна розгорнути на будь-якому Kubernetes кл
  
 Команда OpenEBS буде рада вашим відгукам, побажанням й пропозиціям:
  
-- [приєднуйтесь до нашого товариства](https://openebs.org/community).
-  - Вже зареєстровані? Приєднуйтесь до наших обговорень в [# openebs-users](https://openebs-community.slack.com/messages/openebs-users/).
+- [приєднуйтесь до нашого товариства](https://kubernetes.slack.com).
+  - Вже зареєстровані? Приєднуйтесь до наших обговорень в [#openebs](https://kubernetes.slack.com/messages/openebs/).
 - Бажаєте задати питання?
   - Якщо ваше питання загальне (або «не зовсім певен»), ви можете задати його в  [issues](https://github.com/openebs/openebs/issues).
   - Специфічні проблеми проекту (репозиторія) також можна обговорити в [issues](https://github.com/openebs/openebs/issues) й відмічені окремими ярликами репозиторія, такими як * repo / maya \*.

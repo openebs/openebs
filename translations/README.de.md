@@ -1,13 +1,13 @@
 # OpenEBS
 
 [![Releases](https://img.shields.io/github/release/openebs/openebs/all.svg?style=flat-square)](https://github.com/openebs/openebs/releases)
-[![Slack](https://img.shields.io/badge/chat!!!-slack-ff1493.svg?style=flat-square)]( https://openebs-community.slack.com)
+[![Slack channel #openebs](https://img.shields.io/badge/slack-openebs-brightgreen.svg?logo=slack)](https://kubernetes.slack.com/messages/openebs)
 [![Twitter](https://img.shields.io/twitter/follow/openebs.svg?style=social&label=Follow)](https://twitter.com/intent/follow?screen_name=openebs)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](https://github.com/openebs/openebs/blob/master/CONTRIBUTING.md)
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fopenebs%2Fopenebs.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fopenebs%2Fopenebs?ref=badge_shield)
 [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/1754/badge)](https://bestpractices.coreinfrastructure.org/projects/1754)
 
-https://openebs.org/
+https://openebs.io/
 
 **OpenEBS** ermöglicht die Verwendung von Containern für geschäftskritische, persistente Workloads und für andere Stateful-Workloads, z. B. Protokollierung oder Prometheus. OpenEBS sind Container- und verwandte Speicherdienste.
  
@@ -60,8 +60,8 @@ Wir nähern uns der Beta-Phase mit aktiver Entwicklung. Weitere Informationen fi
  
 OpenEBS freut sich über Ihr Feedback und Ihre Beiträge in jeder möglichen Form.
  
-- [Tritt unserer Gemeinschaft](https://openebs.org/community)
-  - Bereits angemeldet? Besuchen Sie unsere Diskussionen unter [#openebs-users](https://openebs-community.slack.com/messages/openebs-users/).
+- [Tritt unserer Gemeinschaft](https://kubernetes.slack.com)
+  - Bereits angemeldet? Besuchen Sie unsere Diskussionen unter [#openebs](https://kubernetes.slack.com/messages/openebs/).
 - Möchten Sie ein Problem ansprechen?
   - Wenn es sich um ein generisches Produkt (oder "nicht wirklich sicher") handelt, können Sie es dennoch unter [issues](https://github.com/openebs/openebs/issues) anheben.
   - Projekt (Repository) spezifische Probleme können auch unter [issues](https://github.com/openebs/openebs/issues) angesprochen und mit den einzelnen Repository-Labels wie *repo/maya* versehen werden.

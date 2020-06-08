@@ -1,13 +1,13 @@
 # OpenEBS
 
 [![Releases](https://img.shields.io/github/release/openebs/openebs/all.svg?style=flat-square)](https://github.com/openebs/openebs/releases)
-[![Slack](https://img.shields.io/badge/chat!!!-slack-ff1493.svg?style=flat-square)]( https://openebs-community.slack.com)
+[![Slack channel #openebs](https://img.shields.io/badge/slack-openebs-brightgreen.svg?logo=slack)](https://kubernetes.slack.com/messages/openebs)
 [![Twitter](https://img.shields.io/twitter/follow/openebs.svg?style=social&label=Follow)](https://twitter.com/intent/follow?screen_name=openebs)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](https://github.com/openebs/openebs/blob/master/CONTRIBUTING.md)
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fopenebs%2Fopenebs.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fopenebs%2Fopenebs?ref=badge_shield)
 [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/1754/badge)](https://bestpractices.coreinfrastructure.org/projects/1754)
 
-https://openebs.org/
+https://openebs.io/
 
 **OpenEBS**, kritik işlevli, verileri kalıcı olan ve örneğin günlük oluşturma (logging) veya Prometheus gibi uygulamaların depolama ihtiyaçlarını karşılamak için kullanılır. OpenEBS konteyner depolama ve ilgili veri depolama hizmetlerini sunar.
  
@@ -63,8 +63,8 @@ Devam eden aktif yazılım geliştirme çalışmaları ile beta aşamasına yakl
  
 OpenEBS, her açık kaynak kodlu uygulama gibi kullanıcı katılarıyla güçlenen bir projedir. Yorumlarınızlardan ve katkılarınızdan minnettarız.
  
-- [Bizim katılın topluluk](https://openebs.org/community).
-  - Eğer kayıtlıysanız tartışmalarımıza [#openebs-users](https://openebs-community.slack.com/messages/openebs-users/users) adresinden ulaşabilirsiniz.
+- [Bizim katılın topluluk](https://kubernetes.slack.com).
+  - Eğer kayıtlıysanız tartışmalarımıza [#openebs](https://kubernetes.slack.com/messages/openebs/).
 - Bir sorunu bildirmek ister misiniz?
   - Eğer olamadığınız genel bir sorunuz varsa, bunu  [sorunlar](https://github.com/openebs/openebs/issues) altında rapor edebilirsiniz.
   - Proje (repo) ile ilgili belirli konular ayrıca [sorunlar](https://github.com/openebs/openebs/issues) ve *repo/maya* gibi tek tek etiketlerle etiketlenebilir.
