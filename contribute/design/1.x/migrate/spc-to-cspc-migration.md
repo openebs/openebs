@@ -79,13 +79,23 @@ For migrating non-csi volumes to csi volumes following changes are proposed:
 
   2. Set the PV to `Retain` reclaim policy to prevent deletion of OpenEBS resources.
 
-  3. Recreate old PV with csi spec translation.
+  3. A temporary CStorVolumePolicy with target deploy configurations and CSPI names from old CVRs will be created. This is facilitate the creation `cstor/v1` CVRs on the same pool as the old `openebs.io/v1alpha1` CVRs were. I also help preserve any configuration set on the target deployment of old volume.
 
-  4. Recreate old PVC with updated csi spec PV and StorageClass.
+  4. Recreate PVC with volumeName already populated & csi driver info
+ 
+  5. Recreate PV with claimRef of PVC and csi spec
 
-  5. Create CVC CR for the volume with the CV details.
+  6. Delete old target deployment.
 
-  6. Update ownerreferences of CV, service with CVC and CVRs with CV.
+  7. Create new CVC for volume with basic provision info of volume and annotation to temporary policy
+
+  8. Update ownerreferences of target service with CVC.
+  
+  9. Wait for new `cstor/v1` CV to be Healthy.
+
+  10. Patch the pod affinity if present on policy to the new target deployment.
+
+  11. Remove the policy annotation from the CVC and clean up temporary policy and old CV and CVRs.
 
 ### High Level Design
 
