@@ -10,7 +10,7 @@ owners:
   - "@mynktl"
 editor: "@mittachaitu"
 creation-date: 2020-05-11
-last-updated: 2020-05-20
+last-updated: 2020-06-12
 status: provisional
 ---
 
@@ -30,7 +30,6 @@ status: provisional
       - [Create a restore for backuped CStorVolumes](#create-a-restore-for-backuped-cstorvolumes)
       - [Scheduled backup of CStorVolumes](#scheduled-backup-of-cstorvolumes)
     - [Proposed Implementation](#proposed-implementation)
-      - [OpenEBS Velero Plugin](#openebs-velero-plugin)
       - [CVC-Operator REST Interface](#cvc-operator-rest-interface)
     - [Steps to perform user stories](#steps-to-perform-user-stories)
     - [Low Level Design](#low-level-design)
@@ -38,6 +37,7 @@ status: provisional
         - [Velero Server sends CreateSnapshot Request](#velero-server-sends-createsnapshot-request)
         - [Velero Server Sends DeleteSnapshot Request](#velero-server-sends-deletesnapshot-request)
         - [Velero Server Sends CreateVolumeFromSnapshot Request](#velero-server-sends-createvolumefromsnapshot-request)
+        - [Accessing CVC REST Endpoint](#accessing-cvc-rest-endpoint)
         - [Velero Server Sends DeleteSnapshot Request](#velero-server-sends-deletesnapshot-request-1)
         - [Work flow in backup controller](#work-flow-in-backup-controller)
         - [Work flow in restore controller](#work-flow-in-restore-controller)
@@ -85,10 +85,6 @@ As an OpenEBS user, I should be restore a backuped CStorVolumes.
 As an OpenEBS user, I should be able to create a scheduled backups for CStorVolumes.
 
 ### Proposed Implementation
-
-#### OpenEBS Velero Plugin
-
-TODO: @vishnuitta to fill plugin side approach.
 
 #### CVC-Operator REST Interface
 
