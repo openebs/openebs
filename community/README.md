@@ -13,11 +13,14 @@ If that does not answer your questions, or if you think you found a bug, please 
 
 ## Contact
 
-- **Slack:** Join our Slack Channels. 
-  - `Kubernetes Slack`, please join the [#openebs channel](https://kubernetes.slack.com/messages/openebs/)
-  - `Cloud Native Slack`, please join the [#openebs channel](https://cloud-native.slack.com/messages/openebs/)
-  
-- **Forum:** Subscribe to our [user forum](https://lists.cncf.io/g/cncf-openebs-users) or [announcement list](https://lists.cncf.io/g/cncf-openebs-announcements).
+- **Slack:** [Join OpenEBS community on Kubernetes Slack](https://kubernetes.slack.com).
+    - Already signed up? 
+      * Head to our user discussions at [#openebs](https://kubernetes.slack.com/messages/openebs/)
+      * Head to our contributor discussions at [#openebs-dev](https://kubernetes.slack.com/messages/openebs-dev/)
+
+- **Forum:** Subscribe to our email lists: 
+  - [user forum](https://lists.cncf.io/g/cncf-openebs-users) or 
+  - [announcement list](https://lists.cncf.io/g/cncf-openebs-announcements).
 
 - **Twitter:** Follow us [@openebs](https://twitter.com/openebs).
 
@@ -50,7 +53,5 @@ We have a weekly or bi-weekly sync up over Google hangout or Zoom on sub project
 We have monthly meeting every first Tuesday at 9.30AM PT over [Zoom](https://zoom.us/j/93142650382). Map that to your local time with this [timezone table](http://www.thetimezoneconverter.com/?t=09:30&tz=PT%20%28Pacific%20Time%29).
 
 This meeting focuses on reviewing the [current roadmap](https://github.com/openebs/openebs/blob/master/ROADMAP.md) and direction of the project or general questions from the broader community. 
-
-
 
 Go back to [**Contributing to OpenEBS**](../CONTRIBUTING.md).
