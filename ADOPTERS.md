@@ -2,7 +2,7 @@
 
 This is the list of organizations and users that publicly shared details of how they are using OpenEBS for running their Stateful workloads.  Please send PRs to add or remove organizations/users.
 
-Note: There are several other organizations/users that couldn’t publicly share their usage details, but are active in the [OpenEBS Slack](https://slack.openebs.io). 
+Note: There are several other organizations/users that couldn’t publicly share their usage details, but are active in the [OpenEBS Community](./community/). 
 
 The list of organizations that have publicly shared the usage of OpenEBS:
 
@@ -29,6 +29,7 @@ The list of users that have publicly shared the usage of OpenEBS.
 | [Maartje Eyskens](https://github.com/meyskens) | Minio | [English](./adopters/users/meyskens/README.md)  | 
 | [proegssilb](https://github.com/proegssilb) | PostgreSQL, Redis, Factorio (video game server) | [English](./adopters/users/proegssilb/README.md)  | 
 | [radicand](https://github.com/radicand) | Wordpress, MariaDB on ARM64 cluster | [English](./adopters/users/radicand/README.md) | 
+| [Steve Fan](https://github.com/stevefan1999-personal) | [Agones - Game Servers on K8s](https://agones.dev/site/) | [English](./adopters/users/stevefan/README.md)  | 
 | [tardich](https://github.com/tardich) | Postfix Mail Relay, NextCloud, Nexus Repository, Plex | [English](./adopters/users/tardich/README.md)  | 
 | [V. Aretakis](https://github.com/aretakisv) | Percona, OpenZwave, Traefik, librenms, Multiple MQTT brokers, private applications, Unifi, multiple other stateful applications | [English](./adopters/users/aretakisv/README.md)  |
 
