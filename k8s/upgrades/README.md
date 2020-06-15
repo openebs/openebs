@@ -4,17 +4,7 @@
 
 This document describes the steps for the following OpenEBS Upgrade paths:
 
-- Upgrade from 1.0.0 to any of 1.1.0, 1.2.0, 1.3.0, 1.4.0, 1.5.0, 1.6.0, 1.7.0, 1.8.0, 1.9.0, 1.10.0, 1.11.0
-- Upgrade from 1.0.0 to any of 1.1.0, 1.2.0, 1.3.0, 1.4.0, 1.5.0, 1.6.0, 1.7.0, 1.8.0, 1.9.0, 1.10.0
-- Upgrade from 1.1.0 to any of 1.2.0, 1.3.0, 1.4.0, 1.5.0, 1.6.0, 1.7.0, 1.8.0, 1.9.0, 1.10.0
-- Upgrade from 1.2.0 to any of 1.3.0, 1.4.0, 1.5.0, 1.6.0, 1.7.0, 1.8.0, 1.9.0, 1.10.0
-- Upgrade from 1.3.0 to any of 1.4.0, 1.5.0, 1.6.0, 1.7.0, 1.8.0, 1.9.0, 1.10.0
-- Upgrade from 1.4.0 to 1.5.0, 1.6.0, 1.7.0, 1.8.0, 1.9.0, 1.10.0
-- Upgrade from 1.5.0 to 1.6.0, 1.7.0, 1.8.0, 1.9.0, 1.10.0
-- Upgrade from 1.6.0 to 1.7.0, 1.8.0, 1.9.0, 1.10.0
-- Upgrade from 1.7.0 to 1.8.0, 1.9.0, 1.10.0
-- Upgrade from 1.8.0 to 1.9.0, 1.10.0
-- Upgrade from 1.9.0 to 1.10.0
+- Upgrade from 1.0.0 or later to a newer release up to 1.11.0
 
 For other upgrade paths, please refer to the respective directories.
 Example, the steps to upgrade from 0.9.0 to 1.0.0 will be under [0.9.0-1.0.0](./0.9.0-1.0.0/).
@@ -34,17 +24,7 @@ The upgrade of OpenEBS is a three step process:
 
 **Note: It is mandatory to make sure to that all OpenEBS control plane
 and data plane components are running with expected version before the upgrade.**
-- **For upgrading to 1.1.0, the previous version should be 1.0.0**
-- **For upgrading to 1.2.0, the previous version should be 1.0.0 or 1.1.0**
-- **For upgrading to 1.3.0, the previous version should be 1.0.0 or 1.1.0 or 1.2.0**
-- **For upgrading to 1.4.0, the previous version should be 1.0.0 or 1.1.0 or 1.2.0 or 1.3.0**
-- **For upgrading to 1.5.0, the previous version should be 1.0.0 or 1.1.0 or 1.2.0 or 1.3.0 or 1.4.0**
-- **For upgrading to 1.6.0, the previous version should be 1.0.0 or 1.1.0 or 1.2.0 or 1.3.0 or 1.4.0 or 1.5.0**
-- **For upgrading to 1.7.0, the previous version should be 1.0.0 or 1.1.0 or 1.2.0 or 1.3.0 or 1.4.0 or 1.5.0 or 1.6.0**
-- **For upgrading to 1.8.0, the previous version should be 1.0.0 or 1.1.0 or 1.2.0 or 1.3.0 or 1.4.0 or 1.5.0 or 1.6.0 or 1.7.0**
-- **For upgrading to 1.9.0, the previous version should be 1.0.0 or 1.1.0 or 1.2.0 or 1.3.0 or 1.4.0 or 1.5.0 or 1.6.0 or 1.7.0 or 1.8.0**
-- **For upgrading to 1.10.0, the previous version should be 1.0.0 or 1.1.0 or 1.2.0 or 1.3.0 or 1.4.0 or 1.5.0 or 1.6.0 or 1.7.0 or 1.8.0 or 1.9.0**
-- **For upgrading to 1.11.0, the previous version should be 1.0.0 or 1.1.0 or 1.2.0 or 1.3.0 or 1.4.0 or 1.5.0 or 1.6.0 or 1.7.0 or 1.8.0 or 1.9.0 or 1.10.0**
+- **For upgrading to the latest release (1.11.0), the previous version should be 1.x.0 (1.0.0 or newer)**
 
 **Note: All steps described in this document need to be performed from a
 machine that has access to Kubernetes master**
@@ -242,7 +222,7 @@ spec:
         # as mentioned below
         - "pvc-1bc3b45a-3023-4a8e-a94b-b457cf9529b4"
         - "pvc-82a2d097-c666-4f29-820d-6b7e41541c11"
-        # For upgrades lesser than 1.9.0, use
+        # For upgrades older than 1.9.0, use
         # '--pv-name=<pv_name> format as
         # below commented line
         # - "--pv-name=pvc-1bc3b45a-3023-4a8e-a94b-b457cf9529b4"
@@ -333,7 +313,7 @@ spec:
         # as mentioned below
         - "cstor-sparse-pool"
         - "cstor-disk-pool"
-        # For upgrades lesser than 1.9.0, use
+        # For upgrades older than 1.9.0, use
         # '--spc-name=<spc_name> format as
         # below commented line
         # - "--spc-name=cstor-sparse-pool"
@@ -414,7 +394,7 @@ spec:
         # as mentioned below
         - "pvc-c630f6d5-afd2-11e9-8e79-42010a800065"
         - "pvc-a4aba0e9-8ad3-4d18-9b34-5e6e7cea2eb3"
-        # For upgrades lesser than 1.9.0, use
+        # For upgrades older than 1.9.0, use
         # '--pv-name=<pv_name> format as
         # below commented line
         # - "--pv-name=pvc-c630f6d5-afd2-11e9-8e79-42010a800065"
