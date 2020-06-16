@@ -97,6 +97,13 @@ For migrating non-csi volumes to csi volumes following changes are proposed:
 
   11. Remove the policy annotation from the CVC and clean up temporary policy and old CV and CVRs.
 
+  12. If snapshots are present for the given PVC migrate them from old schema to new schema.
+      - Check whether the snapshotClass `csi-cstor-snapshotclass` is installed.
+      - Create equivalent `volumesnapshotcontent` for old `volumesnapshotdata`.
+      - Create equivalent csi `volumesnapshot` for old `volumesnapshot`.
+      - Check whether the `volumesnapshotcontent` and the csi `volumesnapshot` are bound.
+      - Delete the old `volumesnapshot` which should automatically remove corresponding `volumesnapshotdata`.
+
 ### High Level Design
 
 #### Phase 1: Migration of SPC to CSPC
