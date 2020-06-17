@@ -88,16 +88,24 @@ As an OpenEBS user, I should be able to create a scheduled backups for CStorVolu
 
 #### CVC-Operator REST Interface
 
-The volume management api like create, delete, snapshot, clone etc have moved from m-apiserver to CVC-Operator as part of supporting the CSI Driver. The backup/restore of volume API also should be moved to the CVC Operator as the backup/restore api in turn depends on the volume snapshot, clone implementations. Currently CVC Operator only supports declarative API via CRs, but plugin requires imperative API(REST API). The proposal is to implement a REST server within CVC-Operator to perform backup/restore operations. The CStor backup/restore module should identify the type of the volume and forward the REST API requests to the CVC Operator.
+The volume management api like create, delete, snapshot, clone etc have moved from m-apiserver to CVC-Operator as part of supporting the CSI Driver. The velero-plugin of volume API also should be moved to the CVC Operator as the velero-plugin api in turn depends on the volume snapshot, clone implementations. Currently CVC Operator only supports declarative API via CRs, but plugin requires imperative API(REST API). The proposal is to implement a REST server within CVC-Operator to perform velero-plugin operations. The velero-plugin should identify the type of the volume and forward the REST API requests to the CVC Operator.
 
-As mentioned [above](#openebs-veleroplugin) velero-plugin triggers different REST API calls based on the type of request from velero-server.
+Velero-plugin execute different REST API of CVC-Apiserver based on the type-of-request/API from velero.
 
 ### Steps to perform user stories
 
 - User can create backup using velero CLI
-  Ex: velero backup create <BACKUP_NAME> --include-namespaces=<NAME_SPACE> --snapshot-volumes –volume-snapshot-locations=<SNAPSHOT_LOCATION>
+
+Example:
+```sh
+velero backup create <BACKUP_NAME> --include-namespaces=<NAME_SPACE> --snapshot-volumes –volume-snapshot-locations=<SNAPSHOT_LOCATION>
+```
 - User can resotre backuped using velero CLI
-  Ex: velero restore create --from-backup <BACKUP_NAME> --restore-volumes=true
+
+Example
+```
+velero restore create --from-backup <BACKUP_NAME> --restore-volumes=true
+```
 
 ### Low Level Design
 
@@ -105,61 +113,66 @@ As mentioned [above](#openebs-veleroplugin) velero-plugin triggers different RES
 
 ##### Velero Server sends CreateSnapshot Request
 
-Velero server sends CreateSnapshot API with volumeID to create the snapshot. Velero Interface will `CreateSnapshot` API of the cStor backup/restore controller. cStor backup/restore controller is responsible for executing below steps:
-1. BackUp the relevant PVC object to the cloud provider.
-2. Execute the REST API(POST `/latest/backups`) of CVC-Operator (This object will include the IP Address of snapshot receiver/sender module) to create backup.
-    2.1 Create a snapshot using volume name and snapshot name(which will get during the CreateSnapshot request).
-    2.2 If the request is to create `local backup` then return from here else continue with other steps.
-    2.3 Find the Healthy cStorVolumeReplica if it doesn't exist return error.
-    2.4 Create CStorCompletedBackUp resources if it doesn’t exist(Intention of creating this resource is used for incremental backup purpose).
-    2.5 Create CStorBackUp resource by populating the current snapshot name and previous snapshot name(if exists from CStorCompletedBackUp) with Healthy CStorVolumeReplica pool UID.
-    2.6 Corresponding backup controllers exist in pool-manager will responsible for sending the snapshot data from pool to velero-plugin.         and velero-plugin will write this stream to cloud-provider.
+Velero server sends CreateSnapshot API with volumeID to create the snapshot. Velero Interface will execute `CreateSnapshot` API of the cStor velero-plugin controller.
+
+cStor velero-plugin controller is responsible for executing below steps:
+1.  BackUp the relevant PVC object to the cloud provider.
+2.  Execute the REST API(POST `/latest/backups`) of CVC-Operator (This object will include the IP Address of snapshot receiver/sender module) to create backup.
+    1.  Create a snapshot using volume name and snapshot name(which will get during the    CreateSnapshot request).
+    2.  If the request is to create `local backup` then return from here else continue with other steps.
+    3.  Find the Healthy cStorVolumeReplica if it doesn't exist return error.
+    4.  Create CStorCompletedBackUp resources if it doesn’t exist(Intention of creating this resource is used for incremental backup purpose).
+    5.  Create CStorBackUp resource by populating the current snapshot name and previous snapshot name(if exists from CStorCompletedBackUp) with Healthy CStorVolumeReplica pool UID.
+    6.  Corresponding backup controllers exist in pool-manager will responsible for sending the snapshot data from pool to velero-plugin.         and velero-plugin will write this stream to cloud-provider.
 3. Call cloud interface API `UploadSnapshot` which will upload the backup to the cloud provider.
 4. This API will return the unique ‘snapshotID’ (volumeID + "-velero-bkp-" + backupName) to the velero server. This ‘snapshotID’ will be used to refer to the backup snapshot.
 
 ##### Velero Server Sends DeleteSnapshot Request
 
-Velero server sends `DeleteSnapshot` API of Velero Interface to delete the backup/snapshot with argument `snapshotID`. This snapshotID is generated during the backup creation of this snapshot. Velero Interface will execute the DeleteSnapshot API of cStor backup/restore module. cStor backup/restore module is responsible for performing below steps:
-1. Delete the PVC object for this backup from the cloud provider.
-2. Execute REST API(`latest/backups/`) of the CVC-Operater to delete the resources created for this particular backup.
-    2.1 Delete the CStorCompletedBackUp resources if the given cstorbackup is the last backup of schedule or cstorcompletedbackup doesn't have any successful backup.
-    2.2 Delete the snapshot created for that backup.
-    2.3 Delete the CStorBackUp resource.
+Velero server sends `DeleteSnapshot` API of Velero Interface to delete the backup/snapshot with argument `snapshotID`. This snapshotID is generated during the backup creation of this snapshot. Velero Interface will execute the DeleteSnapshot API of cStor velero-plugin. cStor velero-plugin is responsible for performing below steps:
+1.  Delete the PVC object for this backup from the cloud provider.
+2.  Execute REST API(`latest/backups/`) of the CVC-Operater to delete the resources created for this particular backup.
+    1.  Delete the CStorCompletedBackUp resources if the given cstorbackup is the last backup of schedule or cstorcompletedbackup doesn't have any successful backup.
+    2.  Delete the snapshot created for that backup.
+    3.  Delete the CStorBackUp resource.
 3. Execute the `RemoveSnapshot` API of the cloud interface to delete the snapshot from the cloud provider.
 
 ##### Velero Server Sends CreateVolumeFromSnapshot Request
 
-Velero Server will execute the `CreateVolumeFromSnapshot` API of the velero interface to restore the backup with the argument (snapshotID, volumeType). Velero interface will execute `CreateVolumeFromSnapshot` API of cStor backup/restore module. cStor backup/restore module will perform following below steps:
-1. Download the PVC object from the cloud provider through a cloud interface and deploy the PVC. If PVC already exists in the cluster then skip the PVC creation(only for remote restore).
-2. Check If PVC status is bounded.
-3. Execute the REST API(`latest/restore`) with CVC-Operator restore details(includes the IP address of snapshot receiver/sender module) to initiate the restore of the snapshot.
-   3.1 Create CVC with clone configuration(i.e CVC will hold source volume and snapshot information in spec) only if the restore request is local restore and for remote restore velero-plugin creates PVC with annotation `openebs.io/created-through: restore` then CSI-Provisioner will propogate this annotation to CVC and then CVC-controller will create CVR with annotation `isRestoreVol: true` only if `openebs.io/created-through` annotation is set. If CVR contains annotation `isRestoreVol: true` then CVR controller will skip setting targetIP(targetIP helpful for replica to connect to target to serve IOs).
-   3.2 Wait till CVC comes to Bound state(blocking call and it will be retried for 10 seconds at interval of 2 seconds in case if it is not Bound).
-   3.3 Create a replica count number of restore CR’s which will be responsible for dumping backup data into the volume dataset.
+Velero Server will execute the `CreateVolumeFromSnapshot` API of the velero interface to restore the backup with the argument (snapshotID, volumeType). Velero interface will execute `CreateVolumeFromSnapshot` API of velero-plugin. velero-plugin will perform following below steps:
+1.  Download the PVC object from the cloud provider through a cloud interface and deploy the PVC. If PVC already exists in the cluster then skip the PVC creation. (only for remote restore)
+2.  Check If PVC status is bounded. (Only for remote restore)
+3.  Execute the REST API(`latest/restore`) with CVC-Operator restore details(includes the   IP address of snapshot receiver/sender module) to initiate the restore of the snapshot.
+    1.  Create CVC with clone configuration(i.e CVC will hold source volume and snapshot information in spec) only if the restore request is local restore and for remote restore velero-plugin creates PVC with annotation `openebs.io/created-through: restore` then CSI-Provisioner will propogate this annotation to CVC and then CVC-controller will create CVR with annotation `isRestoreVol: true` only if `openebs.io/created-through` annotation is set. If CVR contains annotation `isRestoreVol: true` then CVR controller will skip setting targetIP(targetIP helpful for replica to connect to target to serve IOs).
+    2.  Wait till CVC comes to Bound state(blocking call and it will be retried for 10 seconds at interval of 2 seconds in case if it is not Bound).
+    3.  Create a replica count number of restore CR’s which will be responsible for dumping backup data into the volume dataset.
 4. Call cloud interface API `RestoreSnapshot` to download the snapshot from the cloud provider.
 
 ##### Accessing CVC REST Endpoint
 
 - One can access the REST endpoint of CVC by fetching the details of CVC-Operator service. Below command will be help to get the CVC-Operator service
+```sh
   kubectl get service -n <openebs_namespace> -l openebs.io/component-name: cvc-operator-svc
+```
 
 ##### Velero Server Sends DeleteSnapshot Request
 
-Restore delete will delete restore resource object onlu.
+Restore delete will delete restore resource object only.
+
 Note: It will not delete the resources restored in that restore(ex: PVC).
 
 ##### Work flow in backup controller
 
 When REST API `/latest/backups` is executed it creates CStorBackUp CR with `Pending` status. Backup controller which present in pool-manager will get event and perform the following operations:
-1. Update the CStorBackUp status to `Init`(which conveys controller instantiate process).
-2. In next reconciliation update the Status of CStorBackUp resource as `InProgress`(Which will help to understand the backup process is started).
-3. Execute the below command and ZFS will send the data to `sender/receiver module`(blocking call and this command execution will be retried for 50 seconds at interval of 5 seconds in case of errors).
+1.  Update the CStorBackUp status to `Init`(which conveys controller instantiate process).
+2.  In next reconciliation update the Status of CStorBackUp resource as `InProgress`(Which will help to understand the backup process is started).
+3.  Execute the below command and ZFS will send the data to `sender/receiver module`(blocking call and this command execution will be retried for 50 seconds at interval of 5 seconds in case of errors).
+
 CMD:
-   1. If request is for full backup then command is `zfs send <snapshot_dataset_name> | nc -w 3 <ip_address> <port>`
-   2. If request is for incremental backup then command is `zfs send -i <old_snapshot_dataset_name> <new_snapshot_dataset_name> | nc -w 3 <ip_address> <port>`
-4. Updates the corresponding CStorCompletedBackups with last two completed backups.
-   For example, if schedule `b` has last two backups b-0 and b-1 (b-0 created first and after that b-1 was created) having snapshots
-   b-0 and b-1 respectively then CStorCompletedBackups for the schedule `b` will have following information :
+1.  If request is for full backup then command is `zfs send <snapshot_dataset_name> | nc -w 3 <ip_address> <port>`
+2.  If request is for incremental backup then command is `zfs send -i <old_snapshot_dataset_name> <new_snapshot_dataset_name> | nc -w 3 <ip_address> <port>`
+3.  Updates the corresponding CStorCompletedBackups with last two completed backups. For example, if schedule `b` has last two backups b-0 and b-1 (b-0 created first and after that b-1 was created) having snapshots
+  b-0 and b-1 respectively then CStorCompletedBackups for the schedule `b` will have following information :
 ```go
    CStorCompletedBackups.Spec.PrevSnapName =  b-1
    CStorCompletedBackups.Spec.SnapName = b-0
@@ -169,9 +182,10 @@ NOTE: ip_address and port are the IP Address and port of snapshot sender/receive
 ##### Work flow in restore controller
 
 When REST API `/latest/restore` is executed it creates CStorRestore CR with `Pending` status. Restore controller which present in pool-manager will get event and perform the following operations:
-1. Update the CStorRestore status to `Init`(which conveys controller instantiate process).
-2. Update the status of CStorRestore resource as `InProgress`(Which will help to understand the restore process is started).
-3. Execute the below command and ZFS will receive the data from `sender/receiver module`(blocking call and this command execution will be retried for 50 seconds at interval of 5 seconds in case of errors).
+1.  Update the CStorRestore status to `Init`(which conveys controller instantiate process).
+2.  Update the status of CStorRestore resource as `InProgress`(Which will help to understand the restore process is started).
+3.  Execute the below command and ZFS will receive the data from `sender/receiver module`(blocking call and this command execution will be retried for 50 seconds at interval of 5 seconds in case of errors).
+
 CMD: `nc -w 3 <ip_address> <port> | zfs recv -F <volume_datasetname>`
 
 NOTE: ip_address and port are the IP Address and port of snapshot sender/receiver module.
@@ -212,6 +226,27 @@ type CStorBackupSpec struct {
 
 // CStorBackupStatus is to hold status of backup
 type CStorBackupStatus string
+
+// Status written onto CStorBackup objects.
+const (
+	// BKPCStorStatusDone , backup is completed.
+	BKPCStorStatusDone CStorBackupStatus = "Done"
+
+	// BKPCStorStatusFailed , backup is failed.
+	BKPCStorStatusFailed CStorBackupStatus = "Failed"
+
+	// BKPCStorStatusInit , backup is initialized.
+	BKPCStorStatusInit CStorBackupStatus = "Init"
+
+	// BKPCStorStatusPending , backup is pending.
+	BKPCStorStatusPending CStorBackupStatus = "Pending"
+
+	// BKPCStorStatusInProgress , backup is in progress.
+	BKPCStorStatusInProgress CStorBackupStatus = "InProgress"
+
+	// BKPCStorStatusInvalid , backup operation is invalid.
+	BKPCStorStatusInvalid CStorBackupStatus = "Invalid"
+)
 ```
 
 ### CStorRestore Schema
@@ -241,6 +276,30 @@ type CStorRestoreSpec struct {
 
 // CStorRestoreStatus is to hold result of action.
 type CStorRestoreStatus string
+
+// Status written onto CStrorRestore object.
+const (
+	// RSTCStorStatusEmpty ensures the create operation is to be done, if import fails.
+	RSTCStorStatusEmpty CStorRestoreStatus = ""
+
+	// RSTCStorStatusDone , restore operation is completed.
+	RSTCStorStatusDone CStorRestoreStatus = "Done"
+
+	// RSTCStorStatusFailed , restore operation is failed.
+	RSTCStorStatusFailed CStorRestoreStatus = "Failed"
+
+	// RSTCStorStatusInit , restore operation is initialized.
+	RSTCStorStatusInit CStorRestoreStatus = "Init"
+
+	// RSTCStorStatusPending , restore operation is pending.
+	RSTCStorStatusPending CStorRestoreStatus = "Pending"
+
+	// RSTCStorStatusInProgress , restore operation is in progress.
+	RSTCStorStatusInProgress CStorRestoreStatus = "InProgress"
+
+	// RSTCStorStatusInvalid , restore operation is invalid.
+	RSTCStorStatusInvalid CStorRestoreStatus = "Invalid"
+)
 ```
 
 ### CStorCompletedBackup Schema
