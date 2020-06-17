@@ -126,6 +126,12 @@ For importing without renaming the command would look like:
 
 The `cstorpoolinstance.openebs.io/oldname` annotation will be used to rename the pool which was named as `cstor-cspuid` to `cstor-cspcuid`. This annotation will be removed after successful import of the pool.
 
+**Note: Before migrating make sure:**
+ - OpenEBS version of old resources(control-plane and data-plane) should be atleast 1.11.0.
+ - Apply new cstor-operators and csi driver which also should be atleast in 1.11.0 version.
+ - Identify the nodes on which the `CSP` are present and run `fdisk -l` command on that node. If the command is hung then bad block file exists on that node. If such case occurs, please resolve this issue before proceeding with the migration. To identify the nodes look for the `kubernetes.io/hostname` label on the `CSP`.
+
+
 The Job spec for migrating SPC is:
 ```yaml
 ---
@@ -145,7 +151,7 @@ spec:
       containers:
       - name:  migrate
         args:
-        - "pool"
+        - "cstor-spc"
         # name of the spc that is to be migrated
         - "--spc-name=cstor-sparse-pool"
 
@@ -217,6 +223,6 @@ After the successful completion of the job the applications can be scaled up to 
 ## Infrastructure Needed
 
 - Kubernetes version should be 1.14 or above.
-- OpenEBS version should be 1.3 or above.
-- CSPC operator should be installed.
-- CStor CSI operator should be installed.
+- OpenEBS version should be 1.11 or above.
+- CSPC operator 1.11 or above should be installed.
+- CStor CSI operator 1.11 or above should be installed.
