@@ -19,7 +19,6 @@ status: provisional
 ## Table of Contents
 
 - [Backup and Restore for V1 version of CStorVolumes](#backup-and-restore-for-v1-version-of-cstorvolumes)
-  - [Table of Contents](#table-of-contents)
   - [Summary](#summary)
   - [Motivation](#motivation)
     - [Goals](#goals)
@@ -45,9 +44,6 @@ status: provisional
     - [CStorBackup Schema](#cstorbackup-schema)
     - [CStorRestore Schema](#cstorrestore-schema)
     - [CStorCompletedBackup Schema](#cstorcompletedbackup-schema)
-  - [Drawbacks](#drawbacks)
-  - [Alternatives](#alternatives)
-  - [Infrastructure Needed](#infrastructure-needed)
 
 ## Summary
 
@@ -88,7 +84,7 @@ As an OpenEBS user, I should be able to create a scheduled backups for CStorVolu
 
 #### CVC-Operator REST Interface
 
-The volume management api like create, delete, snapshot, clone etc have moved from m-apiserver to CVC-Operator as part of supporting the CSI Driver. The velero-plugin of volume API also should be moved to the CVC Operator as the velero-plugin api in turn depends on the volume snapshot, clone implementations. Currently CVC Operator only supports declarative API via CRs, but plugin requires imperative API(REST API). The proposal is to implement a REST server within CVC-Operator to perform velero-plugin operations. The velero-plugin should identify the type of the volume and forward the REST API requests to the CVC Operator.
+The volume management api like create, delete, snapshot, clone etc have moved from m-apiserver to CVC-Operator as part of supporting the CSI Driver. REST API of Maya-ApiServer to trigger backup/restore also needs to be implemented in the CVC operator as these APIs are using volume snapshot/clone API. Currently CVC Operator only supports declarative API via CRs, but plugin requires imperative API(REST API). The proposal is to implement a REST server within CVC-Operator to perform velero-plugin operations. The velero-plugin should identify the type of the volume and forward the REST API requests to the CVC Operator.
 
 Velero-plugin execute different REST API of CVC-Apiserver based on the type-of-request/API from velero.
 
@@ -100,7 +96,7 @@ Example:
 ```sh
 velero backup create <BACKUP_NAME> --include-namespaces=<NAME_SPACE> --snapshot-volumes –volume-snapshot-locations=<SNAPSHOT_LOCATION>
 ```
-- User can resotre backuped using velero CLI
+- User can resotre a backup using velero CLI
 
 Example
 ```
@@ -123,7 +119,7 @@ cStor velero-plugin controller is responsible for executing below steps:
     3.  Find the Healthy cStorVolumeReplica if it doesn't exist return error.
     4.  Create CStorCompletedBackUp resources if it doesn’t exist(Intention of creating this resource is used for incremental backup purpose).
     5.  Create CStorBackUp resource by populating the current snapshot name and previous snapshot name(if exists from CStorCompletedBackUp) with Healthy CStorVolumeReplica pool UID.
-    6.  Corresponding backup controllers exist in pool-manager will responsible for sending the snapshot data from pool to velero-plugin.         and velero-plugin will write this stream to cloud-provider.
+    6.  Corresponding backup controllers exist in pool-manager will responsible for sending the snapshot data from pool to velero-plugin         and velero-plugin will write this stream to cloud-provider.
 3. Call cloud interface API `UploadSnapshot` which will upload the backup to the cloud provider.
 4. This API will return the unique ‘snapshotID’ (volumeID + "-velero-bkp-" + backupName) to the velero server. This ‘snapshotID’ will be used to refer to the backup snapshot.
 
@@ -131,7 +127,7 @@ cStor velero-plugin controller is responsible for executing below steps:
 
 Velero server sends `DeleteSnapshot` API of Velero Interface to delete the backup/snapshot with argument `snapshotID`. This snapshotID is generated during the backup creation of this snapshot. Velero Interface will execute the DeleteSnapshot API of cStor velero-plugin. cStor velero-plugin is responsible for performing below steps:
 1.  Delete the PVC object for this backup from the cloud provider.
-2.  Execute REST API(`latest/backups/`) of the CVC-Operater to delete the resources created for this particular backup.
+2.  Execute REST API(`latest/backups/`) of the CVC-Operator to delete the resources created for this particular backup.
     1.  Delete the CStorCompletedBackUp resources if the given cstorbackup is the last backup of schedule or cstorcompletedbackup doesn't have any successful backup.
     2.  Delete the snapshot created for that backup.
     3.  Delete the CStorBackUp resource.
@@ -186,7 +182,7 @@ When REST API `/latest/restore` is executed it creates CStorRestore CR with `Pen
 2.  Update the status of CStorRestore resource as `InProgress`(Which will help to understand the restore process is started).
 3.  Execute the below command and ZFS will receive the data from `sender/receiver module`(blocking call and this command execution will be retried for 50 seconds at interval of 5 seconds in case of errors).
 
-CMD: `nc -w 3 <ip_address> <port> | zfs recv -F <volume_datasetname>`
+CMD: `nc -w 3 <ip_address> <port> | zfs recv -F <volume_dataset_name>`
 
 NOTE: ip_address and port are the IP Address and port of snapshot sender/receiver module.
 
@@ -312,12 +308,3 @@ type CStorCompletedBackup struct {
     Spec              CStorBackupSpec `json:"spec"`
 }
 ```
-
-## Drawbacks
-
-
-
-## Alternatives
-
-
-## Infrastructure Needed
