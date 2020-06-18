@@ -9,7 +9,7 @@ owners:
   - "@kmova"
 editor: "@shubham14bajpai"
 creation-date: 2019-11-15
-last-updated: 2020-05-21
+last-updated: 2020-06-18
 status: implementable
 see-also:
   - NA
@@ -60,7 +60,7 @@ This design proposes the following key changes while migrating from a SPC to CSP
 
   2. Equivalent CSPC CR will be created for the migrating SPC.
 
-  3. Equivalent CSPI CRs will be created by operator which will replace the CSP for given SPC. The CSPI will reconcile disabled to avoid double import.
+  3. Equivalent CSPI CRs will be created by operator which will replace the CSP for given SPC. The CSPI will be created by disabling the reconciliation to avoid double import.
 
   4. The SPC owner reference on the BDCs will be replaced by equivalent CSPC owner reference.
 
@@ -79,7 +79,7 @@ For migrating non-csi volumes to csi volumes following changes are proposed:
 
   2. Set the PV to `Retain` reclaim policy to prevent deletion of OpenEBS resources.
 
-  3. A temporary CStorVolumePolicy with target deploy configurations and CSPI names from old CVRs will be created. This is facilitate the creation `cstor/v1` CVRs on the same pool as the old `openebs.io/v1alpha1` CVRs were. I also help preserve any configuration set on the target deployment of old volume.
+  3. A temporary CStorVolumePolicy with target deploy configurations and CSPI names from old CVRs will be created. This is facilitate the creation `cstor/v1` CVRs on the same pool as the old `openebs.io/v1alpha1` CVRs were. It also help preserve any configuration set on the target deployment of old volume.
 
   4. Recreate PVC with volumeName already populated & csi driver info
  
@@ -175,7 +175,7 @@ After successful completion of pool migration the logs will list out all applica
 
 #### Phase 2: Migration of Non-CSI volume to CSI volume
 
-**Note: Before proceeding to the below steps the pool must be migrated successfully and all the applications having volumes on the pool must be scale down.**
+**Note: Before proceeding to the below steps the pool must be migrated successfully and the application using the volume to be migrated must be scale down.**
 
 The migration of volumes will be performed via a job which takes the migrated CSPC name as one of its argument.
 
