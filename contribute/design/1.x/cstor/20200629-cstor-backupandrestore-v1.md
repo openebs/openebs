@@ -50,7 +50,7 @@ A detailed description on how cStor Backup and Restore works is out of the scope
 
 ## Motivation
 
-- Create a backup and restore CRs in V1 version of cstor.openebs.io group which provides backup and restore support of cStor CSI volumes.
+- Promote backup and restore CRs to V1 version of cstor.openebs.io group which provides backup and restore support of cStor CSI volumes.
 
 ### Goals
 
