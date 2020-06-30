@@ -27,6 +27,7 @@ The list of users that have publicly shared the usage of OpenEBS.
 | User | Stateful Workloads | Success Story |
 | :--- | :--- | :--- |
 | [Alin Jurj](https://github.com/Perfect-Web) | Elasticsearch | [English](./adopters/users/Perfect-Web/README.md)  | 
+| [Dean Stathos](https://github.com/dstathos) | MariaDB, homegrown applications | [English](./adopters/users/dstathos/README.md)  |
 | [Maartje Eyskens](https://github.com/meyskens) | Minio | [English](./adopters/users/meyskens/README.md)  | 
 | [proegssilb](https://github.com/proegssilb) | PostgreSQL, Redis, Factorio (video game server) | [English](./adopters/users/proegssilb/README.md)  | 
 | [radicand](https://github.com/radicand) | Wordpress, MariaDB on ARM64 cluster | [English](./adopters/users/radicand/README.md) | 
