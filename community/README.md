@@ -44,9 +44,9 @@ We have a weekly or bi-weekly sync up over Google hangout or Zoom on sub project
 - E2e Review every Monday at 12:45PM IST over [Hangout](https://meet.google.com/bme-vjsj-qdp)
 - Backup and Restore Review every other Tuesday at 11:00AM IST over [Hangout](https://meet.google.com/xjb-pcxo-wsx)
 - NDM and Local PV Review every Tuesday at 12:45PM IST over [Hangout](https://meet.google.com/vid-sfmt-igs)
-- Jiva Review every Tuesday at 12:45PM IST over [Hangout](https://meet.google.com/nvu-dhwx-jhb)
-- cStor Review every Tuesday at 12:45PM IST over [Hangout](https://meet.google.com/tdk-rqwj-ujp)
-- ZFS Local PV Review every Tuesday at 12:45PM IST over [Hangout](https://meet.google.com/yoq-fktt-qqn)
+- Jiva Review every Wednesday at 12:45PM IST over [Hangout](https://meet.google.com/nvu-dhwx-jhb)
+- cStor Review every Thursday at 12:45PM IST over [Hangout](https://meet.google.com/tdk-rqwj-ujp)
+- ZFS Local PV Review every Friday at 12:45PM IST over [Hangout](https://meet.google.com/yoq-fktt-qqn)
 
 ### Monthly Product Roadmap Review Meetings
 
