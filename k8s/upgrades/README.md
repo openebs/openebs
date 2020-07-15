@@ -81,25 +81,25 @@ desired openebs-operator.yaml and customize it again**
 $ kubectl apply -f https://openebs.github.io/charts/openebs-operator-1.12.0.yaml
 ```
 
-### Upgrade using helm chart (using stable/openebs, openebs-charts repo, etc.,):
+### Upgrade using helm chart (using openebs/openebs, openebs-charts repo, etc.,):
 
 **The sample steps below will work if you have installed openebs with
-default values provided by stable/openebs helm chart.**
+default values provided by openebs/openebs helm chart.**
 
 Before upgrading via helm, please review the default values available with
-latest stable/openebs chart.
-(https://raw.githubusercontent.com/helm/charts/master/stable/openebs/values.yaml).
+latest openebs/openebs chart.
+(https://openebs.github.io/charts).
 
 - If the default values seem appropriate, you can use the below commands to
-  update OpenEBS. [More](https://hub.helm.sh/charts/stable/openebs) details about the specific chart version.
+  update OpenEBS. [More](https://hub.helm.sh/charts/openebs/openebs) details about the specific chart version.
   ```sh
-  $ helm upgrade --reset-values <release name> stable/openebs --version 1.12.0
+  $ helm upgrade --reset-values <release name> openebs/openebs --version 1.12.0
   ```
 - If not, customize the values into your copy (say custom-values.yaml),
   by copying the content from above default yamls and edit the values to
   suite your environment. You can upgrade using your custom values using:
   ```sh
-  $ helm upgrade <release name> stable/openebs --version 1.12.0 -f custom-values.yaml`
+  $ helm upgrade <release name> openebs/openebs --version 1.12.0 -f custom-values.yaml`
   ```
 
 ### Using customized operator YAML or helm chart.
