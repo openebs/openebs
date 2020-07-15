@@ -88,7 +88,7 @@ default values provided by openebs/openebs helm chart.**
 
 Before upgrading via helm, please review the default values available with
 latest openebs/openebs chart.
-(https://openebs.github.io/charts).
+(https://github.com/openebs/charts/blob/master/charts/openebs/values.yaml).
 
 - If the default values seem appropriate, you can use the below commands to
   update OpenEBS. [More](https://hub.helm.sh/charts/openebs/openebs) details about the specific chart version.
