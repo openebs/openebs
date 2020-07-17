@@ -34,8 +34,6 @@ status: provisional
 				- [Migration Workflows](#migration-workflows)
 					- [Approach1(With Backward compatibility)](#approach1with-backward-compatibility)
 					- [Cons](#cons)
-					- [Apporach2(Without Backward compatibility)](#apporach2without-backward-compatibility)
-					- [Cons](#cons-1)
 
 ## Introduction
 
@@ -68,7 +66,6 @@ A detailed description on how cStor Backup and Restore works is out of the scope
 ### Proposed Approaches
 
 - Backward compatibility to support any version of backup and restore.
-- Don't have backward compatibility i.e backup and restore is supported only if CVC-Operator and pool-manager are in same version till 1.12.0 version of OpenEBS.
 
   Example:
   |   CVC-Operator Version    | Pool-Manager Version  |
@@ -273,17 +270,6 @@ From existing to proposed has only one schema change i.e CStorCompletedBackupSpe
 
 - Code needs to hold old and new group APIs to support backward compatibility.
 - If CSP.Version.Status.Current is not equal to CSP.Version.Desired value then backup and restore endpoint of CVC-Operator will return error saying upgrade is in progress and can't perform backup/restore at this point.
-
-###### Apporach2(Without Backward compatibility)
-
-- Support of backup and restore is possible only if CVC-Operator and cStor pools are in same versions which means both should be in 1.11.0 (or) greater versions.
-- If CVC-Operator is greater than 1.11.0 and cStor pools are in 1.11.0 then end point will throw an error saying incompatible version to serve backup and restore request.
-- Migration of group and version of cStor backup and restore resources will be done during cStor pool(CSPC) upgrade time from 1.11.0 to later versions by upgrade job.
-
-###### Cons
-
-- If CSP.Version.Status.Current is not equal to CSP.Version.Desired then backup and restore endpoint of CVC-Operator will return error saying upgrade is in progress and can't perform backup/restore at this point.
-- Can not provide backward compatibility support.
 
 *NOTE:*
 - Upgrade/migrate is not atomic process there were three steps involved to upgrade/migrate:
