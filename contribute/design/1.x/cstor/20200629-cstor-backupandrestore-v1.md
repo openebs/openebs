@@ -10,7 +10,7 @@ owners:
   - "@mynktl"
 editor: "@mittachaitu"
 creation-date: 2020-06-29
-last-updated: 2020-06-29
+last-updated: 2020-07-21
 status: provisional
 ---
 
@@ -71,7 +71,7 @@ A detailed description on how cStor Backup and Restore works is out of the scope
   |   CVC-Operator Version    | Pool-Manager Version  |
   |  ------------------------ | --------------------  |
   |   1.11.0                  |  1.11.0               |
-  |   >= 1.12.0               |  >= 1.12.0            |
+  |   >= 1.12.0               |  >= 1.11.0            |
 
 *Note:*
 
@@ -80,7 +80,7 @@ _CVC-Operator and pool-manager version **< 1.11.0** will not support Backup and 
 ### Steps to perform user stories
 
 - User need to install or upgrade the CSPC based cStor pools to atleast 1.12.0
-- SPC based cStor pools and Non-CSI volumes should migrate to 1.12.0 version of CSPC-Operater to get v1 version of Backup and Restore.
+- SPC based cStor pools and Non-CSI volumes should migrate to 1.13.0 version of CSPC-Operater to get v1 version of Backup and Restore.
 
 ### Low Level Design
 
@@ -261,18 +261,19 @@ From existing to proposed has only one schema change i.e CStorCompletedBackupSpe
 
 ###### Approach1(With Backward compatibility)
 
-- Converting group and version of cStor backup and restore resources from `openebs.io/v1alpha1` to `cstor.openebs.io/v1` will break the support of backup and restore if control plane(CVC-Operator) alone is upgraded to latest version i.e 1.12.0 and data plane(cStor pools) is in lower version i.e 1.11.0. When control plane is upgraded it will understand `cstor.openebs.io` group but data plane is in old version so it will understand `openebs.io` group. To fix compatibility issues OpenEBS(CVC-Operator) needs to support backward compatibility for alpha features(backup and restore).
+- Converting group and version of cStor backup and restore resources from `openebs.io/v1alpha1` to `cstor.openebs.io/v1` will break the support of backup and restore if control plane(CVC-Operator) alone is upgraded to latest version i.e 1.13.0 and data plane(cStor pools) is in lower version i.e less than 1.13.0. When control plane is upgraded it will understand `cstor.openebs.io` group but data plane is in old version it will only understand `openebs.io` group. To fix compatibility issues OpenEBS(CVC-Operator) needs to support backward compatibility for alpha features(backup and restore).
 - How can we fix backward compatibility? We can achieve it by following steps:
-  1. Whenever a CVC-Operator needs to perform CRUD request on backup and restore endpoints it will find the version of cStor pool by using payload(based on volume it will fetch CVR and using CVR labels CSPI info can be fetched) which was sent during request and takes a decision on which group it has to perform CRUD operations. For example if pool version is equal to 1.11.0 then CVC-Operator will make use `openebs.io` group client or if pool version is 1.12.0 then it will make use of `cstor.openebs.io` group.
-  2. Migration of  group and versions of cStor backup and restore resources will be done during cStor pool(CSPC) upgrade time from 1.11.0 to later versions using upgrade job.
+  1. Whenever a CVC-Operator needs to perform CRUD request on backup and restore endpoints it will find the current version of cStor pool by using payload(based on volume it will fetch CVR and using CVR labels CSPI info can be fetched) which was sent during request and takes a decision on which group it has to perform CRUD operations. For example if pool version is less than 1.13.0 then CVC-Operator will make use `openebs.io` group client or if pool version is >1.13.0 then it will make use of `cstor.openebs.io` group.
+  2. Migration of  group and versions of cStor backup and restore resources will be done during cStor pool(CSPC) upgrade time from older versions to later versions(where we support v1 group) using upgrade job.
+  3. If pool is about to upgrade and at the same time if backup/restore is requested then CVC-Operator will create the corresponding resorce in respective group based on the current version of cStorPoolInstance. Later when corresponding pool(cspi) is successfull upgraded(which means `current.version` == `desired.version`) it will migrate backup and restore resources to `cstor.openebs.io` version with same `status.phase` present on backup and resotore resources.
 
 ###### Cons
 
 - Code needs to hold old and new group APIs to support backward compatibility.
-- If CSP.Version.Status.Current is not equal to CSP.Version.Desired value then backup and restore endpoint of CVC-Operator will return error saying upgrade is in progress and can't perform backup/restore at this point.
 
 *NOTE:*
-- Upgrade/migrate is not atomic process there were three steps involved to upgrade/migrate:
+- Upgrade is not atomic process there were three steps involved to upgrade/migrate:
   1. Control plane upgrades.
-  2. CStor pools upgrade/migrate.
-  3. CStor Volumes upgrade/migrate.
+  2. CStor pools upgrade.
+  3. CStor Volumes upgrade.
+- During Migration from v1alpha1 to v1(both pools and volumes) time backup and restore of volume is not supported(User needs to plan accordingly)[why it is not supported? Since migration involves deleteion of PVC, PV and SC so it not recomended to schedule backup/restore at same time].
