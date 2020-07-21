@@ -78,7 +78,7 @@ desired openebs-operator.yaml and customize it again**
 
 ```
 #Upgrade to OpenEBS control plane components to desired version. Say 1.12.0
-$ kubectl apply -f https://openebs.github.io/charts/openebs-operator-1.12.0.yaml
+$ kubectl apply -f https://openebs.github.io/charts/1.12.0/openebs-operator.yaml
 ```
 
 ### Upgrade using helm chart (using openebs/openebs, openebs-charts repo, etc.,):
