@@ -203,7 +203,7 @@ spec:
         - name: OPENEBS_IO_CSTOR_POOL_EXPORTER_IMAGE
           value: "openebs/m-exporter:ci"
         - name: OPENEBS_IO_HELPER_IMAGE
-          value: "openebs/linux-utils:1.12.0"
+          value: "openebs/linux-utils:ci"
         # OPENEBS_IO_ENABLE_ANALYTICS if set to true sends anonymous usage
         # events to Google Analytics
         - name: OPENEBS_IO_ENABLE_ANALYTICS
@@ -615,7 +615,7 @@ spec:
             - name: OPERATOR_NAME
               value: "node-disk-operator"
             - name: CLEANUP_JOB_IMAGE
-              value: "openebs/linux-utils:1.12.0"
+              value: "openebs/linux-utils:ci"
             # OPENEBS_IO_INSTALL_CRD environment variable is used to enable/disable CRD installation
             # from NDM operator. By default the CRDs will be installed
             #- name: OPENEBS_IO_INSTALL_CRD
@@ -747,7 +747,7 @@ spec:
         - name: OPENEBS_IO_INSTALLER_TYPE
           value: "openebs-operator"
         - name: OPENEBS_IO_HELPER_IMAGE
-          value: "openebs/linux-utils:1.12.0"
+          value: "openebs/linux-utils:ci"
         # Process name used for matching is limited to the 15 characters
         # present in the pgrep output.
         # So fullname can't be used here with pgrep (>15 chars).A regular expression
