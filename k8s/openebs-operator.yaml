@@ -475,6 +475,9 @@ spec:
       #  "openebs.io/nodegroup": "storage-node"
       serviceAccountName: openebs-maya-operator
       hostNetwork: true
+      # host PID is used to check status of iSCSI Service when the NDM
+      # API service is enabled
+      #hostPID: true
       containers:
       - name: node-disk-manager
         image: openebs/node-disk-manager:ci
@@ -482,6 +485,9 @@ spec:
           - -v=4
         # The feature-gate is used to enable the new UUID algorithm.
           - --feature-gates="GPTBasedUUID"
+        # The feature gate is used to start the gRPC API service. The gRPC server
+        # starts at 9115 port by default. This feature is currently in Alpha state
+        # - --feature-gates="APIService"
         imagePullPolicy: IfNotPresent
         securityContext:
           privileged: true
