@@ -18,11 +18,11 @@ The list of organizations that have publicly shared the usage of OpenEBS:
 | [CORT](https://www.cort.com/) | Magento, Elasticsearch, MariaDB | [English](./adopters/cort/README.md) |
 | [DISID](https://disid.com/) | Minio, DataStax, Greenplum, Gridgain, mongoDB, Qlickhouse, PosgtreSQL | [English](./adopters/disid/README.md) |
 | [D-Rating](https://www.d-rating.com/) | MongoDB, Elasticsearch, PostgreSQL | [English](./adopters/d-rating/README.md) |
+| [KPN](https://www.kpn.com/) | ManageIQ, AWX, Harbor, Selenium Hub based automated UI testing, verdaccio, openshift monitoring (alert manager), openshift monitoring (cassandra) | [English](./adopters/kpn/README.md) |
 | [Optoro](https://www.optoro.com/) | PostgreSQL, MySQL, Apache Kafka, Redis, ElasticSearch, Prometheus, Thanos | [English](./adopters/optoro/README.md) |
 | [Orange](https://www.orange.com/en/home) | Prometheus, Alertmanager, ChartMuseum, Harbor, GitLab, PostgreSQL, Redis, OpenLdap, RabbitMQ, MySQL, MinIO, Metabase, ... | [English](./adopters/orange/README.md) |
 | [Plaid Cloud](https://github.com/PlaidCloud) | Redis, Prometheus, Elasticsearch, PostgreSQL | [English](./adopters/plaidcloud/README.md) |
 | [Stratus5](https://stratus5.com/) | Redis,Ceryx, MySQL, MariaDB, Wordpress | [English](./adopters/stratus5/README.md) |
-
 
 The list of users that have publicly shared the usage of OpenEBS.
 
