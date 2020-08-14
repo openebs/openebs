@@ -4,9 +4,9 @@
 
 ### Migration of cStor Pools/Volumes to latest CSPC Pools/CSI based Volumes
 
-OpenEBS 2.0.0 moves the cStor engine towards `v1` schema and CSI based provisioning. To migrate from old SPC base pools and cStor external-provisioned volume to CSPC based pools and cStor CSI volumes follow the steps mentioned in the [Migration doc](https://github.com/openebs/upgrade/blob/master/docs/migration.md). 
+OpenEBS 2.0.0 moves the cStor engine towards `v1` schema and CSI based provisioning. To migrate from old SPC based pools and cStor external-provisioned volume to CSPC based pools and cStor CSI volumes follow the steps mentioned in the [Migration doc](https://github.com/openebs/upgrade/blob/master/docs/migration.md). 
 
-This migration can be performed after upgrading to old OpenEBS resources to `1.12.0` or above. 
+This migration can be performed after upgrading the old OpenEBS resources to `2.0.0` or above. 
 
 ### Upgrading CSPC pools and cStor CSI volumes
 
@@ -36,7 +36,7 @@ The upgrade of OpenEBS is a three step process:
 ## Step 1: Prerequisites
 
 **Note: It is mandatory to make sure to that all OpenEBS control plane
-and data plane components are running with expected version before the upgrade.**
+and data plane components are running with the expected version before the upgrade.**
 - **For upgrading to the latest release (2.0.0), the previous version should be minimum 1.0.0 **
 
 **Note: All steps described in this document need to be performed from a
@@ -81,9 +81,10 @@ Upgrade steps vary depending on the way OpenEBS was installed by you.
 Below are steps to upgrade using some common ways to install OpenEBS:
 
 ### Prerequisite for control plane upgrade
-1. Make sure all the blockdevices that are in use are connected to the node.
-2. Make sure that all manually created and claimed blockdevices are excluded in the NDM configmap path
-filter
+1. Make sure all the blockdevices that are in use by cstor or localPV are connected to the node.
+2. Make sure all the blockdevices that are in use are in active and claimed state.
+3. Make sure that all manually created and claimed blockdevices are excluded in the NDM configmap path
+filter.
 
 **NOTE: Upgrade of LocalPV rawblock volumes are not supported. Please exclude it in configmap**
 
@@ -127,6 +128,11 @@ As a first step, you must update your custom helm chart or YAML with desired
 release tags and changes made in the values/templates. After updating the YAML
 or helm chart or helm chart values, you can use the above procedures to upgrade
 the OpenEBS Control Plane components.
+
+### After Upgrade
+From 2.0.0, OpenEBS uses a new algorithm to generate the UUIDs for blockdevices to identify any type of disk across the 
+nodes in the cluster. Therefore, blockdevices that were not used (Unclaimed state) in earlier versions will be made
+Inactive and new resources will be created for them. Existing devices that are in use will continue to work normally.
 
 ## Step 3: Upgrade the OpenEBS Pools and Volumes
 
