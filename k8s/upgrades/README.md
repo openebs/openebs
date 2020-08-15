@@ -82,11 +82,31 @@ Below are steps to upgrade using some common ways to install OpenEBS:
 
 ### Prerequisite for control plane upgrade
 1. Make sure all the blockdevices that are in use by cstor or localPV are connected to the node.
-2. Make sure all the blockdevices that are in use are in active and claimed state.
-3. Make sure that all manually created and claimed blockdevices are excluded in the NDM configmap path
+2. Make sure that all manually created and claimed blockdevices are excluded in the NDM configmap path
 filter.
 
 **NOTE: Upgrade of LocalPV rawblock volumes are not supported. Please exclude it in configmap**
+
+eg: If partitions or dm devices are used, make sure it is added to the config map.
+To edit the config map, run the following command
+```bash
+kubectl edit cm openebs-ndm-config -n openebs
+```
+
+Add the partitions or manually created disks into path filter if not already present
+
+```yaml
+- key: path-filter
+        name: path filter
+        state: true
+        include: ""
+        exclude: "loop,/dev/fd0,/dev/sr0,/dev/ram,/dev/dm-,/dev/md,/dev/rbd, /dev/sda1, /dev/nvme0n1p1"
+``` 
+
+Here, `/dev/sda1` and `/dev/nvm0n1p1` are partitions that are in use and blockdevices were manually created. It needs
+to be included in the path filter of configmap
+
+**Note: If you have any queries or see something unexpected, please reach out to the OpenEBS maintainers via [Github Issue](https://github.com/openebs/openebs/issues) or via #openebs channel on [Kubernetes Slack](https://slack.k8s.io).**
 
 ### Upgrade using kubectl (using openebs-operator.yaml):
 
@@ -133,6 +153,8 @@ the OpenEBS Control Plane components.
 From 2.0.0, OpenEBS uses a new algorithm to generate the UUIDs for blockdevices to identify any type of disk across the 
 nodes in the cluster. Therefore, blockdevices that were not used (Unclaimed state) in earlier versions will be made
 Inactive and new resources will be created for them. Existing devices that are in use will continue to work normally.
+
+**Note: After upgrading to 2.0.0. If the devices that were in use before the upgrade are no longer required and becomes unclaimed at any point of time. Please restart NDM daemon pod on that node to sync those devices with the latest changes.**
 
 ## Step 3: Upgrade the OpenEBS Pools and Volumes
 
