@@ -17,24 +17,28 @@ status: provisional
 ## Table of Contents
 
 - [CStor Pool Migration](#cstor-pool-migration)
+  - [Table of Contents](#table-of-contents)
   - [Summary](#summary)
   - [Motivation](#motivation)
     - [Goals](#goals)
     - [Non-Goals](#non-goals)
   - [Proposal](#proposal)
     - [User Stories](#user-stories)
-      - [Migrate cStor pools from one node to other node](#)
+      - [Node name changes upon terminating/rebooting the node](#node-name-changes-upon-terminatingrebooting-the-node)
+      - [Existing node is replcaed with new node in the cluster](#existing-node-is-replcaed-with-new-node-in-the-cluster)
+      - [Scaling down the nodes in the cluster to 0 and scaling up the nodes in cluster](#scaling-down-the-nodes-in-the-cluster-to-0-and-scaling-up-the-nodes-in-cluster)
     - [Proposed Implementation](#proposed-implementation)
+      - [CSPC-Operator](#cspc-operator)
     - [Steps to perform user stories](#steps-to-perform-user-stories)
     - [Low Level Design](#low-level-design)
-      - [Work Flow](#work-flow)
+    - [Schema changes](#schema-changes)
 
 ## Summary
 
 This proposal brings out the design details to implement pool migration
 from one node to other node.
 
-##### NOTE: Before pool migration all the disks participating in the cStor pools should be attached to newer node.
+*NOTE: Before pool migration all the disks participating in the cStor pools should be attached to newer node.*
 
 ## Motivation
 
