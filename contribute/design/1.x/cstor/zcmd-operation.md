@@ -164,9 +164,9 @@ type CStorPoolSpec struct {
 type CommandExecution struct {
     // Command that need to execute on corresponding cStor pool
     Command string
-    // MaxRetryCount desribes the no.of times controller needs to try for execution
+    // MaxRetryCount desribes the max retries controller try for execution
     MaxRetryCount int
-    // CurreentRetryCount describes the current time controller executing
+    // CurreentRetryCount describes the current iteration controller executing the command
     CurrentRetryCount int
 }
 
@@ -215,6 +215,9 @@ type CStorPoolStatus struct {
 
 	//ReadOnly if pool is readOnly or not
 	ReadOnly bool `json:"readOnly"`
+
+    // CommandResult contains the output of command requested in spec section
+    CommandResult string `json:"commandResult"`
 
 	LastUpdateTime metav1.Time `json:"lastUpdateTime,omitempty"`
 	Message        string      `json:"message,omitempty"`
