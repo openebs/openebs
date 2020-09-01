@@ -9,7 +9,7 @@ owners:
   - "@vishnuitta"
 editor: "@akhilerm"
 creation-date: 2019-07-05
-last-updated: 2019-09-10
+last-updated: 2020-09-01
 status: provisional
 ---
 
@@ -66,7 +66,7 @@ and thus the data movement within the cluster.
 ### User Stories
 
 #### Identify a physical disk
-NDM should be able to generate a unqiue id for a physical disk attached to the node
+NDM should be able to generate a unique id for a physical disk attached to the node
 and this id should not change even if the disk is attached at a different port on the
 same host or moved to a different node or altogether moved to a different cluster.
 
@@ -111,37 +111,27 @@ claim possibly leading to data loss
 
 #### Proposed Implementation
 
-User will be able to give a configuration to NDM so that they can choose between the device identification
-method to be used. As an inital step, 3 methods will be provided
-- Ignore the disks which we are unable to uniquely identify.
-- Use the current implementation of disk identification.
-- Use the new implementation of creating GPT parition to identify the disk.
-
+If the disk has WWN, then a combination of WWN and Serial will be used, else a GPT
+partition will be created on the disk.
 
 ##### Disk Identification using GPT partitions
 
-1. We try to generate the UUID using the current implementation. 
+This method describes the algorithm used to generate UUID for different device types:
+- `disk` type
+1. Check if the device has a WWN, if yes then use the combination of WWN and Serial to generate UUID
 
-2. If the `ID_TYPE` is empty or `ID_MODEL` is `Virtual_disk` or `EphemeralDisk` or `QEMU_HARDDISK` and `ID_WWN` is empty 
+2. Else,
 
-    1. Check if the disk has a GPT label available on it.
-    	- If a GPT label is available we will use only that label for UID generation
-    	  of the disk. This will ensure that even if the path is changed, or the disk
-    	  comes up at a different node, the UID generated will be same and the disk
-    	  can be uniquely identified.
-    	- Once the GPT label is available, it is possible to identify partitions
-    	  also on the disk (if it exists). This will work by adding the partition
-    	  number along with the generated UID.
-    	  eg: disk-xxxx-1 (/dev/sdX1), disk-xxxx-2 (/dev/sdX2). 
-    	  This is guaranteed to be unique since the partition numbers won't change
-    	  even if the device path changes
-    2. Check if the disk has a Filesystem label available on it. This is in cases where the 
+    1. Check if the disk has a Filesystem label available on it. This is in cases where the 
        complete disk is formatted with a filesystem without a partition table. If filesystem
        label is available we use it for generating the UUID.
-    3. If GPT and FS label is not available on the disk, we create a GPT partition table on the disk,
+    3. If WWN and FS label is not available on the disk, we create a GPT partition table on the disk,
        and then create a single partition which spans the complete disk. This new partition will
        be consumed by the users. This will help to identify a virtual disk for movements across
        the cluster also.
+       
+- `partition` type
+1. The Partition entry ID (ID_PART_ENTRY_UUID) will be used to generate the UUID.
 
 This will be further configurable, so that users can specify how many partition to be created etc. This
 partitions will be automatically by NDM during start-up itself.
@@ -153,72 +143,47 @@ only partition is being wiped, it won't cause the labels to be removed.
 
 ##### Workflow
 ```
-+------------+
-|check config|
-|    if GPT  |
-|  method is |
-|  selected  |
-|            |
-+------------+
-     |yes
-     |
-+----v-----+
-|UID = WWN +|
-|    Model +|
-|   Serial +|
-|   Vendor  |
-|           |
-+-----------+
-     |
-     |
-+----v-------------+        +-----------+      +-----------+      +-------------------+
-|    If            |        |  Check    |      |  Check    |      | Create GPT        |
-|ID_TYPE is empty  |   Yes  | GPT label |  No  | FS label  |  No  | partition         |
-|    or ID_MODEL is+------->+           +----->+           +----->+ table and         |
-|Virtual/Ephemeral |        |           |      |           |      | one partition     |
-|Disk and empty WWN|        |           |      |           |      | spanning the disk |
-+------------------+        +-----------+      +-----------+      +-------------------+
-     |                        |                     |                  |
-     |No                      |                     |                  |
-     v                        |Yes                  |Yes               |
-+-----------+                 |                     |                  |
-|if DEVTYPE |                 |                     |                  |
-| equals    |                 |                     |                  |
-|"partition"|                 |                     |                  |
-|add part   |                 |                     |                  |
-|number to  |                 |                     |                  |
-|  UID      |                 |                     |                  |
-+-----------+                 |                     |                  |
-     |                        |                     |                  |
-     |                        |                     |                  |
-     |                        |                     |                  |
-+----v------+                 |                     |                  |
-|           |                 |                     |                  |
-|Use md5 of |                 |                     |                  |
-| generated |                 |                     |                  |
-|   UID     |<----------------+---------------------+-------------------
-|           |
-|           |
-+-----------+
 
++-----------+           +----v-------------+        +-----------+      +-------------------+
+|if DEVTYPE |           |                  |        |  Check    |      | Create GPT        |
+| equals    |   No      |     If           |    No  | FS label  |  No  | partition         |
+|"partition"|---------->+ WWN is present   +------->+           +----->+ table and         |
+|use PART   |           |                  |        |           |      | one partition     |
+|ENTRY ID   |           |                  |        |           |      | spanning the disk |
++----+------+           +------------------+        +-----------+      +-------------------+
+     |                       |                           |                  |
+     | Yes                   |Yes                        |                  |
+     |                       |                           |Yes               |
+     |                       |                           |                  |
++----v------+                |                           |                  |
+|           |                |                           |                  |
+|Use md5 of |                |                           |                  |
+| generated |                |                           |                  |
+|   UID     |<---------------+---------------------------+-------------------
+|           |                        
+|           |                        
++-----------+                        
 
 ```
+
+The algorithm used for upgrading from devices using old UUID to new UUID is mentioned [here](https://gist.github.com/akhilerm/cb9cfff929bff00efaa0d3f70d25a116)
 
 ## Graduation Criteria
 
 - NDM should be able to uniquely identify the disks, across reboots, across different
-  SCSI ports and anywhere within the cluster. NDM should be also able to create
-  N partition as per the user config. The unique identification can be marked
+  SCSI ports and anywhere within the cluster. The unique identification can be marked
   successful, if NDM detects the disk, and the user is able to retrieve his data
-  from the disk
+  from the disk. 
+  
+- A mechanism to seamlessly upgrade from old UUID to new UUID.
 
 ## Implementation History
 
-- Owner acceptance of `Summary` and `Motivation` sections - YYYYMMDD
-- Agreement on `Proposal` section - YYYYMMDD
-- Date implementation started - YYYYMMDD
-- First OpenEBS release where an initial version of this OEP was available - YYYYMMDD
-- Version of OpenEBS where this OEP graduated to general availability - YYYYMMDD
+- Owner acceptance of `Summary` and `Motivation` sections - 2020-02-29
+- Agreement on `Proposal` section - 2020-02-29
+- Date implementation started - 2020-02-29
+- First OpenEBS release where an initial version of this OEP was available - OpenEBS 1.10
+- Version of OpenEBS where this OEP graduated to general availability - OpenEBS 2.0
 - If this OEP was retired or superseded - YYYYMMDD
 
 ## Drawbacks
