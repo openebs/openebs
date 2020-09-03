@@ -34,7 +34,7 @@ via CSP custom resource.
 
 ## Motivation
 
-- Zpool and ZFS command execution via CSP custom resource
+- Zpool and ZFS command execution via CSP custom resource is one of the use case where migration job needs to execute zpool commands even if user has tighten the RBAC rules(Here example: Not allowing other process to exec into cStor pool pods).
 
 ### Goals
 
@@ -50,17 +50,17 @@ High level operator should able to execute Zpool/ZFS commands even if user has t
 
 High level operator will update the new field in CSP with command that it requires to execute in corresponding pool. After updating the CSP resource with command corresponding watcher present in CStor-pool-mgmt will get modified event and execute the command mention on CSP resource and update the result in status field.
 
-**NOTE:** Changes can be eliminated if we set proper RBAC rules migration job(i.e allowing changes migration job to perform exec operation).
+**NOTE:** These changes can be eliminated if we set proper RBAC rules for migration job(i.e allowing migration process to perform exec and perform required operations).
 
 ### Steps to be performed by high level operator
 
-High level operator/job will add command on CSP resource that required to execute and wait for response in status.
+High level operator/job will add command on CSP resource(under spec section) that required to execute and wait for response by watching at CSP status.
 
 ### Low Level Design
 
 #### WrokFlow
 
-When CSP resource is updated with command and no.of times it has to retry for command execution watcher present in the cstor-pool-mgmt will get an event and execute the command during every sync time and update the output in status of corresponding CSP upon successfully execution of command or completion of retries. If retries are completed it will update the status as with corresponding error message.
+When CSP resource is updated with command and no.of times it has to retry for command execution watcher present in the cstor-pool-mgmt will get an event and execute the command during every sync time and update the output in status of corresponding CSP. It will update `.status.CommandResult`only upon successfully execution of command or completion of retries. If retries are completed it will update the status as with corresponding error message. Apart from updating the CommandResult it will also update another field in status i.e `.Status.CommandPhase` which will helpful to know whether command is succeded/failed[NOTE: CommandPhase will be updated along with the output].
 
 **Current Schema**:
 
@@ -218,6 +218,9 @@ type CStorPoolStatus struct {
 
     // CommandResult contains the output of command requested in spec section
     CommandResult string `json:"commandResult"`
+
+    // CommandPhase contains the Success/Failure status depends on command execution
+    CommandPhase string
 
 	LastUpdateTime metav1.Time `json:"lastUpdateTime,omitempty"`
 	Message        string      `json:"message,omitempty"`
