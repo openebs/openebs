@@ -42,7 +42,10 @@ from one node to other node.
 
 ## Motivation
 
-- CStor pool migration should be supported when the disks were migrated to different node.
+- CStor pool migration should be supported when the disks were dettached and attached to different node. Following are the use cases:
+  1. Scaling down the nodes in cluster to 0 and scaling up nodes in should work by updating the node selectors on CSPC(Use case in cloud environment).
+  2. Dettaching and attaching underlying disks to different nodes.
+
 
 ### Goals
 
