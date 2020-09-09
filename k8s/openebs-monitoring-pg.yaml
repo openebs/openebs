@@ -1,7 +1,7 @@
 # The following file is intended for deployments that are not already
 # configured with prometheus. This is a minified version of the config
 # from the files present under ./openebs-monitoring/
-# 
+#
 # Prometheus tunables
 apiVersion: v1
 kind: ConfigMap
@@ -171,7 +171,7 @@ metadata:
 data:
   alert.rules: |-
     groups:
-      - name: CPU 
+      - name: CPU
         rules:
         - alert: High CPU Load
           expr: 100 - (avg by(instance) (irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 85
@@ -190,7 +190,7 @@ data:
           labels:
             team: devops
           annotations:
-            summary: "Out of Memory (instance {{ $labels.instance }})" 
+            summary: "Out of Memory (instance {{ $labels.instance }})"
             description: "Memory is filling up (< 10% left)\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
 
       - name: Filesystem
@@ -201,7 +201,7 @@ data:
           labels:
             team: devops
           annotations:
-            summary: "Out of disk root space (instance {{ $labels.instance }})" 
+            summary: "Out of disk root space (instance {{ $labels.instance }})"
             description: "Root Disk is almost full (< 10% left)\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
         - alert: No Mounted Disk Space Left
           expr: node_filesystem_free_bytes{mountpoint !="/"} / node_filesystem_size_bytes{mountpoint !="/"} * 100 < 10
@@ -209,20 +209,20 @@ data:
           labels:
             team: devops
           annotations:
-            summary: "Out of mounted disk space (instance {{ $labels.instance }})" 
+            summary: "Out of mounted disk space (instance {{ $labels.instance }})"
             description: "Mounted Disk is almost full (< 10% left) \n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
 
       - name: Kubernetes
         rules:
-        - alert: Pod CrashLoopBackOff 
+        - alert: Pod CrashLoopBackOff
           expr: kube_pod_container_status_waiting_reason{reason="CrashLoopBackOff"} > 0
           for: 1m
           labels:
             team: devops
           annotations:
-            summary: "Pod '{{$labels.pod}}' in namespace '{{$labels.namespace}}' is in CrashLoopBackOff" 
+            summary: "Pod '{{$labels.pod}}' in namespace '{{$labels.namespace}}' is in CrashLoopBackOff"
             description: "A container named '{{$labels.container}}' in the pod '{{$labels.pod}}' in namespace '{{$labels.namespace}}' is experiencing restarts"
-            
+
       - name: OpenEBS
         rules:
         - alert: OpenEBS Volume Not Available
@@ -235,17 +235,24 @@ data:
             description: "Volume '{{ $labels.openebs_pv }}' if offline, either because replica quorum is not met, target is not running or backend storage is lost"
 ---
 # prometheus-deployment
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: openebs-prometheus
+  name: openebs-prometheus-server
   namespace: openebs
 spec:
   replicas: 1
+  selector:
+    matchLabels:
+      name: openebs-prometheus-server
   template:
     metadata:
       labels:
         name: openebs-prometheus-server
+  #selector:
+  #  matchLabels:
+  #    name: openebs-prometheus-server
+
     spec:
       serviceAccountName: openebs-maya-operator
       containers:
@@ -261,8 +268,9 @@ spec:
             - "--storage.tsdb.retention=$(STORAGE_RETENTION)"
           ports:
             - containerPort: 9090
+              hostPort: 9090
           env:
-            # environment vars are stored in prometheus-env configmap. 
+            # environment vars are stored in prometheus-env configmap.
             - name: STORAGE_RETENTION
               valueFrom:
                 configMapKeyRef:
@@ -280,7 +288,7 @@ spec:
             limits:
               memory: "700M"
               cpu: "500m"
-          
+
           volumeMounts:
             # prometheus config file stored in the given mountpath
             - name: prometheus-server-volume
@@ -291,7 +299,7 @@ spec:
             - name: prometheus-rules-volume
               mountPath: /etc/prometheus-rules
       volumes:
-        # Prometheus Config file will be stored in this volume 
+        # Prometheus Config file will be stored in this volume
         - name: prometheus-server-volume
           configMap:
             name: openebs-prometheus-config
@@ -302,7 +310,7 @@ spec:
         # All the time series stored in this volume in form of .db file.
         - name: prometheus-storage-volume
           # containers in the Pod can all read and write the same files here.
-          emptyDir: {} 
+          emptyDir: {}
 ---
 # prometheus-service
 apiVersion: v1
@@ -311,8 +319,8 @@ metadata:
   name: openebs-prometheus-service
   namespace: openebs
 spec:
-  selector: 
-    name: openebs-prometheus-server
+  selector:
+    name: openebs-prometheus-service
   type: NodePort
   ports:
     - port: 80 # this Service's port (cluster-internal IP clusterIP)
@@ -333,8 +341,9 @@ spec:
     nodePort: 32515
   selector:
     app: openebs-grafana
+    name: openebs-grafana
 ---
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
@@ -344,6 +353,9 @@ metadata:
 spec:
   replicas: 1
   revisionHistoryLimit: 2
+  selector:
+    matchLabels:
+      app: openebs-grafana
   template:
     metadata:
       labels:
@@ -354,6 +366,7 @@ spec:
         name: grafana
         ports:
         - containerPort: 3000
+          hostPort: 3000
         env:
           - name: GF_AUTH_BASIC_ENABLED
             value: "true"
@@ -367,12 +380,15 @@ spec:
           timeoutSeconds: 1
 ---
 # node-exporter will be launch as daemonset.
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   name: node-exporter
   namespace: openebs
 spec:
+  selector:
+    matchLabels:
+      app: node-exporter
   template:
     metadata:
       labels:
@@ -381,7 +397,7 @@ spec:
     spec:
       containers:
       #- image: prom/node-exporter:v0.18.1
-      - image: quay.io/prometheus/node-exporter:v0.18.1 
+      - image: quay.io/prometheus/node-exporter:v0.18.1
         args:
           - --path.procfs=/host/proc
           - --path.sysfs=/host/sys
@@ -419,32 +435,32 @@ spec:
           mountPropagation: HostToContainer
           readOnly: true
       # The Kubernetes scheduler’s default behavior works well for most cases
-      # -- for example, it ensures that pods are only placed on nodes that have 
-      # sufficient free resources, it ties to spread pods from the same set 
-      # (ReplicaSet, StatefulSet, etc.) across nodes, it tries to balance out 
+      # -- for example, it ensures that pods are only placed on nodes that have
+      # sufficient free resources, it ties to spread pods from the same set
+      # (ReplicaSet, StatefulSet, etc.) across nodes, it tries to balance out
       # the resource utilization of nodes, etc.
       #
       # But sometimes you want to control how your pods are scheduled. For example,
-      # perhaps you want to ensure that certain pods only schedule on nodes with 
-      # specialized hardware, or you want to co-locate services that communicate 
-      # frequently, or you want to dedicate a set of nodes to a particular set of 
+      # perhaps you want to ensure that certain pods only schedule on nodes with
+      # specialized hardware, or you want to co-locate services that communicate
+      # frequently, or you want to dedicate a set of nodes to a particular set of
       # users. Ultimately, you know much more about how your applications should be
       # scheduled and deployed than Kubernetes ever will.
       #
-      # “taints and tolerations,” allows you to mark (“taint”) a node so that no 
+      # “taints and tolerations,” allows you to mark (“taint”) a node so that no
       # pods can schedule onto it unless a pod explicitly “tolerates” the taint.
-      # toleration  is particularly useful for situations where most pods in 
+      # toleration  is particularly useful for situations where most pods in
       # the cluster should avoid scheduling onto the node. In our case we want
-      # node-exporter to run on master node also i.e, we want to collect metrics 
+      # node-exporter to run on master node also i.e, we want to collect metrics
       # from master node. That's why tolerations added.
       # if removed master's node metrics can't be scrapped by prometheus.
       tolerations:
       - effect: NoSchedule
         operator: Exists
       volumes:
-        # A hostPath volume mounts a file or directory from the host node’s 
+        # A hostPath volume mounts a file or directory from the host node’s
         # filesystem.For example, some uses for a hostPath are:
-        # running a container that needs access to Docker internals; use a hostPath 
+        # running a container that needs access to Docker internals; use a hostPath
         # of /var/lib/docker
         # running cAdvisor in a container; use a hostPath of /dev/cgroups
         - name: proc
