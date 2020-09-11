@@ -80,6 +80,7 @@ Once a release made on a repository, Travis will trigger the release on the depe
           - openebs/maya
             - openebs/velero-plugin
             - openebs/cstor-csi
+            - openebs/upgrade
             - openebs/jiva-operator
               - openebs/jiva-csi
 
