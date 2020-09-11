@@ -16,7 +16,7 @@ If already using CSPC pools and cStor CSI volumes they can be upgraded from `1.1
 
 This document describes the steps for the following OpenEBS Upgrade paths:
 
-- Upgrade from 1.0.0 or later to a newer release up to 2.0.0
+- Upgrade from 1.0.0 or later to a newer release up to 2.1.0
 
 For other upgrade paths of earlier releases, please refer to the respective directories.
 Example: 
@@ -38,7 +38,7 @@ The upgrade of OpenEBS is a three step process:
 
 **Note: It is mandatory to make sure to that all OpenEBS control plane
 and data plane components are running with the expected version before the upgrade.**
-- **For upgrading to the latest release (2.0.0), the previous version should be minimum 1.0.0 **
+- **For upgrading to the latest release (2.1.0), the previous version should be minimum 1.0.0 **
 
 **Note: All steps described in this document need to be performed from a
 machine that has access to Kubernetes master**
@@ -119,8 +119,8 @@ the openebs-operator.yaml for your cluster, you will have to download the
 desired openebs-operator.yaml and customize it again**
 
 ```
-#Upgrade to OpenEBS control plane components to desired version. Say 2.0.0
-$ kubectl apply -f https://openebs.github.io/charts/2.0.0/openebs-operator.yaml
+#Upgrade to OpenEBS control plane components to desired version. Say 2.1.0
+$ kubectl apply -f https://openebs.github.io/charts/2.1.0/openebs-operator.yaml
 ```
 
 ### Upgrade using helm chart (using openebs/openebs, openebs-charts repo, etc.,):
@@ -135,13 +135,13 @@ latest openebs/openebs chart.
 - If the default values seem appropriate, you can use the below commands to
   update OpenEBS. [More](https://hub.helm.sh/charts/openebs/openebs) details about the specific chart version.
   ```sh
-  $ helm upgrade --reset-values <release name> openebs/openebs --version 2.0.0
+  $ helm upgrade --reset-values <release name> openebs/openebs --version 2.1.0
   ```
 - If not, customize the values into your copy (say custom-values.yaml),
   by copying the content from above default yamls and edit the values to
   suite your environment. You can upgrade using your custom values using:
   ```sh
-  $ helm upgrade <release name> openebs/openebs --version 2.0.0 -f custom-values.yaml`
+  $ helm upgrade <release name> openebs/openebs --version 2.1.0 -f custom-values.yaml`
   ```
 
 ### Using customized operator YAML or helm chart.
@@ -151,11 +151,11 @@ or helm chart or helm chart values, you can use the above procedures to upgrade
 the OpenEBS Control Plane components.
 
 ### After Upgrade
-From 2.0.0, OpenEBS uses a new algorithm to generate the UUIDs for blockdevices to identify any type of disk across the 
+From 2.0.0 onwards, OpenEBS uses a new algorithm to generate the UUIDs for blockdevices to identify any type of disk across the 
 nodes in the cluster. Therefore, blockdevices that were not used (Unclaimed state) in earlier versions will be made
 Inactive and new resources will be created for them. Existing devices that are in use will continue to work normally.
 
-**Note: After upgrading to 2.0.0. If the devices that were in use before the upgrade are no longer required and becomes unclaimed at any point of time. Please restart NDM daemon pod on that node to sync those devices with the latest changes.**
+**Note: After upgrading to 2.0.0 or above. If the devices that were in use before the upgrade are no longer required and becomes unclaimed at any point of time. Please restart NDM daemon pod on that node to sync those devices with the latest changes.**
 
 ## Step 3: Upgrade the OpenEBS Pools and Volumes
 
@@ -168,9 +168,9 @@ backup of the data before starting the below upgrade procedure.
 - Automatic rollback option is not provided. To rollback, you need to update
   the controller, exporter and replica pod images to the previous version
 - Before proceeding with the upgrade of the OpenEBS Data Plane components like cStor or Jiva,  verify that OpenEBS Control plane is indeed in desired version
-  You can use the following command to verify components are in 2.0.0:
+  You can use the following command to verify components are in 2.1.0:
   ```sh
-  $ kubectl get pods -n openebs -l openebs.io/version=2.0.0
+  $ kubectl get pods -n openebs -l openebs.io/version=2.1.0
   ```
   The above command should show that the control plane components are upgrade.
   The output should look like below:
@@ -231,7 +231,7 @@ metadata:
   #VERIFY that you have provided a unique name for this upgrade job.
   #The name can be any valid K8s string for name. This example uses
   #the following convention: jiva-vol-<flattened-from-to-versions>
-  name: jiva-vol-1120200
+  name: jiva-vol-1120210
 
   #VERIFY the value of namespace is same as the namespace where openebs components
   # are installed. You can verify using the command:
@@ -256,7 +256,7 @@ spec:
         - "--from-version=1.12.0"
 
         # --to-version is the version desired upgrade version
-        - "--to-version=2.0.0"
+        - "--to-version=2.1.0"
 
         # Bulk upgrade is supported
         # To make use of it, please provide the list of PVs
@@ -277,7 +277,7 @@ spec:
 
         # the image version should be same as the --to-version mentioned above
         # in the args of the job
-        image: openebs/m-upgrade:2.0.0
+        image: openebs/m-upgrade:2.1.0
         imagePullPolicy: Always
       restartPolicy: OnFailure
 ---
@@ -292,7 +292,7 @@ You can check the status of the Job using commands like:
 ```sh
 $ kubectl get job -n openebs
 $ kubectl get pods -n openebs #to check on the name for the job pod
-$ kubectl logs -n openebs jiva-upg-1120200-bgrhx
+$ kubectl logs -n openebs jiva-upg-1120210-bgrhx
 ```
 
 ### Upgrade cStor Pools
@@ -319,7 +319,7 @@ metadata:
   #VERIFY that you have provided a unique name for this upgrade job.
   #The name can be any valid K8s string for name. This example uses
   #the following convention: cstor-spc-<flattened-from-to-versions>
-  name: cstor-spc-1120200
+  name: cstor-spc-1120210
 
   #VERIFY the value of namespace is same as the namespace where openebs components
   # are installed. You can verify using the command:
@@ -343,7 +343,7 @@ spec:
         - "--from-version=1.12.0"
 
         # --to-version is the version desired upgrade version
-        - "--to-version=2.0.0"
+        - "--to-version=2.1.0"
 
         # Bulk upgrade is supported
         # To make use of it, please provide the list of SPCs
@@ -364,7 +364,7 @@ spec:
 
         # the image version should be same as the --to-version mentioned above
         # in the args of the job
-        image: openebs/m-upgrade:2.0.0
+        image: openebs/m-upgrade:2.1.0
         imagePullPolicy: Always
       restartPolicy: OnFailure
 ---
@@ -395,7 +395,7 @@ metadata:
   #VERIFY that you have provided a unique name for this upgrade job.
   #The name can be any valid K8s string for name. This example uses
   #the following convention: cstor-vol-<flattened-from-to-versions>
-  name: cstor-vol-1120200
+  name: cstor-vol-1120210
 
   #VERIFY the value of namespace is same as the namespace where openebs components
   # are installed. You can verify using the command:
@@ -420,7 +420,7 @@ spec:
         - "--from-version=1.12.0"
 
         # --to-version is the version desired upgrade version
-        - "--to-version=2.0.0"
+        - "--to-version=2.1.0"
 
         # Bulk upgrade is supported from 1.9
         # To make use of it, please provide the list of PVs
@@ -441,7 +441,7 @@ spec:
 
         # the image version should be same as the --to-version mentioned above
         # in the args of the job
-        image: openebs/m-upgrade:2.0.0
+        image: openebs/m-upgrade:2.1.0
         imagePullPolicy: Always
       restartPolicy: OnFailure
 ---
