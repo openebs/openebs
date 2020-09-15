@@ -35,6 +35,8 @@ spec:
           value: "minio"
         - name: MINIO_SECRET_KEY
           value: "minio123"
+        - name: MINIO_PROMETHEUS_AUTH_TYPE
+          value: "public"           
         ports:
         - containerPort: 9000
           hostPort: 9000
