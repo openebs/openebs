@@ -72,17 +72,17 @@ Once a release made on a repository, Travis will trigger the release on the depe
 
 - openebs/linux-utils
   - openebs/jiva
+  - openebs/cstor
   - openebs/libcstor
-    - openebs/cstor
-      - openebs/istgt
-        - openebs/cstor-operators
-        - openebs/external-storage
-          - openebs/maya
-            - openebs/velero-plugin
-            - openebs/cstor-csi
-            - openebs/upgrade
-            - openebs/jiva-operator
-              - openebs/jiva-csi
+    - openebs/istgt
+      - openebs/cstor-operators
+      - openebs/external-storage
+        - openebs/maya
+          - openebs/velero-plugin
+          - openebs/cstor-csi
+          - openebs/upgrade
+          - openebs/jiva-operator
+            - openebs/jiva-csi
 
 The following repositories currently follow a different release versioning than other components, so these are triggered parallely. 
 - openebs/node-disk-manager
