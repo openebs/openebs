@@ -36,8 +36,8 @@ OpenEBS source code is spread across multiple repositories, organized either by 
 ## Common or Generic 
 
 - [openebs/openebs](https://github.com/openebs/openebs) is OpenEBS meta repository that contains design documents, project management, community and contributor documents, deployment and workload examples. 
-- [openebs/openebs-docs](https://github.com/openebs/openebs-docs) contains the source code for OpenEBS Documentation portal (https://docs.openebs.io) implemented using Docusaurus framework and other libraries listed in [package.json](https://github.com/openebs/openebs-docs/blob/staging/website/package.json)
-- [openebs/website](https://github.com/openebs/website) contains the source code for OpenEBS portal (https://openebs.io) implemented using Gatsby framework and other libraries listed in [package.json](https://github.com/openebs/website/blob/refactor-to-ghost-and-gatsby/package.json)
+- [openebs/openebs-docs](https://github.com/openebs/openebs-docs) contains the source code for OpenEBS Documentation portal (https://docs.openebs.io) implemented using Docusaurus framework and other libraries listed in [package.json](https://github.com/openebs/openebs-docs/blob/staging/website/package.json).
+- [openebs/website](https://github.com/openebs/website) contains the source code for OpenEBS portal (https://openebs.io) implemented using Gatsby framework and other libraries listed in [package.json](https://github.com/openebs/website/blob/refactor-to-ghost-and-gatsby/package.json).
 - [openebs/charts](https://github.com/openebs/charts) contains the Helm chart source code for OpenEBS and also hosts a gh-pages website for install artifacts and Helm packages. 
 - [openebs/maya](https://github.com/openebs/maya) contains OpenEBS Storage Management components that help with managing cStor, Jiva and Local Volumes. This repository contains the non-CSI drivers. The code is being moved from this repository to engine specific CSI drivers. Detailed dependency list can be found in: [go.mod](https://github.com/openebs/maya/blob/master/go.mod). OpenEBS also maintains a forked copy of the Kubernetes external-storage repository to support the external-provisioners for cStor and Jiva volumes. 
   - [openebs/external-storage](https://github.com/openebs/external-storage) contains OpenEBS extensions for Kubernetes External Dynamic Provisioners. These provisioners will be deprecated in the near term in favor of the CSI drivers that are under beta and alpha stage at the moment. This is a forked repository from [kubernetes-incubator/external-storage](https://github.com/kubernetes-retired/external-storage).
@@ -84,10 +84,10 @@ OpenEBS source code is spread across multiple repositories, organized either by 
   - [openebs/spdk](https://github.com/openebs/spdk) is a forked repository of [spdk/spdk](https://github.com/spdk/spdk) (License: BSD) for managing the upstream changes. 
   - [openebs/spdk-sys](https://github.com/openebs/spdk-sys) (License: MIT) contains Rust bindings for SPDK. 
   - [openebs/partition-identity](https://github.com/openebs/partition-identity) is forked from [pop-os/partition-identity](https://github.com/pop-os/partition-identity) (License: MIT) for managing the upstream changes. 
-  - [openebs/blkid](https://github.com/openebs/blkid) is forked from [pop-os/blkid](https://github.com/pop-os/blkid) (License: MIT) for managing the upstream changes
-  - [openebs/proc-mounts](https://github.com/openebs/proc-mounts/) is forked from [pop-os/proc-mounts](https://github.com/pop-os/proc-mounts) (License: MIT) for managing upstream changes
-  - [openebs/sys-mount](https://github.com/openebs/sys-mount/) is forked from [pop-os/sys-mount](https://github.com/pop-os/sys-mount) (License: MIT) for managing upstream changes
-  - [openebs/blkid-sys](https://github.com/openebs/blkid-sys/) is forked from [cholcombe973/blkid-sys](https://github.com/cholcombe973/blkid-sys) (License: MIT) for managing upstream changes
+  - [openebs/blkid](https://github.com/openebs/blkid) is forked from [pop-os/blkid](https://github.com/pop-os/blkid) (License: MIT) for managing the upstream changes.
+  - [openebs/proc-mounts](https://github.com/openebs/proc-mounts/) is forked from [pop-os/proc-mounts](https://github.com/pop-os/proc-mounts) (License: MIT) for managing upstream changes.
+  - [openebs/sys-mount](https://github.com/openebs/sys-mount/) is forked from [pop-os/sys-mount](https://github.com/pop-os/sys-mount) (License: MIT) for managing upstream changes.
+  - [openebs/blkid-sys](https://github.com/openebs/blkid-sys/) is forked from [cholcombe973/blkid-sys](https://github.com/cholcombe973/blkid-sys) (License: MIT) for managing upstream changes.
 
 
 
@@ -98,6 +98,19 @@ OpenEBS source code is spread across multiple repositories, organized either by 
 
 
 
-# Further details
+# Additional details
 
-Additional details and how each of the Data engines operate are provided in this [Presentation](https://docs.google.com/presentation/d/1mjOkAQppyd23sw7PIryxu5kSrex352bT6bINzw6mUFY/edit?usp=sharing)
+- Architectural overview on how each of the Data engines operate are provided in this [Presentation](https://docs.google.com/presentation/d/1mjOkAQppyd23sw7PIryxu5kSrex352bT6bINzw6mUFY/edit?usp=sharing)
+- Design Documents for various components and features are listed [here](./)
+
+# Getting involved with Contributions
+
+There is always something more that is required, to make it easier to suit your use-cases. Feel free to join the discussion on new features or raise a PR with your proposed change. 
+
+- [Join OpenEBS contributor community on Kubernetes Slack](https://kubernetes.slack.com)
+	- Already signed up? Head to our discussions at [#openebs-dev](https://kubernetes.slack.com/messages/openebs-dev/)
+- [Join our Community meetings](https://github.com/openebs/openebs/tree/master/community)
+- Pick an issue of your choice to work on from any of the repositories listed above. Here are some contribution ideas to start looking at:
+  - [Good first issues](https://github.com/search?q=org%3Aopenebs+is%3Aissue+label%3A%22good+first+issue%22).
+  - [Slightly more involved issues](https://github.com/search?q=org%3Aopenebs+is%3Aissue+label%3A%22help+wanted%22).
+  - Help with backlogs from the [roadmap](../../ROADMAP.md) by discussing requirements and design.
