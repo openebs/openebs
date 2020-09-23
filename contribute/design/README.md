@@ -38,7 +38,7 @@ OpenEBS source code is spread across multiple repositories, organized either by 
 - [openebs/openebs](https://github.com/openebs/openebs) is OpenEBS meta repository that contains design documents, project management, community and contributor documents, deployment and workload examples. 
 - [openebs/openebs-docs](https://github.com/openebs/openebs-docs) contains the source code for OpenEBS Documentation portal (https://docs.openebs.io) implemented using Docusaurus framework and other libraries listed in [package.json](https://github.com/openebs/openebs-docs/blob/staging/website/package.json)
 - [openebs/website](https://github.com/openebs/website) contains the source code for OpenEBS portal (https://openebs.io) implemented using Gatsby framework and other libraries listed in [package.json](https://github.com/openebs/website/blob/refactor-to-ghost-and-gatsby/package.json)
-- [openebs/charts](https://github.com/openebs/charts) contains the helm chart source code for OpenEBS and also hosts a gh-pages website for install artifacts and helm packages. 
+- [openebs/charts](https://github.com/openebs/charts) contains the Helm chart source code for OpenEBS and also hosts a gh-pages website for install artifacts and Helm packages. 
 - [openebs/maya](https://github.com/openebs/maya) contains OpenEBS Storage Management components that help with managing cStor, Jiva and Local Volumes. This repository contains the non-CSI drivers. The code is being moved from this repository to engine specific CSI drivers. Detailed dependency list can be found in: [go.mod](https://github.com/openebs/maya/blob/master/go.mod). OpenEBS also maintains a forked copy of the Kubernetes external-storage repository to support the external-provisioners for cStor and Jiva volumes. 
   - [openebs/external-storage](https://github.com/openebs/external-storage) contains OpenEBS extensions for Kubernetes External Dynamic Provisioners. These provisioners will be deprecated in the near term in favor of the CSI drivers that are under beta and alpha stage at the moment. This is a forked repository from [kubernetes-incubator/external-storage](https://github.com/kubernetes-retired/external-storage).
 - [openebs/velero-plugin](https://github.com/openebs/velero-plugin) has the plugin code to perform cStor and ZFS Local PV based Backup and Restore using Velero. 
@@ -52,20 +52,20 @@ OpenEBS source code is spread across multiple repositories, organized either by 
 - [openebs/openebsctl](https://github.com/openebs/openebsctl) contains the OpenEBS CLI that can be run as kubectl plugin. This functionality is being split from the mono-repo [openebs/maya](https://github.com/openebs/maya) into its own repository. (Currently in Alpha). 
 - [openebs/performance-benchmark](https://github.com/openebs/performance-benchmark) contains tools/scripts for running performance benchmarks on Kubernetes volumes.  This is an experimental repo. The work in this repo can move to other repos like e2e-tests. 
 - [openebs/monitor-pv](https://github.com/openebs/monitor-pv) is a prometheus exporter for sending capacity usage statistics using `du` from hostpath volumes. 
-- [openebs/helm-operator](https://github.com/openebs/helm-operator) is wrapper around OpenEBS Helm to allow installation via Operator Hub. 
+- [openebs/helm-operator](https://github.com/openebs/helm-operator) is wrapper around OpenEBS Helm to allow installation the [Operator Hub](https://operatorhub.io/). 
 
 
 
 ## Node Disk Manager (aka Storage Device Management plane)
 
-- [openebs/node-disk-manager](https://github.com/openebs/node-disk-manager) contains Kubernetes native Device Inventory Management functionality. Detailed dependency list can be found in [go.mod](https://github.com/openebs/node-disk-manager/blob/master/go.mod). Along with being dependent on Kubernetes and Operator SDK for managing the kubernetes custom resources, NDM also optionally depends on the following. 
+- [openebs/node-disk-manager](https://github.com/openebs/node-disk-manager) contains Kubernetes native Device Inventory Management functionality. A detailed dependency list can be found in [go.mod](https://github.com/openebs/node-disk-manager/blob/master/go.mod). Along with being dependent on Kubernetes and Operator SDK for managing the Kubernetes custom resources, NDM also optionally depends on the following. 
   - [openSeaChest](https://github.com/Seagate/openSeaChest) (License: MPL 2.0) for discovering device attributes. OpenEBS maintains forked repositories of openSeaChest to fix/upstream the issues found in this libarary.
 
 ## Jiva
-- [openebs/jiva](https://github.com/openebs/jiva) is the one of the data engines supported by OpenEBS which was forked from Rancher Longhorn engine and has diverged from the way jiva volumes are managed within Kubernetes. At the time of the fork, Longhorn was focused towards Docker and OpenEBS was focused on supporting Kubernetes. Jiva engine depends on the following:
-  - A fork of longhorn engine is maintained in OpenEBS to upsteam the common changes from Jiva to Longhorn. 
+- [openebs/jiva](https://github.com/openebs/jiva) is one of the data engines supported by OpenEBS which was forked from Rancher Longhorn engine and has diverged from the way Jiva volumes are managed within Kubernetes. At the time of the fork, Longhorn was focused towards Docker and OpenEBS was focused on supporting Kubernetes. Jiva engine depends on the following:
+  - A fork of Longhorn engine is maintained in OpenEBS to upstream the common changes from Jiva to Longhorn. 
   - [gostor/gotgt](https://github.com/openebs/gotgt) for providing user space iSCSI Target support implemented in Go. A fork of the project is maintained in OpenEBS to keep the dependencies in sync and upstream the changes. 
-  - [longhorn/sparse-tools](https://github.com/openebs/sparse-tools) fork is also maintained by OpenEBS to manage the differences between jiva way of writing into the sparse files.
+  - [longhorn/sparse-tools](https://github.com/openebs/sparse-tools) fork is also maintained by OpenEBS to manage the differences between Jiva way of writing into the sparse files.
   - [go.mod](https://github.com/openebs/jiva/blob/master/go.mod) provides a complete list of dependencies used by the Jiva project. 
 - [openebs/jiva-csi](https://github.com/openebs/jiva-csi) contains the CSI Driver for Jiva Volumes. Currently in alpha. Dependencies are in: [go.mod](https://github.com/openebs/jiva-csi/blob/master/go.mod).
 - [openebs/jiva-operator](https://github.com/openebs/jiva-operator) contains Kubernetes custom resources and operators to manage Jiva volumes. Currently in alpha used by Jiva CSI Driver. This will replace the volume management functionality offered by OpenEBS API Server. Dependencies are in: [go.mod](https://github.com/openebs/jiva-operator/blob/master/go.mod).
