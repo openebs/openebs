@@ -16,7 +16,7 @@ Note: OpenEBS follows a monthly release cadence with a new release on the 15th o
 - [Project Tracker](https://github.com/orgs/openebs/projects/2)
 - Source repositories
   - https://github.com/openebs/node-disk-manager
-- Features under active development
+- Backlogs
   - Enhance the discovery probes to support partitions, lvms and so forth
   - Support Prometheus exporter on block device metrics
   - Add gRPC API layer around NDM capabilities
@@ -29,7 +29,7 @@ Note: OpenEBS follows a monthly release cadence with a new release on the 15th o
   - https://github.com/openebs/maya/tree/master/cmd/provisioner-localpv
   - https://github.com/openebs/zfs-localpv
   - https://github.com/openebs/rawfile-localpv
-- Feature under active development
+- Backlogs
   - Split the Local Provisioner for hostpath and device from openebs/maya into its own repository
   - Support for specifying total capacity of all volumes and max capacity per volume that can be provisioned from a given hostpath
   - Support for specifying multiple hostpaths to be used with Local PV 
@@ -42,7 +42,7 @@ Note: OpenEBS follows a monthly release cadence with a new release on the 15th o
 - Project Tracker
 - Source repositories
   - https://github.com/openebs/Mayastor
-- Feature under active development
+- Backlogs
   - Multi-arch builds for all Mayastor components
 
 ### Jiva
@@ -51,7 +51,7 @@ Note: OpenEBS follows a monthly release cadence with a new release on the 15th o
   - https://github.com/openebs/jiva
   - https://github.com/openebs/jiva-operator
   - https://github.com/openebs/jiva-csi
-- Features under active development
+- Backlogs
   - Enhance Jiva Operator functionality to reduce manual steps around launching new replicas when node is completely removed from the cluster
   - Add additional integration tests to Jiva CSI Driver to move towards beta
   - Multi-arch builds for Jiva
@@ -66,7 +66,7 @@ Note: OpenEBS follows a monthly release cadence with a new release on the 15th o
   - https://github.com/openebs/velero-plugin
   - https://github.com/openebs/api
   - https://github.com/openebs/upgrade
-- Features under active development
+- Backlogs
   - Multi-arch builds for all cstor containers
   - Helm chart to install only cStor components
   - Move the Backup/Restore related API to v1
@@ -76,7 +76,7 @@ Note: OpenEBS follows a monthly release cadence with a new release on the 15th o
 ### OpenEBS CLI
 - Source repositories
   - https://github.com/openebs/openebsctl
-- Features under active development
+- Backlogs
   - Add the existing functionality available in [mayactl](https://github.com/openebs/maya/tree/master/cmd/mayactl) for volume management to openebsctl
   - Add Local PV volumes related status checks to openebsctl 
 
