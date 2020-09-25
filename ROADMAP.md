@@ -43,6 +43,11 @@ Note: OpenEBS follows a monthly release cadence with a new release on the 15th o
 - Source repositories
   - https://github.com/openebs/Mayastor
 - Backlogs
+  - Support for VolumeSnapshot
+  - Mayastor Replica placement should be topology aware
+  - Mayastor should expose metrics which meet the needs of the SRE persona, to trend review throughput, latency, capacity utilisation and errors
+  - User applications can continue to access volumes when the nexus hosting them fails (e.g. Mayastor container crashes or is otherwise rescheduled, or its host node is lost or disconnected)
+  - It should be possible for Moac (and all other significant control plane components) to be rescheduled within a cluster  
   - Multi-arch builds for all Mayastor components
 
 ### Jiva
@@ -84,19 +89,23 @@ Note: OpenEBS follows a monthly release cadence with a new release on the 15th o
 
 Typically the items under this category fall under 3 to 6 months roadmap. At a high level, the focus is towards moving the alpha and beta engines towards stable by adding more automated e2e tests and updating the corresponding user and contributor documents. To name a few backlogs (not in any particular order) on the near-term radar where we are looking for additional help: 
 
-* Update user documentation with reference stacks of running various workloads using OpenEBS volumes 
-* Auto provisioning of block devices that can be used with OpenEBS storage engines
-* Enhancements to OpenEBS CLI (openebsctl) for better status reporting and management of various OpenEBS components 
-* Building additional Grafana Dashboards for OpenEBS Components, Pools and Volumes, that can be used to monitor SLOs
-* Move NDM API (Kubernetes custom resources) to v1
-* Split the provisioners and/or operators from the mono-repos [openebs/maya](https://github.com/openebs/maya) and [openebs/external-storage](https://github.com/openebs/external-storage) into individual repos
-* Setup E2e pipelines for ARM Clusters
-* Simplify the setup of NFS based Read-Write-Many volumes using OpenEBS RWO block volumes
-* Refactor the website and user documentation to be built as a single website using Hugo, similar to other CNCF projects 
-* Move towards GitHub actions based builds from Travis for all the repositories. Currently there is a mix of Travis and GitHub actions
-* Conform with the new enhancements coming in the newer Kubernetes releases around Capacity based provisioning, CSI, and so forth
-* Automate the workflows around handling scenarios like compelete cluster failures that currently require some manual steps
-* Custom Kubernetes storage schedulers to address auto-rebalancing of the data placed on the nodes to help with scale up/down of Kubernetes nodes
+- Update user documentation with reference stacks of running various workloads using OpenEBS volumes 
+- Auto provisioning of block devices that can be used with OpenEBS storage engines
+- Enhancements to OpenEBS CLI (openebsctl) for better status reporting and management of various OpenEBS components 
+- Building additional Grafana Dashboards for OpenEBS Components, Pools and Volumes, that can be used to monitor SLOs
+- Move NDM API (Kubernetes custom resources) to v1
+- Split the provisioners and/or operators from the mono-repos [openebs/maya](https://github.com/openebs/maya) and [openebs/external-storage](https://github.com/openebs/external-storage) into individual repos
+- Setup E2e pipelines for ARM Clusters
+- Simplify the setup of NFS based Read-Write-Many volumes using OpenEBS RWO block volumes
+- Refactor the website and user documentation to be built as a single website using Hugo, similar to other CNCF projects 
+- Move towards GitHub actions based builds from Travis for all the repositories. Currently there is a mix of Travis and GitHub actions
+- Conform with the new enhancements coming in the newer Kubernetes releases around Capacity based provisioning, CSI, and so forth
+- Automate the workflows around handling scenarios like compelete cluster failures that currently require some manual steps
+- Custom Kubernetes storage schedulers to address auto-rebalancing of the data placed on the nodes to help with scale up/down of Kubernetes nodes
+- User-friendly installation & configuration command-line tool (analogy to linkerd CLI for linkerd)
+- Allow Mayastor Pools to incorporate more than one capacity contributing disk device
+- Failed replicas should be garbage collected (return capacity to Mayastor Pool)
+- Allow a new replica to be created within the same Mayastor Pool as the failed replica it replaces
 
 ## Future
 
