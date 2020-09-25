@@ -18,9 +18,10 @@ Note: OpenEBS follows a monthly release cadence with a new release on the 15th o
   - https://github.com/openebs/node-disk-manager
 - Backlogs
   - Enhance the discovery probes to support partitions, lvms and so forth
-  - Support Prometheus exporter on block device metrics
-  - Add gRPC API layer around NDM capabilities
-
+  - Scan for device media errors, reporting and alerting by enhancing the ndm-exporter
+  - Support Bulk BDC requests to claim multiple block devices that satisfy affinity or anti-affinity rules of applications. Example: two block devices from same node or two block devices from different nodes. 
+  - Support for device configuration tasks like partitioning, mounting or unmounting devices by adding new services via NDM gRPC API layer.
+  
 ### Dynamic Local PVs
 - Project Trackers
   - [Hostpath and Device](https://github.com/orgs/openebs/projects/11)
@@ -30,6 +31,7 @@ Note: OpenEBS follows a monthly release cadence with a new release on the 15th o
   - https://github.com/openebs/zfs-localpv
   - https://github.com/openebs/rawfile-localpv
 - Backlogs
+  - Support for incremental and full Backups for ZFS Local PV
   - Split the Local Provisioner for hostpath and device from openebs/maya into its own repository
   - Support for specifying total capacity of all volumes and max capacity per volume that can be provisioned from a given hostpath
   - Support for specifying multiple hostpaths to be used with Local PV 
@@ -106,15 +108,21 @@ Typically the items under this category fall under 3 to 6 months roadmap. At a h
 - Allow Mayastor Pools to incorporate more than one capacity contributing disk device
 - Failed replicas should be garbage collected (return capacity to Mayastor Pool)
 - Allow a new replica to be created within the same Mayastor Pool as the failed replica it replaces
+- Auto-scaling up and down of cStor pools as the new nodes are added and removed
+- Auto-upgrade of cStor Pools and Volumes when user upgrades control plane
+- Dashboard/UI for monitoring and managing cStor pools and volumes
+- Asynchronous or DR replica for cStor and Mayastor volumes
+
+
 
 ## Future
 
 As the name suggests this bucket contains items that are planned for future. Some times the items are related to adapting to the changes coming in the Kubernetes or other related projects. Some of the items currently planned include: 
-* Support for working with multiple network interfaces
-* Automate the installation of pre-requisities on Kubernetes nodes like setting up iSCSI or huge page
-* Integrate performance benchmarking of various engines into the release E2e test pipelines
-* Native RWX support for OpenEBS Volumes
-* Native Object support for OpenEBS Volumes
+- Support for working with multiple network interfaces
+- Automate the installation of pre-requisities on Kubernetes nodes like setting up iSCSI or huge page
+- Integrate performance benchmarking of various engines into the release E2e test pipelines
+- Native RWX support for OpenEBS Volumes
+- Native Object support for OpenEBS Volumes
 
 For a full list of issues, check out the [future backlog](https://github.com/openebs/openebs/milestone/11). 
 
