@@ -89,7 +89,7 @@ Note: OpenEBS follows a monthly release cadence with a new release on the 15th o
 
 ## Near Term
 
-Typically the items under this category fall under 3 to 6 months roadmap. At a high level, the focus is towards moving the alpha and beta engines towards stable by adding more automated e2e tests and updating the corresponding user and contributor documents. To name a few backlogs (not in any particular order) on the near-term radar where we are looking for additional help: 
+Typically the items under this category fall under 3 to 6 month roadmap. At a high level, the focus is towards moving the alpha and beta engines towards stable by adding more automated e2e tests and updating the corresponding user and contributor documents. To name a few backlogs (not in any particular order) on the near-term radar, where we are looking for additional help: 
 
 - Update user documentation with reference stacks of running various workloads using OpenEBS volumes 
 - Auto provisioning of block devices that can be used with OpenEBS storage engines
@@ -117,7 +117,7 @@ Typically the items under this category fall under 3 to 6 months roadmap. At a h
 
 ## Future
 
-As the name suggests this bucket contains items that are planned for future. Some times the items are related to adapting to the changes coming in the Kubernetes or other related projects. Some of the items currently planned include: 
+As the name suggests this bucket contains items that are planned for future. Some times the items are related to adapting to the changes coming in the Kubernetes repo or other related projects. Some of the items currently planned include:
 - Support for working with multiple network interfaces
 - Automate the installation of pre-requisities on Kubernetes nodes like setting up iSCSI or huge page
 - Integrate performance benchmarking of various engines into the release E2e test pipelines
