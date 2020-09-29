@@ -94,7 +94,7 @@ Typically the items under this category fall under 3 to 6 month roadmap. At a hi
 - Update user documentation with reference stacks of running various workloads using OpenEBS volumes 
 - Auto provisioning of block devices that can be used with OpenEBS storage engines
 - Enhancements to OpenEBS CLI (openebsctl) for better status reporting and management of various OpenEBS components 
-- Building additional Grafana Dashboards for OpenEBS Components, Pools and Volumes, that can be used to monitor SLOs
+- Building additional Grafana Dashboards for OpenEBS Components, Block Devices, Pools and Volumes, that can be used to monitor SLOs
 - Move NDM API (Kubernetes custom resources) to v1
 - Split the provisioners and/or operators from the mono-repos [openebs/maya](https://github.com/openebs/maya) and [openebs/external-storage](https://github.com/openebs/external-storage) into individual repos
 - Setup E2e pipelines for ARM Clusters
@@ -112,6 +112,7 @@ Typically the items under this category fall under 3 to 6 month roadmap. At a hi
 - Auto-upgrade of cStor Pools and Volumes when user upgrades control plane
 - Dashboard/UI for monitoring and managing cStor pools and volumes
 - Asynchronous or DR replica for cStor and Mayastor volumes
+- Update the uZFS used by cStor with latest changes in upstream ZFS
 
 
 
