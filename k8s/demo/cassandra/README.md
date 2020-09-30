@@ -36,6 +36,8 @@ A storage engine is the data plane component of the IO path of a persistent volu
 
 ### Configure OpenEBS LocalPV StorageClass
 
+In this tutorial, OpenEBS LocalPV device has been used as the storage engine for deploying Kudo Cassandra.
+
 - `openebs-hostpath` - Using this option, it will create Kubernetes Persistent Volumes that will store the data into OS host path directory at: /var/openebs/<cassandra-pv>/. Select this option, if you don’t have any additional block devices attached to Kubernetes nodes. You would like to customize the directory where data will be saved, create a new OpenEBS LocalPV storage class using these instructions. 
   
 - `openebs-device` - Using this option will create Kubernetes Local PVs using the block devices attached to the node. Select this option when you want to dedicate a complete block device on a node to a Cassandra node. You can customize which devices will be discovered and managed by OpenEBS using the instructions here. 
