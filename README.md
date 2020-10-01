@@ -80,7 +80,24 @@ The status of various storage engines that power the OpenEBS Persistent Volumes 
 | Mayastor | alpha | A new storage engine that operates at the efficiency of Local Storage but also offers storage services like Replication. Development is underway to support Snapshots and Clones. |
 
 For more details, please refer to [OpenEBS Documentation](https://docs.openebs.io/docs/next/quickstart.html).
- 
+
+## Upgrading OpenEBS reources
+Below are the steps for upgrading the OpenEBS reources:
+- [CSPC pools](https://github.com/openebs/upgrade/blob/master/docs/upgrade.md#cspc-pools)
+- [cStor CSI volumes](https://github.com/openebs/upgrade/blob/master/docs/upgrade.md#cstor-csi-volumes)
+
+**Note:** 
+ - If current version of ndm-operator is 1.12.0 or below and using virtual disks as blockdevices for provisioning cStor pool please refer this [doc](https://github.com/openebs/upgrade/blob/master/docs/virtual-disk-troubleshoot.md) before proceeding.
+
+## Migrating cStor pools and volumes from SPC to CSPC
+Below are the steps for migrating the OpenEBS cStor custom reources:
+- [SPC pools to CSPC pools](https://github.com/openebs/upgrade/blob/master/docs/migration.md#spc-pools-to-cspc-pools)
+- [cStor External Provisioned volumes to cStor CSI volumes](https://github.com/openebs/upgrade/blob/master/docs/migration.md#cstor-external-provisioned-volumes-to-cstor-csi-volumes)
+
+**Note:** 
+ - If the Kubernetes cluster is on rancher and iscsi is running inside the kubelet container then it is mandatory to install iscsi service on the nodes and add extra binds to the kubelet container as mentioned [here](https://github.com/openebs/cstor-operators/blob/master/docs/troubleshooting/rancher_prerequisite.md).
+ - Minimum version of Kubernetes to migrate to CSPC pools / CSI volumes is 1.17.0.
+ - If using virtual disks as blockdevices for provisioning cStorpool please refer this [doc](https://github.com/openebs/upgrade/blob/master/docs/virtual-disk-troubleshoot.md) before proceeding.
 ## Contributing
  
 OpenEBS welcomes your feedback and contributions in any form possible.
