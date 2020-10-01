@@ -1,13 +1,30 @@
-# OpenEBS
+<p align="center">
+  <img src="https://avatars1.githubusercontent.com/u/20769039?s=200&v=4" height="100"/>
+    <img src="https://raw.githubusercontent.com/openebs/openebs-docs/b99fd16fa074ee761d7da5b15c0b50eb87f64b1c/docs/assets/openebs-logo.svg" width="300" />
+  <br>
+  <h1 align="center">OpenEBS: Open-Source Storage Solution for Kubernetes</h1>
+</p>
+<p align="center">
+  <a href="https://github.com/openebs/openebs/releases">
+    <img src="https://img.shields.io/github/release/openebs/openebs/all.svg?style=flat-square" alt="Releases" />
+  </a>
+  <a href="https://twitter.com/intent/follow?screen_name=openebs">
+    <img src="https://img.shields.io/twitter/follow/openebs.svg?style=social&label=Follow" alt="Twitter" />
+  </a>
+  <a href="https://app.fossa.com/projects/git%2Bgithub.com%2Fopenebs%2Fopenebs?ref=badge_shield">
+    <img src="https://app.fossa.com/api/projects/git%2Bgithub.com%2Fopenebs%2Fopenebs.svg?type=shield" alt="FOSSA Status" />
+  </a>
+  <a href="https://github.com/openebs/openebs/blob/master/CONTRIBUTING.md">
+    <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square" alt="PRs Welcome" />
+  </a>
+    <a href="https://bestpractices.coreinfrastructure.org/projects/1754">
+    <img src="https://bestpractices.coreinfrastructure.org/projects/1754/badge" alt="CII Best Practices" />
+  </a>
+  <br>
+  <a href="https://openebs.io/">openebs.io</a> | <a href="https://kubernetes.slack.com/messages/openebs">Slack</a>
+</p>
 
-[![Releases](https://img.shields.io/github/release/openebs/openebs/all.svg?style=flat-square)](https://github.com/openebs/openebs/releases)
-[![Slack channel #openebs](https://img.shields.io/badge/slack-openebs-brightgreen.svg?logo=slack)](https://kubernetes.slack.com/messages/openebs)
-[![Twitter](https://img.shields.io/twitter/follow/openebs.svg?style=social&label=Follow)](https://twitter.com/intent/follow?screen_name=openebs)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](https://github.com/openebs/openebs/blob/master/CONTRIBUTING.md)
-[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fopenebs%2Fopenebs.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fopenebs%2Fopenebs?ref=badge_shield)
-[![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/1754/badge)](https://bestpractices.coreinfrastructure.org/projects/1754)
-
-https://openebs.io/
+--------------
  
 **OpenEBS** is the most widely deployed and easy to use open-source storage solution for Kubernetes. 
 
@@ -37,6 +54,18 @@ An added advantage of being a completely Kubernetes native solution is that admi
 [🇹🇷](translations/README.tr.md)
 [🇺🇦](translations/README.ua.md)
 [🇨🇳](translations/README.zh.md)
+
+Table of Contents
+=================
+
+- [OpenEBS](#openebs-open-source-storage-solution-for-Kubernetes)
+  - [Scalability](#scalability)
+  - [Installation and Getting Started](#installation-and-getting-started)
+  - [Status](#status)
+  - [Contributing](#contributing)
+  - [Show me the Code](#show-me-the-code)
+  - [License](#license)
+  - [Commercial Offerings](#commercial-offerings)
 
 ## Scalability
  
