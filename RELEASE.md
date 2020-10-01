@@ -1,5 +1,5 @@
 # Release Process
-
+## Add new Dependencies as it would avaiable.
 OpenEBS follows a monthly release cadence. The process is as follows:
 
 The scope of the release is determined by:
