@@ -29,6 +29,7 @@ https://openebs.io/
 [🇷🇺](README.ru.md)
 [🇹🇷](README.tr.md)
 [🇨🇳](README.zh.md)
+[HI](README.hi.md)
 
 ## Масштабованість
  
