@@ -52,10 +52,10 @@ cd $working_dir
 
 ```
 
-Set `user` to match your Github profile name:
+Set `user` to match your GitHub profile name:
 
 ```bash
-user={your Github profile name}
+user={your GitHub profile name}
 ```
 
 ### Clone your repo
@@ -102,7 +102,7 @@ git push origin <branch-name>  #After this changes will appear in your $user/ext
 
 ### Create pull request to `kubernetes-incubator/external-storage`
 
-Once above procedure is followed, you will see your changes in branch `<branch-name>` of `$user/external-storage` on Github. You can create a PR at `kubernetes-incubator/external-storage`.
+Once above procedure is followed, you will see your changes in branch `<branch-name>` of `$user/external-storage` on GitHub. You can create a PR at `kubernetes-incubator/external-storage`.
 You can add the label `area/openebs` to your PR by commenting `/area openebs` in the comment section of your PR.
 
 ### Fetching latest changes to `openebs/external-storage`

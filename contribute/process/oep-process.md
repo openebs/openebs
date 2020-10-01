@@ -163,12 +163,12 @@ Metadata items:
   * Must be one of `provisional`, `implementable`, `implemented`, `deferred`, `rejected`, `withdrawn`, or `replaced`.
 * **authors** Required
   * A list of authors for the OEP.
-    This is simply the Github ID.
+    This is simply the GitHub ID.
     In the future we may enhance this to include other types of identification.
 * **owners** Required
   * An OWNER is the person or entity that works on the proposal.
   * OWNERs consist of `approvers` and `reviewers` joined from the [MAINTAINERS](https://github.com/openebs/openebs/blob/master/MAINTAINERS) file
-  * OWNERs are listed as `@owner` where the name matches up with the Github ID.
+  * OWNERs are listed as `@owner` where the name matches up with the GitHub ID.
   * The OWNER that is most closely associated with this OEP. If there is code or
     other artifacts that will result from this OEP, then it is expected that
     this OWNER will take responsibility for the bulk of those artifacts.

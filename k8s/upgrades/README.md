@@ -107,7 +107,7 @@ Add the partitions or manually created disks into path filter if not already pre
 Here, `/dev/sda1` and `/dev/nvm0n1p1` are partitions that are in use and blockdevices were manually created. It needs
 to be included in the path filter of configmap
 
-**Note: If you have any queries or see something unexpected, please reach out to the OpenEBS maintainers via [Github Issue](https://github.com/openebs/openebs/issues) or via #openebs channel on [Kubernetes Slack](https://slack.k8s.io).**
+**Note: If you have any queries or see something unexpected, please reach out to the OpenEBS maintainers via [GitHub Issue](https://github.com/openebs/openebs/issues) or via #openebs channel on [Kubernetes Slack](https://slack.k8s.io).**
 
 ### Upgrade using kubectl (using openebs-operator.yaml):
 
@@ -187,7 +187,7 @@ backup of the data before starting the below upgrade procedure.
   openebs-snapshot-operator-75dc998946-xdskl     2/2     Running   0          2m6s
   ```
 
-**Note: If you have any queries or see something unexpected, please reach out to the OpenEBS maintainers via [Github Issue](https://github.com/openebs/openebs/issues) or via #openebs channel on [Kubernetes Slack](https://slack.k8s.io).**
+**Note: If you have any queries or see something unexpected, please reach out to the OpenEBS maintainers via [GitHub Issue](https://github.com/openebs/openebs/issues) or via #openebs channel on [Kubernetes Slack](https://slack.k8s.io).**
 
 As you might have seen by now, control plane components and data plane components
 work independently. Even after the OpenEBS Control Plane components have been

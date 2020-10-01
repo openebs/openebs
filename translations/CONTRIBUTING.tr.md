@@ -48,7 +48,7 @@ Kod yapılandırması ve takip edilecek yönergeler hakkında daha fazla bilgi i
 
 Katkıda bulunanlardan yardıma ihtiyaç duyulan sorunları bulmak için [sorunlar](https://github.com/openebs/openebs/issues) 'a gidin. Daha hızlı çözebileceğiniz sorunları bulmanıza yardımcı olmak için [etiketler listesi](../contribute/labels-of-issues.md) bölümüne bakın.
 
-Katkıda bulunmayı düşünen bir kişi, bir yorum olarak Github ID'sini atayarak / talep ederek bir soruyu ele alabilir. Söz konusu konuyla ilgili bir haftalık bir PR ya da güncelleme yapılmadığı takdirde, konu yeniden herkesin tekrar açılmasını talep ediyor. Yanıt süresinin bir gün veya daha uzun olması gereken yüksek öncelikli sorunları / regresyonları dikkate almamız gerekiyor.
+Katkıda bulunmayı düşünen bir kişi, bir yorum olarak GitHub ID'sini atayarak / talep ederek bir soruyu ele alabilir. Söz konusu konuyla ilgili bir haftalık bir PR ya da güncelleme yapılmadığı takdirde, konu yeniden herkesin tekrar açılmasını talep ediyor. Yanıt süresinin bir gün veya daha uzun olması gereken yüksek öncelikli sorunları / regresyonları dikkate almamız gerekiyor.
 
 ---
 ### İşini imzala

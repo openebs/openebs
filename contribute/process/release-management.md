@@ -137,7 +137,7 @@ Once the release build validation is complete, helm and operator YAMLs are publi
 ## Generating Changelog and Release Summary
 
 - For each individual repositories:
-  * Update the Github releases with the commit log. The following commands can be used:
+  * Update the GitHub releases with the commit log. The following commands can be used:
 
     ```
     git checkout <release-branch>

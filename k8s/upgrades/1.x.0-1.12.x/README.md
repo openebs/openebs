@@ -146,7 +146,7 @@ like cStor or Jiva, verify that OpenEBS Control plane is indeed in desired versi
   ```
 
 **Note: If you have any queries or see something unexpected, please reach out to the
-OpenEBS maintainers via [Github Issue](https://github.com/openebs/openebs/issues) or via [OpenEBS Slack](https://slack.openebs.io).**
+OpenEBS maintainers via [GitHub Issue](https://github.com/openebs/openebs/issues) or via [OpenEBS Slack](https://slack.openebs.io).**
 
 As you might have seen by now, control plane components and data plane components
 work independently. Even after the OpenEBS Control Plane components have been

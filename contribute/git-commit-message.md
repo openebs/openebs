@@ -23,7 +23,7 @@ Any line of the commit message cannot be longer than 80 characters! This allows 
 
 Subject line may be prefixed for continuous integration purposes
  or better project management with a ticket id. The ticket id could 
- be a Github Issue, Rally Id, JIRA Id, etc.,  For example,
+ be a GitHub Issue, Rally Id, JIRA Id, etc.,  For example,
  if you use Rally to track your development, the subject could be
  "[TA-1234] test(mayactl): add unit tests for cstor volume list"
 

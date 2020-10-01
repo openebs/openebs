@@ -10,10 +10,10 @@ mkdir -p $working_dir
 cd $working_dir
 ```
 
-Set `user` to match your Github profile name:
+Set `user` to match your GitHub profile name:
 
 ```bash
-user={your Github profile name}
+user={your GitHub profile name}
 ```
 
 ## The steps mentioned here are w.r.t contribution towards openebs/openebs project
