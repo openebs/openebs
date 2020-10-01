@@ -28,7 +28,7 @@ OpenEBS itself is deployed as just another container on your host and enables st
 
 An added advantage of being a completely Kubernetes native solution is that administrators and developers can interact and manage OpenEBS using all the wonderful tooling that is available for Kubernetes like kubectl, Helm, Prometheus, Grafana, Weave Scope, etc.
 
-**Our vision** is simple: let storage and storage services for persistent workloads be fully integrated into the environment so that each team and workload benefits from the granularity of control and Kubernetes native behaviour.
+**Our vision** is simple: let storage and storage services for persistent workloads be fully integrated into the environment so that each team and workload benefits from the granularity of control and Kubernetes native behavior.
 
 #### *Read this in [other languages](translations/TRANSLATIONS.md).*
 
@@ -101,7 +101,7 @@ This is a meta-repository for OpenEBS. Please start with the pinned repositories
 
 ## License
 
-OpenEBS is developed under [Apache License 2.0](https://github.com/openebs/openebs/blob/master/LICENSE) license at the project level. Some components of the project are derived from other open source projects and are distributed under their respective licenses. 
+OpenEBS is developed under [Apache License 2.0](https://github.com/openebs/openebs/blob/master/LICENSE) license at the project level. Some components of the project are derived from other open-source projects and are distributed under their respective licenses. 
 
 OpenEBS is part of the CNCF Projects.
 
