@@ -15,20 +15,20 @@ https://openebs.io/
 
 Some key aspects that make OpenEBS different compared to other traditional storage solutions:
 - Built using the micro-services architecture like the applications it serves. OpenEBS is itself deployed as a set of containers on Kubernetes worker nodes. Uses Kubernetes itself to orchestrate and manage OpenEBS components
-- Built completely in userspace making it highly portable to run across any OS/platform
+- Built entirely in userspace, making it highly portable to run across any OS/platform
 - Completely intent-driven, inheriting the same principles that drive the ease of use with Kubernetes
-- OpenEBS supports a range of storage engines so that developers can deploy the storage technology appropriate to their application design objectives. Distributed applications like Cassandra can use the LocalPV engine for lowest latency writes. Monolithic applications like MySQL and PostgreSQL can use the ZFS engine (cStor) for resilience. Streaming applications like Kafka can use the NVMe engine [Mayastor](https://github.com/openebs/Mayastor) for best performance in edge environments. Across engine types, OpenEBS provides a consistent framework for high availability, snapshots, clones and manageability.
+- OpenEBS supports a range of storage engines so that developers can deploy the storage technology appropriate to their application design objectives. Distributed applications like Cassandra can use the LocalPV engine for the lowest latency writes. Monolithic applications like MySQL and PostgreSQL can use the ZFS engine (cStor) for resilience. Streaming applications like Kafka can use the NVMe engine [Mayastor](https://github.com/openebs/Mayastor) for best performance in edge environments. Across engine types, OpenEBS provides a consistent framework for high availability, snapshots, clones, and manageability.
 
-OpenEBS itself is deployed as just another container on your host and enables storage services that can be designated on a per pod, application, cluster or container level, including:
+OpenEBS itself is deployed as just another container on your host and enables storage services that can be designated on a per pod, application, cluster, or container level, including:
 - Automate the management of storage attached to the Kubernetes worker nodes and allow the storage to be used for Dynamically provisioning OpenEBS PVs or Local PVs.
-- Data persistence across nodes, dramatically reducing time spent rebuilding Cassandra rings for example.
-- Synchronization of data across availability zones and cloud providers improving availability and decreasing attach/detach times for example.
-- A common layer so whether you are running on AKS, or your bare metal, or GKE, or AWS - your wiring and developer experience for storage services is as similar as possible.
+- Data persistence across nodes, dramatically reducing time spent rebuilding Cassandra rings, for example.
+- Synchronization of data across availability zones and cloud providers, improving availability, and decreasing attach/detach times, for example.
+- A standard layer, so whether you are running on AKS, or your bare metal, or GKE, or AWS - your wiring and developer experience for storage services is as similar as possible.
 - Management of tiering to and from S3 and other targets.
 
-An added advantage of being a completely Kubernetes native solution is that administrators and developers can interact and manage OpenEBS using all the wonderful tooling that is available for Kubernetes like kubectl, Helm, Prometheus, Grafana, Weave Scope, etc.
+An added advantage of being a completely Kubernetes native solution is that administrators and developers can interact and manage OpenEBS using all the excellent tooling that is available for Kubernetes like kubectl, Helm, Prometheus, Grafana, Weave Scope, etc.
 
-**Our vision** is simple: let storage and storage services for persistent workloads be fully integrated into the environment so that each team and workload benefits from the granularity of control and Kubernetes native behaviour.
+**Our vision** is simple: let storage and storage services for persistent workloads be fully integrated into the environment so that each team and workload benefits from the granularity of control and Kubernetes native behavior.
 
 #### *Read this in [other languages](translations/TRANSLATIONS.md).*
 
@@ -44,7 +44,7 @@ OpenEBS can scale to include an arbitrarily large number of containerized storag
 
 ## Installation and Getting Started
  
-OpenEBS can be set up in a few easy steps. You can get going on your choice of Kubernetes cluster by having open-iscsi installed on the Kubernetes nodes and running the openebs-operator using kubectl. 
+OpenEBS can scale to include an arbitrarily large number of containerized storage controllers. Kubernetes is used to provide fundamental pieces such as using etcd for inventory. OpenEBS scales to the extent of your Kubernetes scales 
 
 **Start the OpenEBS Services using operator**
 ```bash
@@ -60,16 +60,16 @@ helm install --namespace openebs --name openebs stable/openebs
 
 You could also follow our [QuickStart Guide](https://docs.openebs.io/docs/overview.html).
 
-OpenEBS can be deployed on any Kubernetes cluster - either in the cloud, on-premise or developer laptop (minikube). Note that there are no changes to the underlying kernel that are required as OpenEBS operates in userspace.  Please follow our [OpenEBS Setup](https://docs.openebs.io/docs/overview.html) documentation. Also, we have a Vagrant environment available that includes a sample Kubernetes deployment and synthetic load that you can use to simulate the performance of OpenEBS. You may also find interesting the related project called Litmus (https://litmuschaos.io) which helps with chaos engineering for stateful workloads on Kubernetes.
+OpenEBS can be deployed on any Kubernetes cluster - either in the cloud, on-premise, or developer laptop (minikube). Note that there are no changes to the underlying kernel that are required as OpenEBS operates in userspace.  Please follow our [OpenEBS Setup](https://docs.openebs.io/docs/overview.html) documentation. Also, we have a Vagrant environment available that includes a sample Kubernetes deployment and synthetic load that you can use to simulate the performance of OpenEBS. You may also find the related project called Litmus (https://litmuschaos.io), which helps with chaos engineering for stateful workloads on Kubernetes.
 
 ## Status
 
-OpenEBS is one of the most widely used and tested Kubernetes storage infrastructures in the industry. A CNCF Sandbox project since May 2019, OpenEBS is the first and only storage system to provide a consistent set of software-defined storage capabilities on multiple backends (local, nfs, zfs, nvme) across both on-premise and cloud systems, and was the first to open source its own Chaos Engineering Framework for Stateful Workloads, the [Litmus Project](https://litmuschaos.io), which the community relies on to automatically readiness assess the monthly cadence of OpenEBS versions. Enterprise customers have been using OpenEBS in production since 2018 and the project supports 2.5M+ docker pulls a week.
+OpenEBS is one of the most widely used and tested Kubernetes storage infrastructures in the industry. A CNCF Sandbox project since May 2019, OpenEBS is the first and only storage system to provide a consistent set of software-defined storage capabilities on multiple backends (local, nfs, zfs, nvme) across both on-premise and cloud systems, and was the first to open source its own Chaos Engineering Framework for Stateful Workloads, the [Litmus Project](https://litmuschaos.io), which the community relies on to automatically readiness assess the monthly cadence of OpenEBS versions. Enterprise customers have been using OpenEBS in production since 2018, and the project supports 2.5M+ docker pulls a week.
 
-The status of various storage engines that power the OpenEBS Persistent Volumes are provided below. The key difference between the statuses are summarized below:
+The status of various storage engines that power the OpenEBS Persistent Volumes are provided below. The critical difference between the statuses are summarized below:
 - **alpha:** The API may change in incompatible ways in a later software release without notice, recommended for use only in short-lived testing clusters, due to increased risk of bugs and lack of long-term support.
 - **beta**: Support for the overall features will not be dropped, though details may change. Support for upgrading or migrating between versions will be provided, either through automation or manual steps.
-- **stable**: Features will appear in released software for many subsequent versions and support for upgrading between versions will be provided with software automation in the vast majority of scenarios.
+- **stable**: Features will appear in released software for many subsequent versions, and support for upgrading between versions will be provided with software automation in the vast majority of scenarios.
 
 
 | Storage Engine | Status | Details |
