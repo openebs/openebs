@@ -50,7 +50,7 @@ We have a weekly or bi-weekly sync up over Google hangout or Zoom on sub project
 
 ### Monthly Product Roadmap Review Meetings
 
-We have monthly meeting every first Tuesday at 9.30AM PT over [Zoom](https://zoom.us/j/93142650382). Map that to your local time with this [timezone table](http://www.thetimezoneconverter.com/?t=09:30&tz=PT%20%28Pacific%20Time%29).
+We have monthly meeting every first Tuesday at 9:30AM PT over [Zoom](https://zoom.us/j/93142650382). Map that to your local time with this [timezone table](https://www.thetimezoneconverter.com/?t=09:30&tz=PT%20%28Pacific%20Time%29).
 
 This meeting focuses on reviewing the [current roadmap](https://github.com/openebs/openebs/blob/master/ROADMAP.md) and direction of the project or general questions from the broader community. 
 
