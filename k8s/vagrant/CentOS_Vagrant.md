@@ -346,4 +346,4 @@ openebs-zk           openebs.io/provisioner-iscsi
 ## Running Stateful Workloads using OpenEBS
 
 - Some sample YAML files for stateful workloads using OpenEBS are provided [here](https://github.com/openebs/openebs/tree/master/k8s/demo).
-- For more information visit [http://docs.openebs.io/](http://docs.openebs.io/).
+- For more information visit [OpenEBS Documentation](https://docs.openebs.io/).
