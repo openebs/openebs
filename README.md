@@ -17,9 +17,9 @@ Some key aspects that make OpenEBS different compared to other traditional stora
 - Built using the micro-services architecture like the applications it serves. OpenEBS is itself deployed as a set of containers on Kubernetes worker nodes. Uses Kubernetes itself to orchestrate and manage OpenEBS components
 - Built completely in userspace making it highly portable to run across any OS/platform
 - Completely intent-driven, inheriting the same principles that drive the ease of use with Kubernetes
-- OpenEBS supports a range of storage engines so that developers can deploy the storage technology appropriate to their application design objectives. Distributed applications like Cassandra can use the LocalPV engine for lowest latency writes. Monolithic applications like MySQL and PostgreSQL can use the ZFS engine (cStor) for resilience. Streaming applications like Kafka can use the NVMe engine [Mayastor](https://github.com/openebs/Mayastor) for best performance in edge environments. Across engine types, OpenEBS provides a consistent framework for high availability, snapshots, clones and manageability.
+- OpenEBS supports a range of storage engines so that developers can deploy the storage technology appropriate to their application design objectives. Distributed applications like Cassandra can use the LocalPV engine for the lowest latency writes. Monolithic applications like MySQL and PostgreSQL can use the ZFS engine (cStor) for resilience. Streaming applications like Kafka can use the NVMe engine [Mayastor](https://github.com/openebs/Mayastor) for best performance in edge environments. Across engine types, OpenEBS provides a consistent framework for high availability, snapshots, clones, and manageability.
 
-OpenEBS itself is deployed as just another container on your host and enables storage services that can be designated on a per pod, application, cluster or container level, including:
+OpenEBS itself is deployed as just another container on your host and enables storage services that can be designated on a per pod, application, cluster, or container level, including:
 - Automate the management of storage attached to the Kubernetes worker nodes and allow the storage to be used for Dynamically provisioning OpenEBS PVs or Local PVs.
 - Data persistence across nodes, dramatically reducing time spent rebuilding Cassandra rings for example.
 - Synchronization of data across availability zones and cloud providers improving availability and decreasing attach/detach times for example.
@@ -40,7 +40,7 @@ An added advantage of being a completely Kubernetes native solution is that admi
 
 ## Scalability
  
-OpenEBS can scale to include an arbitrarily large number of containerized storage controllers. Kubernetes is used to provide fundamental pieces such as using etcd for inventory. OpenEBS scales to the extent your Kubernetes scales.
+OpenEBS can scale to include an arbitrarily large number of containerized storage controllers. Kubernetes is used to provide fundamental pieces such as using etcd for inventory. OpenEBS scales to the extent of your Kubernetes scales.
 
 ## Installation and Getting Started
  
@@ -60,7 +60,7 @@ helm install --namespace openebs --name openebs stable/openebs
 
 You could also follow our [QuickStart Guide](https://docs.openebs.io/docs/overview.html).
 
-OpenEBS can be deployed on any Kubernetes cluster - either in the cloud, on-premise or developer laptop (minikube). Note that there are no changes to the underlying kernel that are required as OpenEBS operates in userspace.  Please follow our [OpenEBS Setup](https://docs.openebs.io/docs/overview.html) documentation. Also, we have a Vagrant environment available that includes a sample Kubernetes deployment and synthetic load that you can use to simulate the performance of OpenEBS. You may also find interesting the related project called Litmus (https://litmuschaos.io) which helps with chaos engineering for stateful workloads on Kubernetes.
+OpenEBS can be deployed on any Kubernetes cluster - either in the cloud, on-premise, or developer laptop (minikube). Note that there are no changes to the underlying kernel that are required as OpenEBS operates in userspace.  Please follow our [OpenEBS Setup](https://docs.openebs.io/docs/overview.html) documentation. Also, we have a Vagrant environment available that includes a sample Kubernetes deployment and synthetic load that you can use to simulate the performance of OpenEBS. You may also find interesting the related project called Litmus (https://litmuschaos.io) which helps with chaos engineering for stateful workloads on Kubernetes.
 
 ## Status
 
@@ -101,7 +101,7 @@ This is a meta-repository for OpenEBS. Please start with the pinned repositories
 
 ## License
 
-OpenEBS is developed under [Apache License 2.0](https://github.com/openebs/openebs/blob/master/LICENSE) license at the project level. Some components of the project are derived from other open source projects and are distributed under their respective licenses. 
+OpenEBS is developed under [Apache License 2.0](https://github.com/openebs/openebs/blob/master/LICENSE) license at the project level. Some components of the project are derived from other open-source projects and are distributed under their respective licenses. 
 
 OpenEBS is part of the CNCF Projects.
 
