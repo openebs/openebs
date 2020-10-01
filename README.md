@@ -8,8 +8,8 @@
 [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/1754/badge)](https://bestpractices.coreinfrastructure.org/projects/1754)
 
 https://openebs.io/
- 
-**OpenEBS** is the most widely deployed and easy to use open-source storage solution for Kubernetes. 
+
+**OpenEBS** is the most widely deployed and easy to use open-source storage solution for Kubernetes.
 
 **OpenEBS** is the leading open-source example of a category of storage solutions sometimes called [Container Attached Storage](https://www.cncf.io/blog/2018/04/19/container-attached-storage-a-primer/). **OpenEBS** is listed as an open-source example in the [CNCF Storage Landscape White Paper](https://github.com/cncf/sig-storage/blob/master/CNCF%20Storage%20Landscape%20-%20White%20Paper.pdf) under the hyperconverged storage solutions.
 
@@ -37,14 +37,15 @@ An added advantage of being a completely Kubernetes native solution is that admi
 [🇹🇷](translations/README.tr.md)
 [🇺🇦](translations/README.ua.md)
 [🇨🇳](translations/README.zh.md)
+[🇫🇷](translations/README.fr.md)
 
 ## Scalability
- 
+
 OpenEBS can scale to include an arbitrarily large number of containerized storage controllers. Kubernetes is used to provide fundamental pieces such as using etcd for inventory. OpenEBS scales to the extent your Kubernetes scales.
 
 ## Installation and Getting Started
- 
-OpenEBS can be set up in a few easy steps. You can get going on your choice of Kubernetes cluster by having open-iscsi installed on the Kubernetes nodes and running the openebs-operator using kubectl. 
+
+OpenEBS can be set up in a few easy steps. You can get going on your choice of Kubernetes cluster by having open-iscsi installed on the Kubernetes nodes and running the openebs-operator using kubectl.
 
 **Start the OpenEBS Services using operator**
 ```bash
@@ -80,17 +81,17 @@ The status of various storage engines that power the OpenEBS Persistent Volumes 
 | Mayastor | alpha | A new storage engine that operates at the efficiency of Local Storage but also offers storage services like Replication. Development is underway to support Snapshots and Clones. |
 
 For more details, please refer to [OpenEBS Documentation](https://docs.openebs.io/docs/next/quickstart.html).
- 
+
 ## Contributing
- 
+
 OpenEBS welcomes your feedback and contributions in any form possible.
- 
+
 - [Join OpenEBS community on Kubernetes Slack](https://kubernetes.slack.com)
   - Already signed up? Head to our discussions at [#openebs](https://kubernetes.slack.com/messages/openebs/)
 - Want to raise an issue or help with fixes and features?
   - See [open issues](https://github.com/openebs/openebs/issues)
   - See [contributing guide](./CONTRIBUTING.md)
-  - Want to join our contributor community meetings, [check this out](./community/README.md). 
+  - Want to join our contributor community meetings, [check this out](./community/README.md).
 - Join our OpenEBS CNCF Mailing lists
   - For OpenEBS project updates, subscribe to [OpenEBS Announcements](https://lists.cncf.io/g/cncf-openebs-announcements)
   - For interacting with other OpenEBS users, subscribe to [OpenEBS Users](https://lists.cncf.io/g/cncf-openebs-users)
@@ -101,7 +102,7 @@ This is a meta-repository for OpenEBS. Please start with the pinned repositories
 
 ## License
 
-OpenEBS is developed under [Apache License 2.0](https://github.com/openebs/openebs/blob/master/LICENSE) license at the project level. Some components of the project are derived from other open source projects and are distributed under their respective licenses. 
+OpenEBS is developed under [Apache License 2.0](https://github.com/openebs/openebs/blob/master/LICENSE) license at the project level. Some components of the project are derived from other open source projects and are distributed under their respective licenses.
 
 OpenEBS is part of the CNCF Projects.
 
