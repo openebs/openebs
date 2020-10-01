@@ -19,7 +19,7 @@ Note: OpenEBS follows a monthly release cadence with a new release on the 15th o
 - Backlogs
   - Enhance the discovery probes to support partitions, lvms and so forth
   - Scan for device media errors, reporting and alerting by enhancing the ndm-exporter
-  - Support Bulk BDC requests to claim multiple block devices that satisfy affinity or anti-affinity rules of applications. Example: two block devices from same node or two block devices from different nodes. 
+  - Support Bulk BDC requests to claim multiple block devices that satisfy affinity or anti-affinity rules of applications. Example: two block devices from the same node or two block devices from different nodes. 
   - Support for device configuration tasks like partitioning, mounting or unmounting devices by adding new services via NDM gRPC API layer.
   
 ### Dynamic Local PVs
@@ -78,7 +78,7 @@ Note: OpenEBS follows a monthly release cadence with a new release on the 15th o
   - Helm chart to install only cStor components
   - Move the Backup/Restore related API to v1
   - Move cstor volume and pool metrics code from openebs/maya to openebs/cstor-operators
-  - Additional integration and e2e tests to help move cStor towards stable
+  - Additional integration and e2e tests to help move cStor towards stability
 
 ### OpenEBS CLI
 - Source repositories
@@ -89,7 +89,7 @@ Note: OpenEBS follows a monthly release cadence with a new release on the 15th o
 
 ## Near Term
 
-Typically the items under this category fall under 3 to 6 month roadmap. At a high level, the focus is towards moving the alpha and beta engines towards stable by adding more automated e2e tests and updating the corresponding user and contributor documents. To name a few backlogs (not in any particular order) on the near-term radar, where we are looking for additional help: 
+Typically the items under this category fall under a 3 to 6 month roadmap. At a high level, the focus is towards moving the alpha and beta engines towards stable by adding more automated e2e tests and updating the corresponding user and contributor documents. To name a few backlogs (not in any particular order) on the near-term radar, where we are looking for additional help: 
 
 - Update user documentation with reference stacks of running various workloads using OpenEBS volumes 
 - Auto provisioning of block devices that can be used with OpenEBS storage engines
