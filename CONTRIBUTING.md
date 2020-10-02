@@ -1,4 +1,5 @@
-# Contributing to OpenEBS
+# Beitrag zu OpenEBS
+
 Toll!! Wir sind immer auf der Suche nach weiteren OpenEBS-Hackern. Sie können beginnen, indem Sie dies lesen [Überblick](./contribute/design/README.md)
 
 Erstens, wenn Sie sich nicht sicher sind oder Angst vor irgendetwas haben, fragen oder senden Sie das Problem oder ziehen Sie die Anfrage trotzdem. Sie werden nicht angeschrien, wenn Sie Ihr Bestes geben. Das Schlimmste, was passieren kann, ist, dass Sie höflich gebeten werden, etwas zu ändern. Wir freuen uns über jede Art von Beiträgen und möchten nicht, dass eine Regelwand dem im Wege steht.
@@ -25,7 +26,8 @@ Wenn Sie Probleme ansprechen, geben Sie bitte Folgendes an:
 ## Senden Sie die Änderung, um die Dokumentation zu verbessern
 
 Die richtige Dokumentation zu finden ist schwierig! Siehe diese [Seite](./contribute/CONTRIBUTING-TO-DEVELOPER-DOC.md) Weitere Informationen dazu, wie Sie die Entwicklerdokumentation verbessern können, indem Sie Pull-Anforderungen mit entsprechenden Tags senden. Hier ist eine [Liste der Tags](./contribute/labels-of-issues.md) das könnte für das gleiche verwendet werden. Helfen Sie uns, unsere Dokumentation sauber, leicht verständlich und zugänglich zu halten.
-## Submit Proposals for New Features
+
+## Vorschläge für neue Funktionen einreichen
 
 Es ist immer etwas mehr erforderlich, um die Anpassung an Ihre Anwendungsfälle zu vereinfachen. Nehmen Sie an der Diskussion über neue Funktionen teil oder erheben Sie eine PR mit Ihrer vorgeschlagenen Änderung. 
 
