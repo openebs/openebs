@@ -1,4 +1,4 @@
-<img alt="openebs" src="https://clv-vm2.s3.amazonaws.com/p/images2/qv/vr/x2/vsa9fgc/thumbnail_99a20264422dc25663857f4231a4dcc226140f68.jpg" height="200", width="500" align="left">
+<img alt="openebs" src="https://landscape.cncf.io/logos/open-ebs.svg" width="200" align="left">
 
 # OpenEBS
 
