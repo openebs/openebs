@@ -1,3 +1,4 @@
+<img alt="openebs" src="https://landscape.cncf.io/logos/open-ebs.svg" width="200" align="left">
 # OpenEBS
 
 [![Releases](https://img.shields.io/github/release/openebs/openebs/all.svg?style=flat-square)](https://github.com/openebs/openebs/releases)
