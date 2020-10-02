@@ -1,70 +1,67 @@
 # Contributing to OpenEBS
+Toll!! Wir sind immer auf der Suche nach weiteren OpenEBS-Hackern. Sie können beginnen, indem Sie dies lesen [Überblick](./contribute/design/README.md)
 
-Great!! We are always on the lookout for more OpenEBS hackers. You can get started by reading this [overview](./contribute/design/README.md)
+Erstens, wenn Sie sich nicht sicher sind oder Angst vor irgendetwas haben, fragen oder senden Sie das Problem oder ziehen Sie die Anfrage trotzdem. Sie werden nicht angeschrien, wenn Sie Ihr Bestes geben. Das Schlimmste, was passieren kann, ist, dass Sie höflich gebeten werden, etwas zu ändern. Wir freuen uns über jede Art von Beiträgen und möchten nicht, dass eine Regelwand dem im Wege steht.
 
-Firstly, if you are unsure or afraid of anything, just ask or submit the issue or pull request anyways. You won't be yelled at for giving your best effort. The worst that can happen is that you'll be politely asked to change something. We appreciate any sort of contributions and don't want a wall of rules to get in the way of that.
+Lesen Sie jedoch weiter, wenn Sie mehr Anleitungen wünschen, wie Sie am besten zum Projekt beitragen können. Dieses Dokument behandelt alle Punkte, nach denen wir in Ihren Beiträgen suchen, und erhöht Ihre Chancen, Ihre Beiträge schnell zusammenzuführen oder zu adressieren.
 
-However, for those individuals who want a bit more guidance on the best way to contribute to the project, read on. This document will cover all the points we're looking for in your contributions, raising your chances of quickly merging or addressing your contributions.
+OpenEBS ist jedoch eine Innovation in Open Source. Sie können gerne auf jede erdenkliche Weise einen Beitrag leisten, und jede Hilfe wird sehr geschätzt.
 
-That said, OpenEBS is an innovation in Open Source. You are welcome to contribute in any way you can and all the help provided is very much appreciated. 
+- [Probleme aufwerfen, um neue Funktionen anzufordern, Dokumentation zu reparieren oder Fehler zu melden.](#raising-issues)
+- [Senden Sie Änderungen, um die Dokumentation zu verbessern.](#submit-change-to-improve-documentation) 
+- [Reichen Sie Vorschläge für neue Funktionen / Verbesserungen ein.](#submit-proposals-for-new-features)
+- [Lösen Sie vorhandene Probleme im Zusammenhang mit Dokumentation oder Code.](#contributing-to-source-code-and-bug-fixes)
 
-- [Raise issues to request new functionality, fix documentation or for reporting bugs.](#raising-issues)
-- [Submit changes to improve documentation.](#submit-change-to-improve-documentation) 
-- [Submit proposals for new features/enhancements.](#submit-proposals-for-new-features)
-- [Solve existing issues related to documentation or code.](#contributing-to-source-code-and-bug-fixes)
+Es gibt einige einfache Richtlinien, die Sie befolgen müssen, bevor Sie Ihre Hacks bereitstellen.
 
-There are a few simple guidelines that you need to follow before providing your hacks. 
+## Probleme aufwerfen
 
-## Raising Issues
+Wenn Sie Probleme ansprechen, geben Sie bitte Folgendes an:
+- Die Setup-Details müssen wie in der Problemvorlage angegeben klar angegeben werden, damit der Prüfer sie überprüfen kann.
+- Ein Szenario, in dem das Problem aufgetreten ist (mit Details zur Reproduktion).
+- Fehler und Protokollmeldungen, die von der Software angezeigt werden.
+- Alle anderen Details, die nützlich sein könnten.
 
-When raising issues, please specify the following:
-- Setup details need to be filled as specified in the issue template clearly for the reviewer to check.
-- A scenario where the issue occurred (with details on how to reproduce it).
-- Errors and log messages that are displayed by the software.
-- Any other details that might be useful.
+## Senden Sie die Änderung, um die Dokumentation zu verbessern
 
-## Submit Change to Improve Documentation
-
-Getting documentation right is hard! Refer to this [page](./contribute/CONTRIBUTING-TO-DEVELOPER-DOC.md) for more information on how you could improve the developer documentation by submitting pull requests with appropriate tags. Here's a [list of tags](./contribute/labels-of-issues.md) that could be used for the same. Help us keep our documentation clean, easy to understand, and accessible.
-
+Die richtige Dokumentation zu finden ist schwierig! Siehe diese [Seite](./contribute/CONTRIBUTING-TO-DEVELOPER-DOC.md) Weitere Informationen dazu, wie Sie die Entwicklerdokumentation verbessern können, indem Sie Pull-Anforderungen mit entsprechenden Tags senden. Hier ist eine [Liste der Tags](./contribute/labels-of-issues.md) das könnte für das gleiche verwendet werden. Helfen Sie uns, unsere Dokumentation sauber, leicht verständlich und zugänglich zu halten.
 ## Submit Proposals for New Features
 
-There is always something more that is required, to make it easier to suit your use-cases. Feel free to join the discussion on new features or raise a PR with your proposed change. 
+Es ist immer etwas mehr erforderlich, um die Anpassung an Ihre Anwendungsfälle zu vereinfachen. Nehmen Sie an der Diskussion über neue Funktionen teil oder erheben Sie eine PR mit Ihrer vorgeschlagenen Änderung. 
 
-- [Join OpenEBS community on Kubernetes Slack](https://kubernetes.slack.com)
-	- Already signed up? Head to our discussions at [#openebs](https://kubernetes.slack.com/messages/openebs/)
+- [Treten Sie der OpenEBS-Community auf Kubernetes Slack bei](https://kubernetes.slack.com)
+	- Schon angemeldet? Besuchen Sie unsere Diskussionen unter [#openebs](https://kubernetes.slack.com/messages/openebs/)
 
-## Contributing to Source Code and Bug Fixes
+## Beitrag zum Quellcode und zu Fehlerkorrekturen
 
-Provide PRs with appropriate tags for bug fixes or enhancements to the source code. For a list of tags that could be used, see [this](./contribute/labels-of-issues.md).
+Stellen Sie PRs geeignete Tags für Fehlerbehebungen oder Verbesserungen des Quellcodes zur Verfügung. Eine Liste der Tags, die verwendet werden könnten, finden Sie unter[dies](./contribute/labels-of-issues.md).
 
-* For contributing to K8s demo, please refer to this [document](./contribute/CONTRIBUTING-TO-K8S-DEMO.md).
-    - For checking out how OpenEBS works with K8s, refer to this [document](./k8s/README.md) 
-- For contributing to Kubernetes OpenEBS Provisioner, please refer to this [document](./contribute/CONTRIBUTING-TO-KUBERNETES-OPENEBS-PROVISIONER.md).
+* Informationen zum Beitrag zur K8-Demo finden Sie hier [document](./contribute/CONTRIBUTING-TO-K8S-DEMO.md).
+    - Informationen dazu, wie OpenEBS mit K8s funktioniert, finden Sie hier [dokument](./k8s/README.md) 
+- Informationen zum Beitrag zu Kubernetes OpenEBS Provisioner finden Sie hier [dokument](./contribute/CONTRIBUTING-TO-KUBERNETES-OPENEBS-PROVISIONER.md).
     
-Refer to this [document](./contribute/design/code-structuring.md) for more information on code structuring and guidelines to follow on the same.
+Beziehen Sie sich darauf [dokument](./contribute/design/code-structuring.md) weitere Informationen zur Codestrukturierung und Richtlinien finden Sie hier.
 
-## Solve Existing Issues
-Head over to [issues](https://github.com/openebs/openebs/issues) to find issues where help is needed from contributors. See our [list of labels guide](./contribute/labels-of-issues.md) to help you find issues that you can solve faster.
+## Bestehende Probleme lösen
+Gehe rüber zu [Probleme](https://github.com/openebs/openebs/issues) um Probleme zu finden, bei denen Hilfe von Mitwirkenden benötigt wird. Siehe unsere [Liste der Etiketten](./contribute/labels-of-issues.md) um Ihnen zu helfen, Probleme zu finden, die Sie schneller lösen können.
 
-A person looking to contribute can take up an issue by claiming it as a comment/assign their GitHub ID to it. In case there is no PR or update in progress for a week on the said issue, then the issue reopens for anyone to take up again. We need to consider high priority issues/regressions where response time must be a day or so. 
+Eine Person, die einen Beitrag leisten möchte, kann ein Problem aufgreifen, indem sie es als Kommentar beansprucht / ihr ihre GitHub-ID zuweist. Falls eine Woche lang keine PR oder Aktualisierung zu diesem Thema durchgeführt wird, wird das Problem erneut geöffnet, damit jeder es erneut aufgreifen kann. Wir müssen Probleme / Regressionen mit hoher Priorität berücksichtigen, bei denen die Antwortzeit etwa einen Tag betragen muss.
 
 ---
-### Sign your work
+### Unterschreiben Sie Ihre Arbeit
 
-We use the Developer Certificate of Origin (DCO) as an additional safeguard for the OpenEBS project. This is a well established and widely used mechanism to assure contributors have confirmed their right to license their contribution under the project's license. Please read [developer-certificate-of-origin](./contribute/developer-certificate-of-origin).
+Wir verwenden das Developer Certificate of Origin (DCO) als zusätzlichen Schutz für das OpenEBS-Projekt. Dies ist ein gut etablierter und weit verbreiteter Mechanismus, um sicherzustellen, dass die Mitwirkenden ihr Recht bestätigt haben, ihren Beitrag unter der Projektlizenz zu lizenzieren. Bitte lesen Sie [developer-certificate-of-origin](./contribute/developer-certificate-of-origin).
 
-If you can certify it, then just add a line to every git commit message:
+Wenn Sie es zertifizieren können, fügen Sie einfach jeder Git-Commit-Nachricht eine Zeile hinzu:
 
 ````
   Signed-off-by: Random J Developer <random@developer.example.org>
 ````
-or use the command `git commit -s -m "commit message comes here"` to sign-off on your commits.
+oder verwenden Sie den Befehl `git commit -s -m "commit message comes here"` um Ihre Commits abzumelden.
 
-Use your real name (sorry, no pseudonyms or anonymous contributions). If you set your `user.name` and `user.email` git configs, you can sign your commit automatically with `git commit -s`. You can also use git [aliases](https://git-scm.com/book/en/v2/Git-Basics-Git-Aliases) like `git config --global alias.ci 'commit -s'`. Now you can commit with `git ci` and the commit will be signed.
-
+Verwenden Sie Ihren richtigen Namen (leider keine Pseudonyme oder anonymen Beiträge). Wenn Sie Ihre einstellen `user.name` und `user.email` git configs können Sie Ihr Commit automatisch mit signieren `git commit -s`. Sie können auch git verwenden [aliases](https://git-scm.com/book/en/v2/Git-Basics-Git-Aliases) mögen `git config --global alias.ci 'commit -s'`. Jetzt können Sie mit festlegen `git ci` und das Commit wird unterschrieben.
 ---
 
-## Join our community 
+## Tritt unserer Gemeinschaft bei
 
-Want to actively develop and contribute to the OpenEBS community, refer to this [document](./community/README.md).
+Wenn Sie sich aktiv entwickeln und zur OpenEBS-Community beitragen möchten, lesen Sie dies [dokument](./community/README.md).
