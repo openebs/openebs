@@ -26,7 +26,7 @@ The list of organizations that have publicly shared the usage of OpenEBS:
 | [Stratus5](https://stratus5.com/) | Redis,Ceryx, MySQL, MariaDB, Wordpress | [English](./adopters/stratus5/README.md) |
 | [TOBG Services Ltd](https://www.tobg.com.de/) | Postgresql, Confluence, Gitlab, Bitcoin Full Node, Bitcoin Lightning Nodes, BTCPay, Cardano Nodes and Pool, Docker Registry, Prometheus, Grafana, Zabbix monitoring, ELK | [English](./adopters/tobgservices/README.md) |
 
-The list of users that have publicly shared the usage of OpenEBS.
+The list of users that have publicly shared the usage of OpenEBS:
 
 | User | Stateful Workloads | Success Story |
 | :--- | :--- | :--- |
