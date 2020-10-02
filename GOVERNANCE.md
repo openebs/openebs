@@ -16,7 +16,7 @@ all maintainers have 3 things in common:
 3) They spend that time doing whatever needs to be done, not necessarily what
 is the most interesting or fun.
 
-Maintainers are often under-appreciated, because their work is harder to appreciate.
+Maintainers are often under-appreciated because their work is harder to appreciate.
 It's easy to appreciate a really cool and technically advanced feature. It's harder
 to appreciate the absence of bugs, the slow but steady improvement in stability,
 or the reliability of a release process. But those things distinguish a great
@@ -29,7 +29,7 @@ They share in reviewing issues and pull requests and their LGTM counts towards t
 required LGTM count to merge a code change into the project.
 
 Reviewers are part of the organization but do not have write access.
-Becoming a reviewer is a core aspect in the journey to becoming a maintainer.
+Becoming a reviewer is a core aspect of the journey to becoming a maintainer.
 
 ## Adding maintainers
 
@@ -67,7 +67,7 @@ becomes a maintainer once the pull request is merged.
 Similar to adding maintainers, new sub projects can be added to OpenEBS
 GitHub organization as long as they adhere to the OpenEBS vision and mission. 
 New projects are discussed in either the Contributor Meeting or the Community 
-slack and requires at least 1 maintainer approval.
+slack and require at least 1 maintainer approval.
 
 If a project is approved, a maintainer will add the project to the OpenEBS
 GitHub organization, and make an announcement on a public forum.
