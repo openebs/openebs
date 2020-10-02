@@ -4,7 +4,7 @@ This document describes the process for improving developer documentation by cre
 
 Developer documentation is available under the folder: [openebs/contribute](https://github.com/openebs/openebs/tree/master/contribute)
 
-The developer documentation includes anything that will help the community like:
+The documentation includes anything that will help the community like:
 
 - Architecture and Design documentation
 - Technical or Research Notes
@@ -12,7 +12,7 @@ The developer documentation includes anything that will help the community like:
 - Process Documentation
 - Generic / Miscellaneous Notes
 
-We are also looking for an explainer video or presentation from the community that helps new developers in understanding the OpenEBS Architecture, it's use cases, and installation procedure locally.
+We are also looking for an explainer video or presentation from the community that will help new developers in understanding the OpenEBS Architecture, it's use cases, and installation procedure locally.
 
 At a very high level, the process to contributing and improving the code is pretty simple:
 
@@ -55,3 +55,4 @@ You can also help with some existing issues under this category available at [de
 - After the PR is merged the development branch in the forked repository can be deleted.
 
 If you need any help with git, refer to this [git cheat sheet](./git-cheatsheet.md) and go back to the [**contributing to OpenEBS Documentation**](../CONTRIBUTING.md) guide to proceed.
+thanks 
