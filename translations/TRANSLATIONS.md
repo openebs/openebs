@@ -8,3 +8,4 @@
 | :uk: | [English](../README.md) |
 | 🇹🇷 | [Türkçe](README.tr.md) |
 | 🇨🇳 | [中文](README.zh.md) |
+| 🇳🇵 | [Nepali](README.np.md) |

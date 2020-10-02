@@ -37,6 +37,7 @@ An added advantage of being a completely Kubernetes native solution is that admi
 [🇹🇷](translations/README.tr.md)
 [🇺🇦](translations/README.ua.md)
 [🇨🇳](translations/README.zh.md)
+[🇳🇵](translations/README.np.md)
 
 ## Scalability
  
