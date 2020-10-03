@@ -59,7 +59,7 @@ helm repo update
 helm install --namespace openebs --name openebs stable/openebs
 ```
 
-You could also follow our [QuickStart Guide](https://docs.openebs.io/docs/overview.html).
+You can also follow our [QuickStart Guide](https://docs.openebs.io/docs/overview.html).
 
 OpenEBS can be deployed on any Kubernetes cluster - either in the cloud, on-premise or developer laptop (minikube). Note that there are no changes to the underlying kernel that are required as OpenEBS operates in userspace.  Please follow our [OpenEBS Setup](https://docs.openebs.io/docs/overview.html) documentation. Also, we have a Vagrant environment available that includes a sample Kubernetes deployment and synthetic load that you can use to simulate the performance of OpenEBS. You may also find interesting the related project called Litmus (https://litmuschaos.io) which helps with chaos engineering for stateful workloads on Kubernetes.
 
