@@ -32,12 +32,12 @@ OpenEBS 本身被部署为主机上的另一个容器，支持在每个pod、应
 
 #### *阅读关于这个文档的 [其他语言版本](translations/TRANSLATIONS.md)。*
 
-[🇩🇪](translations/README.de.md)
-[🇷🇺](translations/README.ru.md)
-[🇹🇷](translations/README.tr.md)
-[🇺🇦](translations/README.ua.md)
-[🇫🇷](translations/README.fr.md)
-[:india:](translations/README.gu.md)
+[🇩🇪](README.de.md)
+[🇷🇺](README.ru.md)
+[🇹🇷](README.tr.md)
+[🇺🇦](README.ua.md)
+[🇫🇷](README.fr.md)
+[:india:](README.gu.md)
 
 ## 可扩展性
 
