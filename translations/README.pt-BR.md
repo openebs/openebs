@@ -100,9 +100,9 @@ OpenEBS agradece seu feedback e suas contribuições em qualquer forma possível
 
 Este é um meta-repositório para OpenEBS. Por favor inicie com os repositórios fixados ou com o documento de [Arquitetura OpenEBS](/contribute/design/README.md).
 
-## Licensa
+## Licença
 
-OpenEBS é desenvolvido sob a licensa [Apache License 2.0](https://github.com/openebs/openebs/blob/master/LICENSE) à nível de projeto. Alguns componentes do projeto são derivados de outros projetos open-source e estão distribuídos sob suas respectivas licensas.
+OpenEBS é desenvolvido sob a licença [Apache License 2.0](https://github.com/openebs/openebs/blob/master/LICENSE) à nível de projeto. Alguns componentes do projeto são derivados de outros projetos open-source e estão distribuídos sob suas respectivas licenças.
 
 OpenEBS é parte dos Projetos CNCF.
 
