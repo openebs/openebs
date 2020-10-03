@@ -1,0 +1,22 @@
+name: ci-build
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - name: Kubeval
+      uses: stefanprodan/kube-tools@v1
+      with:
+        kubectl: 1.16.2
+        kustomize: 3.4.0
+        helm: 2.16.1
+        helmv3: 3.0.0
+        command: |
+          kubeval -d k8s/vagrant --strict --ignore-missing-schemas
