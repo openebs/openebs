@@ -1,4 +1,7 @@
+<img alt="OpenEBS Storage" src="https://github.com/mayadata-io/chitrakala/blob/master/OpenEBS%20logo/openebs%20logos-01.png" width="200" align="left">
+
 # OpenEBS
+### Containerized Storage for Containers
 
 [![Releases](https://img.shields.io/github/release/openebs/openebs/all.svg?style=flat-square)](https://github.com/openebs/openebs/releases)
 [![Slack channel #openebs](https://img.shields.io/badge/slack-openebs-brightgreen.svg?logo=slack)](https://kubernetes.slack.com/messages/openebs)
