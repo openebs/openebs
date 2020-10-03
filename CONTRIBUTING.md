@@ -15,6 +15,16 @@ That said, OpenEBS is an innovation in Open Source. You are welcome to contribut
 
 There are a few simple guidelines that you need to follow before providing your hacks. 
 
+## *Read this in [other languages](/translations).*
+
+[:uk:](/CONTRIBUTING.md)
+[🇷🇺](translations/CONTRIBUTING.ru.md)
+[🇹🇷](translations/CONTRIBUTING.tr.md)
+[🇺🇦](translations/CONTRIBUTING.ua.md)
+[🇨🇳](translations/CONTRIBUTING.zh.md)
+[🇫🇷](translations/CONTRIBUTING.fr.md)
+[🇮🇹](translations/CONTRIBUTING.it.md)
+
 ## Raising Issues
 
 When raising issues, please specify the following:
