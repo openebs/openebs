@@ -15,6 +15,15 @@ Cela dit, OpenEBS est une innovation en Open Source. Vous êtes invités à cont
 
 Il y a quelques directives simples que vous devez suivre avant de fournir vos hacks.
 
+#### *Lisez ceci dans [autres langues](/translations).*
+[:uk:](/CONTRIBUTING.md)
+[🇷🇺](CONTRIBUTING.ru.md)
+[🇹🇷](CONTRIBUTING.tr.md)
+[🇺🇦](CONTRIBUTING.ua.md)
+[🇨🇳](CONTRIBUTING.zh.md)
+[🇫🇷](CONTRIBUTING.fr.md)
+[🇮🇹](CONTRIBUTING.it.md)
+
 ## Créer des issues
 
 Lorsque vous créez des issues, veuillez préciser les éléments suivants:
