@@ -29,6 +29,7 @@ https://openebs.io/
 [🇺🇦](README.ua.md)
 [🇨🇳](README.zh.md)
 [🇳🇵](README.np.md)
+[🇫🇷](README.fr.md)
 
 ## Ölçeklenebilirlik
  

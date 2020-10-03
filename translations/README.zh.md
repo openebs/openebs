@@ -8,7 +8,7 @@
 [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/1754/badge)](https://bestpractices.coreinfrastructure.org/projects/1754)
 
 https://openebs.io/
- 
+
 **OpenEBS** 是 Kubernetes 部署使用最广泛且易用的开源存储解决方案。
 
 作为业界领先的开源存储解决方案，**OpenEBS** 通常又以其名 [Container Attached Storage](https://www.cncf.io/blog/2018/04/19/container-attached-storage-a-primer/) （基于容器的块存储）而被广泛熟知。同时 **OpenEBS** 作为一个开源范例列入 [CNCF 存储全景白皮书](https://github.com/cncf/sig-storage/blob/master/CNCF%20Storage%20Landscape%20-%20White%20Paper.pdf) 的超融合存储解决方案中。
@@ -37,9 +37,10 @@ OpenEBS 本身被部署为主机上的另一个容器，支持在每个pod、应
 [🇹🇷](translations/README.tr.md)
 [🇺🇦](translations/README.ua.md)
 [🇳🇵](translations/README.np.md)
+[🇫🇷](translations/README.fr.md)
 
 ## 可扩展性
- 
+
 OpenEBS 可以扩展到包含任意数量的容器化存储控制器。Kubernetes 用于提供基本的组件，例如使用 etcd 作为 inventory。OpenEBS 遵照你的 Kubernetes 的级别进行扩展。
 
 ## 安装以及使用
@@ -76,24 +77,24 @@ OpenEBS 是业界最广泛使用和测试的 Kubernetes 存储基础设施之一
 | Mayastor | alpha | 一种全新的存储引擎，比肩本地存储的工作效率，同时也提供复制等存储服务。快照和克隆的功能支持正在开发中。|
 
 更多详情请参阅 [OpenEBS 文档](https://docs.openebs.io/docs/next/quickstart.html).
- 
+
 ## 参与贡献
- 
+
 OpenEBS 欢迎任何形式的反馈和贡献。
- 
+
 - [加入我们的社区](https://kubernetes.slack.com).
   - 已经注册? 前往我们的讨论组 [#openebs](https://kubernetes.slack.com/messages/openebs/)
 - 希望反馈问题或参与修复或者贡献特性?
   - 查看 [开放中的问题](https://github.com/openebs/openebs/issues)
   - 查看 [参与贡献说明](./CONTRIBUTING.zh.md)
-  - 想加入我们的社区开发者会议, [点击这里](./community/README.md). 
+  - 想加入我们的社区开发者会议, [点击这里](./community/README.md).
 - 加入我们的 OpenEBS CNCF 邮件列表
   - 关注 OpenEBS 项目更新动态，订阅 [OpenEBS 公告](https://lists.cncf.io/g/cncf-openebs-announcements)
   - 与其他 OpenEBS 用户交流, 订阅 [OpenEBS 用户](https://lists.cncf.io/g/cncf-openebs-users)
 
 ## 秀出你的代码
 
-这个是 OpenEBS 的元仓库。 请首先从已置顶的仓库开始。或者查看 [OpenEBS 架构](./contribute/design/README.md) 文档。 
+这个是 OpenEBS 的元仓库。 请首先从已置顶的仓库开始。或者查看 [OpenEBS 架构](./contribute/design/README.md) 文档。
 
 ## 协议
 
