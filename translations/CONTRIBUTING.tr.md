@@ -15,6 +15,15 @@ Bununla birlikte, OpenEBS Açık Kaynakta bir yazılımdır. Herhangi bir şekil
 
 Hack'lerinizi vermeden önce izlemeniz gereken birkaç basit yönerge vardır.
 
+#### *Bunu okuyun [diğer dillerde](/translations)*
+[:uk:](/CONTRIBUTING.md)
+[🇷🇺](CONTRIBUTING.ru.md)
+[🇹🇷](CONTRIBUTING.tr.md)
+[🇺🇦](CONTRIBUTING.ua.md)
+[🇨🇳](CONTRIBUTING.zh.md)
+[🇫🇷](CONTRIBUTING.fr.md)
+[🇮🇹](CONTRIBUTING.it.md)
+
 ## Sorunları Yükseltme
 
 Sorunları yükselttiğinizde lütfen şunları belirtin:
