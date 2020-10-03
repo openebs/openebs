@@ -15,6 +15,15 @@
 
 在提供这些技巧之前，您需要遵循一些简单的指导原则。
 
+#### *阅读[其他语言](/translations)*
+[:uk:](/CONTRIBUTING.md)
+[🇷🇺](CONTRIBUTING.ru.md)
+[🇹🇷](CONTRIBUTING.tr.md)
+[🇺🇦](CONTRIBUTING.ua.md)
+[🇨🇳](CONTRIBUTING.zh.md)
+[🇫🇷](CONTRIBUTING.fr.md)
+[🇮🇹](CONTRIBUTING.it.md)
+
 ## 提交问题
 
 当您提交新的问题(issue)时，请列明下列事项:
