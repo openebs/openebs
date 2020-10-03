@@ -29,7 +29,7 @@ x
 [🇹🇷](README.tr.md)
 [🇨🇳](README.zh.md)
 [🇫🇷](README.fr.md)
-
+[🇮🇹](README.it.md)
 ## Skalierbarkeit
  
 OpenEBS kann skaliert werden, um eine beliebig große Anzahl von Container-Speichercontrollern aufzunehmen. Kubernetes wird verwendet, um grundlegende Elemente wie die Verwendung von etcd für das Inventar bereitzustellen. OpenEBS skaliert in dem Umfang, in dem sich Ihre Kubernetes-Skalen befinden.
