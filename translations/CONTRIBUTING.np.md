@@ -61,7 +61,6 @@
 ````
 वा कमाण्ड `git commit -s -m "commit message comes here"` तपाईंको कमिटमा साईन-अप प्रयोग गर्नुहोस्।
 
-Use your real name (sorry, no pseudonyms or anonymous contributions). If you set your `user.name` and `user.email` git configs, you can sign your commit automatically with `git commit -s`. You can also use git [aliases](https://git-scm.com/book/en/v2/Git-Basics-Git-Aliases) like `git config --global alias.ci 'commit -s'`. Now you can commit with `git ci` and the commit will be signed.
 तपाईंको वास्तविक नाम प्रयोग गर्नुहोस् (माफ गर्नुहोस्, छद्म नाम वा बेनामी योगदानहरू)। यदि तपाइँ तपाइँको `user.name` र `user.email` git कन्फिगरेसन सेट गर्नुहुन्छ, तपाइँ तपाइँको कमिट `git commit -s` को साथ स्वचालित रूपमा हस्ताक्षर गर्न सक्नुहुन्छ। तपाईं git [उपनामहरू](https://git-scm.com/book/en/v2/Git-Basics-Git-Aliases) जस्तै `git config --global alias.ci 'commit -s'` प्रयोग गर्न सक्नुहुन्छ। अब तपाईं `git ci` सँग प्रतिबद्ध गर्न सक्नुहुनेछ र कमिट हस्ताक्षर हुनेछ।
 ---
 
