@@ -32,13 +32,14 @@ Un ulteriore vantaggio di essere una soluzione completamente nativa Kubernetes �
 
 #### *Leggi questo in [altre lingue](translations/TRANSLATIONS.md).*
 
-[🇩🇪](translations/README.de.md)
-[🇷🇺](translations/README.ru.md)
-[🇹🇷](translations/README.tr.md)
-[🇺🇦](translations/README.ua.md)
-[🇨🇳](translations/README.zh.md)
-[🇫🇷](translations/README.fr.md)
-[🇮🇹](translations/README.it.md)
+[🇩🇪](README.de.md)
+[:uk:](/README.md)
+[🇷🇺](README.ru.md)
+[🇹🇷](README.tr.md)
+[🇺🇦](README.ua.md)
+[🇨🇳](README.zh.md)
+[🇫🇷](README.fr.md)
+[🇮🇹](README.it.md)
 ## Scalabilità
 
 OpenEBS può essere scalato per includere un numero arbitrariamente elevato di controller di archiviazione containerizzati. Kubernetes viene utilizzato per fornire elementi fondamentali come l'utilizzo di etcd per l'inventario. OpenEBS scala nella misura in cui scala il tuo Kubernetes.
