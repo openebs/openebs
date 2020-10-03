@@ -15,7 +15,7 @@ Detto questo, OpenEBS è un'innovazione in Open Source. Sei il benvenuto a contr
 
 Ci sono alcune semplici linee guida che devi seguire prima di fornire i tuoi hack.
 
-#### *Leggi questo in [altre lingue](translations).*
+#### *Leggi questo in [altre lingue](/translations).*
 
 [:uk:](/CONTRIBUTING.md)
 [🇷🇺](CONTRIBUTING.ru.md)
