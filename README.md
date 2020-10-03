@@ -48,7 +48,7 @@ OpenEBS can be set up in a few easy steps. You can get going on your choice of K
 
 **Start the OpenEBS Services using operator**
 ```bash
-# apply this yaml
+# apply this yaml to start OpenEBS Services
 kubectl apply -f https://openebs.github.io/charts/openebs-operator.yaml
 ```
 
