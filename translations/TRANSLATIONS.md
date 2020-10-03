@@ -9,3 +9,4 @@
 | 🇹🇷 | [Türkçe](README.tr.md) |
 | 🇨🇳 | [中文](README.zh.md) |
 | 🇫🇷 | [Français](README.fr.md) |
+| 🇮🇹 | [ITALIANO](README.it.md) |
