@@ -30,6 +30,7 @@ https://openebs.io/
 [🇹🇷](README.tr.md)
 [🇨🇳](README.zh.md)
 [🇫🇷](README.fr.md)
+[:india:](README.gu.md)
 
 ## Масштабируемость
  

@@ -39,6 +39,7 @@ Un avantage supplémentaire d'être une solution entièrement native de Kubernet
 [🇺🇦](README.ua.md)
 [🇨🇳](README.zh.md)
 [🇫🇷](README.fr.md)
+[:india:](README.gu.md)
 
 ## Scalabilité
 

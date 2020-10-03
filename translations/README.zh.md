@@ -37,6 +37,7 @@ OpenEBS 本身被部署为主机上的另一个容器，支持在每个pod、应
 [🇹🇷](translations/README.tr.md)
 [🇺🇦](translations/README.ua.md)
 [🇫🇷](translations/README.fr.md)
+[:india:](translations/README.gu.md)
 
 ## 可扩展性
 
