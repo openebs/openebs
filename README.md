@@ -55,6 +55,7 @@ kubectl apply -f https://openebs.github.io/charts/openebs-operator.yaml
 
 **Start the OpenEBS Services using helm**
 ```bash
+helm repo add stable https://kubernetes-charts.storage.googleapis.com
 helm repo update
 helm install --namespace openebs --name openebs stable/openebs
 ```
