@@ -1,0 +1,57 @@
+## Código de Conduta Comunitário da CNCF v1.0
+
+Outras línguas disponíveis:
+- [Chinês/中文](código de conduta/zh.md)
+- [Alemão/Deutsch](código de conduta/de.md)
+- [Espanhol/Espanhol](código de conduta/es.md)
+- [Francês/Français](código de conduta/fr.md)
+- [Italiano/Italiano](código de conduta/it.md)
+- [Japonês/日本語](código de conduta/jp.md)
+- [Coreano/한국어](código de conduta/ko.md)
+- [Ucraniano/Українська](código de conduta/uk.md)
+- [Russo/Русский](código de conduta/ru.md)
+- [Português/Português](código de conduta/pt.md)
+- [Árabe/العربية](código de conduta/ar.md)
+- [Polaco/Polski](código de conduta/pl.md)
+
+## Código de Conduta do Contribuinte
+
+Como colaboradores e manutenção deste projeto, e no interesse de fomentar
+uma comunidade aberta e acolhedora, comprometemo-nos a respeitar todas as pessoas que contribuem
+através de questões de reporte, pedidos de funcionalidades de publicação, atualização da documentação,
+submeter pedidos de pull ou patches, e outras atividades.
+
+Estamos empenhados em fazer da participação neste projeto uma experiência sem assédio para
+todos, independentemente do nível de experiência, género, identidade de género e expressão,
+orientação sexual, deficiência, aparência pessoal, tamanho do corpo, raça, etnia, idade,
+religião, ou nacionalidade.
+
+Exemplos de comportamento inaceitável por parte dos participantes incluem:
+
+* O uso de linguagem ou imagologia sexualizada
+* Ataques pessoais
+* Trolling ou comentários insultuosos/depreciativos
+* Assédio público ou privado
+* Publicar informações privadas de outros, tais como endereços físicos ou eletrónicos,
+sem permissão explícita
+* Outra conduta antiética ou não profissional.
+
+Os defensores do projeto têm o direito e a responsabilidade de remover, editar ou rejeitar
+comentários, compromissos, código, wiki edições, questões e outras contribuições que não são
+alinhado com este Código de Conduta. Ao adotar este Código de Conduta, os defensores do projeto
+comprometer-se a aplicar de forma justa e consistente estes princípios a todos os aspetos
+de gestão deste projeto. Os defensores do projeto que não seguem ou aplicam o Código de
+A conduta pode ser permanentemente removida da equipa do projeto.
+
+Este código de conduta aplica-se tanto nos espaços do projeto como nos espaços públicos
+quando um indivíduo representa o projeto ou a sua comunidade.
+
+Os casos de comportamento abusivo, assédio ou de outro modo inaceitável em Kubernetes podem ser comunicados contactando o [Comité de Conduta de Kubernetes](https://git.k8s.io/community/committee-code-of-conduct) via <conduct@kubernetes.io>. Para outros projetos, contacte um responsável pelo projeto CNCF ou o nosso mediador, Mishi Choudhary <mishi@linux.com>.
+
+Este Código de Conduta é adaptado do Pacto de Contribuinte
+(http://contributor-covenant.org), versão 1.2.0, disponível em
+http://contributor-covenant.org/version/1/2/0/
+
+## CNCF Código de Conduta de Eventos
+
+Os eventos CNCF são regidos pela Fundação Linux [Código de Conduta](https://events.linuxfoundation.org/code-of-conduct/) disponível na página do evento. Este objetivo foi concebido para ser compatível com a política acima referida e inclui também mais detalhes sobre a resposta aos incidentes.
