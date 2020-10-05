@@ -1,5 +1,7 @@
 # OpenEBS
 
+<img alt="OpenEBS Logo" src="https://openebs.io/static/openebs-d523c15cc3cd27332a251c25dd1f0a61.svg" width="250">
+
 [![Releases](https://img.shields.io/github/release/openebs/openebs/all.svg?style=flat-square)](https://github.com/openebs/openebs/releases)
 [![Slack channel #openebs](https://img.shields.io/badge/slack-openebs-brightgreen.svg?logo=slack)](https://kubernetes.slack.com/messages/openebs)
 [![Twitter](https://img.shields.io/twitter/follow/openebs.svg?style=social&label=Follow)](https://twitter.com/intent/follow?screen_name=openebs)
