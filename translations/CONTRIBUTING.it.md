@@ -1,7 +1,7 @@
 # Contribuire a OpenEBS
 Grande!! Siamo sempre alla ricerca di altri hacker OpenEBS. Puoi iniziare leggendo questa panoramica [panoramica](./contribute/design/README.md)
 
-In primo luogo, se non sei sicuro o hai paura di qualcosa, chiedi o invia comunque il problema o richiama comunque. Non sarai sgridato per aver fatto del tuo meglio. La cosa peggiore che può succedere è che ti venga chiesto cortesemente di cambiare qualcosa. Apprezziamo qualsiasi tipo di contributo e non vogliamo che un muro di regole si intrometta.
+In primo luogo, se non sei sicuro o hai paura   el tuo meglio. La cosa peggiore che può succedere è che ti venga chiesto cortesemente di cambiare qualcosa. Apprezziamo qualsiasi tipo di contributo e non vogliamo che un muro di regole si intrometta.
 
 Tuttavia, per coloro che desiderano un po 'più di indicazioni sul modo migliore per contribuire al progetto, continua a leggere. Questo documento coprirà tutti i punti che stiamo cercando nei tuoi contributi, aumentando le tue possibilità di unire rapidamente o affrontare i tuoi contributi.
 
