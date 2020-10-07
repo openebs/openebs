@@ -30,14 +30,7 @@ OpenEBS 本身被部署为主机上的另一个容器，支持在每个pod、应
 
 **我们的愿景**很简单: 让持久化工作负载的存储和存储服务完全集成到环境中，这样每个团队和工作负载都可以从控制的粒度和 Kubernetes 原生行为中获益。
 
-#### *阅读关于这个文档的 [其他语言版本](translations/TRANSLATIONS.md)。*
-
-[🇩🇪](README.de.md)
-[🇷🇺](README.ru.md)
-[🇹🇷](README.tr.md)
-[🇺🇦](README.ua.md)
-[🇫🇷](README.fr.md)
-[:india:](README.gu.md)
+#### *阅读关于这个文档的 [其他语言版本](/translations#readme)。*
 
 ## 可扩展性
 
