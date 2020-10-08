@@ -31,6 +31,7 @@ The list of users that have publicly shared the usage of OpenEBS.
 | User | Stateful Workloads | Success Story |
 | :--- | :--- | :--- |
 | [Alin Jurj](https://github.com/Perfect-Web) | Elasticsearch | [English](./adopters/users/Perfect-Web/README.md)  | 
+| [Daniel Sand](https://github.com/danielsand) | Gitea, Postgres, Concourse... | [English](./adopters/users/danielsand/README.md)
 | [Dean Stathos](https://github.com/dstathos) | MariaDB, homegrown applications | [English](./adopters/users/dstathos/README.md)  |
 | [Maartje Eyskens](https://github.com/meyskens) | Minio | [English](./adopters/users/meyskens/README.md)  | 
 | [Mark V.](https://github.com/mikroskeem) | Concourse CI, Mattermost, Minio, Few game servers, Bunch of micro services | [English](./adopters/users/mikroskeem/README.md)  | 
