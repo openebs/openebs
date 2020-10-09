@@ -74,7 +74,7 @@ OpenEBS source code is spread across multiple repositories, organized either by 
 
 - [openebs/libcstor](https://github.com/openebs/libcstor) contains the cStor Replica functionality that makes use of uZFS - userspace ZFS to store the data on devices. 
   - [openebs/cstor](https://github.com/openebs/cstor) is a fork of [openzfs/zfs](https://github.com/openzfs/zfs) (License: CDDL). This fork contains the code that modifies ZFS to run in user space. 
-- [openebs/istgt](https://github.com/openebs/istgt) contains the iSCSI Target functionality used by cStor volumes. This work is derived from earlier work available as FreeBSD port at http://www.peach.ne.jp/archives/istgt/. The original work was licensed under BSD license.
+- [openebs/istgt](https://github.com/openebs/istgt) contains the iSCSI Target functionality used by cStor volumes. This work is derived from earlier work available as FreeBSD port at http://www.peach.ne.jp/archives/istgt/ (archive link: https://web.archive.org/web/20190622064711/peach.ne.jp/archives/istgt/). The original work was licensed under BSD license.
 - [openebs/cstor-csi](https://github.com/openebs/cstor-csi) is the CSI Driver for cStor Volumes. This will deprecate the external provisioners. Currently in beta. Dependencies are in: [go.mod](https://github.com/openebs/cstor-csi/blob/master/go.mod).
 - [openebs/cstor-operators](https://github.com/openebs/cstor-operators) contain the Kubernetes custom resources and operators to manage cStor Pools volumes. Currently in beta and used by cStor CSI Driver. This will replace the volume management functionality offered by OpenEBS API Server. Dependencies are in: [go.mod](https://github.com/openebs/cstor-operators/blob/master/go.mod).
 
