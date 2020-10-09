@@ -9,6 +9,15 @@
 
 https://openebs.io/
 
+**Read this in**
+[🇩🇪](translations/README.de.md)	
+[🇷🇺](translations/README.ru.md)	
+[🇹🇷](translations/README.tr.md)	
+[🇺🇦](translations/README.ua.md)	
+[🇨🇳](translations/README.zh.md)	
+[🇫🇷](translations/README.fr.md)
+**[other languages](translations/#readme).**
+
 **OpenEBS** is the most widely deployed and easy to use open-source storage solution for Kubernetes.
 
 **OpenEBS** is the leading open-source example of a category of storage solutions sometimes called [Container Attached Storage](https://www.cncf.io/blog/2018/04/19/container-attached-storage-a-primer/). **OpenEBS** is listed as an open-source example in the [CNCF Storage Landscape White Paper](https://github.com/cncf/sig-storage/blob/master/CNCF%20Storage%20Landscape%20-%20White%20Paper.pdf) under the hyperconverged storage solutions.
@@ -29,15 +38,6 @@ OpenEBS itself is deployed as just another container on your host and enables st
 An added advantage of being a completely Kubernetes native solution is that administrators and developers can interact and manage OpenEBS using all the wonderful tooling that is available for Kubernetes like kubectl, Helm, Prometheus, Grafana, Weave Scope, etc.
 
 **Our vision** is simple: let storage and storage services for persistent workloads be fully integrated into the environment so that each team and workload benefits from the granularity of control and Kubernetes native behaviour.
-
-#### *Read this in [other languages](translations/TRANSLATIONS.md).*
-
-[🇩🇪](translations/README.de.md)
-[🇷🇺](translations/README.ru.md)
-[🇹🇷](translations/README.tr.md)
-[🇺🇦](translations/README.ua.md)
-[🇨🇳](translations/README.zh.md)
-[🇫🇷](translations/README.fr.md)
 
 ## Scalability
 
