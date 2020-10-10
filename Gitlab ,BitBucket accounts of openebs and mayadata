@@ -1,0 +1,8 @@
+
+Openebs and MayaData start  should look at supporting pull requests (merge requests) on the public instances of Gitlab & BitBucket for Hacktoberfest 2020.
+
+Key considerations here (to my mind):
+
+How will the user sign up for Hacktoberfest?
+Auth with GitHub, Gitlab, Bitbucket?
+Spam repo logic will need to support all three providers
