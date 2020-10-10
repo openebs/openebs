@@ -10,13 +10,14 @@
 https://openebs.io/
 
 **اقرأ هذا باللغة**
-[🇩🇪](translations/README.de.md)	
-[🇷🇺](translations/README.ru.md)	
-[🇹🇷](translations/README.tr.md)	
-[🇺🇦](translations/README.ua.md)	
-[🇨🇳](translations/README.zh.md)	
-[🇫🇷](translations/README.fr.md)
-**[لغات اخرى](translations/#readme).**
+[🇩🇪](/translations/README.de.md)	
+[🇷🇺](/translations/README.ru.md)	
+[🇹🇷](/translations/README.tr.md)	
+[🇺🇦](/translations/README.ua.md)	
+[🇨🇳](/translations/README.zh.md)	
+[🇫🇷](/translations/README.fr.md)
+
+**[لغات اخرى](/translations/#readme).**
 
 **OpenEBS** هو حل التخزين مفتوح المصدر الأكثر انتشارًا وسهل الاستخدام لـ Kubernetes.
 
