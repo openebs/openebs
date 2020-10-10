@@ -20,15 +20,7 @@ https://openebs.io/
 
 **Unsere Vision** ist einfach: Lassen Sie die Speicher- und Speicherdienste für persistente Workloads vollständig in die Umgebung integrieren, sodass jedes Team und jeder Workload von der Granularität der Steuerung und dem nativen Verhalten von Kubernetes profitiert.
 x
-#### *Lies dies in [anderen Sprachen](/translations/TRANSLATIONS.md).*
-
-[🇩🇪](README.de.md)
-[:uk:](/README.md)
-[🇷🇺](README.ru.md)
-[🇺🇦](README.ua.md)
-[🇹🇷](README.tr.md)
-[🇨🇳](README.zh.md)
-[🇫🇷](README.fr.md)
+#### *Lies dies in [anderen Sprachen](/translations#readme).*
 
 ## Skalierbarkeit
  

@@ -20,15 +20,7 @@ https://openebs.io/
 
 **Vizyonumuz** gayet basit: Verileri kalıcı olan uygulamalar için depolama ve depolama hizmetlerinin konteyner ekosistemine tamamen entegre olmasını sağlamak. Böylelikle her uygulama geliştirici ekibi granüler yönetim ve Kubernetes'e özgü davranışlardan yararlanır.
 
-#### *Bu dosyayı [diğer dillerde](/translations/TRANSLATIONS.md) oku.*
-
-[🇩🇪](README.de.md)
-[:uk:](/README.md)
-[🇷🇺](README.ru.md)
-[🇹🇷](README.tr.md)
-[🇺🇦](README.ua.md)
-[🇨🇳](README.zh.md)
-[🇫🇷](README.fr.md)
+#### *Bu dosyayı [diğer dillerde](/translations#readme) oku.*
 
 ## Ölçeklenebilirlik
  

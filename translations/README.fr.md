@@ -30,15 +30,7 @@ Un avantage supplémentaire d'être une solution entièrement native de Kubernet
 
 **Notre vision** est simple: laissez le stockage et les services de stockage pour les workloads persistants être entièrement intégrés dans l'environnement afin que chaque équipe et charge de travail bénéficie de la granularité du contrôle et du comportement natif de Kubernetes.
 
-#### *Lisez ceci dans [autres langues](TRANSLATIONS.md).*
-
-[🇩🇪](README.de.md)
-[:uk:](/README.md)
-[🇷🇺](README.ru.md)
-[🇹🇷](README.tr.md)
-[🇺🇦](README.ua.md)
-[🇨🇳](README.zh.md)
-[🇫🇷](README.fr.md)
+#### *Lisez ceci dans [autres langues](/translations#readme).*
 
 ## Scalabilité
 
