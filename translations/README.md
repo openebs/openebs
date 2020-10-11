@@ -10,4 +10,5 @@
 | 🇨🇳 | [中文](README.zh.md) |
 | 🇫🇷 | [Français](README.fr.md) |
 | :india: | [ગુજરાતી](README.gu.md) |
+| GU | [Gujarati](README.gu.md)
 | GE | [German](README.ge.md)
