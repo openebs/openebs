@@ -17,6 +17,7 @@ https://openebs.io/
 [🇨🇳](translations/README.zh.md)	
 [🇫🇷](translations/README.fr.md)
 [🇧🇷](translations/README.pt-BR.md)
+[GU](translations/README.gu.md)
 [GE](translations/README.ge.md)
 **[other languages](translations/#readme).**
 
