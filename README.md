@@ -17,6 +17,7 @@ https://openebs.io/
 [🇨🇳](translations/README.zh.md)	
 [🇫🇷](translations/README.fr.md)
 [🇧🇷](translations/README.pt-BR.md)
+[NL](translations/README.nl.md)
 **[other languages](translations/#readme).**
 
 **OpenEBS** is the most widely deployed and easy to use open-source storage solution for Kubernetes.
@@ -70,8 +71,8 @@ OpenEBS is one of the most widely used and tested Kubernetes storage infrastruct
 
 The status of various storage engines that power the OpenEBS Persistent Volumes are provided below. The key difference between the statuses are summarized below:
 - **alpha:** The API may change in incompatible ways in a later software release without notice, recommended for use only in short-lived testing clusters, due to increased risk of bugs and lack of long-term support.
-- **beta**: Support for the overall features will not be dropped, though details may change. Support for upgrading or migrating between versions will be provided, either through automation or manual steps.
-- **stable**: Features will appear in released software for many subsequent versions and support for upgrading between versions will be provided with software automation in the vast majority of scenarios.
+- **beta:** Support for the overall features will not be dropped, though details may change. Support for upgrading or migrating between versions will be provided, either through automation or manual steps.
+- **stable:** Features will appear in released software for many subsequent versions and support for upgrading between versions will be provided with software automation in the vast majority of scenarios.
 
 
 | Storage Engine | Status | Details |
