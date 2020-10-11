@@ -1,3 +1,12 @@
+**Read this in**
+[🇷🇺](translations/CONTRIBUTING.ru.md)	
+[🇹🇷](translations/CONTRIBUTING.tr.md)	
+[🇺🇦](translations/CONTRIBUTING.ua.md)	
+[🇨🇳](translations/CONTRIBUTING.zh.md)	
+[🇫🇷](translations/CONTRIBUTING.fr.md)
+[🇧🇷](translations/CONTRIBUTING.pt-BR.md)
+[Gu](translations/CONTRIBUTING.gu.md)
+[GE](translations/CONTRIBUTING.ge.md)
 # Contributing to OpenEBS
 
 Great!! We are always on the lookout for more OpenEBS hackers. You can get started by reading this [overview](./contribute/design/README.md)
