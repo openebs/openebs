@@ -1,6 +1,6 @@
 # Wkład w OpenEBS
 
-Wspaniale!! Zawsze szukamy kolejnych kontrybutorów do OpenEBS. Możesz zacząć od przeczytania tego [omówienia](./contrib/design/README.md)
+Wspaniale!! Zawsze szukamy kolejnych kontrybutorów do OpenEBS. Możesz zacząć od przeczytania tego [omówienia](./contrib/design/README.md).
 
 Po pierwsze, jeśli nie masz pewności lub czegoś się boisz, po prostu zapytaj lub prześlij zgłoszenie lub mimo wszystko wycofaj żądanie. Nie będziemy krzyczeć, że robisz wszystko, co tylko w twojej mocy. Najgorsze, co może się zdarzyć, to grzeczna prośba o zmianę czegoś. Doceniamy wszelkiego rodzaju wkład i nie chcemy, aby ściana zasad stała na twojej drodze.
 
@@ -38,7 +38,7 @@ Zawsze są pewne rzeczy, które są potrzebne w oprogramowaniu, które mogłyby 
 
 Dostarcz PR z odpowiednimi tagami do poprawek błędów lub ulepszeń w kodzie źródłowym. Aby zapoznać się z listą tagów, których można użyć, zobacz [ten dokument](./contrib/labels-of-issues.md).
 
-* Aby wnieść wkład w demo K8s, zapoznaj się z tym [dokumentem](./ contrib/CONTRIBUTING-TO-K8S-DEMO.md).
+* Aby wnieść wkład w demo K8s, zapoznaj się z tym [dokumentem](./contrib/CONTRIBUTING-TO-K8S-DEMO.md).
     - Aby sprawdzić, jak OpenEBS współpracuje z K8s, zapoznaj się z tym [dokumentem](./k8s/README.md)
 - Aby wnieść wkład w Kubernetes OpenEBS Provisioner, zapoznaj się z tym [dokumentem](./contrib/CONTRIBUTING-TO-KUBERNETES-OPENEBS-PROVISIONER.md).
     

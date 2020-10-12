@@ -9,7 +9,7 @@
 
 https://openebs.io/
 
-**Przeczytaj ten dokument w [innym języku](translations/#readme).**
+**Przeczytaj ten dokument w [innym języku](/translations#readme).**
 
 **OpenEBS** to najczęściej wdrażane i najłatwiejsze w obsłudze rozwiązanie pamięci masowej typu open-source dla platformy Kubernetes.
 
