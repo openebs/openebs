@@ -1,3 +1,5 @@
+<img alt="LitmusChaos" src="https://miro.medium.com/max/1250/1*Evgs2JpNaEpRy_M1ZRpgvg.png" width="200" align="left">
+
 # OpenEBS
 
 [![Releases](https://img.shields.io/github/release/openebs/openebs/all.svg?style=flat-square)](https://github.com/openebs/openebs/releases)
