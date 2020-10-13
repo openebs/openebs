@@ -1,7 +1,7 @@
 # Commit Message Guidelines for OpenEBS Projects
 
 This document borrows concepts, conventions, and text mainly from the following sources, extending them in order to provide a sensible guideline for writing commit messages for OpenEBS projects.
-- Tim Pope's [article](http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html) on readable commit messages
+- Tim Pope's [article](https://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html) on readable commit messages
 - Thanks to @stephenparish https://gist.github.com/stephenparish/9941e89d80e2bc58a153
 - Thanks to @abravalheri https://gist.github.com/abravalheri/34aeb7b18d61392251a2
 

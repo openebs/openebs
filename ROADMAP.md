@@ -102,7 +102,7 @@ Typically the items under this category fall under 3 to 6 month roadmap. At a hi
 - Refactor the website and user documentation to be built as a single website using Hugo, similar to other CNCF projects 
 - Move towards GitHub actions based builds from Travis for all the repositories. Currently there is a mix of Travis and GitHub actions
 - Conform with the new enhancements coming in the newer Kubernetes releases around Capacity based provisioning, CSI, and so forth
-- Automate the workflows around handling scenarios like compelete cluster failures that currently require some manual steps
+- Automate the workflows around handling scenarios like complete cluster failures that currently require some manual steps
 - Custom Kubernetes storage schedulers to address auto-rebalancing of the data placed on the nodes to help with scale up/down of Kubernetes nodes
 - User-friendly installation & configuration command-line tool (analogy to linkerd CLI for linkerd)
 - Allow Mayastor Pools to incorporate more than one capacity contributing disk device
@@ -118,9 +118,9 @@ Typically the items under this category fall under 3 to 6 month roadmap. At a hi
 
 ## Future
 
-As the name suggests this bucket contains items that are planned for future. Some times the items are related to adapting to the changes coming in the Kubernetes repo or other related projects. Some of the items currently planned include:
+As the name suggests this bucket contains items that are planned for future. Sometimes the items are related to adapting to the changes coming in the Kubernetes repo or other related projects. Some of the items currently planned include:
 - Support for working with multiple network interfaces
-- Automate the installation of pre-requisities on Kubernetes nodes like setting up iSCSI or huge page
+- Automate the installation of pre-requisites on Kubernetes nodes like setting up iSCSI or huge page
 - Integrate performance benchmarking of various engines into the release E2e test pipelines
 - Native RWX support for OpenEBS Volumes
 - Native Object support for OpenEBS Volumes
