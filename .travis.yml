@@ -2,6 +2,8 @@
 services:
   - docker
 
+if: (type == push) OR (type == pull_request AND fork == true)
+
 env:
   global:
     - COMMIT=${TRAVIS_COMMIT::8}
