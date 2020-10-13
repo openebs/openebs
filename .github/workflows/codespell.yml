@@ -10,6 +10,3 @@ jobs:
       - uses: actions/setup-python@v2
       - run: pip install codespell flake8
       - run: codespell --ignore-words="./.codespell-ignores.txt" --skip="./.git,*.png,*.jpg,*.ico,*.pdf,get-pip.py,dynamo"
-      - name: Codespell comment
-        if: ${{ failure() }}
-        uses: plettich/python_codespell_action@master
