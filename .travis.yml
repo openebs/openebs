@@ -19,4 +19,8 @@ script:
 cache:
   directories:
     - $HOME/.cache/trivy
+
+notifications:
+    webhooks: https://www.travisbuddy.com/
+    on_success: never
   
