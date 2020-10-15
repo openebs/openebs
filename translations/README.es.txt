@@ -1,4 +1,4 @@
-• OpenEBS
+# OpenEBS
 
 [! [Liberaciones] (https://img.shields.io/github/release/openebs/openebs/all.svg?style=flat-square)] (https://github.com/openebs/openebs/releases)
 [! [#openebs canal de Slack] (https://img.shields.io/badge/slack-openebs-brightgreen.svg?logo=slack)] (https://kubernetes.slack.com/messages/openebs)
@@ -30,26 +30,26 @@ Una ventaja añadida de ser una solución nativa completamente Kubernetes es que
 
 **Nuestra visión** es simple: permita que los servicios de almacenamiento y almacenamiento para cargas de trabajo persistentes se integren completamente en el entorno para que cada equipo y carga de trabajo se beneficie de la granularidad del control y el comportamiento nativo de Kubernetes.
 
-• *Leer esto en [otros idiomas](traducciones/TRANSLATIONS.md).*
+#### *Leer esto en [otros idiomas](traducciones/TRANSLATIONS.md).*
 
-[🇩🇪] (traducciones/README.de.md)
-[🇷🇺] (traducciones/README.ru.md)
-[🇹🇷] (traducciones/README.tr.md)
-[🇺🇦] (traducciones/README.ua.md)
-[🇨🇳] (traducciones/README.zh.md)
-[🇫🇷] (traducciones/README.fr.md)
+[🇩🇪] (translations/README.de.md)
+[🇷🇺] (translations/README.ru.md)
+[🇹🇷] (translations/README.tr.md)
+[🇺🇦] (translations/README.ua.md)
+[🇨🇳] (translations/README.zh.md)
+[🇫🇷] (translations/README.fr.md)
 
-• Escalabilidad
+## Escalabilidad
 
 OpenEBS puede escalar para incluir un gran número arbitrariamente de controladores de almacenamiento en contenedores. Kubernetes se utiliza para proporcionar piezas fundamentales como el uso de etcd para el inventario. OpenEBS escala en la medida en que sus escalas de Kubernetes.
 
-• Instalación y introducción
+## Instalación y introducción
 
 OpenEBS se puede configurar en unos sencillos pasos. Puede ponerse en marcha en su elección del clúster de Kubernetes teniendo open-iscsi instalado en los nodos de Kubernetes y ejecutando el openebs-operator mediante kubectl.
 
 **Iniciar los servicios de OpenEBS utilizando el operador**
 '''bash
-• Aplicar este yaml
+# Aplicar este yaml
 kubectl aplicar -f https://openebs.github.io/charts/openebs-operator.yaml
 ```
 
@@ -63,7 +63,7 @@ También puede seguir nuestra [Guía de inicio rápido](https://docs.openebs.io/
 
 OpenEBS se puede implementar en cualquier clúster de Kubernetes, ya sea en la nube, en las instalaciones o en el equipo portátil para desarrolladores (minikube). Tenga en cuenta que no hay cambios en el kernel subyacente que sean necesarios ya que OpenEBS opera en el espacio de usuario. Siga nuestra documentación de [OpenEBS Setup](https://docs.openebs.io/docs/overview.html). Además, tenemos un entorno Vagrant disponible que incluye una implementación de Kubernetes de ejemplo y carga sintética que puede usar para simular el rendimiento de OpenEBS. También puede encontrar interesante el proyecto relacionado llamado Litmus (https://litmuschaos.io) que ayuda con la ingeniería del caos para cargas de trabajo con estado en Kubernetes.
 
-• Estado
+## Estado
 
 OpenEBS es una de las infraestructuras de almacenamiento de Kubernetes más utilizadas y probadas en la industria. Un proyecto CNCF Sandbox desde mayo de 2019, OpenEBS es el primer y único sistema de almacenamiento en los sistemas locales y en la nube, y fue el primero en abrir su propio Marco de Ingeniería de Caos para cargas de trabajo con estado, el [Proyecto Litmus](https://litmuschaos.io), en el que la comunidad confía para evaluar automáticamente la cadencia mensual de OpenEBS. Los clientes empresariales han estado utilizando OpenEBS en producción desde 2018 y el proyecto admite tiradores de acopladores de 2.5M+ a la semana.
 
@@ -81,7 +81,7 @@ A continuación se proporciona el estado de varios motores de almacenamiento que
 
 Para obtener más información, consulte [Documentación de OpenEBS](https://docs.openebs.io/docs/next/quickstart.html).
 
-• Contribuir
+## Contribuir
 
 OpenEBS da la bienvenida a sus comentarios y contribuciones en cualquier forma posible.
 
@@ -95,11 +95,11 @@ OpenEBS da la bienvenida a sus comentarios y contribuciones en cualquier forma p
 - Para actualizaciones de proyectos OpenEBS, suscríbete a [Anuncios OpenEBS](https://lists.cncf.io/g/cncf-openebs-announcements)
 - Para interactuar con otros usuarios de OpenEBS, suscríbete a [Usuarios de OpenEBS](https://lists.cncf.io/g/cncf-openebs-users)
 
-• Muéstrame el código
+## Muéstrame el código
 
 Este es un meta-repositorio para OpenEBS. Comience con los repositorios anclados o con el documento [OpenEBS Architecture](./contribute/design/README.md). 
 
-• Licencia
+## Licencia
 
 OpenEBS se desarrolla bajo la licencia [Apache License 2.0](https://github.com/openebs/openebs/blob/master/LICENSE) en el nivel del proyecto. Algunos componentes del proyecto se derivan de otros proyectos de código abierto y se distribuyen bajo sus respectivas licencias.
 
@@ -107,7 +107,7 @@ OpenEBS forma parte de los Proyectos CNCF.
 
 [! [Proyecto de caja de arena CNCF] (https://raw.githubusercontent.com/cncf/artwork/master/other/cncf-sandbox/horizontal/color/cncf-sandbox-horizontal-color.png)] (https://landscape.cncf.io/selected=open-ebs)
 
-• Ofertas Comerciales
+## Ofertas Comerciales
 
 Esta es una lista de terceras empresas e individuos que proporcionan productos o servicios relacionados con OpenEBS. OpenEBS es un proyecto CNCF que no respalda a ninguna empresa. La lista se proporciona en orden alfabético.
 - [Clouds Sky GmbH](https://cloudssky.com/es/)
