@@ -1,13 +1,23 @@
 # OpenEBS
 
-[! [Liberaciones] (https://img.shields.io/github/release/openebs/openebs/all.svg?style=flat-square)] (https://github.com/openebs/openebs/releases)
-[! [#openebs canal de Slack] (https://img.shields.io/badge/slack-openebs-brightgreen.svg?logo=slack)] (https://kubernetes.slack.com/messages/openebs)
-[! [Twitter] (https://img.shields.io/twitter/follow/openebs.svg?style=social&label=Follow)] (https://twitter.com/intent/follow?screen_name=openebs)
-[! [Bienvenidos a los PRP] (https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)] (https://github.com/openebs/openebs/blob/master/CONTRIBUTING.md)
-[! [Estado FOSSA] (https://app.fossa.com/api/projects/git%2Bgithub.com%2Fopenebs%2Fopenebs.svg?type=shield)] (https://app.fossa.com/projects/git%2Bgithub.com%2Fopenebs%2Fopenebs?ref=badge_shield)
-[! [Prácticas recomendadas de CII] (https://bestpractices.coreinfrastructure.org/projects/1754/badge)] (https://bestpractices.coreinfrastructure.org/projects/1754)
+[![Releases](https://img.shields.io/github/release/openebs/openebs/all.svg?style=flat-square)](https://github.com/openebs/openebs/releases)
+[![Slack channel #openebs](https://img.shields.io/badge/slack-openebs-brightgreen.svg?logo=slack)](https://kubernetes.slack.com/messages/openebs)
+[![Twitter](https://img.shields.io/twitter/follow/openebs.svg?style=social&label=Follow)](https://twitter.com/intent/follow?screen_name=openebs)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](https://github.com/openebs/openebs/blob/master/CONTRIBUTING.md)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fopenebs%2Fopenebs.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fopenebs%2Fopenebs?ref=badge_shield)
+[![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/1754/badge)](https://bestpractices.coreinfrastructure.org/projects/1754)
 
 https://openebs.io/
+
+**Lea esto en**
+[🇩🇪](translations/README.de.md)	
+[🇷🇺](translations/README.ru.md)	
+[🇹🇷](translations/README.tr.md)	
+[🇺🇦](translations/README.ua.md)	
+[🇨🇳](translations/README.zh.md)	
+[🇫🇷](translations/README.fr.md)
+[🇧🇷](translations/README.pt-BR.md)
+**[otros idiomas](translations/#readme).**
 
 **OpenEBS** es la solución de almacenamiento de código abierto más ampliamente implementada y fácil de usar para Kubernetes.
 
@@ -30,15 +40,6 @@ Una ventaja añadida de ser una solución nativa completamente Kubernetes es que
 
 **Nuestra visión** es simple: permita que los servicios de almacenamiento y almacenamiento para cargas de trabajo persistentes se integren completamente en el entorno para que cada equipo y carga de trabajo se beneficie de la granularidad del control y el comportamiento nativo de Kubernetes.
 
-#### *Leer esto en [otros idiomas](traducciones/TRANSLATIONS.md).*
-
-[🇩🇪] (translations/README.de.md)
-[🇷🇺] (translations/README.ru.md)
-[🇹🇷] (translations/README.tr.md)
-[🇺🇦] (translations/README.ua.md)
-[🇨🇳] (translations/README.zh.md)
-[🇫🇷] (translations/README.fr.md)
-
 ## Escalabilidad
 
 OpenEBS puede escalar para incluir un gran número arbitrariamente de controladores de almacenamiento en contenedores. Kubernetes se utiliza para proporcionar piezas fundamentales como el uso de etcd para el inventario. OpenEBS escala en la medida en que sus escalas de Kubernetes.
@@ -48,13 +49,13 @@ OpenEBS puede escalar para incluir un gran número arbitrariamente de controlado
 OpenEBS se puede configurar en unos sencillos pasos. Puede ponerse en marcha en su elección del clúster de Kubernetes teniendo open-iscsi instalado en los nodos de Kubernetes y ejecutando el openebs-operator mediante kubectl.
 
 **Iniciar los servicios de OpenEBS utilizando el operador**
-'''bash
+```bash
 # Aplicar este yaml
 kubectl aplicar -f https://openebs.github.io/charts/openebs-operator.yaml
 ```
 
 **Iniciar los servicios de OpenEBS con el timón**
-'''bash
+```bash
 actualización del repositorio del timón
 helm install --namespace openebs --name openebs stable/openebs
 ```
@@ -72,12 +73,12 @@ A continuación se proporciona el estado de varios motores de almacenamiento que
 - **beta**: El soporte para las características generales no se eliminará, aunque los detalles pueden cambiar. Se proporcionará compatibilidad para actualizar o migrar entre versiones, ya sea mediante la automatización o pasos manuales.
 - **stable**: Las características aparecerán en el software lanzado para muchas versiones posteriores y el soporte para la actualización entre versiones se proporcionará con automatización de software en la gran mayoría de escenarios.
 
-| Motor de almacenamiento de información ? Estado ? Detalles ?
+| Motor de almacenamiento de información | Estado | Detalles |
 |---|---|---|
-| Jiva ? estables ? Es el más adecuado para ejecutar almacenamiento de bloques replicados en nodos que utilizan el almacenamiento efímero en los nodos de trabajo de Kubernetes.
-| cStor ? beta ? Una opción preferida para ejecutarse en nodos que tienen dispositivos de bloque. Opción recomendada si se requieren Instantáneas y Clones .
-| Volúmenes locales ? beta ? Más adecuado para aplicaciones distribuidas que necesitan almacenamiento de baja latencia: almacenamiento con conexión directa desde los nodos de Kubernetes. |
-| Mayastor ? alfa ? Un nuevo motor de almacenamiento que funciona con la eficiencia del almacenamiento local, pero también ofrece servicios de almacenamiento como replicación. El desarrollo está en marcha para admitir instantáneas y clones. |
+| Jiva | estables | Es el más adecuado para ejecutar almacenamiento de bloques replicados en nodos que utilizan el almacenamiento efímero en los nodos de trabajo de Kubernetes.
+| cStor | beta | Una opción preferida para ejecutarse en nodos que tienen dispositivos de bloque. Opción recomendada si se requieren Instantáneas y Clones .
+| Volúmenes locales | beta | Más adecuado para aplicaciones distribuidas que necesitan almacenamiento de baja latencia: almacenamiento con conexión directa desde los nodos de Kubernetes. |
+| Mayastor | alfa | Un nuevo motor de almacenamiento que funciona con la eficiencia del almacenamiento local, pero también ofrece servicios de almacenamiento como replicación. El desarrollo está en marcha para admitir instantáneas y clones. |
 
 Para obtener más información, consulte [Documentación de OpenEBS](https://docs.openebs.io/docs/next/quickstart.html).
 
@@ -86,14 +87,14 @@ Para obtener más información, consulte [Documentación de OpenEBS](https://doc
 OpenEBS da la bienvenida a sus comentarios y contribuciones en cualquier forma posible.
 
 - [Unirse a la comunidad OpenEBS en Kubernetes Slack](https://kubernetes.slack.com)
-- ¿Ya te has registrado? Dirígete a nuestras discusiones en [#openebs](https://kubernetes.slack.com/messages/openebs/)
+  - ¿Ya te has registrado? Dirígete a nuestras discusiones en [#openebs](https://kubernetes.slack.com/messages/openebs/)
 - ¿Quieres plantear un problema o ayudar con las correcciones y características?
-- Ver [problemas abiertos](https://github.com/openebs/openebs/issues)
-- Ver [guía colaboradora](./CONTRIBUTING.md)
-- Quieres unirte a nuestras reuniones de la comunidad de colaboradores, [echa un vistazo a esto](./community/README.md).
+  - Ver [problemas abiertos](https://github.com/openebs/openebs/issues)
+  - Ver [guía colaboradora](./CONTRIBUTING.md)
+  - Quieres unirte a nuestras reuniones de la comunidad de colaboradores, [echa un vistazo a esto](./community/README.md).
 - Unirse a nuestras listas de correo OpenEBS CNCF
-- Para actualizaciones de proyectos OpenEBS, suscríbete a [Anuncios OpenEBS](https://lists.cncf.io/g/cncf-openebs-announcements)
-- Para interactuar con otros usuarios de OpenEBS, suscríbete a [Usuarios de OpenEBS](https://lists.cncf.io/g/cncf-openebs-users)
+  - Para actualizaciones de proyectos OpenEBS, suscríbete a [Anuncios OpenEBS](https://lists.cncf.io/g/cncf-openebs-announcements)
+  - Para interactuar con otros usuarios de OpenEBS, suscríbete a [Usuarios de OpenEBS](https://lists.cncf.io/g/cncf-openebs-users)
 
 ## Muéstrame el código
 
@@ -105,7 +106,7 @@ OpenEBS se desarrolla bajo la licencia [Apache License 2.0](https://github.com/o
 
 OpenEBS forma parte de los Proyectos CNCF.
 
-[! [Proyecto de caja de arena CNCF] (https://raw.githubusercontent.com/cncf/artwork/master/other/cncf-sandbox/horizontal/color/cncf-sandbox-horizontal-color.png)] (https://landscape.cncf.io/selected=open-ebs)
+[![Proyecto de caja de arena CNCF](https://raw.githubusercontent.com/cncf/artwork/master/other/cncf-sandbox/horizontal/color/cncf-sandbox-horizontal-color.png)](https://landscape.cncf.io/selected=open-ebs)
 
 ## Ofertas Comerciales
 
