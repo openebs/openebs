@@ -1,20 +1,21 @@
-• Código de Conducta Comunitario CNCF v1.0
+## Código de Conducta Comunitario CNCF v1.0
 
 Otros idiomas disponibles:
-- [Chino/-](código de conducta-idiomas/zh.md)
-- [Alemán/Deutsch](código de conducta-idiomas/de.md)
-- [Español/Español](código de conducta-idiomas/es.md)
-- [Francés/Francés](código de conducta-idiomas/fr.md)
-- [Italiano/Italiano](código de conducta-idiomas/it.md)
-- [Japonés/日語](código de conducta-idiomas/jp.md)
-- [Coreano/한국어](código de conducta-idiomas/ko.md)
-- [Ukrainian/Українська](código de conducta-idiomas/uk.md)
-- [Ruso/A](código de conducta-idiomas/ru.md)
-- [Portugués/Portugués](código de conducta-idiomas/pt.md)
-- [árabe/a](código de conducta-idiomas/ar.md)
-- [Polaco/Polski](código de conducta-idiomas/pl.md)
+- [Chino/-](code-of-conduct-languages/zh.md)
+- [Alemán/Deutsch](code-of-conduct-languages/de.md)
+- [Español/Español](code-of-conduct-languages/es.md)
+- [Francés/Francés](code-of-conduct-languages/fr.md)
+- [Italiano/Italiano](code-of-conduct-languages/it.md)
+- [Japonés/日本語](code-of-conduct-languages/jp.md)
+- [Coreano/한국어](code-of-conduct-languages/ko.md)
+- [Ukrainian/Українська](code-of-conduct-languages/uk.md)
+- [Ruso/Русский](code-of-conduct-languages/ru.md)
+- [Portugués/Portugués](code-of-conduct-languages/pt.md)
+- [árabe/العربية](code-of-conduct-languages/ar.md)
+- [Polaco/Polski](code-of-conduct-languages/pl.md)
+- [Indonesian/Bahasa Indonesia](code-of-conduct-languages/id.md)
 
-• Código de conducta del contribuyente
+### Código de conducta del contribuyente
 
 Como contribuyentes y mantenedores de este proyecto, y en aras de fomentar
 una comunidad abierta y acogedora, nos comprometemos a respetar a todas las personas que contribuyen
@@ -52,6 +53,6 @@ Este Código de Conducta está adaptado del Pacto de Contribuyentes
 (http://contributor-covenant.org), versión 1.2.0, disponible en
 http://contributor-covenant.org/version/1/2/0/
 
-Código de Conducta para Eventos CNCF
+### Código de Conducta para Eventos CNCF
 
 Los eventos CNCF se rigen por la Fundación Linux [Código de conducta](https://events.linuxfoundation.org/code-of-conduct/) disponible en la página del evento. Esto está diseñado para ser compatible con la política anterior y también incluye más detalles sobre cómo responder a incidentes.
