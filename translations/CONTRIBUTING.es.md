@@ -1,4 +1,4 @@
-• Contribuir a OpenEBS
+# Contribuir a OpenEBS
 
 ¡¡Gran!! Siempre estamos en la búsqueda de más hackers OpenEBS. Puede comenzar leyendo esta [overview](./contribute/design/README.md)
 
@@ -15,7 +15,7 @@ Dicho esto, OpenEBS es una innovación en código abierto. Le invitamos a contri
 
 Hay algunas pautas simples que debe seguir antes de proporcionar sus hacks. 
 
-• Aumento de problemas
+## Aumento de problemas
 
 Al plantear problemas, especifique lo siguiente:
 - Los detalles de configuración deben rellenarse como se especifica en la plantilla de emisión claramente para que el revisor la compruebe.
@@ -23,18 +23,18 @@ Al plantear problemas, especifique lo siguiente:
 - Errores y mensajes de registro que se muestran por el software.
 - Cualquier otro detalle que pueda ser útil.
 
-• Enviar cambios para mejorar la documentación
+## Enviar cambios para mejorar la documentación
 
 ¡Conseguir la documentación correcta es difícil! Consulte esta [página](./contribute/CONTRIBUTING-TO-DEVELOPER-DOC.md) para obtener más información sobre cómo podría mejorar la documentación del desarrollador enviando solicitudes de extracción con etiquetas adecuadas. Aquí hay una [lista de etiquetas](./contribute/labels-of-issues.md) que se podría usar para la misma. Ayúdenos a mantener nuestra documentación limpia, fácil de entender y accesible.
 
-• Enviar propuestas para nuevas características
+## Enviar propuestas para nuevas características
 
 Siempre hay algo más que se requiere para que sea más fácil adaptarse a sus casos de uso. Siéntase libre de unirse a la discusión sobre nuevas características o plantear un PR con su cambio propuesto. 
 
 - [Unirse a la comunidad OpenEBS en Kubernetes Slack](https://kubernetes.slack.com)
 	- ¿Ya te has registrado? Dirígete a nuestras discusiones en [#openebs](https://kubernetes.slack.com/messages/openebs/)
 	
-• Contribuir al código fuente y a las correcciones de errores
+## Contribuir al código fuente y a las correcciones de errores
 
 Proporcione a los archivos P etiquetas las etiquetas adecuadas para correcciones de errores o mejoras en el código fuente. Para obtener una lista de las etiquetas que se podrían utilizar, consulte [this](./contribute/labels-of-issues.md).
 
@@ -44,13 +44,13 @@ Proporcione a los archivos P etiquetas las etiquetas adecuadas para correcciones
 
 Consulte este [documento](./contribute/design/code-structuriing.md) para obtener más información sobre la estructuración de código y las directrices a seguir en el mismo.
 
-• Resolver problemas existentes
+## Resolver problemas existentes
 Dirígete a [issues](https://github.com/openebs/openebs/issues) para encontrar problemas donde se necesita ayuda de los colaboradores. Consulte nuestra [guía de etiquetas](./contribute/labels-of-issues.md) para ayudarle a encontrar problemas que puede resolver más rápido.
 
 Una persona que desee contribuir puede ocupar un problema asignándolo como un comentario/asignar su ID de GitHub a él. En caso de que no haya relaciones públicas o actualizaciones en curso durante una semana sobre dicho problema, el problema se reabre para que alguien vuelva a ocuparse. Tenemos que considerar problemas/regresiones de alta prioridad donde el tiempo de respuesta debe ser un día más o menos.
 
 ---
-• Firma tu trabajo
+### Firma tu trabajo
 
 Utilizamos el Certificado de Origen para Desarrolladores (DCO) como una salvaguardia adicional para el proyecto OpenEBS. Se trata de un mecanismo bien establecido y ampliamente utilizado para asegurar que los contribuyentes hayan confirmado su derecho a licenciar su contribución bajo la licencia del proyecto. Lea [developer-certificate-of-origin](./contribute/developer-certificate-of-origin).
 
@@ -65,6 +65,6 @@ Utilice su nombre real (lo siento, sin seudónimos o contribuciones anónimas). 
 
 ---
 
-• Unirse a nuestra comunidad
+## Unirse a nuestra comunidad
 
 Desea desarrollar y contribuir a la comunidad OpenEBS activamente, refiérase a este [documento](./community/README.md).
