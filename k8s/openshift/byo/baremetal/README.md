@@ -25,7 +25,7 @@ successful in resolving the machine IP addresses).
 
 #### Notes: 
 
-- System recommendations for production cluster can be found [here](https://docs.openshift.org/latest/install_config/install/prerequisites.html#hardware).
+- System recommendations for production cluster can be found [here](https://docs.openshift.com/container-platform/3.11/install/prerequisites.html#hardware).
 This document focuses on bringing up a setup for evaluation purposes.
   
 - Ensure that the Docker service is running. 
