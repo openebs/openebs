@@ -1,7 +1,7 @@
 ## Código de Conducta Comunitario CNCF v1.0
 
 Otros idiomas disponibles:
-- [Chino/-](code-of-conduct-languages/zh.md)
+- [Chino/中文](code-of-conduct-languages/zh.md)
 - [Alemán/Deutsch](code-of-conduct-languages/de.md)
 - [Español/Español](code-of-conduct-languages/es.md)
 - [Francés/Francés](code-of-conduct-languages/fr.md)
