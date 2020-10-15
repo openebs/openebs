@@ -23,7 +23,7 @@ https://openebs.io/
 
 **OpenEBS** is the leading open-source example of a category of storage solutions sometimes called [Container Attached Storage](https://www.cncf.io/blog/2018/04/19/container-attached-storage-a-primer/). **OpenEBS** is listed as an open-source example in the [CNCF Storage Landscape White Paper](https://github.com/cncf/sig-storage/blob/master/CNCF%20Storage%20Landscape%20-%20White%20Paper.pdf) under the hyperconverged storage solutions.
 
-Some key aspects that make OpenEBS different compared to other traditional storage solutions:
+Some key aspects that make OpenEBS different as in comparison to other traditional storage solutions:
 - Built using the micro-services architecture like the applications it serves. OpenEBS is itself deployed as a set of containers on Kubernetes worker nodes. Uses Kubernetes itself to orchestrate and manage OpenEBS components
 - Built completely in userspace making it highly portable to run across any OS/platform
 - Completely intent-driven, inheriting the same principles that drive the ease of use with Kubernetes
