@@ -10,7 +10,7 @@
 https://openebs.io/
 
 **OpenEBS** ermöglicht die Verwendung von Containern für geschäftskritische, persistente Workloads und für andere Stateful-Workloads, z. B. Protokollierung oder Prometheus. OpenEBS sind Container- und verwandte Speicherdienste.
- 
+ 
 **OpenEBS** ermöglicht es Ihnen, persistente Workload-Container wie DBs auf Containern wie andere Container zu behandeln. OpenEBS selbst wird nur als weiterer Container auf Ihrem Host bereitgestellt und ermöglicht Speicherdienste, die auf Pod-, Anwendungs-, Cluster- oder Containerebene festgelegt werden können. Dazu gehören:
 - Datenpersistenz über Knoten hinweg, wodurch beispielsweise der Zeitaufwand für den Neuaufbau von Cassandra-Ringen drastisch reduziert wird.
 - Synchronisierung von Daten zwischen Verfügbarkeitszonen und Cloud-Anbietern, um beispielsweise die Verfügbarkeit zu verbessern und die Verbindungszeiten zu verkürzen.
@@ -23,11 +23,11 @@ x
 #### *Lies dies in [anderen Sprachen](/translations#readme).*
 
 ## Skalierbarkeit
- 
+ 
 OpenEBS kann skaliert werden, um eine beliebig große Anzahl von Container-Speichercontrollern aufzunehmen. Kubernetes wird verwendet, um grundlegende Elemente wie die Verwendung von etcd für das Inventar bereitzustellen. OpenEBS skaliert in dem Umfang, in dem sich Ihre Kubernetes-Skalen befinden.
 
 ## Installation und Erste Schritte
- 
+ 
 OpenEBS kann in wenigen einfachen Schritten eingerichtet werden. Sie können Ihre Wahl des Kubernetes-Clusters wählen, indem Sie open-iscsi auf den Kubernetes-Knoten installieren und den Openebs-Operator mit kubectl ausführen.
 
 **Starten Sie die OpenEBS Services mit dem Operator**
@@ -48,11 +48,11 @@ OpenEBS kann auf jedem Kubernetes-Cluster bereitgestellt werden - entweder in de
 
 ## Status
 Wir nähern uns der Beta-Phase mit aktiver Entwicklung. Weitere Informationen finden Sie in unserem [Project Tracker](https://github.com/openebs/openebs/wiki/Project-Tracker). Viele Anwender betreiben OpenEBS in der Produktion. Im September 2018 wurden kommerzielle Lösungen für den frühen Zugriff von unserem Hauptsponsor [MayaData](https://www.mayadata.io) zur Verfügung gestellt.
- 
+ 
 ## Mitmachen
- 
+ 
 OpenEBS freut sich über Ihr Feedback und Ihre Beiträge in jeder möglichen Form.
- 
+ 
 - [Tritt unserer Gemeinschaft](https://kubernetes.slack.com)
   - Bereits angemeldet? Besuchen Sie unsere Diskussionen unter [#openebs](https://kubernetes.slack.com/messages/openebs/).
 - Möchten Sie ein Problem ansprechen?
