@@ -8,10 +8,10 @@ Sin embargo, para aquellas personas que quieren un poco más de orientación sob
 
 Dicho esto, OpenEBS es una innovación en código abierto. Le invitamos a contribuir de cualquier manera que pueda, y toda la ayuda proporcionada es muy apreciada. 
 
-- [Levantar problemas para solicitar nuevas funciones, corregir documentación o para informar de errores.] (#raising problemas)
-- [Enviar cambios para mejorar la documentación.] (#submit-cambio-para mejorar-documentación) 
-- [Enviar propuestas para nuevas características/mejoras.] (#submit-propuestas para nuevas características)
-- [Resolver problemas existentes relacionados con la documentación o el código.] (#contributing-a-código fuente-y-bug-fixes)
+- [Plantee problemas para solicitar nuevas funciones, corregir documentación o informar errores.](#raising-issues)
+- [Envíe cambios para mejorar la documentación.](#submit-change-to-improve-documentation) 
+- [Envíe propuestas para nuevas funciones / mejoras.](#submit-proposals-for-new-features)
+- [Resuelva problemas existentes relacionados con la documentación o el código.](#contributing-to-source-code-and-bug-fixes)
 
 Hay algunas pautas simples que debe seguir antes de proporcionar sus hacks. 
 
@@ -39,7 +39,7 @@ Siempre hay algo más que se requiere para que sea más fácil adaptarse a sus c
 Proporcione a los archivos P etiquetas las etiquetas adecuadas para correcciones de errores o mejoras en el código fuente. Para obtener una lista de las etiquetas que se podrían utilizar, consulte [this](./contribute/labels-of-issues.md).
 
 * Para contribuir a la demostración de K8s, consulte este [documento](./contribute/CONTRIBUTING-TO-K8S-DEMO.md).
-- Para comprobar cómo funciona OpenEBS con K8, consulte este [documento](./k8s/README.md)
+  - Para comprobar cómo funciona OpenEBS con K8, consulte este [documento](./k8s/README.md)
 - Para contribuir a Kubernetes OpenEBS Provisioner, consulte este [documento](./contribute/CONTRIBUTING-TO-KUBERNETES-OPENEBS-PROVISIONER.md).
 
 Consulte este [documento](./contribute/design/code-structuriing.md) para obtener más información sobre la estructuración de código y las directrices a seguir en el mismo.
@@ -59,9 +59,9 @@ Si puede certificarlo, simplemente agregue una línea a cada mensaje de confirma
 ````
 Firmado: Random J Developer <random@developer.example.org>
 ````
-o utilice el comando 'git commit -s -m "commit message comes here"' para cerrar la sesión de sus confirmaciones.
+o utilice el comando `git commit -s -m "commit message comes here"` para cerrar la sesión de sus confirmaciones.
 
-Utilice su nombre real (lo siento, sin seudónimos o contribuciones anónimas). Si estableces tus configs git 'user.name' y 'user.email', puedes firmar tu confirmación automáticamente con 'git commit -s'. También puede utilizar git [aliases](https://git-scm.com/book/en/v2/Git-Basics-Git-Aliases) como 'git config --global alias.ci 'commit -s''. Ahora puede confirmar con 'git ci', y se firmará la confirmación.
+Utilice su nombre real (lo siento, sin seudónimos o contribuciones anónimas). Si estableces tus configs git `user.name` y `user.email`, puedes firmar tu confirmación automáticamente con `git commit -s`. También puede utilizar git [aliases](https://git-scm.com/book/en/v2/Git-Basics-Git-Aliases) como `git config --global alias.ci 'commit -s'`. Ahora puede confirmar con `git ci`, y se firmará la confirmación.
 
 ---
 
