@@ -111,8 +111,9 @@ OpenEBS is part of the CNCF Projects.
 
 ## Commercial Offerings
 
-This is a list of third-party companies and individuals who provide products or services related to OpenEBS. OpenEBS is a CNCF project which does not endorse any company. The list is provided in alphabetical order.
+This is a list of third-party companies and individuals who provide products or services related to OpenEBS. Open EBS is a CNCF project which does not endorse any company. The list is provided in alphabetical order.
 - [Clouds Sky GmbH](https://cloudssky.com/en/)
 - [CodeWave](https://codewave.eu/)
 - [Gridworkz Cloud Services](https://gridworkz.com/)
 - [MayaData](https://mayadata.io/)
+
