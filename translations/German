@@ -1,0 +1,85 @@
+OpenEBS ist die am weitesten verbreitete und benutzerfreundlichste Open-Source-Speicherlösung für Kubernetes.
+
+OpenEBS ist das führende Open-Source-Beispiel für eine Kategorie von Speicherlösungen, die manchmal als Container Attached Storage bezeichnet werden. OpenEBS ist als Open-Source-Beispiel im CNCF Storage Landscape White Paper unter den hyperkonvergenten Speicherlösungen aufgeführt.
+
+Einige wichtige Aspekte, die OpenEBS von anderen herkömmlichen Speicherlösungen unterscheiden:
+
+Erstellt unter Verwendung der Mikrodienstarchitektur wie der Anwendungen, die sie bedient. OpenEBS wird selbst als eine Reihe von Containern auf Kubernetes-Worker-Knoten bereitgestellt. Verwendet Kubernetes selbst, um OpenEBS-Komponenten zu orchestrieren und zu verwalten
+Vollständig im Benutzerbereich integriert, sodass es sehr portabel ist und auf jedem Betriebssystem / jeder Plattform ausgeführt werden kann
+Völlig absichtsorientiert und erbt dieselben Prinzipien, die die Benutzerfreundlichkeit von Kubernetes fördern
+OpenEBS unterstützt eine Reihe von Speicher-Engines, sodass Entwickler die Speichertechnologie bereitstellen können, die ihren Anwendungsdesignzielen entspricht. Verteilte Anwendungen wie Cassandra können die LocalPV-Engine für Schreibvorgänge mit der geringsten Latenz verwenden. 
+Monolithische Anwendungen wie MySQL und PostgreSQL können die ZFS-Engine (cStor) für die Ausfallsicherheit verwenden. Streaming-Anwendungen wie Kafka können die NVMe-Engine Mayastor verwenden, um die beste Leistung in Edge-Umgebungen zu erzielen. OpenEBS bietet über alle Motortypen hinweg ein konsistentes
+Framework für Hochverfügbarkeit, Snapshots, Klone und Verwaltbarkeit.
+
+OpenEBS selbst wird als nur ein weiterer Container auf Ihrem Host bereitgestellt und ermöglicht Speicherdienste, die auf Pod-, Anwendungs-, Cluster- oder Containerebene festgelegt werden können, einschließlich:
+
+Automatisieren Sie die Verwaltung des an die Kubernetes-Worker-Knoten angeschlossenen Speichers und ermöglichen Sie die Verwendung des Speichers für die dynamische Bereitstellung von OpenEBS-PVs oder lokalen PVs.
+Datenpersistenz über Knoten hinweg, wodurch beispielsweise der Zeitaufwand für die Wiederherstellung von Cassandra-Ringen drastisch reduziert wird.
+Die Synchronisierung von Daten über Verfügbarkeitszonen und Cloud-Anbieter hinweg verbessert beispielsweise die Verfügbarkeit und verkürzt die An- und Ablösezeiten.
+Unabhängig davon, ob Sie mit AKS, Bare Metal, GKE oder AWS arbeiten - Ihre Verkabelungs- und Entwicklererfahrung für Speicherdienste ist so ähnlich wie möglich.
+Verwaltung der Einstufung von und zu S3 und anderen Zielen.
+Ein zusätzlicher Vorteil einer vollständig nativen Lösung von Kubernetes besteht darin, dass Administratoren und Entwickler OpenEBS mit all den wunderbaren Tools interagieren und verwalten können, die für Kubernetes wie Kubectl, Helm, Prometheus, Grafana, Weave Scope usw. verfügbar sind.
+
+Unsere Vision ist einfach: Lassen Sie Speicher und Speicherdienste für dauerhafte Workloads vollständig in die Umgebung integrieren, sodass jedes Team und jede Workload von der Granularität der Steuerung und dem nativen Verhalten von Kubernetes profitiert.
+
+Skalierbarkeit
+OpenEBS kann so skaliert werden, dass es eine beliebig große Anzahl von containerisierten Speichercontrollern enthält. Kubernetes wird verwendet, um grundlegende Elemente wie die Verwendung von etcd für die Inventarisierung bereitzustellen. OpenEBS skaliert in dem Maße, wie Ihre Kubernetes skaliert.
+
+Installation und erste Schritte
+OpenEBS kann in wenigen einfachen Schritten eingerichtet werden. Sie können mit der Auswahl des Kubernetes-Clusters beginnen, indem Sie open-iscsi auf den Kubernetes-Knoten installieren und den openebs-Operator mit kubectl ausführen.
+
+Starten Sie die OpenEBS Services mit dem Operator
+
+# wende dieses yaml an
+kubectl apply -f https://openebs.github.io/charts/openebs-operator.yaml
+Starten Sie die OpenEBS Services mit helm
+
+Helm Repo Update
+helm install --namespace openebs --name openebs stabil / openebs
+
+Sie können auch unserer Kurzanleitung folgen.
+
+OpenEBS kann auf jedem Kubernetes-Cluster bereitgestellt werden - entweder in der Cloud, vor Ort oder auf einem Entwickler-Laptop (Minikube). Beachten Sie, dass keine Änderungen am zugrunde liegenden Kernel erforderlich sind, da OpenEBS im Benutzerbereich ausgeführt wird. Bitte folgen Sie unserer OpenEBS Setup-Dokumentation. Außerdem steht eine Vagrant-Umgebung zur Verfügung, die eine Beispielbereitstellung für Kubernetes und eine synthetische Last enthält, mit der Sie die Leistung von OpenEBS simulieren können. Vielleicht finden Sie auch das verwandte Projekt Litmus (https://litmuschaos.io) interessant, das beim Chaos Engineering für Stateful Workloads auf Kubernetes hilft.
+
+Status
+OpenEBS ist eine der am weitesten verbreiteten und getesteten Kubernetes-Speicherinfrastrukturen in der Branche. OpenEBS ist seit Mai 2019 ein CNCF-Sandbox-Projekt und das erste und einzige Speichersystem, das konsistente softwaredefinierte Speicherfunktionen auf mehreren Backends (lokal, nfs, zfs, nvme) sowohl vor Ort als auch in Cloud-Systemen bereitstellt Das Litmus-Projekt, das als erstes Open Source sein eigenes Chaos Engineering Framework für Stateful Workloads veröffentlicht, auf das sich die Community stützt, um die monatliche Trittfrequenz von OpenEBS-Versionen automatisch zu bewerten. Unternehmenskunden verwenden OpenEBS seit 2018 in der Produktion und das Projekt unterstützt Docker Pulls ab 2,5 Millionen pro Woche.
+
+Der Status verschiedener Speicher-Engines, die die OpenEBS Persistent Volumes unterstützen, wird unten angegeben. Der Hauptunterschied zwischen den Status ist nachstehend zusammengefasst:
+
+alpha: Die API kann in einer späteren Softwareversion ohne vorherige Ankündigung auf inkompatible Weise geändert werden. Aufgrund des erhöhten Fehlerrisikos und des Mangels an langfristiger Unterstützung wird die Verwendung nur in kurzlebigen Testclustern empfohlen.
+Beta: Die Unterstützung für die allgemeinen Funktionen wird nicht eingestellt, Details können sich jedoch ändern. Unterstützung für das Upgrade oder die Migration zwischen Versionen wird entweder durch Automatisierung oder durch manuelle Schritte bereitgestellt.
+Stable: Funktionen werden in der freigegebenen Software für viele nachfolgende Versionen angezeigt, und die Unterstützung für das Upgrade zwischen Versionen wird in den allermeisten Szenarien durch Software-Automatisierung bereitgestellt.
+Statusdetails der Speicher-Engine
+Jiva Stable Am besten geeignet, um Replicated Block Storage auf Knoten auszuführen, die kurzlebigen Speicher auf den Kubernetes-Worker-Knoten verwenden
+cStor Beta Eine bevorzugte Option für die Ausführung auf Knoten mit Blockgeräten. Empfohlene Option, wenn Snapshot und Klone erforderlich sind
+Beta lokaler Volumes Bestens geeignet für verteilte Anwendungen, die Speicher mit geringer Latenz benötigen - direkt angeschlossener Speicher von den Kubernetes-Knoten.
+Mayastor alpha Eine neue Speicher-Engine, die mit der Effizienz von Local Storage arbeitet, aber auch Speicherdienste wie Replikation bietet. Die Entwicklung zur Unterstützung von Snapshots und Klonen ist im Gange.
+Weitere Informationen finden Sie in der OpenEBS-Dokumentation.
+
+Mitwirken
+OpenEBS freut sich über Ihr Feedback und Ihre Beiträge in jeder möglichen Form.
+
+Treten Sie der OpenEBS-Community auf Kubernetes Slack bei
+Schon angemeldet? Besuchen Sie unsere Diskussionen unter #openebs
+Möchten Sie ein Problem ansprechen oder bei Korrekturen und Funktionen helfen?
+Siehe offene Fragen
+Siehe beitragende Anleitung
+Möchten Sie an unseren Community-Meetings für Mitwirkende teilnehmen?
+Treten Sie unseren OpenEBS CNCF Mailinglisten bei
+Abonnieren Sie für OpenEBS-Projektaktualisierungen OpenEBS-Ankündigungen
+Abonnieren Sie OpenEBS-Benutzer, um mit anderen OpenEBS-Benutzern zu interagieren
+Zeig mir den Code
+Dies ist ein Meta-Repository für OpenEBS. Beginnen Sie mit den angehefteten Repositorys oder mit dem OpenEBS Architecture-Dokument.
+
+Lizenz
+OpenEBS wird unter der Apache License 2.0-Lizenz auf Projektebene entwickelt. Einige Komponenten des Projekts stammen aus anderen Open Source-Projekten und werden unter ihren jeweiligen Lizenzen vertrieben.
+
+OpenEBS ist Teil der CNCF-Projekte.
+Kommerzielle Angebote
+Dies ist eine Liste von Drittunternehmen und Einzelpersonen, die Produkte oder Dienstleistungen im Zusammenhang mit OpenEBS anbieten. OpenEBS ist ein CNCF-Projekt, das kein Unternehmen unterstützt. Die Liste wird in alphabetischer Reihenfolge angezeigt.
+
+Clouds Sky GmbH
+CodeWave
+Gridworkz Cloud Services
+MayaData
+
