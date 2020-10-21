@@ -27,7 +27,7 @@ Whether you use OpenEBS Local PV or cStor, you can set up the Kubernetes cluster
 
 ### Install OpenEBS
 
-If OpenEBS is not installed in your K8s cluster, this can be done from [here](https://docs.openebs.io/docs/next/overview.html). If OpenEBS is already installed, go to next step.
+If OpenEBS is not installed in your K8s cluster, this can be done from [here](https://docs.openebs.io/docs/next/overview.html). If OpenEBS is already installed, go to the next step.
 
 ### Select OpenEBS storage engine
 
