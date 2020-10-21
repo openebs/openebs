@@ -68,7 +68,7 @@ In this tutorial, OpenEBS LocalPV device has been used as the storage engine for
   ```
   $ kubectl apply --validate=false -f https://github.com/jetstack/cert-manager/releases/download/v0.15.1/cert-manager.yaml
   ```
-- Install Kudo operator using specified version. In the following command, selected version is v0.14.0.
+- Install Kudo operator using a specified version. In the following command, the selected version is v0.14.0.
   ```
   $ kubectl-kudo init --version 0.14.0
   ```
