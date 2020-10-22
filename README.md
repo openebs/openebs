@@ -9,17 +9,7 @@
 
 https://openebs.io/
 
-**Read this in**
-[🇩🇪](translations/README.de.md)	
-[🇷🇺](translations/README.ru.md)	
-[🇹🇷](translations/README.tr.md)	
-[🇺🇦](translations/README.ua.md)	
-[🇨🇳](translations/README.zh.md)	
-[🇫🇷](translations/README.fr.md)
-[🇧🇷](translations/README.pt-BR.md)
-[GU](translations/README.gu.md)
-[GE](translations/README.ge.md)
-**[other languages](translations/#readme).**
+**Read this in** **[other languages](translations/#readme).**
 
 **OpenEBS** is the most widely deployed and easy to use open-source storage solution for Kubernetes.
 
