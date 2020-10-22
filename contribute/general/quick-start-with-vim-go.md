@@ -51,3 +51,6 @@ The `vim-go` repository provides a large number of additional plugins and shortc
 - Initiate the build `:GoBuild`.
 - Navigate to the definition `ctrl-{`.
 - Navigate back `ctrl-o`.
+
+
+Thank you for showing your interest in this 
