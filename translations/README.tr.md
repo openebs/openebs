@@ -13,7 +13,7 @@ https://openebs.io/
  
 **OpenEBS**, örneğin konteynerler içerisinde çalışan veritabanları gibi kalıcı uygulama konteynarlarını adeta diğer konteynerlar gibi kullanmanızı sağlar. Diğer mevcut kurumsal depolama çözümlerinden farklı olarak OpenEBS'in kendisi de sunucunuzda konteynerlar aracılığıyla dağıtılır. OpenEBS depolama servisleri bir pod, uygulama (application), cluster veya konteyner düzeyinde atanabilecek depolama hizmetlerini etkinleştirir:
 - Sunucular arası veri kalıcılığı, örneğin Cassandra halkalarının yeniden inşası için harcanan zamanı önemli ölçüde azaltır.
-- Bulut üzerinde kullanılabilirlik bölgeleri (Avaialibility Zone) ve bulut sağlayıcıları arasında verilerin kullanılabilirliğini iyileştirmesi ve örneğin ekleme / çıkarma zamanlarını azaltma.
+- Bulut üzerinde kullanılabilirlik bölgeleri (Availability Zone) ve bulut sağlayıcıları arasında verilerin kullanılabilirliğini iyileştirmesi ve örneğin ekleme / çıkarma zamanlarını azaltma.
 - Ortak bir API tabanı oluşturur. İster AKS, ister direkt olarak sunucu üzerinde veya GKE ya da AWS'de çalışıyor olsanız dahi, yazılım geliştirici deneyiminin mümkün olduğunca benzer olmasını sağlar. Bu sayede farklı platformlar üzerinde hiçbir değişiklik yapmaksınız çalışmanızı sağlar.
 - Kubernetes ile entegredir. Geliştirici ve uygulamanın talepleri otomatik olarak OpenEBS konfigürasyonlarına aktarılır.
 - S3 ve diğer depolama hedeflerinin yönetimini kolaylaştırır.
@@ -33,7 +33,7 @@ OpenEBS birkaç kolay adımda kurulabilir. Kubernetes kümenizde (cluster) open-
 **Operatör kullanarak OpenEBS hizmetlerini başlatınız**
 
 ```bash
-# bu yamayı uygula
+# bu yaml'ı uygulayın
 kubectl apply -f https://openebs.github.io/charts/openebs-operator.yaml
 ```
 
@@ -46,20 +46,22 @@ helm install --namespace openebs --name openebs stable/openebs
 
 Ayrıca [Hızlı Başlangıç ​​Kılavuzu](https://docs.openebs.io/docs/overview.html)'nu da takip edebilirsiniz.
 
-OpenEBS, kurumsal bulut, şirket içi veya geliştirici dizüstü bilgisayarı (minikube) gibi herhangi bir Kubernetes kümesine (cluster) kurulabilir. OpenEBS kullanıcı alanında (userspace) çalıştığı için kernel diye de bilinen Linux çekirdeğinde hiçbir değişiklik gerektirmez. Lütfen [OpenEBS Kurulumu](https://docs.openebs.io/docs/overview.html) dokümantasyonumuzu takip edin. Ayrıca, OpenEBS'in performansını simüle etmek için kullanabileceğiniz örnek bir Kubernetes dağıtımı ve sentetik yük içeren bir Vagrant kurulumu da mevcut. Ayrıca, Kubernetes'teki kalıcı veri gerektiren uygulamalar için kaos mühendisliği ile yardımcı olan [Litmus](https://www.openebs.io/litmus) adlı ilgili projeyi de ilginç bulabilirsiniz.
+OpenEBS, kurumsal bulut, şirket içi veya geliştirici dizüstü bilgisayarı (minikube) gibi herhangi bir Kubernetes kümesine (cluster) kurulabilir. OpenEBS kullanıcı alanında (userspace) çalıştığı için kernel diye de bilinen Linux çekirdeğinde hiçbir değişiklik gerektirmez. Lütfen [OpenEBS Kurulumu](https://docs.openebs.io/docs/overview.html) dokümantasyonumuzu takip edin. Ayrıca, OpenEBS'in performansını simüle etmek için kullanabileceğiniz örnek bir Kubernetes dağıtımı ve sentetik yük içeren bir Vagrant kurulumu da mevcut. Ayrıca, Kubernetes'teki kalıcı veri gerektiren uygulamalar için kaos mühendisliği ile yardımcı olan [Litmus](https://litmuschaos.io/) adlı ilgili projeyi de ilginç bulabilirsiniz.
 
 ## Durum
 
-Devam eden aktif yazılım geliştirme çalışmaları ile beta aşamasına yaklaşıyoruz. Daha fazla bilgi için [Project Tracker](https://github.com/openebs/openebs/wiki/Project-Tracker)'a bakınız. Birçok kullanıcı OpenEBS'i production'da çalıştırıyor ve erken erişim ticari çözümleri, birincil sponsorumuz [MayaData](https://www.mayadata.io) tarafından Eylül 2018'de kullanıma sunuldu.
+OpenEBS en çok kullanılan ve test edilmiş Kubernetes depolama altyapılarından bir tanesi. Kurumsal müşterilerimiz OpenEBS'i 2018'den beri üretimde kullanıyor ve projemiz haftada 2.5 milyondan fazla Docker pull işlemlerini destekliyor.
+
+Projemizin güncel durumu hakkında daha fazla bilgi için [Project Tracker](https://github.com/openebs/openebs/wiki/Project-Tracker)'a bakınız.
  
 ## Katkı
  
 OpenEBS, her açık kaynak kodlu uygulama gibi kullanıcı katılarıyla güçlenen bir projedir. Yorumlarınızlardan ve katkılarınızdan minnettarız.
  
-- [Bizim katılın topluluk](https://kubernetes.slack.com).
-  - Eğer kayıtlıysanız tartışmalarımıza [#openebs](https://kubernetes.slack.com/messages/openebs/).
+- [Slack üzerinden topluluğumuza katılın](https://kubernetes.slack.com).
+  - Eğer kayıtlıysanız tartışmalarımıza [#openebs](https://kubernetes.slack.com/messages/openebs/) kanalından ulaşabilirsiniz.
 - Bir sorunu bildirmek ister misiniz?
-  - Eğer olamadığınız genel bir sorunuz varsa, bunu  [sorunlar](https://github.com/openebs/openebs/issues) altında rapor edebilirsiniz.
+  - Eğer çözüm bulamadığınız bir sorununuz varsa, bunu  [sorunlar](https://github.com/openebs/openebs/issues) altında rapor edebilirsiniz.
   - Proje (repo) ile ilgili belirli konular ayrıca [sorunlar](https://github.com/openebs/openebs/issues) ve *repo/maya* gibi tek tek etiketlerle etiketlenebilir.
 - Düzeltmeler ve özellikler konusunda yardımcı olmak ister misiniz?
   - Bkz. [Açık sorunlar](https://github.com/openebs/openebs/labels)
