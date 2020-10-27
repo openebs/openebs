@@ -9,6 +9,7 @@
 | 🇹🇷 | [Türkçe](README.tr.md) |
 | 🇨🇳 | [中文](README.zh.md) |
 | 🇫🇷 | [Français](README.fr.md) |
-| :india: | [ગુજરાતી](README.gu.md) |
+| :india: | [हिंदी](README.hi.md) |
 | :egypt: | [عربى](README.ar.md) |
+| :brazil: | [Brasil](README.pt-BR.md) |
 
