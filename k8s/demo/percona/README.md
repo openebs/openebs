@@ -10,7 +10,7 @@ order to illustrate I/O traffic on the storage.
 Pre-requisites include the following: 
 
 - A fully configured kubernetes cluster with kubernetes master and at least one node. This may be created on 
-cloud platforms like GKE, on-premise virtual machines (vagrant/VMware/Hyper-V) or bare-metal boxes
+cloud platforms like AKS, on-premise virtual machines (vagrant/VMware/Hyper-V) or bare-metal boxes
 
   Note: 
 
@@ -18,9 +18,7 @@ cloud platforms like GKE, on-premise virtual machines (vagrant/VMware/Hyper-V) o
   as this will aid creation of storage replicas on separate nodes. This 
   is especially helpful to maintain redundancy and data availability.
 
-  - If you are using GCP, view the appendix in this 
-  [tutorial](https://github.com/openebs/openebs/blob/master/k8s/hyperconverged/tutorial-configure-openebs-gke.md)
-  for additional steps for setting cluster admin context and using it 
+  - For more details, see [this](https://docs.openebs.io/docs/next/prerequisites.html)
   
   Verify that the kubernetes cluster is in optimal state: 
   

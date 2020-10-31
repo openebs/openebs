@@ -21,5 +21,5 @@ The configuration scripts under the boxes will typically perform the following:
 OpenEBS repository also hosts (in different directory), the scripts required for post-vm initialization tasks like calling "kubeadm join" with required parameters. Similarly, the sample k8s pod specs are also provided. These scripts and specs are pre-packaged into spec files into setup and demo directories respectively. 
 
 - configuration scripts are at [k8s/lib/scripts](https://github.com/openebs/openebs/tree/master/k8s/lib/scripts)
-- demo yaml files are at [k8s/demo/specs](https://github.com/openebs/openebs/tree/master/k8s/demo/specs)
+- demo yaml files are at [k8s/demo](https://github.com/openebs/openebs/tree/master/k8s/demo)
 
