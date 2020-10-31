@@ -11,6 +11,10 @@
 | 🇨🇳 | [中文](README.zh.md) |
 | 🇫🇷 | [Français](README.fr.md) |
 | :india: | [ગુજરાતી](README.gu.md) |
+| :india: | [हिंदी](README.hi.md) |
+| :india: | [ਪੰਜਾਬੀ](README.pu.md) |
 | :egypt: | [عربى](README.ar.md) |
+| JP | [日本語](README.JP.md) |
 | 🇧🇷 | [Português Brasil](README.pt-BR.md) |
+
 
