@@ -59,7 +59,7 @@ OpenEBS freut sich über Ihr Feedback und Ihre Beiträge in jeder möglichen For
   - Wenn es sich um ein generisches Produkt (oder "nicht wirklich sicher") handelt, können Sie es dennoch unter [issues](https://github.com/openebs/openebs/issues) anheben.
   - Projekt (Repository) spezifische Probleme können auch unter [issues](https://github.com/openebs/openebs/issues) angesprochen und mit den einzelnen Repository-Labels wie *repo/maya* versehen werden.
 - Möchten Sie mit Fixes und Features helfen?
-  - Siehe [offene Ausgaben](https://github.com/openebs/openebs/labels)
+  - Siehe [offene Ausgaben](https://github.com/openebs/openebs/labels).
 - Siehe [Beitragender Leitfaden](/CONTRIBUTING.md)
   - Möchten Sie unserer Community beitreten, [check this out](/community/README.md).
 
