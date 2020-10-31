@@ -17,6 +17,8 @@ https://openebs.io/
 [🇨🇳](translations/README.zh.md)	
 [🇫🇷](translations/README.fr.md)
 [🇧🇷](translations/README.pt-BR.md)
+[🇪🇸](translations/README.es.md)
+[🇵🇱](translations/README.pl.md)
 **[other languages](translations/#readme).**
 
 **OpenEBS** is the most widely deployed and easy to use open-source storage solution for Kubernetes.
@@ -24,9 +26,9 @@ https://openebs.io/
 **OpenEBS** is the leading open-source example of a category of storage solutions sometimes called [Container Attached Storage](https://www.cncf.io/blog/2018/04/19/container-attached-storage-a-primer/). **OpenEBS** is listed as an open-source example in the [CNCF Storage Landscape White Paper](https://github.com/cncf/sig-storage/blob/master/CNCF%20Storage%20Landscape%20-%20White%20Paper.pdf) under the hyperconverged storage solutions.
 
 Some key aspects that make OpenEBS different compared to other traditional storage solutions:
-- Built using the micro-services architecture like the applications it serves. OpenEBS is itself deployed as a set of containers on Kubernetes worker nodes. Uses Kubernetes itself to orchestrate and manage OpenEBS components
-- Built completely in userspace making it highly portable to run across any OS/platform
-- Completely intent-driven, inheriting the same principles that drive the ease of use with Kubernetes
+- Built using the micro-services architecture like the applications it serves. OpenEBS is itself deployed as a set of containers on Kubernetes worker nodes. Uses Kubernetes itself to orchestrate and manage OpenEBS components.
+- Built completely in userspace making it highly portable to run across any OS/platform.
+- Completely intent-driven, inheriting the same principles that drive the ease of use with Kubernetes.
 - OpenEBS supports a range of storage engines so that developers can deploy the storage technology appropriate to their application design objectives. Distributed applications like Cassandra can use the LocalPV engine for lowest latency writes. Monolithic applications like MySQL and PostgreSQL can use the ZFS engine (cStor) for resilience. Streaming applications like Kafka can use the NVMe engine [Mayastor](https://github.com/openebs/Mayastor) for best performance in edge environments. Across engine types, OpenEBS provides a consistent framework for high availability, snapshots, clones and manageability.
 
 OpenEBS itself is deployed as just another container on your host and enables storage services that can be designated on a per pod, application, cluster or container level, including:
@@ -62,7 +64,7 @@ helm install --namespace openebs --name openebs stable/openebs
 
 You could also follow our [QuickStart Guide](https://docs.openebs.io/docs/overview.html).
 
-OpenEBS can be deployed on any Kubernetes cluster - either in the cloud, on-premise or developer laptop (minikube). Note that there are no changes to the underlying kernel that are required as OpenEBS operates in userspace.  Please follow our [OpenEBS Setup](https://docs.openebs.io/docs/overview.html) documentation. Also, we have a Vagrant environment available that includes a sample Kubernetes deployment and synthetic load that you can use to simulate the performance of OpenEBS. You may also find interesting the related project called Litmus (https://litmuschaos.io) which helps with chaos engineering for stateful workloads on Kubernetes.
+OpenEBS can be deployed on any Kubernetes cluster - either in the cloud, on-premise or developer laptop (minikube). Note that there are no changes to the underlying kernel that are required as OpenEBS operates in userspace.  Please follow our [OpenEBS Setup](https://docs.openebs.io/docs/overview.html) documentation. Also, we have a Vagrant environment available that includes a sample Kubernetes deployment and synthetic load that you can use to simulate the performance of OpenEBS. You may also find interesting the related project called [Litmus](https://litmuschaos.io) which helps with chaos engineering for stateful workloads on Kubernetes.
 
 ## Status
 
