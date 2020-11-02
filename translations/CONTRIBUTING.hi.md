@@ -61,10 +61,10 @@
 
 यदि आप इसे प्रमाणित कर सकते हैं, तो बस हर git कमिट मैसेज में एक लाइन जोड़ें:
 
-`साइन-ऑफ-बाय: रैंडम जे डेवलपर <random@developer.example.org>`
+`Signed-off-by: Random J Developer <random@developer.example.org>`
 या कमांड का उपयोग करें "git commit -s -m" कमिट मैसेज यहां आता है "` अपने कमेंट्स पर साइन-ऑफ करने के लिए।
 
-अपने वास्तविक नाम का उपयोग करें (क्षमा करें, कोई छद्म शब्द या अनाम योगदान नहीं)। यदि आप अपना `user.name` और`user.email` git कॉन्फिगर सेट करते हैं, तो आप अपने कमिट को `git commit -s` के साथ साइन इन कर सकते हैं। आप git [एलियासेस](https://git-scm.com/book/en/v2/Git-Basics-Git-Aliases) का भी उपयोग कर सकते हैं जैसे `git config --global alias.ci 'commit  -s'`। अब आप `git ci` के साथ कमिट कर सकते हैं और कमिट पर हस्ताक्षर किए जाएंगे।
+अपने वास्तविक नाम का उपयोग करें (क्षमा करें, कोई छद्म शब्द या अनाम योगदान नहीं)। यदि आप अपना `user.name` और`user.email` git config सेट करते हैं, तो आप अपने कमिट को `git commit -s` के साथ साइन इन कर सकते हैं। आप git [एलियासेस](https://git-scm.com/book/en/v2/Git-Basics-Git-Aliases) का भी उपयोग कर सकते हैं जैसे `git config --global alias.ci 'commit -s'`। अब आप `git ci` के साथ कमिट कर सकते हैं और कमिट पर हस्ताक्षर किए जाएंगे।
 
 ---
 
