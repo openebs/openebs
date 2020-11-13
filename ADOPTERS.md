@@ -24,6 +24,7 @@ The list of organizations that have publicly shared the usage of OpenEBS:
 | [Orange](https://www.orange.com/en/home) | Prometheus, Alertmanager, ChartMuseum, Harbor, GitLab, PostgreSQL, Redis, OpenLdap, RabbitMQ, MySQL, MinIO, Metabase, ... | [English](./adopters/orange/README.md) |
 | [Plaid Cloud](https://github.com/PlaidCloud) | Redis, Prometheus, Elasticsearch, PostgreSQL | [English](./adopters/plaidcloud/README.md) |
 | [Stratus5](https://stratus5.com/) | Redis,Ceryx, MySQL, MariaDB, Wordpress | [English](./adopters/stratus5/README.md) |
+| [eXact lab](https://www.exact-lab.it/) | ELK, Prometheus, PostgreSQL, MySQL, Apache Kafka, Grafana, GitLab |  [English](./adopters/exact/README.md) |
 | [TOBG Services Ltd](https://www.tobg.com.de/) | Postgresql, Confluence, Gitlab, Bitcoin Full Node, Bitcoin Lightning Nodes, BTCPay, Cardano Nodes and Pool, Docker Registry, Prometheus, Grafana, Zabbix monitoring, ELK | [English](./adopters/tobgservices/README.md) |
 
 The list of users that have publicly shared the usage of OpenEBS.
