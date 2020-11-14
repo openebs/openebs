@@ -10,6 +10,7 @@ The list of organizations that have publicly shared the usage of OpenEBS:
 | :--- | :--- | :--- |
 | [Agnes Intelligence](https://www.agnesintel.com/) | Apache Kafka, Apache Solr, NFS | [English](./adopters/agnesintel/README.md) |
 | [Arista Networks](https://www.arista.com/en/) | Gerrit (multiple flavors), NPM, Maven, Redis, NFS, Sonarqube, Internal tools | [English](./adopters/arista/README.md) |
+| [ByteDance](https://www.bytedance.com/) | Elasticsearch | [English](./adopters/bytedance/README.md) |
 | [CLEW Medical](https://clewmed.com/) | PostgreSQL, Keycloak, RabbitMQ | [English](./adopters/clewmedical/README.md) |
 | [Clouds Sky GmbH](https://cloudssky.com/en/) | Confluent Kafka, Strimzi Kafka, Elasticsearch, Prometheus | [English](./adopters/cloudssky/README.md) |
 | [CNCF, The Linux Foundation](https://www.linuxfoundation.org/) | PostgreSQL, MariaDB, ElasticSearch, Redis, DevStats | [English](./adopters/cncf/README.md) |
@@ -34,6 +35,7 @@ The list of users that have publicly shared the usage of OpenEBS.
 | [Alin Jurj](https://github.com/Perfect-Web) | Elasticsearch | [English](./adopters/users/Perfect-Web/README.md)  | 
 | [Daniel Sand](https://github.com/danielsand) | Gitea, Postgres, Concourse... | [English](./adopters/users/danielsand/README.md)
 | [Dean Stathos](https://github.com/dstathos) | MariaDB, homegrown applications | [English](./adopters/users/dstathos/README.md)  |
+| [jkuzelka](https://github.com/kuja53) | GitLab, Prometheus, Grafana, Nexus Repository, Elasticsearch, RabbitMQ | [English](./adopters/users/kuja53/README.md) |
 | [Maartje Eyskens](https://github.com/meyskens) | Minio | [English](./adopters/users/meyskens/README.md)  | 
 | [Mark V.](https://github.com/mikroskeem) | Concourse CI, Mattermost, Minio, Few game servers, Bunch of micro services | [English](./adopters/users/mikroskeem/README.md)  | 
 | [proegssilb](https://github.com/proegssilb) | PostgreSQL, Redis, Factorio (video game server) | [English](./adopters/users/proegssilb/README.md)  | 
