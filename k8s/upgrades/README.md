@@ -165,8 +165,12 @@ OpenEBS PV while performing this upgrade. Also, make sure you have taken a
 backup of the data before starting the below upgrade procedure.
 - please have the following link handy in case the volume gets into read-only during upgrade
   https://docs.openebs.io/docs/next/t-volume-provisioning.html#recovery-readonly-when-kubelet-is-container
-- Automatic rollback option is not provided. To rollback, you need to update
-  the controller, exporter and replica pod images to the previous version
+- If the pool and volume images have the prefix `quay.io/openebs/` then please add the flag
+    ```yaml
+    - "--to-version-image-prefix=openebs/"
+    ```
+  as the new multi-arch images are not pushed to quay.
+  It can also be used specify any other private repository or airgap prefix in use.
 - Before proceeding with the upgrade of the OpenEBS Data Plane components like cStor or Jiva,  verify that OpenEBS Control plane is indeed in desired version
   You can use the following command to verify components are in 2.3.0:
   ```sh
@@ -258,6 +262,11 @@ spec:
         # --to-version is the version desired upgrade version
         - "--to-version=2.3.0"
 
+        # If the pools and volumes images have the prefix `quay.io/openebs/`
+        # then please add this flag as the new multi-arch images are not pushed to quay.
+        # It can also be used specify any other private repository or airgap prefix in use.
+        # "--to-version-image-prefix=openebs/"
+
         # Bulk upgrade is supported
         # To make use of it, please provide the list of PVs
         # as mentioned below
@@ -345,6 +354,11 @@ spec:
         # --to-version is the version desired upgrade version
         - "--to-version=2.3.0"
 
+        # If the pools and volumes images have the prefix `quay.io/openebs/`
+        # then please add this flag as the new multi-arch images are not pushed to quay.
+        # It can also be used specify any other private repository or airgap prefix in use.
+        # "--to-version-image-prefix=openebs/"
+
         # Bulk upgrade is supported
         # To make use of it, please provide the list of SPCs
         # as mentioned below
@@ -421,6 +435,11 @@ spec:
 
         # --to-version is the version desired upgrade version
         - "--to-version=2.3.0"
+
+        # If the pools and volumes images have the prefix `quay.io/openebs/`
+        # then please add this flag as the new multi-arch images are not pushed to quay.
+        # It can also be used specify any other private repository or airgap prefix in use.
+        # "--to-version-image-prefix=openebs/"
 
         # Bulk upgrade is supported from 1.9
         # To make use of it, please provide the list of PVs
