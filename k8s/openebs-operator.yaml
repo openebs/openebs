@@ -303,6 +303,10 @@ spec:
         # This is supported for openebs provisioner version 0.5.3-RC1 onwards
         #- name: OPENEBS_MAYA_SERVICE_NAME
         #  value: "maya-apiserver-apiservice"
+        # LEADER_ELECTION_ENABLED is used to enable/disable leader election. By default
+        # leader election is enabled.
+        #- name: LEADER_ELECTION_ENABLED
+        #  value: "true"
          # Process name used for matching is limited to the 15 characters
          # present in the pgrep output.
          # So fullname can't be used here with pgrep (>15 chars).A regular expression
@@ -380,12 +384,16 @@ spec:
             valueFrom:
               fieldRef:
                 fieldPath: metadata.namespace
-        # OPENEBS_MAYA_SERVICE_NAME provides the maya-apiserver K8s service name,
-        # that snapshot provisioner  should forward the clone create/delete requests.
-        # If not present, "maya-apiserver-service" will be used for lookup.
-        # This is supported for openebs provisioner version 0.5.3-RC1 onwards
-        #- name: OPENEBS_MAYA_SERVICE_NAME
-        #  value: "maya-apiserver-apiservice"
+          # OPENEBS_MAYA_SERVICE_NAME provides the maya-apiserver K8s service name,
+          # that snapshot provisioner  should forward the clone create/delete requests.
+          # If not present, "maya-apiserver-service" will be used for lookup.
+          # This is supported for openebs provisioner version 0.5.3-RC1 onwards
+          #- name: OPENEBS_MAYA_SERVICE_NAME
+          #  value: "maya-apiserver-apiservice"
+          # LEADER_ELECTION_ENABLED is used to enable/disable leader election. By default
+          # leader election is enabled.
+          #- name: LEADER_ELECTION_ENABLED
+          #  value: "true"
          # Process name used for matching is limited to the 15 characters
          # present in the pgrep output.
          # So fullname can't be used here with pgrep (>15 chars).A regular expression
@@ -439,7 +447,7 @@ data:
         name: path filter
         state: true
         include: ""
-        exclude: "loop,/dev/fd0,/dev/sr0,/dev/ram,/dev/dm-,/dev/md,/dev/rbd"
+        exclude: "/dev/loop,/dev/fd0,/dev/sr0,/dev/ram,/dev/dm-,/dev/md,/dev/rbd,/dev/zd"
 ---
 apiVersion: apps/v1
 kind: DaemonSet
@@ -753,7 +761,11 @@ spec:
         - name: OPENEBS_IO_INSTALLER_TYPE
           value: "openebs-operator"
         - name: OPENEBS_IO_HELPER_IMAGE
-          value: "openebs/linux-utils:ci"
+          value: "openebs/linux-utils:2.3.0"
+        # LEADER_ELECTION_ENABLED is used to enable/disable leader election. By default
+        # leader election is enabled.
+        #- name: LEADER_ELECTION_ENABLED
+        #  value: "true"
         # Process name used for matching is limited to the 15 characters
         # present in the pgrep output.
         # So fullname can't be used here with pgrep (>15 chars).A regular expression
