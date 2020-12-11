@@ -16,7 +16,7 @@ If already using CSPC pools and cStor CSI volumes they can be upgraded from `1.1
 
 This document describes the steps for the following OpenEBS Upgrade paths:
 
-- Upgrade from 1.0.0 or later to a newer release up to 2.3.0
+- Upgrade from 1.0.0 or later to a newer release up to 2.4.0
 
 For other upgrade paths of earlier releases, please refer to the respective directories.
 Example: 
@@ -38,7 +38,7 @@ The upgrade of OpenEBS is a three step process:
 
 **Note: It is mandatory to make sure to that all OpenEBS control plane
 and data plane components are running with the expected version before the upgrade.**
-- **For upgrading to the latest release (2.3.0), the previous version should be minimum 1.0.0 **
+- **For upgrading to the latest release (2.4.0), the previous version should be minimum 1.0.0 **
 
 **Note: All steps described in this document need to be performed from a
 machine that has access to Kubernetes master**
@@ -119,8 +119,8 @@ the openebs-operator.yaml for your cluster, you will have to download the
 desired openebs-operator.yaml and customize it again**
 
 ```
-#Upgrade to OpenEBS control plane components to desired version. Say 2.3.0
-$ kubectl apply -f https://openebs.github.io/charts/2.3.0/openebs-operator.yaml
+#Upgrade to OpenEBS control plane components to desired version. Say 2.4.0
+$ kubectl apply -f https://openebs.github.io/charts/2.4.0/openebs-operator.yaml
 ```
 
 ### Upgrade using helm chart (using openebs/openebs, openebs-charts repo, etc.,):
@@ -135,13 +135,13 @@ latest openebs/openebs chart.
 - If the default values seem appropriate, you can use the below commands to
   update OpenEBS. [More](https://hub.helm.sh/charts/openebs/openebs) details about the specific chart version.
   ```sh
-  $ helm upgrade --reset-values <release name> openebs/openebs --version 2.3.0
+  $ helm upgrade --reset-values <release name> openebs/openebs --version 2.4.0
   ```
 - If not, customize the values into your copy (say custom-values.yaml),
   by copying the content from above default yamls and edit the values to
   suite your environment. You can upgrade using your custom values using:
   ```sh
-  $ helm upgrade <release name> openebs/openebs --version 2.3.0 -f custom-values.yaml`
+  $ helm upgrade <release name> openebs/openebs --version 2.4.0 -f custom-values.yaml`
   ```
 
 ### Using customized operator YAML or helm chart.
@@ -172,9 +172,9 @@ backup of the data before starting the below upgrade procedure.
   as the new multi-arch images are not pushed to quay.
   It can also be used specify any other private repository or airgap prefix in use.
 - Before proceeding with the upgrade of the OpenEBS Data Plane components like cStor or Jiva,  verify that OpenEBS Control plane is indeed in desired version
-  You can use the following command to verify components are in 2.3.0:
+  You can use the following command to verify components are in 2.4.0:
   ```sh
-  $ kubectl get pods -n openebs -l openebs.io/version=2.3.0
+  $ kubectl get pods -n openebs -l openebs.io/version=2.4.0
   ```
   The above command should show that the control plane components are upgrade.
   The output should look like below:
@@ -206,7 +206,7 @@ using Kubernetes Job spec.
 
 The following instructions provide details on how to create your Upgrade Job specs.
 Please ensure the `from` and `to` versions are as per your upgrade path. The below
-examples show upgrading from 1.12.0 to 2.3.0.
+examples show upgrading from 1.12.0 to 2.4.0.
 
 ### Upgrade the OpenEBS Jiva PV
 
@@ -235,7 +235,7 @@ metadata:
   #VERIFY that you have provided a unique name for this upgrade job.
   #The name can be any valid K8s string for name. This example uses
   #the following convention: jiva-vol-<flattened-from-to-versions>
-  name: jiva-vol-1120230
+  name: jiva-vol-1120240
 
   #VERIFY the value of namespace is same as the namespace where openebs components
   # are installed. You can verify using the command:
@@ -260,7 +260,7 @@ spec:
         - "--from-version=1.12.0"
 
         # --to-version is the version desired upgrade version
-        - "--to-version=2.3.0"
+        - "--to-version=2.4.0"
 
         # If the pools and volumes images have the prefix `quay.io/openebs/`
         # then please add this flag as the new multi-arch images are not pushed to quay.
@@ -294,14 +294,14 @@ spec:
 
 Execute the Upgrade Job Spec
 ```sh
-$ kubectl apply -f jiva-vol-120230.yaml
+$ kubectl apply -f jiva-vol-120240.yaml
 ```
 
 You can check the status of the Job using commands like:
 ```sh
 $ kubectl get job -n openebs
 $ kubectl get pods -n openebs #to check on the name for the job pod
-$ kubectl logs -n openebs jiva-upg-1120230-bgrhx
+$ kubectl logs -n openebs jiva-upg-1120240-bgrhx
 ```
 
 ### Upgrade cStor Pools
@@ -328,7 +328,7 @@ metadata:
   #VERIFY that you have provided a unique name for this upgrade job.
   #The name can be any valid K8s string for name. This example uses
   #the following convention: cstor-spc-<flattened-from-to-versions>
-  name: cstor-spc-1120230
+  name: cstor-spc-1120240
 
   #VERIFY the value of namespace is same as the namespace where openebs components
   # are installed. You can verify using the command:
@@ -352,7 +352,7 @@ spec:
         - "--from-version=1.12.0"
 
         # --to-version is the version desired upgrade version
-        - "--to-version=2.3.0"
+        - "--to-version=2.4.0"
 
         # If the pools and volumes images have the prefix `quay.io/openebs/`
         # then please add this flag as the new multi-arch images are not pushed to quay.
@@ -409,7 +409,7 @@ metadata:
   #VERIFY that you have provided a unique name for this upgrade job.
   #The name can be any valid K8s string for name. This example uses
   #the following convention: cstor-vol-<flattened-from-to-versions>
-  name: cstor-vol-1120230
+  name: cstor-vol-1120240
 
   #VERIFY the value of namespace is same as the namespace where openebs components
   # are installed. You can verify using the command:
@@ -434,7 +434,7 @@ spec:
         - "--from-version=1.12.0"
 
         # --to-version is the version desired upgrade version
-        - "--to-version=2.3.0"
+        - "--to-version=2.4.0"
 
         # If the pools and volumes images have the prefix `quay.io/openebs/`
         # then please add this flag as the new multi-arch images are not pushed to quay.
