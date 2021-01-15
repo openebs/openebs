@@ -11,7 +11,11 @@ cd $working_dir
 ```
 
 Set `user` to match your Github profile name:
+for setting global configurations use - 
+git config --global user.name "your usernae here"
+git config --global user.email "your email used in github account"
 
+and for configuring locally use the above commands just remove the --global flag
 ```bash
 user={your Github profile name}
 ```
@@ -59,7 +63,8 @@ git push
 ```bash
 # make your changes
 # keep fetching the commits from upstream master & rebase them here
-git commit
+git add -A
+git commit -m "creating changes in local repository"
 git push
 
 # submit the PR to upstream from browser link https://github.com/$user/openebs
