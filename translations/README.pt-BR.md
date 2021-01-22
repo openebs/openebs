@@ -23,7 +23,7 @@ O deploy de OpenEBS é realizado como qualquer outro container na sua hospedagem
 - Automatize o gerenciamento de armazenamento anexado aos nodes Kubernetes e permita o armazenamento para ser utilizado no provisionamento dinâmico dos PVs OpenEBS ou PVs Locais.
 - Persistência de dados através de nodes, reduzindo dramaticamente o tempo gasto re-criando rings Cassandra, por exemplo.
 - Sincronização de dados através de zonas de disponibilidade e provedores cloud, melhorando a disponibilidade e diminuindo o tempo de anexo/separação, por exemplo.
-- Uma camada comum então esteja você todando em AKS, ou no seu "bare metal", ou GKE, ou AWS - sua experiência de serviço de armazenamento é a mais similar possível.
+- Uma camada comum então esteja você rodando em AKS, ou no seu "bare metal", ou GKE, ou AWS - sua experiência de serviço de armazenamento é a mais similar possível.
 - Gerenciamento de escalonamento para e de S3 e outros targets.
 
 Uma vantagem de ser uma solução nativa ao Kubernetes é que administradores e desenvolvedores podem interagir e gerenciar OpenEBS usando todas as maravilhosas ferramentas que estão disponíveis para Kubernetes, como kubectl, Helm, Prometheus, Grafana, Weave Scope, etc.
