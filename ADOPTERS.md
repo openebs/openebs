@@ -20,6 +20,7 @@ The list of organizations that have publicly shared the usage of OpenEBS:
 | [DISID](https://disid.com/) | Minio, DataStax, Greenplum, Gridgain, mongoDB, Qlickhouse, PosgtreSQL | [English](./adopters/disid/README.md) |
 | [D-Rating](https://www.d-rating.com/) | MongoDB, Elasticsearch, PostgreSQL | [English](./adopters/d-rating/README.md) |
 | [Hamravesh](https://github.com/hamravesh) | Multiple minio instances, Multiple docker-in-docker instances | [English](./adopters/hamravesh/README.md) |
+| [IDNT](https://idnt.net/) | Elasticsearch, RabbitMQ, KubeVirt, Prometheus, YugabyteDB, Couchbase, MySQL | [English](./adopters/idnt/README.md) |
 | [KPN](https://www.kpn.com/) | ManageIQ, AWX, Harbor, Selenium Hub based automated UI testing, verdaccio, openshift monitoring (alert manager), openshift monitoring (cassandra) | [English](./adopters/kpn/README.md) |
 | [KubeSphere](https://kubesphere.io) | [KubeSphere](https://github.com/kubesphere/kubesphere), there are some stateful components of KubeSphere including Redis, MySQL, Elasticsearch, Prometheus, etc. | [English](./adopters/kubesphere/README.md) |
 | [Optoro](https://www.optoro.com/) | PostgreSQL, MySQL, Apache Kafka, Redis, ElasticSearch, Prometheus, Thanos | [English](./adopters/optoro/README.md) |
