@@ -36,6 +36,7 @@ The list of users that have publicly shared the usage of OpenEBS.
 | User | Stateful Workloads | Success Story |
 | :--- | :--- | :--- |
 | [Alin Jurj](https://github.com/Perfect-Web) | Elasticsearch | [English](./adopters/users/Perfect-Web/README.md)  | 
+| [Armel Soro](https://github.com/rm3l) | Ghost blog, MariaDB, Argo Workflows, MinIO, Prometheus, Redis, private apps, ... | [English](./adopters/users/rm3l/README.md)  |
 | [Daniel Sand](https://github.com/danielsand) | Gitea, Postgres, Concourse... | [English](./adopters/users/danielsand/README.md)
 | [Dean Stathos](https://github.com/dstathos) | MariaDB, homegrown applications | [English](./adopters/users/dstathos/README.md)  |
 | [jkuzelka](https://github.com/kuja53) | GitLab, Prometheus, Grafana, Nexus Repository, Elasticsearch, RabbitMQ | [English](./adopters/users/kuja53/README.md) |
