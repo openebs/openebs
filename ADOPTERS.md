@@ -30,6 +30,7 @@ The list of organizations that have publicly shared the usage of OpenEBS:
 | [Stratus5](https://stratus5.com/) | Redis,Ceryx, MySQL, MariaDB, Wordpress | [English](./adopters/stratus5/README.md) |
 | [eXact lab](https://www.exact-lab.it/) | ELK, Prometheus, PostgreSQL, MySQL, Apache Kafka, Grafana, GitLab |  [English](./adopters/exact/README.md) |
 | [TOBG Services Ltd](https://www.tobg.com.de/) | Postgresql, Confluence, Gitlab, Bitcoin Full Node, Bitcoin Lightning Nodes, BTCPay, Cardano Nodes and Pool, Docker Registry, Prometheus, Grafana, Zabbix monitoring, ELK | [English](./adopters/tobgservices/README.md) |
+| [Verizon Media](https://www.verizonmedia.com/) | Jenkins, IDOL license server | [English](./adopters/verizon/README.md) |
 
 The list of users that have publicly shared the usage of OpenEBS.
 
@@ -37,6 +38,7 @@ The list of users that have publicly shared the usage of OpenEBS.
 | :--- | :--- | :--- |
 | [Alin Jurj](https://github.com/Perfect-Web) | Elasticsearch | [English](./adopters/users/Perfect-Web/README.md)  | 
 | [Armel Soro](https://github.com/rm3l) | Ghost blog, MariaDB, Argo Workflows, MinIO, Prometheus, Redis, private apps, ... | [English](./adopters/users/rm3l/README.md)  |
+| [Art Win](https://github.com/artw) | Graylog, Zabbix, Authelia, Guacamole (Elastic, MySQL, MongoDB, Redis) | [English](./adopters/users/artw/README.md)  |
 | [Daniel Sand](https://github.com/danielsand) | Gitea, Postgres, Concourse... | [English](./adopters/users/danielsand/README.md)
 | [Dean Stathos](https://github.com/dstathos) | MariaDB, homegrown applications | [English](./adopters/users/dstathos/README.md)  |
 | [jkuzelka](https://github.com/kuja53) | GitLab, Prometheus, Grafana, Nexus Repository, Elasticsearch, RabbitMQ | [English](./adopters/users/kuja53/README.md) |
