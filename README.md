@@ -81,9 +81,9 @@ The status of various storage engines that power the OpenEBS Persistent Volumes 
 | Jiva | stable | Best suited for running Replicated Block Storage on nodes that make use of ephemeral storage on the Kubernetes worker nodes |
 | cStor | beta | A preferred option for running on nodes that have Block Devices. Recommended option if Snapshot and Clones are required |
 | Local Volumes | beta | Best suited for Distributed Application that need low latency storage - direct-attached storage from the Kubernetes nodes. |
-| Mayastor | alpha | A new storage engine that operates at the efficiency of Local Storage but also offers storage services like Replication. Development is underway to support Snapshots and Clones. |
+| Mayastor | beta | A new storage engine that operates at the efficiency of Local Storage but also offers storage services like Replication. Development is underway to support Snapshots and Clones. |
 
-For more details, please refer to [OpenEBS Documentation](https://docs.openebs.io/docs/next/quickstart.html).
+For more details, please refer to [OpenEBS Documentation](https://docs.openebs.io/docs/next/overview.html).
 
 ## Contributing
 
