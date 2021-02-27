@@ -19,6 +19,7 @@ The list of organizations that have publicly shared the usage of OpenEBS:
 | [CORT](https://www.cort.com/) | Magento, Elasticsearch, MariaDB | [English](./adopters/cort/README.md) |
 | [DISID](https://disid.com/) | Minio, DataStax, Greenplum, Gridgain, mongoDB, Qlickhouse, PosgtreSQL | [English](./adopters/disid/README.md) |
 | [D-Rating](https://www.d-rating.com/) | MongoDB, Elasticsearch, PostgreSQL | [English](./adopters/d-rating/README.md) |
+| [eXact-lab](https://www.exact-lab.it/) | ELK, Prometheus, PostgreSQL, MySQL, Apache Kafka, Grafana, GitLab |  [English](./adopters/exact/README.md) |
 | [Hamravesh](https://github.com/hamravesh) | Multiple minio instances, Multiple docker-in-docker instances | [English](./adopters/hamravesh/README.md) |
 | [IDNT](https://idnt.net/) | Elasticsearch, RabbitMQ, KubeVirt, Prometheus, YugabyteDB, Couchbase, MySQL | [English](./adopters/idnt/README.md) |
 | [KPN](https://www.kpn.com/) | ManageIQ, AWX, Harbor, Selenium Hub based automated UI testing, verdaccio, openshift monitoring (alert manager), openshift monitoring (cassandra) | [English](./adopters/kpn/README.md) |
@@ -28,7 +29,6 @@ The list of organizations that have publicly shared the usage of OpenEBS:
 | [Plaid Cloud](https://github.com/PlaidCloud) | Redis, Prometheus, Elasticsearch, PostgreSQL | [English](./adopters/plaidcloud/README.md) |
 | [Renthopper](https://renthopper.co.uk) | Ruby on Rails with ActiveStorage, Redmine, Docker registry, ownCloud, Mattermost, Bitbucket, Jira and Blynk | [English](./adopters/users/laimison/README.md) |
 | [Stratus5](https://stratus5.com/) | Redis,Ceryx, MySQL, MariaDB, Wordpress | [English](./adopters/stratus5/README.md) |
-| [eXact lab](https://www.exact-lab.it/) | ELK, Prometheus, PostgreSQL, MySQL, Apache Kafka, Grafana, GitLab |  [English](./adopters/exact/README.md) |
 | [TOBG Services Ltd](https://www.tobg.com.de/) | Postgresql, Confluence, Gitlab, Bitcoin Full Node, Bitcoin Lightning Nodes, BTCPay, Cardano Nodes and Pool, Docker Registry, Prometheus, Grafana, Zabbix monitoring, ELK | [English](./adopters/tobgservices/README.md) |
 | [Verizon Media](https://www.verizonmedia.com/) | Jenkins, IDOL license server | [English](./adopters/verizon/README.md) |
 
@@ -45,8 +45,8 @@ The list of users that have publicly shared the usage of OpenEBS.
 | [Maartje Eyskens](https://github.com/meyskens) | Minio | [English](./adopters/users/meyskens/README.md)  | 
 | [Mark V.](https://github.com/mikroskeem) | Concourse CI, Mattermost, Minio, Few game servers, Bunch of micro services | [English](./adopters/users/mikroskeem/README.md)  | 
 | [Mike T.](https://gitlab.com/mterhar) | Coder, Mattermost, Minio | [English](./adopters/users/mterhar/README.md) |
+| [Nick Pappas](https://github.com/radicand) | Wordpress, MariaDB on ARM64 cluster | [English](./adopters/users/radicand/README.md) | 
 | [proegssilb](https://github.com/proegssilb) | PostgreSQL, Redis, Factorio (video game server) | [English](./adopters/users/proegssilb/README.md)  | 
-| [radicand](https://github.com/radicand) | Wordpress, MariaDB on ARM64 cluster | [English](./adopters/users/radicand/README.md) | 
 | [Steve Fan](https://github.com/stevefan1999-personal) | [Agones - Game Servers on K8s](https://agones.dev/site/) | [English](./adopters/users/stevefan/README.md)  | 
 | [tardich](https://github.com/tardich) | Postfix Mail Relay, NextCloud, Nexus Repository, Plex | [English](./adopters/users/tardich/README.md)  | 
 | [V. Aretakis](https://github.com/aretakisv) | Percona, OpenZwave, Traefik, librenms, Multiple MQTT brokers, private applications, Unifi, multiple other stateful applications | [English](./adopters/users/aretakisv/README.md)  |
