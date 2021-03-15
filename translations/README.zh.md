@@ -54,7 +54,7 @@ helm install --namespace openebs --name openebs stable/openebs
 
 同样可以参考我们的 [快速上手指南](https://docs.openebs.io/docs/overview.html)。
 
-OpenEBS 可以部署在任何 Kubernetes 集群上，可以部署在公有云、私有云或开发人员的笔记本电脑 (minikube) 上。请注意，由于OpenEBS 是在用户空间中操作的，所以不需要对底层内核进行任何更改。请遵循我们的 [OpenEBS设置](https://docs.openebs.io/docs/overview.html) 文档。另外，我们有一个 Vagrant 环境，其中包括一个 Kubernetes 部署示例和一个模拟 OpenEBS 性能的综合负载。或许您还会发现一个有趣的相关项目，称为 [Litmus](https://www.openebs.io/litmus)，协助 Kubernetes 上有状态工作负载的混沌工程。
+OpenEBS 可以部署在任何 Kubernetes 集群上，可以部署在公有云、私有云或开发人员的笔记本电脑 (minikube) 上。请注意，由于OpenEBS 是在用户空间中操作的，所以不需要对底层内核进行任何更改。请遵循我们的 [OpenEBS设置](https://docs.openebs.io/docs/overview.html) 文档。另外，我们有一个 Vagrant 环境，其中包括一个 Kubernetes 部署示例和一个模拟 OpenEBS 性能的综合负载。或许您还会发现一个有趣的相关项目，称为 [Litmus](https://litmuschaos.io)，协助 Kubernetes 上有状态工作负载的混沌工程。
 
 ## 项目状态
 
@@ -66,8 +66,8 @@ OpenEBS 是业界最广泛使用和测试的 Kubernetes 存储基础设施之一
 |---|---|---|
 | Jiva | stable | 最适合在使用临时存储的 Kubernetes 工作节点上运行 Replicated Block Storage |
 | cStor | beta | 在具有块设备的节点上的首选。如果需要快照和克隆，建议使用此选项 |
-| Local Volumes | beta | Best suited for Distributed Application that need low latency storage - direct-attached storage from the Kubernetes nodes. Kubernetes 节点上的本地存储-最适合需要低延迟存储的分布式应用程序。|
-| Mayastor | alpha | 一种全新的存储引擎，比肩本地存储的工作效率，同时也提供复制等存储服务。快照和克隆的功能支持正在开发中。|
+| Local Volumes | beta | Kubernetes 节点上的本地存储-最适合需要低延迟存储的分布式应用程序 |
+| Mayastor | alpha | 一种全新的存储引擎，比肩本地存储的工作效率，同时也提供复制等存储服务。快照和克隆的功能支持正在开发中 |
 
 更多详情请参阅 [OpenEBS 文档](https://docs.openebs.io/docs/next/quickstart.html).
 
@@ -80,14 +80,14 @@ OpenEBS 欢迎任何形式的反馈和贡献。
 - 希望反馈问题或参与修复或者贡献特性?
   - 查看 [开放中的问题](https://github.com/openebs/openebs/issues)
   - 查看 [参与贡献说明](./CONTRIBUTING.zh.md)
-  - 想加入我们的社区开发者会议, [点击这里](./community/README.md).
+  - 想加入我们的社区开发者会议, [点击这里](/community/README.md).
 - 加入我们的 OpenEBS CNCF 邮件列表
   - 关注 OpenEBS 项目更新动态，订阅 [OpenEBS 公告](https://lists.cncf.io/g/cncf-openebs-announcements)
   - 与其他 OpenEBS 用户交流, 订阅 [OpenEBS 用户](https://lists.cncf.io/g/cncf-openebs-users)
 
 ## 秀出你的代码
 
-这个是 OpenEBS 的元仓库。 请首先从已置顶的仓库开始。或者查看 [OpenEBS 架构](./contribute/design/README.md) 文档。
+这个是 OpenEBS 的元仓库。 请首先从已置顶的仓库开始。或者查看 [OpenEBS 架构](/contribute/design/README.md) 文档。
 
 ## 协议
 
