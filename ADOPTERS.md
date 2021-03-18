@@ -41,6 +41,7 @@ The list of users that have publicly shared the usage of OpenEBS.
 | [Art Win](https://github.com/artw) | Graylog, Zabbix, Authelia, Guacamole (Elastic, MySQL, MongoDB, Redis) | [English](./adopters/users/artw/README.md)  |
 | [Daniel Sand](https://github.com/danielsand) | Gitea, Postgres, Concourse... | [English](./adopters/users/danielsand/README.md)
 | [Dean Stathos](https://github.com/dstathos) | MariaDB, homegrown applications | [English](./adopters/users/dstathos/README.md)  |
+| [grouchojeff](https://github.com/grouchojeff) | Elasticsearch, MariaDB, MinIO, PostgreSQL, Prometheus, Kafka, Cassandra | [English](./adopters/users/grouchojeff/README.md) |
 | [jkuzelka](https://github.com/kuja53) | GitLab, Prometheus, Grafana, Nexus Repository, Elasticsearch, RabbitMQ | [English](./adopters/users/kuja53/README.md) |
 | [Maartje Eyskens](https://github.com/meyskens) | Minio | [English](./adopters/users/meyskens/README.md)  | 
 | [Mark V.](https://github.com/mikroskeem) | Concourse CI, Mattermost, Minio, Few game servers, Bunch of micro services | [English](./adopters/users/mikroskeem/README.md)  | 
