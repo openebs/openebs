@@ -32,6 +32,7 @@ The list of organizations that have publicly shared the usage of OpenEBS:
 | [Stratus5](https://stratus5.com/) | Redis,Ceryx, MySQL, MariaDB, Wordpress | [English](./adopters/stratus5/README.md) |
 | [TOBG Services Ltd](https://www.tobg.com.de/) | Postgresql, Confluence, Gitlab, Bitcoin Full Node, Bitcoin Lightning Nodes, BTCPay, Cardano Nodes and Pool, Docker Registry, Prometheus, Grafana, Zabbix monitoring, ELK | [English](./adopters/tobgservices/README.md) |
 | [Verizon Media](https://www.verizonmedia.com/) | Jenkins, IDOL license server | [English](./adopters/verizon/README.md) |
+| [Zeta Associates](https://www.zai.com/) | Elasticsearch, MariaDB, MinIO, PostgreSQL, Prometheus, Kafka, Cassandra | [English](./adopters/zetaassociates/README.md) |
 
 The list of users that have publicly shared the usage of OpenEBS.
 
@@ -42,7 +43,6 @@ The list of users that have publicly shared the usage of OpenEBS.
 | [Art Win](https://github.com/artw) | Graylog, Zabbix, Authelia, Guacamole (Elastic, MySQL, MongoDB, Redis) | [English](./adopters/users/artw/README.md)  |
 | [Daniel Sand](https://github.com/danielsand) | Gitea, Postgres, Concourse... | [English](./adopters/users/danielsand/README.md)
 | [Dean Stathos](https://github.com/dstathos) | MariaDB, homegrown applications | [English](./adopters/users/dstathos/README.md)  |
-| [grouchojeff](https://github.com/grouchojeff) | Elasticsearch, MariaDB, MinIO, PostgreSQL, Prometheus, Kafka, Cassandra | [English](./adopters/users/grouchojeff/README.md) |
 | [jkuzelka](https://github.com/kuja53) | GitLab, Prometheus, Grafana, Nexus Repository, Elasticsearch, RabbitMQ | [English](./adopters/users/kuja53/README.md) |
 | [Maartje Eyskens](https://github.com/meyskens) | Minio | [English](./adopters/users/meyskens/README.md)  | 
 | [Mark V.](https://github.com/mikroskeem) | Concourse CI, Mattermost, Minio, Few game servers, Bunch of micro services | [English](./adopters/users/mikroskeem/README.md)  | 

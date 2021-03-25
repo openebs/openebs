@@ -1,3 +1,5 @@
+### **Company**: Zeta Associates ([zai.com](https://www.zai.com/#/))
+
 ### Stateful Applications that you are running on OpenEBS
 Elasticsearch, MariaDB, minio, postgresql, prometheus, kafka, cassandra
 
