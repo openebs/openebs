@@ -3,6 +3,8 @@ oep-number: CSI Volume Provisioning 20190606
 title: CSI Volume Provisioning
 authors:
   - "@amitkumardas"
+  - "@payes"
+  - "@prateekpandey14"
 owners:
   - "@kmova"
   - "@vishnuitta"
@@ -39,9 +41,8 @@ superseded-by:
       * [Volume Creation Workflow](#volume-creation-workflow)
       * [Volume Deletion Workflow](#volume-deletion-workflow)
     * [High Level Design](#high-level-design)
-      * [CStorVolumeConfigClass -- new custom resource](#cstorvolumeconfigclass----new-custom-resource)
-      * [CStorVolumeClaim -- new custom resource](#cstorvolumeclaim----new-custom-resource)
-      * [ConfigInjector -- new custom resource](#configinjector----new-custom-resource)
+      * [CStorVolumePolicy -- new custom resource](#cstorvolumepolicy----new-custom-resource)
+      * [CStorVolumeConfig -- new custom resource](#cstorvolumeconfig----new-custom-resource)
       * [CStorVolume -- existing custom resource](#cstorvolume----existing-custom-resource)
       * [CStorVolumeReplica -- existing custom resource](#cstorvolumereplica----existing-custom-resource)
     * [CVC Controller Patterns](#cvc-controller-patterns)
@@ -72,11 +73,6 @@ the same from inner workings of a container orchestrator.
 
 ### Non-Goals
 
-- Providing tunables w.r.t creating and deleting a volume
-- Coupling CSI implementation with any particular container orchestrator e.g. Kubernetes
-- Ability to resize a volume
-- Ability to take volume snapshots
-- Ability to clone a volume
 - Handling high availability in cases of node restarts
 - Handling volume placement related requirements
 
@@ -95,10 +91,6 @@ consumed by my application. This volume should get deleted only when the
 application is deleted.
 
 ### Implementation Details/Notes/Constraints
-
-There were previous attempts to implement CSI which is tightly coupled with the 
-way Kubernetes works. This attempt will revisit to have an implementation that
-is not tied to Kubernetes native resources.
 
 Current provisioning approach works well given day 1 operations. However, we 
 consider this approach as limiting when day 2 operations come into picture. There
@@ -198,10 +190,8 @@ implement features via Custom Resources.
 - CSI driver will handle CSI request for volume create
 - Kubernetes will have following as part of the infrastructure required to operate 
 OpenEBS CSI driver
-  - CStorVolumeConfigClass _(Kubernetes custom resource)_
-- CSI driver will read the request parameters and create following resources:
-  - CStorVolumeClaim _(Kubernetes custom resource)_
-- CStorVolumeClaim will be watched and reconciled by a dedicated controller
+  - CStorVolumeConfig _(Kubernetes custom resource)_
+- CStorVolumeConfig will be watched and reconciled by a dedicated controller
 
 #### Volume Deletion Workflow
 - CSI driver will handle CSI request for volume delete
@@ -221,25 +211,23 @@ orchestrator.
                 \|/
                [PV]
 
-                                      [CStorVolumeConfigClass]
+                                      [CStorVolumePolicy]
                                                  |
                                                  |6
                                                 \|/
---3-->[CStorVolumeClaim]--5-->(CStorVolumeClaimController)
+--3-->[CStorVolumeConfig]--5-->(CStorVolumeConfigController)
 
 
-[Mount]--7-->(CSI Node)--8-->[CStorVolumeClaim]--9-->(CStorVolumeClaimController)--10-->
+[Mount]--7-->(CSI Node)--8-->[CStorVolumeConfig]--9-->(CStorVolumeConfigController)--10-->
 
---10-->[CStorVolume + ConfigInjector + Deployment + Service + CStorVolumeReplica(s)]
+--10-->[CStorVolume + Deployment + Service + CStorVolumeReplica(s)]
 ```
 
 Below represents owner and owned resources
 ```
                     |--- CStorVolume..................K8s Custom Resource
                     |
-                    |--- ConfigInjector...............K8s Custom Resource
-                    |
-CStorVolumeClaim ---|--- CStor Target.................K8s Deployment
+CStorVolumeConfig --|--- CStor Target.................K8s Deployment
                     |
                     |--- CStor Target Service.........K8s Service
                     |
@@ -250,88 +238,153 @@ CStorVolumeClaim ---|--- CStor Target.................K8s Deployment
       owner                                    owned
 ```
 
-Below represents resources that are in a constant state of reconciliation
+Bow represents resources that are in a constant state of reconciliation
 ```
                     |--- CStorVolume
-                    |   
-CStorVolumeClaim ---|--- ConfigInjector
-                    |
+CStorVolumeConfig ---|
                     |--- CStorVolumeReplica
-
-
-                    |--- CStor Target
-                    |
-                    |--- CStor Service
-ConfigInjector -----|
-                    |--- CStorVolumeReplica
-                    |
-                    |--- CStorVolume
 ```
 
 Next sections provide details on these resources that work in tandem to ensure 
 smooth volume create & delete operations.
 
-#### CStorVolumeConfigClass -- new custom resource
-This is a new Kubernetes custom resource that holds config information to be
-used by cstor volume claim controller while provisioning cstor volumes.
+#### CStorVolumePolicy -- new custom resource
+This is a new Kubernetes custom resource that holds volume policy information to be
+used by cstor volume config controller while provisioning cstor volumes.
+
+Whenever a cstor volume policy field is changed by the user, webhook inturrupts
+and updates the phase as reconciling. It is assumed if webhook server is not running,
+the editing of the resource would not be allowed. On detecting the phase as reconciling,
+the CVC controller will reverify all the policies and update the change to the
+corresponding resource. After successful changes, phase is updated back to bound.
 
 NOTE: This resource kind does not have a controller i.e. watcher logic. It holds
-the config information to be utilized by cstor volume claim controller.
+the config policy information to be utilized by cstor volume config controller.
 
-Following is the proposed schema for `CStorVolumeConfigClass`:
+Following is the proposed schema for `CStorVolumePolicy`:
 
-```yaml
-kind: CStorVolumeConfigClass
-metadata:
-  name: <some name -- can be same as storage class name>
-  namespace: <namespace of openebs i.e. openebs system namespace>
-spec:
-  targetDeployment:
-    # this gets applied to cstor volume target
-    # deployment via ConfigInjector
-    spec:
-  targetService:
-    # this gets applied to cstor volume target
-    # service via ConfigInjector 
-    spec:
-  cv:
-    # this gets applied to CStorVolume via 
-    # ConfigInjector
-    spec:
-  cvr:
-    # this gets applied to all CStorVolumeReplicas
-    # via ConfigInjector
-    spec:
-```
+```go
+type CStorVolumePolicy struct {
+	metav1.TypeMeta   `json:",inline"`
+	metav1.ObjectMeta `json:"metadata,omitempty"`
+	// Spec defines a configuration info of a cstor volume required
+	// to provisione cstor volume resources
+	Spec   CStorVolumePolicySpec   `json:"spec"`
+	Status CStorVolumePolicyStatus `json:"status,omitempty"`
+}
 
-Detailed specifications:
-```yaml
-kind: CStorVolumeConfigClass
-metadata:
-  name: <some name -- can be same as storage class name>
-  namespace: <namespace of openebs i.e. openebs system namespace>
-spec:
-  targetDeployment:
-    spec:
-      containers:
-      - name: cstor-istgt
-        env:
-        - name: QueueDepth
-          value: 6
-        - name: Luworkers
-          value: 3
-  targetService:
-    spec:
-      labels:
-      annotations:
-  cv:
-    spec:
-      labels:
-      annotations:
-  cvr:
-    spec:
-      labels:
-      annotations:
+// CStorVolumePolicySpec ...
+type CStorVolumePolicySpec struct {
+	// replicaAffinity is set to true then volume replica resources need to be
+	// distributed across the pool instances
+	Provision Provision `json:"provision,omitempty"`
+
+	// TargetSpec represents configuration related to cstor target and its resources
+	Target TargetSpec `json:"target,omitempty"`
+
+	// ReplicaSpec represents configuration related to replicas resources
+	Replica ReplicaSpec `json:"replica,omitempty"`
+
+	// ReplicaPoolInfo holds the pool information of volume replicas.
+	// Ex: If volume is provisioned on which CStor pool volume replicas exist
+	ReplicaPoolInfo []ReplicaPoolInfo `json:"replicaPoolInfo,omitempty"`
+}
+
+// TargetSpec represents configuration related to cstor target and its resources
+type TargetSpec struct {
+	// QueueDepth sets the queue size at iSCSI target which limits the
+	// ongoing IO count from client
+	QueueDepth string `json:"queueDepth,omitempty"`
+
+	// IOWorkers sets the number of threads that are working on above queue
+	IOWorkers int64 `json:"luWorkers,omitempty"`
+
+	// Monitor enables or disables the target exporter sidecar
+	Monitor bool `json:"monitor,omitempty"`
+
+	// ReplicationFactor represents maximum number of replicas
+	// that are allowed to connect to the target
+	ReplicationFactor int64 `json:"replicationFactor,omitempty"`
+
+	// Resources are the compute resources required by the cstor-target
+	// container.
+	Resources *corev1.ResourceRequirements `json:"resources,omitempty"`
+
+	// AuxResources are the compute resources required by the cstor-target pod
+	// side car containers.
+	AuxResources *corev1.ResourceRequirements `json:"auxResources,omitempty"`
+
+	// Tolerations, if specified, are the target pod's tolerations
+	Tolerations []corev1.Toleration `json:"tolerations,omitempty"`
+
+	// PodAffinity if specified, are the target pod's affinities
+	PodAffinity *corev1.PodAffinity `json:"affinity,omitempty"`
+
+	// NodeSelector is the labels that will be used to select
+	// a node for target pod scheduleing
+	// Required field
+	NodeSelector map[string]string `json:"nodeSelector,omitempty"`
+
+	// PriorityClassName if specified applies to this target pod
+	// If left empty, no priority class is applied.
+	PriorityClassName string `json:"priorityClassName,omitempty"`
+}
+
+// ReplicaSpec represents configuration related to replicas resources
+type ReplicaSpec struct {
+	// IOWorkers represents number of threads that executes client IOs
+	IOWorkers string `json:"zvolWorkers,omitempty"`
+	// Controls the compression algorithm used for this volumes
+	// examples: on|off|gzip|gzip-N|lz4|lzjb|zle
+	//
+	// Setting compression to "on" indicates that the current default compression
+	// algorithm should be used.The default balances compression and decompression
+	// speed, with compression ratio and is expected to work well on a wide variety
+	// of workloads. Unlike all other set‐tings for this property, on does not
+	// select a fixed compression type.  As new compression algorithms are added
+	// to ZFS and enabled on a pool, the default compression algorithm may change.
+	// The current default compression algorithm is either lzjb or, if the
+	// `lz4_compress feature is enabled, lz4.
+
+	// The lz4 compression algorithm is a high-performance replacement for the lzjb
+	// algorithm. It features significantly faster compression and decompression,
+	// as well as a moderately higher compression ratio than lzjb, but can only
+	// be used on pools with the lz4_compress
+
+	// feature set to enabled.  See zpool-features(5) for details on ZFS feature
+	// flags and the lz4_compress feature.
+
+	// The lzjb compression algorithm is optimized for performance while providing
+	// decent data compression.
+
+	// The gzip compression algorithm uses the same compression as the gzip(1)
+	// command.  You can specify the gzip level by using the value gzip-N,
+	// where N is an integer from 1 (fastest) to 9 (best compression ratio).
+	// Currently, gzip is equivalent to gzip-6 (which is also the default for gzip(1)).
+
+	// The zle compression algorithm compresses runs of zeros.
+	Compression string `json:"compression,omitempty"`
+}
+
+// Provision represents different provisioning policy for cstor volumes
+type Provision struct {
+	// replicaAffinity is set to true then volume replica resources need to be
+	// distributed across the cstor pool instances based on the given topology
+	ReplicaAffinity bool `json:"replicaAffinity"`
+	// BlockSize is the logical block size in multiple of 512 bytes
+	// BlockSize specifies the block size of the volume. The blocksize
+	// cannot be changed once the volume has been written, so it should be
+	// set at volume creation time. The default blocksize for volumes is 4 Kbytes.
+	// Any power of 2 from 512 bytes to 128 Kbytes is valid.
+	BlockSize uint32 `json:"blockSize,omitempty"`
+}
+
+// ReplicaPoolInfo represents the pool information of volume replica
+type ReplicaPoolInfo struct {
+	// PoolName represents the pool name where volume replica exists
+	PoolName string `json:"poolName"`
+	// UID also can be added
+}
 ```
 
 ##### NOTES
@@ -349,122 +402,157 @@ will be of same data type
   - & so on
 - `spec.*.spec` will mostly reflect the fields supported by Pod kind
 
-#### CStorVolumeClaim -- new custom resource
+#### CStorVolumeConfig -- new custom resource
 This resource is built & created by the CSI driver on a volume create request.
 This resource will be the trigger to get the desired i.e. requested cstor volume
-into the actual state in Kubernetes cluster. CStorVolumeClaim controller will 
-reconcile this claim into actual resources. CStorVolumeClaim controller will 
-operate from within the maya-apiserver pod.
+into the actual state in Kubernetes cluster. CStorVolumeConfig controller will 
+reconcile this config into actual resources. CStorVolumeConfig controller will 
+will be deployed as k8s deployment in k8s cluster.
 
-CStorVolumeClaim will be reconciled into following owned resources:
-- ConfigInjector _(Kubernetes custom resource)_
+CStorVolumeConfig will be reconciled into following owned resources:
 - CStorVolume _(Kubernetes custom resource)_
 - CStor volume target _(Kubernetes Deployment)_
 - CStor volume service _(Kubernetes Service)_
 - CStorVolumeReplica _(Kubernetes custom resource)_
 
-Following is the proposed schema for `CStorVolumeClaim`:
+Following is the proposed schema for `CStorVolumeConfig`:
 
-```yaml
-kind: CStorVolumeClaim
-metadata:
-  name: <name of the volume>
-  namespace: <openebs system namespace>
-  labels:
-  annotations:
-    openebs.io/config-class: 
-    openebs.io/volume-id:
-spec:
-  capacity:
-  claimRef:
-publish:
-  nodeId:
-status:
-  phase: # INIT, BOUND and ERROR can be the supported phases
+```go
+type CStorVolumeConfig struct {
+	metav1.TypeMeta   `json:",inline"`
+	metav1.ObjectMeta `json:"metadata,omitempty"`
+	// Spec defines a specification of a cstor volume config required
+	// to provisione cstor volume resources
+	Spec CStorVolumeConfigSpec `json:"spec"`
 
-  # conditions represent current reconciliation
-  # activities
-  conditions:
-  - type:  # RESIZE_IN_PROGRES, etc. TODO Need to think of proper names.
-    active:
-    message:
-    createdAt:
-    lastUpdatedAt:
-    count:
+	// Publish contains info related to attachment of a volume to a node.
+	// i.e. NodeId etc.
+	Publish CStorVolumeConfigPublish `json:"publish,omitempty"`
+
+	// Status represents the current information/status for the cstor volume
+	// config, populated by the controller.
+	Status         CStorVolumeConfigStatus `json:"status"`
+	VersionDetails VersionDetails          `json:"versionDetails"`
+}
+
+// CStorVolumeConfigSpec is the spec for a CStorVolumeConfig resource
+type CStorVolumeConfigSpec struct {
+	// Capacity represents the actual resources of the underlying
+	// cstor volume.
+	Capacity corev1.ResourceList `json:"capacity"`
+	// CStorVolumeRef has the information about where CstorVolumeClaim
+	// is created from.
+	CStorVolumeRef *corev1.ObjectReference `json:"cstorVolumeRef,omitempty"`
+	// CStorVolumeSource contains the source volumeName@snapShotname
+	// combaination.  This will be filled only if it is a clone creation.
+	CStorVolumeSource string `json:"cstorVolumeSource,omitempty"`
+	// Provision represents the initial volume configuration for the underlying
+	// cstor volume based on the persistent volume request by user. Provision
+	// properties are immutable
+	Provision VolumeProvision `json:"provision"`
+	// Policy contains volume specific required policies target and replicas
+	Policy CStorVolumePolicySpec `json:"policy"`
+}
+
+type VolumeProvision struct {
+	// Capacity represents initial capacity of volume replica required during
+	// volume clone operations to maintain some metadata info related to child
+	// resources like snapshot, cloned volumes.
+	Capacity corev1.ResourceList `json:"capacity"`
+	// ReplicaCount represents initial cstor volume replica count, its will not
+	// be updated later on based on scale up/down operations, only readonly
+	// operations and validations.
+	ReplicaCount int `json:"replicaCount"`
+}
+
+// CStorVolumeConfigPublish contains info related to attachment of a volume to a node.
+// i.e. NodeId etc.
+type CStorVolumeConfigPublish struct {
+	// NodeID contains publish info related to attachment of a volume to a node.
+	NodeID string `json:"nodeId,omitempty"`
+}
+
+// CStorVolumeConfigPhase represents the current phase of CStorVolumeConfig.
+type CStorVolumeConfigPhase string
+
+const (
+	//CStorVolumeConfigPhasePending indicates that the cvc is still waiting for
+	//the cstorvolume to be created and bound
+	CStorVolumeConfigPhasePending CStorVolumeConfigPhase = "Pending"
+
+	//CStorVolumeConfigPhaseBound indiacates that the cstorvolume has been
+	//provisioned and bound to the cstor volume config
+	CStorVolumeConfigPhaseBound CStorVolumeConfigPhase = "Bound"
+
+	//CStorVolumeConfigPhaseFailed indiacates that the cstorvolume provisioning
+	//has failed
+	CStorVolumeConfigPhaseFailed CStorVolumeConfigPhase = "Failed"
+)
+
+// CStorVolumeConfigStatus is for handling status of CstorVolume Claim.
+// defines the observed state of CStorVolumeConfig
+type CStorVolumeConfigStatus struct {
+	// Phase represents the current phase of CStorVolumeConfig.
+	Phase CStorVolumeConfigPhase `json:"phase,omitempty"`
+
+	// PoolInfo represents current pool names where volume replicas exists
+	PoolInfo []string `json:"poolInfo,omitempty"`
+
+	// Capacity the actual resources of the underlying volume.
+	Capacity corev1.ResourceList `json:"capacity,omitempty"`
+
+	Conditions []CStorVolumeConfigCondition `json:"condition,omitempty"`
+}
+
+// CStorVolumeConfigCondition contains details about state of cstor volume
+type CStorVolumeConfigCondition struct {
+	// Current Condition of cstor volume config. If underlying persistent volume is being
+	// resized then the Condition will be set to 'ResizeStarted' etc
+	Type CStorVolumeConfigConditionType `json:"type"`
+	// Last time we probed the condition.
+	// +optional
+	LastProbeTime metav1.Time `json:"lastProbeTime,omitempty"`
+	// Last time the condition transitioned from one status to another.
+	// +optional
+	LastTransitionTime metav1.Time `json:"lastTransitionTime,omitempty"`
+	// Reason is a brief CamelCase string that describes any failure
+	Reason string `json:"reason"`
+	// Human-readable message indicating details about last transition.
+	Message string `json:"message"`
+}
+
+// CStorVolumeConfigConditionType is a valid value of CstorVolumeConfigCondition.Type
+type CStorVolumeConfigConditionType string
+
+// These constants are CVC condition types related to resize operation.
+const (
+	// CStorVolumeConfigResizePending ...
+	CStorVolumeConfigResizing CStorVolumeConfigConditionType = "Resizing"
+	// CStorVolumeConfigResizeFailed ...
+	CStorVolumeConfigResizeFailed CStorVolumeConfigConditionType = "VolumeResizeFailed"
+	// CStorVolumeConfigResizeSuccess ...
+	CStorVolumeConfigResizeSuccess CStorVolumeConfigConditionType = "VolumeResizeSuccessful"
+	// CStorVolumeConfigResizePending ...
+	CStorVolumeConfigResizePending CStorVolumeConfigConditionType = "VolumeResizePending"
+)
 ```
-
-#### ConfigInjector -- new custom resource
-This is a new Kubernetes custom resource whose object will get created by cstor
-volume claim controller. This resource gets built and applied by cstor volume 
-claim controller after referring to `CStorVolumeConfigClass`.
-
-ConfigInjector kind has its dedicated controller residing in maya api 
-server. The job of this controller is to inject infrastructure related 
-configurations to targeted Kubernetes resources (native as well as custom).
-
-_NOTE: ConfigInjector is a generic resource and is not tied to cstor volume operations._
-
-_NOTE: This can be implemented as part of Phase 2 of CSI implementation_
-
-Following is the proposed schema for `ConfigInjector`:
-
-```yaml
-kind: ConfigInjector
-metadata:
-  name: <name of cstor volume -- in this case>
-  namespace: <openebs system namespace -- in this case>
-spec:
-  policies:
-  - name:   # name given to this injection
-    select: # select kubernetes resource(s)
-    apply:  # apply values against above selected kubernetes resource(s)
-```
-
-```yaml
-kind: ConfigInjector
-metadata:
-  name: <name of cstor volume>
-  namespace: <openebs system namespace>
-spec:
-  policies:
-  - name: inject-perf-tunables
-    select: 
-      kind: Deployment
-      name: <name of cstor volume deployment>
-      namespace: <openebs system namespace>
-    apply:
-      containers:
-      - name: cstor-istgt
-        env:
-        - name: QueueDepth
-          value: 6
-        - name: Luworkers
-          value: 3
-```
-
-##### NOTES:
-- policies[*].apply will have below fields:
-  - labels,
-  - annotations,
-  - owners,
-  - nodeAffinity,
-  - podAntiAffinity,
-  - containers,
-  - initContainers,
-  - & so on
-- policies[*].apply will mostly reflect the fields supported by Pod kind
 
 #### CStorVolume -- existing custom resource
 
+Refer [CStorVolume APIs Spec](https://github.com/openebs/api/blob/master/pkg/apis/cstor/v1/cstorvolume.go)
+
 #### CStorVolumeReplica -- existing custom resource
+
+Refer [CStorVolumeReplica APIs Spec](https://github.com/openebs/api/blob/master/pkg/apis/cstor/v1/cstorvolumereplica.go)
 
 ### CVC Controller Patterns
 These are some of the controller patterns that can be followed while implementing
 controllers.
 
-- Status.Phase of a CStorVolumeClaim (CVC) resource can have following:
+- Status.Phase of a CStorVolumeConfig (CVC) resource can have following:
   - Pending
   - Bound
+  - Reconciling
 - Status.Phase is only set during creation
   - Once the phase is Bound it should never revert to Pending
 - Status.Conditions will be used to track an on-going operation or sub status-es
@@ -477,34 +565,34 @@ controllers.
   - An item within a condition can be updated by a separate controller
     - The resource’s own controller still holds the right to delete this condition item
 
-Below is a sample schema snippet for `CStorVolumeClaimStatus` resource
+Below is a sample schema snippet for `CStorVolumeConfigStatus` resource
 ```go
-type CStorVolumeClaimStatus struct {
-  Phase      CStorVolumeClaimPhase       `json:"phase"`
-  Conditions []CStorVolumeClaimCondition `json:"conditions"`
+type CStorVolumeConfigStatus struct {
+  Phase      CStorVolumeConfigPhase       `json:"phase"`
+  Conditions []CStorVolumeConfigCondition `json:"conditions"`
 }
 
-type CStorVolumeClaimCondition struct {
-  Type                CStorVolumeClaimConditionType   `json:"type"`
-  Status              CStorVolumeClaimConditionStatus `json:"status"`
+type CStorVolumeConfigCondition struct {
+  Type                CStorVolumeConfigConditionType   `json:"type"`
+  Status              CStorVolumeConfigConditionStatus `json:"status"`
   LastTransitionTime  metav1.Time                     `json:"lastTransitionTime"`
   LastUpdateTime      metav1.Time                     `json:"lastUpdateTime"`
   Reason              string                          `json:"reason"`
   Message             string                          `json:"message"`
 }
 
-type CStorVolumeClaimConditionType string
+type CStorVolumeConfigConditionType string
 
 const (
-  CVCConditionResizing CStorVolumeClaimConditionType = "resizing"
+  CVCConditionResizing CStorVolumeConfigConditionType = "resizing"
 )
 
-type CStorVolumeClaimConditionStatus string
+type CStorVolumeConfigConditionStatus string
 
 const (
-  CVCConditionStatusTrue    CStorVolumeClaimConditionStatus = "true"
-  CVCConditionStatusFalse   CStorVolumeClaimConditionStatus = "false"
-  CVCConditionStatusUnknown CStorVolumeClaimConditionStatus = "unknown"
+  CVCConditionStatusTrue    CStorVolumeConfigConditionStatus = "true"
+  CVCConditionStatusFalse   CStorVolumeConfigConditionStatus = "false"
+  CVCConditionStatusUnknown CStorVolumeConfigConditionStatus = "unknown"
 )
 ```
 
@@ -517,13 +605,9 @@ requirements.
 This will involve considerable risk in terms of time and effort since existing way
 that works will be done away with.
 
-Below can pose a significant challenge for this proposal:
-- Volume provisioning is tightly coupled with Clone provisioning
-- There might be a need to change existing custom resources' schema
-
-We shall try to avoid major disruptions, by having following processes in place:
-- Test Driven Development (TDD) methodology
-  - Need to implement automated test cases in parallel to development
+We shall try to avoid major disruptions, by having the following processes in place:
+- Test-Driven Development (TDD) methodology
+  - Need to implement automated test cases in parallel to the development
 - Try to reuse custom resources that enable provisioning openebs volumes
 
 ## Graduation Criteria
