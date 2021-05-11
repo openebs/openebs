@@ -27,15 +27,14 @@ Release branches need to be created for the following repositories:
 - openebs/libcstor
 - openebs/cstor
 - openebs/istgt
-- openebs/external-storage
-- openebs/maya
 - openebs/velero-plugin
 - openebs/cstor-csi
 - openebs/jiva-operator
-- openebs/jiva-csi
 - openebs/api
 - openebs/cstor-operators
 - openebs/upgrade
+- openebs/dynamic-localpv-provisioner
+- openebs/m-exporter
 
 The following repositories currently follow a custom release version.
 - openebs/node-disk-manager
@@ -71,18 +70,17 @@ Each repository has the automation scripts setup to push the container images to
 Once a release made on a repository, Travis will trigger the release on the dependent repositories. The release tree looks as follows:
 
 - openebs/linux-utils
+  - openebs/dynamic-localpv-provisioner
   - openebs/jiva
+    - openebs/jiva-operator
   - openebs/cstor
   - openebs/libcstor
+    - openebs/m-exporter
     - openebs/istgt
       - openebs/cstor-operators
-      - openebs/external-storage
-        - openebs/maya
-          - openebs/velero-plugin
-          - openebs/cstor-csi
-          - openebs/upgrade
-          - openebs/jiva-operator
-            - openebs/jiva-csi
+        - openebs/velero-plugin
+        - openebs/cstor-csi
+        - openebs/upgrade
 
 The following repositories currently follow a different release versioning than other components, so these are triggered parallely. 
 - openebs/node-disk-manager
