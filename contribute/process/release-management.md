@@ -39,12 +39,21 @@ Release branches need to be created for the following repositories:
 The following repositories currently follow a custom release version.
 - openebs/node-disk-manager
 - openebs/zfs-localpv
+- openebs/lvm-localpv
+- openebs/rawfile-localpv
 
 The following repositories are under active development and releases are created from master branch.
 - openebs/Mayastor
 - openebs/linux-utils
-- openebs/rawfile-localpv
 - openebs/monitor-pv
+- openebs/dynamic-nfs-provisioner
+- openebs/device-localpv
+- openebs/openebsctl
+- openebs/monitoring
+
+The following repositories are deprecated and will be manually tagged
+- openebs/maya
+- openebs/openebs-k8s-provisioner
 
 To verify that release branches are created, you can run the following script:
 
