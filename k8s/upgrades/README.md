@@ -2,6 +2,12 @@
 
 ## Important Notice
 
+- The community e2e pipelines verify upgrade testing only from non-deprecated releases (1.8 and higher) to 2.9. If you are running on release older than 1.8, OpenEBS recommends you upgrade to the latest version as soon as possible.
+
+- OpenEBS has deprecated arch specific container images in favor of multi-arch container images. After 2.6, the arch specific images are not pushed to Docker or Quay repositories. For example, images like cstor-pool-arm64:2.8.0 should be replaced with corresponding multi-arch image cstor-pool:2.8.0.
+
+- If you are upgrading Jiva volumes that are running in version 1.6 and 1.7, you must use these [pre-upgrade steps](https://github.com/openebs/charts/tree/gh-pages/scripts/jiva-tools) to check if your jiva volumes are impacted by [#2956](https://github.com/openebs/openebs/issues/2956).
+
 ### Migration of cStor Pools/Volumes to latest CSPC Pools/CSI based Volumes
 
 OpenEBS 2.0.0 moves the cStor engine towards `v1` schema and CSI based provisioning. To migrate from old SPC based pools and cStor external-provisioned volume to CSPC based pools and cStor CSI volumes follow the steps mentioned in the [Migration doc](https://github.com/openebs/upgrade/blob/master/docs/migration.md). 
