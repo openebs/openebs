@@ -27,25 +27,30 @@ Release branches need to be created for the following repositories:
 - openebs/libcstor
 - openebs/cstor
 - openebs/istgt
-- openebs/external-storage
-- openebs/maya
 - openebs/velero-plugin
 - openebs/cstor-csi
 - openebs/jiva-operator
-- openebs/jiva-csi
 - openebs/api
 - openebs/cstor-operators
 - openebs/upgrade
+- openebs/dynamic-localpv-provisioner
+- openebs/m-exporter
 
 The following repositories currently follow a custom release version.
 - openebs/node-disk-manager
 - openebs/zfs-localpv
-
-The following repositories are under active development and releases are created from master branch.
-- openebs/Mayastor
-- openebs/linux-utils
+- openebs/lvm-localpv
 - openebs/rawfile-localpv
+- openebs/Mayastor
+
+The following repositories are under active development and releases are created from main branch.
+- openebs/linux-utils
 - openebs/monitor-pv
+- openebs/dynamic-nfs-provisioner
+- openebs/device-localpv
+- openebs/openebsctl
+- openebs/monitoring
+
 
 To verify that release branches are created, you can run the following script:
 
@@ -71,28 +76,37 @@ Each repository has the automation scripts setup to push the container images to
 Once a release made on a repository, Travis will trigger the release on the dependent repositories. The release tree looks as follows:
 
 - openebs/linux-utils
+  - openebs/dynamic-localpv-provisioner
   - openebs/jiva
+    - openebs/jiva-operator
   - openebs/cstor
   - openebs/libcstor
+    - openebs/m-exporter
     - openebs/istgt
       - openebs/cstor-operators
-      - openebs/external-storage
-        - openebs/maya
-          - openebs/velero-plugin
-          - openebs/cstor-csi
-          - openebs/upgrade
-          - openebs/jiva-operator
-            - openebs/jiva-csi
+        - openebs/velero-plugin
+        - openebs/cstor-csi
+        - openebs/upgrade
 
 The following repositories currently follow a different release versioning than other components, so these are triggered parallely. 
 - openebs/node-disk-manager
 - openebs/zfs-localpv
 - openebs/Mayastor
+- openebs/lvm-localpv
+- openebs/rawfile-localpv
+
 
 The following repositories are under active development and are not yet added into the release process. These needs to be manually tagged on-demand.
 - openebs/api
-- openebs/rawfile-localpv
 - openebs/monitor-pv
+- openebs/dynamic-nfs-provisioner
+- openebs/device-localpv
+- openebs/openebsctl
+- openebs/monitoring
+
+The following repositories are being deprecated and will be manually tagged.
+- openebs/maya
+- openebs/openebs-k8s-provisioner
 
 Once the release is triggered, Travis build process has to be monitored. Once Travis builds are passed, images are pushed to docker hub and quay.io. Images can be verified by going through docker hub and quay.io. Also the images shouldn't have any critical security vulnerabilities.
 Example:
