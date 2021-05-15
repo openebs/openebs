@@ -41,9 +41,9 @@ The following repositories currently follow a custom release version.
 - openebs/zfs-localpv
 - openebs/lvm-localpv
 - openebs/rawfile-localpv
-
-The following repositories are under active development and releases are created from master branch.
 - openebs/Mayastor
+
+The following repositories are under active development and releases are created from main branch.
 - openebs/linux-utils
 - openebs/monitor-pv
 - openebs/dynamic-nfs-provisioner
@@ -51,9 +51,6 @@ The following repositories are under active development and releases are created
 - openebs/openebsctl
 - openebs/monitoring
 
-The following repositories are deprecated and will be manually tagged
-- openebs/maya
-- openebs/openebs-k8s-provisioner
 
 To verify that release branches are created, you can run the following script:
 
@@ -95,11 +92,21 @@ The following repositories currently follow a different release versioning than 
 - openebs/node-disk-manager
 - openebs/zfs-localpv
 - openebs/Mayastor
+- openebs/lvm-localpv
+- openebs/rawfile-localpv
+
 
 The following repositories are under active development and are not yet added into the release process. These needs to be manually tagged on-demand.
 - openebs/api
-- openebs/rawfile-localpv
 - openebs/monitor-pv
+- openebs/dynamic-nfs-provisioner
+- openebs/device-localpv
+- openebs/openebsctl
+- openebs/monitoring
+
+The following repositories are being deprecated and will be manually tagged.
+- openebs/maya
+- openebs/openebs-k8s-provisioner
 
 Once the release is triggered, Travis build process has to be monitored. Once Travis builds are passed, images are pushed to docker hub and quay.io. Images can be verified by going through docker hub and quay.io. Also the images shouldn't have any critical security vulnerabilities.
 Example:
