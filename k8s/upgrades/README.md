@@ -2,11 +2,11 @@
 
 ## Important Notice
 
-- The community e2e pipelines verify upgrade testing only from non-deprecated releases (1.8 and higher) to 2.9. If you are running on release older than 1.8, OpenEBS recommends you upgrade to the latest version as soon as possible.
+- The community e2e pipelines verify upgrade testing only from non-deprecated releases (1.8.0 and higher) to 2.9.0. If you are running on release older than 1.8.0, OpenEBS recommends you upgrade to the latest version as soon as possible.
 
-- OpenEBS has deprecated arch specific container images in favor of multi-arch container images. After 2.6, the arch specific images are not pushed to Docker or Quay repositories. For example, images like cstor-pool-arm64:2.8.0 should be replaced with corresponding multi-arch image cstor-pool:2.8.0.
+- OpenEBS has deprecated arch specific container images in favor of multi-arch container images. After 2.6.0, the arch specific images are not pushed to Docker or Quay repositories. For example, images like cstor-pool-arm64:2.8.0 should be replaced with corresponding multi-arch image cstor-pool:2.8.0.
 
-- If you are upgrading Jiva volumes that are running in version 1.6 and 1.7, you must use these [pre-upgrade steps](https://github.com/openebs/charts/tree/gh-pages/scripts/jiva-tools) to check if your jiva volumes are impacted by [#2956](https://github.com/openebs/openebs/issues/2956).
+- If you are upgrading Jiva volumes that are running in version 1.6.0 and 1.7.0, you must use these [pre-upgrade steps](https://github.com/openebs/charts/tree/gh-pages/scripts/jiva-tools) to check if your jiva volumes are impacted by [#2956](https://github.com/openebs/openebs/issues/2956).
 
 ### Migration of cStor Pools/Volumes to latest CSPC Pools/CSI based Volumes
 
@@ -42,12 +42,16 @@ The upgrade of OpenEBS is a three step process:
 
 ## Step 1: Prerequisites
 
-**Note: It is mandatory to make sure to that all OpenEBS control plane
-and data plane components are running with the expected version before the upgrade.**
-- **For upgrading to the latest release (2.9.0), the previous version should be minimum 1.6.0 **
+**Note: All steps described in this document need to be performed from a machine that has access to Kubernetes master.**
 
-**Note: All steps described in this document need to be performed from a
-machine that has access to Kubernetes master**
+**Note: It is mandatory to make sure to that all OpenEBS control plane and data plane components are running with the expected version before the upgrade.**
+
+**Note: If the current version is 2.0.0 or below please run the given command to cleanup old upgradetask resources which can result in [error](https://github.com/openebs/openebs/issues/3392).**
+```bash
+kubectl -n <openebs-namespace> delete utasks --all
+```
+
+- **For upgrading to the latest release (2.9.0), the previous version should be minimum 1.6.0**
 
 - Note down the `namespace` where openebs components are installed.
   The following document assumes that namespace to be `openebs`.
