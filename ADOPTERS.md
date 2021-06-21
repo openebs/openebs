@@ -22,6 +22,7 @@ The list of organizations that have publicly shared the usage of OpenEBS:
 | [eXact-lab](https://www.exact-lab.it/) | ELK, Prometheus, PostgreSQL, MySQL, Apache Kafka, Grafana, GitLab |  [English](./adopters/exact/README.md) |
 | [Hamravesh](https://github.com/hamravesh) | Multiple minio instances, Multiple docker-in-docker instances | [English](./adopters/hamravesh/README.md) |
 | [IDNT](https://idnt.net/) | Elasticsearch, RabbitMQ, KubeVirt, Prometheus, YugabyteDB, Couchbase, MySQL | [English](./adopters/idnt/README.md) |
+| Jerabi Inc. | InfluxDB, MariaDB, Elasticsearch, Neo4j, Prometheus, Grafana, AlertManager | [English](./adopters/jerabi/README.md) |
 | [KPN](https://www.kpn.com/) | ManageIQ, AWX, Harbor, Selenium Hub based automated UI testing, verdaccio, openshift monitoring (alert manager), openshift monitoring (cassandra) | [English](./adopters/kpn/README.md) |
 | [KubeSphere](https://kubesphere.io) | [KubeSphere](https://github.com/kubesphere/kubesphere), there are some stateful components of KubeSphere including Redis, MySQL, Elasticsearch, Prometheus, etc. | [English](./adopters/kubesphere/README.md) |
 | Lannister Investments LTD | Prometheus, Grafana, Elasticsearch, PostgreSQL DB, Redis | [English](./adopters/lannisterinvestments/README.md) |
