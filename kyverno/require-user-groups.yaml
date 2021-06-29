@@ -1,0 +1,66 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: require-user-groups
+  namespace: openebs
+  annotations:
+    policies.kyverno.io/category: Pod Security Standards (Privileged)
+    policies.kyverno.io/severity: medium
+    policies.kyverno.io/subject: Pod
+    policies.kyverno.io/description: >-
+      Containers should allow to run with a root primary or supplementary GID.
+spec:
+  validationFailureAction: audit
+  background: true
+  rules:
+    - name: user-groups
+      match:
+        resources:
+          name: check-runasuser
+          kinds:
+            - Pod
+      validate:
+        message: >-
+          Running the user IDs are allowed.
+        pattern:
+          spec:
+            =(initContainers):
+              - =(securityContext):
+                  =(runAsUser): 'RunAsAny'
+            =(securityContext):
+                =(runAsUser): 'RunAsAny'
+            containers:
+              - =(securityContext):
+                  =(runAsUser): 'RunAsAny'
+
+      match:
+        resources:
+           name: check-supplementalGroups
+           kinds:
+            - Pod
+      validate:
+        message: >-
+           Adding of supplemental group IDs is allowed.
+        pattern:
+          spec:
+             =(securityContext):
+               =(supplementalGroups):
+               - 'RunAsAny'
+
+      match:
+        resources:
+           name: check-fsGroup
+           kinds:
+            - Pod
+      validate:
+        message: >-
+          Changing to root group ID is allowed.
+        pattern:
+           spec:
+             =(securityContext):
+               =(fsGroup): 'RunAsAny'
+
+
+
+          
+           
