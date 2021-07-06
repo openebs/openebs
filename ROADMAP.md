@@ -111,7 +111,7 @@ Note: OpenEBS follows a monthly release cadence with a new minor release on the 
   - [Done] Add the existing functionality available in [mayactl](https://github.com/openebs/maya/tree/master/cmd/mayactl) for volume management to openebsctl
   - [In-progress] Provide component level helm charts, that can then be used as dependent charts by the openebs chat
   - [In-progress] Refactor the website and user documentation to be built as a single website using Hugo, similar to other CNCF projects 
-  - [In-progress] Add supoort for Kyverno, as a replacement for PSP
+  - [In-progress] Add support for Kyverno, as a replacement for PSP
   - [In-progress] Integrate the content sites like - website and documentation into a single repo. 
 
 
