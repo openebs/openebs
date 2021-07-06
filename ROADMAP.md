@@ -8,19 +8,10 @@ OpenEBS follows a lean project management approach by splitting the development 
 
 ## Current
 
-These are some of the backlogs that are prioritized and planned to be completed within the next three releases. While the following are planned items, higher priority is given to usability and stability issues reported by the community. The completion of these items also depends on the availability of contributors.
+These are some of the backlogs that are prioritized and planned to be completed within the next major release (e.g. OpenEBS 3.0). While the following are planned items, higher priority is given to usability and stability issues reported by the community. The completion of these items also depends on the availability of contributors.
 
-Note: OpenEBS follows a monthly release cadence with a new release on the 15th of every month.  For the most current plan and status check out the [release project trackers](https://github.com/orgs/openebs/projects) or the component specific trackers listed below. 
+Note: OpenEBS follows a monthly release cadence with a new minor release on the 15th of every month.  For the most current plan and status check out the [release project trackers](https://github.com/orgs/openebs/projects) or the component specific trackers listed below. 
 
-### NDM 
-- [Project Tracker](https://github.com/orgs/openebs/projects/2)
-- Source repositories
-  - https://github.com/openebs/node-disk-manager
-- Backlogs
-  - Enhance the discovery probes to support partitions, lvms and so forth
-  - Scan for device media errors, reporting and alerting by enhancing the ndm-exporter
-  - Support Bulk BDC requests to claim multiple block devices that satisfy affinity or anti-affinity rules of applications. Example: two block devices from same node or two block devices from different nodes. 
-  - Support for device configuration tasks like partitioning, mounting or unmounting devices by adding new services via NDM gRPC API layer.
   
 ### Dynamic Local PVs
 - Project Trackers
@@ -80,12 +71,32 @@ Note: OpenEBS follows a monthly release cadence with a new release on the 15th o
   - Move cstor volume and pool metrics code from openebs/maya to openebs/cstor-operators
   - Additional integration and e2e tests to help move cStor towards stable
 
+### NDM 
+- [Project Tracker](https://github.com/orgs/openebs/projects/2)
+- Source repositories
+  - https://github.com/openebs/node-disk-manager
+- Backlogs
+  - Enhance the discovery probes to support partitions, lvms and so forth
+  - Scan for device media errors, reporting and alerting by enhancing the ndm-exporter
+  - Support Bulk BDC requests to claim multiple block devices that satisfy affinity or anti-affinity rules of applications. Example: two block devices from same node or two block devices from different nodes. 
+  - Support for device configuration tasks like partitioning, mounting or unmounting devices by adding new services via NDM gRPC API layer.
+
 ### OpenEBS CLI
 - Source repositories
   - https://github.com/openebs/openebsctl
 - Backlogs
   - Add the existing functionality available in [mayactl](https://github.com/openebs/maya/tree/master/cmd/mayactl) for volume management to openebsctl
   - Add Local PV volumes related status checks to openebsctl 
+
+### Others
+- Building additional Grafana Dashboards for OpenEBS Components, Block Devices, Pools and Volumes, that can be used to monitor SLOs
+- Dashboard/UI for monitoring and managing cStor pools and volumes
+- Split the provisioners and/or operators from the mono-repos [openebs/maya](https://github.com/openebs/maya) and [openebs/external-storage](https://github.com/openebs/external-storage) into individual repos
+- Simplify the setup of NFS based Read-Write-Many volumes using OpenEBS RWO block volumes
+- Move towards GitHub actions based builds from Travis for all the repositories. Currently there is a mix of Travis and GitHub actions
+- Refactor the website and user documentation to be built as a single website using Hugo, similar to other CNCF projects 
+- Update the uZFS used by cStor with latest changes in upstream ZFS
+
 
 ## Near Term
 
@@ -94,13 +105,8 @@ Typically the items under this category fall under 3 to 6 month roadmap. At a hi
 - Update user documentation with reference stacks of running various workloads using OpenEBS volumes 
 - Auto provisioning of block devices that can be used with OpenEBS storage engines
 - Enhancements to OpenEBS CLI (openebsctl) for better status reporting and management of various OpenEBS components 
-- Building additional Grafana Dashboards for OpenEBS Components, Block Devices, Pools and Volumes, that can be used to monitor SLOs
 - Move NDM API (Kubernetes custom resources) to v1
-- Split the provisioners and/or operators from the mono-repos [openebs/maya](https://github.com/openebs/maya) and [openebs/external-storage](https://github.com/openebs/external-storage) into individual repos
 - Setup E2e pipelines for ARM Clusters
-- Simplify the setup of NFS based Read-Write-Many volumes using OpenEBS RWO block volumes
-- Refactor the website and user documentation to be built as a single website using Hugo, similar to other CNCF projects 
-- Move towards GitHub actions based builds from Travis for all the repositories. Currently there is a mix of Travis and GitHub actions
 - Conform with the new enhancements coming in the newer Kubernetes releases around Capacity based provisioning, CSI, and so forth
 - Automate the workflows around handling scenarios like complete cluster failures that currently require some manual steps
 - Custom Kubernetes storage schedulers to address auto-rebalancing of the data placed on the nodes to help with scale up/down of Kubernetes nodes
@@ -110,10 +116,7 @@ Typically the items under this category fall under 3 to 6 month roadmap. At a hi
 - Allow a new replica to be created within the same Mayastor Pool as the failed replica it replaces
 - Auto-scaling up and down of cStor pools as the new nodes are added and removed
 - Auto-upgrade of cStor Pools and Volumes when user upgrades control plane
-- Dashboard/UI for monitoring and managing cStor pools and volumes
 - Asynchronous or DR replica for cStor and Mayastor volumes
-- Update the uZFS used by cStor with latest changes in upstream ZFS
-
 
 
 ## Future
