@@ -59,8 +59,3 @@ spec:
            spec:
              =(securityContext):
                =(fsGroup): 'RunAsAny'
-
-
-
-          
-           
