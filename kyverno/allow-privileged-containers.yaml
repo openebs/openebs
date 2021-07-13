@@ -25,9 +25,6 @@ spec:
            and spec.initContainers[*].securityContext.privileged must not set to be false.
         pattern:
           spec:
-            =(initContainers):
-              - =(securityContext):
-                  =(privileged): "true"
             containers:
               - =(securityContext):
                   =(privileged): "true"
