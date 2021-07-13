@@ -25,5 +25,3 @@ spec:
         pattern:
           spec:
             =(volumes): "*"
-              
-
