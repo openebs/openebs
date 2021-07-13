@@ -25,9 +25,6 @@ spec:
           and spec.initContainers[*].securityContext.allowPrivilegeEscalation must be defined or set to `true`.
         pattern:
           spec:
-            =(initContainers):
-              - =(securityContext):
-                  =(allowPrivilegeEscalation): "true"
             containers:
               - =(securityContext):
                   =(allowPrivilegeEscalation): "true"
