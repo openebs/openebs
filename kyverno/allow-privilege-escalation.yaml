@@ -1,0 +1,30 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: allow-privileged-escalation
+  namespace: openebs
+  annotations:
+    policies.kyverno.io/category: Pod Security Standards (Privileged)
+    policies.kyverno.io/severity: medium
+    policies.kyverno.io/subject: Pod
+    policies.kyverno.io/description: >-
+      Privilege escalation, such as via set-user-ID or set-group-ID file mode, should be allowed.
+spec:
+  validationFailureAction: audit
+  background: true
+  rules:
+    - name: priviledged-escalation
+      match:
+        resources:
+          name: "openebs-*"
+          kinds:
+            - Pod
+      validate:
+        message: >-
+          Privilege escalation is allowed. The fields spec.containers[*].securityContext.allowPrivilegeEscalation, 
+          and spec.initContainers[*].securityContext.allowPrivilegeEscalation must be defined or set to `true`.
+        pattern:
+          spec:
+            containers:
+              - =(securityContext):
+                  =(allowPrivilegeEscalation): "true"

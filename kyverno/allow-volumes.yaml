@@ -1,0 +1,27 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: allow-volumes
+  namespace: openebs
+  annotations:
+    policies.kyverno.io/category: Pod Security Standards (Privileged)
+    policies.kyverno.io/severity: medium
+    policies.kyverno.io/subject: Pod
+    policies.kyverno.io/description: >-
+            In the privileged mode all types of the volumes allowed.
+spec:
+  validationFailureAction: audit
+  background: true
+  rules:
+    - name: volumes
+      match:
+        resources:
+          name: "openebs-*"
+          kinds:
+            - Pod
+      validate:
+        message: >-
+                  all types of  volumes shoud be allowed.
+        pattern:
+          spec:
+            =(volumes): "*"

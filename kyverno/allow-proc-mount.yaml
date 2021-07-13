@@ -1,0 +1,31 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: require-default-proc-mount
+  namespace: openebs
+  annotations:
+    policies.kyverno.io/category: Pod Security Standards (Baseline)
+    policies.kyverno.io/severity: medium
+    policies.kyverno.io/subject: Pod
+    policies.kyverno.io/description: >-
+            The default /proc masks are set up to reduce attack surface and should be required.
+spec:
+  validationFailureAction: audit
+  background: true
+  rules:
+    - name: check-proc-mount
+      match:
+        resources:
+          kinds:
+            - Pod
+      validate:
+        message: >-
+          Changing the proc mount from the default is not allowed. The fields
+          spec.containers[*].securityContext.procMount and
+          spec.initContainers[*].securityContext.procMount must not be changed 
+          from `Default`.          
+        pattern:
+          spec:
+            containers:
+              - =(securityContext):
+                  =(procMount): "Default"
