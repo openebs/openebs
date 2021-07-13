@@ -28,8 +28,3 @@ spec:
               - =(securityContext):
                   =(capabilities):
                     =(add): "*"
-            =(initContainers):
-              - =(securityContext):
-                  =(capabilities):
-                    =(add): "*"
-
