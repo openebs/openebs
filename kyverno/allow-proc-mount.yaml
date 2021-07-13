@@ -26,10 +26,6 @@ spec:
           from `Default`.          
         pattern:
           spec:
-            =(initContainers):
-              - =(securityContext):
-                  =(procMount): "Default"
             containers:
               - =(securityContext):
                   =(procMount): "Default"
-
