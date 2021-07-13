@@ -29,10 +29,6 @@ spec:
           spec:
             =(securityContext):
               =(seLinuxOptions): "on"
-            =(initContainers):
-              - =(securityContext):
-                  =(seLinuxOptions): "on"
             containers:
               - =(securityContext):
                   =(seLinuxOptions): "on"
-
