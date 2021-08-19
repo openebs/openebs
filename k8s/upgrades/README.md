@@ -2,7 +2,7 @@
 
 ## Important Notice
 
-- The community e2e pipelines verify upgrade testing only from non-deprecated releases (1.8.0 and higher) to 2.11.0. If you are running on release older than 1.8.0, OpenEBS recommends you upgrade to the latest version as soon as possible.
+- The community e2e pipelines verify upgrade testing only from non-deprecated releases (1.8.0 and higher) to 2.12.0. If you are running on release older than 1.8.0, OpenEBS recommends you upgrade to the latest version as soon as possible.
 
 - OpenEBS has deprecated arch specific container images in favor of multi-arch container images. After 2.6.0, the arch specific images are not pushed to Docker or Quay repositories. For example, images like cstor-pool-arm64:2.8.0 should be replaced with corresponding multi-arch image cstor-pool:2.8.0.
 
@@ -22,7 +22,7 @@ If already using CSPC pools and cStor CSI volumes they can be upgraded from `1.1
 
 This document describes the steps for the following OpenEBS Upgrade paths:
 
-- Upgrade from 1.6.0 or later to a newer release up to 2.11.0
+- Upgrade from 1.8.0 or later to a newer release up to 2.12.0
 
 For other upgrade paths of earlier releases, please refer to the respective directories.
 Example: 
@@ -51,7 +51,7 @@ The upgrade of OpenEBS is a three step process:
 kubectl -n <openebs-namespace> delete utasks --all
 ```
 
-- **For upgrading to the latest release (2.11.0), the previous version should be minimum 1.6.0**
+- **For upgrading to the latest release (2.12.0), the previous version should be minimum 1.6.0**
 
 - Note down the `namespace` where openebs components are installed.
   The following document assumes that namespace to be `openebs`.
@@ -129,8 +129,8 @@ the openebs-operator.yaml for your cluster, you will have to download the
 desired openebs-operator.yaml and customize it again**
 
 ```
-#Upgrade to OpenEBS control plane components to desired version. Say 2.11.0
-$ kubectl apply -f https://openebs.github.io/charts/2.11.0/openebs-operator.yaml
+#Upgrade to OpenEBS control plane components to desired version. Say 2.12.0
+$ kubectl apply -f https://openebs.github.io/charts/2.12.0/openebs-operator.yaml
 ```
 
 ### Upgrade using helm chart (using openebs/openebs, openebs-charts repo, etc.,):
@@ -145,13 +145,13 @@ latest openebs/openebs chart.
 - If the default values seem appropriate, you can use the below commands to
   update OpenEBS. [More](https://hub.helm.sh/charts/openebs/openebs) details about the specific chart version.
   ```sh
-  $ helm upgrade --reset-values <release name> openebs/openebs --version 2.11.0
+  $ helm upgrade --reset-values <release name> openebs/openebs --version 2.12.0
   ```
 - If not, customize the values into your copy (say custom-values.yaml),
   by copying the content from above default yamls and edit the values to
   suite your environment. You can upgrade using your custom values using:
   ```sh
-  $ helm upgrade <release name> openebs/openebs --version 2.11.0 -f custom-values.yaml`
+  $ helm upgrade <release name> openebs/openebs --version 2.12.0 -f custom-values.yaml`
   ```
 
 ### Using customized operator YAML or helm chart.
@@ -182,9 +182,9 @@ backup of the data before starting the below upgrade procedure.
   as the new multi-arch images are not pushed to quay.
   It can also be used specify any other private repository or airgap prefix in use.
 - Before proceeding with the upgrade of the OpenEBS Data Plane components like cStor or Jiva,  verify that OpenEBS Control plane is indeed in desired version
-  You can use the following command to verify components are in 2.11.0:
+  You can use the following command to verify components are in 2.12.0:
   ```sh
-  $ kubectl get pods -n openebs -l openebs.io/version=2.11.0
+  $ kubectl get pods -n openebs -l openebs.io/version=2.12.0
   ```
   The above command should show that the control plane components are upgrade.
   The output should look like below:
@@ -216,7 +216,7 @@ using Kubernetes Job spec.
 
 The following instructions provide details on how to create your Upgrade Job specs.
 Please ensure the `from` and `to` versions are as per your upgrade path. The below
-examples show upgrading from 1.12.0 to 2.11.0.
+examples show upgrading from 1.12.0 to 2.12.0.
 
 ### Upgrade the OpenEBS Jiva PV
 
@@ -270,7 +270,7 @@ spec:
         - "--from-version=1.12.0"
 
         # --to-version is the version desired upgrade version
-        - "--to-version=2.11.0"
+        - "--to-version=2.12.0"
 
         # If the pools and volumes images have the prefix `quay.io/openebs/`
         # then please add this flag as the new multi-arch images are not pushed to quay.
@@ -362,7 +362,7 @@ spec:
         - "--from-version=1.12.0"
 
         # --to-version is the version desired upgrade version
-        - "--to-version=2.11.0"
+        - "--to-version=2.12.0"
 
         # If the pools and volumes images have the prefix `quay.io/openebs/`
         # then please add this flag as the new multi-arch images are not pushed to quay.
@@ -444,7 +444,7 @@ spec:
         - "--from-version=1.12.0"
 
         # --to-version is the version desired upgrade version
-        - "--to-version=2.11.0"
+        - "--to-version=2.12.0"
 
         # If the pools and volumes images have the prefix `quay.io/openebs/`
         # then please add this flag as the new multi-arch images are not pushed to quay.
