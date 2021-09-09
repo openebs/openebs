@@ -33,6 +33,7 @@
 "Vishnu Itta",@vishnuitta,Independent
 
 #Reviewers
+"Aditya Jain",@z0marlin,Independent #control-plane-maintainers
 "Akhil Mohan",@akhilerm,MayaData #control-plane-maintainers
 "Aman Gupta",@w3aman,MayaData #control-plane-maintainers
 "Arne Rusek",@arne-rusek,MayaData #mayastor-maintainers
