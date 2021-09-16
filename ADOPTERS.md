@@ -32,6 +32,8 @@ The list of organizations that have publicly shared the usage of OpenEBS:
 | [Renthopper](https://renthopper.co.uk) | Ruby on Rails with ActiveStorage, Redmine, Docker registry, ownCloud, Mattermost, Bitbucket, Jira and Blynk | [English](./adopters/users/laimison/README.md) |
 | [Sharecare, Inc.](https://www.sharecare.com/) | Prometheus, internal applications | [English](./adopters/sharecare/README.md) |
 | [Stratus5](https://stratus5.com/) | Redis,Ceryx, MySQL, MariaDB, Wordpress | [English](./adopters/stratus5/README.md) |
+| [Surveily](https://surveily.com/) | CVAT, NVIDIA Triton, Keycloak, Bitwarden, Elasticsearch, PostgresDB, Cassandra | [English](./adopters/surveily/README.md) |
+| [Teknologi Anak Rantau Indonesia](https://tari.co.id) | MinIO S3 compatible object storage | [English](./adopters/teknologi_anak_rantau_indonesia/README.md) |
 | [TOBG Services Ltd](https://www.tobg.com.de/) | Postgresql, Confluence, Gitlab, Bitcoin Full Node, Bitcoin Lightning Nodes, BTCPay, Cardano Nodes and Pool, Docker Registry, Prometheus, Grafana, Zabbix monitoring, ELK | [English](./adopters/tobgservices/README.md) |
 | [Verizon Media](https://www.verizonmedia.com/) | Jenkins, IDOL license server | [English](./adopters/verizon/README.md) |
 | [Zeta Associates](https://www.zai.com/) | Elasticsearch, MariaDB, MinIO, PostgreSQL, Prometheus, Kafka, Cassandra | [English](./adopters/zetaassociates/README.md) |
@@ -50,9 +52,10 @@ The list of users that have publicly shared the usage of OpenEBS.
 | [Mark V.](https://github.com/mikroskeem) | Concourse CI, Mattermost, Minio, Few game servers, Bunch of micro services | [English](./adopters/users/mikroskeem/README.md)  | 
 | [Mike T.](https://gitlab.com/mterhar) | Coder, Mattermost, Minio | [English](./adopters/users/mterhar/README.md) |
 | [Nick Pappas](https://github.com/radicand) | Wordpress, MariaDB on ARM64 cluster | [English](./adopters/users/radicand/README.md) | 
-| [proegssilb](https://github.com/proegssilb) | PostgreSQL, Redis, Factorio (video game server) | [English](./adopters/users/proegssilb/README.md)  | 
+| [proegssilb](https://github.com/proegssilb) | PostgreSQL, Redis, Factorio (video game server) | [English](./adopters/users/proegssilb/README.md)  |
+| [Somsubhra Das](https://github.com/Somsubhra1) | PostgreSQL, MariaDB, Prometheus | [English](./adopters/users/Somsubhra1/README.md) |
 | [Steve Fan](https://github.com/stevefan1999-personal) | [Agones - Game Servers on K8s](https://agones.dev/site/) | [English](./adopters/users/stevefan/README.md)  | 
-| [tardich](https://github.com/tardich) | Postfix Mail Relay, NextCloud, Nexus Repository, Plex | [English](./adopters/users/tardich/README.md)  | 
+| [tardich](https://github.com/tardich) | Postfix Mail Relay, NextCloud, Nexus Repository, Plex | [English](./adopters/users/tardich/README.md)  |
 | [V. Aretakis](https://github.com/aretakisv) | Percona, OpenZwave, Traefik, librenms, Multiple MQTT brokers, private applications, Unifi, multiple other stateful applications | [English](./adopters/users/aretakisv/README.md)  |
 
 
