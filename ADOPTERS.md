@@ -32,6 +32,7 @@ The list of organizations that have publicly shared the usage of OpenEBS:
 | [Renthopper](https://renthopper.co.uk) | Ruby on Rails with ActiveStorage, Redmine, Docker registry, ownCloud, Mattermost, Bitbucket, Jira and Blynk | [English](./adopters/users/laimison/README.md) |
 | [Sharecare, Inc.](https://www.sharecare.com/) | Prometheus, internal applications | [English](./adopters/sharecare/README.md) |
 | [Stratus5](https://stratus5.com/) | Redis,Ceryx, MySQL, MariaDB, Wordpress | [English](./adopters/stratus5/README.md) |
+| [SurplusCI](https://surplusci.com/) | Postgres, KubeVirt (qemu), Grafana | [English](./adopters/surplusci/README.md) |
 | [Surveily](https://surveily.com/) | CVAT, NVIDIA Triton, Keycloak, Bitwarden, Elasticsearch, PostgresDB, Cassandra | [English](./adopters/surveily/README.md) |
 | [Teknologi Anak Rantau Indonesia](https://tari.co.id) | MinIO S3 compatible object storage | [English](./adopters/teknologi_anak_rantau_indonesia/README.md) |
 | [TOBG Services Ltd](https://www.tobg.com.de/) | Postgresql, Confluence, Gitlab, Bitcoin Full Node, Bitcoin Lightning Nodes, BTCPay, Cardano Nodes and Pool, Docker Registry, Prometheus, Grafana, Zabbix monitoring, ELK | [English](./adopters/tobgservices/README.md) |
