@@ -99,6 +99,10 @@ OpenEBS welcomes your feedback and contributions in any form possible.
   - For OpenEBS project updates, subscribe to [OpenEBS Announcements](https://lists.cncf.io/g/cncf-openebs-announcements)
   - For interacting with other OpenEBS users, subscribe to [OpenEBS Users](https://lists.cncf.io/g/cncf-openebs-users)
 
+ ## Follow Us
+
+Join our growing community around the world! See our official [Blog](https://openebs.io/blog). Follow us on [Twitter](https://twitter.com/openebs?s=20), [Facebook Page](https://www.facebook.com/openebs), [Slack Community](https://openebs.io/community) or join our live [Youtube](https://www.youtube.com/channel/UC3ywadaAUQ1FI4YsHZ8wa0g) for more help, ideas, and discussions.
+
 ## Show me the Code
 
 This is a meta-repository for OpenEBS. Please start with the pinned repositories or with [OpenEBS Architecture](./contribute/design/README.md) document. 
