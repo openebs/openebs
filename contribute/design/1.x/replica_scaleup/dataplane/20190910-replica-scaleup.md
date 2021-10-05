@@ -144,9 +144,9 @@ sets quorum property while creating replica.
 
 #### Current Implementation
 Above mentioned properties are used as below at istgt:
-- Allow replicas (upto max of 5) to connect to target until RF number of
+- Allow replicas (up to max of 5) to connect to target until RF number of
 healthy replicas are available.
-- Atleast CF in-quorum replicas are required to perform rebuilding and start IOs
+- At least CF in-quorum replicas are required to perform rebuilding and start IOs
 - Rebuilding will be triggered and replicas become healthy. As RF number of
 replicas are healthy, other connected replicas, if any, gets disconnected.
 
@@ -255,7 +255,7 @@ This can be better explained with scenarios.
 Lets say, one replica(R3) was lost and new one (R4) got added.
 After R4 got reconstructed with data, another replica (R2) got lost and
 new one (R5) got connected.
-Once R5 got reconstructed, all replicas have quorum propery on. But, just that
+Once R5 got reconstructed, all replicas have quorum property on. But, just that
 R2 and R3 are not reachable.
 At a later point of time, if R1, R4, R5 are down and R2, R3 are connected to
 istgt (which can be due to attachment of old disks), istgt cannot identify that
@@ -359,7 +359,7 @@ iteration.
   - When any replica is marked as scaleup replica, all write IOs need to be
 verified to be successful with new and old consistency models.
   - Inform cstor-volume-mgmt with new replicas and replication factor details
-- If udpating CR succeeds, update in-memory data structures of istgt
+- If updating CR succeeds, update in-memory data structures of istgt
 - If updating CR fails, retry above steps after some time
 
 #### LLDNotes

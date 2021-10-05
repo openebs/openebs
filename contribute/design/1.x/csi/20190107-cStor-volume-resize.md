@@ -153,7 +153,7 @@ otherwise.
 - CSI controller will get gRPC resize request from kubernetes-csi external-resizer
   controller(when pvc storage field is updated).
 - CSI controller acquire lease and checks is there any ongoing resize on requested
-  volume if yes then CSI controller will return error. If volume size is upto
+  volume if yes then CSI controller will return error. If volume size is up to
   date (i.e cvc.spec.capacity == cvc.status.capacity) then CSI controller updates
   CVC spec capacity with latest size.
   Example status: status of CVC when resize request is in progress.

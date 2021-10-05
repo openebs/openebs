@@ -219,10 +219,10 @@ In case if same space is available for all the nodes, the scheduler can pick any
 
 #### 1.2  Volume Creation
 
-It will create the PV object on scheduled node so that the applcation using that PV always comes to the same node and also it creates the ZFSVolume object for that volume in order to manage the creation of the ZFS dataset. There will be a watcher at each node which will be watching for the ZFSVolume resource which is aimed for them. The watcher is inbuilt into ZFS node-agent. As soon as ZFSVolume object is created for a node, the corresponding watcher will get the add event and it will create the ZFS dataset with all the volume properties from ZFSVolume custom resource. It will get the pool name from the ZFSVolume custom resource and creates the volume in that pool with pvc name.
+It will create the PV object on scheduled node so that the application using that PV always comes to the same node and also it creates the ZFSVolume object for that volume in order to manage the creation of the ZFS dataset. There will be a watcher at each node which will be watching for the ZFSVolume resource which is aimed for them. The watcher is inbuilt into ZFS node-agent. As soon as ZFSVolume object is created for a node, the corresponding watcher will get the add event and it will create the ZFS dataset with all the volume properties from ZFSVolume custom resource. It will get the pool name from the ZFSVolume custom resource and creates the volume in that pool with pvc name.
 
 ### 2. CSI Node Publish
-When the application pod is scheduled on a node, the CSI node-agent will get a NodePublish event. The driver will get the device path from the ZFSVolume custome resource and try to mount the file system as per user request given in the storage class. Once the ZFS volume dataset is created it will put a finalizer and return successful for the NodePublish event.
+When the application pod is scheduled on a node, the CSI node-agent will get a NodePublish event. The driver will get the device path from the ZFSVolume customer resource and try to mount the file system as per user request given in the storage class. Once the ZFS volume dataset is created it will put a finalizer and return successful for the NodePublish event.
 
 - the kubernetes managed ZFS volume will look like this
 
@@ -285,7 +285,7 @@ spec:
     persistentVolumeClaimName: zfspv-pvc
 ```
 
-it will create a ZFSSnapshot custom resource. This custom resuorce will get all the details from the ZFSVolume CR, ownerNodeID will be same here as snapshot will also be there on same node where the original volume is there. The controller will create the request with status as Pending and set a label "openebs.io/volname" to the volume name from where the snapshot has to be created.
+it will create a ZFSSnapshot custom resource. This custom resource will get all the details from the ZFSVolume CR, ownerNodeID will be same here as snapshot will also be there on same node where the original volume is there. The controller will create the request with status as Pending and set a label "openebs.io/volname" to the volume name from where the snapshot has to be created.
 
 ```yaml
 apiVersion: openebs.io/v1alpha1
@@ -332,7 +332,7 @@ status:
 We can use GRPC call also to create the snapshot, The controller plugin will call node plugin's grpc server to create the snapshot. Creating a ZFSSnapshot custom resource has advantages :-
 
 - Even if Node plugin is down we can get the info about snapshots
-- No need to do zfs call everytime to get the list of snapshots
+- No need to do zfs call every time to get the list of snapshots
 - Controller plugin and Node plugin can run without knowledge of each other
 - Reconciliation is easy to manage as K8s only supports a reconciliation based snapshots as of today. For example, the operation to create a snapshot is triggered via K8s CR. Post that, K8s will be re-trying till a successful snapshot is created. In this case, having an API doesn't add much value.
 

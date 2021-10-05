@@ -44,7 +44,7 @@ OpenEBS source code is spread across multiple repositories, organized either by 
 - [openebs/velero-plugin](https://github.com/openebs/velero-plugin) has the plugin code to perform cStor and ZFS Local PV based Backup and Restore using Velero. 
 - [openebs/linux-utils](https://github.com/openebs/linux-utils) is a general purpose alpine container used to launch some management jobs by OpenEBS Operators. 
 - [openebs/api](https://github.com/openebs/api) contains the OpenEBS related Kubernetes custom resource specifications and the related Go-client API to manage those resources. This functionality is being split from the mono-repo [openebs/maya](https://github.com/openebs/maya) into its own repository.
-- [openebs/upgrade](https://github.com/openebs/upgrade) contains management tools for upgrading and migrating OpenEBS volumes and pools. This funtionality is being split from the mono-repo [openebs/maya](https://github.com/openebs/maya) into its own repository. Go dependencies are listed [here](https://github.com/openebs/upgrade/blob/master/go.mod).
+- [openebs/upgrade](https://github.com/openebs/upgrade) contains management tools for upgrading and migrating OpenEBS volumes and pools. This functionality is being split from the mono-repo [openebs/maya](https://github.com/openebs/maya) into its own repository. Go dependencies are listed [here](https://github.com/openebs/upgrade/blob/master/go.mod).
 - [openebs/e2e-tests](https://github.com/openebs/e2e-tests) contains the Litmus based e2e tests that are executed on GitLab pipelines. Contains tests for Jiva, cStor and Local PV.
 
 ## Experimental repos  
@@ -59,7 +59,7 @@ OpenEBS source code is spread across multiple repositories, organized either by 
 ## Node Disk Manager (aka Storage Device Management plane)
 
 - [openebs/node-disk-manager](https://github.com/openebs/node-disk-manager) contains Kubernetes native Device Inventory Management functionality. A detailed dependency list can be found in [go.mod](https://github.com/openebs/node-disk-manager/blob/master/go.mod). Along with being dependent on Kubernetes and Operator SDK for managing the Kubernetes custom resources, NDM also optionally depends on the following. 
-  - [openSeaChest](https://github.com/Seagate/openSeaChest) (License: MPL 2.0) for discovering device attributes. OpenEBS maintains forked repositories of openSeaChest to fix/upstream the issues found in this libarary.
+  - [openSeaChest](https://github.com/Seagate/openSeaChest) (License: MPL 2.0) for discovering device attributes. OpenEBS maintains forked repositories of openSeaChest to fix/upstream the issues found in this library.
 
 ## Jiva
 - [openebs/jiva](https://github.com/openebs/jiva) is one of the data engines supported by OpenEBS which was forked from Rancher Longhorn engine and has diverged from the way Jiva volumes are managed within Kubernetes. At the time of the fork, Longhorn was focused towards Docker and OpenEBS was focused on supporting Kubernetes. Jiva engine depends on the following:

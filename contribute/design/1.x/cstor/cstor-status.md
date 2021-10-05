@@ -46,7 +46,7 @@ As a OpenEBS user, the information regarding a CR should be present in the statu
 
 ### Proposed Implementation
 
-Kuberentes provides a framework for status conditions and events which can be used to pass relevant information from the controllers to the CRs. 
+Kubernetes provides a framework for status conditions and events which can be used to pass relevant information from the controllers to the CRs. 
 
 #### CSPI Status
 
@@ -122,7 +122,7 @@ Conditions:
 Conditions:
   - lastTransitionTime: "2020-04-10T03:56:57Z"
     lastUpdateTime: "2020-04-10T03:56:57Z"
-    message: Pool expansion was successfull by adding blockdevices/raid groups
+    message: Pool expansion was successful by adding blockdevices/raid groups
     reason: PoolExpansionSuccessful
     status: "False"
     type: PoolExpansion
