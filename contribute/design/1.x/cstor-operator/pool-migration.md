@@ -44,7 +44,7 @@ from one node to other node.
 
 - CStor pool migration should be supported when the disks were dettached and attached to different node. Following are the use cases:
   1. Scaling down the nodes in cluster to 0 and scaling up nodes in should work by updating the node selectors on CSPC(Use case in cloud environment).
-  2. Dettaching and attaching underlying disks to different nodes.
+  2. Detaching and attaching underlying disks to different nodes.
 
 
 ### Goals
@@ -80,7 +80,7 @@ Currently to provision the cStorPoolInstances(cStor pools) user will create CSPC
 
 ### Steps to perform user stories
 
-1. Update the node selectors on the CSPC spec with new node details whereever blockdevices were attached.
+1. Update the node selectors on the CSPC spec with new node details wherever blockdevices were attached.
 
 **Consider following example for mirror pool migration**
 This CSPC corresponds to a mirror pool on node `node1` and `node2`.

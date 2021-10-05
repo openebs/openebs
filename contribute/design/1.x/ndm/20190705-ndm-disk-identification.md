@@ -53,7 +53,7 @@ and thus the data movement within the cluster.
 
 - Configurable device detection mechanism
 - A unique disk identification mechanism that will work across the cluster on
-  disks having atleast a GPT label
+  disks having at least a GPT label
 - Should be able to identify same disk attached at multiple paths.
 - Should be able to generate separate IDs for partitions
 
@@ -102,7 +102,7 @@ If the `ID_TYPE` is empty or `ID_MODEL` is `Virtual_disk` or `EphemeralDisk`:
 	- md5 hash of the result is generated which will be UID for the disk by NDM
 
 #### Shortcomings of current implementation
-In case of virtual disks, since we are using the DEVNAME for generating UID, everytime 
+In case of virtual disks, since we are using the DEVNAME for generating UID, every time 
 the same disk comes at a different path, the UID gets changed. This results in getting 
 the device identified as a new disk. This will lead to data corruption as the disk that 
 was being claimed by some users has now came up with a new UID, but with the old data.

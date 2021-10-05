@@ -71,7 +71,7 @@ This design proposes the following key changes while migrating from a SPC to CSP
       3. The CVR with CSP labels and annotations will be replaced by CSPI labels and annotations.
       4. Finalizers from CSP will be removed to for proper cleanup.
 
-  6. Clean up old SPC and CSP after successfull creation of CSPC and CSPI objects.
+  6. Clean up old SPC and CSP after successful creation of CSPC and CSPI objects.
 
 For migrating non-csi volumes to csi volumes following changes are proposed:
 
@@ -127,8 +127,8 @@ For importing without renaming the command would look like:
 The `cstorpoolinstance.openebs.io/oldname` annotation will be used to rename the pool which was named as `cstor-cspuid` to `cstor-cspcuid`. This annotation will be removed after successful import of the pool.
 
 **Note: Before migrating make sure:**
- - OpenEBS version of old resources(control-plane and data-plane) should be atleast 1.11.0.
- - Apply new cstor-operators and csi driver which also should be atleast in 1.11.0 version.
+ - OpenEBS version of old resources(control-plane and data-plane) should be at least 1.11.0.
+ - Apply new cstor-operators and csi driver which also should be at least in 1.11.0 version.
  - Identify the nodes on which the `CSP` are present and run `fdisk -l` command on that node. If the command is hung then bad block file exists on that node. If such case occurs, please resolve this issue before proceeding with the migration. To identify the nodes look for the `kubernetes.io/hostname` label on the `CSP`.
 
 

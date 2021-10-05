@@ -81,7 +81,7 @@ Note: OpenEBS follows a monthly release cadence with a new minor release on the 
   - [Done] Add gRPC API to list and re-scan block device
   - [Done] Enhance the discovery probes to detect if the device already has device mapper, zfs and so forth
   - [Done] Scan for device media errors and report them as prometheus metrics via ndm-exporter
-  - [Done] Label the block devices so that they can be reseved for use by different StorageClasses
+  - [Done] Label the block devices so that they can be reserved for use by different StorageClasses
   - [In-progress] Auto-detecting capacity and mountpoint changes and updating the block device CR 
   - [In-progress] Additional integration and e2e tests
   - Support for using a custom node label to claim devices (instead of default kubernetes.io/hostname)

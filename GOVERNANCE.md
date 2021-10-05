@@ -27,7 +27,7 @@ explained in the following sub-sections.
 ### Community Contributor
 
 OpenEBS is a very welcoming community and is eager to onboard and help anyone
-from the OpenSource community to contribute to the project. To faciliate onboarding
+from the OpenSource community to contribute to the project. To facilitate onboarding
 of the community members, OpenEBS maintainers participate in Hackthon events and are
 responsive on the [slack, community meetings and github](./community/). 
 
