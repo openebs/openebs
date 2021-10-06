@@ -1,10 +1,10 @@
 # Contributing to OpenEBS
 
-Great!! We are always on the lookout for more OpenEBS hackers. You can get started by reading this [overview](./contribute/design/README.md)
+Great!! We all are always on the lookout for more OpenEBS hackers. You can get started by reading this [overview](./contribute/design/README.md)
 
 Firstly, if you are unsure or afraid of anything, just ask or submit the issue or pull request anyways. You won't be yelled at for giving your best effort. The worst that can happen is that you'll be politely asked to change something. We appreciate any sort of contributions and don't want a wall of rules to get in the way of that.
 
-However, for those individuals who want a bit more guidance on the best way to contribute to the project, read on. This document will cover all the points we're looking for in your contributions, raising your chances of quickly merging or addressing your contributions.
+However, for those individuals who are willing to get a bit more guidance on there way to contribute to the project, read on. This document will cover all the points we're looking for in your contributions, raising your chances of quickly merging or addressing your contributions.
 
 That said, OpenEBS is an innovation in Open Source. You are welcome to contribute in any way you can and all the help provided is very much appreciated.
 
@@ -30,7 +30,7 @@ Getting documentation right is hard! Refer to this [page](./contribute/CONTRIBUT
 
 ## Submit Proposals for New Features
 
-There is always something more that is required, to make it easier to suit your use-cases. Feel free to join the discussion on new features or raise a PR with your proposed change.
+There is always something more that is required, to make it easier to suit your use-cases. Feel free to join the discussion on new features or raise a PR with your proposed changes.
 
 - [Join OpenEBS community on Kubernetes Slack](https://kubernetes.slack.com) - Already signed up? Head to our discussions at [#openebs](https://kubernetes.slack.com/messages/openebs/)
 
@@ -39,7 +39,7 @@ There is always something more that is required, to make it easier to suit your 
 Provide PRs with appropriate tags for bug fixes or enhancements to the source code. For a list of tags that could be used, see [this](./contribute/labels-of-issues.md).
 
 - For contributing to K8s demo, please refer to this [document](./contribute/CONTRIBUTING-TO-K8S-DEMO.md).
-  - For checking out how OpenEBS works with K8s, refer to this [document](./k8s/README.md)
+- For checking out how OpenEBS works with K8s, refer to this [document](./k8s/README.md)
 
 * For contributing to Kubernetes OpenEBS Provisioner, please refer to this [document](./contribute/CONTRIBUTING-TO-KUBERNETES-OPENEBS-PROVISIONER.md).
 
@@ -72,3 +72,4 @@ Use your real name (sorry, no pseudonyms or anonymous contributions). If you set
 ## Join our community
 
 Want to actively develop and contribute to the OpenEBS community, refer to this [document](./community/README.md).
+Don't forget to Star!!
