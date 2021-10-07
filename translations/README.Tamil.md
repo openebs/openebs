@@ -93,7 +93,7 @@ OpenEBS உங்கள் கருத்து மற்றும் பங்
   - ஏற்கனவே பதிவு செய்துள்ளீர்களா? எங்கள் விவாதங்களுக்குச் செல்லுங்கள் [#openebs](https://kubernetes.slack.com/messages/openebs/)
 - ஒரு சிக்கலை எழுப்ப விரும்புகிறீர்களா அல்லது திருத்தங்கள் மற்றும் அம்சங்களுக்கு உதவ வேண்டுமா?
   - பார்க்கவும் [open issues](https://github.com/openebs/openebs/issues)
-  - பார்க்கவும் [contributing guide](translations/CONTRIBUTING-Tamil.md)
+  - பார்க்கவும் [contributing guide](CONTRIBUTING-Tamil.md)
   - எங்கள் பங்களிப்பாளர் சமூகக் கூட்டங்களில் சேர விரும்புகிறோம், [இதை சோதிக்கவும்](./community/README.md).
 - எங்கள் OpenEBS CNCF அஞ்சல் பட்டியல்களில் சேரவும்
   - OpenEBS திட்ட புதுப்பிப்புகளுக்கு, குழுசேரவும் [OpenEBS அறிவிப்புகள்](https://lists.cncf.io/g/cncf-openebs-announcements)
