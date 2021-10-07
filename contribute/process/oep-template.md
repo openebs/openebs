@@ -39,7 +39,7 @@ To get started with this template:
   Avoid getting hung up on specific details and instead aim to get the goal of the OEP merged quickly.
   The best way to do this is to just start with the "Overview" sections and fill out details incrementally in follow on PRs.
   View anything marked as a `provisional` as a working document and subject to change.
-  Aim for single topic PRs to keep discussions focused.
+  Aim for single-topic PRs to keep discussions focused.
   If you disagree with what is already in a document, open a new PR with suggested changes.
 
 The canonical place for the latest set of instructions (and the likely source of this file) is [here](https://github.com/openebs/openebs/blob/master/contribute/process/oep-template.md).
@@ -50,7 +50,7 @@ See the [OEP process](https://github.com/openebs/openebs/blob/master/contribute/
 
 ## Table of Contents
 
-A table of contents is helpful for quickly jumping to sections of a OEP and for highlighting any additional information provided beyond the standard OEP template.
+A table of contents is helpful for quickly jumping to sections of an OEP and for highlighting any additional information provided beyond the standard OEP template.
 [Tools for generating][] a table of contents from markdown are available.
 
 * [Table of Contents](#table-of-contents)
@@ -74,9 +74,9 @@ A table of contents is helpful for quickly jumping to sections of a OEP and for 
 
 ## Summary
 
-The `Summary` section is incredibly important for producing high quality user focused documentation such as release notes or a development road map.
+The `Summary` section is incredibly important for producing high-quality user focused documentation such as release notes or a development road map.
 It should be possible to collect this information before implementation begins in order to avoid requiring implementors to split their attention between writing release notes and implementing the feature itself.
-OEP editors should help to ensure that the tone and content of the `Summary` section is useful for a wide audience.
+OEP editors should help to ensure that the tone and content of the `Summary` section are useful for a wide audience.
 
 A good summary is probably at least a paragraph in length.
 
@@ -84,7 +84,7 @@ A good summary is probably at least a paragraph in length.
 
 This section is for explicitly listing the motivation, goals and non-goals of this OEP.
 Describe why the change is important and the benefits to users.
-The motivation section can optionally provide links to [experience reports][] to demonstrate the interest in a OEP within the wider OpenEBS community.
+The motivation section can optionally provide links to [experience reports][] to demonstrate the interest in an OEP within the wider OpenEBS community.
 
 [experience reports]: https://github.com/golang/go/wiki/ExperienceReports
 
@@ -100,7 +100,7 @@ Listing non-goals helps to focus discussion and make progress.
 
 ## Proposal
 
-This is where we get down to the nitty gritty of what the proposal actually is.
+This is where we get down to the nitty-gritty of what the proposal actually is.
 
 ### User Stories [optional]
 
@@ -115,13 +115,13 @@ The goal here is to make this feel real for users without getting bogged down.
 ### Implementation Details/Notes/Constraints [optional]
 
 What are the caveats to the implementation?
-What are some important details that didn't come across above.
-Go in to as much detail as necessary here.
+What are some important details that didn't come across above?
+Go into as much detail as necessary here.
 This might be a good place to talk about core concepts and how they relate.
 
 ### Risks and Mitigations
 
-What are the risks of this proposal and how do we mitigate.
+What are the risks of this proposal and how do we mitigate them.
 Think broadly.
 For example, consider both security and how this will impact the larger kubernetes ecosystem.
 
@@ -129,13 +129,13 @@ For example, consider both security and how this will impact the larger kubernet
 
 How will we know that this has succeeded?
 Gathering user feedback is crucial for building high quality experiences and owners have the important responsibility of setting milestones for stability and completeness.
-Hopefully the content previously contained in [umbrella issues][] will be tracked in the `Graduation Criteria` section.
+Hopefully, the content previously contained in [umbrella issues][] will be tracked in the `Graduation Criteria` section.
 
 [umbrella issues]: https://github.com/kubernetes/kubernetes/issues/42752
 
 ## Implementation History
 
-Major milestones in the life cycle of a OEP should be tracked in `Implementation History`.
+Major milestones in the life cycle of an OEP should be tracked in `Implementation History`.
 Major milestones might include
 
 - the `Summary` and `Motivation` sections being merged signaling owner acceptance
@@ -147,14 +147,14 @@ Major milestones might include
 
 ## Drawbacks [optional]
 
-Why should this OEP _not_ be implemented.
+Why should this OEP _not_ be implemented?
 
 ## Alternatives [optional]
 
-Similar to the `Drawbacks` section the `Alternatives` section is used to highlight and record other possible approaches to delivering the value proposed by a OEP.
+Similar to the `Drawbacks` section the `Alternatives` section is used to highlight and record other possible approaches to delivering the value proposed by an OEP.
 
 ## Infrastructure Needed [optional]
 
 Use this section if you need things from the project/owner.
 Examples include a new subproject, repos requested, github details.
-Listing these here allows a owner to get the process for these resources started right away.
+Listing these here allows an owner to get the process for these resources started right away.
