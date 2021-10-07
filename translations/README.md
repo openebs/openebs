@@ -10,6 +10,7 @@
 | 🇹🇷 | [Türkçe](README.tr.md) |
 | 🇨🇳 | [中文](README.zh.md) |
 | 🇫🇷 | [Français](README.fr.md) |
+| :india: | [தமிழ்](README.Tamil.md) |
 | :india: | [ગુજરાતી](README.gu.md) |
 | :india: | [हिंदी](README.hi.md) |
 | :india: | [ਪੰਜਾਬੀ](README.pu.md) |
