@@ -10,14 +10,16 @@
 https://openebs.io/
 
 **Read this in**
-[🇩🇪](translations/README.de.md)
-[🇷🇺](translations/README.ru.md)
-[🇹🇷](translations/README.tr.md)
-[🇺🇦](translations/README.ua.md)
-[🇨🇳](translations/README.zh.md)
-[🇫🇷](translations/README.fr.md)
-[id](translations/README.id.md)
-**[other languages](translations/#readme).**
+[🇩🇪](https://github.com/openebs/openebs/blob/main/translations/README.de.md)	
+[🇷🇺](https://github.com/openebs/openebs/blob/main/translations/README.ru.md)	
+[🇹🇷](https://github.com/openebs/openebs/blob/main/translations/README.tr.md)	
+[🇺🇦](https://github.com/openebs/openebs/blob/main/translations/README.ua.md)	
+[🇨🇳](https://github.com/openebs/openebs/blob/main/translations/README.zh.md)	
+[🇫🇷](https://github.com/openebs/openebs/blob/main/translations/README.fr.md)
+[🇧🇷](https://github.com/openebs/openebs/blob/main/translations/README.pt-BR.md)
+[🇪🇸](https://github.com/openebs/openebs/blob/main/translations/README.es.md)
+[🇵🇱](https://github.com/openebs/openebs/blob/main/translations/README.pl.md)
+**[other languages](https://github.com/openebs/openebs/blob/main/translations/#readme).**
 
 **OpenEBS** adalah penyimpanan _open-source_ yang paling mudah dan banyak digunakan untuk solusi penyimpanan _Kubernetes_
 
