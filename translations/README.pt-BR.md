@@ -78,7 +78,7 @@ O status de várias engines (motores) de armazenamento que capacitam os volumes 
 | Jiva | estável | Mais adequado para rodar blocos de armazenamento replicado em nodes que usam armazenamento efêmero nos nodes Kubernetes |
 | cStor | beta | Uma solução preferida para rodar em nodes que tem dispositivos de bloco. Opção recomendada se Snapshots e Clones forem requeridos |
 | Local Volumes | beta | Mais adequado para aplicações distribuídas que requerem armazenamento com baixa latência - armazenamento de anexo direto de nodes Kubernetes |
-| Mayastor | alpha | Um novo motor de armazenamento que opera com a mesma eficiência do armazenamento local porém também oferece serviços de armazenamento como Réplicas. Desenvolvimento está em andamento para suportar Snapshots e Clones. |
+| Mayastor | beta | Um novo motor de armazenamento que opera com a mesma eficiência do armazenamento local porém também oferece serviços de armazenamento como Réplicas. Desenvolvimento está em andamento para suportar Snapshots e Clones. |
 
 Para mais detalhes, por favor acesse a [Documentação OpenEBS](https://docs.openebs.io/docs/next/quickstart.html).
 
