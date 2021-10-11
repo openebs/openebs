@@ -113,5 +113,5 @@ OpenEBS é parte dos Projetos CNCF.
 Esta é uma lista com empresas terceiras e indivíduos que provêem produtos ou serviços relacionados à OpenEBS. OpenEBS é um projeto CNCF que não endossa qualquer empresa. Esta lista é apresentada em ordem alfabética.
 - [Clouds Sky GmbH](https://cloudssky.com/en/)
 - [CodeWave](https://codewave.eu/)
-- [Gridworkz Cloud Services](https://gridworkz.com/)
+- [Gridworkz Cloud Services](https://www.gridworkz.com/)
 - [MayaData](https://mayadata.io/)
