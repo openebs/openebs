@@ -1,4 +1,4 @@
-# Contributing to OpenEBS
+# Contribuire a OpenEBS
 
 Fantastico!! Siamo sempre alla ricerca di nuovi OpenEBS hackers. Puoi iniziare leggendo questa [panoramica](./contribute/design/README.md)
 
