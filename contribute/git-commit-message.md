@@ -5,7 +5,7 @@ This document borrows concepts, conventions, and text mainly from the following 
 - Thanks to @stephenparish https://gist.github.com/stephenparish/9941e89d80e2bc58a153
 - Thanks to @abravalheri https://gist.github.com/abravalheri/34aeb7b18d61392251a2
 
-These conventions are aimed at tools to automatically generate useful documentation, or by developers during debugging process.
+These conventions are aimed at tools to automatically generate useful documentation, or by developers during the debugging process.
 
 ## Proposed Commit Message Format
 
@@ -40,13 +40,13 @@ Subject line may be prefixed for continuous integration purposes
    such as documentation generation
 
 ### Allowed `<scope>`
-Scope could be anything specifying impacted module/package.
+Scope could be anything specifying an impacted module/package.
 For example: when committing to openebs/maya repo, the scope can be
 - components : mayactl, m-apiserver, spc-watcher, cast, install, util, etc.
 - generic    : compile, travis-ci, etc.
 
 ### `<subject>` text
-Subject line should contains succinct description of the change. 
+Subject line should contain a succinct description of the change. 
 
 * use imperative, present tense: “change” not “changed” nor “changes”
 * don't capitalize first letter
