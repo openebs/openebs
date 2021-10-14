@@ -101,7 +101,7 @@ OpenEBS welcomes your feedback and contributions in any form possible.
 
 ## Show me the Code
 
-This is a meta-repository for OpenEBS. Please start with the pinned repositories or with [OpenEBS Architecture](./contribute/design/README.md) document. 
+This is a meta-repository for OpenEBS. Please start with the pinned repositories or with the [OpenEBS Architecture](./contribute/design/README.md) document. 
 
 ## License
 
