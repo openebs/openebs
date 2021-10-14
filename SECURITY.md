@@ -1,6 +1,6 @@
 # Security Policy
 
-OpenEBS follows similar security policy as other CNCF projects, primarily inspired from the Kubernetes project. As the community and adoption increases, a much more detailed process will be put in place. 
+OpenEBS follows a similar security policy as other CNCF projects, primarily inspired from the Kubernetes project. As the community and adoption increases, a much more detailed process will be put in place. 
 
 ## Announcements
 
