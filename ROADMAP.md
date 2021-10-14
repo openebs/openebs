@@ -78,14 +78,14 @@ Note: OpenEBS follows a monthly release cadence with a new minor release on the 
   - https://github.com/openebs/node-disk-manager
 - Backlogs
   - [Done] Enhance the discovery probes to identify virtual storage (without WWN) moving across nodes
-  - [Done] Add gRPC API to list and re-scan block device
+  - [Done] Add gRPC API to list and rescan block device
   - [Done] Enhance the discovery probes to detect if the device already has device mapper, zfs and so forth
   - [Done] Scan for device media errors and report them as prometheus metrics via ndm-exporter
   - [Done] Label the block devices so that they can be reserved for use by different StorageClasses
-  - [In-progress] Auto-detecting capacity and mountpoint changes and updating the block device CR 
+  - [In-progress] Auto-detecting capacity and mount point changes and updating the block device CR 
   - [In-progress] Additional integration and e2e tests
   - Support for using a custom node label to claim devices (instead of default kubernetes.io/hostname)
-  - Support Bulk BDC requests to claim multiple block devices that satisfy affinity or anti-affinity rules of applications. Example: two block devices from same node or two block devices from different nodes. 
+  - Support Bulk BDC requests to claim multiple block devices that satisfy affinity or anti-affinity rules of applications. Example: two block devices from the same node or two block devices from different nodes. 
   - Support for device configuration tasks like partitioning, mounting or unmounting devices by adding new services via NDM gRPC API layer.
 
 
@@ -117,7 +117,7 @@ Note: OpenEBS follows a monthly release cadence with a new minor release on the 
 
 ## Near Term
 
-Typically the items under this category fall under next major release (after the current. e.g 4.0). At a high level, the focus is towards moving the beta engines towards stable by adding more automated e2e tests and updating the corresponding user and contributor documents. To name a few backlogs (not in any particular order) on the near-term radar, where we are looking for additional help: 
+Typically the items under this category fall under the next major release (after the current. e.g 4.0). At a high level, the focus is moving the beta engines towards stability by adding more automated e2e tests and updating the corresponding user and contributor documents. To name a few backlogs (not in any particular order) on the near-term radar, where we are looking for additional help: 
 
 
 - Support for specifying multiple hostpaths to be used with Local PV hostpath
@@ -142,7 +142,7 @@ Typically the items under this category fall under next major release (after the
 
 ## Future
 
-As the name suggests this bucket contains items that are planned for future. Sometimes the items are related to adapting to the changes coming in the Kubernetes repo or other related projects. Github milestone called [future backlog](https://github.com/openebs/openebs/milestone/11) is used to track these requests . 
+As the name suggests this bucket contains items that are planned for the future. Sometimes the items are related to adapting to the changes coming in the Kubernetes repo or other related projects. A Github milestone called [future backlog](https://github.com/openebs/openebs/milestone/11) is used to track these requests . 
 
 # Getting involved with Contributions
 
