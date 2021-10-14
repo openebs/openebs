@@ -22,17 +22,17 @@ or the reliability of a release process. But those things distinguish a great
 project from a good one.
 
 The levels of maintainership as maintained in the OpenEBS GitHub organization are
-explained in the following sub-sections. 
+explained in the following subsections. 
 
 ### Community Contributor
 
 OpenEBS is a very welcoming community and is eager to onboard and help anyone
 from the OpenSource community to contribute to the project. To facilitate onboarding
-of the community members, OpenEBS maintainers participate in Hackthon events and are
+of the community members, OpenEBS maintainers participate in Hackathon events and are
 responsive on the [slack, community meetings and github](./community/). 
 
 Any individual with intent to contribute to open source in general or fix a specific
-issue they are having the OpenEBS project can contribute. If anyone is looking for 
+issue they are having in the OpenEBS project can contribute. If anyone is looking for 
 ideas for contributing, the open issue backlog maintained under the 
 [OpenEBS GitHub projects](https://github.com/orgs/openebs/projects) is a great place to start. 
 
