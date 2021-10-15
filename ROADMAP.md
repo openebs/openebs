@@ -2,14 +2,14 @@
 
 This document provides information on OpenEBS development in current and upcoming releases. Community and contributor involvement is vital for successfully implementing all desired items for each release. We hope that the items listed below will inspire further engagement from the community to keep OpenEBS progressing and shipping exciting and valuable features.
 
-OpenEBS follows a lean project management approach by splitting the development items into current, near term and future categories.
+OpenEBS follows a lean project management approach by splitting the development items into current, near-term, and future categories.
 
 
 ## Current
 
-These are some of the backlogs that are prioritized and planned to be completed within the next major release (e.g. OpenEBS 3.0). While the following are planned items, higher priority is given to usability and stability issues reported by the community. The completion of these items also depends on the availability of contributors.
+These are some of the backlogs that are prioritized and planned to be completed within the next major release (e.g. OpenEBS 3.0). While the following are planned items, a higher priority is given to usability and stability issues reported by the community. The completion of these items also depends on the availability of contributors.
 
-Note: OpenEBS follows a monthly release cadence with a new minor release on the 15th of every month.  For the most current plan and status check out the [release project trackers](https://github.com/orgs/openebs/projects) or the component specific trackers listed below. This document is reviewed and updated by the maintainers after each release. 
+Note: OpenEBS follows a monthly release cadence with a new minor release on the 15th of every month.  For the most current plan and status check out the [release project trackers](https://github.com/orgs/openebs/projects) or the component-specific trackers listed below. This document is reviewed and updated by the maintainers after each release. 
 
   
 ### Dynamic Local PVs
@@ -43,7 +43,7 @@ Note: OpenEBS follows a monthly release cadence with a new minor release on the 
   - [In-progress] Refactoring for better control plane and stability fixes
   - [In-progress] Add additional integration and end-to-end tests 
   - Mayastor Replica placement should be topology aware
-  - Mayastor should expose metrics which meet the needs of the SRE persona, to trend review throughput, latency, capacity utilisation and errors
+  - Mayastor should expose metrics that meet the needs of the SRE persona, to trend review throughput, latency, capacity utilization, and errors
   - Multi-arch builds for all Mayastor components
   - Support for VolumeSnapshot
 
@@ -52,9 +52,9 @@ Note: OpenEBS follows a monthly release cadence with a new minor release on the 
   - https://github.com/openebs/jiva
   - https://github.com/openebs/jiva-operator
 - Backlogs
-  - [Done] Enhance Jiva Operator functionality to reduce manual steps around launching new replicas when node is completely removed from the cluster
+  - [Done] Enhance Jiva Operator functionality to reduce manual steps around launching new replicas when the node is completely removed from the cluster
   - [Done] Add additional integration tests to Jiva CSI Driver to move towards beta
-  - [Done] Consolidate the CSI driver and Jiva control plane into single repo
+  - [Done] Consolidate the CSI driver and Jiva control plane into a single repo
   - [In-progress] Automate the migration of volumes from out-of-tree provisioners to CSI Driver
   - [In-progress] Add additional integration and end-to-end tests 
   
@@ -79,14 +79,14 @@ Note: OpenEBS follows a monthly release cadence with a new minor release on the 
 - Backlogs
   - [Done] Enhance the discovery probes to identify virtual storage (without WWN) moving across nodes
   - [Done] Add gRPC API to list and re-scan block device
-  - [Done] Enhance the discovery probes to detect if the device already has device mapper, zfs and so forth
+  - [Done] Enhance the discovery probes to detect if the device already has a device-mapper, zfs and so forth
   - [Done] Scan for device media errors and report them as prometheus metrics via ndm-exporter
   - [Done] Label the block devices so that they can be reserved for use by different StorageClasses
   - [In-progress] Auto-detecting capacity and mountpoint changes and updating the block device CR 
   - [In-progress] Additional integration and e2e tests
   - Support for using a custom node label to claim devices (instead of default kubernetes.io/hostname)
-  - Support Bulk BDC requests to claim multiple block devices that satisfy affinity or anti-affinity rules of applications. Example: two block devices from same node or two block devices from different nodes. 
-  - Support for device configuration tasks like partitioning, mounting or unmounting devices by adding new services via NDM gRPC API layer.
+  - Support Bulk BDC requests to claim multiple block devices that satisfy affinity or anti-affinity rules of applications. Example: two block devices from the same node or two block devices from different nodes. 
+  - Support for device configuration tasks like partitioning, mounting, or unmounting devices by adding new services via NDM gRPC API layer.
 
 
 ### Others
@@ -123,18 +123,18 @@ Typically the items under this category fall under next major release (after the
 - Support for specifying multiple hostpaths to be used with Local PV hostpath
 - Ability to migrate the Local PVs to other nodes in the cluster to handle node upgrades
 - Update user documentation with reference stacks of running various workloads using OpenEBS volumes 
-- Auto provisioning of block devices (on the external storage systems) that can be used with OpenEBS storage engines
+- Auto-provisioning of block devices (on the external storage systems) that can be used with OpenEBS storage engines
 - Enhancements to OpenEBS CLI (openebsctl) for better troubleshooting OpenEBS components and fixing the errors
 - Setup E2e pipelines for ARM Clusters
-- Conform with the new enhancements coming in the newer Kubernetes releases around Capacity based provisioning, CSI, and so forth
+- Confirm with the new enhancements coming in the newer Kubernetes releases around Capacity based provisioning, CSI, and so forth
 - Automate the workflows around handling scenarios like complete cluster failures that currently require some manual steps
-- Custom Kubernetes storage schedulers to address auto-rebalancing of the data placed on the nodes to help with scale up/down of Kubernetes nodes
+- Custom Kubernetes storage schedulers to address auto-rebalancing of the data placed on the nodes to help with scale-up/down of Kubernetes nodes
 - User-friendly installation & configuration command-line tool (analogy to linkerd CLI for linkerd)
 - Allow Mayastor Pools to incorporate more than one capacity contributing disk device
 - Failed replicas should be garbage collected (return capacity to Mayastor Pool)
 - Allow a new replica to be created within the same Mayastor Pool as the failed replica it replaces
 - Auto-scaling up and down of cStor pools as the new nodes are added and removed
-- Auto-upgrade of cStor Pools and Volumes when user upgrades control plane
+- Auto-upgrade of cStor Pools and Volumes when a user upgrades the control plane
 - Asynchronous or DR replica for cStor and Mayastor volumes
 - Support for restoring a volume (in-place) for supporting blue/green stateful deployments
 - Upstream uZFS changes and start using them instead of a local fork 
@@ -142,11 +142,11 @@ Typically the items under this category fall under next major release (after the
 
 ## Future
 
-As the name suggests this bucket contains items that are planned for future. Sometimes the items are related to adapting to the changes coming in the Kubernetes repo or other related projects. Github milestone called [future backlog](https://github.com/openebs/openebs/milestone/11) is used to track these requests . 
+As the name suggests this bucket contains items that are planned for the future. Sometimes the items are related to adapting to the changes coming in the Kubernetes repo or other related projects. Github milestone called [future backlog](https://github.com/openebs/openebs/milestone/11) is used to track these requests. 
 
 # Getting involved with Contributions
 
-We are always looking for more contributions. If you see anything above that you would love to work on, we welcome you to become a contributor and maintainer of the areas that you love. You can get started by commenting on the related issue or by creating a new issue. Also you can reach out to us by:
+We are always looking for more contributions. If you see anything above that you would love to work on, we welcome you to become a contributor and maintainer of the areas that you love. You can get started by commenting on the related issue or by creating a new issue. Also, you can reach out to us by:
 
 - [Joining OpenEBS contributor community on Kubernetes Slack](https://kubernetes.slack.com)
 	- Already signed up? Head to our discussions at [#openebs-dev](https://kubernetes.slack.com/messages/openebs-dev/)
