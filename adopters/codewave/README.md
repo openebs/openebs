@@ -4,7 +4,7 @@
 Jiva. We are planning tests on cStor and might switch to it.
 
 ### Number of Applications: 
-varies between 20 and 50 
+Ranges from 20 to 50.
 
 ### Names of the Stateful Applications: 
 The tools we are using or were using with OpenEBS: Bitwarden, Bookstack, Allegros Ralph, LimeSurvey, Grafana, Hackmd/Codimd, MinIO, Nextcloud, Percona XtraDB Cluster Operator, Nextcloud, SonarQube, Sentry, JupyterHub.
