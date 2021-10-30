@@ -1,4 +1,4 @@
-# Git Cheat Sheet
+# Git Cheat_Sheet
 
 Fork the [openebs/openebs](https://github.com/openebs/openebs) repository into your account, referred in the below instructions as $user.
 
