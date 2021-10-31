@@ -9,7 +9,7 @@ These conventions are aimed at tools to automatically generate useful documentat
 
 ## Proposed Commit Message Format
 
-Any line of the commit message cannot be longer than 80 characters! This allows the message to be easier to read on github as well as in various git tools.
+Any line of the commit message cannot be longer than 80 characters! This allows the message to be easier to read on GitHub as well as in various git tools.
 
 ```
 [TICKET] <type>(<scope>): <subject> <meta>
@@ -23,7 +23,7 @@ Any line of the commit message cannot be longer than 80 characters! This allows 
 
 Subject line may be prefixed for continuous integration purposes
  or better project management with a ticket id. The ticket id could 
- be a Github Issue, Rally Id, JIRA Id, etc.,  For example,
+ be a GitHub Issue, Rally Id, JIRA Id, etc.,  For example,
  if you use Rally to track your development, the subject could be
  "[TA-1234] test(mayactl): add unit tests for cstor volume list"
 
@@ -32,7 +32,7 @@ Subject line may be prefixed for continuous integration purposes
 * **fix**: A bug fix
 * **docs**: Documentation only changes
 * **style**: Changes that do not affect the meaning of the code 
-  (white-space, formatting, missing semi-colons, etc)
+  (white-space, formatting, missing semi-colons, etc.)
 * **refactor**: A code change that neither fixes a bug nor adds a feature
 * **perf**: A code change that improves performance
 * **test**: Adding missing tests
@@ -46,7 +46,7 @@ For example: when committing to openebs/maya repo, the scope can be
 - generic    : compile, travis-ci, etc.
 
 ### `<subject>` text
-Subject line should contains succinct description of the change. 
+Subject line should contain succinct description of the change. 
 
 * use imperative, present tense: “change” not “changed” nor “changes”
 * don't capitalize first letter

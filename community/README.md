@@ -28,7 +28,7 @@ If that does not answer your questions, or if you think you found a bug, please 
 
 ## Community Meetings
 
-To add any of the following events to your calendar, please send an email to `kiran.mova@mayadata.io`.
+To add any of the following events to your calendar, please email `kiran.mova@mayadata.io`.
 
 ### Daily Standup and Release Cadence Meetings
 
@@ -38,7 +38,7 @@ Feature requests and current release tasks are captured in this [GitHub projects
 
 ### Weekly Project Sync-up Meetings
 
-We have a weekly or bi-weekly sync up over Google hangout or Zoom on sub projects of openebs: 
+We have a weekly or bi-weekly sync up over Google hangout or Zoom on subprojects of openebs: 
 
 - OpenEBS Release Review meeting every Thursday at 12:00PM IST over [Zoom](https://zoom.us/j/94026663246). 
 - E2e Review every Monday at 12:45PM IST over [Hangout](https://meet.google.com/bme-vjsj-qdp)

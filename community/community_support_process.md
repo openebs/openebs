@@ -14,7 +14,7 @@ One or more of the OpenEBS contributors may also take up the additional responsi
 
 1. **Add new tickets**: Read through the [slack threads](https://kubernetes.slack.com/messages/openebs) created during the duration of the month,  **E.g.** For the [2021 - April Community Tracker](https://github.com/orgs/openebs/projects/31) project, we'll look at posts created during the month of April, 2021. Add new queries as cards in the `New` section. For queries which already have their own GitHub issue, add the issue card into the `New` section. Add a link to the slack thread in the card to add context to the ticket.
 
-2. **Update existing tickets**: Issues which have been engaged need to move out of the `New` section. If the slack conversation is active and progressing, move the card to the `In progress` section. If the conversation needs feedback from the user to progress, move the card to the `Waiting on user feedback` section.
+2. **Update existing tickets**: Issues which have been engaged need to move out of the `New` section. If the Slack conversation is active and progressing, move the card to the `In progress` section. If the conversation needs feedback from the user to progress, move the card to the `Waiting on user feedback` section.
 
 3. **Reach resolution**: Issues which reach resolution should ideally have a line or two describing how it was resolved. Issues may reach resolution in one of 3 ways (4 sections)...
 	- *Resolved* -- Move cards to this section when user's query has been resolved, and no code or documentation change could be recommended.

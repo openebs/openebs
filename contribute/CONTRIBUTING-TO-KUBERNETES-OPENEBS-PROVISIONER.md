@@ -52,7 +52,7 @@ cd $working_dir
 
 ```
 
-Set `user` to match your Github profile name:
+Set `user` to match your GitHub profile name:
 
 ```bash
 user={your Github profile name}
@@ -102,13 +102,13 @@ git push origin <branch-name>  #After this changes will appear in your $user/ext
 
 ### Create pull request to `kubernetes-incubator/external-storage`
 
-Once above procedure is followed, you will see your changes in branch `<branch-name>` of `$user/external-storage` on Github. You can create a PR at `kubernetes-incubator/external-storage`.
+Once above procedure is followed, you will see your changes in branch `<branch-name>` of `$user/external-storage` on GitHub. You can create a PR at `kubernetes-incubator/external-storage`.
 You can add the label `area/openebs` to your PR by commenting `/area openebs` in the comment section of your PR.
 
 ### Fetching latest changes to `openebs/external-storage`
 
-Once, a PR is merged in `kubernetes-incubator/external-storage`, ask one of the OpenEBS owners to fetch latest changes to `openebs/external-storage`.
+Once, a PR is merged in `kubernetes-incubator/external-storage`, ask one of the OpenEBS owners to fetch the latest changes to `openebs/external-storage`.
 
-Owners will fetch latest changes from `kubernetes-incubator/external-storage` to `openebs/external-storage`repo. Your changes will appear here! :smile:
+Owners will fetch the latest changes from `kubernetes-incubator/external-storage` to `openebs/external-storage`repo. Your changes will appear here! :smile:
 
 If you need any help with git, refer to this [git cheat sheet](./git-cheatsheet.md) and go back to the [**contributing to OpenEBS Documentation**](../CONTRIBUTING.md) guide to proceed.

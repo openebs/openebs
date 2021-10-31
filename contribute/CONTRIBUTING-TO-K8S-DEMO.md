@@ -7,7 +7,7 @@ Kubernetes YAML files for running application using OpenEBS Volumes are located 
 Each application example should comprise of the following:
 
 - K8s YAML file(s) for starting the application and its associated components. The volumes should point to the OpenEBS Storage Class. If the existing storage-classes does not suit the need, create a new storage class at [openebs-storageclasses.yaml](../k8s/openebs-storageclasses.yaml).
-- K8s YAML file(s) for starting a client that accesses the application. This is optional, in case the application itself provides a mechanism like in Jupyter, Wordpress, etc.
+- K8s YAML file(s) for starting a client that accesses the application. This is optional, in case the application itself provides a mechanism like in Jupyter, WordPress, etc.
 
   When demonstrating a database-like application like Apache Cassandra, Redis, and so on, it is recommended to have such a mechanism to test that the application has been launched.
 - An instruction guide, that will help in launch and verification of the application.
@@ -34,7 +34,7 @@ Some general guidelines when submitting issues for example applications:
 
 ## Create your development branch
 
-- Fork the openebs repository and if you had previously forked, rebase with master to fetch latest changes.
+- Fork the openebs repository and if you had previously forked, rebase with master to fetch the latest changes.
 - Create a new development branch in your forked repository with the following naming convention: *"task description-#issue"*
 
   **Example:** *OpenEBS-Support-Kafka-Application-#538*

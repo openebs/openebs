@@ -10,10 +10,10 @@ mkdir -p $working_dir
 cd $working_dir
 ```
 
-Set `user` to match your Github profile name:
+Set `user` to match your GitHub profile name:
 for setting global configurations use - 
-git config --global user.name "your usernae here"
-git config --global user.email "your email used in github account"
+git config --global user.name "your username here"
+git config --global user.email "your email used in GitHub account"
 
 and for configuring locally use the above commands just remove the --global flag
 ```bash

@@ -19,7 +19,7 @@ The high availability is achieved by abstracting the access to the volume into t
 
 ## Storage Management or Control Plane
 
-The Storage Management or Control Plane is responsible for interfacing between Kubernetes (Volume/CSI interface) and managing the volumes created using the OpenEBS Data Engines. The Storage Management Plane is implemented using a set of containers that are either running at the cluster level or the node level. Some of the storage management options are also provided by containers running as side-cars to the data engine containers. 
+The Storage Management or Control Plane is responsible for interfacing between Kubernetes (Volume/CSI interface) and managing the volumes created using the OpenEBS Data Engines. The Storage Management Plane is implemented using a set of containers that are either running at the cluster level or the node level. Some storage management options are also provided by containers running as side-cars to the data engine containers. 
 
 The storage management containers are responsible for providing APIs for gathering details about the volumes. The APIs can be used by Kubernetes Provisioners for managing volumes, snapshots, backups, so forth; used by Prometheus to collect metrics of volumes; used by custom programs like CLI or UI to provide insights into the OpenEBS Storage status or management.
 
