@@ -29,6 +29,7 @@ The list of organizations that have publicly shared the usage of OpenEBS:
 | [Optoro](https://www.optoro.com/) | PostgreSQL, MySQL, Apache Kafka, Redis, ElasticSearch, Prometheus, Thanos | [English](./adopters/optoro/README.md) |
 | [Orange](https://www.orange.com/en/home) | Prometheus, Alertmanager, ChartMuseum, Harbor, GitLab, PostgreSQL, Redis, OpenLdap, RabbitMQ, MySQL, MinIO, Metabase, ... | [English](./adopters/orange/README.md) |
 | [Plaid Cloud](https://github.com/PlaidCloud) | Redis, Prometheus, Elasticsearch, PostgreSQL | [English](./adopters/plaidcloud/README.md) |
+| [Realworks BV](https://www.realworks.nl/) | Strimzi operator for Apache Kafka, Spilo operator for PostgreSQL | [English](./adopters/realworks/README.md) |
 | [Renthopper](https://renthopper.co.uk) | Ruby on Rails with ActiveStorage, Redmine, Docker registry, ownCloud, Mattermost, Bitbucket, Jira and Blynk | [English](./adopters/users/laimison/README.md) |
 | [Sharecare, Inc.](https://www.sharecare.com/) | Prometheus, internal applications | [English](./adopters/sharecare/README.md) |
 | [Stratus5](https://stratus5.com/) | Redis,Ceryx, MySQL, MariaDB, Wordpress | [English](./adopters/stratus5/README.md) |
