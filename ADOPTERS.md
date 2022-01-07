@@ -26,6 +26,7 @@ The list of organizations that have publicly shared the usage of OpenEBS:
 | [KPN](https://www.kpn.com/) | ManageIQ, AWX, Harbor, Selenium Hub based automated UI testing, verdaccio, openshift monitoring (alert manager), openshift monitoring (cassandra) | [English](./adopters/kpn/README.md) |
 | [KubeSphere](https://kubesphere.io) | [KubeSphere](https://github.com/kubesphere/kubesphere), there are some stateful components of KubeSphere including Redis, MySQL, Elasticsearch, Prometheus, etc. | [English](./adopters/kubesphere/README.md) |
 | Lannister Investments LTD | Prometheus, Grafana, Elasticsearch, PostgreSQL DB, Redis | [English](./adopters/lannisterinvestments/README.md) |
+| [NationTech](https://nationtechuae.com/) | Elasticsearch, Kibana, Prometheus, Alertmanager, PostgreSQL, Docker registry, Odoo, NextCloud, Grafana, Django, FluentD | [English](./adopters/nationtech/README.md) |
 | [Optoro](https://www.optoro.com/) | PostgreSQL, MySQL, Apache Kafka, Redis, ElasticSearch, Prometheus, Thanos | [English](./adopters/optoro/README.md) |
 | [Orange](https://www.orange.com/en/home) | Prometheus, Alertmanager, ChartMuseum, Harbor, GitLab, PostgreSQL, Redis, OpenLdap, RabbitMQ, MySQL, MinIO, Metabase, ... | [English](./adopters/orange/README.md) |
 | [Plaid Cloud](https://github.com/PlaidCloud) | Redis, Prometheus, Elasticsearch, PostgreSQL | [English](./adopters/plaidcloud/README.md) |
