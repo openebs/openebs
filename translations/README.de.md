@@ -53,7 +53,7 @@ Wir nähern uns der Beta-Phase mit aktiver Entwicklung. Weitere Informationen fi
  
 OpenEBS freut sich über Ihr Feedback und Ihre Beiträge in jeder möglichen Form.
  
-- [Tritt unserer Gemeinschaft](https://kubernetes.slack.com)
+- [Tritt unserer Gemeinschaft bei](https://kubernetes.slack.com)
   - Bereits angemeldet? Besuchen Sie unsere Diskussionen unter [#openebs](https://kubernetes.slack.com/messages/openebs/).
 - Möchten Sie ein Problem ansprechen?
   - Wenn es sich um ein generisches Produkt (oder "nicht wirklich sicher") handelt, können Sie es dennoch unter [issues](https://github.com/openebs/openebs/issues) anheben.
