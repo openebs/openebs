@@ -79,6 +79,7 @@ Note: OpenEBS follows a quarterly release cadence with a new minor release aroun
 - Backlogs
   - Enhancements to OpenEBS CLI (openebsctl) for better troubleshooting OpenEBS components and fixing the errors
   - User-friendly installation & configuration command-line tool (analogy to linkerd CLI for linkerd)
+  - Migrate the CI to CNCF infrastructure from vendor infrastructure
 
 ## Near Term
 
