@@ -30,12 +30,11 @@ Note: OpenEBS follows a quarterly release cadence with a new minor release aroun
   - https://github.com/openebs/moac (deprecated)
   - https://github.com/openebs/mayastor-control-plane
 - Backlogs
-  - Mayastor Replica placement should be topology aware for statefulsets (zonal (or HA) distribution. 
+  - Mayastor Replica placement should be topology aware for statefulsets zonal (or HA) distribution. 
   - Mayastor should expose metrics that meet the needs of the SRE persona, to trend review throughput, latency, capacity utilization, and errors
   - Support for VolumeSnapshot
   - API refactoring exposed via gRPC
   - Allow a new replica to be created within the same Mayastor Pool as the failed replica it replaces
-  - Failed replicas should be garbage collected (return capacity to Mayastor Pool)  
 
 ### Jiva
 - Source repositories
