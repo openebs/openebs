@@ -56,6 +56,7 @@ The list of users that have publicly shared the usage of OpenEBS.
 | [Mike T.](https://gitlab.com/mterhar) | Coder, Mattermost, Minio | [English](./adopters/users/mterhar/README.md) |
 | [Nick Pappas](https://github.com/radicand) | Wordpress, MariaDB on ARM64 cluster | [English](./adopters/users/radicand/README.md) | 
 | [proegssilb](https://github.com/proegssilb) | PostgreSQL, Redis, Factorio (video game server) | [English](./adopters/users/proegssilb/README.md)  |
+| [Rytis Ilciukas](https://linkedin.com/in/rytis-ilciukas) | ownCloud, Jellyfin, PhotoPrism, filebrowser, pyLoad | [English](./adopters/users/RytisLT/README.md) |
 | [Somsubhra Das](https://github.com/Somsubhra1) | PostgreSQL, MariaDB, Prometheus | [English](./adopters/users/Somsubhra1/README.md) |
 | [Steve Fan](https://github.com/stevefan1999-personal) | [Agones - Game Servers on K8s](https://agones.dev/site/) | [English](./adopters/users/stevefan/README.md)  | 
 | [tardich](https://github.com/tardich) | Postfix Mail Relay, NextCloud, Nexus Repository, Plex | [English](./adopters/users/tardich/README.md)  |
