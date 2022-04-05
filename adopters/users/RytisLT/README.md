@@ -17,4 +17,4 @@ ZFS-LocalPV
 Evaluating for Home NAS
 
 ### **A brief description of the use case or details on how OpenEBS is helping your projects.**
-Very easy to set up and get to a production grade setup with proper automation, dashboards and alerts. Best thing about it I think is the transparency. There is nothing about openebs/zfs-localpv that feels like a black box and it's something important for us when we are considering deploying a storage solution.
+I'm using True NAS Scale with Flux CD to fully describe the desired state of my NAS. OpenEBS + Flux CD allows me to define my applications, their configs and storage needs (ZPool Datasets) in git without needing to interact with True NAS Scale UI. Since the entire state is version controlled disaster recovery should be a cake walk.
