@@ -22,6 +22,7 @@
 #
 #Maintainers 
 "Amit Kumar Das",@AmitKumarDas,JIMDO
+"Giridhar Shankar",@giridharshankar013,Datacore
 "Glenn Bullingham",@GlennBullingham,MayaData
 "Jeffry Molanus",@gila,MayaData
 "Karthik Satchitanand",@ksatchit,ChaosNative
@@ -43,7 +44,6 @@
 "Evan Powell",@epowell101,MayaData #content-maintainers
 "Giri",@gprasath,MayaData #control-plane-maintainers
 "Harsh Thakur",@realHarshThakur,Independent #control-plane-maintainers
-"Jan Kryl",@jkryl,MayaData #cstor-engine-maintainers, mayastor-maintainers
 "Jonathan Teh",@jonathan-teh,MayaData #mayastor-maintainers
 "Mehran Kholdi",@SeMeKh,Hamravesh #control-plane-maintainers
 "Michael Fornaro",@xUnholy,Independent-Raspbernetes #control-plane-maintainers
@@ -65,5 +65,6 @@
 "Yashpal Choudhary",@iyashu,Independent #control-plane-maintainers
 
 #Emeritus Maintainers or Reviewers due to change in project priorities. 
+#"Jan Kryl",@jkryl,MayaData #cstor-engine-maintainers, mayastor-maintainers
 #"Peeyush Gupta",@Pensu,DigitalOcean #control-plane-maintainers
 #"Satbir Singh satbirchhikara",@satbirchhikara,MayaData #cstor-engine-maintainers
