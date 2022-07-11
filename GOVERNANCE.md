@@ -1,14 +1,13 @@
-# OpenEBS Project Governance
+# Governance 
 
-We abide by the [Code of Conduct](./CODE_OF_CONDUCT.md) for all the projects maintained under the OpenEBS Organization.
-
-For specific guidance on practical contribution steps for any OpenEBS sub-project please
-see our [CONTRIBUTING.md](./CONTRIBUTING.md) guide and the sub-project specific contributing guides 
-in the respective GitHub repositories.
+OpenEBS is a collection of [multiple sub-projects](./contribute/design#source-code-and-dependencies)
+that can either be used independently or as combination of multiple sub-projects by end-users 
+to run Stateful workloads in Kubernetes. This document outlines how these projects are governed,
+while abiding by the [CNCF Code of Conduct](./CODE_OF_CONDUCT.md).
 
 ## Maintainership
 
-There are different types of maintainers, with different responsibilities, but
+There are different levels of maintainers, with different responsibilities, but
 all maintainers have 3 things in common:
 
 1) They share responsibility in the project's success.
@@ -22,25 +21,58 @@ to appreciate the absence of bugs, the slow but steady improvement in stability,
 or the reliability of a release process. But those things distinguish a great
 project from a good one.
 
-## Reviewers
+The levels of maintainership as maintained in the OpenEBS GitHub organization are
+explained in the following sub-sections. 
 
-A reviewer is a core role within the project.
-They share in reviewing issues and pull requests and their LGTM counts towards the
+### Community Contributor
+
+OpenEBS is a very welcoming community and is eager to onboard and help anyone
+from the OpenSource community to contribute to the project. To facilitate onboarding
+of the community members, OpenEBS maintainers participate in Hackthon events and are
+responsive on the [slack, community meetings and github](./community/). 
+
+Any individual with intent to contribute to open source in general or fix a specific
+issue they are having the OpenEBS project can contribute. If anyone is looking for 
+ideas for contributing, the open issue backlog maintained under the 
+[OpenEBS GitHub projects](https://github.com/orgs/openebs/projects) is a great place to start. 
+
+Community Contributors are typically outside of the OpenEBS GitHub organization. 
+
+### Contributors 
+
+Becoming an OpenEBS contributor demonstrates that the individual has started to make 
+regular contributors to the project and is progressing up the levels of maintainership. 
+
+The contributors get a write access to the GitHub project to allow them to directly request 
+other org members as reviewers for their PRs and to help them being added as reviewers for
+contributions coming from other community contributors or OpenEBS org members. 
+
+### Reviewers
+
+A reviewer is a core role within the project. Becoming a reviewer is a core aspect in
+the journey to becoming a maintainer.
+
+Reviewers has gained expertise in one or more of the sub projects and they can influence the
+planning of the release and review pull requests and their LGTM counts towards the
 required LGTM count to merge a code change into the project.
 
-Reviewers are part of the organization but do not have write access.
-Becoming a reviewer is a core aspect in the journey to becoming a maintainer.
+Reviewers are part of the organization and have maintain access to the projects they lead.
 
-## Adding maintainers
+
+### Maintainers
 
 Maintainers are first and foremost contributors that have shown they are
-committed to the long term success of a project. Contributors wanting to become
+committed to the long term success of a project. Anyone wanting to become
 maintainers are expected to be deeply involved in contributing code, pull
 request review, and triage of issues in the project for more than three months.
 
 Just contributing does not make you a maintainer, it is about building trust
 with the current maintainers of the project and being a person that they can
 depend on and trust to make decisions in the best interest of the project.
+
+Maintainers have admin access to the GitHub organization.
+
+## Adding a reviewer or maintainer 
 
 Periodically, the existing maintainers curate a list of contributors that have
 shown regular activity on the project over the prior months. From this list,
@@ -61,6 +93,10 @@ MAINTAINERS file. The voting process may take place inside a pull request if a
 maintainer has already discussed the candidacy with the candidate and a
 maintainer is willing to be a sponsor by opening the pull request. The candidate
 becomes a maintainer once the pull request is merged.
+
+A contributor can be added to the sub-project at the discretion of the reviewers or
+maintainers of the sub project and take help from any of the maintainers to add the
+contributor to the OpenEBS Github project. 
 
 ## Adding sub-projects
 
@@ -109,9 +145,7 @@ manifesto, and so on.
 All decisions affecting OpenEBS, big and small, follow the same 3 steps:
 
 * Step 1: Open a pull request. Anyone can do this.
-
 * Step 2: Discuss the pull request. Anyone can do this.
-
 * Step 3: Merge or refuse the pull request. Who does this depends on the nature
 of the pull request and which areas of the project it affects.
 

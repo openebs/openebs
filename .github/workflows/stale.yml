@@ -10,11 +10,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/stale@v1
+    - uses: actions/stale@v4
       with:
         repo-token: ${{ secrets.GITHUB_TOKEN }}
-        stale-issue-message: 'Issues go stale after 90d of inactivity.'
-        stale-pr-message: 'PRs go stale after 90d of inactivity.'
+        stale-issue-message: 'Issues go stale after 90d of inactivity. Please comment or re-open the issue if you are still interested in getting this issue fixed.'
+        stale-pr-message: 'PRs go stale after 90d of inactivity. Please comment or re-open the PR if you are still working on this PR.'
         stale-issue-label: 'no-issue-activity'
         stale-pr-label: 'no-pr-activity'
         days-before-stale: 90

@@ -11,49 +11,59 @@
 # Each reviewer can be part of one or more GitHub 
 # team aliases created for maintaining sub projects. 
 # Current active team aliases for sub projects are:
-# - control-plane-maintainers
+# - control-plane-maintainers (includes Local PVs)
 # - jiva-maintainers
 # - cstor-maintainers
+# - mayastor-maintainers
 # - e2e-maintainers
-# - content-maintainers
+# - content-maintainers (website, documentation) 
 #
 # Please keep the below list sorted in ascending order.
 #
-#Maintainers
-"Amit Kumar Das",@AmitKumarDas,MayaData
+#Maintainers 
+"Amit Kumar Das",@AmitKumarDas,JIMDO
+"Glenn Bullingham",@GlennBullingham,MayaData
 "Jeffry Molanus",@gila,MayaData
-"Karthik Satchitanand",@ksatchit,MayaData
+"Karthik Satchitanand",@ksatchit,ChaosNative
 "Kiran Mova",@kmova,MayaData
+"Mayank",@mynktl,MayaData
 "Murat Karslioglu",@muratkars,MayaData
+"Pawan Prakash Sharma",@pawanpraka1,MayaData
 "Richard Elling",@richardelling,Viking Enterprise Solutions a division of Sanmina Corporation
-"Vishnu Itta",@vishnuitta,MayaData
+"Vishnu Itta",@vishnuitta,Independent
 
 #Reviewers
+"Aditya Jain",@z0marlin,Independent #control-plane-maintainers
 "Akhil Mohan",@akhilerm,MayaData #control-plane-maintainers
+"Aman Gupta",@w3aman,MayaData #control-plane-maintainers
+"Arne Rusek",@arne-rusek,MayaData #mayastor-maintainers
 "Ashutosh Kumar",@sonasingh46,MayaData #control-plane-maintainers
+"Blaise Dias",@blaisedias,MayaData #mayastor-maintainers
+"Chris Wldenyer",@chriswldenyer,MayaData #mayastor-maintainers
 "Evan Powell",@epowell101,MayaData #content-maintainers
-"Giri",@gprasath,MayaData #e2e-maintainers
-"Glenn Bullingham",@GlennBullingham,MayaData #mayastor-maintainers
+"Giri",@gprasath,MayaData #control-plane-maintainers
 "Harsh Thakur",@realHarshThakur,Independent #control-plane-maintainers
 "Jan Kryl",@jkryl,MayaData #cstor-engine-maintainers, mayastor-maintainers
 "Jonathan Teh",@jonathan-teh,MayaData #mayastor-maintainers
-"Mayank",@mynktl,MayaData #control-plane-maintainers, cstor-engine-maintainers
 "Mehran Kholdi",@SeMeKh,Hamravesh #control-plane-maintainers
 "Michael Fornaro",@xUnholy,Independent-Raspbernetes #control-plane-maintainers
-"Pawan Prakash Sharma",@pawanpraka1,MayaData #control-plane-maintainers, cstor-engine-maintainers
-"Payes Anand",@payes,MayaData #control-plane-maintainers, cstor-engine-maintainers, jiva-engine-maintainers
-"Peeyush Gupta",@Pensu,DigitalOcean #control-plane-maintainers
+"Michael Tsymbalyuk",@mtzaurus,MayaData #mayastor-maintainers
+"Payes Anand",@payes,MayaData,#control-plane-maintainers, jiva-engine-maintainers, cstor-engine-maintainers, mayastor-maintainers
+"Paul Yoong",@paulyoong,MayaData #mayastor-maintainers
 "Prateek Pandey",@prateekpandey14,MayaData #control-plane-maintainers
 "Praveen Kumar G T",@praveengt,Independent #control-plane-maintainers
 "Ranjith R",@ranjithwingrider,MayaData #content-maintainers
-"Sagar Kumar",@sagarkrsd,MayaData #content-maintainers
+"Sagar Kumar",@sagarkrsd,Independent #content-maintainers
 "Sai Chaithanya",@mittachaitu,MayaData #control-plane-maintainers
+"Sathya Seelan",@nsathyaseelan,MayaData #control-plane-maintainers
 "Sebastien Dionne",@survivant,Jerabi inc. #control-plane-maintainers
 "Shubham Bajpai",@shubham14bajpai,MayaData #control-plane-maintainers
 "Sjors Gielen",@sgielen,Independent #control-plane-maintainers, cstor-engine-maintainers
-"Uma Mukkara",@umamukkara,MayaData #content-maintainers, e2e-maintainers
-"Utkarsh Mani Tripathi",@utkarshmani1997,MayaData #control-plane-maintainers, jiva-engine-maintainers
+"Tiago Castro",@tiagolobocastro,MayaData #mayastor-maintainers
+"Uma Mukkara",@umamukkara,MayaData #content-maintainers
+"Utkarsh Mani Tripathi",@utkarshmani1997,Independent #control-plane-maintainers, jiva-engine-maintainers
 "Yashpal Choudhary",@iyashu,Independent #control-plane-maintainers
 
 #Emeritus Maintainers or Reviewers due to change in project priorities. 
+#"Peeyush Gupta",@Pensu,DigitalOcean #control-plane-maintainers
 #"Satbir Singh satbirchhikara",@satbirchhikara,MayaData #cstor-engine-maintainers

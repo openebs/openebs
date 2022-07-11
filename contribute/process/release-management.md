@@ -88,7 +88,7 @@ Once a release made on a repository, Travis will trigger the release on the depe
         - openebs/cstor-csi
         - openebs/upgrade
 
-The following repositories currently follow a different release versioning than other components, so these are triggered parallely. 
+The following repositories currently follow a different release versioning than other components, so these are triggered parallelly. 
 - openebs/node-disk-manager
 - openebs/zfs-localpv
 - openebs/Mayastor
