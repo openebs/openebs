@@ -116,5 +116,5 @@ OpenEBS is part of the CNCF Projects.
 This is a list of third-party companies and individuals who provide products or services related to OpenEBS. OpenEBS is a CNCF project which does not endorse any company. The list is provided in alphabetical order.
 - [Clouds Sky GmbH](https://cloudssky.com/en/)
 - [CodeWave](https://codewave.eu/)
+- [DataCore](https://www.datacore.com/support/openebs/)
 - [Gridworkz Cloud Services](https://gridworkz.com/)
-- [MayaData](https://mayadata.io/)
