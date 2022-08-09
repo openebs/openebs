@@ -30,8 +30,7 @@ If that does not answer your questions, or if you think you found a bug, please 
 
 To add any of the following events to your calendar, please send an email to `cncf-openebs-maintainers@lists.cncf.io`.
 
-- Bi-weekly (Every 2 weeks on Thursday 10 PM IST) contributors meeting over [Google hangout](https://meet.google.com/rui-powc-fgt).
-- Monthly roadmap review meeting on every third Tuesday at 8:30PM IST over [Google hangout](meet.google.com/vid-sfmt-igs). Map that to your local time with this [timezone table](https://www.thetimezoneconverter.com/?t=09:30&tz=PT%20%28Pacific%20Time%29).
+- Bi-weekly (Every 2 weeks on Tuesday 7 PM IST) contributors meeting over [Google hangout](https://meet.google.com/rui-powc-fgt). The agenda items and previous discussions can be found [here](https://hackmd.io/tRmnyg9AQPShxFAXOyFpSA?edit).
 
 
 Go back to [**Contributing to OpenEBS**](../CONTRIBUTING.md).
