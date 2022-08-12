@@ -21,17 +21,11 @@
 # Please keep the below list sorted in ascending order.
 #
 #Maintainers 
-"Amit Kumar Das",@AmitKumarDas,JIMDO
-"Giridhar Shankar",@giridharshankar013,Datacore
 "Glenn Bullingham",@GlennBullingham,MayaData
-"Jeffry Molanus",@gila,MayaData
-"Karthik Satchitanand",@ksatchit,ChaosNative
 "Kiran Mova",@kmova,MayaData
 "Mayank",@mynktl,MayaData
-"Murat Karslioglu",@muratkars,MayaData
 "Pawan Prakash Sharma",@pawanpraka1,MayaData
 "Richard Elling",@richardelling,Viking Enterprise Solutions a division of Sanmina Corporation
-"Vishnu Itta",@vishnuitta,Independent
 
 #Reviewers
 "Aditya Jain",@z0marlin,Independent #control-plane-maintainers
@@ -65,6 +59,11 @@
 "Yashpal Choudhary",@iyashu,Independent #control-plane-maintainers
 
 #Emeritus Maintainers or Reviewers due to change in project priorities. 
+#"Amit Kumar Das",@AmitKumarDas,JIMDO
 #"Jan Kryl",@jkryl,MayaData #cstor-engine-maintainers, mayastor-maintainers
+#"Jeffry Molanus",@gila,MayaData
+#"Karthik Satchitanand",@ksatchit,ChaosNative
+#"Murat Karslioglu",@muratkars,MayaData
 #"Peeyush Gupta",@Pensu,DigitalOcean #control-plane-maintainers
 #"Satbir Singh satbirchhikara",@satbirchhikara,MayaData #cstor-engine-maintainers
+#"Vishnu Itta",@vishnuitta,Independent
