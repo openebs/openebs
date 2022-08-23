@@ -81,7 +81,7 @@ The status of various storage engines that power the OpenEBS Persistent Volumes 
 | Jiva | stable | Best suited for running Replicated Block Storage on nodes that make use of ephemeral storage on the Kubernetes worker nodes |
 | cStor | stable | A preferred option for running on nodes that have Block Devices. Recommended option if Snapshot and Clones are required |
 | Local Volumes | stable | Best suited for Distributed Application that need low latency storage - direct-attached storage from the Kubernetes nodes. |
-| Mayastor | beta | A new storage engine that operates at the efficiency of Local Storage but also offers storage services like Replication. Development is underway to support Snapshots and Clones. |
+| Mayastor | stable | Persistent storage solution for Kubernetes, with near-native NVMe performance and advanced data services. |
 
 For more details, please refer to [OpenEBS Documentation](https://openebs.io/docs/).
 
@@ -116,5 +116,5 @@ OpenEBS is part of the CNCF Projects.
 This is a list of third-party companies and individuals who provide products or services related to OpenEBS. OpenEBS is a CNCF project which does not endorse any company. The list is provided in alphabetical order.
 - [Clouds Sky GmbH](https://cloudssky.com/en/)
 - [CodeWave](https://codewave.eu/)
-- [Gridworkz Cloud Services](https://www.gridworkz.com/)
-- [MayaData](https://mayadata.io/)
+- [DataCore](https://www.datacore.com/support/openebs/)
+- [Gridworkz Cloud Services](https://gridworkz.com/)
