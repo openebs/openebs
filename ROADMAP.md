@@ -9,9 +9,39 @@ OpenEBS follows a lean project management approach by splitting the development 
 
 These are some of the backlogs that are prioritized and planned to be completed within the next major release (e.g. OpenEBS 4.0). While the following are planned items, higher priority is given to usability and stability issues reported by the community. The completion of these items also depends on the availability of contributors.
 
-Note: OpenEBS follows a quarterly release cadence with a new minor release around the end of each quarter. For the most current plan and status check out the [release project trackers](https://github.com/orgs/openebs/projects). This document is reviewed and updated by the maintainers after each major release. 
+Note: OpenEBS follows a quarterly release cadence with a new minor release around the end of each quarter. For the most current plan and status check out the [release project trackers](https://github.com/orgs/openebs/projects). This document is reviewed and updated by the maintainers after each major release.
 
-  
+### Mayastor
+- Source repositories
+  - https://github.com/openebs/mayastor
+  - https://github.com/openebs/mayastor-control-plane
+  - https://github.com/openebs/mayastor-api
+  - https://github.com/openebs/mayastor-extensions
+  - https://github.com/openebs/mayastor-docs
+- Backlogs in-progress (under active development)
+  - Ease of installation by having a unified Helm chart for installing Mayastor in a Kubernetes cluster.
+  - Generic naming of all Mayastor Kubernetes API resources. For eg. MayastorStoragePool will be changed to DiskPool.
+  - Enhance supportability by ingesting Mayastor component logs and creating a bundle through kubectl plug-in. 
+  - Mayastor should expose metrics that meet the needs of the SRE persona, to track utilization at pool and volume levels.
+  - Removal of iSCSI support from Mayastor, NVMe is the only supported protocol.
+  - On manual deletion of a Mayastor PV having Reclaim policy set to "Retain", the related Mayastor resources need to be cleaned up.
+  - Support for Mayastor installation on AWS/EKS clusters.
+  - Support for Mayastor installation on SuSE Rancher clusters.
+  - Support for Mayastor installation on RHEL-based Kubernetes clusters.
+  - High availability support for Mayastor nexus (target), ability to spin up on-demand multipath for a Mayastor volume.
+  - Ability to cordon, drain and delete Mayastor nodes.
+  - Basic upgrade framework for updating Mayastor releases.
+  - Support for thin-provisioned Mayastor volumes.
+  - Faster rebuild of volume replicas using log-based technique.
+  - API refactoring exposed via gRPC.
+  - Allow a new replica to be created within the same Mayastor Pool as the failed replica it replaces
+  - Telemetry
+- Backlogs (near-term)
+  - Support for hot upgrade, business continuity with no downtime.
+  - Support for volume groups, i.e. Mayastor replica placement should be topology aware for statefulsets zonal (or HA) distribution.
+  - Support for Mayastor volume resize.
+  - Support for volume snapshots.
+
 ### Dynamic Local PVs
 - Source repositories
   - https://github.com/openebs/dynamic-localpv-provisioner
@@ -23,18 +53,6 @@ Note: OpenEBS follows a quarterly release cadence with a new minor release aroun
 - Backlogs
   - Shared VG for LVM Local PV. 
   - Data populator for moving Local PVs across nodes. 
-
-### Mayastor
-- Source repositories
-  - https://github.com/openebs/Mayastor
-  - https://github.com/openebs/moac (deprecated)
-  - https://github.com/openebs/mayastor-control-plane
-- Backlogs
-  - Mayastor Replica placement should be topology aware for statefulsets zonal (or HA) distribution. 
-  - Mayastor should expose metrics that meet the needs of the SRE persona, to trend review throughput, latency, capacity utilization, and errors
-  - Support for VolumeSnapshot
-  - API refactoring exposed via gRPC
-  - Allow a new replica to be created within the same Mayastor Pool as the failed replica it replaces
 
 ### Jiva
 - Source repositories
