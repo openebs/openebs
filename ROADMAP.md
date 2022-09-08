@@ -9,7 +9,7 @@ OpenEBS follows a lean project management approach by splitting the development 
 
 These are some of the backlogs that are prioritized and planned to be completed within the next major release (e.g. OpenEBS 4.0). While the following are planned items, higher priority is given to usability and stability issues reported by the community. The completion of these items also depends on the availability of contributors.
 
-Note: OpenEBS follows a quarterly release cadence with a new minor release around the end of each quarter. For the most current plan and status check out the [release project trackers](https://github.com/orgs/openebs/projects). This document is reviewed and updated by the maintainers after each major release.
+Note: OpenEBS follows a quarterly release cadence with a new minor release around the end of each quarter. For the most current plan and status check out the [release project trackers](https://github.com/orgs/openebs/projects?type=classic). This document is reviewed and updated by the maintainers after each major release.
 
 ### Mayastor
 - Source repositories
@@ -28,14 +28,12 @@ Note: OpenEBS follows a quarterly release cadence with a new minor release aroun
   - Support for Mayastor installation on AWS/EKS clusters.
   - Support for Mayastor installation on SuSE Rancher clusters.
   - Support for Mayastor installation on RHEL-based Kubernetes clusters.
-  - High availability support for Mayastor nexus (target), ability to spin up on-demand multipath for a Mayastor volume.
+  - High availability support for Mayastor nexus (target), ability to spin up on-demand replacement target for a Mayastor volume.
   - Ability to cordon, drain and delete Mayastor nodes.
   - Basic upgrade framework for updating Mayastor releases.
   - Support for thin-provisioned Mayastor volumes.
   - Faster rebuild of volume replicas using log-based technique.
-  - API refactoring exposed via gRPC.
-  - Allow a new replica to be created within the same Mayastor Pool as the failed replica it replaces
-  - Telemetry
+  - Call home analytics.
 - Backlogs (near-term)
   - Support for hot upgrade, business continuity with no downtime.
   - Support for volume groups, i.e. Mayastor replica placement should be topology aware for statefulsets zonal (or HA) distribution.
