@@ -1,65 +1,58 @@
 # Official list of OpenEBS Maintainers and Reviewers.
 #
-# Reflecting structural changes to the project with respect
-# to its focus being now on Mayastor as its central intent:
+# Reflecting the governance and administration of OpenEBS as a single project:
 # THIS MAINTAINERS FILE SUPERSEDES AND OVERRIDES ANY SUCH FILE(S)
 # FOUND WITHIN "SUB-PROJECT" REPOSITORIES, IN RESPECT OF IT
 # BEING A DEFINITIVE LIST OF ACTIVE OPENEBS PROJECT MAINTAINERS
 #
-# The sections which follow should be kept in alphabetical order:
-# Lastname, Firstname
+# Please keep the below list sorted in ascending order.
+#
+#Maintainers 
+"Glenn Bullingham",@GlennBullingham,DataCore Software
+"Jeffry Molanus",@gila,Independent
+"Kiran Mova",@kmova,VMware
+"Pawan Prakash Sharma",@pawanpraka1,Independent
+"Vishnu Itta",@vishnuitta,Independent
 
+#Emeritus Maintainers
+"Amit Kumar Das",@AmitKumarDas,JIMDO
+"Karthik Satchitanand",@ksatchit,ChaosNative
+"Mayank",@mynktl,MayaData
+"Murat Karslioglu",@muratkars,MayaData
+"Richard Elling",@richardelling,Viking Enterprise Solutions a division of Sanmina Corporation
 
-# Maintainers 
-#  Name (GitHub Name) <email> Company
-- Glenn Bullingham (GlennBullingham) <glenn.bullingham@datacore.com> DataCore Software
-- Jeffry Molanus (gila) <unknown> independent
-- Kiran Mova (kmova) <kmova@vmware.com> VMware
+#Reviewers
+"Aditya Jain",@z0marlin,Independent #control-plane-maintainers
+"Akhil Mohan",@akhilerm,MayaData #control-plane-maintainers
+"Aman Gupta",@w3aman,MayaData #control-plane-maintainers
+"Arne Rusek",@arne-rusek,MayaData #mayastor-maintainers
+"Ashutosh Kumar",@sonasingh46,MayaData #control-plane-maintainers
+"Blaise Dias",@blaisedias,MayaData #mayastor-maintainers
+"Chris Wldenyer",@chriswldenyer,MayaData #mayastor-maintainers
+"Evan Powell",@epowell101,MayaData #content-maintainers
+"Giri",@gprasath,MayaData #control-plane-maintainers
+"Harsh Thakur",@realHarshThakur,Independent #control-plane-maintainers
+"Jan Kryl",@jkryl,MayaData #cstor-engine-maintainers, mayastor-maintainers
+"Jonathan Teh",@jonathan-teh,MayaData #mayastor-maintainers
+"Mehran Kholdi",@SeMeKh,Hamravesh #control-plane-maintainers
+"Michael Fornaro",@xUnholy,Independent-Raspbernetes #control-plane-maintainers
+"Michael Tsymbalyuk",@mtzaurus,MayaData #mayastor-maintainers
+"Payes Anand",@payes,MayaData,#control-plane-maintainers, jiva-engine-maintainers, cstor-engine-maintainers, mayastor-maintainers
+"Paul Yoong",@paulyoong,MayaData #mayastor-maintainers
+"Prateek Pandey",@prateekpandey14,MayaData #control-plane-maintainers
+"Praveen Kumar G T",@praveengt,Independent #control-plane-maintainers
+"Ranjith R",@ranjithwingrider,MayaData #content-maintainers
+"Sagar Kumar",@sagarkrsd,Independent #content-maintainers
+"Sai Chaithanya",@mittachaitu,MayaData #control-plane-maintainers
+"Sathya Seelan",@nsathyaseelan,MayaData #control-plane-maintainers
+"Sebastien Dionne",@survivant,Jerabi inc. #control-plane-maintainers
+"Shubham Bajpai",@shubham14bajpai,MayaData #control-plane-maintainers
+"Sjors Gielen",@sgielen,Independent #control-plane-maintainers, cstor-engine-maintainers
+"Tiago Castro",@tiagolobocastro,MayaData #mayastor-maintainers
+"Uma Mukkara",@umamukkara,MayaData #content-maintainers
+"Utkarsh Mani Tripathi",@utkarshmani1997,Independent #control-plane-maintainers, jiva-engine-maintainers
+"Yashpal Choudhary",@iyashu,Independent #control-plane-maintainers
 
-# Reviewers
-#  Name (GitHub Name)
-- Tiago Castro (tiagolobocastro)
-- Yashpal Choudhary (iyashu)
-- Chris W.L. Denyer (chriswldenyer)
-- Blaise Dias (blaisedias)
-- Sebastien Dionne (survivant)
-- Michael Fornaro (xUnholy)
-- Aman Gupta (w3aman)
-- Aditya Jain (z0marlin)
-- Mehran Kholdi (SeMeKh)
-- Harsh Thakur (realHarshThakur)
-- Michael Tsymbalyuk (mtzaurus)
-
-# Emeritus Maintainers
-#  Name (GitHub Name)
-- Amit Kumar Das (AmitKumarDas) 
-- Karthik Satchitanand (ksatchit)
-- Mayank Patel (mynktl)
-- Murat Karslioglu (muratkars)
-- Pawan Prakash Sharma (pawanpraka1)
-- Richard Elling (richardelling)
-- Vishnu Itta (vishnuitta)
-
-# Emeritus Reviewers
-#  Name (GitHub Name)
-- Payes Anand (payes)
-- Shubham Bajpai (shubham14bajpai)
-- Sai Chaithanya (mittachaitu)
-- Sjors Gielen (sgielen)
-- Peeyush Gupta (Pensu)
-- Jan Kryl" (jkryl)
-- Ashutosh Kumar (sonasingh46)
-- Praveen Kumar G T (praveengt)
-- Sagar Kumar (sagarkrsd)
-- Akhil Mohan (akhilerm)
-- Uma Mukkara (umamukkara)
-- Prateek Pandey (prateekpandey14)
-- Giri Hara Prasad (gprasath)
-- Evan Powell (epowell101)
-- Ranjith R (ranjithwingrider)
-- Arne Rusek (arne-rusek)
-- Sathya Seelan (nsathyaseelan)
-- Satbir Singh satbirchhikara (satbirchhikara)
-- Jonathan Teh (jonathan-teh)
-- Utkarsh Mani Tripathi (utkarshmani1997)
-- Paul Yoong (paulyoong)
+#Emeritus Reviewers 
+#"Peeyush Gupta",@Pensu,DigitalOcean #control-plane-maintainers
+#"Satbir Singh satbirchhikara",@satbirchhikara,MayaData #cstor-engine-maintainers
