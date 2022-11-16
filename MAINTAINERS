@@ -1,36 +1,25 @@
-# Official list of OpenEBS Maintainers.
+# Official list of OpenEBS Maintainers and Reviewers.
 #
-# Names added to this file should be in the following format:
-#     Individual's name,@githubhandle, Company Name
-#
-# Each of the OpenEBS sub project may have one or more of the 
-# following maintainers and list of reviewers who are 
-# in the process of becoming maintainers. 
-# 
-#
-# Each reviewer can be part of one or more GitHub 
-# team aliases created for maintaining sub projects. 
-# Current active team aliases for sub projects are:
-# - control-plane-maintainers (includes Local PVs)
-# - jiva-maintainers
-# - cstor-maintainers
-# - mayastor-maintainers
-# - e2e-maintainers
-# - content-maintainers (website, documentation) 
+# Reflecting the governance and administration of OpenEBS as a single project:
+# THIS MAINTAINERS FILE SUPERSEDES AND OVERRIDES ANY SUCH FILE(S)
+# FOUND WITHIN "SUB-PROJECT" REPOSITORIES, IN RESPECT OF IT
+# BEING A DEFINITIVE LIST OF ACTIVE OPENEBS PROJECT MAINTAINERS
 #
 # Please keep the below list sorted in ascending order.
 #
 #Maintainers 
+"Glenn Bullingham",@GlennBullingham,DataCore Software
+"Jeffry Molanus",@gila,Independent
+"Kiran Mova",@kmova,VMware
+"Pawan Prakash Sharma",@pawanpraka1,Independent
+"Vishnu Itta",@vishnuitta,Independent
+
+#Emeritus Maintainers
 "Amit Kumar Das",@AmitKumarDas,JIMDO
-"Glenn Bullingham",@GlennBullingham,MayaData
-"Jeffry Molanus",@gila,MayaData
 "Karthik Satchitanand",@ksatchit,ChaosNative
-"Kiran Mova",@kmova,MayaData
 "Mayank",@mynktl,MayaData
 "Murat Karslioglu",@muratkars,MayaData
-"Pawan Prakash Sharma",@pawanpraka1,MayaData
 "Richard Elling",@richardelling,Viking Enterprise Solutions a division of Sanmina Corporation
-"Vishnu Itta",@vishnuitta,Independent
 
 #Reviewers
 "Aditya Jain",@z0marlin,Independent #control-plane-maintainers
@@ -64,6 +53,6 @@
 "Utkarsh Mani Tripathi",@utkarshmani1997,Independent #control-plane-maintainers, jiva-engine-maintainers
 "Yashpal Choudhary",@iyashu,Independent #control-plane-maintainers
 
-#Emeritus Maintainers or Reviewers due to change in project priorities. 
+#Emeritus Reviewers 
 #"Peeyush Gupta",@Pensu,DigitalOcean #control-plane-maintainers
 #"Satbir Singh satbirchhikara",@satbirchhikara,MayaData #cstor-engine-maintainers
