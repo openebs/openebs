@@ -8,7 +8,7 @@ We are always looking for new contributions. [CONTRIBUTING.md](../CONTRIBUTING.m
 
 ## Reporting an Issue
 
-If you have a question about OpenEBS or have a problem using it, please check the [troubleshooting guide](https://docs.openebs.io/docs/next/troubleshooting.html).
+If you have a question about OpenEBS or have a problem using it, please check the [troubleshooting guide](https://openebs.io/docs/troubleshooting).
 If that does not answer your questions, or if you think you found a bug, please [file an issue](https://github.com/openebs/openebs/issues).
 
 ## Contact
@@ -30,7 +30,7 @@ If that does not answer your questions, or if you think you found a bug, please 
 
 To add any of the following events to your calendar, please send an email to `cncf-openebs-maintainers@lists.cncf.io`.
 
-- Bi-weekly (Every 2 weeks on Tuesday 7 PM IST) contributors meeting over [Google hangout](https://meet.google.com/rui-powc-fgt). The agenda items and previous discussions can be found [here](https://hackmd.io/tRmnyg9AQPShxFAXOyFpSA?edit).
+- Bi-weekly (Every 2 weeks on Wednesday 1:30 PM UTC) contributors meeting over [CNCF's community event platform](https://community.cncf.io/openebs-community/). You'd have to register for the meeting before the actual meeting time. The agenda items and previous discussions can be found [here](https://hackmd.io/tRmnyg9AQPShxFAXOyFpSA?edit).
 
 
 Go back to [**Contributing to OpenEBS**](../CONTRIBUTING.md).
