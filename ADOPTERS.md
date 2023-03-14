@@ -37,6 +37,7 @@ The list of organizations that have publicly shared the usage of OpenEBS:
 | [SurplusCI](https://surplusci.com/) | Postgres, KubeVirt (qemu), Grafana | [English](./adopters/surplusci/README.md) |
 | [Surveily](https://surveily.com/) | CVAT, NVIDIA Triton, Keycloak, Bitwarden, Elasticsearch, PostgresDB, Cassandra | [English](./adopters/surveily/README.md) |
 | [Teknologi Anak Rantau Indonesia](https://tari.co.id) | MinIO S3 compatible object storage | [English](./adopters/teknologi_anak_rantau_indonesia/README.md) |
+| [TenxCloud](https://www.tenxcloud.com) | Kubevirt, MySQL、Redis、Kafka、RabbitMQ、MinIO | [English](./adopters/tenxcloud/README.md) |
 | [TOBG Services Ltd](https://www.tobg.com.de/) | Postgresql, Confluence, Gitlab, Bitcoin Full Node, Bitcoin Lightning Nodes, BTCPay, Cardano Nodes and Pool, Docker Registry, Prometheus, Grafana, Zabbix monitoring, ELK | [English](./adopters/tobgservices/README.md) |
 | [Verizon Media](https://www.verizonmedia.com/) | Jenkins, IDOL license server | [English](./adopters/verizon/README.md) |
 | [Zeta Associates](https://www.zai.com/) | Elasticsearch, MariaDB, MinIO, PostgreSQL, Prometheus, Kafka, Cassandra | [English](./adopters/zetaassociates/README.md) |
