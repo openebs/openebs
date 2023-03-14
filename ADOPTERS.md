@@ -9,7 +9,6 @@ The list of organizations that have publicly shared the usage of OpenEBS:
 | Organization | Stateful Workloads | Success Story |
 | :--- | :--- | :--- |
 | [Agnes Intelligence](https://www.agnesintel.com/) | Apache Kafka, Apache Solr, NFS | [English](./adopters/agnesintel/README.md) |
-| [Arista Networks](https://www.arista.com/en/) | Gerrit (multiple flavors), NPM, Maven, Redis, NFS, Sonarqube, Internal tools | [English](./adopters/arista/README.md) |
 | [ByteDance](https://www.bytedance.com/) | Elasticsearch | [English](./adopters/bytedance/README.md) |
 | [CLEW Medical](https://clewmed.com/) | PostgreSQL, Keycloak, RabbitMQ | [English](./adopters/clewmedical/README.md) |
 | [Clouds Sky GmbH](https://cloudssky.com/en/) | Confluent Kafka, Strimzi Kafka, Elasticsearch, Prometheus | [English](./adopters/cloudssky/README.md) |
