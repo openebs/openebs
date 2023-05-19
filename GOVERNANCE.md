@@ -72,6 +72,19 @@ depend on and trust to make decisions in the best interest of the project.
 
 Maintainers have admin access to the GitHub organization.
 
+### Chairs
+
+OpenEBS Chairs are ex-maintainers that have stepped down from active contributions, 
+but continue to support the existing maintainers with: 
+* Open Source Governance of the project
+* Coaching on leadership and prioritization for the existing maintainers
+* Facilitate reviews/audits on the project, resolve conflicts between maintainers. 
+
+Chairs have admin access to the GitHub organization. 
+
+Chairs can become active maintainers of the project in the future. 
+
+
 ## Adding a reviewer or maintainer 
 
 Periodically, the existing maintainers curate a list of contributors that have
