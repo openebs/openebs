@@ -74,16 +74,23 @@ Maintainers have admin access to the GitHub organization.
 
 ### Chairs
 
-OpenEBS Chairs are maintainers that have stepped down from active contributions, 
-but continue to support the existing maintainers with: 
+OpenEBS Chairs comprises of key current maintainers, maintainers that have stepped 
+down from active contributions but are providing support to the existing maintainers
+in the form of: 
 * Open Source Governance of the project
 * Coaching on leadership and prioritization for the existing maintainers
 * Facilitate reviews/audits on the project, resolve conflicts between maintainers. 
 
-Chairs have admin access to the GitHub organization. 
+Chairs will meet quarterly along with the maintainers to review the health of the 
+project and publicly document the outcomes.
 
-Chairs can become active maintainers of the project in the future. 
+An active user or maintainer of the OpenEBS project can be nominated by the existing 
+maintainers and/or chairs into a Chair role, if they are helping with any of the above 
+activities.  
 
+A Chair can be removed from an active role if: 
+* They are no longer able to contribute to the above responsibilities. 
+* They are not alinged with the [CODE_OF_CONDUCT](./CODE_OF_CONDUCT.md) guidelines set forth by CNCF. 
 
 ## Adding a reviewer or maintainer 
 
