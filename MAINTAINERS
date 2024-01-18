@@ -7,10 +7,12 @@
 #
 # Please keep the below list sorted in ascending order.
 #
-#Maintainers 
+#Maintainers
+"Abhinandan Purkait",@Abhinandan-Purkait,Datacore Software
 "Glenn Bullingham",@GlennBullingham,DataCore Software
 "Jeffry Molanus",@gila,Independent
 "Kiran Mova",@kmova,VMware
+"Niladri Halder",@niladrih,DataCore Software
 "Pawan Prakash Sharma",@pawanpraka1,Independent
 "Tiago Castro",@tiagolobocastro,DataCore Software
 "Vishnu Attur",@avishnu,DataCore Software
@@ -55,6 +57,6 @@
 "Utkarsh Mani Tripathi",@utkarshmani1997,Independent #control-plane-maintainers, jiva-engine-maintainers
 "Yashpal Choudhary",@iyashu,Independent #control-plane-maintainers
 
-#Emeritus Reviewers 
+#Emeritus Reviewers
 #"Peeyush Gupta",@Pensu,DigitalOcean #control-plane-maintainers
 #"Satbir Singh satbirchhikara",@satbirchhikara,MayaData #cstor-engine-maintainers
