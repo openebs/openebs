@@ -123,7 +123,7 @@ The Roamap is focused exclusively on the modern Data-Engine **Mayastor**. It doe
 | 11   | E2E Storage UNMAP reclaim integation          | Support Discard: LINUX / UNMAP: SCSI / Deallocate: NVMe issued from file-system down to SPDK Blobstor elements    | Pri 3 /  Rel: (Q4 2024)    |
 | 12   | Thin provisioning phase-2                     | Thin Provision awarness and integarions with DiskPool metrics, pre-emptive intelligence actions                   | Pri 3 /  Rel: (Q4 2024)    |
 | 13   | Native Object Store                           | An S3-compliant fast object store   inteatted with SPDK LVstore/LVols Blobstor & HyperLoca-PVl vols               | Pri 3 /  Rel: (Q4 2024)    |
-| 14   | Zoned-SSD support                             | Integarted Western Digital Team's Mayastor ZNS feature for very high performance vols                             | Pri 2.5 /  Rel: (Q2 2024)   |
+| 14   | Zoned-SSD support                             | Integrated Western Digital Team's Mayastor ZNS feature for very high performance vols                             | Pri 2.5 /  Rel: (Q2 2024)   |
 
 
 
