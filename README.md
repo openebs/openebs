@@ -115,7 +115,7 @@ The Roamap is focused exclusively on the modern Data-Engine **Mayastor**. It doe
 | 7.1  | HyperLocal-PV : UBlock mode                   | Non-replicated PV of Local-PV type via UBlock kernel intgartion to SPDK blobstor LVol as storage                  |  Pri 2 /  Rel: (Q2 2024)   |
 | 7.2  | HyperLocal-PV : PCIe mode                     | Non-replicated PV of Local-PV type via PCIe-based NVMe kernel integration to SPDK blobstor LVol as storage         |  Pri 2.5 /  Rel: (Q2 2024)*   |
 | 8    | GUI Mgmt Portal & Dashboard                   | Provision, manage, monitor Mayastor deployments with a RESTful GUI interface - @ parity with Shell & kubectl cmds | Pri 3 /  Rel: (Q3 2024)    |
-| 8.1  | GUI Mgmt Portal & Dashboard : On-Prem         | Mgmt portal & Dashbord deployed privately on-prem for air-gaped architetcures                                     | Pri 3 /  Rel: (Q3 2024)    |
+| 8.1  | GUI Mgmt Portal & Dashboard : On-Prem         | Mgmt portal & Dashboard deployed privately on-prem for air-gaped architectures                                     | Pri 3 /  Rel: (Q3 2024)    |
 | 8.2  | GUI Mgmt Portal & Dashboard : In-Cloud SaaS   | Mgmt portal & Dashbord deployed as SaaS privately in-cloud for cloud enabled architetcures                        | Pri 3 /  Rel: (Q3 2024)    |
 | 8.3  | GUI Mgmt Portal & Dashboard : Global view     | Mgmt portal aggregated Global world  view of all k8s clusters configred to contribute anonymized global stats     | Pri 3 /  Rel: (Q3 2024)    |
 | 9    | Storgae Encryption                            | Provision Encrypted data-at-rest volume via SPDK LVol layer - multi File system suppoort (ext3, ext4, XFS, BRFS)  | Pri 3 /  Rel: (Q3 2024)    |
