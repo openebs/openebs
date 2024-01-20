@@ -1,6 +1,6 @@
 # Welcome to OpenEBS
 <BR>
-We are an ultra-modern storage target platform, a Hyper-Converged storage software system and a modern Storage Data Fabric natively & tighty integaretd into a Kubernetes platform.<BR>
+We are an ultra-modern storage target platform, a Hyper-Converged storage software system and a modern Storage Data Fabric natively & tighty integrated into a Kubernetes platform.<BR>
 <BR>
 OpenEBS provides... <BR>
 <BR>
