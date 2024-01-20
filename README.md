@@ -13,7 +13,7 @@ OpenEBS provides... <BR>
 
 OpenEBS is completely free and open source software. There are also commercial options available for organizations seeking enterprise support and management capabilities. These are provided by third-party vendors. For more information, see https://openebs.io <BR>
 <BR>
-In 2022, OpenEBS introduced the MayaStor storage Data-Engine which is based on the Ultra High-Performance SPDK NVMe Stack, UIO-Ring Technology & Linux NVMEe drivers. This delivers higher performance than was previously possible in any Kubernetes storage product.<BR>
+In 2022, OpenEBS introduced the MayaStor storage Data-Engine which is based on the Ultra High-Performance SPDK NVMe Stack, IO URING Technology & Linux NVMe drivers. This delivers higher performance than was previously possible in any Kubernetes storage product.<BR>
 <BR>
 The OpeneBS project consists of multiple Data-Engines projects that are grouped into 2 EDITIONs.
 - The older storage engines are refered to as **LEGACY Edition**
