@@ -89,7 +89,7 @@ OpenEBS is 100% open source software.
 The project source code is spread across multiple repos: 
 <BR>
 <BR>
-The Roamap is focused exclusively on the modern Data-Engine **Mayastor**. It does not define any net-new features or capabilities for any OpenEBS LEGACY projects or projects that are tagged & deifned as DEPRERCATED or ARCHIVED. Currently those proejcts are defined as the follows (see refernces above for the details on thje projects DEPRECATED and ARCHIVAL strategy)...
+The Roamap is focused exclusively on the modern Data-Engine **Mayastor**. It does not define any net-new features or capabilities for any OpenEBS LEGACY projects or projects that are tagged & defined as DEPRERCATED or ARCHIVED. Currently those proejcts are defined as the follows (see refernces above for the details on the projects DEPRECATED and ARCHIVAL strategy)...
 - Jiva
 - cStor
 - NFS-Provisioner
