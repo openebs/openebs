@@ -43,6 +43,19 @@ An added advantage of being a completely Kubernetes native solution is that admi
 **Our vision** is simple: let storage and storage services for persistent workloads be fully integrated into the environment so that each team and workload benefits from the granularity of control and Kubernetes native behaviour.
 
 ## Roadmap
+OpenEBS is 100% open source software. The project source code is spread across multiple repos:
+the roadmp is focused exclusively on Mayastor and does not define any net-new features or capabilities for any LEGACY OpenEBS proejcts (e.g. Jiva, cStor, NFS-Provisioner   
+
+|  ID  | Feature name                   | Description and user stpory                                            | Notes, links, tracking issue, GitHub repo                                                   |
+| :--- | :----------------------------- | :--------------------------------------------------------------------- | :------------------------------------------------------------------------------------------ |
+| 1    | Multi-replica volume snapshot and CSI cloning | Able to take consistent snapshots across all available replicas of a volume                         | Pri : 1         |
+| 2    | Volume resize                                 | Able to increase volume size and overlaying file-system size with I/O continuity                    | Pri : 1         |
+| 3    | DiskPool resize                               | Able to increase pool capacity by expansion of underlying disk pool device(s) with I/O continuity   | Pri : 1         |
+| 4    | Disk media aggregation mgmt                   | Able to create, expand & mannage virtual disks that are aggregated from multiple physical disks     | Pri : 1         |
+| 6    | Local-PV Data-Engine integrated + enabled     | Dynamically provision a persistent volume of LocalPV (non-replicated) type using non-SPDK blobstor for storage |  Pri : 1|
+| 7    | HyperLocal-PV Data-Engine                     | Dynamically provision a persistent volume of LocalPV (non-replicated) type using SPDK blobstor LVols as storage + NVMe target device |  Pri : 1|
+
+
 
 ## Scalability
 
