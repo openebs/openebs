@@ -96,7 +96,7 @@ The Roamap is focused exclusively on the modern Data-Engine **Mayastor**. It doe
 <BR>
 
 **MayaStor Roadmap : 2024 Phase-2**
-- Forward facing planned release date, Release version numbers and feature priotiries re subject to chage as the project Maintainers/Leadership/community continiously update and adjust the **Release Feature bundling Strategy** to react to K8s industry movements, trends and our community influence.
+- Forward facing planned release date, Release version numbers and feature priorities are subject to change as the project Maintainers/Leadership/community continuously update and adjust the **Release Feature bundling Strategy** to react to K8s industry movements, trends and our community influence.
 
 |  ID  | Feature name                   | Description and user stpory                                            | Release, links, tracking issue, GitHub repo                                                   |
 | :--- | :----------------------------- | :--------------------------------------------------------------------- | :------------------------------------------------------------------------------------------ |
