@@ -84,7 +84,7 @@ An added advantage of being a completely Kubernetes native solution is that admi
 
 **Our vision** is simple: let storage and storage services for persistent workloads be fully integrated into the environment so that each team and workload benefits from the granularity of control and Kubernetes native behaviour.
 
-## Roadmap (as at Jan 2024)
+## Roadmap (as of Jan 2024)
 OpenEBS is 100% open source software. 
 The project source code is spread across multiple repos: 
 <BR>
