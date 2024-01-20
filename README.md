@@ -117,7 +117,7 @@ The Roamap is focused exclusively on the modern Data-Engine **Mayastor**. It doe
 | 8    | GUI Mgmt Portal & Dashboard                   | Provision, manage, monitor Mayastor deployments with a RESTful GUI interface - @ parity with Shell & kubectl cmds | Pri 3 /  Rel: (Q3 2024)    |
 | 8.1  | GUI Mgmt Portal & Dashboard : On-Prem         | Mgmt portal & Dashboard deployed privately on-prem for air-gapped architectures                                     | Pri 3 /  Rel: (Q3 2024)    |
 | 8.2  | GUI Mgmt Portal & Dashboard : In-Cloud SaaS   | Mgmt portal & Dashbord deployed as SaaS privately in-cloud for cloud enabled architetcures                        | Pri 3 /  Rel: (Q3 2024)    |
-| 8.3  | GUI Mgmt Portal & Dashboard : Global view     | Mgmt portal aggregated Global world  view of all k8s clusters configred to contribute anonymized global stats     | Pri 3 /  Rel: (Q3 2024)    |
+| 8.3  | GUI Mgmt Portal & Dashboard : Global view     | Mgmt portal aggregated Global world view of all k8s clusters configured to contribute anonymized global stats     | Pri 3 /  Rel: (Q3 2024)    |
 | 9    | Storgae Encryption                            | Provision Encrypted data-at-rest volume via SPDK LVol layer - multi File system suppoort (ext3, ext4, XFS, BRFS)  | Pri 3 /  Rel: (Q3 2024)    |
 | 10   | Health & Supportability metrics + Dashboard   | Deep health diagnostics view of all elements OpenEBS manages - enable Metric inclusion in Support Bundle upoloads |  Pri 2.5 /  Rel: (Q2 2024*)   |
 | 11   | E2E Storage UNMAP reclaim integation          | Support Discard: LINUX / UNMAP: SCSI / Deallocate: NVMe issued from file-system down to SPDK Blobstor elements    | Pri 3 /  Rel: (Q4 2024)    |
