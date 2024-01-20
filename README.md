@@ -30,7 +30,7 @@ The project plans to migrate, sunset and archive all LEGACY Data-Engines by June
 <BR>
 
 
-All **LEGACY** Data-Engines will me tagged as DEPRECATED and will be moved to ARCHIVE status by June 2024. These Data-Engines are:
+All **LEGACY** Data-Engines will be tagged as DEPRECATED and will be moved to ARCHIVE status by June 2024. These Data-Engines are:
   - Jiva  - Users should migrate to MayaStor Data-Engine
   - cStor - Users should migrate to MayaStor Data-Engine
   - NFS Provisioner  - Deprecated. No RWX services or features will be supported
