@@ -17,18 +17,25 @@ In 2022, OpenEBS introduced the MayaStor storage Data-Engine which is based on t
 <BR>
 The OpeneBS project consists of multiple Data-Engines projects that are grouped into 2 EDITIONs.
 - The older storage engines are refered to as **LEGACY Edition**
-- The ultra modern Mayastor Data-Engine is classifed as **STANDARD Edition**
+- The ultra modern Mayastor Data-Engine is classifed as **STANDARD Edition**, which also includes...
+    - LVM LocalPV
+    - ZFS LocalPV
+    - Device LocalPV
+    - RawFile LocalPV
+    - LocalPV-HostPath
+    - LocalPV-Device
+
 <BR>
-The project plans to migrate, sunset and archive all **LEGACY** Data-Engines by June 2024.<BR>
+The project plans to migrate, sunset and archive all LEGACY Data-Engines by June 2024. <BR>
 <BR>
 
 
-All **LEGACY** Data-Engines will me tagged as DEPRICATED and will be moved to ARCHIVE status by December 2024. These Data-Engines are:
+All **LEGACY** Data-Engines will me tagged as DEPRECATED and will be moved to ARCHIVE status by June 2024. These Data-Engines are:
   - Jiva  - Users should migrate to MayaStor Data-Engine
   - cStor - Users should migrate to MayaStor Data-Engine
   - NFS Provisioner  - Deprecated. No RWX services or features will be supported
  
-New Roadmap features are planned for **STANDRD** that provide a strong pathway for **LEGACY** users to migrate to **STANDARD**. <BR>
+New Roadmap features are planned for **STANDARD** that provide a strong pathway for **LEGACY** users to migrate to **STANDARD**. <BR>
 <BR>
 We hope you find OpenEBS useful. We welcome all contributions to the project. If you’d like to get in touch, please email us hello@openebs.io 
 
@@ -82,7 +89,7 @@ OpenEBS is 100% open source software.
 The project source code is spread across multiple repos: 
 <BR>
 <BR>
-The Roamap is focused exclusively on the modern Data-Engine **Mayastor**. It does not define any net-new features or capabilities for any OpenEBS LEGACY projects or projects that are tagged & deifned as DEPRICTAED or ARCHIVED. Currently those proejcts are defined as the follows (see refernces above for the details on thje projects DEPRECIATED and ARCHIVAL strategy)...
+The Roamap is focused exclusively on the modern Data-Engine **Mayastor**. It does not define any net-new features or capabilities for any OpenEBS LEGACY projects or projects that are tagged & deifned as DEPRERCATED or ARCHIVED. Currently those proejcts are defined as the follows (see refernces above for the details on thje projects DEPRECATED and ARCHIVAL strategy)...
 - Jiva
 - cStor
 - NFS-Provisioner
