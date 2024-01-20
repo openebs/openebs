@@ -1,4 +1,38 @@
-# OpenEBS
+# Welcome to OpenEBS
+<BR>
+We are an ultra-modern storage target platform, a Hyper-Converged storage software system and a modern Storage Data Fabric natively & tighty integaretd into a Kubernetes platform.<BR>
+<BR>
+OpenEBS provides... <BR>
+<BR>
+
+- Stateful persistent storage voluems for Kubernetes
+- is a 100% Cloud-Native storage solution
+- Delivers a Kubernetes cluster-wide storage fabric that provides containers with access to storage across the entire Kubernetes cluster.
+- Enterprise Grade data management capabilities such as **snapshots, clones and replicated volumes** <BR>
+<BR>
+
+OpenEBS is completely free and open source software. There are also commercial options available for organizations seeking enterprise support and management capabilities. These are provided by third-party vendors. For more information, see https://openebs.io <BR>
+<BR>
+In 2022, OpenEBS introduced the MayaStor storage Data-Engine which is based on the Ultra High-Performance SPDK NVMe Kernel Stack, UIO-Ring Technology & Linux NVMEe drivers. This delivers higher performance than was previously possible in any Kubernetes storage product.<BR>
+<BR>
+The OpeneBS project consists of multiple Data-Engines projects that are grouped into 2 EDITIONs.
+- The older storage engines are refered to as **LEGACY Edition**
+- The ultra modern Mayastor Data-Engine is classifed as **STANDARD Edition**
+<BR>
+The project plans to migrate, sunset and archive all **LEGACY** Data-Engines by June 2024.<BR>
+<BR>
+
+
+All **LEGACY** Data-Engines will me tagged as DEPRICATED and will be moved to ARCHIVE status by December 2024. These Data-Engines are:
+  - Jiva  - Users should migrate to MayaStor Data-Engine
+  - cStor - Users should migrate to MayaStor Data-Engine
+  - NFS Provisioner  - Deprecated. No RWX services or features will be supported
+ 
+New Roadmap features are planned for **STANDRD** that provide a strong pathway for **LEGACY** users to migrate to **STANDARD**. <BR>
+<BR>
+We hope you find OpenEBS useful. We welcome all contributions to the project. If you’d like to get in touch, please email us hello@openebs.io 
+
+# Current status
 
 [![Releases](https://img.shields.io/github/release/openebs/openebs/all.svg?style=flat-square)](https://github.com/openebs/openebs/releases)
 [![Slack channel #openebs](https://img.shields.io/badge/slack-openebs-brightgreen.svg?logo=slack)](https://kubernetes.slack.com/messages/openebs)
@@ -31,6 +65,7 @@ Some key aspects that make OpenEBS different compared to other traditional stora
 - Completely intent-driven, inheriting the same principles that drive the ease of use with Kubernetes.
 - OpenEBS supports a range of storage engines so that developers can deploy the storage technology appropriate to their application design objectives. Distributed applications like Cassandra can use the LocalPV engine for lowest latency writes. Monolithic applications like MySQL and PostgreSQL can use the ZFS engine (cStor) for resilience. Streaming applications like Kafka can use the NVMe engine [Mayastor](https://github.com/openebs/Mayastor) for best performance in edge environments. Across engine types, OpenEBS provides a consistent framework for high availability, snapshots, clones and manageability.
 
+# Deployment
 OpenEBS itself is deployed as just another container on your host and enables storage services that can be designated on a per pod, application, cluster or container level, including:
 - Automate the management of storage attached to the Kubernetes worker nodes and allow the storage to be used for Dynamically provisioning OpenEBS Replicated or Local PVs.
 - Data persistence across nodes, dramatically reducing time spent rebuilding Cassandra rings for example.
@@ -51,7 +86,6 @@ The Roamap is focused exclusively on the modern Data-Engine **Mayastor**. It doe
 - Jiva
 - cStor
 - NFS-Provisioner
-<BR>
 <BR>
 
 **MayaStor Roadmap : 2024 Phase-2**
