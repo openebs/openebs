@@ -43,18 +43,40 @@ An added advantage of being a completely Kubernetes native solution is that admi
 **Our vision** is simple: let storage and storage services for persistent workloads be fully integrated into the environment so that each team and workload benefits from the granularity of control and Kubernetes native behaviour.
 
 ## Roadmap
-OpenEBS is 100% open source software. The project source code is spread across multiple repos:
-the roadmp is focused exclusively on Mayastor and does not define any net-new features or capabilities for any LEGACY OpenEBS proejcts (e.g. Jiva, cStor, NFS-Provisioner   
+OpenEBS is 100% open source software. 
+The project source code is spread across multiple repos: 
+<BR>
+<BR>
+The Roamap is focused exclusively on the modern Data-Engn *Mayastor* and does not define any net-new features or capabilities for any OpenEBS LEGACY projects or projects that are tagged & deifned as DEPRICTAED or ARCHIVED. Whihc are currentl defined as the follows (see refernces above for the details on thje projects DEPRECIATED and ARCHIVAL strategy)...
+- Jiva
+- cStor
+- NFS-Provisioner
+<BR>
+<BR>
+
+**MayaStor Roadmap : 2024 Phase-2**
+- Forward facing release version numbers are subject to chage as the project Maintainers/Leadership continiously update the **Release Feature bundling Strategy** to react to industry movements, trends and our community influence.   
 
 |  ID  | Feature name                   | Description and user stpory                                            | Notes, links, tracking issue, GitHub repo                                                   |
 | :--- | :----------------------------- | :--------------------------------------------------------------------- | :------------------------------------------------------------------------------------------ |
 | 1    | Multi-replica volume snapshot and CSI cloning | Able to take consistent snapshots across all available replicas of a volume                         | Pri : 1         |
 | 2    | Volume resize                                 | Able to increase volume size and overlaying file-system size with I/O continuity                    | Pri : 1         |
 | 3    | DiskPool resize                               | Able to increase pool capacity by expansion of underlying disk pool device(s) with I/O continuity   | Pri : 1         |
-| 4    | Disk media aggregation mgmt                   | Able to create, expand & mannage virtual disks that are aggregated from multiple physical disks     | Pri : 1         |
-| 6    | Local-PV Data-Engine integrated + enabled     | Dynamically provision a persistent volume of LocalPV (non-replicated) type using non-SPDK blobstor for storage |  Pri : 1|
-| 7    | HyperLocal-PV Data-Engine                     | Dynamically provision a persistent volume of LocalPV (non-replicated) type using SPDK blobstor LVols as storage + NVMe target device |  Pri : 1|
-
+| 4    | DiskPool media aggregation mgmt               | Able to create, expand & mannage virtual disks that are aggregated from multiple physical disks     | Pri : 1         |
+| 6    | Local-PV Data-Engine integrated + enabled     | Dynamically provision a persistent volume of LocalPV (non-replicated) type using non-SPDK blobstor for storage |  Pri : 1 |
+| 6    | Local-PV Data-Engine integrated + enabled     | Dynamically provision a persistent volume of LocalPV (non-replicated) type using non-SPDK blobstor for storage |  Pri : 1 |
+| 6.1  | Local-PV Hostpath enabled                     | Able to provision a persistent volume of Local-PV (non-replicated) using type : K8s Hostpath addressed storage  |  Pri : 1 |
+| 6.2  | Local-PV Device enabled                       | Able to provision a persistent volume of Local-PV (non-replicated) using type : K8s Device addressed storage    |  Pri : 2 |
+| 6.3  | Local-PV RawFile Soft Luns enabled            | Able to provision a persistent volume of Local-PV (non-replicated) using type : K8s Soft Fileystem lun addressed storage    |  Pri : 2 |
+| 6.4  | Local-PV RawFile Multi-Filesystem support     | Multi filesystems support for Local-PV RawFile Soft luns : ext3, ext4, XFS, BTRFS, f2fs, ZNS    |  Pri : 2 |
+| 6.5  | NDM integrated + enabled                      | NDM supoort for all Local-PV dependant services |  Pri : 2 |
+| 7    | HyperLocal-PV Data-Engine                     | Dynamically provision a persistent volume of Local-PV (non-replicated) type using SPDK blobstor LVols as storage + NVMe target device |  Pri : 2 |
+| 8    | GUI Mgmt Portal & Dashboard                   | Provision, manage and monitor OpenEBS / Mayastor deployments with a RESTful GUI interface - @ parity with Shell & kubectl cmds |  Pri : 2 |
+| 8.1  | GUI Mgmt Portal & Dashboard : On-Prem         | Mgmt portal & Dashbord deployed privately on-prem for air-gaped architetcures |  Pri : 2 |
+| 8.2  | GUI Mgmt Portal & Dashboard : In-Cloud SaaS   | Mgmt portal & Dashbord deployed as SaaS privately in-cloud for cloud enabled architetcures |  Pri : 2 |
+| 8.3  | GUI Mgmt Portal & Dashboard : Global view     | Mgmt portal aggregated Global world stats view of all k8s clusters configred to contribute anonymized global stats |  Pri : 3 |
+| 9    | Storgae Encryption                            | Provision Volume that Encrypts data-at-rest at the SPDK LVol block layer - with multi File system suppoort (ext3, ext4, XFS, BRFS) |  Pri : 3 |
+| 10   | Health & Supportability metrics + Dashboard   | Comprehensive health diagnostics & view for the all elemets OpenEBS is managing & enable Metric inclusion in Suppoort Bundle upoloads |  Pri : 2 |
 
 
 ## Scalability
