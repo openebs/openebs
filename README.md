@@ -42,6 +42,8 @@ An added advantage of being a completely Kubernetes native solution is that admi
 
 **Our vision** is simple: let storage and storage services for persistent workloads be fully integrated into the environment so that each team and workload benefits from the granularity of control and Kubernetes native behaviour.
 
+## Roadmap
+
 ## Scalability
 
 OpenEBS can scale to include an arbitrarily large number of containerized storage controllers. Kubernetes is used to provide fundamental pieces such as using etcd for inventory. OpenEBS scales to the extent your Kubernetes scales.
