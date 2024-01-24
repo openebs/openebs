@@ -37,7 +37,7 @@ All **LEGACY** Data-Engines will be tagged as DEPRECATED and will be moved to AR
  
 New Roadmap features are planned for **STANDARD** that provide a strong pathway for **LEGACY** users to migrate to **STANDARD**. <BR>
 <BR>
-We hope you find OpenEBS useful. We welcome all contributions to the project. If you’d like to get in touch, please email us hello@openebs.io 
+We hope you find OpenEBS useful. We welcome all contributions to the project. If you’d like to get in touch, please email us cncf-openebs-maintainers@lists.cncf.io
 
 # Current status
 
