@@ -98,7 +98,7 @@ The Roamap is focused exclusively on the modern Data-Engine **Mayastor**. It doe
 **MayaStor Roadmap : 2024 Phase-2**
 - Forward facing planned release date, Release version numbers and feature priorities are subject to change as the project Maintainers/Leadership/community continuously update and adjust the **Release Feature bundling Strategy** to react to K8s industry movements, trends and our community influence.
 
-|  ID  | Feature name                   | Description and user stpory                                            | Release, links, tracking issue, GitHub repo                                                   |
+|  ID  | Feature name                   | Description and user story                                            | Release, links, tracking issue, GitHub repo                                                   |
 | :--- | :----------------------------- | :--------------------------------------------------------------------- | :------------------------------------------------------------------------------------------ |
 | 1    | Multi-replica volume snapshot and CSI cloning | Able to take consistent snapshots across all available replicas of a volume                                     | Pri 1 /  Rel: (Q1 2024)    |
 | 2    | Volume resize                                 | Able to increase volume size and overlaying filesystem size with I/O continuity                                | Pri 1 /  Rel: (Q1 2024)    |
