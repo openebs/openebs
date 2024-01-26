@@ -2,7 +2,7 @@
 <BR>
 우리는 초현대적인 스토리지 대상 플랫폼, 하이퍼 컨버지드 스토리지 소프트웨어 시스템 및 Kubernetes 플랫폼에 기본적으로 긴밀하게 통합된 최신 스토리지 데이터 패브릭(Storage Data Fabric)입니다. <BR>
 <BR>
-OpenEBS provides... <BR>
+OpenEBS는 다음 기능을 제공합니다... <BR>
 <BR>
 
 - Kubernetes를 위한 Stateful persistent storage voluems
