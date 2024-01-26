@@ -16,5 +16,5 @@
 | :egypt: | [عربى](README.ar.md) |
 | JP | [日本語](README.JP.md) |
 | 🇧🇷 | [Português Brasil](README.pt-BR.md) |
-
+| 🇰🇷 | [한국어](README.ko.md) |
 
