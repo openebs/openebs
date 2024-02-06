@@ -11,9 +11,14 @@ OpenEBS follows a lean project management approach by splitting the development 
 This table holds a list of the most active roadmap items. These are the features that are currently getting the most active focus and attention within the project.
 
 ## Current
-These are backlogs items that are prioritized and planned to be completed within the next major release. While many are planned items, higher priority is given to usability, stability, resilence, Data integrity issues reported by the community.
+These are backlog items that are prioritized and planned to be completed within the next major release. While many are planned items, higher priority is given to usability, stability, resilence, Data integrity issues reported by the community.
+
 
 _Note_: OpenEBS follows an agressive release cadence with a new minor release every 2 months. For the most current plan and status check out the [release project trackers](https://github.com/orgs/openebs/projects?type=classic). This document is reviewed and updated by the maintainers after each major release.
+
+
+## Mayastor Roadmap : 2024 Phase-2
+- Forward facing planned release date, Release version numbers and feature priorities are subject to change as the project Maintainers/Leadership/community continuously update and adjust the **Release Feature bundling Strategy** to react to K8s industry movements, trends and our community influence.
 
 
 ## Mayastor Roadmap : 2024 Phase-2
@@ -50,8 +55,8 @@ _Note_: OpenEBS follows an agressive release cadence with a new minor release ev
 ## Excluded from the roadmap
 The Roadmap is focused exclusively on the modern **Mayastor* Data-Engines in the **STANDARD** edition. 
 <BR>
-It does not define any net-new features or capabilities for any OpenEBS **LEGACY** projects or projects that are tagged & defined as DEPRERCATED or ARCHIVED. (Currently those projects are as follows):<BR>
-| ID  | Data-Eegines      | Embeded tech stack   | Status                           |
+It does not define any net-new features or capabilities for any OpenEBS **LEGACY** projects or projects that are tagged & defined as DEPRECATED or ARCHIVED. (Currently those projects are as follows):<BR>
+| ID  | Data-Engines      | Embedded tech stack  | Status                           |
 |-----|-------------------|----------------------|--------------------------------------------|
 |  1  |  Jiva             | iSCSI                | We plan to ARCHIVE & sunset LEGACY in 2024 |
 |  2  |  cStor            | Open ZFS             | We plan to ARCHIVE & sunset LEGACY in 2024 |
@@ -67,7 +72,7 @@ These repos are critically requried for the **current** roadmap.<BR>
   - https://github.com/openebs/mayastor-docs
 
 ### Dynamic Local PVs repos
-- (These repos are integating into Mayastor to be included as part of the Mayastor STANDARD edition - Q1 2024)
+- (These repos are integrating into Mayastor to be included as part of the Mayastor STANDARD edition - Q1 2024)
   - https://github.com/openebs/dynamic-localpv-provisioner
   - https://github.com/openebs/zfs-localpv
   - https://github.com/openebs/lvm-localpv
@@ -78,11 +83,8 @@ These repos are critically requried for the **current** roadmap.<BR>
 - Backlogs
   - Shared VG for LVM Local PV.
   
-## Backlogs in-progress (under active development)
-  - Removal of iSCSI support from Mayastor, NVMe is the only supported protocol.
-  - On manual deletion of a Mayastor PV having Reclaim policy set to "Retain", the related Mayastor resources need to be cleaned up.
-  - High availability support for Mayastor nexus (target), ability to spin up on-demand replacement target for a Mayastor volume.
-  - Faster rebuild of volume replicas using log-based technique.
+## Backlogs in-progress (under active development
+  - New set of items to be updated Feb 2024
 
 ## Backlogs (near-term)
   - Support for hot upgrade, business continuity with no downtime.
@@ -95,12 +97,7 @@ These repos are critically requried for the **current** roadmap.<BR>
   - https://github.com/openebs/website
   - https://github.com/openebs/m-exporter
   - https://github.com/openebs/dynamic-nfs-provisioner
-  - https://github.com/openebs/openebs-k8s-provisioner (deprecated)
-  - https://github.com/openebs/openebs-docs (deprecated)
-  - https://github.com/openebs/maya (deprecated)
 - Backlogs
-  - Enhancements to OpenEBS CLI (openebsctl) for better troubleshooting OpenEBS components and fixing the errors
-
 
 
 ## Repos to be DEPRECATED and ARCHIVED
@@ -128,7 +125,7 @@ These repos are critically requried for the **current** roadmap.<BR>
 
 ## Old items (needs tidy-up)
 
-Typically the items under this category fall under next major releas. 
+Typically the items under this category fall under next major release. 
 - Support for pluggable storage backend for Mayastor (example: replace blobstore with lvm)
 - Support for specifying multiple hostpaths to be used with Local PV hostpath
 - Update user documentation with reference stacks of running various workloads using OpenEBS volumes 
