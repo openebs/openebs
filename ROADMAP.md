@@ -25,8 +25,8 @@ _Note_: OpenEBS follows an agressive release cadence with a new minor release ev
 | 1    | Multi-replica volume snapshot and CSI cloning | Able to take consistent snapshots across all available replicas of a volume                                    | Pri 1 /  Rel: (Q1 2024)    |
 | 2    | Volume resize                                 | Able to increase volume size and overlaying filesystem size with I/O continuity                                | Pri 1 /  Rel: (Q1 2024)    |
 | 3    | DiskPool resize                               | Able to increase pool capacity by expansion of underlying disk pool device(s) with I/O continuity              | Pri 1 /  Rel: (Q1 2024)    |
-| 4    | DiskPool media aggregation mgmt               | Able to create, expand & manage virtual SPDK disks that are aggregates of multiple physical media devices      | Pri 1 /  Rel: (Q2 2024)    |
-| 4.1  | DiskPool media aggregation mgmt               | New DiskPool type (LVM Mediastore) of aggregated media devices managed under an integrated Linux LVM kernel    | Pri 1 /  Rel: (Q2 2024)    |
+| 4    | DiskPool media aggregation mgmt SPDK mode     | Able to create, expand & manage virtual SPDK disks that are aggregates of multiple physical media devices      | Pri 1 /  Rel: (Q2 2024)    |
+| 4.1  | DiskPool media aggregation mgmt LVM mode      | New DiskPool type (LVM Mediastore) of aggregated media devices managed under an integrated Linux LVM kernel    | Pri 1 /  Rel: (Q2 2024)    |
 | 6    | Local-PV Data-Engine(s) integrated + enabled  | Dynamically provision a persistent volume of LocalPV (non-replicated) type using non-SPDK blobstor for storage  | Pri 1 /  Rel: (Q1 2024)   |
 | 6.1  | Local-PV Hostpath enabled                     | Able to provision a persistent volume of Local-PV (non-replicated) using type : K8s Hostpath addressed storage  | Pri 2 /  Rel: (Q2 2024)   |
 | 6.2  | Local-PV Device enabled                       | Able to provision a persistent volume of Local-PV (non-replicated) using type : K8s Device addressed storage    | Pri 2 /  Rel: (Q2 2024)   |
