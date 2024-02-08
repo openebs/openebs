@@ -1,64 +1,110 @@
 # Roadmap
 
-This document provides information on OpenEBS development in current and upcoming releases. Community and contributor involvement is vital for successfully implementing all desired items for each release. We hope that the items listed below will inspire further engagement from the community to keep OpenEBS progressing and shipping exciting and valuable features.
+This Roadmap defines OpenEBS features and capabilities that are in current development and may be included in upcoming releases.<BR>
+<BR>
+Community and contributor involvement is vital for successfully implementing all desired items for each release. We hope that the items listed below will inspire further engagement from the community to keep OpenEBS progressing and shipping exciting and valuable features.
 
 OpenEBS follows a lean project management approach by splitting the development items into current, near term and future categories.
 
 
+## Active Master roadmap
+This table holds a list of the most active roadmap items. These are the features that are currently getting the most active focus and attention within the project.
+
 ## Current
+These are backlog items that are prioritized and planned to be completed within the next major release. While many are planned items, higher priority is given to usability, stability, resilience, Data integrity issues reported by the community.
 
-These are some of the backlogs that are prioritized and planned to be completed within the next major release (e.g. OpenEBS 4.0). While the following are planned items, higher priority is given to usability and stability issues reported by the community. The completion of these items also depends on the availability of contributors.
 
-Note: OpenEBS follows a quarterly release cadence with a new minor release around the end of each quarter. For the most current plan and status check out the [release project trackers](https://github.com/orgs/openebs/projects?type=classic). This document is reviewed and updated by the maintainers after each major release.
+_Note_: OpenEBS follows an aggressive release cadence with a new minor release every 2 months. For the most current plan and status check out the [release project trackers](https://github.com/orgs/openebs/projects?type=classic). This document is reviewed and updated by the maintainers after each major release.
 
-### Mayastor
-- Source repositories
+
+## Mayastor Roadmap : 2024 Phase-2
+- Forward facing planned release date, Release version numbers and feature priorities are subject to change as the project Maintainers/Leadership/community continuously update and adjust the **Release Feature bundling Strategy** to react to K8s industry movements, trends and our community influence.
+
+|  ID  | Feature name                   | Description and user story                                            | Release, links, tracking issue, GitHub repo                                                   |
+| :--- | :----------------------------- | :--------------------------------------------------------------------- | :------------------------------------------------------------------------------------------ |
+| 1    | Multi-replica volume snapshot and CSI cloning | Able to take consistent snapshots across all available replicas of a volume                                    | Pri 1 /  Rel: (Q1 2024)    |
+| 2    | Volume resize                                 | Able to increase volume size and overlaying filesystem size with I/O continuity                                | Pri 1 /  Rel: (Q1 2024)    |
+| 3    | DiskPool resize                               | Able to increase pool capacity by expansion of underlying disk pool device(s) with I/O continuity              | Pri 1 /  Rel: (Q1 2024)    |
+| 4    | DiskPool media aggregation mgmt SPDK mode     | Able to create, expand & manage virtual SPDK disks that are aggregates of multiple physical media devices      | Pri 1 /  Rel: (Q2 2024)    |
+| 4.1  | DiskPool media aggregation mgmt LVM mode      | New DiskPool type (LVM Mediastore) of aggregated media devices managed under an integrated Linux LVM kernel    | Pri 1 /  Rel: (Q2 2024)    |
+| 6    | Local-PV Data-Engine(s) integrated + enabled  | Dynamically provision a persistent volume of LocalPV (non-replicated) type using non-SPDK blobstor for storage  | Pri 1 /  Rel: (Q1 2024)   |
+| 6.1  | Local-PV Hostpath enabled                     | Able to provision a persistent volume of Local-PV (non-replicated) using type : K8s Hostpath addressed storage  | Pri 2 /  Rel: (Q2 2024)   |
+| 6.2  | Local-PV Device enabled                       | Able to provision a persistent volume of Local-PV (non-replicated) using type : K8s Device addressed storage    | Pri 2 /  Rel: (Q2 2024)   |
+| 6.3  | Local-PV RawFile Soft Luns enabled            | Able to provision a persistent volume of Local-PV (non-replicated) using type : K8s Soft Filesystem lun addressed storage    | Pri 3 /  Rel: (Q3 2024)  |
+| 6.4  | Local-PV RawFile Multi-F/S support            | Multi filesystems support for Local-PV RawFile Soft luns : ext3, ext4, XFS, BTRFS, f2fs, SSDFS, ZNS                    | Pri 3 /  Rel: (Q3 2024)   |
+| 6.5  | NDM integrated + enabled                      | NDM support for all Local-PV dependant services                                                                 | Pri 2 /  Rel: (Q2 2024)   |
+| 7    | HyperLocal-PV Data-Engine                     | Dynamically provision a non-replicated PV of Local-PV type via SPDK blobstor LVol as storage + NVMe target device |  Pri 2 /  Rel: (Q2 2024)   |
+| 7.1  | HyperLocal-PV : UBlock mode                   | Non-replicated PV of Local-PV type via UBlock kernel integration to SPDK blobstor LVol as storage                  |  Pri 2 /  Rel: (Q2 2024)   |
+| 7.2  | HyperLocal-PV : PCIe mode                     | Non-replicated PV of Local-PV type via PCIe-based NVMe kernel integration to SPDK blobstor LVol as storage         |  Pri 2.5 /  Rel: (Q2 2024)*   |
+| 8    | GUI Mgmt Portal & Dashboard                   | Provision, manage, monitor Mayastor deployments with a RESTful GUI interface - @ parity with Shell & kubectl cmds | Pri 3 /  Rel: (Q3 2024)    |
+| 8.1  | GUI Mgmt Portal & Dashboard : On-Prem         | Mgmt portal & Dashboard deployed privately on-prem for air-gapped architectures                                     | Pri 3 /  Rel: (Q3 2024)    |
+| 8.2  | GUI Mgmt Portal & Dashboard : In-Cloud SaaS   | Mgmt portal & Dashbord deployed as SaaS privately in-cloud for cloud enabled architectures                        | Pri 3 /  Rel: (Q3 2024)    |
+| 8.3  | GUI Mgmt Portal & Dashboard : Global view     | Mgmt portal aggregated Global world view of all k8s clusters configured to contribute anonymized global stats     | Pri 3 /  Rel: (Q3 2024)    |
+| 9    | Storage Encryption                            | Provision Encrypted data-at-rest volume via SPDK LVol layer - multi File system support (ext3, ext4, XFS, BRFS, SSDFS)  | Pri 3 /  Rel: (Q3 2024)    |
+| 10   | Health & Supportability metrics + Dashboard   | Deep health diagnostics view of all elements OpenEBS manages - enable Metric inclusion in Support Bundle upoloads |  Pri 2.5 /  Rel: (Q2 2024*)   |
+| 11   | E2E Storage UNMAP reclaim integration         | Support Discard: LINUX / UNMAP: SCSI / Deallocate: NVMe issued from filesystem down to SPDK Blobstor elements    | Pri 3 /  Rel: (Q4 2024)    |
+| 12   | Thin provisioning phase-2                     | Thin Provision awareness and integrations with DiskPool metrics, pre-emptive intelligence actions                   | Pri 3 /  Rel: (Q4 2024)    |
+| 13   | Native Object Store                           | An S3-compliant fast object store   integrated with SPDK LVstore/LVols Blobstor & HyperLocal-PV vols               | Pri 3 /  Rel: (Q4 2024)    |
+| 14   | Zoned-SSD support                             | Integrated Western Digital Team's Mayastor ZNS feature for very high performance vols                             | Pri 2.5 /  Rel: (Q2 2024)   |
+<BR>
+
+## Excluded from the roadmap
+The Roadmap is focused exclusively on the modern **Mayastor* Data-Engines in the **STANDARD** edition.
+<BR>
+It does not define any net-new features or capabilities for any OpenEBS **LEGACY** projects or projects that are tagged & defined as DEPRECATED or ARCHIVED. (Currently those projects are as follows):<BR>
+| ID  | Data-Engines      | Embedded tech stack  | Status                           |
+|-----|-------------------|----------------------|--------------------------------------------|
+|  1  |  Jiva             | iSCSI                | We plan to ARCHIVE & sunset LEGACY in 2024 |
+|  2  |  cStor            | Open ZFS             | We plan to ARCHIVE & sunset LEGACY in 2024 |
+|  2  |  NFS Provisioner  | NFS userspace server | We plan to ARCHIVE & sunset LEGACY in 2024 |
+<BR>
+
+## Mayastor Source repositories
+These repos are critically required for the **current** roadmap.<BR>
   - https://github.com/openebs/mayastor
   - https://github.com/openebs/mayastor-control-plane
   - https://github.com/openebs/mayastor-api
   - https://github.com/openebs/mayastor-extensions
   - https://github.com/openebs/mayastor-docs
-- Backlogs in-progress (under active development)
-  - Ease of installation by having a unified Helm chart for installing Mayastor in a Kubernetes cluster.
-  - Generic naming of all Mayastor Kubernetes API resources. For eg. MayastorStoragePool will be changed to DiskPool.
-  - Enhance supportability by ingesting Mayastor component logs and creating a bundle through kubectl plug-in. 
-  - Mayastor should expose metrics that meet the needs of the SRE persona, to track utilization at pool and volume levels.
-  - Removal of iSCSI support from Mayastor, NVMe is the only supported protocol.
-  - On manual deletion of a Mayastor PV having Reclaim policy set to "Retain", the related Mayastor resources need to be cleaned up.
-  - Support for Mayastor installation on AWS/EKS clusters.
-  - Support for Mayastor installation on SuSE Rancher clusters.
-  - Support for Mayastor installation on RHEL-based Kubernetes clusters.
-  - High availability support for Mayastor nexus (target), ability to spin up on-demand replacement target for a Mayastor volume.
-  - Ability to cordon, drain and delete Mayastor nodes.
-  - Basic upgrade framework for updating Mayastor releases.
-  - Support for thin-provisioned Mayastor volumes.
-  - Faster rebuild of volume replicas using log-based technique.
-  - Call home analytics.
-- Backlogs (near-term)
-  - Support for hot upgrade, business continuity with no downtime.
-  - Support for volume groups, i.e. Mayastor replica placement should be topology aware for statefulsets zonal (or HA) distribution.
-  - Support for Mayastor volume resize.
-  - Support for volume snapshots.
 
-### Dynamic Local PVs
-- Source repositories
+### Dynamic Local PVs repos
+- (These repos are integrating into Mayastor to be included as part of the Mayastor STANDARD edition - Q1 2024)
   - https://github.com/openebs/dynamic-localpv-provisioner
   - https://github.com/openebs/zfs-localpv
   - https://github.com/openebs/lvm-localpv
   - https://github.com/openebs/rawfile-localpv
   - https://github.com/openebs/device-localpv
   - https://github.com/openebs/node-disk-manager
-- Backlogs
-  - Shared VG for LVM Local PV. 
 
+- Backlogs
+  - Shared VG for LVM Local PV.
+
+## Backlogs in-progress (under active development)
+  - New set of items to be updated Feb 2024
+
+## Backlogs (near-term)
+  - Support for hot upgrade, business continuity with no downtime.
+  - Support for volume groups, i.e. Mayastor replica placement should be topology aware for statefulsets zonal (or HA) distribution.
+
+### Others
+  - https://github.com/openebs/charts
+  - https://github.com/openebs/openebsctl
+  - https://github.com/openebs/monitoring
+  - https://github.com/openebs/website
+  - https://github.com/openebs/m-exporter
+  - https://github.com/openebs/dynamic-nfs-provisioner
+- Backlogs
+
+
+## Repos to be DEPRECATED and ARCHIVED
 ### Jiva
 - Source repositories
   - https://github.com/openebs/jiva
   - https://github.com/openebs/jiva-operator
 - Backlogs
   - None
- 
-  
+
+
 ### cStor
 - Source repositories
   - https://github.com/openebs/libcstor
@@ -72,53 +118,24 @@ Note: OpenEBS follows a quarterly release cadence with a new minor release aroun
 - Backlogs
   - Upstream uZFS changes and start using them instead of a local fork
 
-### NDM 
-- Source repositories
-  - https://github.com/openebs/node-disk-manager
-- Backlogs
-  - None
 
+## Old items (needs tidy-up)
 
-### Others
-- Source repositories
-  - https://github.com/openebs/charts
-  - https://github.com/openebs/openebsctl
-  - https://github.com/openebs/monitoring
-  - https://github.com/openebs/website
-  - https://github.com/openebs/m-exporter
-  - https://github.com/openebs/dynamic-nfs-provisioner
-  - https://github.com/openebs/openebs-k8s-provisioner (deprecated)
-  - https://github.com/openebs/openebs-docs (deprecated)
-  - https://github.com/openebs/maya (deprecated)
-- Backlogs
-  - Enhancements to OpenEBS CLI (openebsctl) for better troubleshooting OpenEBS components and fixing the errors
-
-## Near Term
-
-Typically the items under this category fall under next major release (after the current. e.g 4.0). At a high level, the focus is towards moving the beta engines towards stable by adding more automated e2e tests and updating the corresponding user and contributor documents. To name a few backlogs (not in any particular order) on the near-term radar, where we are looking for additional help: 
-
-
-- Support for Mayastor Volume resize
+Typically the items under this category fall under next major release.
 - Support for pluggable storage backend for Mayastor (example: replace blobstore with lvm)
 - Support for specifying multiple hostpaths to be used with Local PV hostpath
-- Update user documentation with reference stacks of running various workloads using OpenEBS volumes 
+- Update user documentation with reference stacks of running various workloads using OpenEBS volumes
 - Auto provisioning of block devices (on the external storage systems) that can be used with OpenEBS storage engines
-- Setup E2e pipelines for ARM Clusters
 - Automate the workflows around handling scenarios like complete cluster failures that currently require some manual steps
 - Custom Kubernetes storage schedulers to address auto-rebalancing of the data placed on the nodes to help with scale up/down of Kubernetes nodes
-- Allow Mayastor Pools to incorporate more than one capacity contributing disk device
-- Auto-scaling up and down of cStor pools as the new nodes are added and removed
-- Auto-upgrade of cStor Pools and Volumes when user upgrades control plane
-- Asynchronous or DR replica for cStor and Mayastor volumes
 - Support for restoring a volume (in-place) for supporting blue/green stateful deployments
-- Multi-arch builds for all Mayastor components
-- Partial rebuild for the Mayastor replicas (similar to zfs resilvering) 
-- Support Bulk BDC requests to claim multiple block devices that satisfy affinity or anti-affinity rules of applications. Example: two block devices from same node or two block devices from different nodes. 
+- Partial rebuild for the Mayastor replicas (similar to zfs resilvering)
+- Support Bulk BDC requests to claim multiple block devices that satisfy affinity or anti-affinity rules of applications. Example: two block devices from same node or two block devices from different nodes.
 - Support for device configuration tasks like partitioning, mounting or unmounting devices by adding new services via NDM gRPC API layer.
 
 ## Future
 
-As the name suggests this bucket contains items that are planned for future. Sometimes the items are related to adapting to the changes coming in the Kubernetes repo or other related projects. Github milestone called [future backlog](https://github.com/openebs/openebs/milestone/11) is used to track these requests. 
+As the name suggests this bucket contains items that are planned for future. Sometimes the items are related to adapting to the changes coming in the Kubernetes repo or other related projects. Github milestone called [future backlog](https://github.com/openebs/openebs/milestone/11) is used to track these requests.
 
 # Getting involved with Contributions
 
