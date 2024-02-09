@@ -90,7 +90,7 @@ OpenEBS is 100% open source software.
 The project source code is spread across multiple repos and covers multiple projects: 
 <BR>
 <BR>
-OUr main Roamap is focused exclusively on the modern (STANDARD Edution) Data-Engine **Mayastor**. It does not define any net-new features or capabilities for any LEGACY projects or projects that are tagged & defined as DEPRERCATED or ARCHIVED. Currently those proejcts are defined as the follows (see refernces above for the details on the projects DEPRECATED and ARCHIVAL strategy)...
+Our main Roadmap is focused exclusively on the modern (STANDARD Edition) Data-Engine **Mayastor**. It does not define any net-new features or capabilities for any LEGACY projects or projects that are tagged & defined as DEPRECATED or ARCHIVED. Currently those projects are defined as the follows (see references above for the details on the projects DEPRECATED and ARCHIVAL strategy)...
 - Jiva
 - cStor
 - NFS-Provisioner
