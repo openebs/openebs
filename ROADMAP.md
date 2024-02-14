@@ -27,7 +27,7 @@ _Note_: OpenEBS follows an aggressive release cadence with a new minor release e
 | 3    | DiskPool resize                               | Able to increase pool capacity by expansion of underlying disk pool device(s) with I/O continuity              | Pri 1 /  Rel: (Q1 2024)    |
 | 4    | DiskPool Aggregate media mgmt SPDK mode       | Able to create, expand & manage virtual SPDK disks that are aggregates of multiple physical media devices      | Pri 1 /  Rel: (Q2 2024)    |
 | 4.1  | DiskPool storage media mgmt xVM mode          | New DiskPool type (xVM Mediastore) - Backend media devices are managed under LVM & ZFS kernel layers           | Pri 1 /  Rel: (Q2 2024)    |
-| 4.2  | DiskPool Choosable Replication mode           | New DiskPool enables user to select Replicated/Non-Replciated persona for any volume type (SPDK, LVM, ZFS)     | Pri 1 /  Rel: (Q2 2024)    |
+| 4.2  | DiskPool Choosable Replication mode           | New DiskPool enables user to select Replicated/Non-Replicated persona for any volume type (SPDK, LVM, ZFS)     | Pri 1 /  Rel: (Q2 2024)    |
 | 4.3  | DiskPool Chosable Data Protection mode        | New DiskPool enables RAID Levels 0,1,4,5,6,10 & Z,Z2,Z3 via DiskPool modes LVM & ZFS integrations              | Pri 1 /  Rel: (Q2 2024)    |
 | 5    | DiskPool Erasure Coded Data Protection mode   | New DiskPool enables Distributed Erasure Coding Data Protection as an alternative to RAID architecture         | Pri 1 /  Rel: (Q2 2024)    |
 | 6    | Local-PV Data-Engine integrated + enabled     | Dynamically provision a persistent volume of LocalPV (non-replicated) type using non-SPDK managed storage      | Pri 1 /  Rel: (Q1 2024)   |
