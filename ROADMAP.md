@@ -25,14 +25,17 @@ _Note_: OpenEBS follows an aggressive release cadence with a new minor release e
 | 1    | Multi-replica volume snapshot and CSI cloning | Able to take consistent snapshots across all available replicas of a volume                                    | Pri 1 /  Rel: (Q1 2024)    |
 | 2    | Volume resize                                 | Able to increase volume size and overlaying filesystem size with I/O continuity                                | Pri 1 /  Rel: (Q1 2024)    |
 | 3    | DiskPool resize                               | Able to increase pool capacity by expansion of underlying disk pool device(s) with I/O continuity              | Pri 1 /  Rel: (Q1 2024)    |
-| 4    | DiskPool media aggregation mgmt SPDK mode     | Able to create, expand & manage virtual SPDK disks that are aggregates of multiple physical media devices      | Pri 1 /  Rel: (Q2 2024)    |
-| 4.1  | DiskPool media aggregation mgmt LVM mode      | New DiskPool type (LVM Mediastore) of aggregated media devices managed under an integrated Linux LVM kernel    | Pri 1 /  Rel: (Q2 2024)    |
-| 6    | Local-PV Data-Engine(s) integrated + enabled  | Dynamically provision a persistent volume of LocalPV (non-replicated) type using non-SPDK blobstor for storage  | Pri 1 /  Rel: (Q1 2024)   |
-| 6.1  | Local-PV Hostpath enabled                     | Able to provision a persistent volume of Local-PV (non-replicated) using type : K8s Hostpath addressed storage  | Pri 2 /  Rel: (Q2 2024)   |
+| 4    | DiskPool Aggregate media mgmt SPDK mode       | Able to create, expand & manage virtual SPDK disks that are aggregates of multiple physical media devices      | Pri 1 /  Rel: (Q2 2024)    |
+| 4.1  | DiskPool storage media mgmt xVM mode          | New DiskPool type (xVM Mediastore) - Backend media devices are managed under LVM & ZFS kernel layers           | Pri 1 /  Rel: (Q2 2024)    |
+| 4.2  | DiskPool Choosable Replication mode           | New DiskPool enables user to select Replicated/Non-Replciated persona for any volume type (SPDK, LVM, ZFS)     | Pri 1 /  Rel: (Q2 2024)    |
+| 4.3  | DiskPool Chosable Data Protection mode        | New DiskPool enables RAID Levels 0,1,4,5,6,10 & Z,Z2,Z3 via DiskPool modes LVM & ZFS integrations              | Pri 1 /  Rel: (Q2 2024)    |
+| 5    | DiskPool Erasure Coded Data Protection mode   | New DiskPool enables Distributed Erasure Coding Data Protection as an alternative to RAID architecture         | Pri 1 /  Rel: (Q2 2024)    |
+| 6    | Local-PV Data-Engine integrated + enabled     | Dynamically provision a persistent volume of LocalPV (non-replicated) type using non-SPDK managed storage      | Pri 1 /  Rel: (Q1 2024)   |
+| 6.1  | Local-PV Hostpath integarted + enabled        | Able to provision a persistent volume of Local-PV (non-replicated) using type : K8s Hostpath addressed storage  | Pri 2 /  Rel: (Q2 2024)   |
 | 6.2  | Local-PV Device enabled                       | Able to provision a persistent volume of Local-PV (non-replicated) using type : K8s Device addressed storage    | Pri 2 /  Rel: (Q2 2024)   |
 | 6.3  | Local-PV RawFile Soft Luns enabled            | Able to provision a persistent volume of Local-PV (non-replicated) using type : K8s Soft Filesystem lun addressed storage    | Pri 3 /  Rel: (Q3 2024)  |
 | 6.4  | Local-PV RawFile Multi-F/S support            | Multi filesystems support for Local-PV RawFile Soft luns : ext3, ext4, XFS, BTRFS, f2fs, SSDFS, ZNS                    | Pri 3 /  Rel: (Q3 2024)   |
-| 6.5  | NDM integrated + enabled                      | NDM support for all Local-PV dependant services                                                                 | Pri 2 /  Rel: (Q2 2024)   |
+| 6.5  | NDM enabled                                   | NDM support for all Local-PV dependant services                                                                 | Pri 2 /  Rel: (Q2 2024)   |
 | 7    | HyperLocal-PV Data-Engine                     | Dynamically provision a non-replicated PV of Local-PV type via SPDK blobstor LVol as storage + NVMe target device |  Pri 2 /  Rel: (Q2 2024)   |
 | 7.1  | HyperLocal-PV : UBlock mode                   | Non-replicated PV of Local-PV type via UBlock kernel integration to SPDK blobstor LVol as storage                  |  Pri 2 /  Rel: (Q2 2024)   |
 | 7.2  | HyperLocal-PV : PCIe mode                     | Non-replicated PV of Local-PV type via PCIe-based NVMe kernel integration to SPDK blobstor LVol as storage         |  Pri 2.5 /  Rel: (Q2 2024)*   |
