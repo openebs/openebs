@@ -5,7 +5,7 @@ We are an ultra-modern storage target platform, a Hyper-Converged storage softwa
 OpenEBS provides... <BR>
 <BR>
 
-- Stateful persistent storage voluems for Kubernetes
+- Stateful persistent storage volumes for Kubernetes
 - is a 100% Cloud-Native storage solution
 - Delivers a Kubernetes cluster-wide storage fabric that provides containers with access to storage across the entire Kubernetes cluster.
 - Enterprise Grade data management capabilities such as **snapshots, clones and replicated volumes** <BR>
