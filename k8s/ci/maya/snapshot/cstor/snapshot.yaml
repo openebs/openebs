@@ -1,7 +1,0 @@
-apiVersion: volumesnapshot.external-storage.k8s.io/v1
-kind: VolumeSnapshot
-metadata:
-  name: snapshot-demo-cstor
-  namespace: default
-spec:
-  persistentVolumeClaimName: cstor-vol1-1r-claim

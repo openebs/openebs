@@ -24,14 +24,15 @@ superseded-by:
 
  ## Table of Contents
 
- * [Table of Contents](#table-of-contents)
-* [Summary](#summary)
-* [Motivation](#motivation)
-    * [Goals](#goals)
-* [Proposal](#proposal)
-    * [Implementation Details](#implementation-details)
-* [Performance impact](#performance-impact)
-* [Alternatives](#alternatives)
+- [Jiva automatic snapshot deletion](#jiva-automatic-snapshot-deletion)
+  - [Table of Contents](#table-of-contents)
+  - [Summary](#summary)
+  - [Motivation](#motivation)
+    - [Goals](#goals)
+  - [Proposal](#proposal)
+    - [Implementation Details](#implementation-details)
+  - [Performance impact](#performance-impact)
+  - [Alternatives](#alternatives)
 
  ## Summary
 
@@ -97,9 +98,6 @@ superseded-by:
        - Requires manual cleanup of snapshots if replicas are restarted while
          snapshot deletion is in progress by validating the chain and restart is
          required to rebuild the replica to be on the safer side.
-
- NOTE: A script is written to delete the given no of snapshots automatically. You
- can find the script [here](https://github.com/openebs/openebs/blob/master/k8s/jiva/snapshot-cleanup.sh)
 
  b) **Cleanup in background by picking the snapshots with smallest size**:
 

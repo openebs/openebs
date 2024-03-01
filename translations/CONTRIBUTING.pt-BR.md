@@ -8,10 +8,14 @@ Contudo, para os indivíduos que querem um pouco mais de orientação nas melhor
 
 Dito isso, OpenEBS é uma inovação em Open Source. Você tem boas vindas para contribuir em qualquer maineira que possa e toda a ajuda fornecida é muito apreciada.
 
-- [Levante um problema para solicitar novas funcionalidades, corrigir documentação ou reportar bugs.](#levantando-problemas)
-- [Envie alterações para aprimorar a documentação.](#envie-alterações-para-aprimorar-a-documentação)
-- [Envie propostas para novas funcionalidades/melhorias.](#envie-propostas-para-novas-funcionalidades)
-- [Corrija problemas existentes relacionados à documentação ou código.](#contribua-ao-código-fonte-e-correção-de-bugs)
+- [Contribuindo à OpenEBS](#contribuindo-à-openebs)
+  - [Levantando Problemas](#levantando-problemas)
+  - [Envie alterações para aprimorar a documentação](#envie-alterações-para-aprimorar-a-documentação)
+  - [Envie propostas para novas funcionalidades](#envie-propostas-para-novas-funcionalidades)
+  - [Contribua ao código fonte e correção de bugs](#contribua-ao-código-fonte-e-correção-de-bugs)
+  - [Corrija problemas existentes](#corrija-problemas-existentes)
+    - [Assine seu trabalho](#assine-seu-trabalho)
+  - [Entre na nossa comunidade](#entre-na-nossa-comunidade)
 
 Tem algumas diretrizes simples que você deve seguir antes de fornecer seus hacks.
 
@@ -39,7 +43,7 @@ Sempre existe algo mais que é requerido, para tornar mais fácil e encaixar com
 Forneça Pull Requests com tags apropriadas para correções de bugs ou melhorias ao código fonte. Para uma lista de tags que podem ser utilizadas, veja [isto](/contribute/labels-of-issues.md).
 
 * Para contribuir com demonstrações K8s, por favor consulte este [documento](/contribute/CONTRIBUTING-TO-K8S-DEMO.md).
-    - Para verificar como OpenEBS funciona com K8s, consulte este [documento](/k8s/README.md)
+    - Para verificar como OpenEBS funciona com K8s, consulte este [documento](https://openebs.io/docs)
 - Para contribuir ao Provisioner Kubernetes OpenEBS, por favor consulte este [documento](/contribute/CONTRIBUTING-TO-KUBERNETES-OPENEBS-PROVISIONER.md).
 
 Consulte este [documento](/contribute/design/code-structuring.md) para mais informações sobre estruturação de código e guias para serem seguidos.

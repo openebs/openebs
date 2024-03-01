@@ -40,7 +40,7 @@ Ada sesuatu yang lebih penting dari membuat sebuah fitur baru, membuatnya mudah 
 Lampirkan PR dengan tag yang sesuai untuk fix bug atau memperbaharui _source code_. Untuk list tag, dapat dilihat di halaman [ini](./contribute/labels-of-issues.md).
 
 - Untuk kontribusi pada K8s demo, silahkan lihat [document ini](./contribute/CONTRIBUTING-TO-K8S-DEMO.md).
-  - Untuk melihat apa yang sedang OpenEBS kerjakan pda K8s, lihat [dokumen ini](./k8s/README.md).
+  - Untuk melihat apa yang sedang OpenEBS kerjakan pda K8s, lihat [dokumen ini](https://openebs.io/docs).
 
 * Untuk kontribusi pada _Kubernetes OpenEBS Provisioner_, silihkan lihat [document ini](./contribute/CONTRIBUTING-TO-KUBERNETES-OPENEBS-PROVISIONER.md).
 
