@@ -41,7 +41,7 @@
 
 - K8s डेमो में योगदान देने के लिए, कृपया इस [दस्तावेज़](./contribute/CONTRIBUTING-TO-K8S-DEMO.md) को देखें।
 
-  - OpenEBS K8s के साथ कैसे काम करता है, इसकी जाँच के लिए, इस [दस्तावेज](./k8s/README.md) का संदर्भ लें।
+  - OpenEBS K8s के साथ कैसे काम करता है, इसकी जाँच के लिए, इस [दस्तावेज](https://openebs.io/docs) का संदर्भ लें।
 
 - कुबेरनेट्स ओपनईबीएस प्रोविजनर के लिए योगदान करने के लिए, कृपया इस [दस्तावेज़](./contribute/CONTRIBUTING-TO-KUBERNETES-OPENEBS-PROVISIONER.md) को देखें।
 

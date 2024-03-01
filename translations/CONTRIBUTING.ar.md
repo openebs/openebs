@@ -39,7 +39,7 @@
 [this](./contribute/labels-of-issues.md).
 
 * للمساهمة في K8s demo, يرجى الرجوع إلى هذا [document](./contribute/CONTRIBUTING-TO-K8S-DEMO.md).
-    - للتحقق من كيفية عمل OpenEBS مع K8s, الرجوع إلى هذا [document](./k8s/README.md) 
+    - للتحقق من كيفية عمل OpenEBS مع K8s, الرجوع إلى هذا [document](https://openebs.io/docs) 
 - للمساهمة في Kubernetes OpenEBS Provisioner ، يرجى الرجوع إلى هذا [document](./contribute/CONTRIBUTING-TO-KUBERNETES-OPENEBS-PROVISIONER.md).
     
 الرجوع إلى هذا [document](./contribute/design/code-structuring.md) لمزيد من المعلومات حول هيكلة الكود والمبادئ التوجيهية لاتباعها.

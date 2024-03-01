@@ -22,22 +22,27 @@ superseded-by:
 
 ## Table of Contents
 
-* [Table of Contents](#table-of-contents)
-* [Summary](#summary)
-* [Motivation](#motivation)
-    * [Goals](#goals)
-    * [Non-Goals](#non-goals)
-* [Proposal](#proposal)
-    * [User Stories](#user-stories)
-    * [Design Constraints](#design-constraints)
-    * [Proposed Implementation](#proposed-implementation)
-    * [High Level Design](#high-level-design)
-    * [Risks and Mitigations](#risks-and-mitigations)
-* [Graduation Criteria](#graduation-criteria)
-* [Implementation History](#implementation-history)
-* [Drawbacks](#drawbacks)
-* [Alternatives](#alternatives)
-* [Infrastructure Needed](#infrastructure-needed)
+- [Upgrade via Kubernetes Job](#upgrade-via-kubernetes-job)
+  - [Table of Contents](#table-of-contents)
+  - [Summary](#summary)
+  - [Motivation](#motivation)
+    - [Goals](#goals)
+    - [Non-Goals](#non-goals)
+  - [Proposal](#proposal)
+    - [User Stories](#user-stories)
+    - [Design Constraints](#design-constraints)
+    - [Proposed Implementation](#proposed-implementation)
+    - [Backward Compatibility](#backward-compatibility)
+    - [Design Choices/Decisions](#design-choicesdecisions)
+    - [High Level Design](#high-level-design)
+      - [Upgrade Job Example](#upgrade-job-example)
+      - [UpgradeTask CR Example](#upgradetask-cr-example)
+    - [Risks and Mitigations](#risks-and-mitigations)
+  - [Graduation Criteria](#graduation-criteria)
+  - [Implementation History](#implementation-history)
+  - [Drawbacks](#drawbacks)
+  - [Alternatives](#alternatives)
+  - [Infrastructure Needed](#infrastructure-needed)
 
 ## Summary
 
@@ -208,9 +213,7 @@ This design proposes the following key changes:
     UpgradeJob is executed on an already upgraded resource, it will 
     return success. 
 
-    Note: This replaces the script based upgrades from OpenEBS 1.0. 
-    Sample Kubernetes YAMLs for upgrading various resources can be
-    found [here](../../../../k8s/upgrades/1.0.0-1.1.0/).  
+    Note: This replaces the script based upgrades from OpenEBS 1.0.   
 
     Status: Available in 1.1 and supports upgrading of Jiva Volumes,
     cStor Volumes and cStor pools from 1.0 to 1.1
@@ -353,7 +356,6 @@ and the reasoning behind selecting a certain approach.
 
    
 - How does this design compared to the `kubectl` based upgrade
-  introduced for upgrading from [0.8.2 to 0.9](https://github.com/openebs/openebs/tree/master/k8s/upgrades/0.8.2-0.9.0). 
 
   The current design proposed in this document builds on top of the
   0.8.2 to 0.9 design, by improving on usability and agility of the 

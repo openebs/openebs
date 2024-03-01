@@ -11,15 +11,6 @@
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
 
-# Kubernetes demo
-k8s/demo/.vagrant/
-k8s/demo/*.log
-k8s/demo/*test*
-
-# Kubernetes lib
-k8s/lib/vagrant/*.box
-k8s/lib/vagrant/*.log
-
 # Local build for docs
 documentation/build/
 

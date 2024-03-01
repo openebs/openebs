@@ -8,10 +8,14 @@ Jednak dla tych osób, które chcą nieco więcej wskazówek na temat najlepszeg
 
 To powiedziawszy, OpenEBS jest innowacją w Open Source. Możesz wnieść swój wkład w każdy możliwy sposób, a wszelka udzielona pomoc jest bardzo cenna.
 
-- [Zgłaszaj problemy, aby poprosić o nową funkcjonalność, naprawić dokumentację lub zgłosić błędy.](#zgłaszanie-problemów)
-- [Prześlij zmiany, aby ulepszyć dokumentację.](#prześlij-zmianę-by-ulepszyć-dokumentację)
-- [Prześlij propozycje nowych funkcji / ulepszeń.](#prześlij-propozycje-nowych-funkcji)
-- [Rozwiąż istniejące problemy związane z dokumentacją lub kodem.](#współtworzenie-kodu-źródłowego-i-naprawianie-błędów)
+- [Wkład w OpenEBS](#wkład-w-openebs)
+  - [Zgłaszanie problemów](#zgłaszanie-problemów)
+  - [Prześlij zmianę by ulepszyć dokumentację](#prześlij-zmianę-by-ulepszyć-dokumentację)
+  - [Prześlij propozycje nowych funkcji](#prześlij-propozycje-nowych-funkcji)
+  - [Współtworzenie kodu źródłowego i naprawianie błędów](#współtworzenie-kodu-źródłowego-i-naprawianie-błędów)
+  - [Rozwiąż istniejące problemy](#rozwiąż-istniejące-problemy)
+    - [Podpisz swoją pracę](#podpisz-swoją-pracę)
+  - [Dołącz do naszej społeczności](#dołącz-do-naszej-społeczności)
 
 Jest kilka prostych wskazówek, które musisz przestrzegać przed udostępnieniem wkładu.
 
@@ -39,7 +43,7 @@ Zawsze są pewne rzeczy, które są potrzebne w oprogramowaniu, które mogłyby 
 Dostarcz PR z odpowiednimi tagami do poprawek błędów lub ulepszeń w kodzie źródłowym. Aby zapoznać się z listą tagów, których można użyć, zobacz [ten dokument](./contrib/labels-of-issues.md).
 
 * Aby wnieść wkład w demo K8s, zapoznaj się z tym [dokumentem](./contrib/CONTRIBUTING-TO-K8S-DEMO.md).
-    - Aby sprawdzić, jak OpenEBS współpracuje z K8s, zapoznaj się z tym [dokumentem](./k8s/README.md)
+    - Aby sprawdzić, jak OpenEBS współpracuje z K8s, zapoznaj się z tym [dokumentem](https://openebs.io/docs)
 - Aby wnieść wkład w Kubernetes OpenEBS Provisioner, zapoznaj się z tym [dokumentem](./contrib/CONTRIBUTING-TO-KUBERNETES-OPENEBS-PROVISIONER.md).
     
 Zapoznaj się z tym [dokumentem](./contrib/design/code-structuring.md), aby uzyskać więcej informacji na temat struktury kodu i wskazówek, jak postępować.

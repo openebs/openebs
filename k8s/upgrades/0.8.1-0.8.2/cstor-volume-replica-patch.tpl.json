@@ -1,8 +1,0 @@
-{
-    "metadata": {
-        "finalizers": [],
-        "labels": {
-            "openebs.io/version": "@target_version@"
-        }
-    }
-}
