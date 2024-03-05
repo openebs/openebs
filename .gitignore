@@ -22,3 +22,4 @@ k8s/lib/vagrant/*.log
 
 # Local build for docs
 documentation/build/
+**/.idea
