@@ -3,14 +3,16 @@ Successfully installed OpenEBS.
 
 Check the status by running: kubectl get pods -n {{ .Release.Namespace }}
 
-The default values will install LocalPV Hostpath Provisioner, LocalPV LVM, LocalPV ZFS and Mayastor and enable these
-storage engines along with their default StorageClasses. The LocalPV offer non replicated local storage while Mayastor provides replicated storage.
+The default values will install both Local and Replicated Engines. However,
+the Replicated Engine will require additional configuration to be fuctional.
+The Local Engine offers non replicated local storage using 3 different storage
+backends, while the Replicated Engine provides replicated highly-available
+storage.
+
 Use `kubectl get sc` to see the list of installed OpenEBS StorageClasses.
 
 For more information, 
-- view the online documentation at https://openebs.io/docs or
-- connect with an active community on Kubernetes slack #openebs channel.
-{{- /*
-The section below can be removed once enableDeviceClass and enableHostpathClass
-options are removed.
-*/}}
+- view the online documentation at https://openebs.io/docs
+- connect with an active community on our Kubernetes slack channel.
+        - Sign up to Kubernetes slack: https://slack.k8s.io
+        - #openebs channel: https://kubernetes.slack.com/messages/openebs
