@@ -4,7 +4,7 @@ name: openebs
 appVersion: 4.0.0
 description: Containerized Attached Storage for Kubernetes
 icon: https://raw.githubusercontent.com/cncf/artwork/HEAD/projects/openebs/icon/color/openebs-icon-color.png
-home: http://www.openebs.io/
+home: https://www.openebs.io/
 keywords:
   - cloud-native-storage
   - block-storage
@@ -16,11 +16,11 @@ sources:
   - https://github.com/openebs/openebs
 dependencies:
   - name: localpv-provisioner
-    version: "3.5.0"
+    version: "4.0.0"
     repository: "https://openebs.github.io/dynamic-localpv-provisioner"
     condition: localpv-provisioner.enabled
   - name: zfs-localpv
-    version: "2.4.0"
+    version: "2.5.0"
     repository: "https://openebs.github.io/zfs-localpv"
     condition: zfs-localpv.enabled
   - name: lvm-localpv
@@ -28,6 +28,6 @@ dependencies:
     repository: "https://openebs.github.io/lvm-localpv"
     condition: lvm-localpv.enabled
   - name: mayastor
-    version: "2.5.0"
+    version: "2.6.0"
     repository: "https://openebs.github.io/mayastor-extensions"
     condition: mayastor.enabled
