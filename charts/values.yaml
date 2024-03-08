@@ -24,7 +24,7 @@ localpv-provisioner:
       # For example : quay.io/ is a correct value here and quay.io is incorrect
       registry:
       repository: openebs/provisioner-localpv
-      tag: 4.0.0
+      tag: 3.5.0
       pullPolicy: IfNotPresent
     updateStrategy:
       type: RollingUpdate
@@ -123,7 +123,7 @@ localpv-provisioner:
       repository: openebs/linux-utils
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: 4.0.0
+      tag: 3.5.0
 
   analytics:
     enabled: true
@@ -144,7 +144,7 @@ mayastor:
     # -- Image registry's namespace
     repo: openebs
     # -- Release tag for Mayastor images
-    tag: v2.6.0
+    tag: v2.5.0
     # -- ImagePullPolicy for Mayastor images
     pullPolicy: IfNotPresent
 
@@ -357,9 +357,9 @@ mayastor:
   #     # -- Log level for callhome
   #     logLevel: "info"
 
-  # localpv-provisioner:
-  #   # -- Enables the openebs dynamic-localpv provisioner. If disabled, modify etcd and loki-stack storage class accordingly.
-  #   enabled: false
+  localpv-provisioner:
+    # -- Enables the openebs dynamic-localpv provisioner. If disabled, modify etcd and loki-stack storage class accordingly.
+    enabled: false
   #   hostpathClass:
   #     enabled: false
 
@@ -404,3 +404,7 @@ lvm-localpv:
 #      repository: openebs/lvm-driver
 #      pullPolicy: IfNotPresent
 #      tag: 1.4.0
+
+# Default values for crds.
+crds:
+  enabled: true
