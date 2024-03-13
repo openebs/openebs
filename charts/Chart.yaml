@@ -19,17 +19,17 @@ dependencies:
     version: "4.0.0"
     condition: crds.enabled
   - name: localpv-provisioner
-    version: "3.5.0"
+    version: "4.0.0"
     repository: "https://openebs.github.io/dynamic-localpv-provisioner"
   - name: zfs-localpv
-    version: "2.4.0"
+    version: "2.5.0"
     repository: "https://openebs.github.io/zfs-localpv"
     condition: zfs-localpv.enabled
   - name: lvm-localpv
-    version: "1.4.0"
+    version: "1.5.0"
     repository: "https://openebs.github.io/lvm-localpv"
     condition: lvm-localpv.enabled
   - name: mayastor
-    version: "2.5.0"
+    version: "2.6.0"
     repository: "https://openebs.github.io/mayastor-extensions"
     condition: mayastor.enabled
