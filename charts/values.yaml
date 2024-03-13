@@ -10,7 +10,7 @@ localpv-provisioner:
   # Declare variables to be passed into your templates.
 
   release:
-    version: "3.5.0"
+    version: "4.0.0"
 
   rbac:
     # rbac.create: `true` if rbac resources should be created
@@ -24,7 +24,7 @@ localpv-provisioner:
       # For example : quay.io/ is a correct value here and quay.io is incorrect
       registry:
       repository: openebs/provisioner-localpv
-      tag: 3.5.0
+      tag: 4.0.0
       pullPolicy: IfNotPresent
     updateStrategy:
       type: RollingUpdate
@@ -123,7 +123,7 @@ localpv-provisioner:
       repository: openebs/linux-utils
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: 3.5.0
+      tag: 4.0.0
 
   analytics:
     enabled: true
@@ -133,7 +133,8 @@ localpv-provisioner:
 mayastor:
   # -- Enable Mayastor storage engine
   enabled: true
-
+  crds:
+    enabled: false
   # Sample configuration, if you want to configure mayastor with custom values.
   # This is a small part of the full configuration. Full configuration available
   # here - https://github.com/openebs/mayastor-extensions/blob/v2.5.0/chart/values.yaml
@@ -144,7 +145,7 @@ mayastor:
     # -- Image registry's namespace
     repo: openebs
     # -- Release tag for Mayastor images
-    tag: v2.5.0
+    tag: v2.6.0
     # -- ImagePullPolicy for Mayastor images
     pullPolicy: IfNotPresent
 
@@ -367,8 +368,10 @@ mayastor:
 # ref - https://openebs.github.io/zfs-localpv
 zfs-localpv:
   enabled: true
-
-  # Sample configuration if you want to configure zfs locapv with custom values.
+  crd:
+    enableInstall: false
+    volumeSnapshot: false
+  # Sample configuration if you want to configure zfs localpv with custom values.
   # This is a small part of the full configuration. Full configuration available
   # here - https://openebs.github.io/zfs-localpv
 
@@ -388,7 +391,9 @@ zfs-localpv:
 # ref - https://openebs.github.io/lvm-localpv
 lvm-localpv:
   enabled: true
-
+  crd:
+    enableInstall: false
+    volumeSnapshot: false
   # Sample configuration if you want to configure lvm localpv with custom values.
   # This is a small part of the full configuration. Full configuration available
   # here - https://openebs.github.io/lvm-localpv
@@ -403,7 +408,7 @@ lvm-localpv:
 #      registry: quay.io/
 #      repository: openebs/lvm-driver
 #      pullPolicy: IfNotPresent
-#      tag: 1.4.0
+#      tag: 1.5.0
 
 # Default values for crds.
 crds:
