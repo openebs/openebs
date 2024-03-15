@@ -222,7 +222,7 @@ mayastor:
   #     # -- Number of replicas of rest
   #     replicaCount: 1
 
-  # csi:
+  csi:
   #   image:
   #     # -- Image registry to pull all CSI Sidecar images
   #     registry: registry.k8s.io
@@ -261,7 +261,9 @@ mayastor:
   #     priorityClassName: ""
   #     # -- Prevent modifying the volume mode when creating a PVC from an existing VolumeSnapshot
   #     preventVolumeModeConversion: true
-  #   node:
+    node:
+      initContainers:
+        enabled: true
   #     logLevel: info
   #     topology:
   #       segments:
