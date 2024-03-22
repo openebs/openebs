@@ -8,10 +8,14 @@ Ancak, projeye katkıda bulunmanın en iyi yolu hakkında biraz daha fazla rehbe
 
 Bununla birlikte, OpenEBS Açık Kaynakta bir yazılımdır. Herhangi bir şekilde katkıda bulunabilirsiniz ve sağlanan tüm yardımlar takdir edilmektedir.
 
-- [Yeni işlevsellik istemek, belgeleri düzeltmek veya hataları bildirmek için sorunları yükseltin.](#sorunları-yükseltme)
-- [Belgeleri iyileştirmek için değişiklikleri gönderin.](#belgeleri-geliştirmek-için-değişiklik-gönder) 
-- [Yeni özellikler / geliştirmeler için teklifler gönderin.](#yeni-özellikler-için-öneriler-gönderin)
-- [Belgeleme veya kod ile ilgili mevcut sorunları çözün.](#kaynak-kod-ve-hata-düzeltmelerine-katkı-sağlamak)
+- [OpenEBS'ye katkıda bulunmak](#openebsye-katkıda-bulunmak)
+- [Sorunları Yükseltme](#sorunları-yükseltme)
+- [Belgeleri Geliştirmek İçin Değişiklik Gönder](#belgeleri-geliştirmek-i̇çin-değişiklik-gönder)
+- [Yeni Özellikler için Öneriler Gönderin](#yeni-özellikler-için-öneriler-gönderin)
+- [Kaynak Kod ve Hata Düzeltmelerine Katkı Sağlamak](#kaynak-kod-ve-hata-düzeltmelerine-katkı-sağlamak)
+- [Mevcut Sorunları Çözme](#mevcut-sorunları-çözme)
+  - [İşini imzala](#i̇şini-imzala)
+- [Topluluğumuza Katılın](#topluluğumuza-katılın)
 
 Hack'lerinizi vermeden önce izlemeniz gereken birkaç basit yönerge vardır.
 
@@ -39,7 +43,7 @@ Kullanım durumlarınıza uymayı kolaylaştırmak için her zaman gereken daha 
 PR'leri hata düzeltmeleri veya kaynak kodundaki geliştirmeler için uygun etiketlerle sağlayın. Kullanılabilecek etiketlerin listesi için, [bkz.](../contribute/labels-of-issues.md).
 
 * K8s demosuna katkıda bulunmak için lütfen bu [belge] bölümüne bakınız.(../contribute/CONTRIBUTING-TO-K8S-DEMO.md).
-	- OpenEBS'in K8'lerle nasıl çalıştığını kontrol etmek için, bu belge bölümüne [bakın.](../k8s/README.md) 
+	- OpenEBS'in K8'lerle nasıl çalıştığını kontrol etmek için, bu belge bölümüne [bakın.](https://openebs.io/docs) 
 - Kubernetes OpenEBS Provisioner'a katkıda bulunmak için lütfen bu dokümana [bakınız.](../contribute/CONTRIBUTING-TO-KUBERNETES-OPENEBS-PROVISIONER.md).
 	
 Kod yapılandırması ve takip edilecek yönergeler hakkında daha fazla bilgi için bu belge bölümüne [bakın.](../contribute/design/code-structuring.md) 

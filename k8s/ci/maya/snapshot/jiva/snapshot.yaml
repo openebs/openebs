@@ -1,7 +1,0 @@
-apiVersion: volumesnapshot.external-storage.k8s.io/v1
-kind: VolumeSnapshot
-metadata:
-  name: snapshot-demo-jiva
-  namespace: default
-spec:
-  persistentVolumeClaimName: demo-vol1-claim

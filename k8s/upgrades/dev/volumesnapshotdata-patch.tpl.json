@@ -1,7 +1,0 @@
-{
-  "spec": {
-     "openebsVolume": {
-        "capacity": "@size@"
-     }
-  }
-}

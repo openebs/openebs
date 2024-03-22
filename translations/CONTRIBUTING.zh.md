@@ -39,7 +39,7 @@
 请在问题修复或代码改善的 PR 上添加合适的标签。可用的标签列表请参见[这里](./../contribute/labels-of-issues.md)。
     
 * 关于贡献 K8s demo，请参考这个[文档](./../contribute/CONTRIBUTING-TO-K8S-DEMO.md)。
-    - 要了解 OpenEBS 如何与 K8s 结合，请参考这个[文档](./../k8s/README.md)
+    - 要了解 OpenEBS 如何与 K8s 结合，请参考这个[文档](https://openebs.io/docs)
 - 关于参与贡献 Kubernetes OpenEBS Provisioner，请参考这个[文档](./../contribute/CONTRIBUTING-TO-KUBERNETES-OPENEBS-PROVISIONER.md)。
 
 关于代码结构和指南的更多信息，请参考这个 [文档](./../contribute/design/code-structuring.md) 
