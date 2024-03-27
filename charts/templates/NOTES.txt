@@ -5,7 +5,7 @@ Check the status by running: kubectl get pods -n {{ .Release.Namespace }}
 
 The default values will install both Local and Replicated Engines. However,
 the Replicated Engine will require additional configuration to be fuctional.
-The Local Engine offers non replicated local storage using 3 different storage
+The Local Engine offers non-replicated local storage using 3 different storage
 backends, while the Replicated Engine provides replicated highly-available
 storage.
 

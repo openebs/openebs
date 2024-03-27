@@ -10,7 +10,7 @@ OpenEBS turns any storage available on the Kubernetes worker nodes into local or
 
 ## Documentation and user guides
 
-You can run OpenEBS on any Kubernetes 1.21+ cluster in a matter of minutes. See the [Quickstart Guide to OpenEBS](https://openebs.io/) for detailed instructions.
+You can run OpenEBS on any Kubernetes 1.23 and above cluster in a matter of minutes. See the [Quickstart Guide to OpenEBS](https://openebs.io/) for detailed instructions.
 
 ## Getting started
 
@@ -20,10 +20,10 @@ OpenEBS helm chart is an umbrella chart that pulls together engine specific char
 
 | Repository | Name | Version |
 |------------|------|---------|
-| https://openebs.github.io/dynamic-localpv-provisioner | localpv-provisioner | 3.5.0 |
-| https://openebs.github.io/lvm-localpv | lvm-localpv | 1.4.0 |
-| https://openebs.github.io/mayastor-extensions | mayastor | 2.5.0 |
-| https://openebs.github.io/zfs-localpv | zfs-localpv | 2.4.0 |
+| https://openebs.github.io/dynamic-localpv-provisioner | localpv-provisioner | 4.0.0 |
+| https://openebs.github.io/lvm-localpv | lvm-localpv | 1.5.1 |
+| https://openebs.github.io/mayastor-extensions | mayastor | 2.6.0 |
+| https://openebs.github.io/zfs-localpv | zfs-localpv | 2.5.1 |
 
 ```bash
 openebs
@@ -35,7 +35,7 @@ openebs
 
 ### Prerequisites
 
-- Kubernetes 1.18+ with RBAC enabled
+- Kubernetes 1.23 and above with RBAC enabled
 - Depending on the engine and type of platform, you may have to customize the values or run additional pre-requisites. Refer to [documentation](https://openebs.io).
 
 ### Setup Helm Repository

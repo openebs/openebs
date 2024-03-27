@@ -10,7 +10,7 @@ localpv-provisioner:
 zfs-localpv:
   enabled: true
   crds:
-    lvmLocalPv:
+    zfsLocalPv:
       # For upgrades from previous zfs localpv installation this needs to be disabled.
       enabled: true
     csi:
