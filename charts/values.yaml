@@ -1,417 +1,58 @@
-# Default values for openebs.
-
 release:
-  # "openebs.io/version" label for control plane components
   version: "4.0.0"
 
+# -- Refer to localpv-provisioner chart values.yaml for more configuration.
 localpv-provisioner:
-  # Default values for localpv.
-  # This is a YAML-formatted file.
-  # Declare variables to be passed into your templates.
-
-  release:
-    version: "4.0.0"
-
   rbac:
-    # rbac.create: `true` if rbac resources should be created
     create: true
 
-  localpv:
-    name: localpv-provisioner
-    enabled: true
-    image:
-      # Make sure that registry name end with a '/'.
-      # For example : quay.io/ is a correct value here and quay.io is incorrect
-      registry:
-      repository: openebs/provisioner-localpv
-      tag: 4.0.0
-      pullPolicy: IfNotPresent
-    updateStrategy:
-      type: RollingUpdate
-    # If set to false, containers created by the localpv provisioner will run without extra privileges.
-    privileged: true
-    annotations: {}
-    podAnnotations: {}
-      ## Labels to be added to localpv provisioner deployment pods
-    podLabels:
-      name: openebs-localpv-provisioner
-    healthCheck:
-      initialDelaySeconds: 30
-      periodSeconds: 60
-    replicas: 1
-    enableLeaderElection: true
-    basePath: "/var/openebs/local"
-    resources:
-    # We usually recommend not to specify default resources and to leave this as a conscious
-    # choice for the user. This also increases chances charts run on environments with little
-    # resources, such as Minikube. If you do want to specify resources, uncomment the following
-    # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-    #  limits:
-    #    cpu: 100m
-    #    memory: 128Mi
-    #  requests:
-    #    cpu: 100m
-    #    memory: 128Mi
-    nodeSelector: {}
-    tolerations: []
-    affinity: {}
-    securityContext: {}
-
-  imagePullSecrets:
-    # - name: img-pull-secret
-
-  podSecurityContext: {}
-    # fsGroup: 2000
-
-  nameOverride: ""
-  fullnameOverride: ""
-
-  serviceAccount:
-    # Specifies whether a service account should be created
-    create: true
-    # Annotations to add to the service account
-    annotations: {}
-    # The name of the service account to use.
-    # If not set and create is true, a name is generated using the fullname template
-    name:
-
-  hostpathClass:
-    # Name of the default hostpath StorageClass
-    name: openebs-hostpath
-    # If true, enables creation of the openebs-hostpath StorageClass
-    enabled: true
-    # Available reclaim policies: Delete/Retain, defaults: Delete.
-    reclaimPolicy: Delete
-    # If true, sets the openebs-hostpath StorageClass as the default StorageClass
-    isDefaultClass: false
-    # Path on the host where local volumes of this storage class are mounted under.
-    # NOTE: If not specified, this defaults to the value of localpv.basePath.
-    basePath: ""
-    # Custom node affinity label(s) for example "openebs.io/node-affinity-value"
-    # that will be used instead of hostnames
-    # This helps in cases where the hostname changes when the node is removed and
-    # added back with the disks still intact.
-    # Example:
-    #          nodeAffinityLabels:
-    #            - "openebs.io/node-affinity-key-1"
-    #            - "openebs.io/node-affinity-key-2"
-    nodeAffinityLabels: []
-    # Prerequisite: XFS Quota requires an XFS filesystem mounted with
-    # the 'pquota' or 'prjquota' mount option.
-    xfsQuota:
-      # If true, enables XFS project quota
-      enabled: false
-      # Detailed configuration options for XFS project quota.
-      # If XFS Quota is enabled with the default values, the usage limit
-      # is set at the storage capacity specified in the PVC.
-      softLimitGrace: "0%"
-      hardLimitGrace: "0%"
-    # Prerequisite: EXT4 Quota requires an EXT4 filesystem mounted with
-    # the 'prjquota' mount option.
-    ext4Quota:
-      # If true, enables XFS project quota
-      enabled: false
-      # Detailed configuration options for EXT4 project quota.
-      # If EXT4 Quota is enabled with the default values, the usage limit
-      # is set at the storage capacity specified in the PVC.
-      softLimitGrace: "0%"
-      hardLimitGrace: "0%"
-
-  helperPod:
-    image:
-      registry: ""
-      repository: openebs/linux-utils
-      pullPolicy: IfNotPresent
-      # Overrides the image tag whose default is the chart appVersion.
-      tag: 4.0.0
-
-  analytics:
-    enabled: true
-    # Specify in hours the duration after which a ping event needs to be sent.
-    pingInterval: "24h"
-
-mayastor:
-  # -- Enable Mayastor storage engine
+# -- Refer to zfs-localpv chart values.yaml for more configuration.
+zfs-localpv:
   enabled: true
   crds:
-    enabled: false
-  # Sample configuration, if you want to configure mayastor with custom values.
-  # This is a small part of the full configuration. Full configuration available
-  # here - https://github.com/openebs/mayastor-extensions/blob/v2.5.0/chart/values.yaml
+    lvmLocalPv:
+      # For upgrades from previous zfs localpv installation this needs to be disabled.
+      enabled: true
+    csi:
+      volumeSnapshots:
+        # Default installation of the openebs unified chart will install crds from zfs depenendency chart.
+        enabled: true
+        # Disable this to uninstall crds on chart uninstallation.
+        keep: true 
+  
+# -- Refer to lvm-localpv chart values.yaml for more configuration.
+lvm-localpv:
+  enabled: true
+  crds:
+    lvmLocalPv:
+      # For upgrades from previous lvm localpv installation this needs to be disabled.
+      enabled: true
+    csi:
+      volumeSnapshots:
+        # Enable this if zfs chart installation is disabled.
+        enabled: false
+        # Disable this to uninstall crds on chart uninstallation.
+        keep: true
 
-  image:
-    # -- Image registry to pull Mayastor product images
-    registry: docker.io
-    # -- Image registry's namespace
-    repo: openebs
-    # -- Release tag for Mayastor images
-    tag: v2.6.0
-    # -- ImagePullPolicy for Mayastor images
-    pullPolicy: IfNotPresent
-
-  # -- Pod scheduling priority
-  # ref: https://kubernetes.io/docs/concepts/configuration/pod-priority-preemption/
-  # priorityClassName: ""
-
-  # base:
-  #   # docker-secrets required to pull images if the container registry from image.Registry is protected
-  #   imagePullSecrets:
-  #     # -- Enable imagePullSecrets for pulling our container images
-  #     enabled: false
-  #     # Name of the imagePullSecret in the installed namespace
-  #     secrets:
-  #       - name: login
-
-  #   metrics:
-  #     # -- Enable the metrics exporter
-  #     enabled: true
-
-  #   jaeger:
-  #     # -- Enable jaeger tracing
-  #     enabled: false
-
-  # operators:
-  #   pool:
-  #     # -- Log level for diskpool operator service
-  #     logLevel: info
-
-  # jaeger-operator:
-  #   # Name of jaeger operator
-  #   name: "{{ .Release.Name }}"
-  #   crd:
-  #     # Install jaeger CRDs
-  #     install: false
-  #   jaeger:
-  #     # Install jaeger-operator
-  #     create: false
-  #   rbac:
-  #     # Create a clusterRole for Jaeger
-  #     clusterRole: true
-
-  # agents:
-  #   core:
-  #     # -- Log level for the core service
-  #     logLevel: info
-  #     capacity:
-  #       thin:
-  #       # -- The allowed pool commitment limit when dealing with thin provisioned volumes.
-  #       # Example: If the commitment is 250 and the pool is 10GiB we can overcommit the pool
-  #       # up to 25GiB (create 2 10GiB and 1 5GiB volume) but no further.
-  #       poolCommitment: "250%"
-  #       # -- When creating replicas for an existing volume, each replica pool must have at least
-  #       # this much free space percentage of the volume size.
-  #       # Example: if this value is 40, the pool has 40GiB free, then the max volume size allowed
-  #       # to be created on the pool is 100GiB.
-  #       volumeCommitment: "40%"
-  #       # -- Same as the `volumeCommitment` argument, but applicable only when creating replicas
-  #       # for a new volume.
-  #       volumeCommitmentInitial: "40%"
-  #   ha:
-  #     enabled: true
-  #     node:
-  #       # -- Log level for the ha node service
-  #       logLevel: info
-  #     cluster:
-  #       # -- Log level for the ha cluster service
-  #       logLevel: info
-
-  # apis:
-  #   rest:
-  #     # -- Log level for the rest service
-  #     logLevel: info
-  #     # -- Number of replicas of rest
-  #     replicaCount: 1
-
+# -- Refer to mayastor chart values.yaml for more configuration.
+mayastor:
+  enabled: true
   csi:
-  #   image:
-  #     # -- Image registry to pull all CSI Sidecar images
-  #     registry: registry.k8s.io
-  #     # -- Image registry's namespace
-  #     repo: sig-storage
-  #     # -- imagePullPolicy for all CSI Sidecar images
-  #     pullPolicy: IfNotPresent
-  #     # -- csi-provisioner image release tag
-  #     provisionerTag: v3.5.0
-  #     # -- csi-attacher image release tag
-  #     attacherTag: v4.3.0
-  #     # -- csi-snapshotter image release tag
-  #     snapshotterTag: v6.3.1
-  #     # -- csi-snapshot-controller image release tag
-  #     snapshotControllerTag: v6.3.1
-  #     # -- csi-node-driver-registrar image release tag
-  #     registrarTag: v2.9.0
-
-  #   controller:
-  #     # -- Log level for the csi controller
-  #     logLevel: info
-  #     resources:
-  #       limits:
-  #         # -- Cpu limits for csi controller
-  #         cpu: "32m"
-  #         # -- Memory limits for csi controller
-  #         memory: "128Mi"
-  #       requests:
-  #         # -- Cpu requests for csi controller
-  #         cpu: "16m"
-  #         # -- Memory requests for csi controller
-  #         memory: "64Mi"
-  #     # -- Set tolerations, overrides global
-  #     tolerations: []
-  #     # -- Set PriorityClass, overrides global
-  #     priorityClassName: ""
-  #     # -- Prevent modifying the volume mode when creating a PVC from an existing VolumeSnapshot
-  #     preventVolumeModeConversion: true
     node:
       initContainers:
         enabled: true
-  #     logLevel: info
-  #     topology:
-  #       segments:
-  #         openebs.io/csi-node: mayastor
-  #       # -- Add topology segments to the csi-node daemonset node selector
-  #       nodeSelector: false
-  #     resources:
-  #       limits:
-  #         # -- Cpu limits for csi node plugin
-  #         cpu: "100m"
-  #         # -- Memory limits for csi node plugin
-  #         memory: "128Mi"
-  #       requests:
-  #         # -- Cpu requests for csi node plugin
-  #         cpu: "100m"
-  #         # -- Memory requests for csi node plugin
-  #         memory: "64Mi"
-  #     nvme:
-  #       # The nvme_core module and nvme block io timeout in humantime
-  #       # By default it uses the "io_engine.nvme.ioTimeout" + 10s
-  #       # Do not modify this unless you're really sure about its effects
-  #       io_timeout: ""
-  #       # -- The ctrl_loss_tmo (controller loss timeout) in seconds
-  #       ctrl_loss_tmo: "1980"
-  #       # Kato (keep alive timeout) in seconds
-  #       keep_alive_tmo: ""
-  #     # -- The kubeletDir directory for the csi-node plugin
-  #     kubeletDir: /var/lib/kubelet
-  #     pluginMounthPath: /csi
-  #     socketPath: csi.sock
-  #     # -- Set tolerations, overrides global
-  #     tolerations: []
-  #     # -- Set PriorityClass, overrides global
-  #     priorityClassName: ""
-
-  # io_engine:
-  #   # -- Log level for the io-engine service
-  #   logLevel: info
-  #   api: "v1"
-  #   target:
-  #     nvmf:
-  #       # -- NVMF target interface (ip, mac, name or subnet)
-  #       iface: ""
-  #       # -- Reservations Persist Through Power Loss State
-  #       ptpl: true
-  #       # NVMF target Command Retry Delay for volume target initiators
-  #       hostCmdRetryDelay:
-  #         # A command retry delay in seconds. A value of 0 means no delay, host may retry immediately
-  #         crdt1: 30
-
-  # etcd:
-  #   # Pod labels; okay to remove the openebs logging label if required
-  #   podLabels:
-  #     app: etcd
-  #     openebs.io/logging: "true"
-  #   # -- Number of replicas of etcd
-  #   replicaCount: 3
-  #   persistence:
-  #     # -- If true, use a Persistent Volume Claim. If false, use emptyDir.
-  #     enabled: true
-  #     # -- Will define which storageClass to use in etcd's StatefulSets
-  #     # a `manual` storageClass will provision a hostpath PV on the same node
-  #     # an empty storageClass will use the default StorageClass on the cluster
-  #     storageClass: ""
-  #     # -- Volume size
-  #     size: 2Gi
-  #   podAntiAffinityPreset: "hard"
-
-  #   nvme:
-  #     # -- Timeout for IOs
-  #     # The default here is exaggerated for local disks but we've observed that in
-  #     # shared virtual environments having a higher timeout value is beneficial.
-  #     # In certain cases, you may have to set this to an even higher value. For example,
-  #     # in Hetzner we've had better results setting it to 300s.
-  #     # Please adjust this according to your hardware and needs.
-  #     ioTimeout: "110s"
-  #     # Timeout for admin commands
-  #     adminTimeout: "30s"
-  #     # Timeout for keep alives
-  #     keepAliveTimeout: "10s"
-  #     tcp:
-  #       # -- Max size setting (both initiator and target) for an NVMe queue
-  #       # -- You may need to increase this for a higher outstanding IOs per volume
-  #       maxQueueDepth: "32"
-
-  # loki-stack:
-  #   # -- Enable loki log collection for Mayastor components
-  #   enabled: true
-
-  # obs:
-  #   callhome:
-  #     # -- Enable callhome
-  #     enabled: true
-  #     # -- Log level for callhome
-  #     logLevel: "info"
 
   localpv-provisioner:
-    # -- Enables the openebs dynamic-localpv provisioner. If disabled, modify etcd and loki-stack storage class accordingly.
     enabled: false
-  #   hostpathClass:
-  #     enabled: false
-
-# zfs local pv configuration goes here
-# ref - https://openebs.github.io/zfs-localpv
-zfs-localpv:
-  enabled: true
-  crd:
-    enableInstall: false
-    volumeSnapshot: false
-  # Sample configuration if you want to configure zfs localpv with custom values.
-  # This is a small part of the full configuration. Full configuration available
-  # here - https://openebs.github.io/zfs-localpv
-
-#  imagePullSecrets: []
-#
-#  rbac:
-#    pspEnabled: false
-#
-#  zfsPlugin:
-#    image:
-#      registry: quay.io/
-#      repository: openebs/zfs-driver
-#      pullPolicy: IfNotPresent
-#      tag: 2.5.0
-
-# lvm local pv configuration goes here
-# ref - https://openebs.github.io/lvm-localpv
-lvm-localpv:
-  enabled: true
-  crd:
-    enableInstall: false
-    volumeSnapshot: false
-  # Sample configuration if you want to configure lvm localpv with custom values.
-  # This is a small part of the full configuration. Full configuration available
-  # here - https://openebs.github.io/lvm-localpv
-
-#  imagePullSecrets: []
-#
-#  rbac:
-#    pspEnabled: false
-#
-#  lvmPlugin:
-#    image:
-#      registry: quay.io/
-#      repository: openebs/lvm-driver
-#      pullPolicy: IfNotPresent
-#      tag: 1.5.0
-
-# Default values for crds.
-crds:
-  enabled: true
+  crds:
+    jaeger:
+      # For upgrades from 2.5 mayastor chart this needs to be disabled.
+      enabled: true
+      # Disable this to uninstall crds on chart uninstallation.
+      keep: true
+    csi:
+      volumeSnapshots:
+        # Enable this if zfs chart installation is disabled. For upgrades from previous mayastor installation this needs to be disabled.
+        enabled: false
+        # Disable this to uninstall crds on chart uninstallation.
+        keep: true

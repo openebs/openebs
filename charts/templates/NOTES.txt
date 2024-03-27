@@ -9,8 +9,6 @@ The Local Engine offers non replicated local storage using 3 different storage
 backends, while the Replicated Engine provides replicated highly-available
 storage.
 
-Use `kubectl get sc` to see the list of installed OpenEBS StorageClasses.
-
 For more information, 
 - view the online documentation at https://openebs.io/docs
 - connect with an active community on our Kubernetes slack channel.

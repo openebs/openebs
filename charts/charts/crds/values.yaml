@@ -1,4 +1,0 @@
-# Default values for crds.
-
-release:
-  version: "4.0.0"

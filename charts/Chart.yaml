@@ -15,18 +15,15 @@ keywords:
 sources:
   - https://github.com/openebs/openebs
 dependencies:
-  - name: crds
-    version: "4.0.0"
-    condition: crds.enabled
   - name: localpv-provisioner
     version: "4.0.0"
     repository: "https://openebs.github.io/dynamic-localpv-provisioner"
   - name: zfs-localpv
-    version: "2.5.0"
+    version: "2.5.1"
     repository: "https://openebs.github.io/zfs-localpv"
     condition: zfs-localpv.enabled
   - name: lvm-localpv
-    version: "1.5.0"
+    version: "1.5.1"
     repository: "https://openebs.github.io/lvm-localpv"
     condition: lvm-localpv.enabled
   - name: mayastor
