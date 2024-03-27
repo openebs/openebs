@@ -1,0 +1,15 @@
+dependencies:
+- name: localpv-provisioner
+  repository: https://openebs.github.io/dynamic-localpv-provisioner
+  version: 4.0.0
+- name: zfs-localpv
+  repository: https://openebs.github.io/zfs-localpv
+  version: 2.5.0
+- name: lvm-localpv
+  repository: https://openebs.github.io/lvm-localpv
+  version: 1.5.0
+- name: mayastor
+  repository: https://openebs.github.io/mayastor-extensions
+  version: 0.0.0
+digest: sha256:84776adca5491b81e4fab6c28775ee7bddaa19eb90ecde1f21df818bced0b94b
+generated: "2024-03-25T08:40:30.943972013Z"
