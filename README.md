@@ -48,6 +48,9 @@ We hope you find OpenEBS useful. We welcome all contributions to the project. If
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fopenebs%2Fopenebs.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fopenebs%2Fopenebs?ref=badge_shield)
 [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/1754/badge)](https://bestpractices.coreinfrastructure.org/projects/1754)
 
+## Activity dashbaord
+![Alt](https://repobeats.axiom.co/api/embed/1e565d4d1fdfeacd2cf810f10bcb6cde7368c9ea.svg "Repobeats analytics image")
+
 https://openebs.io/
 
 **Read this in**
@@ -166,8 +169,14 @@ This is a meta-repository for OpenEBS. Please start with the pinned repositories
 OpenEBS is developed under [Apache License 2.0](https://github.com/openebs/openebs/blob/master/LICENSE) license at the project level. Some components of the project are derived from other open source projects and are distributed under their respective licenses.
 
 OpenEBS is part of the CNCF Projects.
+[![CNCF logo](https://github.com/openebs/community/raw/develop/images/CNCF_member-silver-color.svg)](https://www.datacore.com/)
+OpenEBS is a CNCF project and DataCore, Inc is a CNCF Silver member. DataCore support's CNCF extensively and has funded OpenEBS participating in every KubeCon event since 2020. Our project team is managed under the CNCF Storage Landscape and we contribute to the CNCF CSI and TAG Storage project initiatives. We proudly support CNCF Cloud Native Community Groups initatives.<BR>
+<BR>
+<img  alt="Container Storage Interface group" src="https://github.com/openebs/community/raw/develop/images/CNCF_csi-horizontal-color.png" width="300"> <img alt="Storage Technical Advisory Group" src="https://github.com/openebs/community/raw/develop/images/CNCF_tag-storage-horizontal-color.png" width="300">  <img alt="Cloud Native Community Groups" src="https://github.com/openebs/community/raw/develop/images/CNCF_cncg-icon-color.png" width="120">
 
-[![CNCF Sandbox Project](https://raw.githubusercontent.com/cncf/artwork/master/other/cncf-sandbox/horizontal/color/cncf-sandbox-horizontal-color.png)](https://landscape.cncf.io/selected=open-ebs)
+ 
+<BR>
+Thanks for dropping by.
 
 ## Commercial Offerings
 
