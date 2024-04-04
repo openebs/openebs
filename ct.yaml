@@ -1,0 +1,4 @@
+remote: origin
+target-branch: main
+helm-extra-args: --timeout=500s
+validate-maintainers: false
