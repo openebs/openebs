@@ -1,40 +1,40 @@
 release:
   version: "4.0.0"
 
-# -- Refer to localpv-provisioner chart values.yaml for more configuration.
+# Refer to localpv-provisioner chart values.yaml for more configuration.
 localpv-provisioner:
   rbac:
     create: true
 
-# -- Refer to zfs-localpv chart values.yaml for more configuration.
+# Refer to zfs-localpv chart values.yaml for more configuration.
 zfs-localpv:
   enabled: true
   crds:
     zfsLocalPv:
-      # For upgrades from previous zfs localpv installation this needs to be disabled.
+      # -- For upgrades from previous zfs localpv installation this needs to be disabled.
       enabled: true
     csi:
       volumeSnapshots:
-        # Default installation of the openebs unified chart will install crds from zfs depenendency chart.
+        # -- Default installation of the openebs unified chart will install crds from zfs depenendency chart.
         enabled: true
-        # Disable this to uninstall crds on chart uninstallation.
+        # -- Disable this to uninstall crds on chart uninstallation.
         keep: true 
   
-# -- Refer to lvm-localpv chart values.yaml for more configuration.
+# Refer to lvm-localpv chart values.yaml for more configuration.
 lvm-localpv:
   enabled: true
   crds:
     lvmLocalPv:
-      # For upgrades from previous lvm localpv installation this needs to be disabled.
+      # -- For upgrades from previous lvm localpv installation this needs to be disabled.
       enabled: true
     csi:
       volumeSnapshots:
-        # Enable this if zfs chart installation is disabled.
+        # -- Enable this if zfs chart installation is disabled.
         enabled: false
-        # Disable this to uninstall crds on chart uninstallation.
+        # -- Disable this to uninstall crds on chart uninstallation.
         keep: true
 
-# -- Refer to mayastor chart values.yaml for more configuration.
+# Refer to mayastor chart values.yaml for more configuration.
 mayastor:
   enabled: true
   csi:
@@ -46,13 +46,13 @@ mayastor:
     enabled: false
   crds:
     jaeger:
-      # For upgrades from 2.5 mayastor chart this needs to be disabled.
+      # -- For upgrades from 2.5 mayastor chart this needs to be disabled.
       enabled: true
-      # Disable this to uninstall crds on chart uninstallation.
+      # -- Disable this to uninstall crds on chart uninstallation.
       keep: true
     csi:
       volumeSnapshots:
-        # Enable this if zfs chart installation is disabled. For upgrades from previous mayastor installation this needs to be disabled.
+        # -- Enable this if zfs chart installation is disabled. For upgrades from previous mayastor installation this needs to be disabled.
         enabled: false
-        # Disable this to uninstall crds on chart uninstallation.
+        # --Disable this to uninstall crds on chart uninstallation.
         keep: true

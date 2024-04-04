@@ -43,14 +43,14 @@ openebs
 Before installing OpenEBS Helm charts, you need to add the [OpenEBS Helm repository](https://openebs.github.io/charts) to your Helm client.
 
 ```bash
-helm repo add openebs https://openebs.github.io/charts
+helm repo add openebs https://openebs.github.io/openebs
 helm repo update
 ```
 
 ### Installing OpenEBS
 
 ```bash
-helm install --name `my-release` --namespace openebs openebs/openebs --create-namespace
+helm install --name `<RELEASE NAME>` --namespace openebs openebs/openebs --create-namespace
 ```
 
 Examples:
@@ -63,62 +63,35 @@ Examples:
 
 ```bash
 helm ls --all
-helm delete `my-release`
+helm delete `<RELEASE NAME>`
 ```
 
 > **Tip**: Prior to deleting the helm chart, make sure all the storage volumes and pools are deleted.
 
 ## Configuration
 
-The following table lists the common configurable parameters of the OpenEBS chart and their default values. For a full list of configurable parameters check out the [values.yaml](https://github.com/openebs/charts/blob/HEAD/charts/openebs/values.yaml).
+The following table lists the common configurable parameters of the OpenEBS chart and their default values. For a full list of configurable parameters check out the [values.yaml](../charts/values.yaml).
+
+## Values
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| imagePullSecrets | list | `[]` |  |
-| localprovisioner.affinity | object | `{}` |  |
-| localprovisioner.basePath | string | `"/var/openebs/local"` |  |
-| localprovisioner.deviceClass.blockDeviceSelectors | object | `{}` |  |
-| localprovisioner.deviceClass.enabled | bool | `true` |  |
-| localprovisioner.deviceClass.fsType | string | `"ext4"` |  |
-| localprovisioner.deviceClass.isDefaultClass | bool | `false` |  |
-| localprovisioner.deviceClass.name | string | `"openebs-device"` |  |
-| localprovisioner.deviceClass.nodeAffinityLabels | list | `[]` |  |
-| localprovisioner.deviceClass.reclaimPolicy | string | `"Delete"` |  |
-| localprovisioner.enableDeviceClass | bool | `true` |  |
-| localprovisioner.enableHostpathClass | bool | `true` |  |
-| localprovisioner.enableLeaderElection | bool | `true` |  |
-| localprovisioner.enabled | bool | `true` |  |
-| localprovisioner.healthCheck.initialDelaySeconds | int | `30` |  |
-| localprovisioner.healthCheck.periodSeconds | int | `60` |  |
-| localprovisioner.hostpathClass.basePath | string | `""` |  |
-| localprovisioner.hostpathClass.enabled | bool | `true` |  |
-| localprovisioner.hostpathClass.ext4Quota.enabled | bool | `false` |  |
-| localprovisioner.hostpathClass.ext4Quota.hardLimitGrace | string | `"0%"` |  |
-| localprovisioner.hostpathClass.ext4Quota.softLimitGrace | string | `"0%"` |  |
-| localprovisioner.hostpathClass.isDefaultClass | bool | `false` |  |
-| localprovisioner.hostpathClass.name | string | `"openebs-hostpath"` |  |
-| localprovisioner.hostpathClass.nodeAffinityLabels | list | `[]` |  |
-| localprovisioner.hostpathClass.reclaimPolicy | string | `"Delete"` |  |
-| localprovisioner.hostpathClass.xfsQuota.enabled | bool | `false` |  |
-| localprovisioner.hostpathClass.xfsQuota.hardLimitGrace | string | `"0%"` |  |
-| localprovisioner.hostpathClass.xfsQuota.softLimitGrace | string | `"0%"` |  |
-| localprovisioner.image | string | `"openebs/provisioner-localpv"` |  |
-| localprovisioner.imageTag | string | `"3.5.0"` |  |
-| localprovisioner.nodeSelector | object | `{}` |  |
-| localprovisioner.replicas | int | `1` |  |
-| localprovisioner.resources | object | `{}` |  |
-| localprovisioner.tolerations | list | `[]` |  |
-| localprovisioner.waitForBDBindTimeoutRetryCount | string | `"12"` |  |
+| localpv-provisioner.rbac.create | bool | `true` |  |
+| lvm-localpv.crds.csi.volumeSnapshots.enabled | bool | `false` | Enable this if zfs chart installation is disabled. |
+| lvm-localpv.crds.csi.volumeSnapshots.keep | bool | `true` | Disable this to uninstall crds on chart uninstallation. |
+| lvm-localpv.crds.lvmLocalPv.enabled | bool | `true` | For upgrades from previous lvm localpv installation this needs to be disabled. |
 | lvm-localpv.enabled | bool | `true` |  |
-| mayastor.enabled | bool | `true` | Enable Mayastor storage engine Note: Enabling this will remove LocalPV Provisioner and NDM (default chart components). |
-| mayastor.image.pullPolicy | string | `"IfNotPresent"` | ImagePullPolicy for Mayastor images |
-| mayastor.image.registry | string | `"docker.io"` | Image registry to pull Mayastor product images |
-| mayastor.image.repo | string | `"openebs"` | Image registry's namespace |
-| mayastor.image.tag | string | `"v2.5.0"` | Release tag for Mayastor images |
-| rbac.create | bool | `true` |  |
+| mayastor.crds.csi.volumeSnapshots.enabled | bool | `false` | Enable this if zfs chart installation is disabled. For upgrades from previous mayastor installation this needs to be disabled. |
+| mayastor.crds.csi.volumeSnapshots.keep | bool | `true` | Disable this to uninstall crds on chart uninstallation. |
+| mayastor.crds.jaeger.enabled | bool | `true` | For upgrades from 2.5 mayastor chart this needs to be disabled. |
+| mayastor.crds.jaeger.keep | bool | `true` | Disable this to uninstall crds on chart uninstallation. |
+| mayastor.csi.node.initContainers.enabled | bool | `true` |  |
+| mayastor.enabled | bool | `true` |  |
+| mayastor.localpv-provisioner.enabled | bool | `false` |  |
 | release.version | string | `"4.0.0"` |  |
-| serviceAccount.create | bool | `true` |  |
-| serviceAccount.name | string | `nil` |  |
+| zfs-localpv.crds.csi.volumeSnapshots.enabled | bool | `true` | Default installation of the openebs unified chart will install crds from zfs depenendency chart. |
+| zfs-localpv.crds.csi.volumeSnapshots.keep | bool | `true` | Disable this to uninstall crds on chart uninstallation. |
+| zfs-localpv.crds.zfsLocalPv.enabled | bool | `true` | For upgrades from previous zfs localpv installation this needs to be disabled. |
 | zfs-localpv.enabled | bool | `true` |  |
 
 Specify each parameter using the `--set key=value[,key=value]` argument to `helm install`.
@@ -126,7 +99,7 @@ Specify each parameter using the `--set key=value[,key=value]` argument to `helm
 Alternatively, a YAML file that specifies the values for the parameters can be provided while installing the chart. For example,
 
 ```bash
-helm install --name `my-release` -f values.yaml --namespace openebs openebs/openebs --create-namespace
+helm install --name `<RELEASE NAME>` -f values.yaml --namespace openebs openebs/openebs --create-namespace
 ```
 
 > **Tip**: You can use the default [values.yaml](values.yaml)
