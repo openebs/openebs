@@ -27,4 +27,5 @@ documentation/build/
 **/.idea
 
 # Helm chart
-Chart.lock
+charts/Chart.lock
+charts/charts
