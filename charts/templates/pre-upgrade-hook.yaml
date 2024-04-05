@@ -79,5 +79,10 @@ spec:
       restartPolicy: Never
       containers:
       - name: pre-upgrade-job
-        image: bitnami/kubectl:latest
-        args: ["annotate", "--overwrite", "crd", "volumesnapshots.snapshot.storage.k8s.io", "volumesnapshotclasses.snapshot.storage.k8s.io", "volumesnapshotcontents.snapshot.storage.k8s.io", "helm.sh/resource-policy=keep"]
+        image: {{ .Values.preUpgradeHook.image.registry }}/{{ .Values.preUpgradeHook.image.repo }}:{{ .Values.preUpgradeHook.image.tag }}
+        imagePullPolicy: {{ .Values.preUpgradeHook.image.pullPolicy }}
+        command:
+        - "/bin/sh"
+        - "-c"
+        args:
+        - "annotate --overwrite crd volumesnapshots.snapshot.storage.k8s.io volumesnapshotclasses.snapshot.storage.k8s.io volumesnapshotcontents.snapshot.storage.k8s.io helm.sh/resource-policy=keep || true"
