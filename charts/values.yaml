@@ -68,3 +68,10 @@ preUpgradeHook:
     tag: "1.25.15"
     # -- The imagePullPolicy for the container
     pullPolicy: IfNotPresent
+
+engines:
+  local:
+    lvmEnabled: true
+    zfsEnabled: true
+  replicated:
+    mayastorEnabled: true

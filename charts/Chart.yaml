@@ -21,12 +21,12 @@ dependencies:
   - name: zfs-localpv
     version: "2.5.1"
     repository: "https://openebs.github.io/zfs-localpv"
-    condition: zfs-localpv.enabled
+    condition: engines.local.zfsEnabled
   - name: lvm-localpv
     version: "1.5.1"
     repository: "https://openebs.github.io/lvm-localpv"
-    condition: lvm-localpv.enabled
+    condition: engines.local.lvmEnabled
   - name: mayastor
     version: "2.6.0"
     repository: "https://openebs.github.io/mayastor-extensions"
-    condition: mayastor.enabled
+    condition: engines.replicated.mayastorEnabled
