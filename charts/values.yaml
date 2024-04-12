@@ -21,7 +21,6 @@ zfs-localpv:
     csi:
       volumeSnapshots:
         enabled: false
-        keep: true
   
 # Refer to lvm-localpv chart values.yaml for more configuration. FIXME -- ADD LINK when released.
 lvm-localpv:
@@ -32,7 +31,6 @@ lvm-localpv:
     csi:
       volumeSnapshots:
         enabled: false
-        keep: true
 
 # Refer to mayastor chart values.yaml for more configuration. FIXME -- ADD LINK when released.
 mayastor:
@@ -45,13 +43,9 @@ mayastor:
   localpv-provisioner:
     enabled: false
   crds:
-    jaeger:
-      enabled: true
-      keep: true
     csi:
       volumeSnapshots:
         enabled: false
-        keep: true
 
 # -- Configuration options for pre-upgrade helm hook job.
 preUpgradeHook:
