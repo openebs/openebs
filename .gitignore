@@ -28,4 +28,3 @@ documentation/build/
 
 # Helm chart
 charts/Chart.lock
-charts/charts
