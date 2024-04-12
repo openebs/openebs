@@ -61,7 +61,10 @@ preUpgradeHook:
 
 engines:
   local:
-    lvmEnabled: true
-    zfsEnabled: true
+    lvm:
+      enabled: true
+    zfs:
+      enabled: true
   replicated:
-    mayastorEnabled: true
+    mayastor:
+      enabled: true
