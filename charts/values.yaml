@@ -1,0 +1,68 @@
+release:
+  version: "4.0.0"
+
+# Refer to https://github.com/openebs/dynamic-localpv-provisioner/blob/HEAD/deploy/helm/charts/values.yaml for complete set of values.
+localpv-provisioner:
+  rbac:
+    create: true
+
+openebs-crds:
+  csi:
+    volumeSnapshots:
+      enabled: true
+      keep: true
+
+# Refer to https://github.com/openebs/zfs-localpv/blob/HEAD/deploy/helm/charts/values.yaml for complete set of values.
+zfs-localpv:
+  enabled: true
+  crds:
+    zfsLocalPv:
+      enabled: true
+    csi:
+      volumeSnapshots:
+        enabled: false
+  
+# Refer to https://github.com/openebs/lvm-localpv/blob/HEAD/deploy/helm/charts/values.yaml for complete set of values.
+lvm-localpv:
+  enabled: true
+  crds:
+    lvmLocalPv:
+      enabled: true
+    csi:
+      volumeSnapshots:
+        enabled: false
+
+# Refer to https://github.com/openebs/mayastor-extensions/blob/v2.6.0/chart/values.yaml for complete set of values.
+mayastor:
+  enabled: true
+  csi:
+    node:
+      initContainers:
+        enabled: true
+
+  localpv-provisioner:
+    enabled: false
+  crds:
+    enabled: false
+
+# -- Configuration options for pre-upgrade helm hook job.
+preUpgradeHook:
+  image:
+    # -- The container image registry URL for the hook job
+    registry: docker.io
+    # -- The container repository for the hook job
+    repo: bitnami/kubectl
+    # -- The container image tag for the hook job
+    tag: "1.25.15"
+    # -- The imagePullPolicy for the container
+    pullPolicy: IfNotPresent
+
+engines:
+  local:
+    lvm:
+      enabled: true
+    zfs:
+      enabled: true
+  replicated:
+    mayastor:
+      enabled: true

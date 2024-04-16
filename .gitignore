@@ -22,3 +22,11 @@ k8s/lib/vagrant/*.log
 
 # Local build for docs
 documentation/build/
+
+# IDEs
+**/.idea
+
+# Helm chart
+charts/Chart.lock
+!/charts/charts/crds/
+/charts/charts/*
