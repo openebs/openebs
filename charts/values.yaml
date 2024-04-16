@@ -43,9 +43,7 @@ mayastor:
   localpv-provisioner:
     enabled: false
   crds:
-    csi:
-      volumeSnapshots:
-        enabled: false
+    enabled: false
 
 # -- Configuration options for pre-upgrade helm hook job.
 preUpgradeHook:
