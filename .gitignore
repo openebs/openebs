@@ -28,4 +28,5 @@ documentation/build/
 
 # Helm chart
 charts/Chart.lock
-!/chart/charts/crds/
+!/charts/charts/crds/
+/charts/charts/*

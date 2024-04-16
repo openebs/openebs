@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: {{ .Release.Name }}-crd-patch-hook
+  name: {{ .Release.Name }}-pre-upgrade-hook
   namespace: {{ .Release.Namespace }}
   labels:
     app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
@@ -16,7 +16,7 @@ metadata:
 kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  name: {{ .Release.Name }}-crd-patch-hook
+  name: {{ .Release.Name }}-pre-upgrade-hook
   labels:
     app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
     app.kubernetes.io/instance: {{ .Release.Name | quote }}
@@ -37,7 +37,7 @@ rules:
 kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  name: {{ .Release.Name }}-crd-patch-hook
+  name: {{ .Release.Name }}-pre-upgrade-hook
   labels:
     app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
     app.kubernetes.io/instance: {{ .Release.Name | quote }}
@@ -49,17 +49,17 @@ metadata:
     "helm.sh/hook-delete-policy": hook-succeeded
 subjects:
 - kind: ServiceAccount
-  name: {{ .Release.Name }}-crd-patch-hook
+  name: {{ .Release.Name }}-pre-upgrade-hook
   namespace: {{ .Release.Namespace }}
 roleRef:
   kind: ClusterRole
-  name: {{ .Release.Name }}-crd-patch-hook
+  name: {{ .Release.Name }}-pre-upgrade-hook
   apiGroup: rbac.authorization.k8s.io
 ---
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: "{{ .Release.Name }}-crd-patch-hook"
+  name: "{{ .Release.Name }}-pre-upgrade-hook"
   labels:
     app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
     app.kubernetes.io/instance: {{ .Release.Name | quote }}
@@ -72,13 +72,13 @@ metadata:
 spec:
   template:
     metadata:
-      name: "{{ .Release.Name }}-crd-patch-hook"
+      name: "{{ .Release.Name }}-pre-upgrade-hook"
       labels:
         app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
         app.kubernetes.io/instance: {{ .Release.Name | quote }}
         helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
     spec:
-      serviceAccountName: "{{ .Release.Name }}-crd-patch-hook"
+      serviceAccountName: "{{ .Release.Name }}-pre-upgrade-hook"
       restartPolicy: Never
       containers:
       - name: pre-upgrade-job
