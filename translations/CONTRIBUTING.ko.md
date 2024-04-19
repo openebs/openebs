@@ -39,7 +39,7 @@ OpenEBS는 오픈 소스의 혁신입니다. 어떤 방식으로든 기여하실
 버그 수정이나 소스 코드 개선을 위한 적절한 태그를 PR에 제공하세요. 사용할 수 있는 태그 목록은 [이](./contribute/labels-of-issues.md)를 참조하세요.
 
 - K8s 데모에 기여하려면 이 [문서](./contribute/CONTRIBUTING-TO-K8S-DEMO.md)를 참조하세요.
-  - K8s에서 OpenEBS가 어떻게 작동하는지 확인하려면 이 [문서](./k8s/README.md)를 참조하세요.
+  - K8s에서 OpenEBS가 어떻게 작동하는지 확인하려면 이 [문서](https://openebs.io/docs)를 참조하세요.
 
 * Kubernetes OpenEBS Provisioner에 기여하려면 이 [문서](./contribute/CONTRIBUTING-TO-KUBERNETES-OPENEBS-PROVISIONER.md)를 참조하세요.
 

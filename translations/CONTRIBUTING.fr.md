@@ -8,10 +8,14 @@ Cependant, pour les personnes qui souhaitent un peu plus de conseils sur la meil
 
 Cela dit, OpenEBS est une innovation en Open Source. Vous êtes invités à contribuer de toutes les manières possibles et toute l'aide fournie est très appréciée.
 
-- [Créer des issues pour demander de nouvelles fonctionnalités, corriger la documentation ou signaler des bogues.](#Créer-des-issues)
-- [Soumettre des modifications pour améliorer la documentation.](#Soumettre-des-modifications-pour-améliorer-la-documentation)
-- [Soumettre des propositions pour de nouvelles fonctionnalités / améliorations.](#Soumettre-des-propositions-pour-de-nouvelles-fonctionnalités)
-- [Résoudre les problèmes existants liés à la documentation ou au code.](#Contribuer-au-code-source-et-aux-corrections-de-bogues)
+- [Contribuer à OpenEBS](#contribuer-à-openebs)
+  - [Créer des issues](#créer-des-issues)
+  - [Soumettre des modifications pour améliorer la documentation](#soumettre-des-modifications-pour-améliorer-la-documentation)
+  - [Soumettre des propositions pour de nouvelles fonctionnalités](#soumettre-des-propositions-pour-de-nouvelles-fonctionnalités)
+  - [Contribuer au code source et aux corrections de bogues](#contribuer-au-code-source-et-aux-corrections-de-bogues)
+  - [Résoudre les problèmes existants](#résoudre-les-problèmes-existants)
+    - [Signez votre travail](#signez-votre-travail)
+  - [Rejoignez notre communauté](#rejoignez-notre-communauté)
 
 Il y a quelques directives simples que vous devez suivre avant de fournir vos hacks.
 
@@ -39,7 +43,7 @@ Il y a toujours quelque chose de plus qui est nécessaire, pour faciliter l'adap
 Fournissez aux PR des tags appropriés pour les corrections de bogues ou les améliorations du code source. Pour une liste des balises qui pourraient être utilisées, voir [ceci](/contribute/labels-of-issues.md).
 
 * Pour contribuer à la démo de K8, veuillez vous référer à ce [document](/contribute/CONTRIBUTING-TO-K8S-DEMO.md).
-    - Pour savoir comment OpenEBS fonctionne avec K8, reportez-vous à ce [document](./k8s/README.md)
+    - Pour savoir comment OpenEBS fonctionne avec K8, reportez-vous à ce [document](https://openebs.io/docs)
 - Pour contribuer à Kubernetes OpenEBS Provisioner, veuillez vous référer à ce [document](/contribute/CONTRIBUTING-TO-KUBERNETES-OPENEBS-PROVISIONER.md).
 
 Reportez-vous à ce [document](/contribute/design/code-structuring.md) pour plus d'informations sur la structuration du code et les directives à suivre.

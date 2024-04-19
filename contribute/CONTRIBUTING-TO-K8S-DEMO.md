@@ -2,11 +2,9 @@
 
 This document describes the process for adding or improving the existing examples of applications using OpenEBS Volumes.
 
-Kubernetes YAML files for running application using OpenEBS Volumes are located under the folder [openebs/k8s/demo](https://github.com/openebs/openebs/tree/master/k8s/demo)
-
 Each application example should comprise of the following:
 
-- K8s YAML file(s) for starting the application and its associated components. The volumes should point to the OpenEBS Storage Class. If the existing storage-classes does not suit the need, create a new storage class at [openebs-storageclasses.yaml](../k8s/openebs-storageclasses.yaml).
+- K8s YAML file(s) for starting the application and its associated components. The volumes should point to the OpenEBS Storage Class. If the existing storage-classes do not suit the need, you may create a new storage class. Refer to our [documentation](https://openebs.io/docs) for examples.
 - K8s YAML file(s) for starting a client that accesses the application. This is optional, in case the application itself provides a mechanism like in Jupyter, Wordpress, etc.
 
   When demonstrating a database-like application like Apache Cassandra, Redis, and so on, it is recommended to have such a mechanism to test that the application has been launched.

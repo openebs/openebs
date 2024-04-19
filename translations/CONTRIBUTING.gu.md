@@ -39,7 +39,7 @@
 Source code માં સુધારાઓ અથવા વૃદ્ધિ માટે યોગ્ય ટૅગ્સ સાથે PR પ્રદાન કરો. ઉપયોગ કરી શકાય તેવા ટૅગ્સની સૂચિ માટે, જુઓ [this](./contribute/labels-of-issues.md).
 
 * K8s demo ને ફાળો આપવા માટે, કૃપા કરીને આનો સંદર્ભ લો [document](./contribute/CONTRIBUTING-TO-K8S-DEMO.md).
-    - કેવી રીતે OpenEBS કામ કરે છે K8s સાથે, તે તપાસવા માટે આ નો સંદર્ભ લો [document](./k8s/README.md) 
+    - કેવી રીતે OpenEBS કામ કરે છે K8s સાથે, તે તપાસવા માટે આ નો સંદર્ભ લો [document](https://openebs.io/docs) 
 - Kubernetes OpenEBS Provisioner ફાળો આપવા માટે, કૃપા કરીને આનો સંદર્ભ લો [document](./contribute/CONTRIBUTING-TO-KUBERNETES-OPENEBS-PROVISIONER.md).
     
 આનો સંદર્ભ લો [document](./contribute/design/code-structuring.md) code structuring અને guidelines ફોલ્લૉ કરવા માટે.

@@ -1,9 +1,0 @@
-{
-      "spec": {
-              "selector": {
-                      "matchLabels": {
-                              "openebs.io/version": null
-                      }
-              }
-      }
-}
