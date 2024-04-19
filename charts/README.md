@@ -72,7 +72,7 @@ To view the chart and get the following output.
 helm ls -n openebs 
 
 NAME    NAMESPACE       REVISION        UPDATED                                 STATUS          CHART           APP VERSION
-openebs openebs         1               2024-03-25 09:13:00.903321318 +0000 UTC deployed        openebs-4.0.0   4.0.0
+openebs openebs         1               2024-03-25 09:13:00.903321318 +0000 UTC deployed        openebs-4.0.1   4.0.1
 ```
 
 As a next step [verify the installation](https://openebs.io/docs/quickstart-guide/installation#verifying-openebs-installation) and do the [post installation](https://openebs.io/docs/quickstart-guide/installation#post-installation-considerations) steps.
@@ -95,7 +95,7 @@ helm delete `<RELEASE NAME>` -n `<RELEASE NAMESPACE>`
 |  | openebs-crds | 4.0.0 |
 | https://openebs.github.io/dynamic-localpv-provisioner | localpv-provisioner | 4.0.0 |
 | https://openebs.github.io/lvm-localpv | lvm-localpv | 1.5.1 |
-| https://openebs.github.io/mayastor-extensions | mayastor | 2.6.0 |
+| https://openebs.github.io/mayastor-extensions | mayastor | 2.6.1 |
 | https://openebs.github.io/zfs-localpv | zfs-localpv | 2.5.1 |
 
 ## Values
@@ -120,7 +120,7 @@ helm delete `<RELEASE NAME>` -n `<RELEASE NAMESPACE>`
 | preUpgradeHook.image.registry | string | `"docker.io"` | The container image registry URL for the hook job |
 | preUpgradeHook.image.repo | string | `"bitnami/kubectl"` | The container repository for the hook job |
 | preUpgradeHook.image.tag | string | `"1.25.15"` | The container image tag for the hook job |
-| release.version | string | `"4.0.0"` |  |
+| release.version | string | `"4.0.1"` |  |
 | zfs-localpv.crds.csi.volumeSnapshots.enabled | bool | `false` |  |
 | zfs-localpv.crds.zfsLocalPv.enabled | bool | `true` |  |
 | zfs-localpv.enabled | bool | `true` |  |

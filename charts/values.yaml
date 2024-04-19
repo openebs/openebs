@@ -1,5 +1,5 @@
 release:
-  version: "4.0.0"
+  version: "4.0.1"
 
 # Refer to https://github.com/openebs/dynamic-localpv-provisioner/blob/HEAD/deploy/helm/charts/values.yaml for complete set of values.
 localpv-provisioner:
