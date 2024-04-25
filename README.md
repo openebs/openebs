@@ -1,21 +1,21 @@
 # Welcome to OpenEBS
 <BR>
-We are an ultra-modern Block Mode storage platform, a Hyper-Converged software Storage System and a Enterprise Grade virtual NVMe-oF SAN (vSAN) Fabric that is natively & tighty integrated into Kubernetes.<BR>
+We are an ultra-modern Block Mode storage platform, a Hyper-Converged software Storage System and an Enterprise Grade virtual NVMe-oF SAN (vSAN) Fabric that is natively & very tightly integrated into Kubernetes.<BR>
 <BR>
 
 > [!IMPORTANT]
 > **OpenEBS provides**... <BR>
 > - Stateful persistent Dynamically provisioned storage volumes for Kubernetes
-> - High Performance NVMe-oF storage access optomized for All-Flash Solid State storage media
+> - High Performance NVMe-oF storage access optimized for All-Flash Solid State storage media
 > - is a 100% Cloud-Native storage platform
-> - Delivers a Kubernetes cluster-wide vSAN fabric that provides containers/Pods with resillent access to storage across the entire cluster.
-> - Enterprise Grade data management capabilities such as **snapshots, clones, replicated volumes, DIskGroups, Volume Groups, Aggregates, RAID** <BR>
+> - Delivers a Kubernetes cluster-wide vSAN fabric that provides containers/Pods with resilient access to storage across the entire cluster.
+> - Enterprise Grade data management capabilities such as **snapshots, clones, replicated volumes, DiskGroups, Volume Groups, Aggregates, RAID** <BR>
 <BR>
 
 
 ### Multiple Storage Engines
-OpenEBS is a Kubernetes provides Persistent Stateful Storage Platform that has **5 core Data Engines**<BR>
-Each Storage Engine provides differnt Capabilities, Flexibility, Resilliance, Data Protections, and Performance features.<BR>
+OpenEBS is a Kubernetes provides Persistent Stateful Storage Platform that has **5 core Data-Engines**<BR>
+Each Storage engine provides different Capabilities, Flexibility, Resilience, Data Protections, and Performance features. <BR>
 
 | ID  | Data-Eegines       | Where to create your issues                            |
 | :---: | :---             | :---                                                   |
@@ -23,10 +23,10 @@ Each Storage Engine provides differnt Capabilities, Flexibility, Resilliance, Da
 |  1  | [Replicated PV Mayastor](https://github.com/openebs/mayastor)      | Distributed vSAN Fabric attached volumes that are replicated   | 
 | &nbsp;                        |    |
 |     | ```Local PV```          | ```Non-replicated node local storage and volumes```   |                                                            |
-|  2. |  [LocalPV-HostPath](https://github.com/openebs/dynamic-localpv-provisioner)     | Dynamically provisioned Node-local volumes with **```HostPath```** resident backend data |
-|  3. |  [LocalPV-ZFS](https://github.com/openebs/zfs-localpv)      | Dynamically provisioned Node-local volumes with an integrated **```ZFS```** storage backend |
-|  4. |  [LocalPV-LVM](https://github.com/openebs/lvm-localpv)      | Dynamically provisioned Node-local volumes with an integrated **```LVM```** storage backend |
-|  5. |  [LocalPV-Raw-device-File](https://github.com/openebs/rawfile-localpv) | Dynamically provisioned Node-local volumes via **```soft-lun RAW Device files```** on ```Hostpath``` resident backend filesystem  |
+|  2. |  [Local PV HostPath](https://github.com/openebs/dynamic-localpv-provisioner)     | Dynamically provisioned Node-local volumes with **```Hostpath```** resident backend data |
+|  3. |  [Local PV ZFS](https://github.com/openebs/zfs-localpv)      | Dynamically provisioned Node-local volumes with an integrated **```ZFS```** storage backend |
+|  4. |  [Local PV LVM](https://github.com/openebs/lvm-localpv)      | Dynamically provisioned Node-local volumes with an integrated **```LVM```** storage backend |
+|  5. |  [Local PV Raw-device-File](https://github.com/openebs/rawfile-localpv) | Dynamically provisioned Node-local volumes via **```soft-lun RAW Device files```** on ```Hostpath``` resident backend filesystem  |
 <BR>
 <BR>
 
@@ -44,14 +44,14 @@ Each Storage Engine provides differnt Capabilities, Flexibility, Resilliance, Da
 
 We have a very large [active community](https://github.com/openebs/community), and many storage users [contribute to our product](https://github.com/openebs/community/blob/develop/CONTRIBUTING.md) with discussions, ideas, Issues, Feature requests and even code contribnutions.  
 
-There are many ways to get in touch with our team with our team.
+There are many ways to get in touch with our team.
 - **EMAIL us**:  cncf-openebs-maintainers@lists.cncf.io <BR>
 - **Contact the Maintainers** : The up to date Maintainers list [is here](/openebs/MAINTAINERS.md)
 > Reach out via GitHuib to the OpenEBS core leadership team. <BR>
 > :rocket: &nbsp; Ed Robinson | @edrob999 <BR>
 > :star: &nbsp; David Brace | @orville-wright <BR>
 > :zap: &nbsp; Vishnu Attur | @avishnu <BR>
-> :sunglasses: &nbsp; Tiago Castor | @tiagolobocastro <BR>
+> :sunglasses: &nbsp; Tiago Castro | @tiagolobocastro <BR>
 
 | [<img src="https://github.com/openebs/community/blob/develop/images/slack_icon_small.png" width="100">](https://kubernetes.slack.com/messages/openebs)  | **Try our Slack channel** <BR>If you have questions about using OpenEBS, please use the CNCF Kubernetes **OpenEBS slack channel**, it is open for [anyone to ask a question](https://kubernetes.slack.com/messages/openebs/) <BR> |
 | :---         | :---      |
