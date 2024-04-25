@@ -1,43 +1,64 @@
 # Welcome to OpenEBS
 <BR>
-We are an ultra-modern storage target platform, a Hyper-Converged storage software system and a modern Storage Data Fabric natively & tighty integrated into a Kubernetes platform.<BR>
-<BR>
-OpenEBS provides... <BR>
+We are an ultra-modern Block Mode storage platform, a Hyper-Converged software Storage System and a Enterprise Grade virtual NVMe-oF SAN (vSAN) Fabric that is natively & tighty integrated into Kubernetes.<BR>
 <BR>
 
-- Stateful persistent storage volumes for Kubernetes
-- is a 100% Cloud-Native storage solution
-- Delivers a Kubernetes cluster-wide storage fabric that provides containers with access to storage across the entire Kubernetes cluster.
-- Enterprise Grade data management capabilities such as **snapshots, clones and replicated volumes** <BR>
-<BR>
-
-OpenEBS is completely free and open source software. There are also commercial options available for organizations seeking enterprise support and management capabilities. These are provided by third-party vendors. For more information, see https://openebs.io <BR>
-<BR>
-In 2022, OpenEBS introduced the MayaStor storage Data-Engine which is based on the Ultra High-Performance SPDK NVMe Stack, IO URING Technology & Linux NVMe drivers. This delivers higher performance than was previously possible in any Kubernetes storage product.<BR>
-<BR>
-The OpeneBS project consists of multiple Data-Engines projects that are grouped into 2 EDITIONs.
-- The older storage engines are referred to as **LEGACY Edition**
-- The ultra modern Mayastor Data-Engine is classifed as **STANDARD Edition**, which also includes...
-    - LVM LocalPV
-    - ZFS LocalPV
-    - Device LocalPV
-    - RawFile LocalPV
-    - LocalPV-HostPath
-    - LocalPV-Device
-
-<BR>
-The project plans to migrate, sunset and archive all LEGACY Data-Engines by June 2024. <BR>
+> [!IMPORTANT]
+> **OpenEBS provides**... <BR>
+> - Stateful persistent Dynamically provisioned storage volumes for Kubernetes
+> - High Performance NVMe-oF storage access optomized for All-Flash Solid State storage media
+> - is a 100% Cloud-Native storage platform
+> - Delivers a Kubernetes cluster-wide vSAN fabric that provides containers/Pods with resillent access to storage across the entire cluster.
+> - Enterprise Grade data management capabilities such as **snapshots, clones, replicated volumes, DIskGroups, Volume Groups, Aggregates, RAID** <BR>
 <BR>
 
 
-All **LEGACY** Data-Engines will be tagged as DEPRECATED and will be moved to ARCHIVE status by June 2024. These Data-Engines are:
-  - Jiva  - Users should migrate to MayaStor Data-Engine
-  - cStor - Users should migrate to MayaStor Data-Engine
-  - NFS Provisioner  - Deprecated. No RWX services or features will be supported
- 
-New Roadmap features are planned for **STANDARD** that provide a strong pathway for **LEGACY** users to migrate to **STANDARD**. <BR>
+### Multiple Storage Engines
+OpenEBS is a Kubernetes provides Persistent Stateful Storage Platform that has **5 core Data Engines**<BR>
+Each Storage Engine provides differnt Capabilities, Flexibility, Resilliance, Data Protections, and Performance features.<BR>
+
+| ID  | Data-Eegines       | Where to create your issues                            |
+| :---: | :---             | :---                                                   |
+|     | ```Replicated PV```          | ```Replicated storage and data volumes```     |
+|  1  | [Replicated PV Mayastor](https://github.com/openebs/mayastor)      | Distributed vSAN Fabric attached volumes that are replicated   | 
+| &nbsp;                        |    |
+|     | ```Local PV```          | ```Non-replicated node local storage and volumes```   |                                                            |
+|  2. |  [LocalPV-HostPath](https://github.com/openebs/dynamic-localpv-provisioner)     | Dynamically provisioned Node-local volumes with **```HostPath```** resident backend data |
+|  3. |  [LocalPV-ZFS](https://github.com/openebs/zfs-localpv)      | Dynamically provisioned Node-local volumes with an integrated **```ZFS```** storage backend |
+|  4. |  [LocalPV-LVM](https://github.com/openebs/lvm-localpv)      | Dynamically provisioned Node-local volumes with an integrated **```LVM```** storage backend |
+|  5. |  [LocalPV-Raw-device-File](https://github.com/openebs/rawfile-localpv) | Dynamically provisioned Node-local volumes via **```soft-lun RAW Device files```** on ```Hostpath``` resident backend filesystem  |
 <BR>
-We hope you find OpenEBS useful. We welcome all contributions to the project. If you’d like to get in touch, please email us cncf-openebs-maintainers@lists.cncf.io
+<BR>
+
+> **OpenEBS is very popular** : Live OpenEBS systems actively report back product metrics every day, to our Global Anaytics metrics engine (unless disabled by the user).
+> Here are our key project popularity metrics as of: 01 Feb 2024 <BR>
+>
+> :rocket: &nbsp; OpenEBS is the #1 deployed Storage Platform for Kubernetes <BR>
+> :star: &nbsp; We are the [#1 GitHub Star ranked](https://github.com/openebs/website/blob/main/website/public/images/png/github_star-history-2024_Feb_1.png) K8s Data Storage platform <BR>
+> :floppy_disk: &nbsp; We have +49 Million Volumes deployed globally <BR>
+> :tv: &nbsp; We have +8 Million Global installations <BR>
+> :zap: &nbsp; 1 Million OpenEBS K8s Containers are spawned per week <BR>
+> :sunglasses: &nbsp; 1.1 Million global users <BR>
+
+<BR>
+
+We have a very large [active community](https://github.com/openebs/community), and many storage users [contribute to our product](https://github.com/openebs/community/blob/develop/CONTRIBUTING.md) with discussions, ideas, Issues, Feature requests and even code contribnutions.  
+
+There are many ways to get in touch with our team with our team.
+- **EMAIL us**:  cncf-openebs-maintainers@lists.cncf.io <BR>
+- **Contact the Maintainers** : The up to date Maintainers list [is here](/openebs/MAINTAINERS.md)
+> Reach out via GitHuib to the OpenEBS core leadership team. <BR>
+> :rocket: &nbsp; Ed Robinson | @edrob999 <BR>
+> :star: &nbsp; David Brace | @orville-wright <BR>
+> :zap: &nbsp; Vishnu Attur | @avishnu <BR>
+> :sunglasses: &nbsp; Tiago Castor | @tiagolobocastro <BR>
+
+| [<img src="https://github.com/openebs/community/blob/develop/images/slack_icon_small.png" width="100">](https://kubernetes.slack.com/messages/openebs)  | **Try our Slack channel** <BR>If you have questions about using OpenEBS, please use the CNCF Kubernetes **OpenEBS slack channel**, it is open for [anyone to ask a question](https://kubernetes.slack.com/messages/openebs/) <BR> |
+| :---         | :---      |
+
+<BR>
+
+---
 
 # Current status
 
