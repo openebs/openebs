@@ -17,7 +17,7 @@ We are an ultra-modern Block Mode storage platform, a Hyper-Converged software S
 OpenEBS is a Kubernetes provides Persistent Stateful Storage Platform that has **5 core Data-Engines**<BR>
 Each Storage engine provides different Capabilities, Flexibility, Resilience, Data Protections, and Performance features. <BR>
 
-| ID  | Data-Eegines       | Where to create your issues                            |
+| ID  | Data-Engines       | Where to create your issues                            |
 | :---: | :---             | :---                                                   |
 |     | ```Replicated PV```          | ```Replicated storage and data volumes```     |
 |  1  | [Replicated PV Mayastor](https://github.com/openebs/mayastor)      | Distributed vSAN Fabric attached volumes that are replicated   | 
