@@ -1,45 +1,73 @@
 # Welcome to OpenEBS
-<BR>
-We are an ultra-modern Block Mode storage platform, a Hyper-Converged software Storage System and an Enterprise Grade virtual NVMe-oF SAN (vSAN) Fabric that is natively & very tightly integrated into Kubernetes.<BR>
+[![OpenEBS Welcome Banner](https://github.com/openebs/community/blob/develop/images/community_banner_retro_gamer_level-up-2024_transp.png)](https://www.openebs.io/)
+
+OopenEBS is a modern Block-Mode storage platform, a Hyper-Converged software Storage System and virtual NVMe-oF SAN (vSAN) Fabric that is natively & tightly integrated into the core of Kubernetes.<BR>
 <BR>
 
 > [!IMPORTANT]
 > **OpenEBS provides**... <BR>
 > - Stateful persistent Dynamically provisioned storage volumes for Kubernetes
 > - High Performance NVMe-oF storage access optimized for All-Flash Solid State storage media
-> - is a 100% Cloud-Native storage platform
-> - Delivers a Kubernetes cluster-wide vSAN fabric that provides containers/Pods with resilient access to storage across the entire cluster.
+> - Block devices, LVM, ZFS, ext2/ext3/ext4, XFS, BTRFS...and more
+> - 100% Cloud-Native K8s declarative storage platform
+> - A cluster-wide vSAN block-mode fabric that provides containers/Pods with HA resilient access to storage across the entire cluster.
+> - Node local K8s PV's and n-way Replciated K8s PV's
+> - Deployable On-premise & in-cloud: (AWS EC2/EKS, Google GCP/GKE, Azure VM/AKS, Oracle OCI, IBM/RedHat OpenShift, Civo Cloud, Hetzner Cloud... and more)
 > - Enterprise Grade data management capabilities such as **snapshots, clones, replicated volumes, DiskGroups, Volume Groups, Aggregates, RAID** <BR>
 <BR>
 
 
-### Multiple Storage Engines
-OpenEBS is a Kubernetes provides Persistent Stateful Storage Platform that has **5 core Data-Engines**<BR>
-Each Storage engine provides different Capabilities, Flexibility, Resilience, Data Protections, and Performance features. <BR>
+## **openEBS has 2 Editions**:<BR>
+> | 1. **<KBD> STANDARD </KBD>** :heavy_check_mark: > ```Ready Player 1``` |
+> | - |
+> | 2. **<KBD> LEGACY </KBD>** :warning: ```Game Over``` |
 
-| ID  | Data-Engines       | Where to create your issues                            |
-| :---: | :---             | :---                                                   |
-|     | ```Replicated PV```          | ```Replicated storage and data volumes```     |
-|  1  | [Replicated PV Mayastor](https://github.com/openebs/mayastor)      | Distributed vSAN Fabric attached volumes that are replicated   | 
-| &nbsp;                        |    |
-|     | ```Local PV```          | ```Non-replicated node local storage and volumes```   |                                                            |
-|  2. |  [Local PV HostPath](https://github.com/openebs/dynamic-localpv-provisioner)     | Dynamically provisioned Node-local volumes with **```Hostpath```** resident backend data |
-|  3. |  [Local PV ZFS](https://github.com/openebs/zfs-localpv)      | Dynamically provisioned Node-local volumes with an integrated **```ZFS```** storage backend |
-|  4. |  [Local PV LVM](https://github.com/openebs/lvm-localpv)      | Dynamically provisioned Node-local volumes with an integrated **```LVM```** storage backend |
-|  5. |  [Local PV Raw-device-File](https://github.com/openebs/rawfile-localpv) | Dynamically provisioned Node-local volumes via **```soft-lun RAW Device files```** on ```Hostpath``` resident backend filesystem  |
-<BR>
+Within  **STANDARD**, you have a choice of 2 Types of K8s Storage Services. ```Replicated PV``` and ```Local PV```.
+
+---
 <BR>
 
-> **OpenEBS is very popular** : Live OpenEBS systems actively report back product metrics every day, to our Global Anaytics metrics engine (unless disabled by the user).
-> Here are our key project popularity metrics as of: 01 Feb 2024 <BR>
+| Type | Storage Engine   | Type of data services                                                     | Status                      |  In OSS ver  |
+| :---: | :---             | :---                                                                      | :---                       |  :---:  |   
+| ```Replicated_PV``` |         | Replicated data volumes (in a Cluster wide vSAN block mode fabric)  |                             |          |
+| [<img src="https://github.com/openebs/community/blob/develop/images/replicated-pv_mayastor_183x183_t.png" alt="Replicated PV Mayastor" align="center" width="83px"/>](https://github.com/openebs/mayastor) | [Mayastor](https://github.com/openebs/mayastor) | for High Availability deploymemnts distributing & replicating volumes across the cluster | Stable, deployable in PROD <BR>[![Releases](https://img.shields.io/github/release/openebs/Mayastor/all.svg?style=flat-square)]() |  v4.0.1 |
+|     | &nbsp;             |                                                        |                                                            |          |
+| ```Local PV``` |         | Non-replicated node local data volumes    | (Local-PV has multiple variants. See below)                | v4.0.1   |
+|  [<img src="https://github.com/openebs/community/blob/develop/images/local-pv_hostpath_183x183_t.png" alt="Local PV Hostpath" align="center" width="83px"/>](https://github.com/openebs/dynamic-localpv-provisioner) |  [Local PV HostPath](https://github.com/openebs/dynamic-localpv-provisioner) | for integration with local node hostpath (e.g. /mnt/fs1)    | Stable, deployable in PROD <BR>[![Releases](https://img.shields.io/github/release/openebs/dynamic-localpv-provisioner/all.svg?style=flat-square)]()    | v4.0.1   |
+| [<img src="https://github.com/openebs/community/blob/develop/images/local-pv_zfs_183x183_t.png" alt="Local PV ZFS" align="center" width="83px"/>](https://github.com/openebs/zfs-localpv) |  [Local PV ZFS](https://github.com/openebs/zfs-localpv)      | for integration with local ZFS storage deployments          | Stable, deployable in PROD <BR>[![Releases](https://img.shields.io/github/release/openebs/zfs-localpv/all.svg?style=flat-square)]()                   | v4.0.1   |
+| [<img src="https://github.com/openebs/community/blob/develop/images/local-pv_lvm_183x183_t.png" alt="Local PV LVM2" align="center" width="83px"/>](https://github.com/openebs/lvm-localpv) |  [Local PV LVM](https://github.com/openebs/lvm-localpv)      | for integration with local LVM2 storage deployments          | Stable, deployable in PROD <BR>[![Releases](https://img.shields.io/github/release/openebs/lvm-localpv/all.svg?style=flat-square)]()                  | v4.0.1   |
+| [<img src="https://github.com/openebs/community/blob/develop/images/local-pv_rawfile_183x163_t.png" alt="Local PV Rawfile" align="center" width="83px"/>](https://github.com/openebs/rawfile-localpv) |  [Local PV Rawfile](https://github.com/openebs/rawfile-localpv)    | for integration with Loop mounted Raw device-file filesystem | Stable, deployable in PROD, undergoing evaluation & integration <BR>```release: v0.70```   | v4.0.1   |
+<BR>
+
+**STANDARD** (Open Source Standard) is our Ultra modern Datastore stack that is strongly aligned with the cutting edge direction of storage use-cases in the K8s industry. It is designed to facilitate modern K8s datastore architectures, key K8s I/O patterns, K8s data access methods, K8s data use-cases and where K8s Datastore applications are heading.
+<BR>	
+
+ 
+STANDARD is optimized for NVMe and SSD Flash storage media, and integrates ultra modern cutting-edge high performance storage technologies at its core...</summary>
+
 >
-> :rocket: &nbsp; OpenEBS is the #1 deployed Storage Platform for Kubernetes <BR>
-> :star: &nbsp; We are the [#1 GitHub Star ranked](https://github.com/openebs/website/blob/main/website/public/images/png/github_star-history-2024_Feb_1.png) K8s Data Storage platform <BR>
-> :floppy_disk: &nbsp; We have +49 Million Volumes deployed globally <BR>
-> :tv: &nbsp; We have +8 Million Global installations <BR>
-> :zap: &nbsp; 1 Million OpenEBS K8s Containers are spawned per week <BR>
-> :sunglasses: &nbsp; 1.1 Million global users <BR>
+> :ballot_box_with_check: &nbsp; It uses the High performance [SPDK](https://spdk.io) storage stack - (SPDK is an open-source NVMe project initiated by INTEL) <BR>
+> :ballot_box_with_check: &nbsp; The hyper modern [IO_Uring](https://github.com/axboe/liburing) Linux Kernel Async polling-mode I/O Interface - (fastest kernel I/O mode possible) <BR>
+> :ballot_box_with_check: &nbsp; Native abilities for RDMA and Zero-Copy I/O <BR>
+> :ballot_box_with_check: &nbsp; NVMe-oF TCP Block storage Hyper-converged data fabric <BR>
+> :ballot_box_with_check: &nbsp; Block layer volume replication <BR>
+> :ballot_box_with_check: &nbsp; Logical volumes and Diskpool based data managment <BR>
+> :ballot_box_with_check: &nbsp; a Native high performance [Blobstore](https://spdk.io/doc/blob.html) <BR>
+> :ballot_box_with_check: &nbsp; Native Block layer Thin provisioning <BR>
+> :ballot_box_with_check: &nbsp; Native Block layer Snapshots and Clones <BR>
 
+---
+
+> **OpenEBS is very popular :** <BR>
+> Live OpenEBS systems actively report back product telemetry each day, to our Global Analytics system (unless disabled by the user).<BR>
+> Below are our project popularity & pentration metrics as of: <kbd>01 May 2024</kbd> <BR>
+>
+> :rocket: &nbsp; OpenEBS is the **#1 deployed** Storage ```Platform``` for Kubernetes <BR>
+> :star: &nbsp; We are the [#1 GitHub Star ranked](https://github.com/openebs/website/blob/main/website/public/images/png/github_star-history-2024_Feb_1.png) K8s Data Storage platform <BR>
+> :floppy_disk: &nbsp; We have **+49 Million** <kbd>Volumes</kbd> deployed globally <BR>
+> :tv: &nbsp; We have **+9 Million** Global Live <kbd>Nodes</kbd> <BR>
+> :zap: &nbsp; **1 Million** OpenEBS K8s Containers are ```spawned per week``` <BR>
+> :sunglasses: &nbsp; **1.7 Million** ```User Installations ``` <BR>
 <BR>
 
 We have a very large [active community](https://github.com/openebs/community), and many storage users [contribute to our product](https://github.com/openebs/community/blob/develop/CONTRIBUTING.md) with discussions, ideas, Issues, Feature requests and even code contribnutions.  
