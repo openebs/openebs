@@ -1,7 +1,21 @@
-# Welcome to OpenEBS
+## Welcome to OpenEBS
 [![OpenEBS Welcome Banner](https://github.com/openebs/community/blob/develop/images/community_banner_retro_gamer_level-up-2024_transp.png)](https://www.openebs.io/)
 
-OopenEBS is a modern Block-Mode storage platform, a Hyper-Converged software Storage System and virtual NVMe-oF SAN (vSAN) Fabric that is natively & tightly integrated into the core of Kubernetes.<BR>
+OpenEBS is a modern Block-Mode storage platform, a Hyper-Converged software Storage System and virtual NVMe-oF SAN (vSAN) Fabric that is natively & tightly integrated into the core of Kubernetes.<BR>
+
+| [<img src="https://github.com/openebs/community/blob/develop/images/slack_icon_small.png" width="100">](https://kubernetes.slack.com/messages/openebs)  | **Try our Slack channel** <BR>If you have questions about using OpenEBS, please use the CNCF Kubernetes **OpenEBS slack channel**, it is open for [anyone to ask a question](https://kubernetes.slack.com/messages/openebs/) <BR> |
+| :---         | :---      |
+
+### Get in touch with our team.
+> |   |   |   |    |
+> | :--- | :--- | :--- | :--- |
+> | [Vishnu Attur](https://www.linkedin.com/in/vishnu-attur-5309a333/ "Senior Engineering, QA and Dev Manager")| :octocat: <kbd>**[@avishnu](https://github.com/avishnu "Vishnu Govind Attur")**</kbd> | ![](https://github.com/openebs/community/blob/develop/images/flags/de_je/in.png "I am based in Bengaluru, Karnataka, India (GMT+5:30) Timezone") | <kbd>**Admin**</kbd>, ```Maintainer``` |
+> | [Abhinandan Purkait](https://www.linkedin.com/in/abhinandan-purkait/ "Senior Engineer") | :sunglasses: <kbd>**[@Abhinandan-Purkait](https://github.com/Abhinandan-Purkait "Abhinandan Purkait")**</kbd> | ![](https://github.com/openebs/community/blob/develop/images/flags/de_je/in.png "I am based in Bengaluru, Karnataka, India (GMT+5:30) Timezone") | ```Maintainer``` |
+> | [Niladri Halder](https://www.linkedin.com/in/niladrih/ "Senior Engineer") | :rocket: <kbd>**[@niladrih](https://github.com/niladrih "Niladrih Halder")**</kbd> | ![](https://github.com/openebs/community/blob/develop/images/flags/de_je/in.png "I am based in Bengaluru, Karnataka, India (GMT+5:30) Timezone") | ```Maintainer``` |
+> | [Ed Robinson](https://www.linkedin.com/in/edrob/ "CNCF Head Liason") | :dog: <kbd>**[@edrob999](https://github.com/edrob999 "Ed Robinson")**</kbd> | ![](https://github.com/openebs/community/blob/develop/images/flags/ni_tn/nz.png "I am based in San Francisco, USA (GMT-7) Timezone") &nbsp; ![](https://github.com/openebs/community/blob/develop/images/flags/to_zw/us.png "I am based in San Francisco, USA (GMT-7) Timezone") | <kbd>**CNCF Primary Liason**</kbd> ```Special Maintainer``` |
+> | [Tiago Castro](https://www.linkedin.com/in/tiago-castro-3311453a/ "Chief Architect") | :zap: <kbd>**[@tiagolobocastro](https://github.com/tiagolobocastro "Tiago Castro")**</kbd> | ![](https://github.com/openebs/community/blob/develop/images/flags/ni_tn/pt.png "I am based in London, UK (GMT+1) Timezone") &nbsp; ![](https://github.com/openebs/community/blob/develop/images/flags/de_je/gb.png "I am based in London, UK (GMT+1) Timezone") | <kbd>**Admin**</kbd>, ```Maintainer``` |
+> | [David Brace](https://www.linkedin.com/in/dbrace/ "Head of Product Mgmt & Strategy") | :star: <kbd>**[@orville-wright](https://github.com/orville-wright "Dave Brace")**</kbd> | ![](https://github.com/openebs/community/blob/develop/images/flags/ni_tn/nz.png "I am based in San Francisco, USA (GMT-7) Timezone") &nbsp; ![](https://github.com/openebs/community/blob/develop/images/flags/de_je/hu.png "I am based in San Francisco, USA (GMT-7) Timezone") &nbsp; ![](https://github.com/openebs/community/blob/develop/images/flags/to_zw/us.png "I am based in San Francisco, USA (GMT-7) Timezone") | <kbd>**Admin**</kbd>, ```Maintainer``` |
+
 <BR>
 
 > [!IMPORTANT]
@@ -25,7 +39,6 @@ OopenEBS is a modern Block-Mode storage platform, a Hyper-Converged software Sto
 Within  **STANDARD**, you have a choice of 2 Types of K8s Storage Services. ```Replicated PV``` and ```Local PV```.
 
 ---
-<BR>
 
 | Type | Storage Engine   | Type of data services                                                     | Status                      |  In OSS ver  |
 | :---: | :---             | :---                                                                      | :---                       |  :---:  |   
@@ -57,51 +70,15 @@ STANDARD is optimized for NVMe and SSD Flash storage media, and integrates ultra
 > :ballot_box_with_check: &nbsp; Native Block layer Snapshots and Clones <BR>
 
 ---
-
-> **OpenEBS is very popular :** <BR>
-> Live OpenEBS systems actively report back product telemetry each day, to our Global Analytics system (unless disabled by the user).<BR>
-> Below are our project popularity & pentration metrics as of: <kbd>01 May 2024</kbd> <BR>
->
-> :rocket: &nbsp; OpenEBS is the **#1 deployed** Storage ```Platform``` for Kubernetes <BR>
-> :star: &nbsp; We are the [#1 GitHub Star ranked](https://github.com/openebs/website/blob/main/website/public/images/png/github_star-history-2024_Feb_1.png) K8s Data Storage platform <BR>
-> :floppy_disk: &nbsp; We have **+49 Million** <kbd>Volumes</kbd> deployed globally <BR>
-> :tv: &nbsp; We have **+9 Million** Global Live <kbd>Nodes</kbd> <BR>
-> :zap: &nbsp; **1 Million** OpenEBS K8s Containers are ```spawned per week``` <BR>
-> :sunglasses: &nbsp; **1.7 Million** ```User Installations ``` <BR>
-<BR>
-
-We have a very large [active community](https://github.com/openebs/community), and many storage users [contribute to our product](https://github.com/openebs/community/blob/develop/CONTRIBUTING.md) with discussions, ideas, Issues, Feature requests and even code contribnutions.  
-
-There are many ways to get in touch with our team.
-- **EMAIL us**:  cncf-openebs-maintainers@lists.cncf.io <BR>
-- **Contact the Maintainers** : The up to date Maintainers list [is here](/openebs/MAINTAINERS.md)
-> Reach out via GitHuib to the OpenEBS core leadership team. <BR>
-> :rocket: &nbsp; Ed Robinson | @edrob999 <BR>
-> :star: &nbsp; David Brace | @orville-wright <BR>
-> :zap: &nbsp; Vishnu Attur | @avishnu <BR>
-> :sunglasses: &nbsp; Tiago Castro | @tiagolobocastro <BR>
-
-| [<img src="https://github.com/openebs/community/blob/develop/images/slack_icon_small.png" width="100">](https://kubernetes.slack.com/messages/openebs)  | **Try our Slack channel** <BR>If you have questions about using OpenEBS, please use the CNCF Kubernetes **OpenEBS slack channel**, it is open for [anyone to ask a question](https://kubernetes.slack.com/messages/openebs/) <BR> |
-| :---         | :---      |
-
-<BR>
-
----
-
-# Current status
-
-[![Releases](https://img.shields.io/github/release/openebs/openebs/all.svg?style=flat-square)](https://github.com/openebs/openebs/releases)
-[![Slack channel #openebs](https://img.shields.io/badge/slack-openebs-brightgreen.svg?logo=slack)](https://kubernetes.slack.com/messages/openebs)
-[![Twitter](https://img.shields.io/twitter/follow/openebs.svg?style=social&label=Follow)](https://twitter.com/intent/follow?screen_name=openebs)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](https://github.com/openebs/openebs/blob/master/CONTRIBUTING.md)
-[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fopenebs%2Fopenebs.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fopenebs%2Fopenebs?ref=badge_shield)
-[![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/1754/badge)](https://bestpractices.coreinfrastructure.org/projects/1754)
-
 ## Activity dashbaord
 ![Alt](https://repobeats.axiom.co/api/embed/1e565d4d1fdfeacd2cf810f10bcb6cde7368c9ea.svg "Repobeats analytics image")
+---
+## Current status
+| <kbd>Release</kbd> | <kbd>Support</kbd> | <kbd>Twitter/X</kbd> | <kbd>Contrib</kbd> | <kbd>License statue</kbd> | <kbd>CI Staus</kbd> |
+| :---: | :---: | :---: | :---: | :---: | :---: |
+| [![Releases](https://img.shields.io/github/release/openebs/openebs/all.svg?style=flat-square)](https://github.com/openebs/openebs/releases) | [![Slack channel #openebs](https://img.shields.io/badge/slack-openebs-brightgreen.svg?logo=slack)](https://kubernetes.slack.com/messages/openebs) | [![Twitter](https://img.shields.io/twitter/follow/openebs.svg?style=social&label=Follow)](https://twitter.com/intent/follow?screen_name=openebs) | [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](https://github.com/openebs/openebs/blob/master/CONTRIBUTING.md) | [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fopenebs%2Fopenebs.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fopenebs%2Fopenebs?ref=badge_shield) | [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/1754/badge)](https://bestpractices.coreinfrastructure.org/projects/1754) |
 
-https://openebs.io/
-
+---
 **Read this in**
 [🇩🇪](translations/README.de.md)	
 [🇷🇺](translations/README.ru.md)	
@@ -217,15 +194,13 @@ This is a meta-repository for OpenEBS. Please start with the pinned repositories
 
 OpenEBS is developed under [Apache License 2.0](https://github.com/openebs/openebs/blob/master/LICENSE) license at the project level. Some components of the project are derived from other open source projects and are distributed under their respective licenses.
 
-OpenEBS is part of the CNCF Projects.
-[![CNCF logo](https://github.com/openebs/community/raw/develop/images/CNCF_member-silver-color.svg)](https://www.datacore.com/)
-OpenEBS is a CNCF project and DataCore, Inc is a CNCF Silver member. DataCore support's CNCF extensively and has funded OpenEBS participating in every KubeCon event since 2020. Our project team is managed under the CNCF Storage Landscape and we contribute to the CNCF CSI and TAG Storage project initiatives. We proudly support CNCF Cloud Native Community Groups initatives.<BR>
+OpenEBS is a CNCF Member
+[![CNCF logo](https://github.com/openebs/community/blob/develop/images/CNCF_member-silver-color.svg)](https://www.datacore.com/)
+OpenEBS is a CNCF project and DataCore, Inc is a CNCF Silver member. DataCore support's CNCF extensively and has funded OpenEBS participating in every KubeCon event since 2020. Our project team is managed under the CNCF Storage Landscape and we contribute to the CNCF CSI and TAG Storage project initiatives. We proudly support CNCF Cloud Native Community Groups initiatives.<BR>
 <BR>
-<img  alt="Container Storage Interface group" src="https://github.com/openebs/community/raw/develop/images/CNCF_csi-horizontal-color.png" width="300"> <img alt="Storage Technical Advisory Group" src="https://github.com/openebs/community/raw/develop/images/CNCF_tag-storage-horizontal-color.png" width="300">  <img alt="Cloud Native Community Groups" src="https://github.com/openebs/community/raw/develop/images/CNCF_cncg-icon-color.png" width="120">
 
- 
-<BR>
-Thanks for dropping by.
+| [<img alt="Container Storage Interface group" src="https://github.com/openebs/community/blob/develop/images/CNCF_csi-horizontal-color_2024.png" width="320">](https://github.com/kubernetes/community/tree/master/sig-storage) | [<img alt="Storage Technical Advisory Group" src="https://github.com/openebs/community/blob/develop/images/CNCF_tag-storage-horizontal-color_2024.png" width="320">](https://github.com/cncf/tag-storage) | &emsp; &emsp; [<img alt="Cloud Native Community Groups" src="https://github.com/openebs/community/blob/develop/images/CNCF_cncg-icon-color_2024.png" width="200">](https://github.com/cncf/communitygroups)|
+| :---         |     :---:      |          ---: |
 
 ## Commercial Offerings
 
