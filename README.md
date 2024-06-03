@@ -6,16 +6,6 @@ OpenEBS is a modern Block-Mode storage platform, a Hyper-Converged software Stor
 | [<img src="https://github.com/openebs/community/blob/develop/images/slack_icon_small.png" width="100">](https://kubernetes.slack.com/messages/openebs)  | **Try our Slack channel** <BR>If you have questions about using OpenEBS, please use the CNCF Kubernetes **OpenEBS slack channel**, it is open for [anyone to ask a question](https://kubernetes.slack.com/messages/openebs/) <BR> |
 | :---         | :---      |
 
-### Get in touch with our team.
-> |   |   |   |    |
-> | :--- | :--- | :--- | :--- |
-> | [Vishnu Attur](https://www.linkedin.com/in/vishnu-attur-5309a333/ "Senior Engineering, QA and Dev Manager")| :octocat: <kbd>**[@avishnu](https://github.com/avishnu "Vishnu Govind Attur")**</kbd> | ![](https://github.com/openebs/community/blob/develop/images/flags/de_je/in.png "I am based in Bengaluru, Karnataka, India (GMT+5:30) Timezone") | <kbd>**Admin**</kbd>, ```Maintainer``` |
-> | [Abhinandan Purkait](https://www.linkedin.com/in/abhinandan-purkait/ "Senior Engineer") | :sunglasses: <kbd>**[@Abhinandan-Purkait](https://github.com/Abhinandan-Purkait "Abhinandan Purkait")**</kbd> | ![](https://github.com/openebs/community/blob/develop/images/flags/de_je/in.png "I am based in Bengaluru, Karnataka, India (GMT+5:30) Timezone") | ```Maintainer``` |
-> | [Niladri Halder](https://www.linkedin.com/in/niladrih/ "Senior Engineer") | :rocket: <kbd>**[@niladrih](https://github.com/niladrih "Niladrih Halder")**</kbd> | ![](https://github.com/openebs/community/blob/develop/images/flags/de_je/in.png "I am based in Bengaluru, Karnataka, India (GMT+5:30) Timezone") | ```Maintainer``` |
-> | [Ed Robinson](https://www.linkedin.com/in/edrob/ "CNCF Head Liason") | :dog: <kbd>**[@edrob999](https://github.com/edrob999 "Ed Robinson")**</kbd> | ![](https://github.com/openebs/community/blob/develop/images/flags/ni_tn/nz.png "I am based in San Francisco, USA (GMT-7) Timezone") &nbsp; ![](https://github.com/openebs/community/blob/develop/images/flags/to_zw/us.png "I am based in San Francisco, USA (GMT-7) Timezone") | <kbd>**CNCF Primary Liason**</kbd> ```Special Maintainer``` |
-> | [Tiago Castro](https://www.linkedin.com/in/tiago-castro-3311453a/ "Chief Architect") | :zap: <kbd>**[@tiagolobocastro](https://github.com/tiagolobocastro "Tiago Castro")**</kbd> | ![](https://github.com/openebs/community/blob/develop/images/flags/ni_tn/pt.png "I am based in London, UK (GMT+1) Timezone") &nbsp; ![](https://github.com/openebs/community/blob/develop/images/flags/de_je/gb.png "I am based in London, UK (GMT+1) Timezone") | <kbd>**Admin**</kbd>, ```Maintainer``` |
-> | [David Brace](https://www.linkedin.com/in/dbrace/ "Head of Product Mgmt & Strategy") | :star: <kbd>**[@orville-wright](https://github.com/orville-wright "Dave Brace")**</kbd> | ![](https://github.com/openebs/community/blob/develop/images/flags/ni_tn/nz.png "I am based in San Francisco, USA (GMT-7) Timezone") &nbsp; ![](https://github.com/openebs/community/blob/develop/images/flags/de_je/hu.png "I am based in San Francisco, USA (GMT-7) Timezone") &nbsp; ![](https://github.com/openebs/community/blob/develop/images/flags/to_zw/us.png "I am based in San Francisco, USA (GMT-7) Timezone") | <kbd>**Admin**</kbd>, ```Maintainer``` |
-
 <BR>
 
 > [!IMPORTANT]
@@ -29,7 +19,6 @@ OpenEBS is a modern Block-Mode storage platform, a Hyper-Converged software Stor
 > - Deployable On-premise & in-cloud: (AWS EC2/EKS, Google GCP/GKE, Azure VM/AKS, Oracle OCI, IBM/RedHat OpenShift, Civo Cloud, Hetzner Cloud... and more)
 > - Enterprise Grade data management capabilities such as **snapshots, clones, replicated volumes, DiskGroups, Volume Groups, Aggregates, RAID** <BR>
 <BR>
-
 
 ## **openEBS has 2 Editions**:<BR>
 > | 1. **<KBD> STANDARD </KBD>** :heavy_check_mark: > ```Ready Player 1``` |
@@ -55,8 +44,7 @@ Within  **STANDARD**, you have a choice of 2 Types of K8s Storage Services. ```R
 **STANDARD** (Open Source Standard) is our Ultra modern Datastore stack that is strongly aligned with the cutting edge direction of storage use-cases in the K8s industry. It is designed to facilitate modern K8s datastore architectures, key K8s I/O patterns, K8s data access methods, K8s data use-cases and where K8s Datastore applications are heading.
 <BR>	
 
- 
-STANDARD is optimized for NVMe and SSD Flash storage media, and integrates ultra modern cutting-edge high performance storage technologies at its core...</summary>
+ STANDARD is optimized for NVMe and SSD Flash storage media, and integrates ultra modern cutting-edge high performance storage technologies at its core...</summary>
 
 >
 > :ballot_box_with_check: &nbsp; It uses the High performance [SPDK](https://spdk.io) storage stack - (SPDK is an open-source NVMe project initiated by INTEL) <BR>
@@ -68,6 +56,16 @@ STANDARD is optimized for NVMe and SSD Flash storage media, and integrates ultra
 > :ballot_box_with_check: &nbsp; a Native high performance [Blobstore](https://spdk.io/doc/blob.html) <BR>
 > :ballot_box_with_check: &nbsp; Native Block layer Thin provisioning <BR>
 > :ballot_box_with_check: &nbsp; Native Block layer Snapshots and Clones <BR>
+
+### Get in touch with our team.
+|   |   |   |    |
+| :--- | :--- | :--- | :--- |
+| [Vishnu Attur](https://www.linkedin.com/in/vishnu-attur-5309a333/ "Senior Engineering, QA and Dev Manager")| :octocat: <kbd>**[@avishnu](https://github.com/avishnu "Vishnu Govind Attur")**</kbd> | ![](https://github.com/openebs/community/blob/develop/images/flags/de_je/in.png "I am based in Bengaluru, Karnataka, India (GMT+5:30) Timezone") | <kbd>**Admin**</kbd>, ```Maintainer``` |
+| [Abhinandan Purkait](https://www.linkedin.com/in/abhinandan-purkait/ "Senior Engineer") | :sunglasses: <kbd>**[@Abhinandan-Purkait](https://github.com/Abhinandan-Purkait "Abhinandan Purkait")**</kbd> | ![](https://github.com/openebs/community/blob/develop/images/flags/de_je/in.png "I am based in Bengaluru, Karnataka, India (GMT+5:30) Timezone") | ```Maintainer``` |
+| [Niladri Halder](https://www.linkedin.com/in/niladrih/ "Senior Engineer") | :rocket: <kbd>**[@niladrih](https://github.com/niladrih "Niladrih Halder")**</kbd> | ![](https://github.com/openebs/community/blob/develop/images/flags/de_je/in.png "I am based in Bengaluru, Karnataka, India (GMT+5:30) Timezone") | ```Maintainer``` |
+| [Ed Robinson](https://www.linkedin.com/in/edrob/ "CNCF Head Liason") | :dog: <kbd>**[@edrob999](https://github.com/edrob999 "Ed Robinson")**</kbd> | ![](https://github.com/openebs/community/blob/develop/images/flags/ni_tn/nz.png "I am based in San Francisco, USA (GMT-7) Timezone") &nbsp; ![](https://github.com/openebs/community/blob/develop/images/flags/to_zw/us.png "I am based in San Francisco, USA (GMT-7) Timezone") | <kbd>**CNCF Primary Liason**</kbd><BR>```Special Maintainer``` |
+| [Tiago Castro](https://www.linkedin.com/in/tiago-castro-3311453a/ "Chief Architect") | :zap: <kbd>**[@tiagolobocastro](https://github.com/tiagolobocastro "Tiago Castro")**</kbd> | ![](https://github.com/openebs/community/blob/develop/images/flags/ni_tn/pt.png "I am based in London, UK (GMT+1) Timezone") &nbsp; ![](https://github.com/openebs/community/blob/develop/images/flags/de_je/gb.png "I am based in London, UK (GMT+1) Timezone") | <kbd>**Admin**</kbd>, ```Maintainer``` |
+| [David Brace](https://www.linkedin.com/in/dbrace/ "Head of Product Mgmt & Strategy") | :star: <kbd>**[@orville-wright](https://github.com/orville-wright "Dave Brace")**</kbd> | ![](https://github.com/openebs/community/blob/develop/images/flags/ni_tn/nz.png "I am based in San Francisco, USA (GMT-7) Timezone") &nbsp; ![](https://github.com/openebs/community/blob/develop/images/flags/de_je/hu.png "I am based in San Francisco, USA (GMT-7) Timezone") &nbsp; ![](https://github.com/openebs/community/blob/develop/images/flags/to_zw/us.png "I am based in San Francisco, USA (GMT-7) Timezone") | <kbd>**Admin**</kbd>, ```Maintainer``` |
 
 ---
 ## Activity dashbaord
@@ -92,111 +90,93 @@ STANDARD is optimized for NVMe and SSD Flash storage media, and integrates ultra
 [🇰🇷](translations/README.ko.md)
 **[other languages](translations/#readme).**
 
-**OpenEBS** is the most widely deployed and easy to use open-source storage solution for Kubernetes.
-
-**OpenEBS** is the leading open-source example of a category of cloud native storage solutions sometimes called [Container Attached Storage](https://www.cncf.io/blog/2018/04/19/container-attached-storage-a-primer/). **OpenEBS** is listed as an open-source example in the [CNCF Storage White Paper](https://github.com/cncf/tag-storage/blob/master/CNCF%20Storage%20Whitepaper%20V2.pdf) under the hyperconverged storage solutions.
-
 Some key aspects that make OpenEBS different compared to other traditional storage solutions:
-- Built using the micro-services architecture like the applications it serves. OpenEBS is itself deployed as a set of containers on Kubernetes worker nodes. Uses Kubernetes itself to orchestrate and manage OpenEBS components.
-- Built completely in userspace making it highly portable to run across any OS/platform.
-- Completely intent-driven, inheriting the same principles that drive the ease of use with Kubernetes.
-- OpenEBS supports a range of storage engines so that developers can deploy the storage technology appropriate to their application design objectives. Distributed applications like Cassandra can use the LocalPV engine for lowest latency writes. Monolithic applications like MySQL and PostgreSQL can use the ZFS engine (cStor) for resilience. Streaming applications like Kafka can use the NVMe engine [Mayastor](https://github.com/openebs/Mayastor) for best performance in edge environments. Across engine types, OpenEBS provides a consistent framework for high availability, snapshots, clones and manageability.
+- Built using K8s micro-services architecture like the applications it serves. OpenEBS is deployed as a set of intelligent K8s ```Deployments```, ```Containers```, ```Servcies```, ```Stateful sets```, ```CRD's```, ```Sidecars```, ```Jobs``` and ```Binaries``` all on K8s worker nodes. It uses Kubernetes itself to orchestrate and manage all components.
+- Built completely in userspace making it highly portable and able to run across any OS/platform.
+- Completely intent-driven & declaritive. Inheriting the same principles that align with Kubernetes.
+- OpenEBS has 5 <kbd>Storgae Engines</kbd> to support ```Distributed``` applications (like Cassandra), ```Monolithic``` applications (like MySQL and PostgreSQL), ```Streaming``` applications like Kafka.
+- Listed in CNCF Hyper-Converged Storage refernce architecture whitepaper: [CNCF Storage White Paper](https://github.com/cncf/tag-storage/blob/master/CNCF%20Storage%20Whitepaper%20V2.pdf)
 
 # Deployment
-OpenEBS itself is deployed as just another container on your host and enables storage services that can be designated on a per pod, application, cluster or container level, including:
-- Automate the management of storage attached to the Kubernetes worker nodes and allow the storage to be used for Dynamically provisioning OpenEBS Replicated or Local PVs.
-- Data persistence across nodes, dramatically reducing time spent rebuilding Cassandra rings for example.
-- Synchronous replication of volume data across availability zones improving availability and decreasing attach/detach times for example.
-- A common layer so whether you are running on AKS, or your bare metal, or GKE, or AWS - your wiring and developer experience for storage services is as similar as possible.
-- Backup and Restore of volume data to and from S3 and other targets.
+- TBD
 
-An added advantage of being a completely Kubernetes native solution is that administrators and developers can interact and manage OpenEBS using all the wonderful tooling that is available for Kubernetes like kubectl, Helm, Prometheus, Grafana, Weave Scope, etc.
+## Roadmap (as of June 2024)
+- [Replciated PV Mayastor Roadmap](https://github.com/openebs/openebs/blob/main/ROADMAP.md) 
 
-**Our vision** is simple: let storage and storage services for persistent workloads be fully integrated into the environment so that each team and workload benefits from the granularity of control and Kubernetes native behaviour.
-
-## Roadmap (as of Jan 2024)
-OpenEBS is 100% open source software. 
-The project source code is spread across multiple repos and covers multiple projects: 
-<BR>
-<BR>
-Our main Roadmap is focused exclusively on the modern (STANDARD Edition) Data-Engine **Mayastor**. It does not define any net-new features or capabilities for any LEGACY projects or projects that are tagged & defined as DEPRECATED or ARCHIVED. Currently those projects are defined as the follows (see references above for the details on the projects DEPRECATED and ARCHIVAL strategy)...
-- Jiva
-- cStor
-- NFS-Provisioner
-<BR>
-
-**MayaStor Roadmap
-[2024 Roadmap](https://github.com/openebs/openebs/blob/main/ROADMAP.md) 
-
-
-## Scalability
-
-OpenEBS can scale to include an arbitrarily large number of containerized storage controllers. Kubernetes is used to provide fundamental pieces such as using etcd for inventory. OpenEBS scales to the extent your Kubernetes scales.
-
+---
 ## Installation and Getting Started
+OpenEBS can be deployed on any Kubernetes cluster - either in the cloud, on-premise or developer laptop (minikube). Note that there are no changes to the underlying kernel that are required as OpenEBS operates in userspace.
+<BR>
 
-OpenEBS can be set up in a few easy steps. You can get going on your choice of Kubernetes cluster by having open-iscsi installed on the Kubernetes nodes and running the openebs-operator using kubectl.
-
-**Start the OpenEBS Services using operator**
-```bash
-# apply this yaml
-kubectl apply -f https://openebs.github.io/charts/openebs-operator.yaml
+> 1. **Setup helm repository.**
+```Erlang
+# helm repo add openebs https://openebs.github.io/openebs
+# helm repo update
 ```
 
-**Start the OpenEBS Services using helm**
-```bash
-helm repo update
-helm install --namespace openebs --name openebs stable/openebs
+
+> 2a. **Install the Full OpenEBS helm chart with default values.** <BR>
+>    - This installs **ALL OpenEBS Storage Engines*** in the openebs namespace and chart name as <kbd>openebs</kbd>: <BR>
+>    ```Local PV Hostpath```, ```Local PV LVM```, ```Local PV ZFS```, ```Replicated Mayastor```
+```Erlang
+# helm install openebs --namespace openebs openebs/openebs --create-namespace
 ```
 
-You could also follow our [QuickStart Guide](https://openebs.io/docs).
+> 2b. **To Install just the OpenEBS ```Replicated Mayastor``` Storage Engine, use the following command**:
+```Erlang
+# helm install openebs --namespace openebs openebs/openebs --set engines.replicated.mayastor.enabled=false --create-namespace
+```
 
-OpenEBS can be deployed on any Kubernetes cluster - either in the cloud, on-premise or developer laptop (minikube). Note that there are no changes to the underlying kernel that are required as OpenEBS operates in userspace.  Please follow our [OpenEBS Setup](https://openebs.io/docs/user-guides/quickstart) documentation.
+> 3. **To view the chart**
+```Erlang
+# helm ls -n openebs
 
-## Status
+Output:
+NAME     NAMESPACE   REVISION  UPDATED                                   STATUS     CHART           APP VERSION
+openebs  openebs     1         2024-03-25 09:13:00.903321318 +0000 UTC   deployed   openebs-4.0.1   4.0.1
+```
 
-OpenEBS is one of the most widely used and tested Kubernetes storage infrastructures in the industry. A CNCF Sandbox project since May 2019, OpenEBS is the first and only storage system to provide a consistent set of software-defined storage capabilities on multiple backends (local, nfs, zfs, nvme) across both on-premise and cloud systems, and was the first to open source its own Chaos Engineering Framework for Stateful Workloads, the [Litmus Project](https://litmuschaos.io), which the community relies on to automatically readiness assess the monthly cadence of OpenEBS versions. Enterprise customers have been using OpenEBS in production since 2018. 
+> 4. **Verify installation**
+>    - List the pods in <openebs> namespace
+>    - Verify StorageClasses
+```Erlang
+# kubectl get pods -n openebs
 
-The status of various storage engines that power the OpenEBS Persistent Volumes are provided below. The key difference between the statuses are summarized below:
-- **alpha:** The API may change in incompatible ways in a later software release without notice, recommended for use only in short-lived testing clusters, due to increased risk of bugs and lack of long-term support.
-- **beta**: Support for the overall features will not be dropped, though details may change. Support for upgrading or migrating between versions will be provided, either through automation or manual steps.
-- **stable**: Features will appear in released software for many subsequent versions and support for upgrading between versions will be provided with software automation in the vast majority of scenarios.
+Example Ouput:
+NAME                                              READY   STATUS    RESTARTS   AGE
+openebs-agent-core-674f784df5-7szbm               2/2     Running   0          11m
+openebs-agent-ha-node-nnkmv                       1/1     Running   0          11m
+openebs-agent-ha-node-pvcrr                       1/1     Running   0          11m
+openebs-agent-ha-node-rqkkk                       1/1     Running   0          11m
+openebs-api-rest-79556897c8-b824j                 1/1     Running   0          11m
+openebs-csi-controller-b5c47d49-5t5zd             6/6     Running   0          11m
+openebs-csi-node-flq49                            2/2     Running   0          11m
+openebs-csi-node-k8d7h                            2/2     Running   0          11m
+openebs-csi-node-v7jfh                            2/2     Running   0          11m
+openebs-etcd-0                                    1/1     Running   0          11m
+openebs-etcd-1                                    1/1     Running   0          11m
+openebs-etcd-2                                    1/1     Running   0          11m
+...
+```
+```Erlang
+# kubectl get sc
 
-
-| Storage Engine | Status | Details |
-|---|---|---|
-| Jiva | stable | Best suited for running Replicated Block Storage on nodes that make use of ephemeral storage on the Kubernetes worker nodes |
-| cStor | stable | A preferred option for running on nodes that have Block Devices. Recommended option if Snapshot and Clones are required |
-| Local Volumes | stable | Best suited for Distributed Application that need low latency storage - direct-attached storage from the Kubernetes nodes. |
-| Mayastor | stable | Persistent storage solution for Kubernetes, with near-native NVMe performance and advanced data services. |
-
+Example Output:
+NAME                                              READY   STATUS    RESTARTS   AGE
+openebs-localpv-provisioner-6ddf7c7978-jsstg      1/1     Running   0          3m9s
+openebs-lvm-localpv-controller-7b6d6b4665-wfw64   5/5     Running   0          3m9s
+openebs-lvm-localpv-node-62lnq                    2/2     Running   0          3m9s
+openebs-lvm-localpv-node-lhndx                    2/2     Running   0          3m9s
+openebs-lvm-localpv-node-tlcqv                    2/2     Running   0          3m9s
+openebs-zfs-localpv-controller-f78f7467c-k7ldb    5/5     Running   0          3m9s
+...
+```
 For more details, please refer to [OpenEBS Documentation](https://openebs.io/docs/).
 
-## Contributing
-
-OpenEBS welcomes your feedback and contributions in any form possible.
-
-- [Join OpenEBS community on Kubernetes Slack](https://kubernetes.slack.com)
-  - Already signed up? Head to our discussions at [#openebs](https://kubernetes.slack.com/messages/openebs/)
-- Want to raise an issue or help with fixes and features?
-  - See [open issues](https://github.com/openebs/openebs/issues)
-  - See [contributing guide](./CONTRIBUTING.md)
-  - Want to join our contributor community meetings, [check this out](./community/README.md).
-- Join our OpenEBS CNCF Mailing lists
-  - For OpenEBS project updates, subscribe to [OpenEBS Announcements](https://lists.cncf.io/g/cncf-openebs-announcements)
-  - For interacting with other OpenEBS users, subscribe to [OpenEBS Users](https://lists.cncf.io/g/cncf-openebs-users)
-
-## Show me the Code
-
-This is a meta-repository for OpenEBS. Please start with the pinned repositories or with [OpenEBS Architecture](./contribute/design/README.md) document. 
-
-## License
-
-OpenEBS is developed under [Apache License 2.0](https://github.com/openebs/openebs/blob/master/LICENSE) license at the project level. Some components of the project are derived from other open source projects and are distributed under their respective licenses.
-
-OpenEBS is a CNCF Member
 [![CNCF logo](https://github.com/openebs/community/blob/develop/images/CNCF_member-silver-color.svg)](https://www.datacore.com/)
 OpenEBS is a CNCF project and DataCore, Inc is a CNCF Silver member. DataCore support's CNCF extensively and has funded OpenEBS participating in every KubeCon event since 2020. Our project team is managed under the CNCF Storage Landscape and we contribute to the CNCF CSI and TAG Storage project initiatives. We proudly support CNCF Cloud Native Community Groups initiatives.<BR>
+> Project updates, subscribe to [OpenEBS Announcements](https://lists.cncf.io/g/cncf-openebs-announcements) <BR>
+> Interacting with other OpenEBS users, subscribe to [OpenEBS Users](https://lists.cncf.io/g/cncf-openebs-users)
 <BR>
 
 | [<img alt="Container Storage Interface group" src="https://github.com/openebs/community/blob/develop/images/CNCF_csi-horizontal-color_2024.png" width="320">](https://github.com/kubernetes/community/tree/master/sig-storage) | [<img alt="Storage Technical Advisory Group" src="https://github.com/openebs/community/blob/develop/images/CNCF_tag-storage-horizontal-color_2024.png" width="320">](https://github.com/cncf/tag-storage) | &emsp; &emsp; [<img alt="Cloud Native Community Groups" src="https://github.com/openebs/community/blob/develop/images/CNCF_cncg-icon-color_2024.png" width="200">](https://github.com/cncf/communitygroups)|
