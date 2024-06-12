@@ -1,5 +1,5 @@
 ## Welcome to OpenEBS
-[![OpenEBS Welcome Banner](https://github.com/openebs/community/blob/develop/images/community_banner_retro_gamer_level-up-2024_transp.png)](https://www.openebs.io/)
+[![OpenEBS Welcome Banner](https://github.com/openebs/community/blob/develop/images/waterfalls-Gamer-16-bit-pixel-art_HERO_banner.png)](https://www.openebs.io/)
 
 OpenEBS is a modern Block-Mode storage platform, a Hyper-Converged software Storage System and virtual NVMe-oF SAN (vSAN) Fabric that is natively integrates into the core of Kubernetes.<BR>
 
@@ -87,28 +87,19 @@ STANDARD is optimized for NVMe and SSD Flash storage media, and integrates ultra
 [🇰🇷](translations/README.ko.md)
 **[other languages](translations/#readme).**
 
-openEBS is a Cloud-1st Hyperconverged modern storage platform, which is very different to traditional monolithic storage solution:
-- Built using K8s micro-services architecture like the applications it serves.
-- Archietcted & deployed as a set of intelligent K8s ```Deployments```, ```Containers```, ```Servcies```, ```Stateful sets```, ```CRD's```, ```Sidecars```, ```Jobs``` and ```Binaries``` all on K8s worker nodes.
-- Uses Kubernetes itself to orchestrate and manage all storage components.
-- Runs 100% in K8s userspace. So it's highly portable and run across many OS's & platforms.
-- Intent-driven & declaritive driven. Inheriting the same principles of K8s.
-- Has 5 <kbd>Storgae Engines</kbd> to support ```Distributed``` applications (like Cassandra), ```Monolithic``` applications (like MySQL and PostgreSQL), ```Streaming``` applications like Kafka.
-- A refernce arhitecture product in CNCF Hyper-Converged Storage refernce architecture whitepaper: [CNCF Storage White Paper](https://github.com/cncf/tag-storage/blob/master/CNCF%20Storage%20Whitepaper%20V2.pdf)
-
 ## Deployment
 - In-cloud: (AWS EC2/EKS, Google GCP/GKE, Azure VM/AKS, Oracle OCI, IBM/RedHat OpenShift, Civo Cloud, Hetzner Cloud... and more)
 - On-Premise: Bare Metal, Virtualzied Hypervisor infra using VMWare ESXi, KVM/QEMU (K8s KubeVirt), Proxmox
+- Deployed as native K8s elemets: ```Deployments```, ```Containers```, ```Servcies```, ```Stateful sets```, ```CRD's```, ```Sidecars```, ```Jobs``` and ```Binaries``` all on K8s worker nodes.
+- Runs 100% in K8s userspace. So it's highly portable and run across many OS's & platforms.
 
 ## Roadmap (as of June 2024)
 - [Replciated PV Mayastor Roadmap](https://github.com/openebs/openebs/blob/main/ROADMAP.md) 
-
 ---
+
+[![OpenEBS Welcome Banner](https://github.com/openebs/community/blob/develop/images/community_banner_retro_gamer_level-up-2024_transp.png)](https://www.openebs.io/)
 ## QUICKSTART : Installation <BR>
-OpenEBS can be deployed on any Kubernetes cluster - either in the cloud, on-premise or developer laptop (minikube). Note that there are no changes to the underlying kernel that are required as OpenEBS operates in userspace.<BR>
-<BR>```NOTE: ``` There may be some pre-requests that must be met, depending on which of the 5 storage engines you choose to deploy. <BR>
-
----
+```NOTE: ``` Depending on which of the 5 storage engines you choose to deploy, pre-requests that must be met. [See detailed quickstart docs...](https://openebs.io/docs/)<BR>
 
 <BR>
 
