@@ -1,7 +1,7 @@
 ## Welcome to OpenEBS
 [![OpenEBS Welcome Banner](https://github.com/openebs/community/blob/develop/images/community_banner_retro_gamer_level-up-2024_transp.png)](https://www.openebs.io/)
 
-OpenEBS is a modern Block-Mode storage platform, a Hyper-Converged software Storage System and virtual NVMe-oF SAN (vSAN) Fabric that is natively & tightly integrated into the core of Kubernetes.<BR>
+OpenEBS is a modern Block-Mode storage platform, a Hyper-Converged software Storage System and virtual NVMe-oF SAN (vSAN) Fabric that is natively integrates into the core of Kubernetes.<BR>
 
 | [<img src="https://github.com/openebs/community/blob/develop/images/slack_icon_small.png" width="100">](https://kubernetes.slack.com/messages/openebs)  | **Try our Slack channel** <BR>If you have questions about using OpenEBS, please use the CNCF Kubernetes **OpenEBS slack channel**, it is open for [anyone to ask a question](https://kubernetes.slack.com/messages/openebs/) <BR> |
 | :---         | :---      |
@@ -11,7 +11,7 @@ OpenEBS is a modern Block-Mode storage platform, a Hyper-Converged software Stor
 > [!IMPORTANT]
 > **OpenEBS provides**... <BR>
 > - Stateful persistent Dynamically provisioned storage volumes for Kubernetes
-> - High Performance NVMe-oF storage access optimized for All-Flash Solid State storage media
+> - High Performance NVMe-oF & NVMe/RDMA storage transport optimized for All-Flash Solid State storage media
 > - Block devices, LVM, ZFS, ext2/ext3/ext4, XFS, BTRFS...and more
 > - 100% Cloud-Native K8s declarative storage platform
 > - A cluster-wide vSAN block-mode fabric that provides containers/Pods with HA resilient access to storage across the entire cluster.
@@ -41,10 +41,7 @@ Within  **STANDARD**, you have a choice of 2 Types of K8s Storage Services. ```R
 | [<img src="https://github.com/openebs/community/blob/develop/images/local-pv_rawfile_183x163_t.png" alt="Local PV Rawfile" align="center" width="83px"/>](https://github.com/openebs/rawfile-localpv) |  [Local PV Rawfile](https://github.com/openebs/rawfile-localpv)    | for integration with Loop mounted Raw device-file filesystem | Stable, deployable in PROD, undergoing evaluation & integration <BR>```release: v0.70```   | v4.0.1   |
 <BR>
 
-**STANDARD** (Open Source Standard) is our Ultra modern Datastore stack that is strongly aligned with the cutting edge direction of storage use-cases in the K8s industry. It is designed to facilitate modern K8s datastore architectures, key K8s I/O patterns, K8s data access methods, K8s data use-cases and where K8s Datastore applications are heading.
-<BR>	
-
- STANDARD is optimized for NVMe and SSD Flash storage media, and integrates ultra modern cutting-edge high performance storage technologies at its core...</summary>
+STANDARD is optimized for NVMe and SSD Flash storage media, and integrates ultra modern cutting-edge high performance storage technologies at its core...</summary>
 
 >
 > :ballot_box_with_check: &nbsp; It uses the High performance [SPDK](https://spdk.io) storage stack - (SPDK is an open-source NVMe project initiated by INTEL) <BR>
@@ -90,22 +87,29 @@ Within  **STANDARD**, you have a choice of 2 Types of K8s Storage Services. ```R
 [🇰🇷](translations/README.ko.md)
 **[other languages](translations/#readme).**
 
-Some key aspects that make OpenEBS different compared to other traditional storage solutions:
-- Built using K8s micro-services architecture like the applications it serves. OpenEBS is deployed as a set of intelligent K8s ```Deployments```, ```Containers```, ```Servcies```, ```Stateful sets```, ```CRD's```, ```Sidecars```, ```Jobs``` and ```Binaries``` all on K8s worker nodes. It uses Kubernetes itself to orchestrate and manage all components.
-- Built completely in userspace making it highly portable and able to run across any OS/platform.
-- Completely intent-driven & declaritive. Inheriting the same principles that align with Kubernetes.
-- OpenEBS has 5 <kbd>Storgae Engines</kbd> to support ```Distributed``` applications (like Cassandra), ```Monolithic``` applications (like MySQL and PostgreSQL), ```Streaming``` applications like Kafka.
-- Listed in CNCF Hyper-Converged Storage refernce architecture whitepaper: [CNCF Storage White Paper](https://github.com/cncf/tag-storage/blob/master/CNCF%20Storage%20Whitepaper%20V2.pdf)
+openEBS is a Cloud-1st Hyperconverged modern storage platform, which is very different to traditional monolithic storage solution:
+- Built using K8s micro-services architecture like the applications it serves.
+- Archietcted & deployed as a set of intelligent K8s ```Deployments```, ```Containers```, ```Servcies```, ```Stateful sets```, ```CRD's```, ```Sidecars```, ```Jobs``` and ```Binaries``` all on K8s worker nodes.
+- Uses Kubernetes itself to orchestrate and manage all storage components.
+- Runs 100% in K8s userspace. So it's highly portable and run across many OS's & platforms.
+- Intent-driven & declaritive driven. Inheriting the same principles of K8s.
+- Has 5 <kbd>Storgae Engines</kbd> to support ```Distributed``` applications (like Cassandra), ```Monolithic``` applications (like MySQL and PostgreSQL), ```Streaming``` applications like Kafka.
+- A refernce arhitecture product in CNCF Hyper-Converged Storage refernce architecture whitepaper: [CNCF Storage White Paper](https://github.com/cncf/tag-storage/blob/master/CNCF%20Storage%20Whitepaper%20V2.pdf)
 
-# Deployment
-- TBD
+## Deployment
+- In-cloud: (AWS EC2/EKS, Google GCP/GKE, Azure VM/AKS, Oracle OCI, IBM/RedHat OpenShift, Civo Cloud, Hetzner Cloud... and more)
+- On-Premise: Bare Metal, Virtualzied Hypervisor infra using VMWare ESXi, KVM/QEMU (K8s KubeVirt), Proxmox
 
 ## Roadmap (as of June 2024)
 - [Replciated PV Mayastor Roadmap](https://github.com/openebs/openebs/blob/main/ROADMAP.md) 
 
 ---
-## Installation and Getting Started
-OpenEBS can be deployed on any Kubernetes cluster - either in the cloud, on-premise or developer laptop (minikube). Note that there are no changes to the underlying kernel that are required as OpenEBS operates in userspace.
+## QUICKSTART : Installation <BR>
+OpenEBS can be deployed on any Kubernetes cluster - either in the cloud, on-premise or developer laptop (minikube). Note that there are no changes to the underlying kernel that are required as OpenEBS operates in userspace.<BR>
+<BR>```NOTE: ``` There may be some pre-requests that must be met, depending on which of the 5 storage engines you choose to deploy. <BR>
+
+---
+
 <BR>
 
 > 1. **Setup helm repository.**
@@ -184,8 +188,11 @@ OpenEBS is a CNCF project and DataCore, Inc is a CNCF Silver member. DataCore su
 
 ## Commercial Offerings
 
-This is a list of third-party companies and individuals who provide products or services related to OpenEBS. OpenEBS is a CNCF project which does not endorse any company. The list is provided in alphabetical order.
+Commerically supported deployments of openEBS are avaialble via key companies. (Some provide services, funding, technology, infra, rescourced to the openEBS proejct).<BR>
+
+- [DataCore Software, Inc.](https://www.datacore.com/support/openebs/)
 - [Clouds Sky GmbH](https://cloudssky.com/en/)
 - [CodeWave](https://codewave.eu/)
-- [DataCore](https://www.datacore.com/support/openebs/)
 - [Gridworkz Cloud Services](https://gridworkz.com/)
+
+(openEBS OSS is a CNCF project. CNCF does not endorse any specific company).
