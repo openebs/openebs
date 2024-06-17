@@ -20,15 +20,6 @@ OpenEBS is a modern Block-Mode storage platform, a Hyper-Converged software Stor
 > - Enterprise Grade data management capabilities such as **snapshots, clones, replicated volumes, DiskGroups, Volume Groups, Aggregates, RAID** <BR>
 <BR>
 
-## **openEBS has 2 Editions**:<BR>
-> | 1. **<KBD> STANDARD </KBD>** :heavy_check_mark: > ```Ready Player 1``` |
-> | - |
-> | 2. **<KBD> LEGACY </KBD>** :warning: ```Game Over``` |
-
-Within  **STANDARD**, you have a choice of 2 Types of K8s Storage Services. ```Replicated PV``` and ```Local PV```.
-
----
-
 | Type | Storage Engine   | Type of data services                                                     | Status                      |  In OSS ver  |
 | :---: | :---             | :---                                                                      | :---                       |  :---:  |   
 | ```Replicated_PV``` |         | Replicated data volumes (in a Cluster wide vSAN block mode fabric)  |                             |          |
