@@ -111,10 +111,9 @@ helm delete `<RELEASE NAME>` -n `<RELEASE NAMESPACE>`
 | localpv-provisioner.rbac.create | bool | `true` |  |
 | lvm-localpv.crds.csi.volumeSnapshots.enabled | bool | `false` |  |
 | lvm-localpv.crds.lvmLocalPv.enabled | bool | `true` |  |
-| lvm-localpv.enabled | bool | `true` |  |
 | mayastor.crds.csi.volumeSnapshots.enabled | bool | `false` |  |
 | mayastor.csi.node.initContainers.enabled | bool | `true` |  |
-| mayastor.enabled | bool | `true` |  |
+| mayastor.etcd.clusterDomain | string | `"cluster.local"` | Kubernetes Cluster Domain |
 | mayastor.localpv-provisioner.enabled | bool | `false` |  |
 | openebs-crds.csi.volumeSnapshots.enabled | bool | `true` |  |
 | openebs-crds.csi.volumeSnapshots.keep | bool | `true` |  |
@@ -126,4 +125,3 @@ helm delete `<RELEASE NAME>` -n `<RELEASE NAMESPACE>`
 | release.version | string | `"4.1.0"` |  |
 | zfs-localpv.crds.csi.volumeSnapshots.enabled | bool | `false` |  |
 | zfs-localpv.crds.zfsLocalPv.enabled | bool | `true` |  |
-| zfs-localpv.enabled | bool | `true` |  |

@@ -40,6 +40,7 @@ mayastor:
       initContainers:
         enabled: true
   etcd:
+    # -- Kubernetes Cluster Domain
     clusterDomain: cluster.local
   localpv-provisioner:
     enabled: false
