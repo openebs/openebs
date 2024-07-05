@@ -125,3 +125,4 @@ helm delete `<RELEASE NAME>` -n `<RELEASE NAMESPACE>`
 | release.version | string | `"4.1.0"` |  |
 | zfs-localpv.crds.csi.volumeSnapshots.enabled | bool | `false` |  |
 | zfs-localpv.crds.zfsLocalPv.enabled | bool | `true` |  |
+| monitoring.enabled | bool | `false` | Enable monitoring stack for openebs engines |
