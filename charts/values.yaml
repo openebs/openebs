@@ -1,16 +1,16 @@
 release:
   version: "4.1.0"
 
-# Refer to https://github.com/openebs/dynamic-localpv-provisioner/blob/HEAD/deploy/helm/charts/values.yaml for complete set of values.
-localpv-provisioner:
-  rbac:
-    create: true
-
 openebs-crds:
   csi:
     volumeSnapshots:
       enabled: true
       keep: true
+
+# Refer to https://github.com/openebs/dynamic-localpv-provisioner/blob/HEAD/deploy/helm/charts/values.yaml for complete set of values.
+localpv-provisioner:
+  rbac:
+    create: true
 
 # Refer to https://github.com/openebs/zfs-localpv/blob/HEAD/deploy/helm/charts/values.yaml for complete set of values.
 zfs-localpv:
@@ -47,6 +47,13 @@ mayastor:
   crds:
     enabled: false
 
+# Refer to https://github.com/openebs/monitoring/blob/HEAD/deploy/charts/values.yaml for complete set of values.
+monitoring:
+  # -- Enable monitoring stack for openebs engines
+  enabled: false
+  localpv-provisioner:
+    enabled: false
+
 # -- Configuration options for pre-upgrade helm hook job.
 preUpgradeHook:
   image:
@@ -68,10 +75,3 @@ engines:
   replicated:
     mayastor:
       enabled: true
-
-# Refer to https://github.com/openebs/monitoring/blob/HEAD/deploy/charts/values.yaml for complete set of values.
-monitoring:
-  # -- Enable monitoring stack for openebs engines
-  enabled: false
-  localpv-provisioner:
-    enabled: false
