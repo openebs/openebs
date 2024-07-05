@@ -32,6 +32,7 @@ openebs
 ├── (default) Local PV LVM
 ├── (default) Local PV ZFS
 └── (default) Replicated PV Mayastor
+└── (optional) Monitoring
 ```
 
 ### Prerequisites
@@ -97,6 +98,8 @@ helm delete `<RELEASE NAME>` -n `<RELEASE NAMESPACE>`
 | https://openebs.github.io/lvm-localpv | lvm-localpv | 1.6.0 |
 | https://openebs.github.io/mayastor-extensions | mayastor | 2.7.0 |
 | https://openebs.github.io/zfs-localpv | zfs-localpv | 2.6.0 |
+| https://openebs.github.io/monitoring | monitoring | 3.0.0 |
+
 
 ## Values
 

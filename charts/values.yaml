@@ -67,3 +67,7 @@ engines:
   replicated:
     mayastor:
       enabled: true
+
+# Refer to https://github.com/openebs/monitoring/blob/develop/deploy/charts/values.yaml for complete set of values.
+monitoring:
+  enabled: false
