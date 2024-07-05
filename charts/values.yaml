@@ -69,7 +69,7 @@ engines:
     mayastor:
       enabled: true
 
-# Refer to https://github.com/openebs/monitoring/blob/develop/deploy/charts/values.yaml for complete set of values.
+# Refer to https://github.com/openebs/monitoring/blob/HEAD/deploy/charts/values.yaml for complete set of values.
 monitoring:
   enabled: false
   localpv-provisioner:
