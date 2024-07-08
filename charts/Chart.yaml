@@ -32,7 +32,3 @@ dependencies:
     version: 2.7.0
     repository: "https://openebs.github.io/mayastor-extensions"
     condition: engines.replicated.mayastor.enabled
-  - name: monitoring
-    version: 3.0.0
-    repository: "https://openebs.github.io/monitoring"
-    condition: monitoring.enabled
