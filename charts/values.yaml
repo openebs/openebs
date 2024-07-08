@@ -47,13 +47,6 @@ mayastor:
   crds:
     enabled: false
 
-# Refer to https://github.com/openebs/monitoring/blob/HEAD/deploy/charts/values.yaml for complete set of values.
-monitoring:
-  # -- Enable monitoring stack for openebs engines
-  enabled: false
-  localpv-provisioner:
-    enabled: false
-
 # -- Configuration options for pre-upgrade helm hook job.
 preUpgradeHook:
   image:

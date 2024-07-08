@@ -112,7 +112,6 @@ helm delete `<RELEASE NAME>` -n `<RELEASE NAMESPACE>`
 | mayastor.csi.node.initContainers.enabled | bool | `true` |  |
 | mayastor.etcd.clusterDomain | string | `"cluster.local"` | Kubernetes Cluster Domain |
 | mayastor.localpv-provisioner.enabled | bool | `false` |  |
-| monitoring.enabled | bool | `false` | Enable monitoring stack for openebs engines |
 | openebs-crds.csi.volumeSnapshots.enabled | bool | `true` |  |
 | openebs-crds.csi.volumeSnapshots.keep | bool | `true` |  |
 | preUpgradeHook | object | `{"image":{"pullPolicy":"IfNotPresent","registry":"docker.io","repo":"bitnami/kubectl","tag":"1.25.15"}}` | Configuration options for pre-upgrade helm hook job. |
