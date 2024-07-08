@@ -72,7 +72,7 @@ To view the chart and get the following output.
 helm ls -n openebs 
 
 NAME    NAMESPACE       REVISION        UPDATED                                 STATUS          CHART           APP VERSION
-openebs openebs         1               2024-03-25 09:13:00.903321318 +0000 UTC deployed        openebs-4.1.0   4.1.0
+openebs openebs         1               2024-07-07 09:13:00.903321318 +0000 UTC deployed        openebs-4.1.0   4.1.0
 ```
 
 As a next step [verify the installation](https://openebs.io/docs/quickstart-guide/installation#verifying-openebs-installation) and do the [post installation](https://openebs.io/docs/quickstart-guide/installation#post-installation-considerations) steps.
