@@ -81,7 +81,7 @@ STANDARD is optimized for NVMe and SSD Flash storage media, and integrates ultra
 ## Deployment
 - In-cloud: (AWS EC2/EKS, Google GCP/GKE, Azure VM/AKS, Oracle OCI, IBM/RedHat OpenShift, Civo Cloud, Hetzner Cloud... and more)
 - On-Premise: Bare Metal, Virtualzied Hypervisor infra using VMWare ESXi, KVM/QEMU (K8s KubeVirt), Proxmox
-- Deployed as native K8s elemets: ```Deployments```, ```Containers```, ```Servcies```, ```Stateful sets```, ```CRD's```, ```Sidecars```, ```Jobs``` and ```Binaries``` all on K8s worker nodes.
+- Deployed as native K8s elemets: ```Deployments```, ```Containers```, ```Services```, ```Stateful sets```, ```CRD's```, ```Sidecars```, ```Jobs``` and ```Binaries``` all on K8s worker nodes.
 - Runs 100% in K8s userspace. So it's highly portable and run across many OS's & platforms.
 
 ## Roadmap (as of June 2024)
