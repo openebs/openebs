@@ -15,21 +15,21 @@ OpenEBS is a modern Block-Mode storage platform, a Hyper-Converged software Stor
 > - Block devices, LVM, ZFS, ext2/ext3/ext4, XFS, BTRFS...and more
 > - 100% Cloud-Native K8s declarative storage platform
 > - A cluster-wide vSAN block-mode fabric that provides containers/Pods with HA resilient access to storage across the entire cluster.
-> - Node local K8s PV's and n-way Replciated K8s PV's
+> - Node local K8s PVs and n-way Replicated K8s PVs
 > - Deployable On-premise & in-cloud: (AWS EC2/EKS, Google GCP/GKE, Azure VM/AKS, Oracle OCI, IBM/RedHat OpenShift, Civo Cloud, Hetzner Cloud... and more)
 > - Enterprise Grade data management capabilities such as **snapshots, clones, replicated volumes, DiskGroups, Volume Groups, Aggregates, RAID** <BR>
 <BR>
 
 | Type | Storage Engine   | Type of data services                                                     | Status                      |  In OSS ver  |
 | :---: | :---             | :---                                                                      | :---                       |  :---:  |   
-| ```Replicated_PV``` |         | Replicated data volumes (in a Cluster wide vSAN block mode fabric)  |                             |          |
-| [<img src="https://github.com/openebs/community/blob/develop/images/replicated-pv_mayastor_183x183_t.png" alt="Replicated PV Mayastor" align="center" width="83px"/>](https://github.com/openebs/mayastor) | [Mayastor](https://github.com/openebs/mayastor) | for High Availability deploymemnts distributing & replicating volumes across the cluster | Stable, deployable in PROD <BR>[![Releases](https://img.shields.io/github/release/openebs/Mayastor/all.svg?style=flat-square)]() |  v4.0.1 |
+| ```Replicated PV``` |         | Replicated data volumes (in a Cluster wide vSAN block mode fabric)  |                             |          |
+| [<img src="https://github.com/openebs/community/blob/develop/images/replicated-pv_mayastor_183x183_t.png" alt="Replicated PV Mayastor" align="center" width="83px"/>](https://github.com/openebs/mayastor) | [Mayastor](https://github.com/openebs/mayastor) | for High Availability deployments distributing & replicating volumes across the cluster | Stable, deployable in PROD <BR>[![Releases](https://img.shields.io/github/release/openebs/Mayastor/all.svg?style=flat-square)]() |  v4.1.0 |
 |     | &nbsp;             |                                                        |                                                            |          |
-| ```Local PV``` |         | Non-replicated node local data volumes    | (Local-PV has multiple variants. See below)                | v4.0.1   |
-|  [<img src="https://github.com/openebs/community/blob/develop/images/local-pv_hostpath_183x183_t.png" alt="Local PV Hostpath" align="center" width="83px"/>](https://github.com/openebs/dynamic-localpv-provisioner) |  [Local PV HostPath](https://github.com/openebs/dynamic-localpv-provisioner) | for integration with local node hostpath (e.g. /mnt/fs1)    | Stable, deployable in PROD <BR>[![Releases](https://img.shields.io/github/release/openebs/dynamic-localpv-provisioner/all.svg?style=flat-square)]()    | v4.0.1   |
-| [<img src="https://github.com/openebs/community/blob/develop/images/local-pv_zfs_183x183_t.png" alt="Local PV ZFS" align="center" width="83px"/>](https://github.com/openebs/zfs-localpv) |  [Local PV ZFS](https://github.com/openebs/zfs-localpv)      | for integration with local ZFS storage deployments          | Stable, deployable in PROD <BR>[![Releases](https://img.shields.io/github/release/openebs/zfs-localpv/all.svg?style=flat-square)]()                   | v4.0.1   |
-| [<img src="https://github.com/openebs/community/blob/develop/images/local-pv_lvm_183x183_t.png" alt="Local PV LVM2" align="center" width="83px"/>](https://github.com/openebs/lvm-localpv) |  [Local PV LVM](https://github.com/openebs/lvm-localpv)      | for integration with local LVM2 storage deployments          | Stable, deployable in PROD <BR>[![Releases](https://img.shields.io/github/release/openebs/lvm-localpv/all.svg?style=flat-square)]()                  | v4.0.1   |
-| [<img src="https://github.com/openebs/community/blob/develop/images/local-pv_rawfile_183x163_t.png" alt="Local PV Rawfile" align="center" width="83px"/>](https://github.com/openebs/rawfile-localpv) |  [Local PV Rawfile](https://github.com/openebs/rawfile-localpv)    | for integration with Loop mounted Raw device-file filesystem | Stable, deployable in PROD, undergoing evaluation & integration <BR>```release: v0.70```   | v4.0.1   |
+| ```Local PV``` |         | Non-replicated node local data volumes    | (Local-PV has multiple variants. See below)                | v4.1.0   |
+|  [<img src="https://github.com/openebs/community/blob/develop/images/local-pv_hostpath_183x183_t.png" alt="Local PV Hostpath" align="center" width="83px"/>](https://github.com/openebs/dynamic-localpv-provisioner) |  [Local PV HostPath](https://github.com/openebs/dynamic-localpv-provisioner) | for integration with local node hostpath (e.g. /mnt/fs1)    | Stable, deployable in PROD <BR>[![Releases](https://img.shields.io/github/release/openebs/dynamic-localpv-provisioner/all.svg?style=flat-square)]()    | v4.1.0   |
+| [<img src="https://github.com/openebs/community/blob/develop/images/local-pv_zfs_183x183_t.png" alt="Local PV ZFS" align="center" width="83px"/>](https://github.com/openebs/zfs-localpv) |  [Local PV ZFS](https://github.com/openebs/zfs-localpv)      | for integration with local ZFS storage deployments          | Stable, deployable in PROD <BR>[![Releases](https://img.shields.io/github/release/openebs/zfs-localpv/all.svg?style=flat-square)]()                   | v4.1.0   |
+| [<img src="https://github.com/openebs/community/blob/develop/images/local-pv_lvm_183x183_t.png" alt="Local PV LVM2" align="center" width="83px"/>](https://github.com/openebs/lvm-localpv) |  [Local PV LVM](https://github.com/openebs/lvm-localpv)      | for integration with local LVM2 storage deployments          | Stable, deployable in PROD <BR>[![Releases](https://img.shields.io/github/release/openebs/lvm-localpv/all.svg?style=flat-square)]()                  | v4.1.0   |
+| [<img src="https://github.com/openebs/community/blob/develop/images/local-pv_rawfile_183x163_t.png" alt="Local PV Rawfile" align="center" width="83px"/>](https://github.com/openebs/rawfile-localpv) |  [Local PV Rawfile](https://github.com/openebs/rawfile-localpv)    | for integration with Loop mounted Raw device-file | Beta, deployable in testing, undergoing evaluation & integration <BR>```release: v0.70```   | v4.1.0   |
 <BR>
 
 STANDARD is optimized for NVMe and SSD Flash storage media, and integrates ultra modern cutting-edge high performance storage technologies at its core...</summary>
@@ -80,17 +80,17 @@ STANDARD is optimized for NVMe and SSD Flash storage media, and integrates ultra
 
 ## Deployment
 - In-cloud: (AWS EC2/EKS, Google GCP/GKE, Azure VM/AKS, Oracle OCI, IBM/RedHat OpenShift, Civo Cloud, Hetzner Cloud... and more)
-- On-Premise: Bare Metal, Virtualzied Hypervisor infra using VMWare ESXi, KVM/QEMU (K8s KubeVirt), Proxmox
-- Deployed as native K8s elemets: ```Deployments```, ```Containers```, ```Services```, ```Stateful sets```, ```CRD's```, ```Sidecars```, ```Jobs``` and ```Binaries``` all on K8s worker nodes.
+- On-Premise: Bare Metal, Virtualized Hypervisor infra using VMWare ESXi, KVM/QEMU (K8s KubeVirt), Proxmox
+- Deployed as native K8s resources: ```Deployments```, ```Containers```, ```Services```, ```Stateful sets```, ```CRD's```, ```Sidecars```, ```Jobs``` and ```Binaries``` all on K8s worker nodes.
 - Runs 100% in K8s userspace. So it's highly portable and run across many OS's & platforms.
 
 ## Roadmap (as of June 2024)
-- [Replciated PV Mayastor Roadmap](https://github.com/openebs/openebs/blob/main/ROADMAP.md) 
+- [OpenEBS Roadmap](https://github.com/openebs/openebs/blob/main/ROADMAP.md) 
 ---
 
 [![OpenEBS Welcome Banner](https://github.com/openebs/community/blob/develop/images/community_banner_retro_gamer_level-up-2024_transp.png)](https://www.openebs.io/)
 ## QUICKSTART : Installation <BR>
-```NOTE: ``` Depending on which of the 5 storage engines you choose to deploy, pre-requests that must be met. [See detailed quickstart docs...](https://openebs.io/docs/)<BR>
+```NOTE: ``` Depending on which of the 5 storage engines you choose to deploy, pre-requisites those must be met. [See detailed quickstart docs...](https://openebs.io/docs/)<BR>
 
 <BR>
 
@@ -103,12 +103,12 @@ STANDARD is optimized for NVMe and SSD Flash storage media, and integrates ultra
 
 > 2a. **Install the Full OpenEBS helm chart with default values.** <BR>
 >    - This installs **ALL OpenEBS Storage Engines*** in the openebs namespace and chart name as <kbd>openebs</kbd>: <BR>
->    ```Local PV Hostpath```, ```Local PV LVM```, ```Local PV ZFS```, ```Replicated Mayastor```
+>    ```Local PV Hostpath```, ```Local PV LVM```, ```Local PV ZFS```, ```Replicated PV Mayastor```
 ```Erlang
 # helm install openebs --namespace openebs openebs/openebs --create-namespace
 ```
 
-> 2b. **To Install just the OpenEBS ```Replicated Mayastor``` Storage Engine, use the following command**:
+> 2b. **To Install just the OpenEBS ```Local PV``` Storage Engines, use the following command**:
 ```Erlang
 # helm install openebs --namespace openebs openebs/openebs --set engines.replicated.mayastor.enabled=false --create-namespace
 ```
@@ -119,7 +119,7 @@ STANDARD is optimized for NVMe and SSD Flash storage media, and integrates ultra
 
 Output:
 NAME     NAMESPACE   REVISION  UPDATED                                   STATUS     CHART           APP VERSION
-openebs  openebs     1         2024-03-25 09:13:00.903321318 +0000 UTC   deployed   openebs-4.0.1   4.0.1
+openebs  openebs     1         2024-06-25 09:13:00.903321318 +0000 UTC   deployed   openebs-4.1.0   4.1.0
 ```
 
 > 4. **Verify installation**
@@ -160,7 +160,7 @@ openebs-zfs-localpv-controller-f78f7467c-k7ldb    5/5     Running   0          3
 For more details, please refer to [OpenEBS Documentation](https://openebs.io/docs/).
 
 [![CNCF logo](https://github.com/openebs/community/blob/develop/images/CNCF_member-silver-color.svg)](https://www.datacore.com/)
-OpenEBS is a CNCF project and DataCore, Inc is a CNCF Silver member. DataCore support's CNCF extensively and has funded OpenEBS participating in every KubeCon event since 2020. Our project team is managed under the CNCF Storage Landscape and we contribute to the CNCF CSI and TAG Storage project initiatives. We proudly support CNCF Cloud Native Community Groups initiatives.<BR>
+OpenEBS is a CNCF project and DataCore, Inc is a CNCF Silver member. DataCore supports CNCF extensively and has funded OpenEBS participating in every KubeCon event since 2020. Our project team is managed under the CNCF Storage Landscape and we contribute to the CNCF CSI and TAG Storage project initiatives. We proudly support CNCF Cloud Native Community Groups initiatives.<BR>
 > Project updates, subscribe to [OpenEBS Announcements](https://lists.cncf.io/g/cncf-openebs-announcements) <BR>
 > Interacting with other OpenEBS users, subscribe to [OpenEBS Users](https://lists.cncf.io/g/cncf-openebs-users)
 <BR>
@@ -170,11 +170,11 @@ OpenEBS is a CNCF project and DataCore, Inc is a CNCF Silver member. DataCore su
 
 ## Commercial Offerings
 
-Commerically supported deployments of openEBS are avaialble via key companies. (Some provide services, funding, technology, infra, rescourced to the openEBS proejct).<BR>
+Commercially supported deployments of OpenEBS are available via below companies. (Some provide services, funding, technology, infra, resources to the OpenEBS project).<BR>
 
 - [DataCore Software, Inc.](https://www.datacore.com/support/openebs/)
 - [Clouds Sky GmbH](https://cloudssky.com/en/)
 - [CodeWave](https://codewave.eu/)
 - [Gridworkz Cloud Services](https://gridworkz.com/)
 
-(openEBS OSS is a CNCF project. CNCF does not endorse any specific company).
+(OpenEBS OSS is a CNCF project. CNCF does not endorse any specific company).
