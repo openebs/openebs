@@ -20,9 +20,9 @@ _Note_: OpenEBS follows a release cadence with a new minor release every 2-3 mon
 
 |  ID  | Feature name                   | Description and user story                                            | Release, links, tracking issue, GitHub repo                                                   |
 | :--- | :----------------------------- | :--------------------------------------------------------------------- | :------------------------------------------------------------------------------------------ |
-| 1    | Multi-replica volume snapshot and CSI cloning | Able to take consistent snapshots across all available replicas of a volume                                    | Pri 1 /  Rel: (Q3 2024)    |
-| 2    | Volume resize                                 | Able to increase volume size and overlaying filesystem size with I/O continuity                                | Pri 1 /  Rel: (Q1 2024)    |
-| 3    | DiskPool resize                               | Able to increase pool capacity by expansion of underlying disk pool device(s) with I/O continuity              | Pri 1 /  Rel: (Q4 2024)    |
+| 1    | Multi-replica volume snapshot and CSI cloning | Able to take consistent snapshots across all available replicas of a volume                                    | Pri 1 /  Rel: (Q3 2024) / Completed in v4.1  |
+| 2    | Volume resize                                 | Able to increase volume size and overlaying filesystem size with I/O continuity                                | Pri 1 /  Rel: (Q1 2024) / Completed in v4.0   |
+| 3    | DiskPool resize                               | Able to increase pool capacity by expansion of underlying disk pool device(s) with I/O continuity              | Pri 1 /  Rel: (Q4 2024) / In progress for v4.2   |
 | 4    | DiskPool Aggregate media mgmt SPDK mode       | Able to create, expand & manage virtual SPDK disks that are aggregates of multiple physical media devices      | Pri 2 /  Rel: (TBD)    |
 | 4.1  | DiskPool storage media mgmt xVM mode          | New DiskPool type (xVM Mediastore) - Backend media devices are managed under LVM & ZFS kernel layers           | Pri 2 /  Rel: (TBD)    |
 | 4.2  | DiskPool Choosable Replication mode           | New DiskPool enables user to select Replicated/Non-Replicated persona for any volume type (SPDK, LVM, ZFS)     | Pri 2 /  Rel: (TBD)    |
@@ -41,15 +41,17 @@ _Note_: OpenEBS follows a release cadence with a new minor release every 2-3 mon
 | 8.1  | GUI Mgmt Portal & Dashboard : On-Prem         | Mgmt portal & Dashboard deployed privately on-prem for air-gapped architectures                                     | Pri 3 /  Rel: (Out-of-scope)    |
 | 8.2  | GUI Mgmt Portal & Dashboard : In-Cloud SaaS   | Mgmt portal & Dashboard deployed as SaaS privately in-cloud for cloud enabled architectures                        | Pri 3 /  Rel: (Out-of-scope)    |
 | 8.3  | GUI Mgmt Portal & Dashboard : Global view     | Mgmt portal aggregated Global world view of all k8s clusters configured to contribute anonymized global stats     | Pri 3 /  Rel: (Out-of-scope)    |
-| 9    | Storage Encryption                            | Provision Encrypted data-at-rest volume via SPDK LVol layer - multi File system support (ext3, ext4, XFS, BRFS, SSDFS)  | Pri 1 /  Rel: (Q4 2024)    |
-| 10   | Health & Supportability metrics + Dashboard   | Deep health diagnostics view of all elements OpenEBS manages - enable Metric inclusion in Support Bundle uploads |  Pri 2 /  Rel: (Q3 2024*)   |
+| 9    | Storage Encryption                            | Provision Encrypted data-at-rest volume via SPDK LVol layer                                                       | Pri 1 /  Rel: (Q4 2024) / In progress for v4.2   |
+| 10   | Health & Supportability metrics + Dashboard   | Deep health diagnostics view of all elements OpenEBS manages - enable Metric inclusion in Support Bundle uploads |  Pri 2 /  Rel: (TBD)  |
 | 11   | E2E Storage UNMAP reclaim integration         | Support Discard: LINUX / UNMAP: SCSI / Deallocate: NVMe issued from filesystem down to SPDK Blobstor elements    | Pri 3 /  Rel: (TBD)    |
 | 12   | Thin provisioning phase-2                     | Thin Provision awareness and integrations with DiskPool metrics, pre-emptive intelligence actions                   | Pri 3 /  Rel: (TBD)    |
 | 13   | Native Object Store                           | An S3-compliant fast object store   integrated with SPDK LVstore/LVols Blobstor & HyperLocal-PV vols               | Pri 3 /  Rel: (Out-of-scope)    |
-| 14   | Replica topology                              | Replica distribution based on pool and node topologies                                                            | Pri 1 /  Rel: (Q3 2024)   |
-| 15   | Zoned-SSD support                             | Integrated Western Digital Team's Mayastor ZNS feature for very high performance vols                             | Pri 3 /  Rel: (Q4 2024)   |
-| 16   | NVMe-oF over RDMA support                     | Support for NVMe-oF over RDMA as transport for higher performance                                                | Pri 1 /  Rel: (Q4 2024)   |
-| 17   | Local PV CI and E2E hardening                 | Enhancing CI and E2E of Local PV engines with more tests                                                         | Pri 1 /  Rel: (Q4 2024)   |
+| 14   | Replica topology                              | Replica distribution based on pool and node topologies                                                            | Pri 1 /  Rel: (Q3 2024) / In progress for v4.2  |
+| 15   | Zoned-SSD support                             | Integrated Western Digital Team's Mayastor ZNS feature for very high performance vols                             | Pri 3 /  Rel: (Q4 2024) / In progress for v4.2  |
+| 16   | NVMe-oF over RDMA support                     | Support for NVMe-oF over RDMA as transport for higher performance                                                | Pri 1 /  Rel: (Q4 2024) / In progress for v4.2  |
+| 17   | Local PV CI and E2E hardening                 | Enhancing CI and E2E of Local PV engines with more tests                                                         | Pri 1 /  Rel: (Q4 2024) / In progress for v4.2  |
+| 18   | Replicated Hostpath                           | Replication over hostpath volumes                                                                                | Pri 2 /  Rel: (2025)  |
+| 19   | Snapshot rebuilding                           | Rebuilding snapshot data during replica rebuilds                                                                 | Pri 2 /  Rel: (2025) / In progress  |
 <BR>
 
 ## Excluded from the roadmap
@@ -80,7 +82,6 @@ These repos are critically required for the **current** roadmap.<BR>
   - https://github.com/openebs/zfs-localpv
   - https://github.com/openebs/lvm-localpv
   - https://github.com/openebs/rawfile-localpv
-  - https://github.com/openebs/device-localpv
 
 ### Others
   - https://github.com/openebs/charts
