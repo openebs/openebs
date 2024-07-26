@@ -11,44 +11,47 @@ OpenEBS follows a lean project management approach by splitting the development 
 This table holds a list of the most active roadmap items. These are the features that are currently getting the most active focus and attention within the project.
 
 ## Current
-These are backlog items that are prioritized and planned to be completed within the next major release. While many are planned items, higher priority is given to usability, stability, resilience, Data integrity issues reported by the community.
+These are backlog items that are prioritized and planned to be completed within the next major release. While many are planned items, higher priority is given to usability, stability, resilience, data integrity issues reported by the community.
 
-
-_Note_: OpenEBS follows an aggressive release cadence with a new minor release every 2 months. For the most current plan and status check out the [release project trackers](https://github.com/orgs/openebs/projects?type=classic). This document is reviewed and updated by the maintainers after each major release.
-
+_Note_: OpenEBS follows a release cadence with a new minor release every 2-3 months.
 
 ## Mayastor Roadmap : 2024 Phase-2
 - Forward facing planned release date, Release version numbers and feature priorities are subject to change as the project Maintainers/Leadership/community continuously update and adjust the **Release Feature bundling Strategy** to react to K8s industry movements, trends and our community influence.
 
 |  ID  | Feature name                   | Description and user story                                            | Release, links, tracking issue, GitHub repo                                                   |
 | :--- | :----------------------------- | :--------------------------------------------------------------------- | :------------------------------------------------------------------------------------------ |
-| 1    | Multi-replica volume snapshot and CSI cloning | Able to take consistent snapshots across all available replicas of a volume                                    | Pri 1 /  Rel: (Q1 2024)    |
-| 2    | Volume resize                                 | Able to increase volume size and overlaying filesystem size with I/O continuity                                | Pri 1 /  Rel: (Q1 2024)    |
-| 3    | DiskPool resize                               | Able to increase pool capacity by expansion of underlying disk pool device(s) with I/O continuity              | Pri 1 /  Rel: (Q1 2024)    |
-| 4    | DiskPool Aggregate media mgmt SPDK mode       | Able to create, expand & manage virtual SPDK disks that are aggregates of multiple physical media devices      | Pri 1 /  Rel: (Q2 2024)    |
-| 4.1  | DiskPool storage media mgmt xVM mode          | New DiskPool type (xVM Mediastore) - Backend media devices are managed under LVM & ZFS kernel layers           | Pri 1 /  Rel: (Q2 2024)    |
-| 4.2  | DiskPool Choosable Replication mode           | New DiskPool enables user to select Replicated/Non-Replicated persona for any volume type (SPDK, LVM, ZFS)     | Pri 1 /  Rel: (Q2 2024)    |
-| 4.3  | DiskPool Chosable Data Protection mode        | New DiskPool enables RAID Levels 0,1,4,5,6,10 & Z,Z2,Z3 via DiskPool modes LVM & ZFS integrations              | Pri 1 /  Rel: (Q2 2024)    |
-| 5    | DiskPool Erasure Coded Data Protection mode   | New DiskPool enables Distributed Erasure Coding Data Protection as an alternative to RAID architecture         | Pri 1 /  Rel: (Q2 2024)    |
-| 6    | Local-PV Data-Engine integrated + enabled     | Dynamically provision a persistent volume of LocalPV (non-replicated) type using non-SPDK managed storage      | Pri 1 /  Rel: (Q1 2024)   |
-| 6.1  | Local-PV Hostpath integrated + enabled        | Able to provision a persistent volume of Local-PV (non-replicated) using type : K8s Hostpath addressed storage  | Pri 2 /  Rel: (Q2 2024)   |
-| 6.2  | Local-PV Device enabled                       | Able to provision a persistent volume of Local-PV (non-replicated) using type : K8s Device addressed storage    | Pri 2 /  Rel: (Q2 2024)   |
-| 6.3  | Local-PV RawFile Soft Luns enabled            | Able to provision a persistent volume of Local-PV (non-replicated) using type : K8s Soft Filesystem lun addressed storage    | Pri 3 /  Rel: (Q3 2024)  |
-| 6.4  | Local-PV RawFile Multi-F/S support            | Multi filesystems support for Local-PV RawFile Soft luns : ext3, ext4, XFS, BTRFS, f2fs, SSDFS, ZNS                    | Pri 3 /  Rel: (Q3 2024)   |
-| 6.5  | NDM enabled                                   | NDM support for all Local-PV dependant services                                                                 | Pri 2 /  Rel: (Q2 2024)   |
-| 7    | HyperLocal-PV Data-Engine                     | Dynamically provision a non-replicated PV of Local-PV type via SPDK blobstor LVol as storage + NVMe target device |  Pri 2 /  Rel: (Q2 2024)   |
-| 7.1  | HyperLocal-PV : UBlock mode                   | Non-replicated PV of Local-PV type via UBlock kernel integration to SPDK blobstor LVol as storage                  |  Pri 2 /  Rel: (Q2 2024)   |
-| 7.2  | HyperLocal-PV : PCIe mode                     | Non-replicated PV of Local-PV type via PCIe-based NVMe kernel integration to SPDK blobstor LVol as storage         |  Pri 2.5 /  Rel: (Q2 2024)*   |
-| 8    | GUI Mgmt Portal & Dashboard                   | Provision, manage, monitor Mayastor deployments with a RESTful GUI interface - @ parity with Shell & kubectl cmds | Pri 3 /  Rel: (Q3 2024)    |
-| 8.1  | GUI Mgmt Portal & Dashboard : On-Prem         | Mgmt portal & Dashboard deployed privately on-prem for air-gapped architectures                                     | Pri 3 /  Rel: (Q3 2024)    |
-| 8.2  | GUI Mgmt Portal & Dashboard : In-Cloud SaaS   | Mgmt portal & Dashbord deployed as SaaS privately in-cloud for cloud enabled architectures                        | Pri 3 /  Rel: (Q3 2024)    |
-| 8.3  | GUI Mgmt Portal & Dashboard : Global view     | Mgmt portal aggregated Global world view of all k8s clusters configured to contribute anonymized global stats     | Pri 3 /  Rel: (Q3 2024)    |
-| 9    | Storage Encryption                            | Provision Encrypted data-at-rest volume via SPDK LVol layer - multi File system support (ext3, ext4, XFS, BRFS, SSDFS)  | Pri 3 /  Rel: (Q3 2024)    |
-| 10   | Health & Supportability metrics + Dashboard   | Deep health diagnostics view of all elements OpenEBS manages - enable Metric inclusion in Support Bundle upoloads |  Pri 2.5 /  Rel: (Q2 2024*)   |
-| 11   | E2E Storage UNMAP reclaim integration         | Support Discard: LINUX / UNMAP: SCSI / Deallocate: NVMe issued from filesystem down to SPDK Blobstor elements    | Pri 3 /  Rel: (Q4 2024)    |
-| 12   | Thin provisioning phase-2                     | Thin Provision awareness and integrations with DiskPool metrics, pre-emptive intelligence actions                   | Pri 3 /  Rel: (Q4 2024)    |
-| 13   | Native Object Store                           | An S3-compliant fast object store   integrated with SPDK LVstore/LVols Blobstor & HyperLocal-PV vols               | Pri 3 /  Rel: (Q4 2024)    |
-| 14   | Zoned-SSD support                             | Integrated Western Digital Team's Mayastor ZNS feature for very high performance vols                             | Pri 2.5 /  Rel: (Q2 2024)   |
+| 1    | Multi-replica volume snapshot and CSI cloning | Able to take consistent snapshots across all available replicas of a volume                                    | Pri 1 /  Rel: (Q3 2024) / Completed in v4.1  |
+| 2    | Volume resize                                 | Able to increase volume size and overlaying filesystem size with I/O continuity                                | Pri 1 /  Rel: (Q1 2024) / Completed in v4.0   |
+| 3    | DiskPool resize                               | Able to increase pool capacity by expansion of underlying disk pool device(s) with I/O continuity              | Pri 1 /  Rel: (Q4 2024) / In progress for v4.2   |
+| 4    | DiskPool Aggregate media mgmt SPDK mode       | Able to create, expand & manage virtual SPDK disks that are aggregates of multiple physical media devices      | Pri 2 /  Rel: (TBD)    |
+| 4.1  | DiskPool storage media mgmt xVM mode          | New DiskPool type (xVM Mediastore) - Backend media devices are managed under LVM & ZFS kernel layers           | Pri 2 /  Rel: (TBD)    |
+| 4.2  | DiskPool Choosable Replication mode           | New DiskPool enables user to select Replicated/Non-Replicated persona for any volume type (SPDK, LVM, ZFS)     | Pri 2 /  Rel: (TBD)    |
+| 4.3  | DiskPool Chosable Data Protection mode        | New DiskPool enables RAID Levels 0,1,4,5,6,10 & Z,Z2,Z3 via DiskPool modes LVM & ZFS integrations              | Pri 2 /  Rel: (TBD)    |
+| 5    | DiskPool Erasure Coded Data Protection mode   | New DiskPool enables Distributed Erasure Coding Data Protection as an alternative to RAID architecture         | Pri 3 /  Rel: (TBD)    |
+| 6    | Local-PV Data-Engine integrated + enabled     | Dynamically provision a persistent volume of LocalPV (non-replicated) type using non-SPDK managed storage      | Pri 3 /  Rel: (TBD)   |
+| 6.1  | Local-PV Hostpath integrated + enabled        | Able to provision a persistent volume of Local-PV (non-replicated) using type : K8s Hostpath addressed storage  | Pri 2 /  Rel: (TBD)   |
+| 6.2  | Local-PV Device enabled                       | Able to provision a persistent volume of Local-PV (non-replicated) using type : K8s Device addressed storage    | Pri 3 /  Rel: (Dropped, Archived)   |
+| 6.3  | Local-PV RawFile Soft Luns enabled            | Able to provision a persistent volume of Local-PV (non-replicated) using type : K8s Soft Filesystem lun addressed storage    | Pri 3 /  Rel: (2025)  |
+| 6.4  | Local-PV RawFile Multi-F/S support            | Multi filesystems support for Local-PV RawFile Soft luns : ext3, ext4, XFS, BTRFS, f2fs, SSDFS, ZNS                    | Pri 3 /  Rel: (2025)   |
+| 6.5  | NDM enabled                                   | NDM support for all Local-PV dependant services                                                                 | Pri 2 /  Rel: (Dropped, Archived)   |
+| 7    | HyperLocal-PV Data-Engine                     | Dynamically provision a non-replicated PV of Local-PV type via SPDK blobstor LVol as storage + NVMe target device |  Pri 2 /  Rel: (2025)   |
+| 7.1  | HyperLocal-PV : UBlock mode                   | Non-replicated PV of Local-PV type via UBlock kernel integration to SPDK blobstor LVol as storage                  |  Pri 2 /  Rel: (2025)   |
+| 7.2  | HyperLocal-PV : PCIe mode                     | Non-replicated PV of Local-PV type via PCIe-based NVMe kernel integration to SPDK blobstor LVol as storage         |  Pri 2 /  Rel: (2025)*   |
+| 8    | GUI Mgmt Portal & Dashboard                   | Provision, manage, monitor Mayastor deployments with a RESTful GUI interface - @ parity with Shell & kubectl cmds | Pri 3 /  Rel: (Out-of-scope)    |
+| 8.1  | GUI Mgmt Portal & Dashboard : On-Prem         | Mgmt portal & Dashboard deployed privately on-prem for air-gapped architectures                                     | Pri 3 /  Rel: (Out-of-scope)    |
+| 8.2  | GUI Mgmt Portal & Dashboard : In-Cloud SaaS   | Mgmt portal & Dashboard deployed as SaaS privately in-cloud for cloud enabled architectures                        | Pri 3 /  Rel: (Out-of-scope)    |
+| 8.3  | GUI Mgmt Portal & Dashboard : Global view     | Mgmt portal aggregated Global world view of all k8s clusters configured to contribute anonymized global stats     | Pri 3 /  Rel: (Out-of-scope)    |
+| 9    | Storage Encryption                            | Provision Encrypted data-at-rest volume via SPDK LVol layer                                                       | Pri 1 /  Rel: (Q4 2024) / In progress for v4.2   |
+| 10   | Health & Supportability metrics + Dashboard   | Deep health diagnostics view of all elements OpenEBS manages - enable Metric inclusion in Support Bundle uploads |  Pri 2 /  Rel: (TBD)  |
+| 11   | E2E Storage UNMAP reclaim integration         | Support Discard: LINUX / UNMAP: SCSI / Deallocate: NVMe issued from filesystem down to SPDK Blobstor elements    | Pri 3 /  Rel: (TBD)    |
+| 12   | Thin provisioning phase-2                     | Thin Provision awareness and integrations with DiskPool metrics, pre-emptive intelligence actions                   | Pri 3 /  Rel: (TBD)    |
+| 13   | Native Object Store                           | An S3-compliant fast object store   integrated with SPDK LVstore/LVols Blobstor & HyperLocal-PV vols               | Pri 3 /  Rel: (Out-of-scope)    |
+| 14   | Replica topology                              | Replica distribution based on pool and node topologies                                                            | Pri 1 /  Rel: (Q3 2024) / In progress for v4.2  |
+| 15   | Zoned-SSD support                             | Integrated Western Digital Team's Mayastor ZNS feature for very high performance vols                             | Pri 3 /  Rel: (Q4 2024) / In progress for v4.2  |
+| 16   | NVMe-oF over RDMA support                     | Support for NVMe-oF over RDMA as transport for higher performance                                                | Pri 1 /  Rel: (Q4 2024) / In progress for v4.2  |
+| 17   | Local PV CI and E2E hardening                 | Enhancing CI and E2E of Local PV engines with more tests                                                         | Pri 1 /  Rel: (Q4 2024) / In progress for v4.2  |
+| 18   | Replicated Hostpath                           | Replication over hostpath volumes                                                                                | Pri 2 /  Rel: (2025)  |
+| 19   | Snapshot rebuilding                           | Rebuilding snapshot data during replica rebuilds                                                                 | Pri 2 /  Rel: (2025) / In progress  |
 <BR>
 
 ## Excluded from the roadmap
@@ -57,9 +60,13 @@ The Roadmap is focused exclusively on the modern **Mayastor* Data-Engines in the
 It does not define any net-new features or capabilities for any OpenEBS **LEGACY** projects or projects that are tagged & defined as DEPRECATED or ARCHIVED. (Currently those projects are as follows):<BR>
 | ID  | Data-Engines      | Embedded tech stack  | Status                           |
 |-----|-------------------|----------------------|--------------------------------------------|
-|  1  |  Jiva             | iSCSI                | We plan to ARCHIVE & sunset LEGACY in 2024 |
-|  2  |  cStor            | Open ZFS             | We plan to ARCHIVE & sunset LEGACY in 2024 |
-|  2  |  NFS Provisioner  | NFS userspace server | We plan to ARCHIVE & sunset LEGACY in 2024 |
+|  1  |  Jiva             | iSCSI                | ARCHIVED & sunset LEGACY in 2024 with v4.0 |
+|  2  |  cStor            | Open ZFS             | ARCHIVED & sunset LEGACY in 2024 with v4.0 |
+|  3  |  NFS Provisioner  | NFS userspace server | ARCHIVED & sunset LEGACY in 2024 with v4.0 |
+|  4  |  NDM              | Node Device Mgmt     | ARCHIVED & sunset LEGACY in 2024 with v4.0 |
+|  5  |  Local PV Device  | Local device as PV   | ARCHIVED & sunset LEGACY in 2024 with v4.0 |
+|  6  |  Local PV Partition | Device partition as PV | ARCHIVED & sunset LEGACY in 2024 with v4.0 |
+|  7  |  Data Populator   | Data ingestion       | ARCHIVED & sunset LEGACY in 2024 with v4.1 |
 <BR>
 
 ## Mayastor Source repositories
@@ -71,58 +78,18 @@ These repos are critically required for the **current** roadmap.<BR>
   - https://github.com/openebs/mayastor-docs
 
 ### Dynamic Local PVs repos
-- (These repos are integrating into Mayastor to be included as part of the Mayastor STANDARD edition - Q1 2024)
   - https://github.com/openebs/dynamic-localpv-provisioner
   - https://github.com/openebs/zfs-localpv
   - https://github.com/openebs/lvm-localpv
   - https://github.com/openebs/rawfile-localpv
-  - https://github.com/openebs/device-localpv
-  - https://github.com/openebs/node-disk-manager
-
-- Backlogs
-  - Shared VG for LVM Local PV.
-
-## Backlogs in-progress (under active development)
-  - New set of items to be updated Feb 2024
-
-## Backlogs (near-term)
-  - Support for hot upgrade, business continuity with no downtime.
-  - Support for volume groups, i.e. Mayastor replica placement should be topology aware for statefulsets zonal (or HA) distribution.
 
 ### Others
   - https://github.com/openebs/charts
   - https://github.com/openebs/openebsctl
   - https://github.com/openebs/monitoring
   - https://github.com/openebs/website
-  - https://github.com/openebs/m-exporter
-  - https://github.com/openebs/dynamic-nfs-provisioner
-- Backlogs
 
-
-## Repos to be DEPRECATED and ARCHIVED
-### Jiva
-- Source repositories
-  - https://github.com/openebs/jiva
-  - https://github.com/openebs/jiva-operator
-- Backlogs
-  - None
-
-
-### cStor
-- Source repositories
-  - https://github.com/openebs/libcstor
-  - https://github.com/openebs/node-disk-manager
-  - https://github.com/openebs/istgt
-  - https://github.com/openebs/cstor-csi
-  - https://github.com/openebs/cstor-operators
-  - https://github.com/openebs/velero-plugin
-  - https://github.com/openebs/api
-  - https://github.com/openebs/upgrade
-- Backlogs
-  - Upstream uZFS changes and start using them instead of a local fork
-
-
-## Old items (needs tidy-up)
+## Previous roadmap items (mostly completed, need tidying-up)
 
 Typically the items under this category fall under next major release.
 - Support for pluggable storage backend for Mayastor (example: replace blobstore with lvm)
