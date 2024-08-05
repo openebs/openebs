@@ -8,6 +8,13 @@ OpenEBS is a modern Block-Mode storage platform, a Hyper-Converged software Stor
 
 <BR>
 
+## Monthly Community Meetings
+The community meetings are usually held monthly on the last thursday of the month at 14:00 UTC. <BR>
+The meeting is currently held on google meet: https://meet.google.com/oaa-fycu-vsq <BR>
+Please check the invite for up-to-date information.
+
+<BR>
+
 > [!IMPORTANT]
 > **OpenEBS provides**... <BR>
 > - Stateful persistent Dynamically provisioned storage volumes for Kubernetes
