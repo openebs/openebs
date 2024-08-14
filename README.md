@@ -11,7 +11,7 @@ OpenEBS is a modern Block-Mode storage platform, a Hyper-Converged software Stor
 ## Monthly Community Meetings
 The community meetings are usually held monthly on the last thursday of the month at 14:00 UTC. <BR>
 The meeting is currently held on google meet: https://meet.google.com/oaa-fycu-vsq <BR>
-Please check https://calendar.app.google/TBQthr3oW42uyJqz5 for the upcoming schedule.
+Please check [the calendar](https://calendar.app.google/KMXYyGwYAA3Uw6gK6) for the upcoming schedule.
 
 <BR>
 
