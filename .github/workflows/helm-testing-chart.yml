@@ -1,0 +1,20 @@
+name: Helm Testing Chart
+on:
+  push:
+    branches:
+      - 'helm-testing/**'
+    paths:
+      - 'charts/**'
+      - '.github/**'
+
+jobs:
+  helm-testing-chart:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Publish Incremental Umbrella Helm chart
+        uses: stefanprodan/helm-gh-pages@v1.7.0
+        with:
+          token: ${{ secrets.ORG_CI_GITHUB }}
+          charts_dir: .
+          repository: openebs-chart-donotuse
+          branch: gh-pages
