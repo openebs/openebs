@@ -19,5 +19,5 @@ jobs:
         with:
           token: ${{ secrets.ORG_CI_GITHUB }}
           charts_dir: .
-          repository: openebs-chart-donotuse
+          repository: mayastor-chart-donotuse
           branch: gh-pages
