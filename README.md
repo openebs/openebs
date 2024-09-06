@@ -1,5 +1,4 @@
-## Welcome to OpenEBS
-[![OpenEBS Welcome Banner](https://github.com/openebs/community/blob/develop/images/waterfalls-Gamer-16-bit-pixel-art_HERO_banner.png)](https://www.openebs.io/)
+## Project Purpose
 
 OpenEBS is an open-source storage service for Kubernetes applications. OpenEBS manages the block storage and file systems based on the block storage for containers running in Kubernetes. Use OpenEBS for creating fast and resilient storage; with options for single-node, and replicated multi-node storage..<BR>
 
