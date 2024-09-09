@@ -1,7 +1,6 @@
-## Welcome to OpenEBS
-[![OpenEBS Welcome Banner](https://github.com/openebs/community/blob/develop/images/waterfalls-Gamer-16-bit-pixel-art_HERO_banner.png)](https://www.openebs.io/)
+## Project Purpose
 
-OpenEBS is a modern Block-Mode storage platform, a Hyper-Converged software Storage System and virtual NVMe-oF SAN (vSAN) Fabric that is natively integrated into the core of Kubernetes.<BR>
+OpenEBS is an open-source storage service for Kubernetes applications. OpenEBS manages the block storage and file systems based on the block storage for containers running in Kubernetes. Use OpenEBS for creating fast and resilient storage; with options for single-node, and replicated multi-node storage.<BR>
 
 | [<img src="https://github.com/openebs/community/blob/develop/images/slack_icon_small.png" width="100">](https://kubernetes.slack.com/messages/openebs)  | **Try our Slack channel** <BR>If you have questions about using OpenEBS, please use the CNCF Kubernetes **OpenEBS slack channel**, it is open for [anyone to ask a question](https://kubernetes.slack.com/messages/openebs/) <BR> |
 | :---         | :---      |
@@ -9,44 +8,52 @@ OpenEBS is a modern Block-Mode storage platform, a Hyper-Converged software Stor
 <BR>
 
 ## Monthly Community Meetings
-TThe community meetings are usually held monthly on the last thursday of the month at 14:00 UTC.<BR>
-The meeting is currently held on Zoom: https://us05web.zoom.us/j/87535654586?pwd=CigbXigJPn38USc6Vuzt7qSVFoO79X.1<BR>
-Upcoming meeting: 29 Aug 2024 at 14:00 UTC
+OpenEBS holds a monthly community meeting via Zoom on the last Thursday of the month, at 14:00 UTC.
+<br>
+The next meeting is on: `Thursday 26 September, at 14:00 UTC`
+<br>
+Meeting Link: https://us05web.zoom.us/j/87535654586?pwd=CigbXigJPn38USc6Vuzt7qSVFoO79X.1
+<br>
+Starting in August 2024, the meetings will be recorded and posted on YouTube. [Check here](https://www.youtube.com/@openebscommunity6021)
+<BR>
+
+## Why OpenEBS?
+OpenEBS provides enterprise-grade data management for Kubernetes clusters, with five storage engines (four single-node and one replicated) that meet a range of use cases for Kubernetes users. The five engines are summarized in the table below:
+<BR>
+> [!IMPORTANT]
+> The openEBS platform, provides 2 types of K8s Storage Services. ```Replicated PV``` and ```Local PV```.
+<BR>
+
+| Engine | [Local PV HostPath](https://github.com/openebs/dynamic-localpv-provisioner) | [Local PV ZFS](https://github.com/openebs/zfs-localpv) | [Local PV LVM](https://github.com/openebs/lvm-localpv)  | [Local PV Rawfile](https://github.com/openebs/rawfile-localpv) | [Replicated PV Mayastor](https://github.com/openebs/mayastor) |
+| :---:  | :---              | :---         | :---         | :---:            | :---:                  | 
+| Type   | Single-node       | Single-node  | Single-node  |  Single-node     | Multi-node             |
+| What is it for?   | Replacement for in-Tree Kubernetes CSI HostPath       | Storage engine for ZFS managed backend storage  | Storage engine for LVM2 managed backend storage  |  Experimental engine for using an extent file as block storage     | General purpose replicated enterprise storage           |
+| Designed for | Developers or DevOps | ZFS users and production deployments | LVM2 users and production deployments | Developers | Enterprises and production deployments |
+| Features | Everything in Kubernetes HostPath, plus: - Dynamic provisioning, Zero configuration, No CSI driver | Provision ZFS datasets, Provision ZFS volumes, Dynamic provisioning, ZFS resilience, ZFS RAID protection, CSI driver | Provision LVM2 volumes, Dynamic provisioning, LVM2 RAID protection, CSI driver | Provision file system from local files as persistent volumes, CSI driver | Replicated storage NVMe / RDMA, Snapshots, Clones, High availability, CSI driver|
+| Status | Stable, deployable in PROD  | Stable, deployable in PROD  | Stable, deployable in PROD  | Beta, undergoing evaluation & integration | Stable, deployable in PROD  | 
+| Current Version | [![Releases](https://img.shields.io/github/release/openebs/dynamic-localpv-provisioner/all.svg?style=flat-square)]() | ![Releases](https://img.shields.io/github/release/openebs/zfs-localpv/all.svg?style=flat-square) | [![Releases](https://img.shields.io/github/release/openebs/lvm-localpv/all.svg?style=flat-square)]() | ```release: v0.70``` | [![Releases](https://img.shields.io/github/release/openebs/Mayastor/all.svg?style=flat-square)]() | 
+
 <BR>
 
 > [!IMPORTANT]
 > **OpenEBS provides**... <BR>
 > - Stateful persistent Dynamically provisioned storage volumes for Kubernetes
-> - High Performance NVMe-oF & NVMe/RDMA storage transport optimized for All-Flash Solid State storage media
+> - High-performance NVMe-oF & NVMe/RDMA storage transport optimized for All-Flash Solid State storage media
 > - Block devices, LVM, ZFS, ext2/ext3/ext4, XFS, BTRFS...and more
 > - 100% Cloud-Native K8s declarative storage platform
-> - A cluster-wide vSAN block-mode fabric that provides containers/Pods with HA resilient access to storage across the entire cluster.
+> - A cluster-wide vSAN block-mode fabric that provides containers/Pods with HA-resilient access to storage across the entire cluster.
 > - Node local K8s PVs and n-way Replicated K8s PVs
 > - Deployable On-premise & in-cloud: (AWS EC2/EKS, Google GCP/GKE, Azure VM/AKS, Oracle OCI, IBM/RedHat OpenShift, Civo Cloud, Hetzner Cloud... and more)
 > - Enterprise Grade data management capabilities such as **snapshots, clones, replicated volumes, DiskGroups, Volume Groups, Aggregates, RAID** <BR>
 <BR>
 
-| Type | Storage Engine   | Type of data services                                                     | Status                      |  In OSS ver  |
-| :---: | :---             | :---                                                                      | :---                       |  :---:  |   
-| ```Replicated PV``` |         | Replicated data volumes (in a Cluster wide vSAN block mode fabric)  |                             |          |
-| [<img src="https://github.com/openebs/community/blob/develop/images/replicated-pv_mayastor_183x183_t.png" alt="Replicated PV Mayastor" align="center" width="83px"/>](https://github.com/openebs/mayastor) | [Mayastor](https://github.com/openebs/mayastor) | for High Availability deployments distributing & replicating volumes across the cluster | Stable, deployable in PROD <BR>[![Releases](https://img.shields.io/github/release/openebs/Mayastor/all.svg?style=flat-square)]() |  v4.1.0 |
-|     | &nbsp;             |                                                        |                                                            |          |
-| ```Local PV``` |         | Non-replicated node local data volumes    | (Local-PV has multiple variants. See below)                | v4.1.0   |
-|  [<img src="https://github.com/openebs/community/blob/develop/images/local-pv_hostpath_183x183_t.png" alt="Local PV Hostpath" align="center" width="83px"/>](https://github.com/openebs/dynamic-localpv-provisioner) |  [Local PV HostPath](https://github.com/openebs/dynamic-localpv-provisioner) | for integration with local node hostpath (e.g. /mnt/fs1)    | Stable, deployable in PROD <BR>[![Releases](https://img.shields.io/github/release/openebs/dynamic-localpv-provisioner/all.svg?style=flat-square)]()    | v4.1.0   |
-| [<img src="https://github.com/openebs/community/blob/develop/images/local-pv_zfs_183x183_t.png" alt="Local PV ZFS" align="center" width="83px"/>](https://github.com/openebs/zfs-localpv) |  [Local PV ZFS](https://github.com/openebs/zfs-localpv)      | for integration with local ZFS storage deployments          | Stable, deployable in PROD <BR>[![Releases](https://img.shields.io/github/release/openebs/zfs-localpv/all.svg?style=flat-square)]()                   | v4.1.0   |
-| [<img src="https://github.com/openebs/community/blob/develop/images/local-pv_lvm_183x183_t.png" alt="Local PV LVM2" align="center" width="83px"/>](https://github.com/openebs/lvm-localpv) |  [Local PV LVM](https://github.com/openebs/lvm-localpv)      | for integration with local LVM2 storage deployments          | Stable, deployable in PROD <BR>[![Releases](https://img.shields.io/github/release/openebs/lvm-localpv/all.svg?style=flat-square)]()                  | v4.1.0   |
-| [<img src="https://github.com/openebs/community/blob/develop/images/local-pv_rawfile_183x163_t.png" alt="Local PV Rawfile" align="center" width="83px"/>](https://github.com/openebs/rawfile-localpv) |  [Local PV Rawfile](https://github.com/openebs/rawfile-localpv)    | for integration with Loop mounted Raw device-file | Beta, deployable in testing, undergoing evaluation & integration <BR>```release: v0.70```   | v4.1.0   |
-<BR>
-
-STANDARD is optimized for NVMe and SSD Flash storage media, and integrates ultra modern cutting-edge high performance storage technologies at its core...</summary>
-
 >
 > :ballot_box_with_check: &nbsp; It uses the High performance [SPDK](https://spdk.io) storage stack - (SPDK is an open-source NVMe project initiated by INTEL) <BR>
-> :ballot_box_with_check: &nbsp; The hyper modern [IO_Uring](https://github.com/axboe/liburing) Linux Kernel Async polling-mode I/O Interface - (fastest kernel I/O mode possible) <BR>
+> :ballot_box_with_check: &nbsp; The hyper-modern [IO_Uring](https://github.com/axboe/liburing) Linux Kernel Async polling-mode I/O Interface - (fastest kernel I/O mode possible) <BR>
 > :ballot_box_with_check: &nbsp; Native abilities for RDMA and Zero-Copy I/O <BR>
 > :ballot_box_with_check: &nbsp; NVMe-oF TCP Block storage Hyper-converged data fabric <BR>
 > :ballot_box_with_check: &nbsp; Block layer volume replication <BR>
-> :ballot_box_with_check: &nbsp; Logical volumes and Diskpool based data managment <BR>
+> :ballot_box_with_check: &nbsp; Logical volumes and Diskpool based data management <BR>
 > :ballot_box_with_check: &nbsp; a Native high performance [Blobstore](https://spdk.io/doc/blob.html) <BR>
 > :ballot_box_with_check: &nbsp; Native Block layer Thin provisioning <BR>
 > :ballot_box_with_check: &nbsp; Native Block layer Snapshots and Clones <BR>
@@ -62,7 +69,7 @@ STANDARD is optimized for NVMe and SSD Flash storage media, and integrates ultra
 | [David Brace](https://www.linkedin.com/in/dbrace/ "Head of Product Mgmt & Strategy") | :star: <kbd>**[@orville-wright](https://github.com/orville-wright "Dave Brace")**</kbd> | ![](https://github.com/openebs/community/blob/develop/images/flags/ni_tn/nz.png "I am based in San Francisco, USA (GMT-7) Timezone") &nbsp; ![](https://github.com/openebs/community/blob/develop/images/flags/de_je/hu.png "I am based in San Francisco, USA (GMT-7) Timezone") &nbsp; ![](https://github.com/openebs/community/blob/develop/images/flags/to_zw/us.png "I am based in San Francisco, USA (GMT-7) Timezone") | <kbd>**Admin**</kbd>, ```Maintainer``` |
 
 ---
-## Activity dashbaord
+## Activity dashboard
 ![Alt](https://repobeats.axiom.co/api/embed/1e565d4d1fdfeacd2cf810f10bcb6cde7368c9ea.svg "Repobeats analytics image")
 ---
 ## Current status
@@ -88,7 +95,7 @@ STANDARD is optimized for NVMe and SSD Flash storage media, and integrates ultra
 - In-cloud: (AWS EC2/EKS, Google GCP/GKE, Azure VM/AKS, Oracle OCI, IBM/RedHat OpenShift, Civo Cloud, Hetzner Cloud... and more)
 - On-Premise: Bare Metal, Virtualized Hypervisor infra using VMWare ESXi, KVM/QEMU (K8s KubeVirt), Proxmox
 - Deployed as native K8s resources: ```Deployments```, ```Containers```, ```Services```, ```Stateful sets```, ```CRD's```, ```Sidecars```, ```Jobs``` and ```Binaries``` all on K8s worker nodes.
-- Runs 100% in K8s userspace. So it's highly portable and run across many OS's & platforms.
+- Runs 100% in K8s userspace. So it's highly portable and runs across many OSs & platforms.
 
 ## Roadmap (as of June 2024)
 - [OpenEBS Roadmap](https://github.com/openebs/openebs/blob/main/ROADMAP.md) 
@@ -96,7 +103,7 @@ STANDARD is optimized for NVMe and SSD Flash storage media, and integrates ultra
 
 [![OpenEBS Welcome Banner](https://github.com/openebs/community/blob/develop/images/community_banner_retro_gamer_level-up-2024_transp.png)](https://www.openebs.io/)
 ## QUICKSTART : Installation <BR>
-```NOTE: ``` Depending on which of the 5 storage engines you choose to deploy, pre-requisites those must be met. [See detailed quickstart docs...](https://openebs.io/docs/)<BR>
+```NOTE: ``` Depending on which of the 5 storage engines you choose to deploy, pre-requisites must be met. [See detailed quickstart docs...](https://openebs.io/docs/)<BR>
 
 <BR>
 
@@ -166,7 +173,7 @@ openebs-zfs-localpv-controller-f78f7467c-k7ldb    5/5     Running   0          3
 For more details, please refer to [OpenEBS Documentation](https://openebs.io/docs/).
 
 [![CNCF logo](https://github.com/openebs/community/blob/develop/images/CNCF_member-silver-color.svg)](https://www.datacore.com/)
-OpenEBS is a CNCF project and DataCore, Inc is a CNCF Silver member. DataCore supports CNCF extensively and has funded OpenEBS participating in every KubeCon event since 2020. Our project team is managed under the CNCF Storage Landscape and we contribute to the CNCF CSI and TAG Storage project initiatives. We proudly support CNCF Cloud Native Community Groups initiatives.<BR>
+OpenEBS is a CNCF project and DataCore, Inc. is a CNCF Silver member. DataCore supports CNCF extensively and has funded OpenEBS participating in every KubeCon event since 2020. Our project team is managed under the CNCF Storage Landscape and we contribute to the CNCF CSI and TAG Storage project initiatives. We proudly support CNCF Cloud Native Community Groups initiatives.<BR>
 > Project updates, subscribe to [OpenEBS Announcements](https://lists.cncf.io/g/cncf-openebs-announcements) <BR>
 > Interacting with other OpenEBS users, subscribe to [OpenEBS Users](https://lists.cncf.io/g/cncf-openebs-users)
 <BR>
@@ -176,7 +183,7 @@ OpenEBS is a CNCF project and DataCore, Inc is a CNCF Silver member. DataCore su
 
 ## Commercial Offerings
 
-Commercially supported deployments of OpenEBS are available via below companies. (Some provide services, funding, technology, infra, resources to the OpenEBS project).<BR>
+Commercially supported deployments of OpenEBS are available via the companies below. (Some provide services, funding, technology, infra, and resources to the OpenEBS project).<BR>
 
 - [DataCore Software, Inc.](https://www.datacore.com/support/openebs/)
 - [Clouds Sky GmbH](https://cloudssky.com/en/)
