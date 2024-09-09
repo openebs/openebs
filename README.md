@@ -1,6 +1,6 @@
 ## Project Purpose
 
-OpenEBS is an open-source storage service for Kubernetes applications. OpenEBS manages the block storage and file systems based on the block storage for containers running in Kubernetes. Use OpenEBS for creating fast and resilient storage; with options for single-node, and replicated multi-node storage..<BR>
+OpenEBS is an open-source storage service for Kubernetes applications. OpenEBS manages the block storage and file systems based on the block storage for containers running in Kubernetes. Use OpenEBS for creating fast and resilient storage; with options for single-node, and replicated multi-node storage.<BR>
 
 | [<img src="https://github.com/openebs/community/blob/develop/images/slack_icon_small.png" width="100">](https://kubernetes.slack.com/messages/openebs)  | **Try our Slack channel** <BR>If you have questions about using OpenEBS, please use the CNCF Kubernetes **OpenEBS slack channel**, it is open for [anyone to ask a question](https://kubernetes.slack.com/messages/openebs/) <BR> |
 | :---         | :---      |
