@@ -1,7 +1,7 @@
 ## Welcome to OpenEBS
 [![OpenEBS Welcome Banner](https://github.com/openebs/community/blob/develop/images/waterfalls-Gamer-16-bit-pixel-art_HERO_banner.png)](https://www.openebs.io/)
 
-OpenEBS is a modern Block-Mode storage platform, a Hyper-Converged software Storage System and virtual NVMe-oF SAN (vSAN) Fabric that is natively integrates into the core of Kubernetes.<BR>
+OpenEBS is a modern Block-Mode storage platform, a Hyper-Converged software Storage System and virtual NVMe-oF SAN (vSAN) Fabric that is natively integrated into the core of Kubernetes.<BR>
 
 | [<img src="https://github.com/openebs/community/blob/develop/images/slack_icon_small.png" width="100">](https://kubernetes.slack.com/messages/openebs)  | **Try our Slack channel** <BR>If you have questions about using OpenEBS, please use the CNCF Kubernetes **OpenEBS slack channel**, it is open for [anyone to ask a question](https://kubernetes.slack.com/messages/openebs/) <BR> |
 | :---         | :---      |
