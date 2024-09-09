@@ -8,13 +8,13 @@ OpenEBS is an open-source storage service for Kubernetes applications. OpenEBS m
 <BR>
 
 ## Monthly Community Meetings
-OpenEBS holds a monthly community meeting via Zoom on the last Thursday of the month, at 7 am Pacific time.
+OpenEBS holds a monthly community meeting via Zoom on the last Thursday of the month, at 14:00 UTC.
 <br>
 The next meeting is on: `Thursday 26 September, at 14:00 UTC`
 <br>
 Meeting Link: https://us05web.zoom.us/j/87535654586?pwd=CigbXigJPn38USc6Vuzt7qSVFoO79X.1
 <br>
-Starting in August 2024, the meetings will be recorded and posted on YouTube.
+Starting in August 2024, the meetings will be recorded and posted on YouTube. [Check here](https://www.youtube.com/@openebscommunity6021)
 <BR>
 
 ## Why OpenEBS?
@@ -46,8 +46,6 @@ OpenEBS provides enterprise-grade data management for Kubernetes clusters, with 
 > - Deployable On-premise & in-cloud: (AWS EC2/EKS, Google GCP/GKE, Azure VM/AKS, Oracle OCI, IBM/RedHat OpenShift, Civo Cloud, Hetzner Cloud... and more)
 > - Enterprise Grade data management capabilities such as **snapshots, clones, replicated volumes, DiskGroups, Volume Groups, Aggregates, RAID** <BR>
 <BR>
-
-STANDARD is optimized for NVMe and SSD Flash storage media and integrates ultra-modern cutting-edge high-performance storage technologies at its core...</summary>
 
 >
 > :ballot_box_with_check: &nbsp; It uses the High performance [SPDK](https://spdk.io) storage stack - (SPDK is an open-source NVMe project initiated by INTEL) <BR>
