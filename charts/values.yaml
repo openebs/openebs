@@ -14,7 +14,6 @@ localpv-provisioner:
 
 # Refer to https://github.com/openebs/zfs-localpv/blob/HEAD/deploy/helm/charts/values.yaml for complete set of values.
 zfs-localpv:
-  enabled: true
   crds:
     zfsLocalPv:
       enabled: true
@@ -24,7 +23,6 @@ zfs-localpv:
   
 # Refer to https://github.com/openebs/lvm-localpv/blob/HEAD/deploy/helm/charts/values.yaml for complete set of values.
 lvm-localpv:
-  enabled: true
   crds:
     lvmLocalPv:
       enabled: true
@@ -34,7 +32,6 @@ lvm-localpv:
 
 # Refer to https://github.com/openebs/mayastor-extensions/blob/v2.7.0/chart/values.yaml for complete set of values.
 mayastor:
-  enabled: true
   csi:
     node:
       initContainers:
