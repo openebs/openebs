@@ -15,7 +15,6 @@ These are backlog items that are prioritized and planned to be completed within 
 
 _Note_: OpenEBS follows a release cadence with a new minor release every 2-3 months.
 
-## Mayastor Roadmap : 2024 Phase-2
 - Forward facing planned release date, Release version numbers and feature priorities are subject to change as the project Maintainers/Leadership/community continuously update and adjust the **Release Feature bundling Strategy** to react to K8s industry movements, trends and our community influence.
 
 |  ID  | Feature name                   | Description and user story                                            | Release, links, tracking issue, GitHub repo                                                   |
@@ -54,23 +53,8 @@ _Note_: OpenEBS follows a release cadence with a new minor release every 2-3 mon
 | 19   | Snapshot rebuilding                           | Rebuilding snapshot data during replica rebuilds                                                                 | Pri 2 /  Rel: (2025) / In progress  |
 <BR>
 
-## Excluded from the roadmap
-The Roadmap is focused exclusively on the modern **Mayastor* Data-Engines in the **STANDARD** edition.
-<BR>
-It does not define any net-new features or capabilities for any OpenEBS **LEGACY** projects or projects that are tagged & defined as DEPRECATED or ARCHIVED. (Currently those projects are as follows):<BR>
-| ID  | Data-Engines      | Embedded tech stack  | Status                           |
-|-----|-------------------|----------------------|--------------------------------------------|
-|  1  |  Jiva             | iSCSI                | ARCHIVED & sunset LEGACY in 2024 with v4.0 |
-|  2  |  cStor            | Open ZFS             | ARCHIVED & sunset LEGACY in 2024 with v4.0 |
-|  3  |  NFS Provisioner  | NFS userspace server | ARCHIVED & sunset LEGACY in 2024 with v4.0 |
-|  4  |  NDM              | Node Device Mgmt     | ARCHIVED & sunset LEGACY in 2024 with v4.0 |
-|  5  |  Local PV Device  | Local device as PV   | ARCHIVED & sunset LEGACY in 2024 with v4.0 |
-|  6  |  Local PV Partition | Device partition as PV | ARCHIVED & sunset LEGACY in 2024 with v4.0 |
-|  7  |  Data Populator   | Data ingestion       | ARCHIVED & sunset LEGACY in 2024 with v4.1 |
-<BR>
-
-## Mayastor Source repositories
-These repos are critically required for the **current** roadmap.<BR>
+These repositories are critically required for the **current** roadmap.<BR>
+### Mayastor Source repositories
   - https://github.com/openebs/mayastor
   - https://github.com/openebs/mayastor-control-plane
   - https://github.com/openebs/mayastor-api
