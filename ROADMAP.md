@@ -34,7 +34,6 @@ _Note_: OpenEBS follows a release cadence with a new minor release every 2-3 mon
 | 7    | HyperLocal-PV Data-Engine                     | Dynamically provision a non-replicated PV of Local-PV type via SPDK blobstor LVol as storage + NVMe target device |  Pri 2 /  Rel: (2025)   |
 | 7.1  | HyperLocal-PV : UBlock mode                   | Non-replicated PV of Local-PV type via UBlock kernel integration to SPDK blobstor LVol as storage                  |  Pri 2 /  Rel: (2025)   |
 | 7.2  | HyperLocal-PV : PCIe mode                     | Non-replicated PV of Local-PV type via PCIe-based NVMe kernel integration to SPDK blobstor LVol as storage         |  Pri 2 /  Rel: (2025)*   |
-| 8    | GUI Mgmt Portal & Dashboard                   | Provision, manage, monitor Mayastor deployments with a RESTful GUI interface - @ parity with Shell & kubectl cmds | Pri 3 /  Rel: (Out-of-scope)    |
 | 9    | Storage Encryption                            | Provision Encrypted data-at-rest volume via SPDK LVol layer                                                       | Pri 1 /  Rel: (Q4 2024) / In progress for v4.2   |
 | 10   | Health & Supportability metrics + Dashboard   | Deep health diagnostics view of all elements OpenEBS manages - enable Metric inclusion in Support Bundle uploads |  Pri 2 /  Rel: (TBD)  |
 | 11   | E2E Storage UNMAP reclaim integration         | Support Discard: LINUX / UNMAP: SCSI / Deallocate: NVMe issued from filesystem down to SPDK Blobstor elements    | Pri 3 /  Rel: (TBD)    |
