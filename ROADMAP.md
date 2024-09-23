@@ -17,33 +17,33 @@ _Note_: OpenEBS follows a release cadence with a new minor release every 2-3 mon
 
 - Forward facing planned release date, Release version numbers and feature priorities are subject to change as the project Maintainers/Leadership/community continuously update and adjust the **Release Feature bundling Strategy** to react to K8s industry movements, trends and our community influence.
 
-|  ID  | Feature name                   | Description and user story                                            | Release, links, tracking issue, GitHub repo                                                   |
+| Feature name                   | Description and user story                                            | Release, links, tracking issue, GitHub repo                                                   |
 | :--- | :----------------------------- | :--------------------------------------------------------------------- | :------------------------------------------------------------------------------------------ |
-| 1    | Multi-replica volume snapshot and CSI cloning | Able to take consistent snapshots across all available replicas of a volume                                    | Pri 1 /  Rel: (Q3 2024) / Completed in v4.1  |
-| 2    | Volume resize                                 | Able to increase volume size and overlaying filesystem size with I/O continuity                                | Pri 1 /  Rel: (Q1 2024) / Completed in v4.0   |
-| 3    | DiskPool resize                               | Able to increase pool capacity by expansion of underlying disk pool device(s) with I/O continuity              | Pri 1 /  Rel: (Q4 2024) / In progress for v4.2   |
-| 4    | DiskPool Aggregate media mgmt SPDK mode       | Able to create, expand & manage virtual SPDK disks that are aggregates of multiple physical media devices      | Pri 2 /  Rel: (TBD)    |
-| 4.1  | DiskPool storage media mgmt xVM mode          | New DiskPool type (xVM Mediastore) - Backend media devices are managed under LVM & ZFS kernel layers           | Pri 2 /  Rel: (TBD)    |
-| 4.2  | DiskPool Choosable Replication mode           | New DiskPool enables user to select Replicated/Non-Replicated persona for any volume type (SPDK, LVM, ZFS)     | Pri 2 /  Rel: (TBD)    |
-| 4.3  | DiskPool Chosable Data Protection mode        | New DiskPool enables RAID Levels 0,1,4,5,6,10 & Z,Z2,Z3 via DiskPool modes LVM & ZFS integrations              | Pri 2 /  Rel: (TBD)    |
-| 5    | DiskPool Erasure Coded Data Protection mode   | New DiskPool enables Distributed Erasure Coding Data Protection as an alternative to RAID architecture         | Pri 3 /  Rel: (TBD)    |
-| 6    | Local-PV Data-Engine integrated + enabled     | Dynamically provision a persistent volume of LocalPV (non-replicated) type using non-SPDK managed storage      | Pri 3 /  Rel: (TBD)   |
-| 6.1  | Local-PV Hostpath integrated + enabled        | Able to provision a persistent volume of Local-PV (non-replicated) using type : K8s Hostpath addressed storage  | Pri 2 /  Rel: (TBD)   |
-| 6.3  | Local-PV RawFile Soft Luns enabled            | Able to provision a persistent volume of Local-PV (non-replicated) using type : K8s Soft Filesystem lun addressed storage    | Pri 3 /  Rel: (2025)  |
-| 6.4  | Local-PV RawFile Multi-F/S support            | Multi filesystems support for Local-PV RawFile Soft luns : ext3, ext4, XFS, BTRFS, f2fs, SSDFS, ZNS                    | Pri 3 /  Rel: (2025)   |
-| 7    | HyperLocal-PV Data-Engine                     | Dynamically provision a non-replicated PV of Local-PV type via SPDK blobstor LVol as storage + NVMe target device |  Pri 2 /  Rel: (2025)   |
-| 7.1  | HyperLocal-PV : UBlock mode                   | Non-replicated PV of Local-PV type via UBlock kernel integration to SPDK blobstor LVol as storage                  |  Pri 2 /  Rel: (2025)   |
-| 7.2  | HyperLocal-PV : PCIe mode                     | Non-replicated PV of Local-PV type via PCIe-based NVMe kernel integration to SPDK blobstor LVol as storage         |  Pri 2 /  Rel: (2025)*   |
-| 9    | Storage Encryption                            | Provision Encrypted data-at-rest volume via SPDK LVol layer                                                       | Pri 1 /  Rel: (Q4 2024) / In progress for v4.2   |
-| 10   | Health & Supportability metrics + Dashboard   | Deep health diagnostics view of all elements OpenEBS manages - enable Metric inclusion in Support Bundle uploads |  Pri 2 /  Rel: (TBD)  |
-| 11   | E2E Storage UNMAP reclaim integration         | Support Discard: LINUX / UNMAP: SCSI / Deallocate: NVMe issued from filesystem down to SPDK Blobstor elements    | Pri 3 /  Rel: (TBD)    |
-| 12   | Thin provisioning phase-2                     | Thin Provision awareness and integrations with DiskPool metrics, pre-emptive intelligence actions                   | Pri 3 /  Rel: (TBD)    |
-| 14   | Replica topology                              | Replica distribution based on pool and node topologies                                                            | Pri 1 /  Rel: (Q3 2024) / In progress for v4.2  |
-| 15   | Zoned-SSD support                             | Integrated Western Digital Team's Mayastor ZNS feature for very high performance vols                             | Pri 3 /  Rel: (Q4 2024) / In progress for v4.2  |
-| 16   | NVMe-oF over RDMA support                     | Support for NVMe-oF over RDMA as transport for higher performance                                                | Pri 1 /  Rel: (Q4 2024) / In progress for v4.2  |
-| 17   | Local PV CI and E2E hardening                 | Enhancing CI and E2E of Local PV engines with more tests                                                         | Pri 1 /  Rel: (Q4 2024) / In progress for v4.2  |
-| 18   | Replicated Hostpath                           | Replication over hostpath volumes                                                                                | Pri 2 /  Rel: (2025)  |
-| 19   | Snapshot rebuilding                           | Rebuilding snapshot data during replica rebuilds                                                                 | Pri 2 /  Rel: (2025) / In progress  |
+| Multi-replica volume snapshot and CSI cloning | Able to take consistent snapshots across all available replicas of a volume                                    | Pri 1 /  Rel: (Q3 2024) / Completed in v4.1  |
+| Volume resize                                 | Able to increase volume size and overlaying filesystem size with I/O continuity                                | Pri 1 /  Rel: (Q1 2024) / Completed in v4.0   |
+| DiskPool resize                               | Able to increase pool capacity by expansion of underlying disk pool device(s) with I/O continuity              | Pri 1 /  Rel: (Q4 2024) / In progress for v4.2   |
+| DiskPool Aggregate media mgmt SPDK mode       | Able to create, expand & manage virtual SPDK disks that are aggregates of multiple physical media devices      | Pri 2 /  Rel: (TBD)    |
+| DiskPool storage media mgmt xVM mode          | New DiskPool type (xVM Mediastore) - Backend media devices are managed under LVM & ZFS kernel layers           | Pri 2 /  Rel: (TBD)    |
+| DiskPool Choosable Replication mode           | New DiskPool enables user to select Replicated/Non-Replicated persona for any volume type (SPDK, LVM, ZFS)     | Pri 2 /  Rel: (TBD)    |
+| DiskPool Chosable Data Protection mode        | New DiskPool enables RAID Levels 0,1,4,5,6,10 & Z,Z2,Z3 via DiskPool modes LVM & ZFS integrations              | Pri 2 /  Rel: (TBD)    |
+| DiskPool Erasure Coded Data Protection mode   | New DiskPool enables Distributed Erasure Coding Data Protection as an alternative to RAID architecture         | Pri 3 /  Rel: (TBD)    |
+| Local-PV Data-Engine integrated + enabled     | Dynamically provision a persistent volume of LocalPV (non-replicated) type using non-SPDK managed storage      | Pri 3 /  Rel: (TBD)   |
+| Local-PV Hostpath integrated + enabled        | Able to provision a persistent volume of Local-PV (non-replicated) using type : K8s Hostpath addressed storage  | Pri 2 /  Rel: (TBD)   |
+| Local-PV RawFile Soft Luns enabled            | Able to provision a persistent volume of Local-PV (non-replicated) using type : K8s Soft Filesystem lun addressed storage    | Pri 3 /  Rel: (2025)  |
+| Local-PV RawFile Multi-F/S support            | Multi filesystems support for Local-PV RawFile Soft luns : ext3, ext4, XFS, BTRFS, f2fs, SSDFS, ZNS                    | Pri 3 /  Rel: (2025)   |
+| HyperLocal-PV Data-Engine                     | Dynamically provision a non-replicated PV of Local-PV type via SPDK blobstor LVol as storage + NVMe target device |  Pri 2 /  Rel: (2025)   |
+| HyperLocal-PV : UBlock mode                   | Non-replicated PV of Local-PV type via UBlock kernel integration to SPDK blobstor LVol as storage                  |  Pri 2 /  Rel: (2025)   |
+| HyperLocal-PV : PCIe mode                     | Non-replicated PV of Local-PV type via PCIe-based NVMe kernel integration to SPDK blobstor LVol as storage         |  Pri 2 /  Rel: (2025)*   |
+| Storage Encryption                            | Provision Encrypted data-at-rest volume via SPDK LVol layer                                                       | Pri 1 /  Rel: (Q4 2024) / In progress for v4.2   |
+| Health & Supportability metrics + Dashboard   | Deep health diagnostics view of all elements OpenEBS manages - enable Metric inclusion in Support Bundle uploads |  Pri 2 /  Rel: (TBD)  |
+| E2E Storage UNMAP reclaim integration         | Support Discard: LINUX / UNMAP: SCSI / Deallocate: NVMe issued from filesystem down to SPDK Blobstor elements    | Pri 3 /  Rel: (TBD)    |
+| Thin provisioning phase-2                     | Thin Provision awareness and integrations with DiskPool metrics, pre-emptive intelligence actions                   | Pri 3 /  Rel: (TBD)    |
+| Replica topology                              | Replica distribution based on pool and node topologies                                                            | Pri 1 /  Rel: (Q3 2024) / In progress for v4.2  |
+| Zoned-SSD support                             | Integrated Western Digital Team's Mayastor ZNS feature for very high performance vols                             | Pri 3 /  Rel: (Q4 2024) / In progress for v4.2  |
+| NVMe-oF over RDMA support                     | Support for NVMe-oF over RDMA as transport for higher performance                                                | Pri 1 /  Rel: (Q4 2024) / In progress for v4.2  |
+| Local PV CI and E2E hardening                 | Enhancing CI and E2E of Local PV engines with more tests                                                         | Pri 1 /  Rel: (Q4 2024) / In progress for v4.2  |
+| Replicated Hostpath                           | Replication over hostpath volumes                                                                                | Pri 2 /  Rel: (2025)  |
+| Snapshot rebuilding                           | Rebuilding snapshot data during replica rebuilds                                                                 | Pri 2 /  Rel: (2025) / In progress  |
 <BR>
 
 These repositories are critically required for the **current** roadmap.<BR>
