@@ -6,22 +6,30 @@ Community and contributor involvement is vital for successfully implementing all
 
 OpenEBS follows a lean project management approach by splitting the development items into current, near term and future categories.
 
+## Near-term and long-term roadmap (2024 onwards)
+This table contains a list of both near-term and long-term backlog items. Near-term features are currently getting the most active focus and attention within the project. These are prioritized and planned to be completed within the next major release where higher priority is given to usability, stability, resilience, data integrity issues reported by the community. The long-term features require significant design and development efforts, and will be scoped in the future.
 
-## Active Master roadmap
-This table holds a list of the most active roadmap items. These are the features that are currently getting the most active focus and attention within the project.
+OpenEBS follows a release cadence with a new minor release every 3-4 months.
 
-## Current
-These are backlog items that are prioritized and planned to be completed within the next major release. While many are planned items, higher priority is given to usability, stability, resilience, data integrity issues reported by the community.
+_Note_: The planned release timelines, version numbers and feature priorities are subject to change as the project maintainers/leadership/community continuously update and adjust in response to K8s industry movements, trends and our community influence.
 
-_Note_: OpenEBS follows a release cadence with a new minor release every 2-3 months.
+_Note 2_: The table contains the high-level backlog items. For a comprehensive list of features and issues, please refer to https://github.com/openebs/openebs/releases.
 
-- Forward facing planned release date, Release version numbers and feature priorities are subject to change as the project Maintainers/Leadership/community continuously update and adjust the **Release Feature bundling Strategy** to react to K8s industry movements, trends and our community influence.
-
-| Feature name                   | Description and user story                                            | Release, links, tracking issue, GitHub repo                                                   |
-| :----------------------------- | :--------------------------------------------------------------------- | :------------------------------------------------------------------------------------------ |
-| Multi-replica volume snapshot and CSI cloning | Able to take consistent snapshots across all available replicas of a volume                                    | Pri 1 /  Rel: (Q3 2024) / Completed in v4.1  |
-| Volume resize                                 | Able to increase volume size and overlaying filesystem size with I/O continuity                                | Pri 1 /  Rel: (Q1 2024) / Completed in v4.0   |
-| DiskPool resize                               | Able to increase pool capacity by expansion of underlying disk pool device(s) with I/O continuity              | Pri 1 /  Rel: (Q4 2024) / In progress for v4.2   |
+| Feature | Description | Local or Replicated | Release timeline | Status |
+| :------ | :---------- | :------------------ | :--------------- | :----- |
+| One installer | Unified Helm installer for all engines, deprecates operator yaml | All | v4.0 (Q1 2024) | Completed |
+| One documentation | Unified and restructured documentation website, deprecates mayastor.gitbook.io | All | v4.0 (Q1 2024) | Completed |
+| Legacy engines deprecation | Deprecated, archived and removed support for legacy engines and components eg. CStor, Jiva, NFS, NDM | All | v4.0 (Q1 2024) | Completed |
+| Volume resize | Able to increase volume size and overlaying filesystem size with I/O continuity | Replicated PV Mayastor | v4.0 (Q1 2024) | Completed |
+| Multi-replica volume snapshot and restore | Able to take consistent snapshots across all available replicas of a volume and restore to a given snapshot | Replicated PV Mayastor | v4.1 (Q3 2024) | Completed |
+| Local PV CI | CI hardening and enhancements, helm chart support and more tests | Local PV (LVM, ZFS, Hostpath) | v4.2 (Q4 2024) | In progress |
+| Local PV E2E | E2E hardening, umbrella chart testing, conversion of Ansible to Ginkgo-based BDDs | Local PV (LVM, ZFS, Hostpath) | v4.2 (Q4 2024) | In progress |
+| Replica topology | Replica distribution based on pool and node topologies | Replicated PV Mayastor | v4.2 (Q4 2024) | In progress |
+| NVMe-oF over RDMA support | Support for NVMe-oF over RDMA as transport | Replicated PV Mayastor | v4.2 (Q4 2024) | In progress |
+| DiskPool resize | Able to increase pool capacity by expansion of underlying disk pool device(s) with I/O continuity | Replicated PV  Mayastor | v4.3 (Q1 2025) | In progress |
+| At-rest encryption | Provision encrypted data-at-rest volumes | Replicated PV Mayastor | v4.3 (Q1 2025) | In progress |
+| Snapshot rebuilding | Rebuilding snapshot data during replica rebuilds | Replicated PV Mayastor | 2025 | In progress |
+| NVMe zoning support | Support for Western Digital ZNS devices | Replicated PV Mayastor | 2025 | In progress |
 | DiskPool Aggregate media mgmt SPDK mode       | Able to create, expand & manage virtual SPDK disks that are aggregates of multiple physical media devices      | Pri 2 /  Rel: (TBD)    |
 | DiskPool storage media mgmt xVM mode          | New DiskPool type (xVM Mediastore) - Backend media devices are managed under LVM & ZFS kernel layers           | Pri 2 /  Rel: (TBD)    |
 | DiskPool Choosable Replication mode           | New DiskPool enables user to select Replicated/Non-Replicated persona for any volume type (SPDK, LVM, ZFS)     | Pri 2 /  Rel: (TBD)    |
@@ -34,16 +42,10 @@ _Note_: OpenEBS follows a release cadence with a new minor release every 2-3 mon
 | HyperLocal-PV Data-Engine                     | Dynamically provision a non-replicated PV of Local-PV type via SPDK blobstor LVol as storage + NVMe target device |  Pri 2 /  Rel: (2025)   |
 | HyperLocal-PV : UBlock mode                   | Non-replicated PV of Local-PV type via UBlock kernel integration to SPDK blobstor LVol as storage                  |  Pri 2 /  Rel: (2025)   |
 | HyperLocal-PV : PCIe mode                     | Non-replicated PV of Local-PV type via PCIe-based NVMe kernel integration to SPDK blobstor LVol as storage         |  Pri 2 /  Rel: (2025)*   |
-| Storage Encryption                            | Provision Encrypted data-at-rest volume via SPDK LVol layer                                                       | Pri 1 /  Rel: (Q4 2024) / In progress for v4.2   |
 | Health & Supportability metrics + Dashboard   | Deep health diagnostics view of all elements OpenEBS manages - enable Metric inclusion in Support Bundle uploads |  Pri 2 /  Rel: (TBD)  |
 | E2E Storage UNMAP reclaim integration         | Support Discard: LINUX / UNMAP: SCSI / Deallocate: NVMe issued from filesystem down to SPDK Blobstor elements    | Pri 3 /  Rel: (TBD)    |
 | Thin provisioning phase-2                     | Thin Provision awareness and integrations with DiskPool metrics, pre-emptive intelligence actions                   | Pri 3 /  Rel: (TBD)    |
-| Replica topology                              | Replica distribution based on pool and node topologies                                                            | Pri 1 /  Rel: (Q3 2024) / In progress for v4.2  |
-| Zoned-SSD support                             | Integrated Western Digital Team's Mayastor ZNS feature for very high performance vols                             | Pri 3 /  Rel: (Q4 2024) / In progress for v4.2  |
-| NVMe-oF over RDMA support                     | Support for NVMe-oF over RDMA as transport for higher performance                                                | Pri 1 /  Rel: (Q4 2024) / In progress for v4.2  |
-| Local PV CI and E2E hardening                 | Enhancing CI and E2E of Local PV engines with more tests                                                         | Pri 1 /  Rel: (Q4 2024) / In progress for v4.2  |
 | Replicated Hostpath                           | Replication over hostpath volumes                                                                                | Pri 2 /  Rel: (2025)  |
-| Snapshot rebuilding                           | Rebuilding snapshot data during replica rebuilds                                                                 | Pri 2 /  Rel: (2025) / In progress  |
 <BR>
 
 These repositories are critically required for the **current** roadmap.<BR>
@@ -65,24 +67,6 @@ These repositories are critically required for the **current** roadmap.<BR>
   - https://github.com/openebs/openebsctl
   - https://github.com/openebs/monitoring
   - https://github.com/openebs/website
-
-## Previous roadmap items (mostly completed, need tidying-up)
-
-Typically the items under this category fall under next major release.
-- Support for pluggable storage backend for Mayastor (example: replace blobstore with lvm)
-- Support for specifying multiple hostpaths to be used with Local PV hostpath
-- Update user documentation with reference stacks of running various workloads using OpenEBS volumes
-- Auto provisioning of block devices (on the external storage systems) that can be used with OpenEBS storage engines
-- Automate the workflows around handling scenarios like complete cluster failures that currently require some manual steps
-- Custom Kubernetes storage schedulers to address auto-rebalancing of the data placed on the nodes to help with scale up/down of Kubernetes nodes
-- Support for restoring a volume (in-place) for supporting blue/green stateful deployments
-- Partial rebuild for the Mayastor replicas (similar to zfs resilvering)
-- Support Bulk BDC requests to claim multiple block devices that satisfy affinity or anti-affinity rules of applications. Example: two block devices from same node or two block devices from different nodes.
-- Support for device configuration tasks like partitioning, mounting or unmounting devices by adding new services via NDM gRPC API layer.
-
-## Future
-
-As the name suggests this bucket contains items that are planned for future. Sometimes the items are related to adapting to the changes coming in the Kubernetes repo or other related projects. Github milestone called [future backlog](https://github.com/openebs/openebs/milestone/11) is used to track these requests.
 
 # Getting involved with Contributions
 
