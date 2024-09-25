@@ -31,6 +31,7 @@ _Note 2_: The table contains the high-level backlog items. For a comprehensive l
 | DiskPool resize | Able to increase pool capacity by expansion of underlying disk pool device(s) with I/O continuity | Replicated PV  Mayastor | v4.3 (Q1 2025) | In progress |
 | At-rest encryption | Provision encrypted data-at-rest volumes | Replicated PV Mayastor | v4.3 (Q1 2025) | In progress |
 | Data protection | Able to backup and restore OpenEBS volume data to/from an S3 end-point | All | v4.3 (Q1 2025) | In progress |
+| Observability enhancements/fixes | Logging, monitoring and alerting | All | v4.3 (Q1 2025) | In progress |
 | Handle Pool media transfer | Support for handling scenarios where pool block device is disconnected from one node and reconnected to a different node | All | 2025 | |
 | Snapshot rebuilding | Rebuilding snapshot data during replica rebuilds | Replicated PV Mayastor | 2025 | In progress |
 | NVMe zoning support | Support for Western Digital ZNS devices | Replicated PV Mayastor | 2025 | In progress |
@@ -40,6 +41,7 @@ _Note 2_: The table contains the high-level backlog items. For a comprehensive l
 | Local PV RawFile graduation | Steps to graduate localpv-rawfile from beta to stable | Local PV Rawfile | 2025 | |
 | Unified Local PV CSI driver | Single CSI driver for all Local PV engines | Local PV (LVM, ZFS, Hostpath) | TBD | |
 | Unmap support | Support discard/unmap/trim operations for NVMe volumes | Replicated PV Mayastor | TBD | |
+
 <BR>
 
 # Getting involved with Contributions
