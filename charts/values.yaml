@@ -9,7 +9,7 @@ localpv-provisioner:
   rbac:
     create: true
 
-# Refer to https://github.com/openebs/zfs-localpv/blob/v2.6.1/deploy/helm/charts/values.yaml for complete set of values.
+# Refer to https://github.com/openebs/zfs-localpv/blob/v2.6.2/deploy/helm/charts/values.yaml for complete set of values.
 zfs-localpv:
   crds:
     zfsLocalPv:

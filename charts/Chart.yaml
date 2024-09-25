@@ -21,7 +21,7 @@ dependencies:
     version: 4.1.1
     repository: "https://openebs.github.io/dynamic-localpv-provisioner"
   - name: zfs-localpv
-    version: 2.6.1
+    version: 2.6.2
     repository: "https://openebs.github.io/zfs-localpv"
     condition: engines.local.zfs.enabled
   - name: lvm-localpv
