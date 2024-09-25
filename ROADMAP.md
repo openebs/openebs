@@ -17,8 +17,8 @@ _Note 2_: The table contains the high-level backlog items. For a comprehensive l
 
 | Feature | Description | Local or Replicated | Release timeline | Status |
 | :------ | :---------- | :------------------ | :--------------- | :----- |
-| One installer | Unified Helm installer for all engines, deprecates operator yaml | All | v4.0 (Q1 2024) | Completed |
-| One documentation | Unified and restructured documentation website, deprecates mayastor.gitbook.io | All | v4.0 (Q1 2024) | Completed |
+| Unified installer | Unified Helm installer for all engines, deprecates operator yaml | All | v4.0 (Q1 2024) | Completed |
+| Unified documentation | Unified and restructured documentation website, deprecates mayastor.gitbook.io | All | v4.0 (Q1 2024) | Completed |
 | Legacy engines deprecation | Deprecated, archived and removed support for legacy engines and components eg. CStor, Jiva, NFS, NDM | All | v4.0 (Q1 2024) | Completed |
 | Volume resize | Able to increase volume size and overlaying filesystem size with I/O continuity | Replicated PV Mayastor | v4.0 (Q1 2024) | Completed |
 | Multi-replica volume snapshot and cloning | Able to take consistent snapshots across all available replicas of a volume and restore to a given snapshot | Replicated PV Mayastor | v4.1 (Q3 2024) | Completed |
@@ -26,7 +26,7 @@ _Note 2_: The table contains the high-level backlog items. For a comprehensive l
 | Local PV E2E | E2E hardening, umbrella chart testing, conversion of Ansible to Ginkgo-based BDDs | Local PV (LVM, ZFS, Hostpath) | v4.2 (Q4 2024) | In progress |
 | Replica topology | Replica distribution based on pool and node topologies | Replicated PV Mayastor | v4.2 (Q4 2024) | In progress |
 | NVMe-oF over RDMA support | Support for NVMe-oF over RDMA as transport | Replicated PV Mayastor | v4.2 (Q4 2024) | In progress |
-| One kubectl plug-in | Unified kubectl plug-in to manage all OpenEBS components | All | v4.2 (Q4 2024) | In progress |
+| Unified kubectl plugin | Unified kubectl plugin to manage all OpenEBS components | All | v4.2 (Q4 2024) | In progress |
 | Local PV LVM cloning | Able to do K8s restore of Local PV LVM snapshot | Local PV LVM | v4.3 (Q1 2025) | In progress |
 | DiskPool resize | Able to increase pool capacity by expansion of underlying disk pool device(s) with I/O continuity | Replicated PV  Mayastor | v4.3 (Q1 2025) | In progress |
 | At-rest encryption | Provision encrypted data-at-rest volumes | Replicated PV Mayastor | v4.3 (Q1 2025) | In progress |
@@ -44,11 +44,11 @@ _Note 2_: The table contains the high-level backlog items. For a comprehensive l
 
 <BR>
 
-# Getting involved with Contributions
+# Getting involved with contributions
 
 We are always looking for more contributions. If you see anything above that you would love to work on, we welcome you to become a contributor and maintainer of the areas that you love. You can get started by commenting on the related issue or by creating a new issue. Also you can reach out to us by:
 
 - [Joining OpenEBS contributor community on Kubernetes Slack](https://kubernetes.slack.com)
 	- Already signed up? Head to our discussions at [#openebs-dev](https://kubernetes.slack.com/messages/openebs-dev/)
-- [Joining our Community meetings](https://github.com/openebs/openebs/tree/master/community)
+- [Joining our Community meetings](https://github.com/openebs/openebs/tree/main/community)
 
