@@ -21,52 +21,26 @@ _Note 2_: The table contains the high-level backlog items. For a comprehensive l
 | One documentation | Unified and restructured documentation website, deprecates mayastor.gitbook.io | All | v4.0 (Q1 2024) | Completed |
 | Legacy engines deprecation | Deprecated, archived and removed support for legacy engines and components eg. CStor, Jiva, NFS, NDM | All | v4.0 (Q1 2024) | Completed |
 | Volume resize | Able to increase volume size and overlaying filesystem size with I/O continuity | Replicated PV Mayastor | v4.0 (Q1 2024) | Completed |
-| Multi-replica volume snapshot and restore | Able to take consistent snapshots across all available replicas of a volume and restore to a given snapshot | Replicated PV Mayastor | v4.1 (Q3 2024) | Completed |
+| Multi-replica volume snapshot and cloning | Able to take consistent snapshots across all available replicas of a volume and restore to a given snapshot | Replicated PV Mayastor | v4.1 (Q3 2024) | Completed |
 | Local PV CI | CI hardening and enhancements, helm chart support and more tests | Local PV (LVM, ZFS, Hostpath) | v4.2 (Q4 2024) | In progress |
 | Local PV E2E | E2E hardening, umbrella chart testing, conversion of Ansible to Ginkgo-based BDDs | Local PV (LVM, ZFS, Hostpath) | v4.2 (Q4 2024) | In progress |
 | Replica topology | Replica distribution based on pool and node topologies | Replicated PV Mayastor | v4.2 (Q4 2024) | In progress |
 | NVMe-oF over RDMA support | Support for NVMe-oF over RDMA as transport | Replicated PV Mayastor | v4.2 (Q4 2024) | In progress |
+| One kubectl plug-in | Unified kubectl plug-in to manage all OpenEBS components | All | v4.2 (Q4 2024) | In progress |
+| Local PV LVM cloning | Able to do K8s restore of Local PV LVM snapshot | Local PV LVM | v4.3 (Q1 2025) | In progress |
 | DiskPool resize | Able to increase pool capacity by expansion of underlying disk pool device(s) with I/O continuity | Replicated PV  Mayastor | v4.3 (Q1 2025) | In progress |
 | At-rest encryption | Provision encrypted data-at-rest volumes | Replicated PV Mayastor | v4.3 (Q1 2025) | In progress |
+| Data protection | Able to backup and restore OpenEBS volume data to/from an S3 end-point | All | v4.3 (Q1 2025) | In progress |
+| Handle Pool media transfer | Support for handling scenarios where pool block device is disconnected from one node and reconnected to a different node | All | 2025 | |
 | Snapshot rebuilding | Rebuilding snapshot data during replica rebuilds | Replicated PV Mayastor | 2025 | In progress |
 | NVMe zoning support | Support for Western Digital ZNS devices | Replicated PV Mayastor | 2025 | In progress |
-| DiskPool Aggregate media mgmt SPDK mode       | Able to create, expand & manage virtual SPDK disks that are aggregates of multiple physical media devices      | Pri 2 /  Rel: (TBD)    |
-| DiskPool storage media mgmt xVM mode          | New DiskPool type (xVM Mediastore) - Backend media devices are managed under LVM & ZFS kernel layers           | Pri 2 /  Rel: (TBD)    |
-| DiskPool Choosable Replication mode           | New DiskPool enables user to select Replicated/Non-Replicated persona for any volume type (SPDK, LVM, ZFS)     | Pri 2 /  Rel: (TBD)    |
-| DiskPool Chosable Data Protection mode        | New DiskPool enables RAID Levels 0,1,4,5,6,10 & Z,Z2,Z3 via DiskPool modes LVM & ZFS integrations              | Pri 2 /  Rel: (TBD)    |
-| DiskPool Erasure Coded Data Protection mode   | New DiskPool enables Distributed Erasure Coding Data Protection as an alternative to RAID architecture         | Pri 3 /  Rel: (TBD)    |
-| Local-PV Data-Engine integrated + enabled     | Dynamically provision a persistent volume of LocalPV (non-replicated) type using non-SPDK managed storage      | Pri 3 /  Rel: (TBD)   |
-| Local-PV Hostpath integrated + enabled        | Able to provision a persistent volume of Local-PV (non-replicated) using type : K8s Hostpath addressed storage  | Pri 2 /  Rel: (TBD)   |
-| Local-PV RawFile Soft Luns enabled            | Able to provision a persistent volume of Local-PV (non-replicated) using type : K8s Soft Filesystem lun addressed storage    | Pri 3 /  Rel: (2025)  |
-| Local-PV RawFile Multi-F/S support            | Multi filesystems support for Local-PV RawFile Soft luns : ext3, ext4, XFS, BTRFS, f2fs, SSDFS, ZNS                    | Pri 3 /  Rel: (2025)   |
-| HyperLocal-PV Data-Engine                     | Dynamically provision a non-replicated PV of Local-PV type via SPDK blobstor LVol as storage + NVMe target device |  Pri 2 /  Rel: (2025)   |
-| HyperLocal-PV : UBlock mode                   | Non-replicated PV of Local-PV type via UBlock kernel integration to SPDK blobstor LVol as storage                  |  Pri 2 /  Rel: (2025)   |
-| HyperLocal-PV : PCIe mode                     | Non-replicated PV of Local-PV type via PCIe-based NVMe kernel integration to SPDK blobstor LVol as storage         |  Pri 2 /  Rel: (2025)*   |
-| Health & Supportability metrics + Dashboard   | Deep health diagnostics view of all elements OpenEBS manages - enable Metric inclusion in Support Bundle uploads |  Pri 2 /  Rel: (TBD)  |
-| E2E Storage UNMAP reclaim integration         | Support Discard: LINUX / UNMAP: SCSI / Deallocate: NVMe issued from filesystem down to SPDK Blobstor elements    | Pri 3 /  Rel: (TBD)    |
-| Thin provisioning phase-2                     | Thin Provision awareness and integrations with DiskPool metrics, pre-emptive intelligence actions                   | Pri 3 /  Rel: (TBD)    |
-| Replicated Hostpath                           | Replication over hostpath volumes                                                                                | Pri 2 /  Rel: (2025)  |
+| DiskPool over multiple devices | Able to create and expand DiskPools that are aggregates of multiple block devices | Replicated PV Mayastor | 2025 | |
+| DiskPool of ZFS/LVM type | DiskPool over LVM VG & ZFS ZPool | Replicated PV Mayastor | 2025 | In progress |
+| Replicated Hostpath | Replication over hostpath volumes | Local PV Hostpath | 2025 | |
+| Local PV RawFile graduation | Steps to graduate localpv-rawfile from beta to stable | Local PV Rawfile | 2025 | |
+| Unified Local PV CSI driver | Single CSI driver for all Local PV engines | Local PV (LVM, ZFS, Hostpath) | TBD | |
+| Unmap support | Support discard/unmap/trim operations for NVMe volumes | Replicated PV Mayastor | TBD | |
 <BR>
-
-These repositories are critically required for the **current** roadmap.<BR>
-### Mayastor Source repositories
-  - https://github.com/openebs/mayastor
-  - https://github.com/openebs/mayastor-control-plane
-  - https://github.com/openebs/mayastor-api
-  - https://github.com/openebs/mayastor-extensions
-  - https://github.com/openebs/mayastor-docs
-
-### Dynamic Local PVs repos
-  - https://github.com/openebs/dynamic-localpv-provisioner
-  - https://github.com/openebs/zfs-localpv
-  - https://github.com/openebs/lvm-localpv
-  - https://github.com/openebs/rawfile-localpv
-
-### Others
-  - https://github.com/openebs/charts
-  - https://github.com/openebs/openebsctl
-  - https://github.com/openebs/monitoring
-  - https://github.com/openebs/website
 
 # Getting involved with Contributions
 
