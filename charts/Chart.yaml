@@ -1,7 +1,7 @@
 apiVersion: v2
-version: 2.8.0-0-main-unstable-2024-10-10-23-09-10-0
+version: 2.8.0-0-main-unstable-2024-10-11-09-08-33-0
 name: openebs
-appVersion: 2.8.0-0-main-unstable-2024-10-10-23-09-10-0
+appVersion: 2.8.0-0-main-unstable-2024-10-11-09-08-33-0
 description: Containerized Attached Storage for Kubernetes
 icon: https://raw.githubusercontent.com/cncf/artwork/HEAD/projects/openebs/icon/color/openebs-icon-color.png
 home: https://www.openebs.io/
@@ -29,6 +29,6 @@ dependencies:
     repository: "https://openebs.github.io/lvm-localpv"
     condition: engines.local.lvm.enabled
   - name: mayastor
-    version: 2.8.0-0-main-unstable-2024-10-10-23-09-10-0
+    version: 2.8.0-0-main-unstable-2024-10-11-09-08-33-0
     repository: https://openebs.github.io/mayastor-chart-donotuse
     condition: engines.replicated.mayastor.enabled
