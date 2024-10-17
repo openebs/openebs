@@ -1,0 +1,21 @@
+[package]
+name = "kubectl-openebs"
+version = "0.7.0"
+edition = "2021"
+
+[[bin]]
+name = "kubectl-openebs"
+path = "src/main.rs"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+kubectl-plugin = { path = "../mayastor/k8s/plugin", default-features = false }
+rest-plugin = { path = "../mayastor/dependencies/control-plane/control-plane/plugin", default-features = false }
+shutdown = { path = "../mayastor/dependencies/control-plane/utils/shutdown"}
+utils = { path = "../mayastor/dependencies/control-plane/utils/utils-lib" }
+upgrade = { path = "../mayastor/k8s/upgrade" }
+clap = { version = "4.4.6", features = ["color", "derive"] }
+anyhow = "1.0.75"
+async-trait = "0.1.73"
+tokio = { version = "1.33.0" }

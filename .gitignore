@@ -21,3 +21,5 @@ documentation/build/
 charts/Chart.lock
 !/charts/charts/crds/
 /charts/charts/*
+
+plugin/target/
