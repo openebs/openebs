@@ -112,11 +112,11 @@ to coordinate and communicate.
 
 Enhancements that have major impacts on multiple OWNERs should use the OEP process.
 A single OWNER will own the OEP but it is expected that the set of approvers will
-span the impacted OWNERs. The OEP process is the way that OWNERs can negotiate 
+span the impacted OWNERs. The OEP process is the way that OWNERs can negotiate
 and communicate changes that cross boundaries.
 
-OEPs will also be used to drive large changes that will cut across all parts of 
-the project. These OEPs will be owned among the OWNERs and should be seen as a 
+OEPs will also be used to drive large changes that will cut across all parts of
+the project. These OEPs will be owned among the OWNERs and should be seen as a
 way to communicate the most fundamental aspects of what OpenEBS is.
 
 ### OEP Template
@@ -134,13 +134,7 @@ Metadata items:
   * Each proposal has a number.  This is to make all references to proposals as
     clear as possible.  This is especially important as we create a network
     cross references between proposals.
-  * Before having the `Approved` status, the number for the OEP will be in the
-    form of `draft-YYYYMMDD`.  The `YYYYMMDD` is replaced with the current date
-    when first creating the OEP.  The goal is to enable fast parallel merges of
-    pre-acceptance OEPs.
-  * On acceptance a sequential dense number will be assigned.  This will be done
-    by the editor and will be done in such a way as to minimize the chances of
-    conflicts.  The final number for a OEP will have no prefix.
+  * This number is the associated tracking issue number.
 * **title** Required
   * The title of the OEP in plain language.  The title will also be used in the
     OEP filename.  See the template for instructions and details.
@@ -189,7 +183,7 @@ A OEP has the following states
 - `provisional`: The OEP has been proposed and is actively being defined.
   This is the starting state while the OEP is being fleshed out and actively defined and discussed.
   The OWNER has accepted that this is work that needs to be done.
-- `implementable`: The approvers have approved this OEP for implementation and OWNERs create, if appropriate, 
+- `implementable`: The approvers have approved this OEP for implementation and OWNERs create, if appropriate,
   a [milestone](https://github.com/openebs/openebs/milestones) to track implementation work.
 - `implemented`: The OEP has been implemented and is no longer actively changed. OWNERs reflect
   the status change and close its matching milestone, if appropriate.
@@ -202,12 +196,12 @@ A OEP has the following states
 
 ### Git and GitHub Implementation
 
-OEPs are checked into under the `/contribute/design/feature` directory.
+OEPs are checked into under the `/designs/xxx` directory.
 
-New OEPs can be checked in with a file name in the form of `draft-YYYYMMDD-my-title.md`.
-As significant work is done on the OEP the authors can assign a OEP number.
+At least before merging the first provisional draft of an OEP, a GitHub tracking issue must be created.
+The OEP number is taken from the GitHub tracking issue.
+
 No other changes should be put in that PR so that it can be approved quickly and minimize merge conflicts.
-The OEP number can also be done as part of the initial submission if the PR is likely to be uncontested and merged quickly.
 
 ### OEP Editor Role
 
@@ -220,7 +214,7 @@ In keeping with the OEP editors which
 > technical sense, even if they don't seem likely to be accepted.
 > The title should accurately describe the content.
 > Edit the OEP for language (spelling, grammar, sentence structure, etc.), markup
-> (for yaml, schema naming conventions), code style (examples should match 
+> (for yaml, schema naming conventions), code style (examples should match
 idiomatic openebs standards).
 
 OEP editors should generally not pass judgement on a OEP beyond editorial corrections.
