@@ -1,6 +1,8 @@
 use crate::cli_utils::CliArgs;
 use clap::Parser;
 use plugin::ExecuteOperation;
+pub(crate) mod node;
+pub(crate) mod volume;
 
 /// LocalPV lvm operations.
 #[derive(Parser, Debug)]
@@ -61,28 +63,38 @@ impl ExecuteOperation for LvmGet {
     type Args = CliArgs;
     type Error = Error;
 
-    async fn execute(&self, _cli_args: &CliArgs) -> Result<(), Error> {
+    async fn execute(&self, cli_args: &CliArgs) -> Result<(), Error> {
         match self {
-            LvmGet::Volume(_volume_arg) => {
-                todo!("Implementation pending for this command")
+            LvmGet::Volume(volume_arg) => {
+                volume::volume(cli_args, volume_arg).await?;
             }
-            LvmGet::Volumes(_volumes_arg) => {
-                todo!("Implementation pending for this command")
+            LvmGet::Volumes(volumes_arg) => {
+                volume::volumes(cli_args, volumes_arg).await?;
             }
-            LvmGet::VolumeGroups(_volume_groups_arg) => {
-                todo!("Implementation pending for this command")
+            LvmGet::VolumeGroups(volume_groups_arg) => {
+                node::volume_groups(cli_args, volume_groups_arg).await?;
             }
         }
+        Ok(())
     }
 }
 
 /// Error for localpv-lvm stem.
 pub enum Error {
     Generic(anyhow::Error),
+    Kube(kube::Error),
 }
 
+/// Converts anyhow::Error into lovalPV Error.
 impl From<anyhow::Error> for Error {
     fn from(e: anyhow::Error) -> Self {
         Error::Generic(e)
+    }
+}
+
+/// Converts kube::Error into lovalPV Error.
+impl From<kube::Error> for Error {
+    fn from(e: kube::Error) -> Self {
+        Error::Kube(e)
     }
 }

@@ -1,4 +1,4 @@
 [submodule "mayastor"]
 	path = mayastor
 	url = ../mayastor-extensions.git
-	branch = expose_plugin
+	branch = develop

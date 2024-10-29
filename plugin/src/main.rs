@@ -1,4 +1,5 @@
 use clap::Parser;
+use kube::Client;
 use kubectl_plugin::resources;
 use plugin::ExecuteOperation;
 use std::{env, ops::Deref};
@@ -12,13 +13,25 @@ struct CliArgs {
     #[clap(subcommand)]
     operations: cli_utils::Operations,
 
+    /// Kubernetes namespace of openebs service
+    #[clap(global = true, long, short = 'n')]
+    namespace: Option<String>,
+
     #[clap(flatten)]
     args: cli_utils::CliArgs,
 }
 
 impl CliArgs {
-    fn args() -> Self {
-        CliArgs::parse()
+    async fn args() -> Self {
+        let mut arg = CliArgs::parse();
+        if let Some(ns) = arg.namespace.clone() {
+            arg.args.args.namespace = ns;
+        } else {
+            let client = Client::try_default().await.expect("Client init failed");
+            let ns = client.default_namespace().to_string();
+            arg.args.args.namespace = ns;
+        }
+        arg
     }
 }
 
@@ -32,7 +45,7 @@ impl Deref for CliArgs {
 
 #[tokio::main]
 async fn main() {
-    let cli_args = CliArgs::args();
+    let cli_args = CliArgs::args().await;
     let _tracer_flusher = cli_args.init_tracing();
     if let Err(error) = cli_args.execute().await {
         let mut exit_code = 1;
@@ -49,7 +62,8 @@ async fn main() {
                 resources::Error::Generic(error) => eprintln!("{error}"),
             },
             cli_utils::Error::LocalpvLvm(error) => match error {
-                cli_utils::localpvlvm::Error::Generic(error) => eprintln!("{error}"),
+                cli_utils::localpvlvm::Error::Generic(error) => eprint!("{error}"),
+                cli_utils::localpvlvm::Error::Kube(error) => eprint!("{error}"),
             },
             cli_utils::Error::LocalpvZfs(error) => match error {
                 cli_utils::localpvzfs::Error::Generic(error) => eprintln!("{error}"),

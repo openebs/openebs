@@ -11,7 +11,7 @@ pub(crate) mod localpvzfs;
 #[group(skip)]
 pub struct CliArgs {
     #[clap(flatten)]
-    args: resources::CliArgs,
+    pub args: resources::CliArgs,
 }
 
 impl Deref for CliArgs {
@@ -50,20 +50,20 @@ impl ExecuteOperation for Operations {
     async fn execute(&self, cli_args: &CliArgs) -> Result<(), Error> {
         match self {
             Operations::ClusterInfo(cluster_info) => {
-                cluster_info.execute(&cli_args).await?;
+                cluster_info.execute(cli_args).await?;
             }
             Operations::Mayastor(maya_ops) => {
                 resources::init_rest(&cli_args.args).await?;
                 maya_ops.execute(&cli_args.args).await?;
             }
             Operations::LocalpvLvm(lvm_ops) => {
-                lvm_ops.execute(&cli_args).await?;
+                lvm_ops.execute(cli_args).await?;
             }
             Operations::LocalpvZfs(zfs_ops) => {
-                zfs_ops.execute(&cli_args).await?;
+                zfs_ops.execute(cli_args).await?;
             }
             Operations::LocalpvHostpath(hostpath_ops) => {
-                hostpath_ops.execute(&cli_args).await?;
+                hostpath_ops.execute(cli_args).await?;
             }
         }
         Ok(())
@@ -107,6 +107,7 @@ impl From<localpvlvm::Error> for Error {
             localpvlvm::Error::Generic(error) => {
                 Error::LocalpvLvm(localpvlvm::Error::Generic(error))
             }
+            localpvlvm::Error::Kube(error) => Error::LocalpvLvm(localpvlvm::Error::Kube(error)),
         }
     }
 }
