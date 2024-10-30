@@ -1,5 +1,5 @@
 ---
-oep-number: OEP 101
+oep-number: OEP 1
 title: My First OEP
 authors:
   - "@user1"
@@ -29,11 +29,13 @@ The title should be lowercased and spaces/punctuation should be replaced with `-
 
 To get started with this template:
 1. **Make a copy of this template.**
-  Name it `YYYYMMDD-my-title.md`.
+  Name it `my-title.md`.
 1. **Fill out the "overview" sections.**
   This includes the Summary and Motivation sections.
+1. **Create a tracking Issue.**
+  This should follow the GitHub OEP Issue template.
 1. **Create a PR.**
-  Name it `[OEP NUMBER] Title`, e.g. `[OEP 0001] Snapshot for LVM localpv volumes`.
+  Name it `[OEP NUMBER] Title`, e.g. `[OEP 101] Snapshot for LVM localpv volumes`.
   Assign it to owner(s) that are sponsoring this process.
 1. **Merge early.**
   Avoid getting hung up on specific details and instead aim to get the goal of the OEP merged quickly.
@@ -129,9 +131,6 @@ For example, consider both security and how this will impact the larger kubernet
 
 How will we know that this has succeeded?
 Gathering user feedback is crucial for building high quality experiences and owners have the important responsibility of setting milestones for stability and completeness.
-Hopefully the content previously contained in [umbrella issues][] will be tracked in the `Graduation Criteria` section.
-
-[umbrella issues]: https://github.com/kubernetes/kubernetes/issues/42752
 
 ## Implementation History
 
