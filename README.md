@@ -1,3 +1,10 @@
+## OpenEBS - Cloud Native Storage
+[![Release Charts](https://github.com/openebs/openebs/actions/workflows/chart-release.yml/badge.svg)](https://github.com/openebs/openebs/actions/workflows/chart-release.yml)
+[![Slack](https://img.shields.io/badge/chat-slack-ff1493.svg?style=flat-square)](https://kubernetes.slack.com/messages/openebs)
+[![Community Meetings](https://img.shields.io/badge/Community-Meetings-blue)](https://us05web.zoom.us/j/87535654586?pwd=CigbXigJPn38USc6Vuzt7qSVFoO79X.1)
+[![OpenSSF Best Practices](https://www.bestpractices.dev/projects/1754/badge)](https://www.bestpractices.dev/projects/1754)
+[![FOSSA Status](https://app.fossa.com/api/projects/custom%2B162%2Fgithub.com%2Fopenebs%2Fopenebs.svg?type=shield&issueType=license)](https://app.fossa.com/projects/custom%2B162%2Fgithub.com%2Fopenebs%2Fopenebs?ref=badge_shield&issueType=license)
+
 ## Project Purpose
 
 OpenEBS is an open-source storage service for Kubernetes applications. OpenEBS manages the block storage and file systems based on the block storage for containers running in Kubernetes. Use OpenEBS for creating fast and resilient storage; with options for single-node, and replicated multi-node storage.<BR>
@@ -191,3 +198,6 @@ Commercially supported deployments of OpenEBS are available via the companies be
 - [Gridworkz Cloud Services](https://gridworkz.com/)
 
 (OpenEBS OSS is a CNCF project. CNCF does not endorse any specific company).
+
+## License Compliance
+[![FOSSA Status](https://app.fossa.com/api/projects/custom%2B162%2Fgithub.com%2Fopenebs%2Fopenebs.svg?type=large&issueType=license)](https://app.fossa.com/projects/custom%2B162%2Fgithub.com%2Fopenebs%2Fopenebs?ref=badge_large&issueType=license)

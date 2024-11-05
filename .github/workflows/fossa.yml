@@ -1,0 +1,17 @@
+name: Fossa CLI
+on:
+  push:
+    branches:
+      - 'main'
+      - 'release/**'
+
+jobs:
+  fossa-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: fossas/fossa-action@v1.4.0
+        with:
+          api-key: ${{ secrets.FOSSA_API_KEY }}
