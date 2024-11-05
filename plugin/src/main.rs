@@ -13,7 +13,8 @@ struct CliArgs {
     #[clap(subcommand)]
     operations: cli_utils::Operations,
 
-    /// Kubernetes namespace of openebs service
+    /// Namespace where openebs is installed.
+    /// If unset, defaults to the default namespace in the current context.
     #[clap(global = true, long, short = 'n')]
     namespace: Option<String>,
 
@@ -50,7 +51,7 @@ async fn main() {
     if let Err(error) = cli_args.execute().await {
         let mut exit_code = 1;
         match error {
-            cli_utils::Error::Mayastor(variants) => match variants {
+            cli_utils::Error::Mayastor(err_variants) => match err_variants {
                 resources::Error::RestPlugin(error) => eprintln!("{error}"),
                 resources::Error::RestClient(error) => {
                     eprintln!("Failed to initialise the REST client. Error {error}")
@@ -61,20 +62,11 @@ async fn main() {
                 }
                 resources::Error::Generic(error) => eprintln!("{error}"),
             },
-            cli_utils::Error::LocalpvLvm(error) => match error {
-                cli_utils::localpvlvm::Error::Generic(error) => eprint!("{error}"),
-                cli_utils::localpvlvm::Error::Kube(error) => eprint!("{error}"),
-            },
-            cli_utils::Error::LocalpvZfs(error) => match error {
-                cli_utils::localpvzfs::Error::Generic(error) => eprintln!("{error}"),
-            },
-            cli_utils::Error::Hostpath(error) => match error {
-                cli_utils::localpvhostpath::Error::Generic(error) => eprintln!("{error}"),
-            },
-            cli_utils::Error::ClusterInfo(error) => match error {
-                cli_utils::clusterinfo::Error::Generic(error) => eprintln!("{error}"),
-            },
-            cli_utils::Error::Generic(error) => eprintln!("{error}"),
+            cli_utils::Error::LocalpvLvm(error) => eprintln!("{}", error),
+            cli_utils::Error::LocalpvZfs(error) => eprintln!("{}", error),
+            cli_utils::Error::Hostpath(error) => eprintln!("{}", error),
+            cli_utils::Error::ClusterInfo(error) => eprintln!("{}", error),
+            cli_utils::Error::Generic(error) => eprintln!("{}", error),
         }
         std::process::exit(exit_code);
     }

@@ -1,7 +1,7 @@
 use super::Error;
 use k8s_openapi::api::core::v1::PersistentVolume;
 use k8s_openapi::NamespaceResourceScope;
-use kube::{api::ObjectMeta, Resource};
+use kube::{api::ObjectMeta, Resource, ResourceExt};
 use serde::{Deserialize, Serialize};
 use std::borrow::Cow;
 
@@ -103,30 +103,37 @@ pub(crate) struct LvmVolumeObject {
 
 /// Getter implementations for LvmVolumeObject.
 impl LvmVolumeObject {
+    /// Returns name of lvmvolume.
     pub(crate) fn name(&self) -> &String {
         &self.name
     }
 
+    /// Returns node hosting the lvmvolume.
     pub(crate) fn node(&self) -> &String {
         &self.node
     }
 
+    /// Returns capacity of the lvmvolume.
     pub(crate) fn capacity(&self) -> &String {
         &self.capacity
     }
 
+    /// Returns lvmvolume status.
     pub(crate) fn status(&self) -> &String {
         &self.status
     }
 
+    /// Returns PVC name associated with lvmvolume.
     pub(crate) fn pvc_name(&self) -> &String {
         &self.pvc_name
     }
 
+    /// Returns volume group hosting the lvmvolume.
     pub(crate) fn vol_group(&self) -> &String {
         &self.vol_group
     }
 
+    /// Returns storage class name for the lvmvolume.
     pub(crate) fn sc_name(&self) -> &String {
         &self.sc_name
     }
@@ -140,15 +147,17 @@ impl LvmVolume {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub(crate) struct LvolRecord {
+pub(crate) struct LvmVolRecord {
     volumes: Vec<LvmVolumeObject>,
 }
 
-impl LvolRecord {
+impl LvmVolRecord {
+    /// Constructs LvolRecord object.
     pub(crate) fn new(volumes: Vec<LvmVolumeObject>) -> Self {
         Self { volumes }
     }
 
+    /// Returns volume list present in the LvolRecord.
     pub(crate) fn volumes(&self) -> &Vec<LvmVolumeObject> {
         &self.volumes
     }
@@ -156,25 +165,28 @@ impl LvolRecord {
 
 /// Takes lvmvolume and associated PV, Returns LvmVolumeObject.
 impl TryFrom<(&LvmVolume, PersistentVolume)> for LvmVolumeObject {
+    type Error = Error;
     fn try_from(
         (lvm_volume, persistent_volume): (&LvmVolume, PersistentVolume),
     ) -> Result<LvmVolumeObject, Self::Error> {
+        let pv_name = persistent_volume.name_any();
+        let lvmvol_name = lvm_volume.name_any();
         let spec = persistent_volume
             .spec
-            .ok_or_else(|| Error::Generic(anyhow::anyhow!("PersistentVolume spec missing")))?;
+            .clone()
+            .ok_or_else(|| Error::Generic {
+                source: anyhow::anyhow!("PersistentVolume spec missing for {}", pv_name),
+            })?;
         let lvm_spec = &lvm_volume.spec;
         Ok(Self {
-            name: lvm_volume
-                .metadata
-                .name
-                .as_ref()
-                .ok_or_else(|| Error::Generic(anyhow::anyhow!("LvmVolume name missing")))?
-                .clone(),
+            name: lvm_volume.name_any(),
             namespace: lvm_volume
                 .metadata
                 .namespace
                 .as_ref()
-                .ok_or_else(|| Error::Generic(anyhow::anyhow!("LvmVolume namespace missing")))?
+                .ok_or_else(|| Error::Generic {
+                    source: anyhow::anyhow!("LvmVolume namespace missing for {}", lvmvol_name),
+                })?
                 .clone(),
             status: lvm_volume.status.state.clone(),
             node: lvm_spec.owner_node_id.clone(),
@@ -186,19 +198,20 @@ impl TryFrom<(&LvmVolume, PersistentVolume)> for LvmVolumeObject {
             pvc_name: spec
                 .claim_ref
                 .clone()
-                .ok_or_else(|| Error::Generic(anyhow::anyhow!("PV claimRef missing")))?
+                .ok_or_else(|| Error::Generic {
+                    source: anyhow::anyhow!("PV claimRef missing for {}", pv_name),
+                })?
                 .name
                 .unwrap_or_default(),
-            access_mode: spec
-                .access_modes
-                .ok_or_else(|| Error::Generic(anyhow::anyhow!("PV accessmode missing")))?,
-            sc_name: spec
-                .storage_class_name
-                .ok_or_else(|| Error::Generic(anyhow::anyhow!("PV sc name missing")))?,
-            volume_mode: spec
-                .volume_mode
-                .ok_or_else(|| Error::Generic(anyhow::anyhow!("PV vol mode missing")))?,
+            access_mode: spec.access_modes.ok_or_else(|| Error::Generic {
+                source: anyhow::anyhow!("PV accessmode missing for {}", pv_name),
+            })?,
+            sc_name: spec.storage_class_name.ok_or_else(|| Error::Generic {
+                source: anyhow::anyhow!("PV sc name missing for {}", pv_name),
+            })?,
+            volume_mode: spec.volume_mode.ok_or_else(|| Error::Generic {
+                source: anyhow::anyhow!("PV vol mode missing for {}", pv_name),
+            })?,
         })
     }
-    type Error = Error;
 }

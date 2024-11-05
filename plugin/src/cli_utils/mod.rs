@@ -70,7 +70,7 @@ impl ExecuteOperation for Operations {
     }
 }
 
-/// Wrapper for all stem modules.
+/// Wrapper error for all stem modules.
 pub enum Error {
     /// Mayastor stem specific errors.
     Mayastor(resources::Error),
@@ -102,43 +102,26 @@ impl From<resources::Error> for Error {
 }
 
 impl From<localpvlvm::Error> for Error {
-    fn from(value: localpvlvm::Error) -> Self {
-        match value {
-            localpvlvm::Error::Generic(error) => {
-                Error::LocalpvLvm(localpvlvm::Error::Generic(error))
-            }
-            localpvlvm::Error::Kube(error) => Error::LocalpvLvm(localpvlvm::Error::Kube(error)),
-        }
+    fn from(err: localpvlvm::Error) -> Self {
+        Error::LocalpvLvm(err)
     }
 }
 
 impl From<localpvzfs::Error> for Error {
-    fn from(value: localpvzfs::Error) -> Self {
-        match value {
-            localpvzfs::Error::Generic(error) => {
-                Error::LocalpvZfs(localpvzfs::Error::Generic(error))
-            }
-        }
+    fn from(err: localpvzfs::Error) -> Self {
+        Error::LocalpvZfs(err)
     }
 }
 
 impl From<localpvhostpath::Error> for Error {
-    fn from(value: localpvhostpath::Error) -> Self {
-        match value {
-            localpvhostpath::Error::Generic(error) => {
-                Error::Hostpath(localpvhostpath::Error::Generic(error))
-            }
-        }
+    fn from(err: localpvhostpath::Error) -> Self {
+        Error::Hostpath(err)
     }
 }
 
 impl From<clusterinfo::Error> for Error {
-    fn from(value: clusterinfo::Error) -> Self {
-        match value {
-            clusterinfo::Error::Generic(error) => {
-                Error::ClusterInfo(clusterinfo::Error::Generic(error))
-            }
-        }
+    fn from(err: clusterinfo::Error) -> Self {
+        Error::ClusterInfo(err)
     }
 }
 

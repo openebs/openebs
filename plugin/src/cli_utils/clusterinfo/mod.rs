@@ -1,7 +1,8 @@
 use crate::cli_utils::CliArgs;
 use plugin::ExecuteOperation;
+use snafu::Snafu;
 
-/// Cluster-info operations
+/// Cluster-info operations.
 #[derive(clap::Subcommand, Debug)]
 pub enum Operations {
     /// Gets information of all installed engines.
@@ -16,6 +17,7 @@ impl ExecuteOperation for Operations {
     async fn execute(&self, _cli_args: &CliArgs) -> Result<(), Error> {
         match self {
             Operations::Get(_cluster_info_arg) => {
+                let _ = dummy_construct();
                 todo!("Implementation pending for this command")
             }
         }
@@ -25,13 +27,16 @@ impl ExecuteOperation for Operations {
 #[derive(Debug, Clone, clap::Args)]
 pub struct ClusterInfoArg {}
 
-/// Error for clusterinfo stem.
-pub enum Error {
-    Generic(anyhow::Error),
+/// Temporary function to fix warning as snafu variant is not getting constructed.
+fn dummy_construct() -> Result<(), Error> {
+    Err(Error::Generic {
+        source: anyhow::anyhow!("dummy"),
+    })
 }
 
-impl From<anyhow::Error> for Error {
-    fn from(e: anyhow::Error) -> Self {
-        Error::Generic(e)
-    }
+/// Error for clusterinfo stem.
+#[derive(Debug, Snafu)]
+pub enum Error {
+    #[snafu(display("Generic error: {}", source))]
+    Generic { source: anyhow::Error },
 }

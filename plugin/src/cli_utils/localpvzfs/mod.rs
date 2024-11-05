@@ -1,6 +1,7 @@
 use crate::cli_utils::CliArgs;
 use clap::Parser;
 use plugin::ExecuteOperation;
+use snafu::Snafu;
 
 /// LocalPV zfs operations.
 #[derive(Parser, Debug)]
@@ -64,6 +65,7 @@ impl ExecuteOperation for ZfsGet {
     async fn execute(&self, _cli_args: &CliArgs) -> Result<(), Error> {
         match self {
             ZfsGet::Volume(_volume_arg) => {
+                let _ = dummy_construct();
                 todo!("Implementation pending for this command")
             }
             ZfsGet::Volumes(_volumes_arg) => {
@@ -76,13 +78,16 @@ impl ExecuteOperation for ZfsGet {
     }
 }
 
-/// Error for localpv-zfs stem.
-pub enum Error {
-    Generic(anyhow::Error),
+/// Temporary function to fix warning as snafu variant is not getting constructed.
+fn dummy_construct() -> Result<(), Error> {
+    Err(Error::Generic {
+        source: anyhow::anyhow!("dummy"),
+    })
 }
 
-impl From<anyhow::Error> for Error {
-    fn from(e: anyhow::Error) -> Self {
-        Error::Generic(e)
-    }
+/// Error for localpv-zfs stem.
+#[derive(Debug, Snafu)]
+pub enum Error {
+    #[snafu(display("Generic error: {}", source))]
+    Generic { source: anyhow::Error },
 }

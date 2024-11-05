@@ -27,11 +27,17 @@ pub(crate) async fn volume_groups(
     cli_args: &CliArgs,
     args: &GetVolumeGroupsArg,
 ) -> Result<(), Error> {
+    let client = Client::try_default()
+        .await
+        .map_err(|err| Error::Kube { source: err })?;
     let lvm_nodes = if let Some(node_id) = &args.node_id {
-        let lvmnode = get_lvm_node(cli_args, node_id).await?;
-        vec![lvmnode]
+        vec![get_lvm_node(cli_args, node_id, client)
+            .await
+            .map_err(|err| Error::Kube { source: err })?]
     } else {
-        list_lvm_nodes(cli_args).await?
+        list_lvm_nodes(cli_args, client)
+            .await
+            .map_err(|err| Error::Kube { source: err })?
     };
     let records = VolumeGroupRecord::from(lvm_nodes);
     print_table(&cli_args.output, records);
@@ -39,15 +45,17 @@ pub(crate) async fn volume_groups(
 }
 
 /// Gets a specific lvmnode from k8s cluster.
-async fn get_lvm_node(cli_args: &CliArgs, node_id: &str) -> Result<LvmNode, kube::Error> {
-    let client = Client::try_default().await?;
+async fn get_lvm_node(
+    cli_args: &CliArgs,
+    node_id: &str,
+    client: Client,
+) -> Result<LvmNode, kube::Error> {
     let api: Api<LvmNode> = Api::namespaced(client.clone(), &cli_args.args.namespace);
     api.get(node_id).await
 }
 
 /// Lists all lvmnodes from the cluster.
-async fn list_lvm_nodes(cli_args: &CliArgs) -> Result<Vec<LvmNode>, kube::Error> {
-    let client = Client::try_default().await?;
+async fn list_lvm_nodes(cli_args: &CliArgs, client: Client) -> Result<Vec<LvmNode>, kube::Error> {
     let lp = ListParams::default();
     let api: Api<LvmNode> = Api::namespaced(client.clone(), &cli_args.args.namespace);
     let lvm_nodes = api.list(&lp).await?.items;

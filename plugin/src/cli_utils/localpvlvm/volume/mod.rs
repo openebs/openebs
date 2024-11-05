@@ -3,7 +3,7 @@ use super::Error;
 use super::{GetVolumeArg, GetVolumesArg};
 pub(crate) mod types;
 use plugin::resources::utils::{print_table, CreateRows, GetHeaderRow};
-use types::{LvmVolume, LvmVolumeObject, LvolRecord};
+use types::{LvmVolRecord, LvmVolume, LvmVolumeObject};
 
 use k8s_openapi::api::core::v1::PersistentVolume;
 use kube::api::ObjectList;
@@ -20,8 +20,13 @@ lazy_static! {
 
 /// Implementation for volumes cmd.
 pub(crate) async fn volumes(cli_args: &CliArgs, volumes_arg: &GetVolumesArg) -> Result<(), Error> {
-    let client = Client::try_default().await?;
-    let mut vol_list = list_lvm_volumes(cli_args, &client).await?.items;
+    let client = Client::try_default()
+        .await
+        .map_err(|err| Error::Kube { source: err })?;
+    let mut vol_list = list_lvm_volumes(cli_args, &client)
+        .await
+        .map_err(|err| Error::Kube { source: err })?
+        .items;
     vol_list = if let Some(node_id) = &volumes_arg.node_id {
         vol_list
             .iter()
@@ -42,9 +47,14 @@ pub(crate) async fn volumes(cli_args: &CliArgs, volumes_arg: &GetVolumesArg) -> 
 
 /// Implementation for volume cmd.
 pub(crate) async fn volume(cli_args: &CliArgs, volume_arg: &GetVolumeArg) -> Result<(), Error> {
-    let client = Client::try_default().await?;
+    let client = Client::try_default()
+        .await
+        .map_err(|err| Error::Kube { source: err })?;
     let api: Api<LvmVolume> = Api::namespaced(client.clone(), &cli_args.args.namespace);
-    let volume = api.get(&volume_arg.volume).await?;
+    let volume = api
+        .get(&volume_arg.volume)
+        .await
+        .map_err(|err| Error::Kube { source: err })?;
     match get_lvm_vol_output(vec![volume], &client).await {
         Ok(lvol_record) => {
             print_table(&cli_args.output, lvol_record);
@@ -65,23 +75,38 @@ async fn list_lvm_volumes(
 }
 
 /// Converts Vec<LvmVolume> into LvolRecord.
-async fn get_lvm_vol_output(vols: Vec<LvmVolume>, client: &Client) -> Result<LvolRecord, Error> {
+async fn get_lvm_vol_output(
+    lvm_vols: Vec<LvmVolume>,
+    client: &Client,
+) -> Result<LvmVolRecord, Error> {
     let api: Api<PersistentVolume> = Api::<PersistentVolume>::all(client.clone());
-    let mut vol_obj: Vec<LvmVolumeObject> = Vec::new();
-    for vol in vols {
-        let val = api.get(vol.meta().name.as_ref().unwrap().as_str()).await?;
-        vol_obj.push(LvmVolumeObject::try_from((&vol, val))?);
+    let mut lvm_volumes: Vec<LvmVolumeObject> = Vec::new();
+    for lvm_vol in lvm_vols {
+        let pv = api
+            .get(
+                lvm_vol
+                    .meta()
+                    .name
+                    .as_ref()
+                    .ok_or(Error::Generic {
+                        source: anyhow::anyhow!("PV name missing"),
+                    })?
+                    .as_str(),
+            )
+            .await
+            .map_err(|err| Error::Kube { source: err })?;
+        lvm_volumes.push(LvmVolumeObject::try_from((&lvm_vol, pv))?);
     }
-    Ok(LvolRecord::new(vol_obj))
+    Ok(LvmVolRecord::new(lvm_volumes))
 }
 
-impl GetHeaderRow for LvolRecord {
+impl GetHeaderRow for LvmVolRecord {
     fn get_header_row(&self) -> Row {
         (*LVM_VOLUME_HEADER).clone()
     }
 }
 
-impl CreateRows for LvolRecord {
+impl CreateRows for LvmVolRecord {
     fn create_rows(&self) -> Vec<Row> {
         self.volumes()
             .iter()

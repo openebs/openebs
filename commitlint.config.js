@@ -1,0 +1,1 @@
+mayastor/commitlint.config.js

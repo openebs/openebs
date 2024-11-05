@@ -102,36 +102,44 @@ pub(crate) struct LvmVolumeGroup {
     missing_pv_count: String,
 }
 
-/// Getter from LvmVolumeGroup.
+/// Getter for LvmVolumeGroup.
 impl LvmVolumeGroup {
+    /// Returns name of the vg.
     pub(crate) fn name(&self) -> &String {
         &self.name
     }
 
+    /// Returns node hosting the vg.
     pub(crate) fn node(&self) -> &String {
         &self.node
     }
 
+    /// Returns total size of the vg.
     pub(crate) fn total_size(&self) -> &String {
         &self.total_size
     }
 
+    /// Returns free size of the vg.
     pub(crate) fn free_size(&self) -> &String {
         &self.free_size
     }
 
+    /// Returns total lv hosted by vg.
     pub(crate) fn lv_count(&self) -> &String {
         &self.lv_count
     }
 
-    pub(crate) fn pv_count(&self) -> &String {
-        &self.pv_count
-    }
-
+    /// Returns total snapshot hosted by vg.
     pub(crate) fn snap_count(&self) -> &String {
         &self.snap_count
     }
 
+    /// Returns number of PV present in the vg.
+    pub(crate) fn pv_count(&self) -> &String {
+        &self.pv_count
+    }
+
+    /// Returns lvm specific uuid of the vg.
     pub(crate) fn uuid(&self) -> &String {
         &self.uuid
     }

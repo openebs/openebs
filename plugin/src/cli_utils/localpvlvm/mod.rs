@@ -3,6 +3,7 @@ use clap::Parser;
 use plugin::ExecuteOperation;
 pub(crate) mod node;
 pub(crate) mod volume;
+use snafu::Snafu;
 
 /// LocalPV lvm operations.
 #[derive(Parser, Debug)]
@@ -80,21 +81,10 @@ impl ExecuteOperation for LvmGet {
 }
 
 /// Error for localpv-lvm stem.
+#[derive(Debug, Snafu)]
 pub enum Error {
-    Generic(anyhow::Error),
-    Kube(kube::Error),
-}
-
-/// Converts anyhow::Error into lovalPV Error.
-impl From<anyhow::Error> for Error {
-    fn from(e: anyhow::Error) -> Self {
-        Error::Generic(e)
-    }
-}
-
-/// Converts kube::Error into lovalPV Error.
-impl From<kube::Error> for Error {
-    fn from(e: kube::Error) -> Self {
-        Error::Kube(e)
-    }
+    #[snafu(display("{}", source))]
+    Generic { source: anyhow::Error },
+    #[snafu(display("{}", source))]
+    Kube { source: kube::Error },
 }
