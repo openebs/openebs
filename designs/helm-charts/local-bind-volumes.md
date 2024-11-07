@@ -48,7 +48,6 @@ In clusters that do not have dedicated storage nodes, keeping application pods o
 ## 4. Non-Goals
 
 - This proposal does not implement the local feature for multi-replica volumes, as cross-node replication complicates strict local binding.
-- The local feature is specific to Mayastor and does not apply to other OpenEBS engines, such as Jiva or cStor.
 
 ## 5. Proposal
 
@@ -66,7 +65,7 @@ In clusters that do not have dedicated storage nodes, keeping application pods o
      - When the pod is created, Kubernetes will defer scheduling until the volume is provisioned on the node.
      - Mayastor provisions the volume on the same node as the pod, enforcing local attachment.
    - If `volumeBindingMode: Immediate` in the storage class for Mayastor:
-     - Mayastor provisions the volume with the `local` flag enabled.
+     - Mayastor provisions the volume with the `local` flag enabled. The provisioned volume will include a node affinity term specifying the node where the volume resides.
      - Kubernetes scheduler will schedule the pod on the node where the volume is provisioned, ensuring local attachment.
 
 2. **Single-Replica Restriction**:
@@ -79,6 +78,8 @@ In clusters that do not have dedicated storage nodes, keeping application pods o
 4. **Configuring the Local Flag**:
    - The `local` flag can be modified by administrators using `kubectl-mayastor` commands, allowing on-demand toggling.
    - Setting `local: true` enables strict local attachment; setting `local: false` removes the affinity restrictions, allowing the volume to be scheduled across nodes if required.
+   - The enforcement of the `local` flag applies only during the scheduling and rescheduling processes. If a pod is located on a different node from the storage, the scheduling or rescheduling should not be managed by this implementation. Instead, this behavior should be left to the Kubernetes scheduler itself.
+.
 
 ## 6. User Stories
 
