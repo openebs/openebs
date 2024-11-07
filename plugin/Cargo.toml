@@ -1,0 +1,30 @@
+[package]
+name = "kubectl-openebs"
+version = "0.7.0"
+edition = "2021"
+
+[[bin]]
+name = "kubectl-openebs"
+path = "src/main.rs"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+kubectl-plugin = { path = "../mayastor/k8s/plugin", default-features = false }
+rest-plugin = { path = "../mayastor/dependencies/control-plane/control-plane/plugin", default-features = false }
+shutdown = { path = "../mayastor/dependencies/control-plane/utils/shutdown"}
+utils = { path = "../mayastor/dependencies/control-plane/utils/utils-lib" }
+upgrade = { path = "../mayastor/k8s/upgrade" }
+anyhow = "1.0.75"
+async-trait = "0.1.73"
+clap = { version = "4.4.6", features = ["color", "derive"] }
+k8s-openapi = { version = "0.20.0", features = ["v1_22"] }
+kube = { version = "0.87.2", features = ["derive", "runtime"] }
+lazy_static = "1.4.0"
+prettytable-rs = "0.10.0"
+serde = "1.0.188"
+serde_json = {version = "1.0.107", features = ["alloc"]}
+serde_yaml = "0.9.25"
+snafu = "0.8.5"
+tokio = { version = "1.33.0" }
+

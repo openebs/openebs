@@ -1,0 +1,6 @@
+[workspace]
+members = [
+    "plugin"
+]
+exclude = [ "./mayastor", "./mayastor/dependencies/control-plane" ]
+resolver = "1"
