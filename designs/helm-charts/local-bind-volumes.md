@@ -122,3 +122,8 @@ In clusters that do not have dedicated storage nodes, keeping application pods o
 - **Manual Affinity Configurations**: Users could manually configure node affinity, but this is more complex and does not ensure initial volume provisioning on the correct node.
 - **Scheduler extension or plugin**: Adding some implementation to k8s scheduler to check mayastor topology before schedule a pod, but that will only work for volumes already provisioned, but will not strict volume provisioning when `volumeBindingMode: WaitForFirstConsumer`.
 
+## 10. Unresolved Questions
+- Unset feature / the affinity is immutable in the PV. Possible options?
+  - Get rid of the unset, once volume is created cannot be changed.
+  - Delete pv definition retaining data volume and recreate the new pv pointing to original volume
+  - Make a volume replica with openebs.io/csi-node in [mayastor] affinity, and delete original volume
