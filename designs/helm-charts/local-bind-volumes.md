@@ -124,6 +124,5 @@ In clusters that do not have dedicated storage nodes, keeping application pods o
 
 ## 10. Unresolved Questions
 - Unset feature / the affinity is immutable in the PV. Possible options?
-  - Get rid of the unset, once volume is created cannot be changed.
+  - Get rid of the unset, once volume is created cannot be changed. If user want to change, can create a new volume or manual intervention like recreating pv manifest with desired spec.
   - Delete pv definition retaining data volume and recreate the new pv pointing to original volume
-  - Make a volume replica with openebs.io/csi-node in [mayastor] affinity, and delete original volume
