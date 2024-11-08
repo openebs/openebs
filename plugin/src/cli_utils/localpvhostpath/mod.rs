@@ -56,7 +56,6 @@ impl ExecuteOperation for HosthpathGet {
     async fn execute(&self, _cli_args: &CliArgs) -> Result<(), Error> {
         match self {
             HosthpathGet::Volume(_volume_arg) => {
-                let _ = dummy_construct();
                 todo!("Implementation pending for this command")
             }
             HosthpathGet::Volumes(_volumes_arg) => {
@@ -66,16 +65,10 @@ impl ExecuteOperation for HosthpathGet {
     }
 }
 
-/// Temporary function to fix warning as snafu variant is not getting constructed.
-fn dummy_construct() -> Result<(), Error> {
-    Err(Error::Generic {
-        source: anyhow::anyhow!("dummy"),
-    })
-}
-
 /// Error for localpv-hostpath stem.
 #[derive(Debug, Snafu)]
 pub enum Error {
     #[snafu(display("Generic error: {}", source))]
+    #[allow(unused)]
     Generic { source: anyhow::Error },
 }
