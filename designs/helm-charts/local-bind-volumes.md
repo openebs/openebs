@@ -1,14 +1,18 @@
-# Title: OpenEBS Enhancement Proposal for Mayastor Local Feature
-
-### OEP Number: <To be assigned>
-### Title: Reintroduction of Local Feature in Mayastor for Single-Replica Volumes
-### Authors: @todeb
-### Status: Proposed
-### Created: 2024-11-07
-### Last Updated: 2024-11-07
-### Target Release: ?
-
 ---
+oep-number: Issue also needs to be created
+title: OpenEBS Enhancement Proposal for Mayastor Local Feature
+authors:
+  - "@todeb"
+owners:
+  - "@todeb"
+  - "@tiagolobocastro"
+editor: TBD
+creation-date: 2024-11-07
+last-updated: 2024-11-07
+status: provisional
+---
+
+# OpenEBS Enhancement Proposal for Mayastor Local Feature
 
 ## Table of Contents
 
