@@ -1,0 +1,118 @@
+use super::CliArgs;
+use super::Error;
+use super::{GetVolumeArg, GetVolumesArg};
+pub(crate) mod types;
+use kube::ResourceExt;
+use plugin::resources::utils::{print_table, CreateRows, GetHeaderRow};
+use types::{ZfsVolRecord, ZfsVolume, ZfsVolumeObject};
+
+use k8s_openapi::api::core::v1::PersistentVolume;
+use kube::api::ObjectList;
+use kube::{api::ListParams, Api, Client};
+use prettytable::{row, Row};
+
+use lazy_static::lazy_static;
+
+lazy_static! {
+    pub(crate) static ref ZFS_VOLUME_HEADER: Row =
+        row!["NAME", "NODE", "STATUS", "CAPACITY", "POOL", "PVC-NAME", "SC-NAME",];
+}
+
+/// Implementation for volumes cmd.
+pub(crate) async fn volumes(cli_args: &CliArgs, volumes_arg: &GetVolumesArg) -> Result<(), Error> {
+    let client = Client::try_default()
+        .await
+        .map_err(|err| Error::Kube { source: err })?;
+    let vols = if let Some(node_id) = &volumes_arg.node_id {
+        let lp =
+            ListParams::default().labels(format!("kubernetes.io/nodename={}", node_id).as_str());
+        list_zfs_volume(cli_args, &client, lp)
+            .await
+            .map_err(|err| Error::Kube { source: err })?
+            .items
+    } else {
+        let lp = ListParams::default();
+        list_zfs_volume(cli_args, &client, lp)
+            .await
+            .map_err(|err| Error::Kube { source: err })?
+            .items
+    };
+    match get_zfs_vol_record(vols, &client).await {
+        Ok(zvol_record) => {
+            print_table(&cli_args.output, zvol_record);
+            Ok(())
+        }
+        Err(e) => Err(e),
+    }
+}
+
+/// Implementation for volume cmd.
+pub(crate) async fn volume(cli_args: &CliArgs, volume_arg: &GetVolumeArg) -> Result<(), Error> {
+    let client = Client::try_default()
+        .await
+        .map_err(|err| Error::Kube { source: err })?;
+    let api: Api<ZfsVolume> = Api::namespaced(client.clone(), &cli_args.args.namespace);
+    let volume = api
+        .get(&volume_arg.volume)
+        .await
+        .map_err(|err| Error::Kube { source: err })?;
+    match get_zfs_vol_record(vec![volume], &client).await {
+        Ok(zvol_record) => {
+            print_table(&cli_args.output, zvol_record);
+            Ok(())
+        }
+        Err(e) => Err(e),
+    }
+}
+
+/// Lists zfsvolume cr.
+async fn list_zfs_volume(
+    cli_args: &CliArgs,
+    client: &Client,
+    lp: ListParams,
+) -> Result<ObjectList<ZfsVolume>, kube::Error> {
+    let api: Api<ZfsVolume> = Api::namespaced(client.clone(), &cli_args.args.namespace);
+    api.list(&lp).await
+}
+
+/// Converts Vec<ZfsVolume> into ZfsRecord.
+async fn get_zfs_vol_record(
+    zfs_vols: Vec<ZfsVolume>,
+    client: &Client,
+) -> Result<ZfsVolRecord, Error> {
+    let api: Api<PersistentVolume> = Api::<PersistentVolume>::all(client.clone());
+    let mut zfs_volumes: Vec<ZfsVolumeObject> = Vec::new();
+    for zfs_vol in zfs_vols {
+        let pv = api
+            .get(zfs_vol.name_any().as_str())
+            .await
+            .map_err(|err| Error::Kube { source: err })?;
+        zfs_volumes.push(ZfsVolumeObject::try_from((zfs_vol, pv))?);
+    }
+    Ok(ZfsVolRecord::new(zfs_volumes))
+}
+
+impl GetHeaderRow for ZfsVolRecord {
+    fn get_header_row(&self) -> Row {
+        (*ZFS_VOLUME_HEADER).clone()
+    }
+}
+
+impl CreateRows for ZfsVolRecord {
+    fn create_rows(&self) -> Vec<Row> {
+        self.volumes()
+            .iter()
+            .map(|vol| {
+                row![
+                    vol.name(),
+                    vol.node(),
+                    vol.status(),
+                    vol.capacity(),
+                    vol.pool(),
+                    vol.pvc_name(),
+                    vol.sc_name()
+                ]
+            })
+            .collect()
+    }
+}

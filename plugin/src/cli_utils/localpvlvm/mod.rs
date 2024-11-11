@@ -28,6 +28,7 @@ impl ExecuteOperation for Operations {
     }
 }
 
+/// Get commands for localpv-lvm.
 #[derive(clap::Subcommand, Debug)]
 pub enum LvmGet {
     /// Gets a specific localpv-lvm volume.
