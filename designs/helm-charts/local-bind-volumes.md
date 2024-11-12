@@ -26,6 +26,7 @@ status: provisional
 8. [Drawbacks](#drawbacks)
 9. [Alternatives](#alternatives)
 10. [Unresolved Questions](#unresolved-questions)
+11. [Optional extensions](#optional-extensions)
 
 ---
 
@@ -59,7 +60,6 @@ In clusters that do not have dedicated storage nodes, keeping application pods o
 
 1. **Local Provisioning for Single Replica**: Enforce that Mayastor PVs with a single replica are provisioned on the same node as their consuming pods.
 2. **Anti-rescheduling Affinity**: Once scheduled, a pod cannot move to a different node unless the corresponding volume is also located on that node.
-3. **Configurable Local Flag**: Add a `local` flag to Mayastor volumes, which can be set or unset via `kubectl-mayastor`. This flag enables administrators to toggle local binding behavior dynamically.
 
 ### Workflow
 
@@ -77,27 +77,20 @@ In clusters that do not have dedicated storage nodes, keeping application pods o
 
 3. **Anti-Rescheduling Enforcement**:
    - Node affinity rules are set to ensure that a pod cannot be rescheduled to a node without the volume.
-   - If the node with the local volume goes offline, the pod remains unscheduled rather than migrating, preventing data access issues due to cross-node scheduling.
-
-4. **Configuring the Local Flag**:
-   - The `local` flag can be modified by administrators using `kubectl-mayastor` commands, allowing on-demand toggling.
-   - Setting `local: true` enables strict local attachment; setting `local: false` removes the affinity restrictions, allowing the volume to be scheduled across nodes if required.
-   - The enforcement of the `local` flag applies only during the scheduling and rescheduling processes. If a pod is located on a different node from the storage, the scheduling or rescheduling should not be managed by this implementation. Instead, this behavior should be left to the Kubernetes scheduler itself.
-.
+   - If the node with the local volume goes offline, the pod remains unscheduled rather than migrating, preventing data access issues due to cross-node scheduling..
 
 ## 6. User Stories
 
 1. **Story 1**: As an application developer, I want my application pod and its Mayastor volume to stay on the same node, ensuring low latency and high performance for data access.
 2. **Story 2**: As a DevOps engineer, I want control over the local behavior for volumes, so I can enable or disable this feature as needed, using `kubectl-mayastor`.
-3. **Story 3**: As a system administrator, I want the flexibility to toggle local binding without disrupting active volumes, providing seamless adaptability for different workload requirements. Additionally, when cordoning a node for maintenance or reboot, I want to ensure that the pods using local volumes will not be rescheduled to other nodes, ensuring the system's stability during such operations.
+3. **Story 3**: As a system administrator, when cordoning a node for maintenance or reboot, I want to ensure that the pods using local volumes will not be rescheduled to other nodes, ensuring the system's stability during such operations.
 
 ## 7. Implementation Details
 
 ### Design
 
 - **Local Flag Parameter**: 
-  - Add a `local` flag to the volume specification. When `local: true` is set, Mayastor enforces both local provisioning and anti-rescheduling of single-replica volumes.
-  - `kubectl-mayastor` commands can be used to set or unset the `local` flag for active volumes, dynamically controlling local binding.
+  - Add a `local` flag to the StorageClass specification. When `local: true` is set, Mayastor enforces both local provisioning and anti-rescheduling of single-replica volumes.
 
 - **Single-Replica Volume Constraint**: 
   - This feature applies only to volumes configured with one replica, as multi-replica configurations may require cross-node replication.
@@ -110,7 +103,6 @@ In clusters that do not have dedicated storage nodes, keeping application pods o
 ### Components to Update
 
 - **Mayastor Volume Provisioner**: Update the provisioner to recognize and enforce the `local` flag.
-- **kubectl-mayastor Tool**: Extend `kubectl-mayastor` to support commands for setting or unsetting the `local` flag on a per-volume basis.
 
 ## 8. Drawbacks
 
@@ -123,6 +115,7 @@ In clusters that do not have dedicated storage nodes, keeping application pods o
 - **Scheduler extension or plugin**: Adding some implementation to k8s scheduler to check mayastor topology before schedule a pod, but that will only work for volumes already provisioned, but will not strict volume provisioning when `volumeBindingMode: WaitForFirstConsumer`.
 
 ## 10. Unresolved Questions
-- Unset feature / the affinity is immutable in the PV. Possible options?
-  - Get rid of the unset, once volume is created cannot be changed. If user want to change, can create a new volume or manual intervention like recreating pv manifest with desired spec.
-  - Delete pv definition retaining data volume and recreate the new pv pointing to original volume
+- No possibility for changing already provisioner volumes as the affinity is immutable. This needs currentely manual user actions eg. create a new volume or recreating pvc and pv manifest with desired node affinity specification.
+
+## 11. Optional extensions 
+- **Configurable Local Flag**: Add a `local` flag to Mayastor per-volume basis, which can be set or unset via `kubectl-mayastor`. This flag enables administrators to toggle local binding behavior dynamically. Setting `local: true` enables strict local attachment; setting `local: false` removes the affinity restrictions, allowing the volume to be scheduled across nodes if required. The enforcement of the `local` flag applies only during the scheduling and rescheduling processes. If a pod is located on a different node from the storage, the scheduling or rescheduling should not be managed by this implementation. Instead, this behavior should be left to the Kubernetes scheduler itself. As the affinity is immmutable on pv that cannot be modified either extension should perform all manual work needed to delete and recreate manifests or kubernetes should make this property mutable.
