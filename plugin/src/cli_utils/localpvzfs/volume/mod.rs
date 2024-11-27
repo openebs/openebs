@@ -7,7 +7,6 @@ use plugin::resources::utils::{print_table, CreateRows, GetHeaderRow};
 use types::{ZfsVolRecord, ZfsVolume, ZfsVolumeObject};
 
 use k8s_openapi::api::core::v1::PersistentVolume;
-use kube::api::ObjectList;
 use kube::{api::ListParams, Api, Client};
 use prettytable::{row, Row};
 
@@ -23,20 +22,10 @@ pub(crate) async fn volumes(cli_args: &CliArgs, volumes_arg: &GetVolumesArg) -> 
     let client = Client::try_default()
         .await
         .map_err(|err| Error::Kube { source: err })?;
-    let vols = if let Some(node_id) = &volumes_arg.node_id {
-        let lp =
-            ListParams::default().labels(format!("kubernetes.io/nodename={}", node_id).as_str());
-        list_zfs_volume(cli_args, &client, lp)
-            .await
-            .map_err(|err| Error::Kube { source: err })?
-            .items
-    } else {
-        let lp = ListParams::default();
-        list_zfs_volume(cli_args, &client, lp)
-            .await
-            .map_err(|err| Error::Kube { source: err })?
-            .items
-    };
+    let volume_handle: Api<ZfsVolume> = Api::namespaced(client.clone(), &cli_args.args.namespace);
+    let vols = zfs_volumes(volume_handle, volumes_arg)
+        .await
+        .map_err(|err| Error::Kube { source: err })?;
     match get_zfs_vol_record(vols, &client).await {
         Ok(zvol_record) => {
             print_table(&cli_args.output, zvol_record);
@@ -51,9 +40,8 @@ pub(crate) async fn volume(cli_args: &CliArgs, volume_arg: &GetVolumeArg) -> Res
     let client = Client::try_default()
         .await
         .map_err(|err| Error::Kube { source: err })?;
-    let api: Api<ZfsVolume> = Api::namespaced(client.clone(), &cli_args.args.namespace);
-    let volume = api
-        .get(&volume_arg.volume)
+    let volume_handle: Api<ZfsVolume> = Api::namespaced(client.clone(), &cli_args.args.namespace);
+    let volume = zfs_volume(volume_handle, volume_arg)
         .await
         .map_err(|err| Error::Kube { source: err })?;
     match get_zfs_vol_record(vec![volume], &client).await {
@@ -65,14 +53,26 @@ pub(crate) async fn volume(cli_args: &CliArgs, volume_arg: &GetVolumeArg) -> Res
     }
 }
 
-/// Lists zfsvolume cr.
-async fn list_zfs_volume(
-    cli_args: &CliArgs,
-    client: &Client,
-    lp: ListParams,
-) -> Result<ObjectList<ZfsVolume>, kube::Error> {
-    let api: Api<ZfsVolume> = Api::namespaced(client.clone(), &cli_args.args.namespace);
-    api.list(&lp).await
+/// Gets a specific zfs volume fom k8s.
+async fn zfs_volume(
+    volume_handle: Api<ZfsVolume>,
+    volume_arg: &GetVolumeArg,
+) -> Result<ZfsVolume, kube::Error> {
+    let volume = volume_handle.get(&volume_arg.volume).await?;
+    Ok(volume)
+}
+
+/// Lists zfsvolume cr. Filters based on node if specified.
+async fn zfs_volumes(
+    volume_handle: Api<ZfsVolume>,
+    volumes_arg: &GetVolumesArg,
+) -> Result<Vec<ZfsVolume>, kube::Error> {
+    let lp = if let Some(node_id) = volumes_arg.node_id.clone() {
+        ListParams::default().labels(format!("kubernetes.io/nodename={}", node_id).as_str())
+    } else {
+        ListParams::default()
+    };
+    Ok(volume_handle.list(&lp).await?.items)
 }
 
 /// Converts Vec<ZfsVolume> into ZfsRecord.

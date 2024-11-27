@@ -6,7 +6,6 @@ use plugin::resources::utils::{print_table, CreateRows, GetHeaderRow};
 use types::{LvmVolRecord, LvmVolume, LvmVolumeObject};
 
 use k8s_openapi::api::core::v1::PersistentVolume;
-use kube::api::ObjectList;
 use kube::Resource;
 use kube::{api::ListParams, Api, Client};
 use prettytable::{row, Row};
@@ -23,19 +22,10 @@ pub(crate) async fn volumes(cli_args: &CliArgs, volumes_arg: &GetVolumesArg) -> 
     let client = Client::try_default()
         .await
         .map_err(|err| Error::Kube { source: err })?;
-    let mut vol_list = list_lvm_volumes(cli_args, &client)
+    let volume_handle: Api<LvmVolume> = Api::namespaced(client.clone(), &cli_args.args.namespace);
+    let vol_list = lvm_volumes(volume_handle, volumes_arg)
         .await
-        .map_err(|err| Error::Kube { source: err })?
-        .items;
-    vol_list = if let Some(node_id) = &volumes_arg.node_id {
-        vol_list
-            .iter()
-            .filter(|vol| vol.on_node(node_id))
-            .cloned()
-            .collect()
-    } else {
-        vol_list
-    };
+        .map_err(|err| Error::Kube { source: err })?;
     match get_lvm_vol_output(vol_list, &client).await {
         Ok(lvol_record) => {
             print_table(&cli_args.output, lvol_record);
@@ -50,9 +40,8 @@ pub(crate) async fn volume(cli_args: &CliArgs, volume_arg: &GetVolumeArg) -> Res
     let client = Client::try_default()
         .await
         .map_err(|err| Error::Kube { source: err })?;
-    let api: Api<LvmVolume> = Api::namespaced(client.clone(), &cli_args.args.namespace);
-    let volume = api
-        .get(&volume_arg.volume)
+    let volume_handle: Api<LvmVolume> = Api::namespaced(client.clone(), &cli_args.args.namespace);
+    let volume = lvm_volume(volume_handle, volume_arg)
         .await
         .map_err(|err| Error::Kube { source: err })?;
     match get_lvm_vol_output(vec![volume], &client).await {
@@ -64,14 +53,26 @@ pub(crate) async fn volume(cli_args: &CliArgs, volume_arg: &GetVolumeArg) -> Res
     }
 }
 
-/// Lists lvm volume cr from the k8s cluster.
-async fn list_lvm_volumes(
-    cli_args: &CliArgs,
-    client: &Client,
-) -> Result<ObjectList<LvmVolume>, kube::Error> {
-    let lp = ListParams::default();
-    let api: Api<LvmVolume> = Api::namespaced(client.clone(), &cli_args.args.namespace);
-    api.list(&lp).await
+/// Get lvm volume cr from the k8s cluster.
+async fn lvm_volume(
+    volume_handle: Api<LvmVolume>,
+    volume_arg: &GetVolumeArg,
+) -> Result<LvmVolume, kube::Error> {
+    let volume = volume_handle.get(&volume_arg.volume).await?;
+    Ok(volume)
+}
+
+/// Lists lvm volume cr from the k8s cluster. Retuns volumes from specific node if node is specified.
+async fn lvm_volumes(
+    volume_handle: Api<LvmVolume>,
+    volumes_arg: &GetVolumesArg,
+) -> Result<Vec<LvmVolume>, kube::Error> {
+    let lp = if let Some(node_id) = volumes_arg.node_id.clone() {
+        ListParams::default().labels(format!("kubernetes.io/nodename={}", node_id).as_str())
+    } else {
+        ListParams::default()
+    };
+    Ok(volume_handle.list(&lp).await?.items)
 }
 
 /// Converts Vec<LvmVolume> into LvolRecord.

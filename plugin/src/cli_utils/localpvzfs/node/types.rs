@@ -95,8 +95,10 @@ impl ZfsPool {
     }
 }
 
+/// A record containing a collection of zpool.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub(crate) struct ZfsPoolRecord {
+    /// A vector of zpool.
     pools: Vec<ZfsPool>,
 }
 
