@@ -74,7 +74,7 @@ impl ExecuteOperation for ZfsGet {
                 volume::volumes(cli_args, volumes_arg).await?;
             }
             ZfsGet::Zpools(zpools_arg) => {
-                node::volume_groups(cli_args, zpools_arg).await?;
+                node::zpools(cli_args, zpools_arg).await?;
             }
         }
         Ok(())
@@ -84,8 +84,8 @@ impl ExecuteOperation for ZfsGet {
 /// Error for localpv-zfs stem.
 #[derive(Debug, Snafu)]
 pub enum Error {
-    #[snafu(display("{}", source))]
+    #[snafu(display("{source}"))]
     Generic { source: anyhow::Error },
-    #[snafu(display("{}", source))]
+    #[snafu(display("{source}"))]
     Kube { source: kube::Error },
 }

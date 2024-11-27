@@ -139,25 +139,20 @@ impl LvmVolumeObject {
     }
 }
 
-impl LvmVolume {
-    /// Checks if lvmvolume is present on a specific node.
-    pub(crate) fn on_node(&self, node_id: &String) -> bool {
-        &self.spec.owner_node_id == node_id
-    }
-}
-
+/// A record containing a collection of localpv-volume.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub(crate) struct LvmVolRecord {
+    /// A vector of lvm volume.
     volumes: Vec<LvmVolumeObject>,
 }
 
 impl LvmVolRecord {
-    /// Constructs LvolRecord object.
+    /// Constructs LvmVolRecord object.
     pub(crate) fn new(volumes: Vec<LvmVolumeObject>) -> Self {
         Self { volumes }
     }
 
-    /// Returns volume list present in the LvolRecord.
+    /// Returns volume list present in the LvmVolRecord.
     pub(crate) fn volumes(&self) -> &Vec<LvmVolumeObject> {
         &self.volumes
     }
@@ -173,7 +168,7 @@ impl TryFrom<(&LvmVolume, PersistentVolume)> for LvmVolumeObject {
         let lvmvol_name = lvm_volume.name_any();
         let spec = persistent_volume
             .spec
-            .clone()
+            .as_ref()
             .ok_or_else(|| Error::Generic {
                 source: anyhow::anyhow!("PersistentVolume spec missing for {}", pv_name),
             })?;
@@ -203,13 +198,16 @@ impl TryFrom<(&LvmVolume, PersistentVolume)> for LvmVolumeObject {
                 })?
                 .name
                 .unwrap_or_default(),
-            access_mode: spec.access_modes.ok_or_else(|| Error::Generic {
+            access_mode: spec.access_modes.clone().ok_or_else(|| Error::Generic {
                 source: anyhow::anyhow!("PV accessmode missing for {}", pv_name),
             })?,
-            sc_name: spec.storage_class_name.ok_or_else(|| Error::Generic {
-                source: anyhow::anyhow!("PV sc name missing for {}", pv_name),
-            })?,
-            volume_mode: spec.volume_mode.ok_or_else(|| Error::Generic {
+            sc_name: spec
+                .storage_class_name
+                .clone()
+                .ok_or_else(|| Error::Generic {
+                    source: anyhow::anyhow!("PV sc name missing for {}", pv_name),
+                })?,
+            volume_mode: spec.volume_mode.clone().ok_or_else(|| Error::Generic {
                 source: anyhow::anyhow!("PV vol mode missing for {}", pv_name),
             })?,
         })

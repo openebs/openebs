@@ -176,9 +176,10 @@ impl ZfsVolumeObject {
     }
 }
 
-/// Holds list of zfsvolume object.
+/// A record containing a collection of localpv-zfs volume.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub(crate) struct ZfsVolRecord {
+    /// A vector of zfs volume.
     volumes: Vec<ZfsVolumeObject>,
 }
 
@@ -203,7 +204,7 @@ impl TryFrom<(ZfsVolume, PersistentVolume)> for ZfsVolumeObject {
         let pv_name = persistent_volume.name_any();
         let spec = persistent_volume
             .spec
-            .clone()
+            .as_ref()
             .ok_or_else(|| Error::Generic {
                 source: anyhow::anyhow!("PersistentVolume spec missing for {}", pv_name),
             })?;
@@ -237,13 +238,16 @@ impl TryFrom<(ZfsVolume, PersistentVolume)> for ZfsVolumeObject {
                 })?
                 .name
                 .unwrap_or_default(),
-            access_mode: spec.access_modes.ok_or_else(|| Error::Generic {
+            access_mode: spec.access_modes.clone().ok_or_else(|| Error::Generic {
                 source: anyhow::anyhow!("PV accessmode missing for {}", pv_name),
             })?,
-            sc_name: spec.storage_class_name.ok_or_else(|| Error::Generic {
-                source: anyhow::anyhow!("PV sc name missing for {}", pv_name),
-            })?,
-            volume_mode: spec.volume_mode.ok_or_else(|| Error::Generic {
+            sc_name: spec
+                .storage_class_name
+                .clone()
+                .ok_or_else(|| Error::Generic {
+                    source: anyhow::anyhow!("PV sc name missing for {}", pv_name),
+                })?,
+            volume_mode: spec.volume_mode.clone().ok_or_else(|| Error::Generic {
                 source: anyhow::anyhow!("PV vol mode missing for {}", pv_name),
             })?,
             compression: zfs_volume.spec.compression,
