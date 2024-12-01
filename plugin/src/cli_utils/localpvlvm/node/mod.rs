@@ -26,10 +26,8 @@ lazy_static! {
 pub(crate) async fn volume_groups(
     cli_args: &CliArgs,
     args: &GetVolumeGroupsArg,
+    client: Client,
 ) -> Result<(), Error> {
-    let client = Client::try_default()
-        .await
-        .map_err(|err| Error::Kube { source: err })?;
     let api: Api<LvmNode> = Api::namespaced(client.clone(), &cli_args.args.namespace);
     let lvm_nodes = if let Some(node_id) = &args.node_id {
         vec![lvm_node(api, node_id)
@@ -52,9 +50,20 @@ async fn lvm_node(node_handle: Api<LvmNode>, node_id: &str) -> Result<LvmNode, k
 
 /// Lists all lvmnodes from the cluster.
 async fn lvm_nodes(node_handle: Api<LvmNode>) -> Result<Vec<LvmNode>, kube::Error> {
-    let lp = ListParams::default();
-    let lvm_nodes = node_handle.list(&lp).await?.items;
-    Ok(lvm_nodes)
+    let max_entries = 500i32;
+    let mut lp: ListParams = ListParams::default().limit(max_entries as u32);
+    let mut node_list = Vec::new();
+    loop {
+        let list = node_handle.list(&lp).await?;
+        node_list.extend(list.items);
+        match list.metadata.continue_ {
+            Some(token) if !token.is_empty() => {
+                lp = lp.continue_token(&token);
+            }
+            _ => break,
+        }
+    }
+    Ok(node_list)
 }
 
 impl GetHeaderRow for VolumeGroupRecord {

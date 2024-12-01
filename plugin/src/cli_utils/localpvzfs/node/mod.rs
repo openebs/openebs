@@ -14,16 +14,18 @@ lazy_static! {
 }
 
 /// Implementation for volume-groups cmd.
-pub(crate) async fn zpools(cli_args: &CliArgs, args: &GetZpoolsArg) -> Result<(), Error> {
-    let client = Client::try_default()
-        .await
-        .map_err(|err| Error::Kube { source: err })?;
+pub(crate) async fn zpools(
+    cli_args: &CliArgs,
+    args: &GetZpoolsArg,
+    client: Client,
+) -> Result<(), Error> {
+    let api: Api<ZfsNode> = Api::namespaced(client.clone(), &cli_args.args.namespace);
     let zfs_nodes = if let Some(node_id) = &args.node_id {
-        vec![zfs_node(cli_args, node_id, client)
+        vec![zfs_node(api, node_id)
             .await
             .map_err(|err| Error::Kube { source: err })?]
     } else {
-        zfs_nodes(cli_args, client)
+        zfs_nodes(api)
             .await
             .map_err(|err| Error::Kube { source: err })?
     };
@@ -33,21 +35,26 @@ pub(crate) async fn zpools(cli_args: &CliArgs, args: &GetZpoolsArg) -> Result<()
 }
 
 /// Gets a specific lvmnode from k8s cluster.
-async fn zfs_node(
-    cli_args: &CliArgs,
-    node_id: &str,
-    client: Client,
-) -> Result<ZfsNode, kube::Error> {
-    let api: Api<ZfsNode> = Api::namespaced(client.clone(), &cli_args.args.namespace);
-    api.get(node_id).await
+async fn zfs_node(node_handle: Api<ZfsNode>, node_id: &str) -> Result<ZfsNode, kube::Error> {
+    node_handle.get(node_id).await
 }
 
-/// Lists all lvmnodes from the cluster.
-async fn zfs_nodes(cli_args: &CliArgs, client: Client) -> Result<Vec<ZfsNode>, kube::Error> {
-    let lp = ListParams::default();
-    let api: Api<ZfsNode> = Api::namespaced(client.clone(), &cli_args.args.namespace);
-    let zfs_nodes = api.list(&lp).await?.items;
-    Ok(zfs_nodes)
+/// Lists all zfsnodes from the cluster.
+async fn zfs_nodes(node_handle: Api<ZfsNode>) -> Result<Vec<ZfsNode>, kube::Error> {
+    let max_entries = 500i32;
+    let mut lp: ListParams = ListParams::default().limit(max_entries as u32);
+    let mut node_list = Vec::new();
+    loop {
+        let list = node_handle.list(&lp).await?;
+        node_list.extend(list.items);
+        match list.metadata.continue_ {
+            Some(token) if !token.is_empty() => {
+                lp = lp.continue_token(&token);
+            }
+            _ => break,
+        }
+    }
+    Ok(node_list)
 }
 
 impl GetHeaderRow for ZfsPoolRecord {

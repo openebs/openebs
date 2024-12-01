@@ -80,7 +80,7 @@ pub(crate) struct ZfsVolSpec {
     /// Specifies the block size for the volume.
     #[serde(alias = "volblocksize")]
     vol_block_size: Option<String>,
-    /// Specifies whether the volume is of type "DATASET" or "ZVOL"
+    /// Specifies whether the volume is of type "DATASET" or "ZVOL".
     #[serde(alias = "volumeType")]
     vol_type: String,
 }
@@ -102,11 +102,11 @@ pub(crate) struct ZfsVolumeObject {
     node: String,
     /// Capacity of the zfsvolume.
     capacity: String,
-    /// Specifies the block-level compression algorithm to be applied.
+    /// Compression "on" or "off", This can be algorithm specified by user also.
     compression: String,
     /// Dedup on or off on the volume.
     dedup: String,
-    /// Encryption on or off. This can be algorithm used also.
+    /// Encryption on or off, This can be algorithm specified by user also.
     encryption: String,
     /// Specifies filesystem type for the zfs volume/dataset.
     fs_type: String,
@@ -201,7 +201,7 @@ impl TryFrom<(ZfsVolume, PersistentVolume)> for ZfsVolumeObject {
     fn try_from(
         (zfs_volume, persistent_volume): (ZfsVolume, PersistentVolume),
     ) -> Result<ZfsVolumeObject, Error> {
-        let pv_name = persistent_volume.name_any();
+        let pv_name = persistent_volume.name_unchecked();
         let spec = persistent_volume
             .spec
             .as_ref()

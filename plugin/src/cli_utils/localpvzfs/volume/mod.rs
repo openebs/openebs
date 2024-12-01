@@ -18,10 +18,11 @@ lazy_static! {
 }
 
 /// Implementation for volumes cmd.
-pub(crate) async fn volumes(cli_args: &CliArgs, volumes_arg: &GetVolumesArg) -> Result<(), Error> {
-    let client = Client::try_default()
-        .await
-        .map_err(|err| Error::Kube { source: err })?;
+pub(crate) async fn volumes(
+    cli_args: &CliArgs,
+    volumes_arg: &GetVolumesArg,
+    client: Client,
+) -> Result<(), Error> {
     let volume_handle: Api<ZfsVolume> = Api::namespaced(client.clone(), &cli_args.args.namespace);
     let vols = zfs_volumes(volume_handle, volumes_arg)
         .await
@@ -36,10 +37,11 @@ pub(crate) async fn volumes(cli_args: &CliArgs, volumes_arg: &GetVolumesArg) -> 
 }
 
 /// Implementation for volume cmd.
-pub(crate) async fn volume(cli_args: &CliArgs, volume_arg: &GetVolumeArg) -> Result<(), Error> {
-    let client = Client::try_default()
-        .await
-        .map_err(|err| Error::Kube { source: err })?;
+pub(crate) async fn volume(
+    cli_args: &CliArgs,
+    volume_arg: &GetVolumeArg,
+    client: Client,
+) -> Result<(), Error> {
     let volume_handle: Api<ZfsVolume> = Api::namespaced(client.clone(), &cli_args.args.namespace);
     let volume = zfs_volume(volume_handle, volume_arg)
         .await
@@ -67,12 +69,26 @@ async fn zfs_volumes(
     volume_handle: Api<ZfsVolume>,
     volumes_arg: &GetVolumesArg,
 ) -> Result<Vec<ZfsVolume>, kube::Error> {
-    let lp = if let Some(node_id) = volumes_arg.node_id.clone() {
-        ListParams::default().labels(format!("kubernetes.io/nodename={}", node_id).as_str())
-    } else {
+    let max_entries = 500i32;
+    let mut lp: ListParams = if let Some(node_id) = &volumes_arg.node_id {
         ListParams::default()
+            .labels(format!("kubernetes.io/nodename={}", node_id).as_str())
+            .limit(max_entries as u32)
+    } else {
+        ListParams::default().limit(max_entries as u32)
     };
-    Ok(volume_handle.list(&lp).await?.items)
+    let mut vol_list = Vec::new();
+    loop {
+        let list = volume_handle.list(&lp).await?;
+        vol_list.extend(list.items);
+        match list.metadata.continue_ {
+            Some(token) if !token.is_empty() => {
+                lp = lp.continue_token(&token);
+            }
+            _ => break,
+        }
+    }
+    Ok(vol_list)
 }
 
 /// Converts Vec<ZfsVolume> into ZfsRecord.
@@ -81,15 +97,40 @@ async fn get_zfs_vol_record(
     client: &Client,
 ) -> Result<ZfsVolRecord, Error> {
     let api: Api<PersistentVolume> = Api::<PersistentVolume>::all(client.clone());
-    let mut zfs_volumes: Vec<ZfsVolumeObject> = Vec::new();
+
+    let pvs = list_pv(api).await?;
+    let mut lvm_volumes: Vec<ZfsVolumeObject> = Vec::new();
     for zfs_vol in zfs_vols {
-        let pv = api
-            .get(zfs_vol.name_any().as_str())
+        let zfs_vol_name = zfs_vol.name_unchecked();
+        let pv = pvs.iter().find(|pv| pv.name_unchecked() == zfs_vol_name);
+
+        if let Some(pv) = pv {
+            lvm_volumes.push(ZfsVolumeObject::try_from((zfs_vol, pv.clone()))?);
+        } else {
+            eprintln!("Couldnt find PV for LVM volume: {}", zfs_vol_name);
+        }
+    }
+
+    Ok(ZfsVolRecord::new(lvm_volumes))
+}
+
+/// Lists all pv from k8s.
+async fn list_pv(pv_handle: Api<PersistentVolume>) -> Result<Vec<PersistentVolume>, Error> {
+    let max_entries = 500i32;
+    let mut list_param = ListParams::default().limit(max_entries as u32);
+    let mut vol_list = Vec::new();
+    loop {
+        let list = pv_handle
+            .list(&list_param)
             .await
             .map_err(|err| Error::Kube { source: err })?;
-        zfs_volumes.push(ZfsVolumeObject::try_from((zfs_vol, pv))?);
+        vol_list.extend(list.items);
+        match list.metadata.continue_ {
+            Some(token) => list_param = list_param.continue_token(&token),
+            None => break,
+        }
     }
-    Ok(ZfsVolRecord::new(zfs_volumes))
+    Ok(vol_list)
 }
 
 impl GetHeaderRow for ZfsVolRecord {

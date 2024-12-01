@@ -41,10 +41,11 @@ impl GetHeaderRow for HostPathVolumeRecord {
 }
 
 /// Implementation for volume cmd.
-pub(crate) async fn volume(cli_args: &CliArgs, volume_arg: &GetVolumeArg) -> Result<(), Error> {
-    let client = Client::try_default()
-        .await
-        .map_err(|err| Error::Kube { source: err })?;
+pub(crate) async fn volume(
+    cli_args: &CliArgs,
+    volume_arg: &GetVolumeArg,
+    client: Client,
+) -> Result<(), Error> {
     let pv_handle: Api<PersistentVolume> = Api::<PersistentVolume>::all(client);
     let pv = get_pv(pv_handle, volume_arg).await?;
     match get_hostpath_volume(vec![pv], None).await {
@@ -57,10 +58,11 @@ pub(crate) async fn volume(cli_args: &CliArgs, volume_arg: &GetVolumeArg) -> Res
 }
 
 /// Implementation for volumes cmd.
-pub(crate) async fn volumes(cli_args: &CliArgs, volumes_arg: &GetVolumesArg) -> Result<(), Error> {
-    let client = Client::try_default()
-        .await
-        .map_err(|err| Error::Kube { source: err })?;
+pub(crate) async fn volumes(
+    cli_args: &CliArgs,
+    volumes_arg: &GetVolumesArg,
+    client: Client,
+) -> Result<(), Error> {
     let pv_handle: Api<PersistentVolume> = Api::<PersistentVolume>::all(client);
     let pv_list = list_pv(pv_handle).await?;
     match get_hostpath_volume(pv_list, volumes_arg.node_id.clone()).await {
@@ -98,12 +100,22 @@ pub(crate) async fn get_pv(
 
 /// Lists all localpv-hostpath pv from k8s.
 async fn list_pv(pv_handle: Api<PersistentVolume>) -> Result<Vec<PersistentVolume>, Error> {
-    let list_param = ListParams::default().labels("openebs.io/cas-type=local-hostpath");
-    let vol_list = pv_handle
-        .list(&list_param)
-        .await
-        .map_err(|err| Error::Kube { source: err })?
-        .items;
+    let max_entries = 500i32;
+    let mut list_param = ListParams::default()
+        .labels("openebs.io/cas-type=local-hostpath")
+        .limit(max_entries as u32);
+    let mut vol_list = Vec::new();
+    loop {
+        let list = pv_handle
+            .list(&list_param)
+            .await
+            .map_err(|err| Error::Kube { source: err })?;
+        vol_list.extend(list.items);
+        match list.metadata.continue_ {
+            Some(token) if !token.is_empty() => list_param = list_param.continue_token(&token),
+            _ => break,
+        }
+    }
     Ok(vol_list)
 }
 
