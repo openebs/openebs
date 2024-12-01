@@ -1,5 +1,6 @@
 use crate::cli_utils::CliArgs;
 use clap::Parser;
+use kube::Client;
 use plugin::ExecuteOperation;
 use snafu::Snafu;
 pub(crate) mod node;
@@ -66,15 +67,18 @@ impl ExecuteOperation for ZfsGet {
     type Error = Error;
 
     async fn execute(&self, cli_args: &CliArgs) -> Result<(), Error> {
+        let client = Client::try_default()
+            .await
+            .map_err(|err| Error::Kube { source: err })?;
         match self {
             ZfsGet::Volume(volume_arg) => {
-                volume::volume(cli_args, volume_arg).await?;
+                volume::volume(cli_args, volume_arg, client).await?;
             }
             ZfsGet::Volumes(volumes_arg) => {
-                volume::volumes(cli_args, volumes_arg).await?;
+                volume::volumes(cli_args, volumes_arg, client).await?;
             }
             ZfsGet::Zpools(zpools_arg) => {
-                node::zpools(cli_args, zpools_arg).await?;
+                node::zpools(cli_args, zpools_arg, client).await?;
             }
         }
         Ok(())

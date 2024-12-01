@@ -41,10 +41,11 @@ impl GetHeaderRow for HostPathVolumeRecord {
 }
 
 /// Implementation for volume cmd.
-pub(crate) async fn volume(cli_args: &CliArgs, volume_arg: &GetVolumeArg) -> Result<(), Error> {
-    let client = Client::try_default()
-        .await
-        .map_err(|err| Error::Kube { source: err })?;
+pub(crate) async fn volume(
+    cli_args: &CliArgs,
+    volume_arg: &GetVolumeArg,
+    client: Client,
+) -> Result<(), Error> {
     let pv_handle: Api<PersistentVolume> = Api::<PersistentVolume>::all(client);
     let pv = get_pv(pv_handle, volume_arg).await?;
     match get_hostpath_volume(vec![pv], None).await {
@@ -57,10 +58,11 @@ pub(crate) async fn volume(cli_args: &CliArgs, volume_arg: &GetVolumeArg) -> Res
 }
 
 /// Implementation for volumes cmd.
-pub(crate) async fn volumes(cli_args: &CliArgs, volumes_arg: &GetVolumesArg) -> Result<(), Error> {
-    let client = Client::try_default()
-        .await
-        .map_err(|err| Error::Kube { source: err })?;
+pub(crate) async fn volumes(
+    cli_args: &CliArgs,
+    volumes_arg: &GetVolumesArg,
+    client: Client,
+) -> Result<(), Error> {
     let pv_handle: Api<PersistentVolume> = Api::<PersistentVolume>::all(client);
     let pv_list = list_pv(pv_handle).await?;
     match get_hostpath_volume(pv_list, volumes_arg.node_id.clone()).await {

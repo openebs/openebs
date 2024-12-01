@@ -18,10 +18,11 @@ lazy_static! {
 }
 
 /// Implementation for volumes cmd.
-pub(crate) async fn volumes(cli_args: &CliArgs, volumes_arg: &GetVolumesArg) -> Result<(), Error> {
-    let client = Client::try_default()
-        .await
-        .map_err(|err| Error::Kube { source: err })?;
+pub(crate) async fn volumes(
+    cli_args: &CliArgs,
+    volumes_arg: &GetVolumesArg,
+    client: Client,
+) -> Result<(), Error> {
     let volume_handle: Api<ZfsVolume> = Api::namespaced(client.clone(), &cli_args.args.namespace);
     let vols = zfs_volumes(volume_handle, volumes_arg)
         .await
@@ -36,10 +37,11 @@ pub(crate) async fn volumes(cli_args: &CliArgs, volumes_arg: &GetVolumesArg) -> 
 }
 
 /// Implementation for volume cmd.
-pub(crate) async fn volume(cli_args: &CliArgs, volume_arg: &GetVolumeArg) -> Result<(), Error> {
-    let client = Client::try_default()
-        .await
-        .map_err(|err| Error::Kube { source: err })?;
+pub(crate) async fn volume(
+    cli_args: &CliArgs,
+    volume_arg: &GetVolumeArg,
+    client: Client,
+) -> Result<(), Error> {
     let volume_handle: Api<ZfsVolume> = Api::namespaced(client.clone(), &cli_args.args.namespace);
     let volume = zfs_volume(volume_handle, volume_arg)
         .await
@@ -83,11 +85,14 @@ async fn get_zfs_vol_record(
     let api: Api<PersistentVolume> = Api::<PersistentVolume>::all(client.clone());
     let mut zfs_volumes: Vec<ZfsVolumeObject> = Vec::new();
     for zfs_vol in zfs_vols {
-        let pv = api
-            .get(zfs_vol.name_any().as_str())
-            .await
-            .map_err(|err| Error::Kube { source: err })?;
-        zfs_volumes.push(ZfsVolumeObject::try_from((zfs_vol, pv))?);
+        let zfs_vol_name = zfs_vol.name_unchecked();
+        match api.get(zfs_vol_name.as_str()).await {
+            Ok(pv) => zfs_volumes.push(ZfsVolumeObject::try_from((zfs_vol, pv))?),
+            Err(e) => eprintln!(
+                "Couldnt get pv for zfsvolume :{}, Error: {}",
+                zfs_vol_name, e
+            ),
+        }
     }
     Ok(ZfsVolRecord::new(zfs_volumes))
 }

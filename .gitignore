@@ -25,4 +25,3 @@ charts/Chart.lock
 plugin/target/
 .rust-toolchain
 /rust-toolchain.toml
-/.rust-toolchain

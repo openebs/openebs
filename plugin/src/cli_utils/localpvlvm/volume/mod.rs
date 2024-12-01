@@ -2,11 +2,11 @@ use super::CliArgs;
 use super::Error;
 use super::{GetVolumeArg, GetVolumesArg};
 pub(crate) mod types;
+use kube::ResourceExt;
 use plugin::resources::utils::{print_table, CreateRows, GetHeaderRow};
 use types::{LvmVolRecord, LvmVolume, LvmVolumeObject};
 
 use k8s_openapi::api::core::v1::PersistentVolume;
-use kube::Resource;
 use kube::{api::ListParams, Api, Client};
 use prettytable::{row, Row};
 
@@ -18,10 +18,11 @@ lazy_static! {
 }
 
 /// Implementation for volumes cmd.
-pub(crate) async fn volumes(cli_args: &CliArgs, volumes_arg: &GetVolumesArg) -> Result<(), Error> {
-    let client = Client::try_default()
-        .await
-        .map_err(|err| Error::Kube { source: err })?;
+pub(crate) async fn volumes(
+    cli_args: &CliArgs,
+    volumes_arg: &GetVolumesArg,
+    client: Client,
+) -> Result<(), Error> {
     let volume_handle: Api<LvmVolume> = Api::namespaced(client.clone(), &cli_args.args.namespace);
     let vol_list = lvm_volumes(volume_handle, volumes_arg)
         .await
@@ -36,10 +37,11 @@ pub(crate) async fn volumes(cli_args: &CliArgs, volumes_arg: &GetVolumesArg) -> 
 }
 
 /// Implementation for volume cmd.
-pub(crate) async fn volume(cli_args: &CliArgs, volume_arg: &GetVolumeArg) -> Result<(), Error> {
-    let client = Client::try_default()
-        .await
-        .map_err(|err| Error::Kube { source: err })?;
+pub(crate) async fn volume(
+    cli_args: &CliArgs,
+    volume_arg: &GetVolumeArg,
+    client: Client,
+) -> Result<(), Error> {
     let volume_handle: Api<LvmVolume> = Api::namespaced(client.clone(), &cli_args.args.namespace);
     let volume = lvm_volume(volume_handle, volume_arg)
         .await
@@ -67,7 +69,7 @@ async fn lvm_volumes(
     volume_handle: Api<LvmVolume>,
     volumes_arg: &GetVolumesArg,
 ) -> Result<Vec<LvmVolume>, kube::Error> {
-    let lp = if let Some(node_id) = volumes_arg.node_id.clone() {
+    let lp = if let Some(node_id) = &volumes_arg.node_id {
         ListParams::default().labels(format!("kubernetes.io/nodename={}", node_id).as_str())
     } else {
         ListParams::default()
@@ -83,20 +85,14 @@ async fn get_lvm_vol_output(
     let api: Api<PersistentVolume> = Api::<PersistentVolume>::all(client.clone());
     let mut lvm_volumes: Vec<LvmVolumeObject> = Vec::new();
     for lvm_vol in lvm_vols {
-        let pv = api
-            .get(
-                lvm_vol
-                    .meta()
-                    .name
-                    .as_ref()
-                    .ok_or(Error::Generic {
-                        source: anyhow::anyhow!("PV name missing"),
-                    })?
-                    .as_str(),
-            )
-            .await
-            .map_err(|err| Error::Kube { source: err })?;
-        lvm_volumes.push(LvmVolumeObject::try_from((&lvm_vol, pv))?);
+        let lvm_vol_name = lvm_vol.name_unchecked();
+        match api.get(lvm_vol_name.as_str()).await {
+            Ok(pv) => lvm_volumes.push(LvmVolumeObject::try_from((&lvm_vol, pv))?),
+            Err(e) => eprintln!(
+                "Couldnt get pv for lvmvolume :{}, Error: {}",
+                lvm_vol_name, e
+            ),
+        }
     }
     Ok(LvmVolRecord::new(lvm_volumes))
 }
