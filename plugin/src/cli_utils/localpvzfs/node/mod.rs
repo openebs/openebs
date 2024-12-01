@@ -14,10 +14,11 @@ lazy_static! {
 }
 
 /// Implementation for volume-groups cmd.
-pub(crate) async fn zpools(cli_args: &CliArgs, args: &GetZpoolsArg) -> Result<(), Error> {
-    let client = Client::try_default()
-        .await
-        .map_err(|err| Error::Kube { source: err })?;
+pub(crate) async fn zpools(
+    cli_args: &CliArgs,
+    args: &GetZpoolsArg,
+    client: Client,
+) -> Result<(), Error> {
     let zfs_nodes = if let Some(node_id) = &args.node_id {
         vec![zfs_node(cli_args, node_id, client)
             .await
