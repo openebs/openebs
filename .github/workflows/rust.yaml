@@ -2,7 +2,9 @@ name: Rust CI
 on:
   pull_request:
     types: [ 'opened', 'edited', 'reopened', 'synchronize' ]
-  workflow_call:
+    paths:
+      - 'plugin/**'
+      - '**.nix'
   push:
     branches:
       - main
