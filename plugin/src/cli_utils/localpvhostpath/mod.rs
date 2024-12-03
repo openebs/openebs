@@ -2,6 +2,7 @@ use crate::cli_utils::CliArgs;
 use clap::Parser;
 use plugin::ExecuteOperation;
 use snafu::Snafu;
+pub(crate) mod volume;
 
 /// LocalPV Hostpath operations.
 #[derive(Parser, Debug)]
@@ -26,6 +27,7 @@ impl ExecuteOperation for Operations {
     }
 }
 
+/// Get commands for localpv-hostpath.
 #[derive(clap::Subcommand, Debug)]
 pub enum HosthpathGet {
     /// Gets a specific localpv-hostpath volume.
@@ -53,29 +55,24 @@ impl ExecuteOperation for HosthpathGet {
     type Args = CliArgs;
     type Error = Error;
 
-    async fn execute(&self, _cli_args: &CliArgs) -> Result<(), Error> {
+    async fn execute(&self, cli_args: &CliArgs) -> Result<(), Error> {
         match self {
-            HosthpathGet::Volume(_volume_arg) => {
-                let _ = dummy_construct();
-                todo!("Implementation pending for this command")
+            HosthpathGet::Volume(volume_arg) => {
+                volume::volume(cli_args, volume_arg).await?;
             }
-            HosthpathGet::Volumes(_volumes_arg) => {
-                todo!("Implementation pending for this command")
+            HosthpathGet::Volumes(volumes_arg) => {
+                volume::volumes(cli_args, volumes_arg).await?;
             }
         }
+        Ok(())
     }
-}
-
-/// Temporary function to fix warning as snafu variant is not getting constructed.
-fn dummy_construct() -> Result<(), Error> {
-    Err(Error::Generic {
-        source: anyhow::anyhow!("dummy"),
-    })
 }
 
 /// Error for localpv-hostpath stem.
 #[derive(Debug, Snafu)]
 pub enum Error {
-    #[snafu(display("Generic error: {}", source))]
+    #[snafu(display("{source}"))]
     Generic { source: anyhow::Error },
+    #[snafu(display("{source}"))]
+    Kube { source: kube::Error },
 }
