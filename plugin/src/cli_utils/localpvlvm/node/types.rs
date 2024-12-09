@@ -145,17 +145,21 @@ impl LvmVolumeGroup {
     }
 }
 
+/// A record containing a collection of volumegroup.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub(crate) struct VolumeGroupRecord {
+    /// A vector of volumegroup.
     vgs: Vec<LvmVolumeGroup>,
 }
 
 impl VolumeGroupRecord {
+    /// Returns list of volumegroup.
     pub(crate) fn vgs(&self) -> &Vec<LvmVolumeGroup> {
         &self.vgs
     }
 }
 
+/// Takes collection of LvmNode and returns VolumeGroupRecord.
 impl From<Vec<LvmNode>> for VolumeGroupRecord {
     fn from(nodes: Vec<LvmNode>) -> Self {
         let mut volume_group: Vec<LvmVolumeGroup> = Vec::new();

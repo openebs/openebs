@@ -23,5 +23,5 @@ charts/Chart.lock
 /charts/charts/*
 **/target
 plugin/target/
+.rust-toolchain
 /rust-toolchain.toml
-/.rust-toolchain
