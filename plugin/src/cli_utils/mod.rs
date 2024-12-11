@@ -3,9 +3,10 @@ use kubectl_plugin::resources;
 use plugin::ExecuteOperation;
 use std::ops::Deref;
 pub(crate) mod clusterinfo;
-pub(crate) mod localpvhostpath;
-pub(crate) mod localpvlvm;
-pub(crate) mod localpvzfs;
+pub(crate) mod localpv;
+use localpv::hostpath;
+use localpv::lvm;
+use localpv::zfs;
 
 #[derive(Parser, Debug)]
 #[group(skip)]
@@ -33,13 +34,13 @@ pub enum Operations {
     Mayastor(resources::Operations),
     /// Localpv-lvm specific commands.
     #[clap(subcommand)]
-    LocalpvLvm(localpvlvm::Operations),
+    LocalpvLvm(lvm::Operations),
     /// Localpv-zfs specific commands.
     #[clap(subcommand)]
-    LocalpvZfs(localpvzfs::Operations),
+    LocalpvZfs(zfs::Operations),
     /// Localpv-hostpath specific commands.
     #[clap(subcommand)]
-    LocalpvHostpath(localpvhostpath::Operations),
+    LocalpvHostpath(hostpath::Operations),
 }
 
 #[async_trait::async_trait(?Send)]
@@ -75,11 +76,11 @@ pub enum Error {
     /// Mayastor stem specific errors.
     Mayastor(resources::Error),
     /// Localpv-lvm stem specific errors.
-    LocalpvLvm(localpvlvm::Error),
+    LocalpvLvm(lvm::Error),
     /// Localpv-zfs stem specific errors.
-    LocalpvZfs(localpvzfs::Error),
+    LocalpvZfs(zfs::Error),
     /// Localpv-hostpath stem specific errors.
-    Hostpath(localpvhostpath::Error),
+    Hostpath(hostpath::Error),
     /// Cluster-info stem cmd specific errors.
     ClusterInfo(clusterinfo::Error),
     /// Plugin specific error.
@@ -101,20 +102,20 @@ impl From<resources::Error> for Error {
     }
 }
 
-impl From<localpvlvm::Error> for Error {
-    fn from(err: localpvlvm::Error) -> Self {
+impl From<lvm::Error> for Error {
+    fn from(err: lvm::Error) -> Self {
         Error::LocalpvLvm(err)
     }
 }
 
-impl From<localpvzfs::Error> for Error {
-    fn from(err: localpvzfs::Error) -> Self {
+impl From<zfs::Error> for Error {
+    fn from(err: zfs::Error) -> Self {
         Error::LocalpvZfs(err)
     }
 }
 
-impl From<localpvhostpath::Error> for Error {
-    fn from(err: localpvhostpath::Error) -> Self {
+impl From<hostpath::Error> for Error {
+    fn from(err: hostpath::Error) -> Self {
         Error::Hostpath(err)
     }
 }

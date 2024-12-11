@@ -89,7 +89,7 @@ impl ZfsPool {
         &self.used
     }
 
-    /// Returns lvm specific uuid of the vg.
+    /// Returns zfs specific uuid of the vg.
     pub(crate) fn uuid(&self) -> &String {
         &self.uuid
     }

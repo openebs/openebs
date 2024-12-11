@@ -34,7 +34,7 @@ pub(crate) async fn zpools(
     Ok(())
 }
 
-/// Gets a specific lvmnode from k8s cluster.
+/// Gets a specific zfsnode from k8s cluster.
 async fn zfs_node(node_handle: Api<ZfsNode>, node_id: &str) -> Result<ZfsNode, kube::Error> {
     node_handle.get(node_id).await
 }

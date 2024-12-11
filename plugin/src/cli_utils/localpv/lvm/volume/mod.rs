@@ -100,7 +100,7 @@ async fn get_lvm_vol_output(
 
     let pvs = list_pv(api).await?;
 
-    let mut lvm_volumes: Vec<LvmVolumeObject> = Vec::new();
+    let mut lvm_volumes: Vec<LvmVolumeObject> = Vec::with_capacity(lvm_vols.len());
     for lvm_vol in lvm_vols {
         let lvm_vol_name = lvm_vol.name_unchecked();
 
@@ -110,7 +110,7 @@ async fn get_lvm_vol_output(
         if let Some(pv) = pv {
             lvm_volumes.push(LvmVolumeObject::try_from((&lvm_vol, pv.clone()))?);
         } else {
-            eprintln!("Couldnt find PV for LVM volume: {}", lvm_vol_name);
+            eprintln!("Couldnt find PV for LVM volume: {lvm_vol_name}");
         }
     }
 

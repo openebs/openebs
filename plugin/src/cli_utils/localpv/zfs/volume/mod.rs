@@ -99,19 +99,19 @@ async fn get_zfs_vol_record(
     let api: Api<PersistentVolume> = Api::<PersistentVolume>::all(client.clone());
 
     let pvs = list_pv(api).await?;
-    let mut lvm_volumes: Vec<ZfsVolumeObject> = Vec::new();
+    let mut zfs_volumes: Vec<ZfsVolumeObject> = Vec::with_capacity(zfs_vols.len());
     for zfs_vol in zfs_vols {
         let zfs_vol_name = zfs_vol.name_unchecked();
         let pv = pvs.iter().find(|pv| pv.name_unchecked() == zfs_vol_name);
 
         if let Some(pv) = pv {
-            lvm_volumes.push(ZfsVolumeObject::try_from((zfs_vol, pv.clone()))?);
+            zfs_volumes.push(ZfsVolumeObject::try_from((zfs_vol, pv.clone()))?);
         } else {
-            eprintln!("Couldnt find PV for LVM volume: {}", zfs_vol_name);
+            eprintln!("Couldnt find PV for ZFS volume: {zfs_vol_name}");
         }
     }
 
-    Ok(ZfsVolRecord::new(lvm_volumes))
+    Ok(ZfsVolRecord::new(zfs_volumes))
 }
 
 /// Lists all pv from k8s.

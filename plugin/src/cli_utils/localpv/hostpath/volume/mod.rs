@@ -84,8 +84,8 @@ pub(crate) async fn get_pv(
         .await
         .map_err(|err| Error::Kube { source: err })?;
 
-    if let Some(labels) = pv.metadata.labels.clone() {
-        if labels.get("openebs.io/cas-type") != Some(&"local-hostpath".to_string()) {
+    if let Some(labels) = &pv.metadata.labels {
+        if labels.get("openebs.io/cas-type").map(String::as_str) != Some("local-hostpath") {
             return Err(Error::Generic {
                 source: anyhow!("Volume is not a hostpath volume"),
             });
