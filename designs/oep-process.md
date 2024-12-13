@@ -2,25 +2,22 @@
 
 ## Table of Contents
 
-* [OpenEBS Enhancement Proposal Process](#openebs-enhancement-proposal-process)
-  * [Metadata](#metadata)
-  * [Table of Contents](#table-of-contents)
-  * [Summary](#summary)
-  * [Motivation](#motivation)
-  * [Reference-level explanation](#reference-level-explanation)
-      * [What type of work should be tracked by a OEP](#what-type-of-work-should-be-tracked-by-a-oep)
-      * [OEP Template](#oep-template)
-      * [OEP Metadata](#oep-metadata)
-      * [OEP Workflow](#oep-workflow)
-      * [Git and GitHub Implementation](#git-and-github-implementation)
-      * [OEP Editor Role](#oep-editor-role)
-      * [Important Metrics](#important-metrics)
-      * [Prior Art](#prior-art)
-  * [Graduation Criteria](#graduation-criteria)
-  * [Drawbacks](#drawbacks)
-  * [Alternatives](#alternatives)
-  * [Unresolved Questions](#unresolved-questions)
-  * [Mentors](#mentors)
+- [OpenEBS Enhancement Proposal Process](#openebs-enhancement-proposal-process)
+  - [Table of Contents](#table-of-contents)
+  - [Summary](#summary)
+  - [Motivation](#motivation)
+  - [Reference-level explanation](#reference-level-explanation)
+    - [What type of work should be tracked by a OEP](#what-type-of-work-should-be-tracked-by-a-oep)
+    - [OEP Template](#oep-template)
+    - [OEP Metadata](#oep-metadata)
+    - [OEP Workflow](#oep-workflow)
+    - [Git and GitHub Implementation](#git-and-github-implementation)
+    - [OEP Editor Role](#oep-editor-role)
+    - [Important Metrics](#important-metrics)
+    - [Prior Art](#prior-art)
+  - [Drawbacks](#drawbacks)
+    - [GitHub issues vs. OEPs](#github-issues-vs-oeps)
+  - [Unresolved Questions](#unresolved-questions)
 
 ## Summary
 
@@ -84,7 +81,6 @@ for OWNERs to deliberate.
 [road to Go 2]: https://blog.golang.org/toward-go2
 [design proposals]: /contribute/design
 
-
 ## Reference-level explanation
 
 ### What type of work should be tracked by a OEP
@@ -130,51 +126,51 @@ This will be used to support tooling around filtering and display.  It is also
 critical to clearly communicate the status of a OEP.
 
 Metadata items:
-* **oep-number** Required
-  * Each proposal has a number.  This is to make all references to proposals as
+
+- **oep-number** Required
+  - Each proposal has a number.  This is to make all references to proposals as
     clear as possible.  This is especially important as we create a network
     cross references between proposals.
-  * This number is the associated tracking issue number.
-* **title** Required
-  * The title of the OEP in plain language.  The title will also be used in the
+  - This number is the associated tracking issue number.
+- **title** Required
+  - The title of the OEP in plain language.  The title will also be used in the
     OEP filename.  See the template for instructions and details.
-* **status** Required
-  * The current state of the OEP.
-  * Must be one of `provisional`, `implementable`, `implemented`, `deferred`, `rejected`, `withdrawn`, or `replaced`.
-* **authors** Required
-  * A list of authors for the OEP.
+- **status** Required
+  - The current state of the OEP.
+  - Must be one of `provisional`, `implementable`, `implemented`, `deferred`, `rejected`, `withdrawn`, or `replaced`.
+- **authors** Required
+  - A list of authors for the OEP.
     This is simply the Github ID.
     In the future we may enhance this to include other types of identification.
-* **owners** Required
-  * An OWNER is the person or entity that works on the proposal.
-  * OWNERs consist of `approvers` and `reviewers` joined from the [MAINTAINERS](https://github.com/openebs/openebs/blob/master/MAINTAINERS) file
-  * OWNERs are listed as `@owner` where the name matches up with the Github ID.
-  * The OWNER that is most closely associated with this OEP. If there is code or
+- **owners** Required
+  - An OWNER is the person or entity that works on the proposal.
+  - OWNERs consist of `approvers` and `reviewers` joined from the [MAINTAINERS](https://github.com/openebs/openebs/blob/master/MAINTAINERS) file
+  - OWNERs are listed as `@owner` where the name matches up with the Github ID.
+  - The OWNER that is most closely associated with this OEP. If there is code or
     other artifacts that will result from this OEP, then it is expected that
     this OWNER will take responsibility for the bulk of those artifacts.
-* **editor** Required
-  * Someone to keep things moving forward.
-  * If not yet chosen replace with `TBD`
-  * Same name/contact scheme as `authors`
-* **creation-date** Required
-  * The date that the OEP was first submitted in a PR.
-  * In the form `yyyy-mm-dd`
-  * While this info will also be in source control, it is helpful to have the set of OEP files stand on their own.
-* **last-updated** Optional
-  * The date that the OEP was last changed significantly.
-  * In the form `yyyy-mm-dd`
-* **see-also** Optional
-  * A list of other OEPs that are relevant to this OEP.
-  * In the form `OEP 123`
-* **replaces** Optional
-  * A list of OEPs that this OEP replaces.  Those OEPs should list this OEP in
+- **editor** Required
+  - Someone to keep things moving forward.
+  - If not yet chosen replace with `TBD`
+  - Same name/contact scheme as `authors`
+- **creation-date** Required
+  - The date that the OEP was first submitted in a PR.
+  - In the form `yyyy-mm-dd`
+  - While this info will also be in source control, it is helpful to have the set of OEP files stand on their own.
+- **last-updated** Optional
+  - The date that the OEP was last changed significantly.
+  - In the form `yyyy-mm-dd`
+- **see-also** Optional
+  - A list of other OEPs that are relevant to this OEP.
+  - In the form `OEP 123`
+- **replaces** Optional
+  - A list of OEPs that this OEP replaces.  Those OEPs should list this OEP in
     their `superseded-by`.
-  * In the form `OEP 123`
-* **superseded-by**
-  * A list of OEPs that supersede this OEP. Use of this should be paired with
+  - In the form `OEP 123`
+- **superseded-by**
+  - A list of OEPs that supersede this OEP. Use of this should be paired with
     this OEP moving into the `Replaced` status.
-  * In the form `OEP 123`
-
+  - In the form `OEP 123`
 
 ### OEP Workflow
 
