@@ -6,27 +6,33 @@ authors:
 owners:
   - "@tiagolobocastro"
 editor: TBD
-creation-date: 2024-10-03
-last-updated: 2024-10-31
-status: provisional
+creation-date: 03/10/2024
+last-updated: 05/12/2024
+status: implementable
 ---
 
 # Expose OpenEBS HelmChart's Container Images
 
 ## Table of Contents
 
-* [Table of Contents](#table-of-contents)
 * [Summary](#summary)
 * [Motivation](#motivation)
-    * [Goals](#goals)
-    * [Non-Goals](#non-goals)
+  * [Goals](#goals)
+  * [Non-Goals](#non-goals)
 * [Proposal](#proposal)
-    * [User Stories [optional]](#user-stories-optional)
-      * [Story 1](#story-1)
-      * [Story 2](#story-2)
-    * [Implementation Details/Notes/Constraints [optional]](#implementation-detailsnotesconstraints-optional)
-    * [Risks and Mitigations](#risks-and-mitigations)
+  * [User Stories](#user-stories)
+    * [Story 1](#story-1)
+    * [Story 2](#story-2)
+  * [Implementation Details/Notes/Constraints](#implementation-detailsnotesconstraints)
+    * [Discoverable images](#discoverable-images)
+      * [Regex Explanation](#regex-explanation)
+    * [Expose Images](#expose-images)
+    * [Non-Discoverable/Runtime images](#non-discoverableruntime-images)
+  * [Test Plan](#test-plan)
+  * [Risks and Mitigations](#risks-and-mitigations)
+    * [Mitigations](#mitigations)
 * [Graduation Criteria](#graduation-criteria)
+* [Implementation History](#implementation-history)
 * [Drawbacks [optional]](#drawbacks-optional)
 * [Alternatives [optional]](#alternatives-optional)
 
@@ -56,7 +62,8 @@ The proposal is to add an annotation images in the Chart.yaml (or doc.yaml) file
 Each OpenEBS chart will use the annotation from the charts it depends on, thus facilitating and relegating some of the work to the respective chart which is in a better position to generate the image reliably.
 
 Here's a very simple example:
-```
+
+```text
 project:
   name: OpenEBS Mayastor
 annotations:
@@ -81,9 +88,58 @@ As a user, I want to have a single source of truth for all container images requ
 
 ### Implementation Details/Notes/Constraints
 
+#### Discoverable images
+
+Some images can be easily discovered by templating the helm chart and finding all image entries through the key `image:`.
+In order to do this we can use a regular expression:\
+`^[ \t]*image: \K(.*:.*)$`
+
+##### Regex Explanation
+
+* `^` asserts position at start of a line
+* Match a single character present in the list below `[ \t]`
+  * `*` matches the previous token between zero and unlimited times, as many times as possible, giving back as needed (greedy)
+  * ` ` matches a space character (ASCII 32) literally
+  * `\t` matches a tab character (ASCII 9)
+* `image: ` matches the characters `image: ` literally (case sensitive)
+* `\K` resets the starting point of the reported match. Any previously consumed characters are no longer included in the final match
+* 1st Capturing Group `(.*:.*)`
+  * `.` matches any character (except for line terminators)
+  * `*` matches the previous token between zero and unlimited times, as many times as possible, giving back as needed (greedy)
+  * `:` matches the character `:` with index 5810 (3A16 or 728) literally (case sensitive)
+  * `.` matches any character (except for line terminators)
+  * `*` matches the previous token between zero and unlimited times, as many times as possible, giving back as needed (greedy)
+* `$` asserts position at the end of a line
+
+\
+This regex can be used in combination with helm template and grep, example:
+
+```bash
+> helm template . --set "$ENABLE_ALL_FEATURES" | grep -Po "^[ \t]*image: \K(.*:.*)$" | tr -d \"
+```
+
+> **_NOTE:_** Here we must enable all features to ensure we have a comprehensive list of images.
+
+#### Expose Images
+
+Once a list of images is obtained, we may add these as annotations (see above).
+
+#### Non-Discoverable/Runtime images
+
+Deployments which are not configured in a helm chart, but rather deployed at runtime will not have their images discoverable.\
+In such cases, we may need to manually find and "hardcode" these images
+
+### Test Plan
+
+We should validate the list of images, ensuring they are correct and kept up to date as the project develops.
+This can be done on a cluster, either by white-listing images or by disabling image pull altogether and pre-loading the cluster
+with the list of images we've obtained.
+
 ### Risks and Mitigations
 
-The list of images might get outdated.
+There's a risk we may pick up images which are not required as we're enabling all features.
+It would be difficult to address this because the images will vary depending on which features a user wants to enable.
+Non-discoverable images must be manually added to the list.
 
 #### Mitigations
 
@@ -94,7 +150,7 @@ Make use of automated tests to ensure the list is kept up-to-date.
 
 ## Implementation History
 
-- the `Summary` and `Motivation` sections being merged signaling owner acceptance
+* the `Summary` and `Motivation` sections being merged signaling owner acceptance
 
 ## Drawbacks [optional]
 
