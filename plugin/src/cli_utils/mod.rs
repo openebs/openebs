@@ -2,7 +2,6 @@ use clap::Parser;
 use kubectl_plugin::resources;
 use plugin::ExecuteOperation;
 use std::ops::Deref;
-pub(crate) mod clusterinfo;
 pub(crate) mod localpv;
 use localpv::hostpath;
 use localpv::lvm;
@@ -26,9 +25,6 @@ impl Deref for CliArgs {
 /// Storage engines supported.
 #[derive(Parser, Debug)]
 pub enum Operations {
-    /// Lists installed storage engines with component health.
-    #[clap(subcommand)]
-    ClusterInfo(clusterinfo::Operations),
     /// Mayastor specific commands.
     #[clap(subcommand)]
     Mayastor(resources::Operations),
@@ -50,9 +46,6 @@ impl ExecuteOperation for Operations {
 
     async fn execute(&self, cli_args: &CliArgs) -> Result<(), Error> {
         match self {
-            Operations::ClusterInfo(cluster_info) => {
-                cluster_info.execute(cli_args).await?;
-            }
             Operations::Mayastor(maya_ops) => {
                 resources::init_rest(&cli_args.args).await?;
                 maya_ops.execute(&cli_args.args).await?;
@@ -81,8 +74,6 @@ pub enum Error {
     LocalpvZfs(zfs::Error),
     /// Localpv-hostpath stem specific errors.
     Hostpath(hostpath::Error),
-    /// Cluster-info stem cmd specific errors.
-    ClusterInfo(clusterinfo::Error),
     /// Plugin specific error.
     Generic(anyhow::Error),
 }
@@ -117,12 +108,6 @@ impl From<zfs::Error> for Error {
 impl From<hostpath::Error> for Error {
     fn from(err: hostpath::Error) -> Self {
         Error::Hostpath(err)
-    }
-}
-
-impl From<clusterinfo::Error> for Error {
-    fn from(err: clusterinfo::Error) -> Self {
-        Error::ClusterInfo(err)
     }
 }
 
