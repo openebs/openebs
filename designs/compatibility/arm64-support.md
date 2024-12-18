@@ -62,6 +62,7 @@ The growing prevalence of `arm64` servers in both cloud and edge environments ha
 - **Retroactive Support for Legacy Architectures**: We will not extend support to other architectures beyond `arm64` and `amd64`.
 - **Performance Guarantees**: While we aim for parity, we will not provide strict performance guaranatees specific to `arm64` at this stage.
 - **Immediate Full Feature Set Validation on `arm64`**: We will start with core components and eventually roll out to all official modules. Some pre-release/non-official engines (Local Rawfile) or features may come later.
+- **Non-ARM related/Generic OpenEBS Documentation**: Although this process will likely raise a couple of generic OpenEBS documentation issues, the goal of this OEP is not to improve these areas of the project. This is not to downplay the importance of documentation, but mainly to mitigate scope creep.
 
 ## Proposal
 
@@ -82,15 +83,10 @@ This proposal involves extending current build and release workflows to produce 
 - **Dependency Checks**:
   - Verify that all external dependencies (`spdk-rs`, `bitnami-shell`, etc.) provide `arm64` binaries or have acceptable fallbacks.
 
-- **Control-plane Builds**:
-  - Update control-plane builds to support `arm64`.
-
-- **Data-plane build**:
-  - Update data-plane builds to support `arm64`.
-    - LocalPV-HostPath
-    - LocalPV-ZFS
-    - LocalPV-LVM
-    - ReplicatedPV-Mayastor
+- **Core ARM Support**:
+  - Add/Verify `arm64` support for data-plane, control-plane, and core extension components required for running:
+    - All `LocalPV*` except for `LocalPV-RawFile` storage engines.
+    - The `ReplicatedPV-Mayastor` storage engine
   
 - **Testing Strategy**:
   - Introduce `arm64` test nodes for integration tests.
@@ -106,7 +102,7 @@ This proposal involves extending current build and release workflows to produce 
   - *Mitigation*: Use cloud-based ARM runners or Arm-enabled CI platforms, and possibly maintain separate test schedules for `arm64` to reduce load.
   
 - **Risk: Limited Community Hardware**: Some maintainers and community members might not have immediate access to native `arm64` hardware for debugging.
-  - *Mitigation*: Utilize public cloud credits for temporary Arm instances or rely on well-supported emulation to replicate issues.
+  - *Mitigation*: Add dedicated `arm64` special maintainers tasked with addressing `arm64` issues the community may run into.
 
 - **Risk: External Dependencies**: Some upstream dependencies may lack `arm64` builds.
   - *Mitigation*: Work closely with dependency maintainers or find equivalents that support `arm64`. Document any known gaps or compatibility issues.
@@ -114,7 +110,7 @@ This proposal involves extending current build and release workflows to produce 
 ## Graduation Criteria
 
 - **Alpha (Initial Support)**:
-  - `arm64` images are built and published for all primary OpenEBS components.
+  - Ensure `arm64` images are built and published for all primary OpenEBS components (many of the LocalPV images are already built for `arm64`).
   - Basic integration tests pass on an `arm64` test cluster.
   - Documentation updated to reflect `arm64` availability.
 
