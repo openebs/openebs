@@ -1,7 +1,10 @@
 use crate::cli_utils::CliArgs;
 use clap::Parser;
+use kube::Client;
 use plugin::ExecuteOperation;
 use snafu::Snafu;
+pub(crate) mod node;
+pub(crate) mod volume;
 
 /// LocalPV zfs operations.
 #[derive(Parser, Debug)]
@@ -26,6 +29,7 @@ impl ExecuteOperation for Operations {
     }
 }
 
+/// Get commands for localpv-zfs.
 #[derive(clap::Subcommand, Debug)]
 pub enum ZfsGet {
     /// Gets a specific localpv-zfs volume.
@@ -62,32 +66,30 @@ impl ExecuteOperation for ZfsGet {
     type Args = CliArgs;
     type Error = Error;
 
-    async fn execute(&self, _cli_args: &CliArgs) -> Result<(), Error> {
+    async fn execute(&self, cli_args: &CliArgs) -> Result<(), Error> {
+        let client = Client::try_default()
+            .await
+            .map_err(|err| Error::Kube { source: err })?;
         match self {
-            ZfsGet::Volume(_volume_arg) => {
-                let _ = dummy_construct();
-                todo!("Implementation pending for this command")
+            ZfsGet::Volume(volume_arg) => {
+                volume::volume(cli_args, volume_arg, client).await?;
             }
-            ZfsGet::Volumes(_volumes_arg) => {
-                todo!("Implementation pending for this command")
+            ZfsGet::Volumes(volumes_arg) => {
+                volume::volumes(cli_args, volumes_arg, client).await?;
             }
-            ZfsGet::Zpools(_zpools_arg) => {
-                todo!("Implementation pending for this command")
+            ZfsGet::Zpools(zpools_arg) => {
+                node::zpools(cli_args, zpools_arg, client).await?;
             }
         }
+        Ok(())
     }
-}
-
-/// Temporary function to fix warning as snafu variant is not getting constructed.
-fn dummy_construct() -> Result<(), Error> {
-    Err(Error::Generic {
-        source: anyhow::anyhow!("dummy"),
-    })
 }
 
 /// Error for localpv-zfs stem.
 #[derive(Debug, Snafu)]
 pub enum Error {
-    #[snafu(display("Generic error: {}", source))]
+    #[snafu(display("{source}"))]
     Generic { source: anyhow::Error },
+    #[snafu(display("{source}"))]
+    Kube { source: kube::Error },
 }

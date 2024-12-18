@@ -2,10 +2,10 @@ use clap::Parser;
 use kubectl_plugin::resources;
 use plugin::ExecuteOperation;
 use std::ops::Deref;
-pub(crate) mod clusterinfo;
-pub(crate) mod localpvhostpath;
-pub(crate) mod localpvlvm;
-pub(crate) mod localpvzfs;
+pub(crate) mod localpv;
+use localpv::hostpath;
+use localpv::lvm;
+use localpv::zfs;
 
 #[derive(Parser, Debug)]
 #[group(skip)]
@@ -25,21 +25,18 @@ impl Deref for CliArgs {
 /// Storage engines supported.
 #[derive(Parser, Debug)]
 pub enum Operations {
-    /// Lists installed storage engines with component health.
-    #[clap(subcommand)]
-    ClusterInfo(clusterinfo::Operations),
     /// Mayastor specific commands.
     #[clap(subcommand)]
     Mayastor(resources::Operations),
     /// Localpv-lvm specific commands.
     #[clap(subcommand)]
-    LocalpvLvm(localpvlvm::Operations),
+    LocalpvLvm(lvm::Operations),
     /// Localpv-zfs specific commands.
     #[clap(subcommand)]
-    LocalpvZfs(localpvzfs::Operations),
+    LocalpvZfs(zfs::Operations),
     /// Localpv-hostpath specific commands.
     #[clap(subcommand)]
-    LocalpvHostpath(localpvhostpath::Operations),
+    LocalpvHostpath(hostpath::Operations),
 }
 
 #[async_trait::async_trait(?Send)]
@@ -49,9 +46,6 @@ impl ExecuteOperation for Operations {
 
     async fn execute(&self, cli_args: &CliArgs) -> Result<(), Error> {
         match self {
-            Operations::ClusterInfo(cluster_info) => {
-                cluster_info.execute(cli_args).await?;
-            }
             Operations::Mayastor(maya_ops) => {
                 resources::init_rest(&cli_args.args).await?;
                 maya_ops.execute(&cli_args.args).await?;
@@ -75,13 +69,11 @@ pub enum Error {
     /// Mayastor stem specific errors.
     Mayastor(resources::Error),
     /// Localpv-lvm stem specific errors.
-    LocalpvLvm(localpvlvm::Error),
+    LocalpvLvm(lvm::Error),
     /// Localpv-zfs stem specific errors.
-    LocalpvZfs(localpvzfs::Error),
+    LocalpvZfs(zfs::Error),
     /// Localpv-hostpath stem specific errors.
-    Hostpath(localpvhostpath::Error),
-    /// Cluster-info stem cmd specific errors.
-    ClusterInfo(clusterinfo::Error),
+    Hostpath(hostpath::Error),
     /// Plugin specific error.
     Generic(anyhow::Error),
 }
@@ -101,27 +93,21 @@ impl From<resources::Error> for Error {
     }
 }
 
-impl From<localpvlvm::Error> for Error {
-    fn from(err: localpvlvm::Error) -> Self {
+impl From<lvm::Error> for Error {
+    fn from(err: lvm::Error) -> Self {
         Error::LocalpvLvm(err)
     }
 }
 
-impl From<localpvzfs::Error> for Error {
-    fn from(err: localpvzfs::Error) -> Self {
+impl From<zfs::Error> for Error {
+    fn from(err: zfs::Error) -> Self {
         Error::LocalpvZfs(err)
     }
 }
 
-impl From<localpvhostpath::Error> for Error {
-    fn from(err: localpvhostpath::Error) -> Self {
+impl From<hostpath::Error> for Error {
+    fn from(err: hostpath::Error) -> Self {
         Error::Hostpath(err)
-    }
-}
-
-impl From<clusterinfo::Error> for Error {
-    fn from(err: clusterinfo::Error) -> Self {
-        Error::ClusterInfo(err)
     }
 }
 

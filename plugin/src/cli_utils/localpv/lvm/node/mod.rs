@@ -26,16 +26,15 @@ lazy_static! {
 pub(crate) async fn volume_groups(
     cli_args: &CliArgs,
     args: &GetVolumeGroupsArg,
+    client: Client,
 ) -> Result<(), Error> {
-    let client = Client::try_default()
-        .await
-        .map_err(|err| Error::Kube { source: err })?;
+    let api: Api<LvmNode> = Api::namespaced(client.clone(), &cli_args.args.namespace);
     let lvm_nodes = if let Some(node_id) = &args.node_id {
-        vec![get_lvm_node(cli_args, node_id, client)
+        vec![lvm_node(api, node_id)
             .await
             .map_err(|err| Error::Kube { source: err })?]
     } else {
-        list_lvm_nodes(cli_args, client)
+        lvm_nodes(api)
             .await
             .map_err(|err| Error::Kube { source: err })?
     };
@@ -45,21 +44,26 @@ pub(crate) async fn volume_groups(
 }
 
 /// Gets a specific lvmnode from k8s cluster.
-async fn get_lvm_node(
-    cli_args: &CliArgs,
-    node_id: &str,
-    client: Client,
-) -> Result<LvmNode, kube::Error> {
-    let api: Api<LvmNode> = Api::namespaced(client.clone(), &cli_args.args.namespace);
-    api.get(node_id).await
+async fn lvm_node(node_handle: Api<LvmNode>, node_id: &str) -> Result<LvmNode, kube::Error> {
+    node_handle.get(node_id).await
 }
 
 /// Lists all lvmnodes from the cluster.
-async fn list_lvm_nodes(cli_args: &CliArgs, client: Client) -> Result<Vec<LvmNode>, kube::Error> {
-    let lp = ListParams::default();
-    let api: Api<LvmNode> = Api::namespaced(client.clone(), &cli_args.args.namespace);
-    let lvm_nodes = api.list(&lp).await?.items;
-    Ok(lvm_nodes)
+async fn lvm_nodes(node_handle: Api<LvmNode>) -> Result<Vec<LvmNode>, kube::Error> {
+    let max_entries = 500i32;
+    let mut lp: ListParams = ListParams::default().limit(max_entries as u32);
+    let mut node_list = Vec::new();
+    loop {
+        let list = node_handle.list(&lp).await?;
+        node_list.extend(list.items);
+        match list.metadata.continue_ {
+            Some(token) if !token.is_empty() => {
+                lp = lp.continue_token(&token);
+            }
+            _ => break,
+        }
+    }
+    Ok(node_list)
 }
 
 impl GetHeaderRow for VolumeGroupRecord {

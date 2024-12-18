@@ -1,5 +1,6 @@
 use crate::cli_utils::CliArgs;
 use clap::Parser;
+use kube::Client;
 use plugin::ExecuteOperation;
 pub(crate) mod node;
 pub(crate) mod volume;
@@ -28,6 +29,7 @@ impl ExecuteOperation for Operations {
     }
 }
 
+/// Get commands for localpv-lvm.
 #[derive(clap::Subcommand, Debug)]
 pub enum LvmGet {
     /// Gets a specific localpv-lvm volume.
@@ -65,15 +67,18 @@ impl ExecuteOperation for LvmGet {
     type Error = Error;
 
     async fn execute(&self, cli_args: &CliArgs) -> Result<(), Error> {
+        let client = Client::try_default()
+            .await
+            .map_err(|err| Error::Kube { source: err })?;
         match self {
             LvmGet::Volume(volume_arg) => {
-                volume::volume(cli_args, volume_arg).await?;
+                volume::volume(cli_args, volume_arg, client).await?;
             }
             LvmGet::Volumes(volumes_arg) => {
-                volume::volumes(cli_args, volumes_arg).await?;
+                volume::volumes(cli_args, volumes_arg, client).await?;
             }
             LvmGet::VolumeGroups(volume_groups_arg) => {
-                node::volume_groups(cli_args, volume_groups_arg).await?;
+                node::volume_groups(cli_args, volume_groups_arg, client).await?;
             }
         }
         Ok(())
