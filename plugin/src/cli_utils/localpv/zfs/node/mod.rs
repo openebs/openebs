@@ -29,7 +29,7 @@ pub(crate) async fn zpools(
             .await
             .map_err(|err| Error::Kube { source: err })?
     };
-    let records = ZfsPoolRecord::from(zfs_nodes);
+    let records = ZfsPoolRecord::try_from(zfs_nodes)?;
     print_table(&cli_args.output, records);
     Ok(())
 }
