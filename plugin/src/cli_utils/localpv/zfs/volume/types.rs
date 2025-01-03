@@ -1,4 +1,6 @@
 use super::Error;
+use anyhow::anyhow;
+use byte_unit::Byte;
 use k8s_openapi::api::core::v1::PersistentVolume;
 use k8s_openapi::NamespaceResourceScope;
 use kube::{api::ObjectMeta, Resource, ResourceExt};
@@ -208,17 +210,15 @@ impl TryFrom<(ZfsVolume, PersistentVolume)> for ZfsVolumeObject {
             .ok_or_else(|| Error::Generic {
                 source: anyhow::anyhow!("PersistentVolume spec missing for {}", pv_name),
             })?;
+        let name = zfs_volume.name_unchecked();
         Ok(Self {
-            name: zfs_volume.name_any(),
+            name: name.clone(),
             namespace: zfs_volume
                 .metadata
                 .namespace
                 .as_ref()
                 .ok_or_else(|| Error::Generic {
-                    source: anyhow::anyhow!(
-                        "Zfsvolume namespace missing for {}",
-                        zfs_volume.name_any()
-                    ),
+                    source: anyhow::anyhow!("Zfsvolume namespace missing for {}", name.clone()),
                 })?
                 .clone(),
             status: zfs_volume.status.state,
@@ -229,7 +229,15 @@ impl TryFrom<(ZfsVolume, PersistentVolume)> for ZfsVolumeObject {
                 .clone()
                 .unwrap_or_default()
                 .to_string(),
-            capacity: zfs_volume.spec.capacity,
+            capacity: adjust_bytes(zfs_volume.spec.capacity.parse::<u128>().map_err(|e| {
+                Error::Generic {
+                    source: anyhow!(
+                        "Failed to parse used bytes for zfs_volume {}, error: {}",
+                        name,
+                        e.to_string()
+                    ),
+                }
+            })?),
             pvc_name: spec
                 .claim_ref
                 .clone()
@@ -263,4 +271,11 @@ impl TryFrom<(ZfsVolume, PersistentVolume)> for ZfsVolumeObject {
             vol_type: zfs_volume.spec.vol_type.clone(),
         })
     }
+}
+
+/// Converts bytes into human-readable capacity unit.
+fn adjust_bytes(bytes: u128) -> String {
+    let byte = Byte::from(bytes);
+    let adjusted_byte = byte.get_appropriate_unit(true);
+    format!("{adjusted_byte:.2}")
 }

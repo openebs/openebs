@@ -165,7 +165,7 @@ impl From<Vec<LvmNode>> for VolumeGroupRecord {
         let mut volume_group: Vec<LvmVolumeGroup> = Vec::new();
         for node in nodes {
             for vg in &node.volume_groups {
-                volume_group.push(LvmVolumeGroup::from((vg, &node.name_any())));
+                volume_group.push(LvmVolumeGroup::from((vg, &node.name_unchecked())));
             }
         }
         Self { vgs: volume_group }
