@@ -1,3 +1,6 @@
+use super::Error;
+use anyhow::anyhow;
+use crate::cli_utils::localpv::adjust_bytes;
 use k8s_openapi::NamespaceResourceScope;
 use kube::{api::ObjectMeta, Resource, ResourceExt};
 use serde::{Deserialize, Serialize};
@@ -108,26 +111,41 @@ impl ZfsPoolRecord {
     }
 }
 
-impl From<Vec<ZfsNode>> for ZfsPoolRecord {
-    fn from(nodes: Vec<ZfsNode>) -> Self {
+impl TryFrom<Vec<ZfsNode>> for ZfsPoolRecord {
+    type Error = Error;
+    fn try_from(nodes: Vec<ZfsNode>) -> Result<Self, Error> {
         let mut pools: Vec<ZfsPool> = Vec::new();
         for node in nodes {
             for pool in &node.pools {
-                pools.push(ZfsPool::from((pool, &node.name_any())));
+                pools.push(ZfsPool::try_from((pool, &node.name_unchecked()))?);
             }
         }
-        Self { pools }
+        Ok(Self { pools })
     }
 }
 
-impl From<(&Pool, &String)> for ZfsPool {
-    fn from((pool, node): (&Pool, &String)) -> Self {
-        Self {
+impl TryFrom<(&Pool, &String)> for ZfsPool {
+    type Error = Error;
+    fn try_from((pool, node): (&Pool, &String)) -> Result<Self, Error> {
+        Ok(Self {
             name: pool.name.clone(),
             node: node.to_string(),
             uuid: pool.uuid.clone(),
-            free: pool.free.clone(),
-            used: pool.used.clone(),
-        }
+            free: adjust_bytes(pool.free.parse::<u128>().map_err(|e| Error::Generic {
+                source: anyhow!(
+                    "Failed to parse free bytes for zpool {}, error: {}",
+                    pool.name,
+                    e.to_string()
+                ),
+            })?),
+            used: adjust_bytes(pool.used.parse::<u128>().map_err(|e| Error::Generic {
+                source: anyhow!(
+                    "Failed to parse used bytes for zpool {}, error: {}",
+                    pool.name,
+                    e.to_string()
+                ),
+            })?),
+        })
     }
 }
+
