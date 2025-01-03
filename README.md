@@ -158,14 +158,11 @@ openebs-etcd-2                                    1/1     Running   0          1
 # kubectl get sc
 
 Example Output:
-NAME                                              READY   STATUS    RESTARTS   AGE
-openebs-localpv-provisioner-6ddf7c7978-jsstg      1/1     Running   0          3m9s
-openebs-lvm-localpv-controller-7b6d6b4665-wfw64   5/5     Running   0          3m9s
-openebs-lvm-localpv-node-62lnq                    2/2     Running   0          3m9s
-openebs-lvm-localpv-node-lhndx                    2/2     Running   0          3m9s
-openebs-lvm-localpv-node-tlcqv                    2/2     Running   0          3m9s
-openebs-zfs-localpv-controller-f78f7467c-k7ldb    5/5     Running   0          3m9s
-...
+NAME                       PROVISIONER               RECLAIMPOLICY   VOLUMEBINDINGMODE    ALLOWVOLUMEEXPANSION
+mayastor-etcd-localpv      openebs.io/local          Delete          WaitForFirstConsumer false
+mayastor-loki-localpv      openebs.io/local          Delete          WaitForFirstConsumer false
+openebs-hostpath           openebs.io/local          Delete          WaitForFirstConsumer false
+openebs-single-replica     io.openebs.csi-mayastor   Delete          Immediate            true
 ```
 For more details, please refer to [OpenEBS Documentation](https://openebs.io/docs/).
 
