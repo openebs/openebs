@@ -1,6 +1,7 @@
 use super::Error;
-use anyhow::anyhow;
 use crate::cli_utils::localpv::adjust_bytes;
+
+use anyhow::anyhow;
 use k8s_openapi::NamespaceResourceScope;
 use kube::{api::ObjectMeta, Resource, ResourceExt};
 use serde::{Deserialize, Serialize};
@@ -148,4 +149,3 @@ impl TryFrom<(&Pool, &String)> for ZfsPool {
         })
     }
 }
-

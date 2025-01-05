@@ -2,15 +2,14 @@ use super::CliArgs;
 use super::Error;
 use super::{GetVolumeArg, GetVolumesArg};
 pub(crate) mod types;
-use kube::ResourceExt;
 use plugin::resources::utils::{print_table, CreateRows, GetHeaderRow};
 use types::{LvmVolRecord, LvmVolume, LvmVolumeObject};
 
 use k8s_openapi::api::core::v1::PersistentVolume;
+use kube::ResourceExt;
 use kube::{api::ListParams, Api, Client};
-use prettytable::{row, Row};
-
 use lazy_static::lazy_static;
+use prettytable::{row, Row};
 
 lazy_static! {
     pub(crate) static ref LVM_VOLUME_HEADER: Row =
@@ -23,7 +22,7 @@ pub(crate) async fn volumes(
     volumes_arg: &GetVolumesArg,
     client: Client,
 ) -> Result<(), Error> {
-    let volume_handle: Api<LvmVolume> = Api::namespaced(client.clone(), &cli_args.args.namespace);
+    let volume_handle: Api<LvmVolume> = Api::namespaced(client.clone(), &cli_args.namespace);
     let vol_list = lvm_volumes(volume_handle, volumes_arg)
         .await
         .map_err(|err| Error::Kube { source: err })?;
@@ -42,7 +41,7 @@ pub(crate) async fn volume(
     volume_arg: &GetVolumeArg,
     client: Client,
 ) -> Result<(), Error> {
-    let volume_handle: Api<LvmVolume> = Api::namespaced(client.clone(), &cli_args.args.namespace);
+    let volume_handle: Api<LvmVolume> = Api::namespaced(client.clone(), &cli_args.namespace);
     let volume = lvm_volume(volume_handle, volume_arg)
         .await
         .map_err(|err| Error::Kube { source: err })?;

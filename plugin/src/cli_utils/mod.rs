@@ -1,63 +1,39 @@
-use clap::Parser;
 use kubectl_plugin::resources;
-use plugin::ExecuteOperation;
-use std::ops::Deref;
-pub(crate) mod localpv;
 use localpv::hostpath;
 use localpv::lvm;
 use localpv::zfs;
+pub(crate) mod localpv;
+pub(crate) mod mayastor;
 
-#[derive(Parser, Debug)]
-#[group(skip)]
-pub struct CliArgs {
-    #[clap(flatten)]
-    pub args: resources::CliArgs,
-}
-
-impl Deref for CliArgs {
-    type Target = plugin::CliArgs;
-
-    fn deref(&self) -> &Self::Target {
-        &self.args
-    }
-}
+use clap::Parser;
+use plugin::{init_tracing_with_jaeger, ExecuteOperation};
 
 /// Storage engines supported.
+#[allow(clippy::large_enum_variant)]
 #[derive(Parser, Debug)]
 pub enum Operations {
-    /// Mayastor specific commands.
-    #[clap(subcommand)]
-    Mayastor(resources::Operations),
-    /// Localpv-lvm specific commands.
-    #[clap(subcommand)]
-    LocalpvLvm(lvm::Operations),
-    /// Localpv-zfs specific commands.
-    #[clap(subcommand)]
-    LocalpvZfs(zfs::Operations),
-    /// Localpv-hostpath specific commands.
-    #[clap(subcommand)]
-    LocalpvHostpath(hostpath::Operations),
+    Mayastor(mayastor::Mayastor),
+    LocalpvLvm(lvm::Lvm),
+    LocalpvZfs(zfs::Zfs),
+    LocalpvHostpath(hostpath::Hostpath),
 }
 
-#[async_trait::async_trait(?Send)]
-impl ExecuteOperation for Operations {
-    type Args = CliArgs;
-    type Error = Error;
-
-    async fn execute(&self, cli_args: &CliArgs) -> Result<(), Error> {
+impl Operations {
+    pub(crate) async fn execute(&self) -> Result<(), Error> {
         match self {
-            Operations::Mayastor(maya_ops) => {
-                resources::init_rest(&cli_args.args).await?;
-                maya_ops.execute(&cli_args.args).await?;
+            Operations::Mayastor(mayastor) => {
+                init_tracing_with_jaeger(mayastor.cli_args.jaeger.as_ref());
+                resources::init_rest(&mayastor.cli_args).await?;
+                mayastor.ops.execute(&mayastor.cli_args).await?;
             }
-            Operations::LocalpvLvm(lvm_ops) => {
-                lvm_ops.execute(cli_args).await?;
+            Operations::LocalpvLvm(lvm) => {
+                lvm.ops.execute(&lvm.cli_args).await?;
             }
-            Operations::LocalpvZfs(zfs_ops) => {
-                zfs_ops.execute(cli_args).await?;
+            Operations::LocalpvZfs(zfs) => {
+                zfs.ops.execute(&zfs.cli_args).await?;
             }
-            Operations::LocalpvHostpath(hostpath_ops) => {
-                hostpath_ops.execute(cli_args).await?;
+            Operations::LocalpvHostpath(hostpath) => {
+                hostpath.ops.execute(&hostpath.cli_args).await?;
             }
         }
         Ok(())

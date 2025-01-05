@@ -1296,7 +1296,7 @@ dependencies = [
  "hyper 1.5.0",
  "hyper-util",
  "log",
- "rustls 0.23.16",
+ "rustls 0.23.21",
  "rustls-native-certs 0.8.0",
  "rustls-pki-types",
  "tokio",
@@ -1773,7 +1773,7 @@ dependencies = [
  "kube-core 0.94.2",
  "pem",
  "rand",
- "rustls 0.23.16",
+ "rustls 0.23.21",
  "rustls-pemfile 2.2.0",
  "secrecy",
  "serde",
@@ -1862,6 +1862,7 @@ dependencies = [
  "kube 0.94.2",
  "serde_json",
  "shutdown",
+ "thiserror",
  "tokio",
  "tokio-stream",
  "tower 0.5.1",
@@ -1880,8 +1881,10 @@ dependencies = [
  "kube 0.94.2",
  "kube-forward",
  "openapi",
+ "thiserror",
  "tonic",
  "tower 0.5.1",
+ "url",
  "utils",
 ]
 
@@ -1974,6 +1977,7 @@ dependencies = [
  "console-logger",
  "constants",
  "humantime",
+ "kube-forward",
  "kube-proxy",
  "openapi",
  "rest-plugin",
@@ -2194,7 +2198,7 @@ dependencies = [
  "opentelemetry-otlp",
  "opentelemetry_sdk",
  "pin-project",
- "rustls 0.23.16",
+ "rustls 0.23.21",
  "rustls-pemfile 2.2.0",
  "serde",
  "serde_derive",
@@ -2800,9 +2804,9 @@ dependencies = [
 
 [[package]]
 name = "rustls"
-version = "0.23.16"
+version = "0.23.21"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "eee87ff5d9b36712a58574e12e9f0ea80f915a5b0ac518d322b24a465617925e"
+checksum = "8f287924602bf649d949c63dc8ac8b235fa5387d394020705b80c4eb597ce5b8"
 dependencies = [
  "log",
  "once_cell",
@@ -3521,7 +3525,7 @@ version = "0.26.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0c7bc40d0e5a97695bb96e27995cd3a08538541b0a846f65bba7a359f36700d4"
 dependencies = [
- "rustls 0.23.16",
+ "rustls 0.23.21",
  "rustls-pki-types",
  "tokio",
 ]
