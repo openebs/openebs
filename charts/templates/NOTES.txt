@@ -6,7 +6,7 @@ Check the status by running: kubectl get pods -n {{ .Release.Namespace }}
 The default values will install both Local PV and Replicated PV. However,
 the Replicated PV will require additional configuration to be fuctional.
 The Local PV offers non-replicated local storage using 3 different storage
-backends i.e HostPath, LVM and ZFS, while the Replicated PV provides one replicated highly-available
+backends i.e Hostpath, LVM and ZFS, while the Replicated PV provides one replicated highly-available
 storage backend i.e Mayastor.
 
 For more information, 
