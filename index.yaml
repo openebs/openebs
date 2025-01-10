@@ -2,6 +2,45 @@ apiVersion: v1
 entries:
   openebs:
   - apiVersion: v2
+    appVersion: 4.1.2
+    created: "2025-01-10T15:10:34.951810108Z"
+    dependencies:
+    - name: openebs-crds
+      repository: ""
+      version: 4.1.2
+    - name: localpv-provisioner
+      repository: https://openebs.github.io/dynamic-localpv-provisioner
+      version: 4.1.2
+    - condition: engines.local.zfs.enabled
+      name: zfs-localpv
+      repository: https://openebs.github.io/zfs-localpv
+      version: 2.6.2
+    - condition: engines.local.lvm.enabled
+      name: lvm-localpv
+      repository: https://openebs.github.io/lvm-localpv
+      version: 1.6.2
+    - condition: engines.replicated.mayastor.enabled
+      name: mayastor
+      repository: https://openebs.github.io/mayastor-extensions
+      version: 2.7.2
+    description: Containerized Attached Storage for Kubernetes
+    digest: 6a83b8a70271fd7a91ecd96422074a6171d1f4c319497309c7538db7b120402d
+    home: https://www.openebs.io/
+    icon: https://raw.githubusercontent.com/cncf/artwork/HEAD/projects/openebs/icon/color/openebs-icon-color.png
+    keywords:
+    - cloud-native-storage
+    - block-storage
+    - local-storage
+    - NVMe
+    - storage
+    - kubernetes
+    name: openebs
+    sources:
+    - https://github.com/openebs/openebs
+    urls:
+    - https://github.com/openebs/openebs/releases/download/openebs-4.1.2/openebs-4.1.2.tgz
+    version: 4.1.2
+  - apiVersion: v2
     appVersion: 4.1.1
     created: "2024-09-25T12:58:57.21342906Z"
     dependencies:
@@ -157,4 +196,4 @@ entries:
     urls:
     - https://github.com/openebs/openebs/releases/download/openebs-4.0.0/openebs-4.0.0.tgz
     version: 4.0.0
-generated: "2024-09-25T12:58:57.213442655Z"
+generated: "2025-01-10T15:10:34.951830046Z"
