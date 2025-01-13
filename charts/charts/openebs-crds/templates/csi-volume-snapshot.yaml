@@ -66,13 +66,13 @@ spec:
             snapshot of a persistent volume, or binding to a pre-existing snapshot.
           properties:
             apiVersion:
-              description: >
+              description: |
                 APIVersion defines the versioned schema of this representation
                 of an object. Servers should convert recognized schemas to the latest
                 internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
               type: string
             kind:
-              description: >
+              description: |
                 Kind is a string value representing the REST resource this
                 object represents. Servers may infer this from the endpoint the client
                 submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
@@ -108,7 +108,7 @@ spec:
                       type: string
                   type: object
                 volumeSnapshotClassName:
-                  description: >
+                  description: |
                     VolumeSnapshotClassName is the name of the VolumeSnapshotClass
                     requested by the VolumeSnapshot. VolumeSnapshotClassName may be
                     left nil to indicate that the default SnapshotClass should be used.
@@ -131,7 +131,7 @@ spec:
                 point at each other) before using this object.
               properties:
                 boundVolumeSnapshotContentName:
-                  description: >
+                  description: |
                     boundVolumeSnapshotContentName is the name of the VolumeSnapshotContent
                     object to which this VolumeSnapshot object intends to bind to. If
                     not specified, it indicates that the VolumeSnapshot object has not
@@ -257,19 +257,19 @@ spec:
             snapshot of a persistent volume, or binding to a pre-existing snapshot.
           properties:
             apiVersion:
-              description: >
+              description: |
                 APIVersion defines the versioned schema of this representation
                 of an object. Servers should convert recognized schemas to the latest
                 internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
               type: string
             kind:
-              description: >
+              description: |
                 Kind is a string value representing the REST resource this
                 object represents. Servers may infer this from the endpoint the client
                 submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
               type: string
             spec:
-              description: >
+              description: |
                 spec defines the desired characteristics of a snapshot requested
                 by a user. More info: https://kubernetes.io/docs/concepts/storage/volume-snapshots#volumesnapshots
                 Required.
@@ -295,7 +295,7 @@ spec:
                       type: string
                   type: object
                 volumeSnapshotClassName:
-                  description: >
+                  description: |
                     VolumeSnapshotClassName is the name of the VolumeSnapshotClass
                     requested by the VolumeSnapshot. VolumeSnapshotClassName may be
                     left nil to indicate that the default SnapshotClass should be used.
@@ -318,7 +318,7 @@ spec:
                 point at each other) before using this object.
               properties:
                 boundVolumeSnapshotContentName:
-                  description: >
+                  description: |
                     boundVolumeSnapshotContentName is the name of the VolumeSnapshotContent
                     object to which this VolumeSnapshot object intends to bind to. If
                     not specified, it indicates that the VolumeSnapshot object has not
@@ -349,7 +349,7 @@ spec:
                     will be cleared.
                   properties:
                     message:
-                      description: >
+                      description: |
                         message is a string detailing the encountered error
                         during snapshot creation if specified. NOTE: message may be
                         logged, and it should not contain sensitive information.
