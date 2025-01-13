@@ -41,7 +41,7 @@ spec:
             are non-namespaced
           properties:
             apiVersion:
-              description: >
+              description: |
                 APIVersion defines the versioned schema of this representation
                 of an object. Servers should convert recognized schemas to the latest
                 internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
@@ -63,7 +63,7 @@ spec:
                 VolumeSnapshotClass. Required.
               type: string
             kind:
-              description: >
+              description: |
                 Kind is a string value representing the REST resource this
                 object represents. Servers may infer this from the endpoint the client
                 submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
@@ -85,7 +85,7 @@ spec:
         - jsonPath: .driver
           name: Driver
           type: string
-        - description: >
+        - description: |
             Determines whether a VolumeSnapshotContent created through the
             VolumeSnapshotClass should be deleted when its bound VolumeSnapshot is deleted.
           jsonPath: .deletionPolicy
@@ -106,7 +106,7 @@ spec:
             are non-namespaced
           properties:
             apiVersion:
-              description: >
+              description: |
                 APIVersion defines the versioned schema of this representation
                 of an object. Servers should convert recognized schemas to the latest
                 internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
@@ -128,7 +128,7 @@ spec:
                 VolumeSnapshotClass. Required.
               type: string
             kind:
-              description: >
+              description: |
                 Kind is a string value representing the REST resource this
                 object represents. Servers may infer this from the endpoint the client
                 submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
