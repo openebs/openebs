@@ -89,7 +89,7 @@ impl TryFrom<PersistentVolume> for HostPathVolume {
             source: anyhow!("PV node affinity not found"),
         })?;
         Ok(Self {
-            name: value.name_any(),
+            name: value.name_unchecked(),
             status: value
                 .status
                 .as_ref()

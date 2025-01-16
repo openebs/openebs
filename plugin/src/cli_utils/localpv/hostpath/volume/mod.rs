@@ -2,13 +2,14 @@ pub(crate) mod types;
 use super::CliArgs;
 use super::Error;
 use super::{GetVolumeArg, GetVolumesArg};
+use plugin::resources::utils::{print_table, CreateRows, GetHeaderRow};
+use types::{HostPathVolume, HostPathVolumeRecord};
+
 use anyhow::anyhow;
 use k8s_openapi::api::core::v1::PersistentVolume;
 use kube::{api::ListParams, Api, Client};
 use lazy_static::lazy_static;
-use plugin::resources::utils::{print_table, CreateRows, GetHeaderRow};
 use prettytable::{row, Row};
-use types::{HostPathVolume, HostPathVolumeRecord};
 
 lazy_static! {
     pub(crate) static ref HOSTPATH_VOLUME_HEADER: Row =

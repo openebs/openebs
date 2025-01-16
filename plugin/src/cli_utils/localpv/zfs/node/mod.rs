@@ -19,7 +19,7 @@ pub(crate) async fn zpools(
     args: &GetZpoolsArg,
     client: Client,
 ) -> Result<(), Error> {
-    let api: Api<ZfsNode> = Api::namespaced(client.clone(), &cli_args.args.namespace);
+    let api: Api<ZfsNode> = Api::namespaced(client.clone(), &cli_args.namespace);
     let zfs_nodes = if let Some(node_id) = &args.node_id {
         vec![zfs_node(api, node_id)
             .await
@@ -29,7 +29,7 @@ pub(crate) async fn zpools(
             .await
             .map_err(|err| Error::Kube { source: err })?
     };
-    let records = ZfsPoolRecord::from(zfs_nodes);
+    let records = ZfsPoolRecord::try_from(zfs_nodes)?;
     print_table(&cli_args.output, records);
     Ok(())
 }

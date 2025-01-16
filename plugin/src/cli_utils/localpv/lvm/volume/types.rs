@@ -1,4 +1,7 @@
 use super::Error;
+use crate::cli_utils::localpv::adjust_bytes;
+
+use anyhow::anyhow;
 use k8s_openapi::api::core::v1::PersistentVolume;
 use k8s_openapi::NamespaceResourceScope;
 use kube::{api::ObjectMeta, Resource, ResourceExt};
@@ -164,8 +167,8 @@ impl TryFrom<(&LvmVolume, PersistentVolume)> for LvmVolumeObject {
     fn try_from(
         (lvm_volume, persistent_volume): (&LvmVolume, PersistentVolume),
     ) -> Result<LvmVolumeObject, Self::Error> {
-        let pv_name = persistent_volume.name_any();
-        let lvmvol_name = lvm_volume.name_any();
+        let pv_name = persistent_volume.name_unchecked();
+        let lvmvol_name = lvm_volume.name_unchecked();
         let spec = persistent_volume
             .spec
             .as_ref()
@@ -174,7 +177,7 @@ impl TryFrom<(&LvmVolume, PersistentVolume)> for LvmVolumeObject {
             })?;
         let lvm_spec = &lvm_volume.spec;
         Ok(Self {
-            name: lvm_volume.name_any(),
+            name: lvm_volume.name_unchecked(),
             namespace: lvm_volume
                 .metadata
                 .namespace
@@ -186,7 +189,15 @@ impl TryFrom<(&LvmVolume, PersistentVolume)> for LvmVolumeObject {
             status: lvm_volume.status.state.clone(),
             node: lvm_spec.owner_node_id.clone(),
             thin: lvm_spec.thin_provision.clone(),
-            capacity: lvm_volume.spec.capacity.clone(),
+            capacity: adjust_bytes(lvm_volume.spec.capacity.parse::<u128>().map_err(|e| {
+                Error::Generic {
+                    source: anyhow!(
+                        "Failed to parse used bytes for lvm_volume {}, error: {}",
+                        lvm_volume.name_unchecked(),
+                        e.to_string()
+                    ),
+                }
+            })?),
             shared: lvm_volume.spec.shared.clone(),
             vol_group: lvm_volume.spec.vol_group.clone(),
             vg_pattern: lvm_volume.spec.vg_pattern.clone(),

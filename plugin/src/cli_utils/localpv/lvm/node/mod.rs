@@ -28,7 +28,7 @@ pub(crate) async fn volume_groups(
     args: &GetVolumeGroupsArg,
     client: Client,
 ) -> Result<(), Error> {
-    let api: Api<LvmNode> = Api::namespaced(client.clone(), &cli_args.args.namespace);
+    let api: Api<LvmNode> = Api::namespaced(client.clone(), &cli_args.namespace);
     let lvm_nodes = if let Some(node_id) = &args.node_id {
         vec![lvm_node(api, node_id)
             .await

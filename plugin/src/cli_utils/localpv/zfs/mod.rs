@@ -1,10 +1,11 @@
-use crate::cli_utils::CliArgs;
-use clap::Parser;
-use kube::Client;
 use plugin::ExecuteOperation;
-use snafu::Snafu;
 pub(crate) mod node;
 pub(crate) mod volume;
+
+use clap::Parser;
+use kube::Client;
+use plugin::resources::utils::OutputFormat;
+use snafu::Snafu;
 
 /// LocalPV zfs operations.
 #[derive(Parser, Debug)]
@@ -12,6 +13,28 @@ pub enum Operations {
     /// Gets localpv-zfs resources.
     #[clap(subcommand)]
     Get(ZfsGet),
+}
+
+#[derive(Parser, Debug)]
+pub(crate) struct Zfs {
+    /// LocalPV zfs operations.
+    #[command(subcommand)]
+    pub(crate) ops: Operations,
+    /// LocalPV zfs cli args.
+    #[command(flatten)]
+    pub(crate) cli_args: CliArgs,
+}
+
+#[derive(Parser, Debug)]
+#[group(skip)]
+pub struct CliArgs {
+    /// Kubernetes namespace of localpv-zfs services.
+    #[clap(skip)]
+    pub namespace: String,
+
+    /// The Output, viz yaml, json.
+    #[clap(global = true, default_value = OutputFormat::None.as_ref(), short, long)]
+    pub output: OutputFormat,
 }
 
 #[async_trait::async_trait(?Send)]
@@ -34,9 +57,9 @@ impl ExecuteOperation for Operations {
 pub enum ZfsGet {
     /// Gets a specific localpv-zfs volume.
     Volume(GetVolumeArg),
-    /// Lists all localpv-zfs volumes.
+    /// Lists all localpv-zfs volumes. Filters from specific node if node_id is passed.
     Volumes(GetVolumesArg),
-    /// Lists all localpv-zfs zpools.
+    /// Lists all localpv-zfs zpools. Filters from specific node if node_id is passed.
     Zpools(GetZpoolsArg),
 }
 

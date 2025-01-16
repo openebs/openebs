@@ -13,6 +13,8 @@ path = "src/main.rs"
 kubectl-plugin = { path = "../mayastor/k8s/plugin", default-features = false }
 rest-plugin = { path = "../mayastor/dependencies/control-plane/control-plane/plugin", default-features = false }
 shutdown = { path = "../mayastor/dependencies/control-plane/utils/shutdown"}
+byte-unit = "4.0.19"
+bytes = "1.5.0"
 utils = { path = "../mayastor/dependencies/control-plane/utils/utils-lib" }
 upgrade = { path = "../mayastor/k8s/upgrade" }
 anyhow = "1.0.92"

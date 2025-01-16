@@ -1,17 +1,40 @@
-use crate::cli_utils::CliArgs;
 use clap::Parser;
 use kube::Client;
 use plugin::ExecuteOperation;
 pub(crate) mod node;
 pub(crate) mod volume;
+use plugin::resources::utils::OutputFormat;
+
 use snafu::Snafu;
 
 /// LocalPV lvm operations.
 #[derive(Parser, Debug)]
-pub enum Operations {
+pub(crate) enum Operations {
     /// Gets localpv-lvm resources.
     #[clap(subcommand)]
     Get(LvmGet),
+}
+
+#[derive(Parser, Debug)]
+pub(crate) struct Lvm {
+    /// Localpv lvm operations.
+    #[command(subcommand)]
+    pub(crate) ops: Operations,
+    /// Localpv lvm cli args.
+    #[command(flatten)]
+    pub(crate) cli_args: CliArgs,
+}
+
+#[derive(Parser, Debug)]
+#[group(skip)]
+pub struct CliArgs {
+    /// Kubernetes namespace of localpv-lvm service.
+    #[clap(skip)]
+    pub namespace: String,
+
+    /// The Output, viz yaml, json.
+    #[clap(global = true, default_value = OutputFormat::None.as_ref(), short, long)]
+    pub output: OutputFormat,
 }
 
 #[async_trait::async_trait(?Send)]
@@ -34,9 +57,9 @@ impl ExecuteOperation for Operations {
 pub enum LvmGet {
     /// Gets a specific localpv-lvm volume.
     Volume(GetVolumeArg),
-    /// Lists all localpv-lvm volumes.
+    /// Lists all localpv-lvm volumes. Filters from specific node if node_id is passed.
     Volumes(GetVolumesArg),
-    /// Lists all localpv-lvm volumegroups.
+    /// Lists all localpv-lvm volumegroups. Filters from specific node if node_id is passed.
     VolumeGroups(GetVolumeGroupsArg),
 }
 
