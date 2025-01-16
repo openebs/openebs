@@ -1,10 +1,9 @@
+use kubectl_plugin::resources;
+pub(crate) mod cli_utils;
+
 use clap::Parser;
 use kube::Client;
-use kubectl_plugin::resources;
-use plugin::ExecuteOperation;
-use std::{env, ops::Deref};
-
-pub(crate) mod cli_utils;
+use std::env;
 
 #[derive(Parser, Debug)]
 #[clap(name = utils::package_description!(), version = utils::version_info_str!())]
@@ -17,37 +16,39 @@ struct CliArgs {
     /// If unset, defaults to the default namespace in the current context.
     #[clap(global = true, long, short = 'n')]
     namespace: Option<String>,
-
-    #[clap(flatten)]
-    args: cli_utils::CliArgs,
 }
 
 impl CliArgs {
     async fn args() -> Self {
         let mut arg = CliArgs::parse();
-        if let Some(ns) = arg.namespace.clone() {
-            arg.args.args.namespace = ns;
-        } else {
-            let client = Client::try_default().await.expect("Client init failed");
-            let ns = client.default_namespace().to_string();
-            arg.args.args.namespace = ns;
+        let ns = match arg.namespace {
+            Some(ref namespace) => namespace.to_string(),
+            None => {
+                let client = Client::try_default().await.expect("Client init failed");
+                client.default_namespace().to_string()
+            }
+        };
+        match arg.operations {
+            cli_utils::Operations::Mayastor(ref mut operations) => {
+                operations.cli_args.namespace = ns
+            }
+            cli_utils::Operations::LocalpvLvm(ref mut operations) => {
+                operations.cli_args.namespace = ns
+            }
+            cli_utils::Operations::LocalpvZfs(ref mut operations) => {
+                operations.cli_args.namespace = ns
+            }
+            cli_utils::Operations::LocalpvHostpath(ref mut operations) => {
+                operations.cli_args.namespace = ns
+            }
         }
         arg
-    }
-}
-
-impl Deref for CliArgs {
-    type Target = plugin::CliArgs;
-
-    fn deref(&self) -> &Self::Target {
-        &self.args
     }
 }
 
 #[tokio::main]
 async fn main() {
     let cli_args = CliArgs::args().await;
-    let _tracer_flusher = cli_args.init_tracing();
     if let Err(error) = cli_args.execute().await {
         let mut exit_code = 1;
         match error {
@@ -77,7 +78,7 @@ impl CliArgs {
             shutdown = shutdown::Shutdown::wait_sig() => {
                 Err(anyhow::anyhow!("Interrupted by {shutdown:?}").into())
             },
-            done = self.operations.execute(&self.args) => {
+            done = self.operations.execute() => {
                 done
             }
         }

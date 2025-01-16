@@ -1,9 +1,10 @@
-use crate::cli_utils::CliArgs;
+use plugin::resources::utils::OutputFormat;
+use plugin::ExecuteOperation;
+pub(crate) mod volume;
+
 use clap::Parser;
 use kube::Client;
-use plugin::ExecuteOperation;
 use snafu::Snafu;
-pub(crate) mod volume;
 
 /// LocalPV Hostpath operations.
 #[derive(Parser, Debug)]
@@ -11,6 +12,26 @@ pub enum Operations {
     /// Gets localpv-hostpath resources.
     #[clap(subcommand)]
     Get(HosthpathGet),
+}
+
+#[derive(Parser, Debug)]
+pub(crate) struct Hostpath {
+    #[command(subcommand)]
+    pub(crate) ops: Operations,
+    #[command(flatten)]
+    pub(crate) cli_args: CliArgs,
+}
+
+#[derive(Parser, Debug)]
+#[group(skip)]
+pub struct CliArgs {
+    /// Kubernetes namespace of localpv-hostpath service.
+    #[clap(skip)]
+    pub namespace: String,
+
+    /// The Output, viz yaml, json.
+    #[clap(global = true, default_value = OutputFormat::None.as_ref(), short, long)]
+    pub output: OutputFormat,
 }
 
 #[async_trait::async_trait(?Send)]
