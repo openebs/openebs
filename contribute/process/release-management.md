@@ -43,7 +43,7 @@ The following repositories currently follow a custom release version.
 - openebs/rawfile-localpv
 - openebs/Mayastor
 
-The following repositories are under active development and releases are created from main branch.
+The following repositories are under active development and releases are created from develop branch.
 - openebs/linux-utils
 - openebs/monitor-pv
 - openebs/dynamic-nfs-provisioner

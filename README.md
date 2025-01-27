@@ -95,7 +95,7 @@ OpenEBS provides enterprise-grade data management for Kubernetes clusters, with 
 - Runs 100% in K8s userspace. So it's highly portable and runs across many OSs & platforms.
 
 ## Roadmap (as of June 2024)
-- [OpenEBS Roadmap](https://github.com/openebs/openebs/blob/main/ROADMAP.md)
+- [OpenEBS Roadmap](https://github.com/openebs/openebs/blob/develop/ROADMAP.md)
 ---
 
 [![OpenEBS Welcome Banner](https://github.com/openebs/community/blob/develop/images/community_banner_retro_gamer_level-up-2024_transp.png)](https://www.openebs.io/)
