@@ -71,6 +71,7 @@ A table of contents is helpful for quickly jumping to sections of a OEP and for 
 * [Drawbacks [optional]](#drawbacks-optional)
 * [Alternatives [optional]](#alternatives-optional)
 * [Infrastructure Needed [optional]](#infrastructure-needed-optional)
+* [Testing](#testing)
 
 [Tools for generating]: https://github.com/ekalinin/github-markdown-toc
 
@@ -157,3 +158,8 @@ Similar to the `Drawbacks` section the `Alternatives` section is used to highlig
 Use this section if you need things from the project/owner.
 Examples include a new subproject, repos requested, github details.
 Listing these here allows a owner to get the process for these resources started right away.
+
+## Testing
+
+Use this section to list down the methods of testing the proposed enhancement.
+This can include various high level scenarios and the behaviour to be tested.
