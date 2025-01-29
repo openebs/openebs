@@ -4,7 +4,7 @@ openebs-crds:
       enabled: true
       keep: true
 
-# Refer to https://github.com/openebs/dynamic-localpv-provisioner/blob/v4.1.2/deploy/helm/charts/values.yaml for complete set of values.
+# Refer to https://github.com/openebs/dynamic-localpv-provisioner/blob/v4.1.4/deploy/helm/charts/values.yaml for complete set of values.
 localpv-provisioner:
   rbac:
     create: true
@@ -27,7 +27,7 @@ lvm-localpv:
       volumeSnapshots:
         enabled: false
 
-# Refer to https://github.com/openebs/mayastor-extensions/blob/v2.7.2/chart/values.yaml for complete set of values.
+# Refer to https://github.com/openebs/mayastor-extensions/blob/v2.7.3/chart/values.yaml for complete set of values.
 mayastor:
   csi:
     node:
