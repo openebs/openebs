@@ -1,7 +1,7 @@
 apiVersion: v2
-version: 4.1.2
+version: 4.1.3
 name: openebs
-appVersion: 4.1.2
+appVersion: 4.1.3
 description: Containerized Attached Storage for Kubernetes
 icon: https://raw.githubusercontent.com/cncf/artwork/HEAD/projects/openebs/icon/color/openebs-icon-color.png
 home: https://www.openebs.io/
@@ -16,9 +16,9 @@ sources:
   - https://github.com/openebs/openebs
 dependencies:
   - name: openebs-crds
-    version: 4.1.2
+    version: 4.1.3
   - name: localpv-provisioner
-    version: 4.1.2
+    version: 4.1.4
     repository: "https://openebs.github.io/dynamic-localpv-provisioner"
   - name: zfs-localpv
     version: 2.6.2
@@ -29,6 +29,6 @@ dependencies:
     repository: "https://openebs.github.io/lvm-localpv"
     condition: engines.local.lvm.enabled
   - name: mayastor
-    version: 2.7.2
+    version: 2.7.3
     repository: "https://openebs.github.io/mayastor-extensions"
     condition: engines.replicated.mayastor.enabled
