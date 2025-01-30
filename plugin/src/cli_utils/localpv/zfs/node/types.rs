@@ -1,7 +1,5 @@
 use super::Error;
-use crate::cli_utils::localpv::adjust_bytes;
 
-use anyhow::anyhow;
 use k8s_openapi::NamespaceResourceScope;
 use kube::{api::ObjectMeta, Resource, ResourceExt};
 use serde::{Deserialize, Serialize};
@@ -132,20 +130,8 @@ impl TryFrom<(&Pool, &String)> for ZfsPool {
             name: pool.name.clone(),
             node: node.to_string(),
             uuid: pool.uuid.clone(),
-            free: adjust_bytes(pool.free.parse::<u128>().map_err(|e| Error::Generic {
-                source: anyhow!(
-                    "Failed to parse free bytes for zpool {}, error: {}",
-                    pool.name,
-                    e.to_string()
-                ),
-            })?),
-            used: adjust_bytes(pool.used.parse::<u128>().map_err(|e| Error::Generic {
-                source: anyhow!(
-                    "Failed to parse used bytes for zpool {}, error: {}",
-                    pool.name,
-                    e.to_string()
-                ),
-            })?),
+            free: pool.free.clone(),
+            used: pool.used.clone(),
         })
     }
 }
