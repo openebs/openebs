@@ -1,5 +1,4 @@
 name: Release Charts
-
 on:
   push:
     paths:

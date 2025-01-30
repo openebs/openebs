@@ -7,12 +7,18 @@ edition = "2021"
 name = "kubectl-openebs"
 path = "src/main.rs"
 
+[features]
+default = ["rls"]
+rls = ["openapi/tower-client-rls", "rest-plugin/rls"]
+tls = ["openapi/tower-client-tls", "rest-plugin/tls"]
+
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 kubectl-plugin = { path = "../mayastor/k8s/plugin", default-features = false }
 rest-plugin = { path = "../mayastor/dependencies/control-plane/control-plane/plugin", default-features = false }
 shutdown = { path = "../mayastor/dependencies/control-plane/utils/shutdown"}
+openapi = { path = "../mayastor//dependencies/control-plane/openapi", default-features = false, features = ["tower-trace"]  }
 kube-proxy = { path = "../mayastor/dependencies/control-plane/k8s/proxy" }
 utils = { path = "../mayastor/dependencies/control-plane/utils/utils-lib" }
 upgrade = { path = "../mayastor/k8s/upgrade" }

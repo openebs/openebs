@@ -1,5 +1,4 @@
 name: Chart Lint and Test
-
 on:
   push:
     branches:

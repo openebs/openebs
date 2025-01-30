@@ -1,7 +1,9 @@
 name: Rust CI
 on:
   pull_request:
-    types: [ 'opened', 'edited', 'reopened', 'synchronize' ]
+    branches:
+      - develop
+      - 'release/**'
   push:
     branches:
       - develop

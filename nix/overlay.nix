@@ -13,6 +13,8 @@ let
 in
 self: super: {
   sourcer = super.callPackage ./lib/sourcer.nix { };
+  openebs = super.callPackage ./pkgs/openebs { inherit allInOne incremental static tag rustFlags; };
   paperclip = super.callPackage ./../mayastor/dependencies/control-plane/nix/pkgs/paperclip { };
-  channel = import ./lib/rust.nix { pkgs = super.pkgs; };
+  utils = super.callPackage ./pkgs/utils { inherit incremental; };
+  channel = super.callPackage ./../mayastor/nix/lib/rust.nix { pkgs = super.pkgs; };
 }
