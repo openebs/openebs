@@ -1,0 +1,73 @@
+name: Release Artifacts
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+**'
+    branches:
+      - 'release/**'
+      - 'develop'
+
+jobs:
+  kubectl-plugin:
+    runs-on: ${{ matrix.os }}
+    permissions:
+      id-token: "write"
+      contents: "read"
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # NOTE: Update the .krew.yaml file (if required) when making changes here.
+          - os: ubuntu-latest
+            target: linux-musl
+            arch: x86_64
+          - os: ubuntu-latest
+            target: linux-musl
+            arch: aarch64
+          - os: macos-14
+            target: apple-darwin
+            arch: aarch64
+          - os: macos-13
+            target: apple-darwin
+            arch: x86_64
+          - os: ubuntu-latest
+            target: windows-gnu
+            arch: x86_64
+            suffix: .exe
+    steps:
+      - uses: actions/checkout@v4
+        env:
+          checkout_token: ${{ secrets.ORG_CI_GITHUB }}
+        if: ${{ env.checkout_token == '' }}
+        with:
+          fetch-depth: 0
+          submodules: recursive
+      - uses: actions/checkout@v4
+        env:
+          checkout_token: ${{ secrets.ORG_CI_GITHUB }}
+        if: ${{ env.checkout_token != '' }}
+        with:
+          fetch-depth: 0
+          submodules: recursive
+          token: ${{ secrets.ORG_CI_GITHUB }}
+      - run: |
+          # BUG: HEAD tag is fetched as lightweight instead of annotated
+          # https://github.com/actions/checkout/issues/290
+          if [ "${{ github.ref_type }}" == "tag" ]; then
+            git fetch -f origin ${{ github.ref }}:${{ github.ref }}
+          fi
+      - uses: DeterminateSystems/nix-installer-action@v11
+        with:
+          kvm: false
+      - uses: DeterminateSystems/magic-nix-cache-action@v6
+      - run: |
+          nix-build -A utils.release.${{ matrix.arch }}.${{ matrix.target }}.kubectl-openebs --arg incremental false
+      - name: Archive executable
+        run: |
+          # NOTE: Update the .krew.yaml file (if required) when making changes here.
+          tar -czvf kubectl-openebs-${{ matrix.arch }}-${{ matrix.target }}.tar.gz LICENSE -C result/bin kubectl-openebs${{ matrix.suffix }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: kubectl-openebs-${{ matrix.arch }}-${{ matrix.target }}
+          path: kubectl-openebs-${{ matrix.arch }}-${{ matrix.target }}.tar.gz
+          if-no-files-found: error

@@ -10,7 +10,7 @@ let
           )
           allowedPrefixes);
       path = src;
-      name = "extensions";
+      name = "openebs";
     };
 in
 {
