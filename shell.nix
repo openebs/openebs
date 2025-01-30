@@ -11,7 +11,7 @@ let
     "You have requested an environment without rust, you should provide it!";
   devrustup_moth =
     "You have requested an environment for rustup, you should provide it!";
-  channel = import ./nix/lib/rust.nix { inherit pkgs; };
+  channel = import ./mayastor/nix/lib/rust.nix { inherit pkgs; };
   rust_chan = channel.default_src;
   rust = rust_chan.${rust-profile};
   k8sShellAttrs = import ./scripts/k8s/shell.nix { inherit pkgs; };

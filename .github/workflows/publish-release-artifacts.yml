@@ -1,0 +1,26 @@
+name: Publish Release Artifacts
+on:
+  release:
+    types: [published]
+jobs:
+  publish-artifacts:
+    if: ${{ !startsWith(github.event.release.tag_name, 'v4.2') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download Artifacts
+        run: |
+          echo "Release Tag: ${{ github.event.release.tag_name }}"
+          repo="openebs"
+          ./mayastor/scripts/github/release-artifacts.sh --tag "${{ github.event.release.tag_name }}" --workflow "Release Artifacts" --repo-org "${{ github.repository_owner }}" --repo "$repo" download
+        env:
+          GITHUB_TOKEN: ${{ secrets.ORG_CI_GITHUB }}
+      - name: Upload Artifacts
+        run: |
+          repos="openebs"
+          ./mayastor/scripts/github/release-artifacts.sh --tag "${{ github.event.release.tag_name }}" --repo-org "${{ github.repository_owner }}" --upload "$repos" upload
+        env:
+          GITHUB_TOKEN: ${{ secrets.ORG_CI_GITHUB }}
+      - name: Update krew index
+        if: "!github.event.release.prerelease"
+        uses: rajatjindal/krew-release-bot@v0.0.47
