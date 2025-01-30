@@ -16,7 +16,7 @@ let
   rust = rust_chan.${rust-profile};
 in
 mkShell {
-  name = "extensions-shell";
+  name = "openebs-shell";
   buildInputs = [
     cargo-expand
     cargo-udeps

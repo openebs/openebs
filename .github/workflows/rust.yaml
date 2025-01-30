@@ -1,14 +1,20 @@
 name: Rust CI
 on:
   pull_request:
+    branches:
+      - develop
+      - 'release/**'
     types: [ 'opened', 'edited', 'reopened', 'synchronize' ]
     paths:
       - 'plugin/**'
       - '**.nix'
   push:
     branches:
-      - main
+      - develop
       - 'release/**'
+    paths:
+      - 'plugin/**'
+      - '**.nix'
 
 env:
   CARGO_TERM_COLOR: always

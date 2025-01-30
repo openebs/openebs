@@ -1,0 +1,41 @@
+apiVersion: krew.googlecontainertools.github.com/v1alpha2
+kind: Plugin
+metadata:
+  name: openebs
+spec:
+  version: {{ .TagName }}
+  homepage: https://openebs.io/docs/
+  shortDescription: Provides commands for OpenEBS engines.
+  description: |
+    This plugin allows you to manage storage engines provided by OpenEBS.
+  platforms:
+  - selector:
+      matchLabels:
+        os: darwin
+        arch: amd64
+    {{addURIAndSha "https://github.com/openebs/openebs/releases/download/{{ .TagName }}/kubectl-openebs-x86_64-apple-darwin.tar.gz" .TagName }}
+    bin: kubectl-openebs
+  - selector:
+      matchLabels:
+        os: darwin
+        arch: arm64
+    {{addURIAndSha "https://github.com/openebs/openebs/releases/download/{{ .TagName }}/kubectl-openebs-aarch64-apple-darwin.tar.gz" .TagName }}
+    bin: kubectl-openebs
+  - selector:
+      matchLabels:
+        os: linux
+        arch: amd64
+    {{addURIAndSha "https://github.com/openebs/openebs/releases/download/{{ .TagName }}/kubectl-openebs-x86_64-linux-musl.tar.gz" .TagName }}
+    bin: kubectl-openebs
+  - selector:
+      matchLabels:
+        os: linux
+        arch: arm64
+    {{addURIAndSha "https://github.com/openebs/openebs/releases/download/{{ .TagName }}/kubectl-openebs-aarch64-linux-musl.tar.gz" .TagName }}
+    bin: kubectl-openebs
+  - selector:
+      matchLabels:
+        os: windows
+        arch: amd64
+    {{addURIAndSha "https://github.com/openebs/openebs/releases/download/{{ .TagName }}/kubectl-openebs-x86_64-windows-gnu.tar.gz" .TagName }}
+    bin: kubectl-openebs.exe

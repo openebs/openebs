@@ -5,12 +5,14 @@ on:
     paths:
       - 'charts/**'
     branches:
-      - main
+      - develop
+      - 'release/**'
   pull_request:
     paths:
       - 'charts/**'
     branches:
-      - main
+      - develop
+      - 'release/**'
 
 jobs:
   lint-test:
