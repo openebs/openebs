@@ -2,7 +2,7 @@ name: Fossa CLI
 on:
   push:
     branches:
-      - 'main'
+      - 'develop'
       - 'release/**'
 
 jobs:

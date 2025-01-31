@@ -50,5 +50,5 @@ We are always looking for more contributions. If you see anything above that you
 
 - [Joining OpenEBS contributor community on Kubernetes Slack](https://kubernetes.slack.com)
 	- Already signed up? Head to our discussions at [#openebs-dev](https://kubernetes.slack.com/messages/openebs-dev/)
-- [Joining our Community meetings](https://github.com/openebs/openebs/tree/main/community)
+- [Joining our Community meetings](https://github.com/openebs/openebs/tree/develop/community)
 
