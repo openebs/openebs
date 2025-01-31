@@ -1,190 +1,85 @@
 ## OpenEBS - Cloud Native Storage
-[![Release Charts](https://github.com/openebs/openebs/actions/workflows/chart-release.yml/badge.svg)](https://github.com/openebs/openebs/actions/workflows/chart-release.yml)
+
+[![CNCF Status](https://img.shields.io/badge/cncf%20status-sandbox-blue.svg)](https://www.cncf.io/projects/openebs/)
+[![LICENSE](https://img.shields.io/github/license/openebs/openebs.svg)](./LICENSE)
+[![FOSSA Status](https://app.fossa.com/api/projects/custom%2B162%2Fgithub.com%2Fopenebs%2Fopenebs.svg?type=shield&issueType=license)](https://app.fossa.com/projects/custom%2B162%2Fgithub.com%2Fopenebs%2Fopenebs?ref=badge_shield&issueType=license)
+[![OpenSSF Best Practices](https://www.bestpractices.dev/projects/1754/badge)](https://www.bestpractices.dev/projects/1754)
+[![CLOMonitor](https://img.shields.io/endpoint?url=https://clomonitor.io/api/projects/cncf/openebs/badge)](https://clomonitor.io/projects/cncf/openebs)
 [![Slack](https://img.shields.io/badge/chat-slack-ff1493.svg?style=flat-square)](https://kubernetes.slack.com/messages/openebs)
 [![Community Meetings](https://img.shields.io/badge/Community-Meetings-blue)](https://us05web.zoom.us/j/87535654586?pwd=CigbXigJPn38USc6Vuzt7qSVFoO79X.1)
-[![OpenSSF Best Practices](https://www.bestpractices.dev/projects/1754/badge)](https://www.bestpractices.dev/projects/1754)
-[![FOSSA Status](https://app.fossa.com/api/projects/custom%2B162%2Fgithub.com%2Fopenebs%2Fopenebs.svg?type=shield&issueType=license)](https://app.fossa.com/projects/custom%2B162%2Fgithub.com%2Fopenebs%2Fopenebs?ref=badge_shield&issueType=license)
+[![Artifact HUB](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/openebs)](https://artifacthub.io/packages/helm/openebs/openebs)
+[![Release Charts](https://github.com/openebs/openebs/actions/workflows/chart-release.yml/badge.svg)](https://github.com/openebs/openebs/actions/workflows/chart-release.yml)
 
-## Project Purpose
+## Overview
 
-OpenEBS is an open-source storage service for Kubernetes applications. OpenEBS manages the block storage and file systems based on the block storage for containers running in Kubernetes. Use OpenEBS for creating fast and resilient storage; with options for single-node, and replicated multi-node storage.<BR>
+OpenEBS is an open-source Container Native Storage solution that provides persistent storage for Kubernetes workloads. It enables dynamic provisioning of storage resources using containerized storage controllers, making it highly flexible and cloud-native. OpenEBS supports various storage engines, including LocalPVs for direct node storage and Replicated PV advanced data replication and resilience. It is designed to integrate seamlessly with Kubernetes, offering benefits like storage policies, resize, thin-provisioning, snapshots, and restore capabilities, making it an ideal choice for stateful applications.
 
-| [<img src="https://github.com/openebs/community/blob/develop/images/slack_icon_small.png" width="100">](https://kubernetes.slack.com/messages/openebs)  | **Try our Slack channel** <BR>If you have questions about using OpenEBS, please use the CNCF Kubernetes **OpenEBS slack channel**, it is open for [anyone to ask a question](https://kubernetes.slack.com/messages/openebs/) <BR> |
-| :---         | :---      |
+OpenEBS offers two primary storage approaches for Kubernetes workloads: Local Storage and Replicated Storage. Below is a comparative overview:
 
-<BR>
+| Feature                     | Local Storage                                                                 | Replicated Storage                                                                 |
+|-----------------------------|-------------------------------------------------------------------------------|-----------------------------------------------------------------------------------|
+| **Data Availability**       | Limited to the node where the volume is provisioned; not suitable for high-availability requirements.| Synchronously replicates data across multiple nodes, ensuring high availability and durability. |
+| **Use Cases**               | Ideal for applications managing their own replication and availability, such as distributed databases like MongoDB and Cassandra. | Suitable for stateful workloads requiring storage-level replication and high availability, like Percona/ Standalone DBs, and GitLab. |
+| **Performance**             | Provides near-disk performance with minimal overhead. | Designed for high performance, leveraging NVMe-oF semantics for low-latency access. |
+| **Limitations**             | Not highly available; node failure leads to data unavailability. | Requires sufficient resources (CPU, RAM, NVMe) for optimal performance. |
+| **Snapshot and Cloning**    | Supported when backed by advanced filesystems like LVM or ZFS. | Supported, providing enterprise storage capabilities. |
+| **Backup and Restore**      | Supported via Velero, using Restic for local volumes. | Supported via Velero, ensuring data protection and recovery.|
 
-## Monthly Community Meetings
-OpenEBS holds a monthly community meeting via Zoom on the last Thursday of the month, at 14:00 UTC.
-<br>
-The next meeting is on: `Thursday 31 October, at 14:00 UTC`
-<br>
-Meeting Link: https://us05web.zoom.us/j/87535654586?pwd=CigbXigJPn38USc6Vuzt7qSVFoO79X.1
-<br>
-Starting in August 2024, the meetings will be recorded and posted on YouTube. [Check here](https://www.youtube.com/@openebscommunity6021)
-<BR>
+In summary, **Local Storage** is a good choice when your application can manage its own replication and high availability, and **Replicated Storage** when you require storage-level replication, enhanced data durability and network-based storage access.
 
-## Why OpenEBS?
-OpenEBS provides enterprise-grade data management for Kubernetes clusters, with five storage engines (four single-node and one replicated) that meet a range of use cases for Kubernetes users. The five engines are summarized in the table below:
-<BR>
-> [!IMPORTANT]
-> The OpenEBS platform, provides 2 types of K8s Storage Services. ```Replicated PV``` and ```Local PV```.
-<BR>
+Below are the sub-projects or the major storage solutions under the OpenEBS Umbrella. Visit the individual repositories to learn more about their usage and architecture.
 
-| Engine | [Local PV HostPath](https://github.com/openebs/dynamic-localpv-provisioner) | [Local PV ZFS](https://github.com/openebs/zfs-localpv) | [Local PV LVM](https://github.com/openebs/lvm-localpv)  | [Local PV Rawfile](https://github.com/openebs/rawfile-localpv) | [Replicated PV Mayastor](https://github.com/openebs/mayastor) |
+| Sub-Project | [Local PV Hostpath](https://github.com/openebs/dynamic-localpv-provisioner) | [Local PV ZFS](https://github.com/openebs/zfs-localpv) | [Local PV LVM](https://github.com/openebs/lvm-localpv)  | [Local PV Rawfile (_**Experimental**_)](https://github.com/openebs/rawfile-localpv) | [Mayastor](https://github.com/openebs/mayastor) |
 | :---:  | :---              | :---         | :---         | :---:            | :---:                  |
 | Type   | Single-node       | Single-node  | Single-node  |  Single-node     | Multi-node             |
-| What is it for?   | Replacement for in-Tree Kubernetes CSI HostPath       | Storage engine for ZFS managed backend storage  | Storage engine for LVM2 managed backend storage  |  Experimental engine for using an extent file as block storage     | General purpose replicated enterprise storage           |
+| What is it for?   | Replacement for in-Tree Kubernetes CSI Hostpath       | Storage engine for ZFS managed backend storage  | Storage engine for LVM2 managed backend storage  |  Experimental engine for using an extent file as block storage     | General purpose replicated enterprise storage           |
 | Designed for | Developers or DevOps | ZFS users and production deployments | LVM2 users and production deployments | Developers | Enterprises and production deployments |
-| Features | Everything in Kubernetes HostPath, plus: - Dynamic provisioning, Zero configuration, No CSI driver | Provision ZFS datasets, Provision ZFS volumes, Dynamic provisioning, ZFS resilience, ZFS RAID protection, CSI driver | Provision LVM2 volumes, Dynamic provisioning, LVM2 RAID protection, CSI driver | Provision file system from local files as persistent volumes, CSI driver | Replicated storage NVMe / RDMA, Snapshots, Clones, High availability, CSI driver|
+| Features | Everything in Kubernetes Hostpath, plus: - Dynamic provisioning, Zero configuration, No CSI driver | Provision ZFS datasets, Provision ZFS volumes, Dynamic provisioning, ZFS resilience, ZFS RAID protection, CSI driver | Provision LVM2 volumes, Dynamic provisioning, LVM2 RAID protection, CSI driver | Provision file system from local files as persistent volumes, CSI driver | Replicated storage NVMe / RDMA, Snapshots, Clones, High availability, CSI driver|
 | Status | Stable, deployable in PROD  | Stable, deployable in PROD  | Stable, deployable in PROD  | Beta, undergoing evaluation & integration | Stable, deployable in PROD  |
-| Current Version | [![Releases](https://img.shields.io/github/release/openebs/dynamic-localpv-provisioner/all.svg?style=flat-square)]() | ![Releases](https://img.shields.io/github/release/openebs/zfs-localpv/all.svg?style=flat-square) | [![Releases](https://img.shields.io/github/release/openebs/lvm-localpv/all.svg?style=flat-square)]() | ```release: v0.70``` | [![Releases](https://img.shields.io/github/release/openebs/Mayastor/all.svg?style=flat-square)]() |
+| Current Version | [![Releases](https://img.shields.io/github/release/openebs/dynamic-localpv-provisioner/all.svg?style=flat-square)]() | ![Releases](https://img.shields.io/github/release/openebs/zfs-localpv/all.svg?style=flat-square) | [![Releases](https://img.shields.io/github/release/openebs/lvm-localpv/all.svg?style=flat-square)]() | [release v0.80](https://github.com/openebs/rawfile-localpv/releases/tag/0.8.0) | [![Releases](https://img.shields.io/github/release/openebs/Mayastor/all.svg?style=flat-square)]() |
 
-<BR>
+### Why OpenEBS?
 
-> [!IMPORTANT]
-> **OpenEBS provides**... <BR>
-> - Stateful persistent Dynamically provisioned storage volumes for Kubernetes
-> - High-performance NVMe-oF & NVMe/RDMA storage transport optimized for All-Flash Solid State storage media
-> - Block devices, LVM, ZFS, ext2/ext3/ext4, XFS, BTRFS...and more
-> - 100% Cloud-Native K8s declarative storage platform
-> - A cluster-wide vSAN block-mode fabric that provides containers/Pods with HA-resilient access to storage across the entire cluster.
-> - Node local K8s PVs and n-way Replicated K8s PVs
-> - Deployable On-premise & in-cloud: (AWS EC2/EKS, Google GCP/GKE, Azure VM/AKS, Oracle OCI, IBM/RedHat OpenShift, Civo Cloud, Hetzner Cloud... and more)
-> - Enterprise Grade data management capabilities such as **snapshots, clones, replicated volumes, DiskGroups, Volume Groups, Aggregates, RAID** <BR>
-<BR>
+OpenEBS offers several compelling advantages for managing storage in Kubernetes environments:
 
->
-> :ballot_box_with_check: &nbsp; It uses the High performance [SPDK](https://spdk.io) storage stack - (SPDK is an open-source NVMe project initiated by INTEL) <BR>
-> :ballot_box_with_check: &nbsp; The hyper-modern [IO_Uring](https://github.com/axboe/liburing) Linux Kernel Async polling-mode I/O Interface - (fastest kernel I/O mode possible) <BR>
-> :ballot_box_with_check: &nbsp; Native abilities for RDMA and Zero-Copy I/O <BR>
-> :ballot_box_with_check: &nbsp; NVMe-oF TCP Block storage Hyper-converged data fabric <BR>
-> :ballot_box_with_check: &nbsp; Block layer volume replication <BR>
-> :ballot_box_with_check: &nbsp; Logical volumes and Diskpool based data management <BR>
-> :ballot_box_with_check: &nbsp; a Native high performance [Blobstore](https://spdk.io/doc/blob.html) <BR>
-> :ballot_box_with_check: &nbsp; Native Block layer Thin provisioning <BR>
-> :ballot_box_with_check: &nbsp; Native Block layer Snapshots and Clones <BR>
+- <b>Cloud-Native Architecture</b>: Designed as a cloud-native solution, OpenEBS integrates seamlessly with Kubernetes, most of the storage engines are CSI compliant.
+- <b>Solutions for wide range of workloads</b>: Solutions for both workloads which need or may not need replication.
+- <b>Avoidance of Cloud Lock-In</b>: By abstracting storage management, OpenEBS facilitates the movement of data across various Kubernetes environments, whether on-premises or in the cloud, thereby reducing dependency on a single cloud provider.
+- <b>Cost Efficiency</b>: With features like thin provisioning OpenEBS enables dynamic allocation of storage resources, potentially reducing storage by preventing overprovisioning and allowing for on-the-fly storage expansion.
+- <b>High Availability with Lower Blast Radius</b>: OpenEBS enhances application resilience by synchronously replicating data across multiple nodes, ensuring high availability. In the event of a node failure, only the data on that specific node is affected, minimizing the impact on the overall system.
 
----
+These features make OpenEBS a robust and flexible solution for managing persistent storage in Kubernetes environments.
+
+### Documents
+
+- [Official Documentation](https://openebs.io/docs)
+- [Governance Documentation](https://github.com/openebs/community/blob/develop/GOVERNANCE.md)
+- [Contributing to OpenEBS](https://github.com/openebs/community/blob/develop/CONTRIBUTING.md)
+- [OpenEBS Security Guidelines](https://github.com/openebs/community/blob/develop/SECURITY.md)
+- [Release Process](./RELEASE.md)
+- [Roadmap Tracker](https://github.com/orgs/openebs/projects/78)
+
+### Community
+
+- Homepage: [openebs.io](https://openebs.io/)
+- Mailing list: openebs-team@googlegroups.com
+- Slack: [openebs slack](https://kubernetes.slack.com/messages/openebs)
+- Twitter: [openebs](https://twitter.com/intent/follow?screen_name=openebs)
+- Community Meeting: OpenEBS holds a monthly community meeting via Zoom on the last Thursday of the month, at 14:00 UTC. [Meeting Link](https://us05web.zoom.us/j/87535654586?pwd=CigbXigJPn38USc6Vuzt7qSVFoO79X.1)
+- Community Meeting Recordings: [Youtube](https://www.youtube.com/@openebscommunity6021)
+
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=openebs/openebs&type=Date)](https://star-history.com/#openebs/openebs&Date)
+
 ## Activity dashboard
+
 ![Alt](https://repobeats.axiom.co/api/embed/1e565d4d1fdfeacd2cf810f10bcb6cde7368c9ea.svg "Repobeats analytics image")
----
-## Current status
-| <kbd>Release</kbd> | <kbd>Support</kbd> | <kbd>Twitter/X</kbd> | <kbd>Contrib</kbd> | <kbd>License status</kbd> | <kbd>CI Status</kbd> |
-| :---: | :---: | :---: | :---: | :---: | :---: |
-| [![Releases](https://img.shields.io/github/release/openebs/openebs/all.svg?style=flat-square)](https://github.com/openebs/openebs/releases) | [![Slack channel #openebs](https://img.shields.io/badge/slack-openebs-brightgreen.svg?logo=slack)](https://kubernetes.slack.com/messages/openebs) | [![Twitter](https://img.shields.io/twitter/follow/openebs.svg?style=social&label=Follow)](https://twitter.com/intent/follow?screen_name=openebs) | [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](https://github.com/openebs/openebs/blob/master/CONTRIBUTING.md) | [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fopenebs%2Fopenebs.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fopenebs%2Fopenebs?ref=badge_shield) | [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/1754/badge)](https://bestpractices.coreinfrastructure.org/projects/1754) |
-
----
-**Read this in**
-[🇩🇪](translations/README.de.md)
-[🇷🇺](translations/README.ru.md)
-[🇹🇷](translations/README.tr.md)
-[🇺🇦](translations/README.ua.md)
-[🇨🇳](translations/README.zh.md)
-[🇫🇷](translations/README.fr.md)
-[🇧🇷](translations/README.pt-BR.md)
-[🇪🇸](translations/README.es.md)
-[🇵🇱](translations/README.pl.md)
-[🇰🇷](translations/README.ko.md)
-**[other languages](translations/#readme).**
-
-## Deployment
-- In-cloud: (AWS EC2/EKS, Google GCP/GKE, Azure VM/AKS, Oracle OCI, IBM/RedHat OpenShift, Civo Cloud, Hetzner Cloud... and more)
-- On-Premise: Bare Metal, Virtualized Hypervisor infra using VMWare ESXi, KVM/QEMU (K8s KubeVirt), Proxmox
-- Deployed as native K8s resources: ```Deployments```, ```Containers```, ```Services```, ```Stateful sets```, ```CRD's```, ```Sidecars```, ```Jobs``` and ```Binaries``` all on K8s worker nodes.
-- Runs 100% in K8s userspace. So it's highly portable and runs across many OSs & platforms.
-
-## Roadmap (as of June 2024)
-- [OpenEBS Roadmap](https://github.com/openebs/openebs/blob/develop/ROADMAP.md)
----
-
-[![OpenEBS Welcome Banner](https://github.com/openebs/community/blob/develop/images/community_banner_retro_gamer_level-up-2024_transp.png)](https://www.openebs.io/)
-## QUICKSTART : Installation <BR>
-```NOTE: ``` Depending on which of the 5 storage engines you choose to deploy, pre-requisites must be met. [See detailed quickstart docs...](https://openebs.io/docs/)<BR>
-
-<BR>
-
-> 1. **Setup helm repository.**
-```Erlang
-# helm repo add openebs https://openebs.github.io/openebs
-# helm repo update
-```
-
-
-> 2a. **Install the Full OpenEBS helm chart with default values.** <BR>
->    - This installs **ALL OpenEBS Storage Engines*** in the openebs namespace and chart name as <kbd>openebs</kbd>: <BR>
->    ```Local PV Hostpath```, ```Local PV LVM```, ```Local PV ZFS```, ```Replicated PV Mayastor```
-```Erlang
-# helm install openebs --namespace openebs openebs/openebs --create-namespace
-```
-
-> 2b. **To Install just the OpenEBS ```Local PV``` Storage Engines, use the following command**:
-```Erlang
-# helm install openebs --namespace openebs openebs/openebs --set engines.replicated.mayastor.enabled=false --create-namespace
-```
-
-> 3. **To view the chart**
-```Erlang
-# helm ls -n openebs
-
-Output:
-NAME     NAMESPACE   REVISION  UPDATED                                   STATUS     CHART           APP VERSION
-openebs  openebs     1         2024-06-25 09:13:00.903321318 +0000 UTC   deployed   openebs-4.1.0   4.1.0
-```
-
-> 4. **Verify installation**
->    - List the pods in <openebs> namespace
->    - Verify StorageClasses
-```Erlang
-# kubectl get pods -n openebs
-
-Example Ouput:
-NAME                                              READY   STATUS    RESTARTS   AGE
-openebs-agent-core-674f784df5-7szbm               2/2     Running   0          11m
-openebs-agent-ha-node-nnkmv                       1/1     Running   0          11m
-openebs-agent-ha-node-pvcrr                       1/1     Running   0          11m
-openebs-agent-ha-node-rqkkk                       1/1     Running   0          11m
-openebs-api-rest-79556897c8-b824j                 1/1     Running   0          11m
-openebs-csi-controller-b5c47d49-5t5zd             6/6     Running   0          11m
-openebs-csi-node-flq49                            2/2     Running   0          11m
-openebs-csi-node-k8d7h                            2/2     Running   0          11m
-openebs-csi-node-v7jfh                            2/2     Running   0          11m
-openebs-etcd-0                                    1/1     Running   0          11m
-openebs-etcd-1                                    1/1     Running   0          11m
-openebs-etcd-2                                    1/1     Running   0          11m
-...
-```
-```Erlang
-# kubectl get sc
-
-Example Output:
-NAME                       PROVISIONER               RECLAIMPOLICY   VOLUMEBINDINGMODE    ALLOWVOLUMEEXPANSION
-mayastor-etcd-localpv      openebs.io/local          Delete          WaitForFirstConsumer false
-mayastor-loki-localpv      openebs.io/local          Delete          WaitForFirstConsumer false
-openebs-hostpath           openebs.io/local          Delete          WaitForFirstConsumer false
-openebs-single-replica     io.openebs.csi-mayastor   Delete          Immediate            true
-```
-For more details, please refer to [OpenEBS Documentation](https://openebs.io/docs/).
-
-[![CNCF logo](https://github.com/openebs/community/blob/develop/images/CNCF_member-silver-color.svg)](https://www.datacore.com/)
-OpenEBS is a CNCF project and DataCore, Inc. is a CNCF Silver member. DataCore supports CNCF extensively and has funded OpenEBS participating in every KubeCon event since 2020. Our project team is managed under the CNCF Storage Landscape and we contribute to the CNCF CSI and TAG Storage project initiatives. We proudly support CNCF Cloud Native Community Groups initiatives.<BR>
-> Project updates, subscribe to [OpenEBS Announcements](https://lists.cncf.io/g/cncf-openebs-announcements) <BR>
-> Interacting with other OpenEBS users, subscribe to [OpenEBS Users](https://lists.cncf.io/g/cncf-openebs-users)
-<BR>
-
-| [<img alt="Container Storage Interface group" src="https://github.com/openebs/community/blob/develop/images/CNCF_csi-horizontal-color_2024.png" width="320">](https://github.com/kubernetes/community/tree/master/sig-storage) | [<img alt="Storage Technical Advisory Group" src="https://github.com/openebs/community/blob/develop/images/CNCF_tag-storage-horizontal-color_2024.png" width="320">](https://github.com/cncf/tag-storage) | &emsp; &emsp; [<img alt="Cloud Native Community Groups" src="https://github.com/openebs/community/blob/develop/images/CNCF_cncg-icon-color_2024.png" width="200">](https://github.com/cncf/communitygroups)|
-| :---         |     :---:      |          ---: |
-
-## Commercial Offerings
-
-Commercially supported deployments of OpenEBS are available via the companies below. (Some provide services, funding, technology, infra, and resources to the OpenEBS project).<BR>
-
-- [DataCore Software, Inc.](https://www.datacore.com/support/openebs/)
-- [Clouds Sky GmbH](https://cloudssky.com/en/)
-- [CodeWave](https://codewave.eu/)
-- [Gridworkz Cloud Services](https://gridworkz.com/)
-
-(OpenEBS OSS is a CNCF project. CNCF does not endorse any specific company).
 
 ## License Compliance
+
 [![FOSSA Status](https://app.fossa.com/api/projects/custom%2B162%2Fgithub.com%2Fopenebs%2Fopenebs.svg?type=large&issueType=license)](https://app.fossa.com/projects/custom%2B162%2Fgithub.com%2Fopenebs%2Fopenebs?ref=badge_large&issueType=license)
+
+## OpenEBS is a [CNCF Sandbox Project](https://www.cncf.io/projects/openebs)
+
+![OpenEBS is a CNCF Sandbox Project](https://github.com/cncf/artwork/blob/main/other/cncf/horizontal/color/cncf-color.png)

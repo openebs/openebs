@@ -1,0 +1,21 @@
+name: Pull Request
+
+on:
+  pull_request:
+    branches:
+      - develop
+      - "release/**"
+      - main
+
+jobs:
+  markdown-spell-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: DeterminateSystems/nix-installer-action@v14
+      - name: Pre-populate nix-shell
+        run: |
+          export NIX_PATH=nixpkgs=$(jq '.nixpkgs.url' nix/sources.json -r)
+          echo "NIX_PATH=$NIX_PATH" >> $GITHUB_ENV
+      - name: Run spell check
+        run: nix-shell -p codespell --run "git ls-files '*.md' | xargs codespell --ignore-words '.codespell-ignores.txt'"

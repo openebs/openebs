@@ -19,7 +19,7 @@ status: Implemented
     - [Goals](#goals)
     - [Non-Goals](#non-goals)
 - [Proposal](#proposal)
-    - [Implementaion Details](#implementaion-details)
+    - [Implementation Details](#implementation-details)
     - [Usage details](#usage-details)
   - [Test Plan](#test-plan)
   - [Graduation Criteria](#graduation-criteria)
@@ -36,7 +36,7 @@ This proposal charts out the workflow details to support mount options for vario
 ### Goals
 
 - As a user, I should be able to format the volume with desired filesystem and make volume to be
-  availabe as a file.
+  available as a file.
 
 ### Non-Goals
 
@@ -44,7 +44,7 @@ This proposal charts out the workflow details to support mount options for vario
 
 # Proposal
 
-### Implementaion Details
+### Implementation Details
 
 Kubernetes provides a placeholder in StorageClasss to specify driver & Storage Provider
 supported key-value pairs under the parameters section. K8s registered a key called `fsType`
@@ -59,7 +59,7 @@ to specify filesystem.
 - Once the mount operation is succeeded driver will return a success response to `NodePublishVolume`
   gRPC request.
 
-**Note**: 
+**Note**:
 - User can specify filesystem type with two different keys one is `fsType` and another
   key is `csi.storage.k8s.io/fstype`. If unspecified then defaults to ext4.
 - There won't be any validations on filesystem type either from K8s or from CSI driver side.
@@ -78,7 +78,7 @@ provisioner: local.csi.openebs.io
 parameters:
   storage: "lvm"
   vgpattern: "lvmvg.*"
-  fsType: xfs 
+  fsType: "xfs"
 ```
 
 ## Test Plan
