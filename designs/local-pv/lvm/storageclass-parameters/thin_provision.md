@@ -68,7 +68,7 @@ This proposal charts out the workflow details to support creation of thin provis
         Command used to create thin pool & volume: `lvcreate -L <min_pool_size> -T lvmvg/lvmvg_thinpool  -V <volume_size> -n <volume_name> -y`.
       - If there is a thin pool with <vg_name>_thinpool name then controller will create thin volume.
         Command used to create thin volume: `lvcreate -T lvmvg/lvmvg_thinpool -V <volume_size> -n <volume_name> -y`
-    - If thin volume creation is successfull then controller will LVM volume resource as `Ready`.
+    - If thin volume creation is successful then controller will LVM volume resource as `Ready`.
 - After watching `Ready` status CSI driver will return success response to `CreateVolume` gRPC
   request.
 
@@ -95,7 +95,7 @@ parameters:
 - Provision multiple thin volumes with capacities greater than underlying
   VG size and verify volume accessibility from applications.
 - Deprovision thin volume and verify that space should be reclaimed from thin pool.
- 
+
 ## Graduation Criteria
 
 All testcases mentioned in [Test Plan](#test-plan) section need to be automated
@@ -106,9 +106,9 @@ NA
 ## Alternatives
 
 The current implementation will create a new thin pool if there doesn't
-exist pool with name `<vg_name>_thinpool` in specified VolumeGroup(VG). 
+exist pool with name `<vg_name>_thinpool` in specified VolumeGroup(VG).
 This approach requires additional parameters to reclaim the space when there
-are no volumes exist on the pool and also adds complexities for day-2-operations 
+are no volumes exist on the pool and also adds complexities for day-2-operations
 like thin volume expansions(case where pool doesn't have enough space).
 
 To mitigate above limitations we can hand over thin pool creation to the administrator

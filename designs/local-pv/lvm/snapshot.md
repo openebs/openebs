@@ -41,13 +41,13 @@ LVM Snapshots are space efficient point in time copies of lvm volumes. It consum
 - Creating clones from Snapshots
 - restore of a snapshot
 - expanding the snapshot
-- making snapshot available to the source pod, there is a hack to make this possbile. Need to revisit this requirement for the community users.
+- making snapshot available to the source pod, there is a hack to make this possible. Need to revisit this requirement for the community users.
 - internals of csi-snapshotter and snapshot-controller
 
 
 ## Proposal
 
-To create the k8s snapshot, we need to create a snapshot class similiar to storageclass :
+To create the k8s snapshot, we need to create a snapshot class similar to storageclass :
 
 ```
 kind: VolumeSnapshotClass
@@ -108,7 +108,7 @@ status:
   boundVolumeSnapshotContentName: snapcontent-3cbd5e59-4c6f-4bd6-95ba-7f72c9f12fcd
   creationTime: "2020-02-25T08:25:51Z"
   readyToUse: true
-  restoreSize: "0" 
+  restoreSize: "0"
 ```
 
 ## Implementation Details
@@ -162,8 +162,8 @@ If we want to reserve the space for the snapshot created for thin volumes, we ca
 - Verify the snapSize paramaeter with percentage value and check that correct size has been reserved for thin volumes
 - Verify the snapshot creation for non existing pvc and check that it fails
 - Check the LVM behavior when we are exceeding the snapsize space for snapshots
-- Check the perfromance of the volume after creating the snapshot
-- Create multiple snapshots and verify that any modification in origianl volume gets stored in all the snapshots
+- Check the performance of the volume after creating the snapshot
+- Create multiple snapshots and verify that any modification in original volume gets stored in all the snapshots
 - Verify original volume is working fine after creating the snapshot with and without snapsize parameter
 
 ## Graduation Criteria
