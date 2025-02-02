@@ -16,13 +16,13 @@ pub enum Operations {
 }
 
 #[derive(Parser, Debug)]
-pub(crate) struct Zfs {
+pub struct Zfs {
     /// LocalPV zfs operations.
     #[command(subcommand)]
-    pub(crate) ops: Operations,
+    pub ops: Operations,
     /// LocalPV zfs cli args.
     #[command(flatten)]
-    pub(crate) cli_args: CliArgs,
+    pub cli_args: CliArgs,
 }
 
 #[derive(Parser, Debug)]

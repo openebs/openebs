@@ -4,11 +4,11 @@ use clap::Parser;
 
 /// Mayastor operations.
 #[derive(Parser, Debug)]
-pub(crate) struct Mayastor {
+pub struct Mayastor {
     /// Mayastor cli operations.
     #[command(subcommand)]
-    pub(crate) ops: resources::Operations,
+    pub ops: resources::Operations,
     /// Mayastor cli args.
     #[command(flatten)]
-    pub(crate) cli_args: resources::CliArgs,
+    pub cli_args: resources::CliArgs,
 }

@@ -9,20 +9,20 @@ use snafu::Snafu;
 
 /// LocalPV lvm operations.
 #[derive(Parser, Debug)]
-pub(crate) enum Operations {
+pub enum Operations {
     /// Gets localpv-lvm resources.
     #[clap(subcommand)]
     Get(LvmGet),
 }
 
 #[derive(Parser, Debug)]
-pub(crate) struct Lvm {
+pub struct Lvm {
     /// Localpv lvm operations.
     #[command(subcommand)]
-    pub(crate) ops: Operations,
+    pub ops: Operations,
     /// Localpv lvm cli args.
     #[command(flatten)]
-    pub(crate) cli_args: CliArgs,
+    pub cli_args: CliArgs,
 }
 
 #[derive(Parser, Debug)]

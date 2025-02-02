@@ -19,7 +19,7 @@ pub enum Operations {
 }
 
 impl Operations {
-    pub(crate) async fn execute(&self) -> Result<(), Error> {
+    pub async fn execute(&self) -> Result<(), Error> {
         match self {
             Operations::Mayastor(mayastor) => {
                 init_tracing_with_jaeger(mayastor.cli_args.jaeger.as_ref());
