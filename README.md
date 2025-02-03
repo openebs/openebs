@@ -27,7 +27,7 @@ OpenEBS offers two primary storage options for Kubernetes workloads: Local Stora
 | **Snapshot and Cloning**    | Supported when backed by advanced filesystems like LVM or ZFS. | Supported, providing enterprise storage capabilities. |
 | **Backup and Restore**      | Supported via Velero, using Restic for local volumes. | Supported via Velero, ensuring data protection and recovery.|
 
-In summary, choose **Local Storage** when your application can manage its own replication and high availability, and **Replicated Storage** when you require storage-level replication and enhanced data durability.
+In summary, **Local Storage** is a good choice when your application can manage its own replication and high availability, and **Replicated Storage** when you require storage-level replication and enhanced data durability.
 
 Below are the subprojects or the major storage solutions under the OpenEBS Umbrella. Visit the individual repositories to learn more about their usage and architecture.
 
@@ -84,4 +84,4 @@ These features make OpenEBS a robust and flexible solution for managing persiste
 
 ## OpenEBS is a [CNCF Sandbox Project](https://www.cncf.io/projects/openebs)
 
-![OpenEBS is a CNCF Incubating Project](https://github.com/cncf/artwork/blob/main/other/cncf/horizontal/color/cncf-color.png)
+![OpenEBS is a CNCF Sandbox Project](https://github.com/cncf/artwork/blob/main/other/cncf/horizontal/color/cncf-color.png)

@@ -4,7 +4,7 @@ The OpenEBS release process follows a structured approach to ensure stability, r
 
 ---
 ### **Planning & Feature Freeze**
-- The release cyclqaae begins with a planning phase, where maintainers and contributors define the roadmap and key features for the upcoming release.
+- The release cycle begins with a planning phase, where maintainers and contributors define the roadmap and key features for the upcoming release.
 - A feature freeze is enforced to ensure only bug fixes and critical changes are allowed beyond this point.
 
 ### **Development & Code Merging**
