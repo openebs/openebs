@@ -1,6 +1,7 @@
 [workspace]
 members = [
-    "plugin"
+    "plugin",
+    "openebs_upgrade"
 ]
 exclude = [ "./mayastor", "./mayastor/dependencies/control-plane" ]
 resolver = "1"
