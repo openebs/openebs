@@ -1,0 +1,29 @@
+[package]
+name = "openebs_upgrade"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "upgrade-job"
+path = "src/bin/upgrade-job/main.rs"
+
+[lib]
+name = "openebs_upgrade"
+path = "src/lib.rs"
+
+[dependencies]
+async-trait = "0.1.83"
+clap = { version = "4.5.23", features = ["derive"] }
+color-eyre = "0.6.3"
+constants = { path = "../mayastor/constants" }
+futures = "0.3.31"
+k8s-openapi = { version = "0.20.0", features = ["v1_22"] }
+semver = "1.0.24"
+serde = "1.0.214"
+serde_yaml = "0.9.34"
+snafu = "0.8.5"
+tokio = { version = "1.41.0", features = ["full"] }
+tracing = { version = "0.1.40", features = ["log"] }
+upgrade = { path = "../mayastor/k8s/upgrade" }
+url = "2.5.4"
+utils = { path = "../mayastor/dependencies/control-plane/utils/utils-lib" }

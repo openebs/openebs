@@ -1,6 +1,7 @@
 [workspace]
 members = [
     "plugin",
+    "openebs_upgrade"
 ]
 
 exclude = ["./mayastor"]
