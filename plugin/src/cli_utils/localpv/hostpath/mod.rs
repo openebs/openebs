@@ -15,11 +15,11 @@ pub enum Operations {
 }
 
 #[derive(Parser, Debug)]
-pub(crate) struct Hostpath {
+pub struct Hostpath {
     #[command(subcommand)]
-    pub(crate) ops: Operations,
+    pub ops: Operations,
     #[command(flatten)]
-    pub(crate) cli_args: CliArgs,
+    pub cli_args: CliArgs,
 }
 
 #[derive(Parser, Debug)]
