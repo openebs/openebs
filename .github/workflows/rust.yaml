@@ -35,4 +35,4 @@ jobs:
       - name: Lint rust code
         run: nix-shell --run "./scripts/rust/linter.sh"
       - name: Build rust binaries
-        run: nix-shell --run "cargo build --bins"
+        run: nix-shell --run "./scripts/rust/builder.sh"

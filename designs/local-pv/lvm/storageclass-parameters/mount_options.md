@@ -19,7 +19,7 @@ status: Implemented
     - [Goals](#goals)
     - [Non-Goals](#non-goals)
   - [Proposal](#proposal)
-    - [Implementaion Details](#implementaion-details)
+    - [Implementation Details](#implementation-details)
     - [Usage details](#usage-details)
     - [Test Plan](#test-plan)
   - [Graduation Criteria](#graduation-criteria)
@@ -45,7 +45,7 @@ This proposal charts out the workflow details to support mount options for vario
 
 ## Proposal
 
-### Implementaion Details
+### Implementation Details
 
 
 LVMLocalPV Node CSI driver is responsible for mounting LVM Volumes on application

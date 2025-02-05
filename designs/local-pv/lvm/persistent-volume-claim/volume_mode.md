@@ -35,7 +35,7 @@ raw block mode. For more detailed information about raw block mode click [here](
   `NodePublishVolume` gRPC request. Driver will perform following operations based on
   volume access type
   - If access type is mount(which is filesystem mode) then driver will format(if not
-    formated) and mount the volume at given target path.
+    formatted) and mount the volume at given target path.
   - If access type is block(which is raw block mode) then driver will create a file in
     given target path and bind mount the device at target path.
 - Once the operation is succeeded then driver will return success response to gRPC request.
@@ -60,7 +60,7 @@ spec:
 
 ### Test Plan
 - Provision and application on volume with filesystem volume mode
-  and verify that volume should get formated with user specified filesystem.
+  and verify that volume should get formatted with user specified filesystem.
 - Provision volume with raw block volume and verify block volume accessibility
   from inside the application pod.
 

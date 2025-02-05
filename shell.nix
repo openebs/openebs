@@ -30,6 +30,7 @@ mkShell {
     pkg-config
     pre-commit
     which
+    codespell
   ] ++ pkgs.lib.optional (!norust) channel.default_src.nightly
   ++ pkgs.lib.optional (system == "aarch64-darwin") darwin.apple_sdk.frameworks.Security;
 
