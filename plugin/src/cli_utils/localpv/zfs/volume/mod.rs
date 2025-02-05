@@ -1,8 +1,6 @@
-use super::CliArgs;
-use super::Error;
-use super::{GetVolumeArg, GetVolumesArg};
-pub(crate) mod types;
+use super::{CliArgs, Error, GetVolumeArg, GetVolumesArg};
 use plugin::resources::utils::{print_table, CreateRows, GetHeaderRow};
+pub(crate) mod types;
 use types::{ZfsVolRecord, ZfsVolume, ZfsVolumeObject};
 
 use k8s_openapi::api::core::v1::PersistentVolume;

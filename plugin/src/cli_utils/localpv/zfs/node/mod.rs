@@ -1,8 +1,6 @@
-pub(crate) mod types;
-use super::CliArgs;
-use super::Error;
-use super::GetZpoolsArg;
+use super::{CliArgs, Error, GetZpoolsArg};
 use plugin::resources::utils::{print_table, CreateRows, GetHeaderRow};
+pub(crate) mod types;
 use types::{ZfsNode, ZfsPoolRecord};
 
 use kube::{api::ListParams, Api, Client};
