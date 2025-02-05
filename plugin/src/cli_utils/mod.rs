@@ -2,7 +2,7 @@ use kubectl_plugin::resources;
 use localpv::hostpath;
 use localpv::lvm;
 use localpv::zfs;
-pub(crate) mod localpv;
+pub mod localpv;
 pub(crate) mod mayastor;
 
 use clap::Parser;
