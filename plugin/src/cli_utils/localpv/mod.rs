@@ -1,6 +1,6 @@
-pub(crate) mod hostpath;
-pub(crate) mod lvm;
-pub(crate) mod zfs;
+pub mod hostpath;
+pub mod lvm;
+pub mod zfs;
 
 use byte_unit::Byte;
 

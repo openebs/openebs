@@ -21,7 +21,10 @@ documentation/build/
 charts/Chart.lock
 !/charts/charts/crds/
 /charts/charts/*
+
+# Build files
 **/target
+result
 plugin/target/
 .rust-toolchain
 /rust-toolchain.toml
