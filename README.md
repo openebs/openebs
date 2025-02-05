@@ -19,7 +19,8 @@ OpenEBS holds a monthly community meeting via Zoom on the last Thursday of the m
 <br>
 The next meeting is on: `Thursday 31 October, at 14:00 UTC`
 <br>
-Meeting Link: https://us05web.zoom.us/j/87535654586?pwd=CigbXigJPn38USc6Vuzt7qSVFoO79X.1
+Meeting Link: https://us05web.zoom.us/j/87535654586?pwd=CigbXigJPn38USc6Vuzt7qSVFoO79X.1  
+Calendar Link: https://tockify.com/cncf.public.events/detail/837/1738245600000
 <br>
 Starting in August 2024, the meetings will be recorded and posted on YouTube. [Check here](https://www.youtube.com/@openebscommunity6021)
 <BR>
