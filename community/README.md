@@ -28,9 +28,10 @@ If that does not answer your questions, or if you think you found a bug, please 
 
 ## Community Meetings
 
-To add any of the following events to your calendar, please send an email to `cncf-openebs-maintainers@lists.cncf.io`.
+To add any of the following events to your calendar, use one of the following:
+- [Google Calendar](https://calendar.google.com/calendar/event?action=TEMPLATE&tmeid=ZDhqbDB0YjZtNmpvanJjN2Y2bWw3NnY0ajRfMjAyNTAyMjdUMTQwMDAwWiBvcGVuZWJzLnRlYW1AbQ&tmsrc=openebs.team%40gmail.com&scp=ALL)
+- [Other Calendars](https://openebs.github.io/community/community_meeting.ics)
 
-- Bi-weekly (Every 2 weeks on Wednesday 1:30 PM UTC) contributors meeting over [CNCF's community event platform](https://community.cncf.io/openebs-community/). You'd have to register for the meeting before the actual meeting time. The agenda items and previous discussions can be found [here](https://hackmd.io/tRmnyg9AQPShxFAXOyFpSA?edit).
-
+- Monthly (14:00 UTC) contributors meeting on the last Thursday of the month.
 
 Go back to [**Contributing to OpenEBS**](../CONTRIBUTING.md).
