@@ -21,3 +21,6 @@
 *.tmproj
 # OWNERS file for Kubernetes
 OWNERS
+# Nix Shell
+*.nix
+images.txt

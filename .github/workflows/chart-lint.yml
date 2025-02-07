@@ -2,13 +2,9 @@ name: Chart Lint and Test
 
 on:
   push:
-    paths:
-      - 'charts/**'
     branches:
       - develop
   pull_request:
-    paths:
-      - 'charts/**'
     branches:
       - develop
 
@@ -21,20 +17,31 @@ jobs:
         with:
           fetch-depth: 0
 
+      - uses: dorny/paths-filter@v3
+        id: changes
+        with:
+          filters: |
+            chart:
+              - 'charts/**'
+
       - name: Set up Helm
+        if: steps.changes.outputs.chart == 'true'
         uses: azure/setup-helm@v4
         with:
           version: v3.14.3
 
       - uses: actions/setup-python@v5
+        if: steps.changes.outputs.chart == 'true'
         with:
           python-version: '3.10'
           check-latest: true
 
       - name: Set up chart-testing
+        if: steps.changes.outputs.chart == 'true'
         uses: helm/chart-testing-action@v2.6.1
 
       - name: Run chart-testing (list-changed)
+        if: steps.changes.outputs.chart == 'true'
         id: list-changed
         run: |
           changed=$(ct list-changed --config ct.yaml)
@@ -43,6 +50,7 @@ jobs:
           fi
 
       - name: Run chart-testing (lint)
+        if: steps.changes.outputs.chart == 'true'
         run: ct lint --config ct.yaml
 
       - name: Create kind cluster
@@ -50,6 +58,7 @@ jobs:
         if: steps.list-changed.outputs.changed == 'true'
 
       - name: Add dependency chart repos
+        if: steps.list-changed.outputs.changed == 'true'
         run: |
           helm repo add openebs-mayastor https://openebs.github.io/mayastor-extensions
           helm repo add openebs-localpv https://openebs.github.io/dynamic-localpv-provisioner
@@ -58,4 +67,5 @@ jobs:
           helm repo update
 
       - name: Run chart-testing (install)
+        if: steps.list-changed.outputs.changed == 'true'
         run: ct install --config ct.yaml

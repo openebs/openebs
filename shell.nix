@@ -14,16 +14,17 @@ let
   channel = import ./nix/lib/rust.nix { inherit pkgs; };
   rust_chan = channel.default_src;
   rust = rust_chan.${rust-profile};
+  k8sShellAttrs = import ./scripts/k8s/shell.nix { inherit pkgs; };
+  helmShellAttrs = import ./charts/shell.nix { inherit pkgs; };
 in
 mkShell {
-  name = "extensions-shell";
+  name = "openebs-shell";
   buildInputs = [
     cargo-expand
     cargo-udeps
     commitlint
     cowsay
     git
-    helm-docs
     nixpkgs-fmt
     paperclip
     openssl
@@ -31,6 +32,7 @@ mkShell {
     pre-commit
     which
   ] ++ pkgs.lib.optional (!norust) channel.default_src.nightly
+  ++ k8sShellAttrs.buildInputs ++ helmShellAttrs.buildInputs
   ++ pkgs.lib.optional (system == "aarch64-darwin") darwin.apple_sdk.frameworks.Security;
 
   PROTOC = "${protobuf}/bin/protoc";
