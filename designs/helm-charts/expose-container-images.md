@@ -7,8 +7,8 @@ owners:
   - "@tiagolobocastro"
 editor: TBD
 creation-date: 03/10/2024
-last-updated: 05/12/2024
-status: implementable
+last-updated: 07/02/2025
+status: implemented
 ---
 
 # Expose OpenEBS HelmChart's Container Images

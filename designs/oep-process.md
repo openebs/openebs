@@ -144,7 +144,7 @@ Metadata items:
     In the future we may enhance this to include other types of identification.
 - **owners** Required
   - An OWNER is the person or entity that works on the proposal.
-  - OWNERs consist of `approvers` and `reviewers` joined from the [MAINTAINERS](https://github.com/openebs/openebs/blob/master/MAINTAINERS) file
+  - OWNERs consist of `approvers` and `reviewers` joined from the [MAINTAINERS](https://github.com/openebs/community/blob/HEAD/MAINTAINERS.md) file
   - OWNERs are listed as `@owner` where the name matches up with the Github ID.
   - The OWNER that is most closely associated with this OEP. If there is code or
     other artifacts that will result from this OEP, then it is expected that
