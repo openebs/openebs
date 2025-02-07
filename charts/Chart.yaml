@@ -32,3 +32,77 @@ dependencies:
     version: 2.7.3
     repository: "https://openebs.github.io/mayastor-extensions"
     condition: engines.replicated.mayastor.enabled
+annotations:
+  helm.sh/images: |
+    - name: bats
+      image: bats/bats:1.8.2
+    - name: etcd
+      image: docker.io/bitnami/etcd:3.5.6-debian-11-r10
+    - name: kubectl
+      image: docker.io/bitnami/kubectl:1.25.15
+    - name: promtail
+      image: docker.io/grafana/promtail:2.8.3
+    - name: alpine-bash
+      image: docker.io/openebs/alpine-bash:4.1.0
+    - name: alpine-sh
+      image: docker.io/openebs/alpine-sh:4.1.0
+    - name: mayastor-agent-core
+      image: docker.io/openebs/mayastor-agent-core:v2.7.3
+    - name: mayastor-agent-ha-cluster
+      image: docker.io/openebs/mayastor-agent-ha-cluster:v2.7.3
+    - name: mayastor-agent-ha-node
+      image: docker.io/openebs/mayastor-agent-ha-node:v2.7.3
+    - name: mayastor-api-rest
+      image: docker.io/openebs/mayastor-api-rest:v2.7.3
+    - name: mayastor-csi-controller
+      image: docker.io/openebs/mayastor-csi-controller:v2.7.3
+    - name: mayastor-csi-node
+      image: docker.io/openebs/mayastor-csi-node:v2.7.3
+    - name: mayastor-io-engine
+      image: docker.io/openebs/mayastor-io-engine:v2.7.3
+    - name: mayastor-metrics-exporter-io-engine
+      image: docker.io/openebs/mayastor-metrics-exporter-io-engine:v2.7.3
+    - name: mayastor-obs-callhome-stats
+      image: docker.io/openebs/mayastor-obs-callhome-stats:v2.7.3
+    - name: mayastor-obs-callhome
+      image: docker.io/openebs/mayastor-obs-callhome:v2.7.3
+    - name: mayastor-operator-diskpool
+      image: docker.io/openebs/mayastor-operator-diskpool:v2.7.3
+    - name: loki
+      image: grafana/loki:2.6.1
+    - name: nats
+      image: nats:2.9.17-alpine
+    - name: nats-box
+      image: natsio/nats-box:0.13.8
+    - name: nats-server-config-reloader
+      image: natsio/nats-server-config-reloader:0.10.1
+    - name: prometheus-nats-exporter
+      image: natsio/prometheus-nats-exporter:0.11.0
+    - name: linux-utils
+      image: openebs/linux-utils:4.0.0
+    - name: lvm-driver
+      image: openebs/lvm-driver:1.6.1
+    - name: provisioner-localpv
+      image: openebs/provisioner-localpv:4.1.4
+    - name: zfs-driver
+      image: openebs/zfs-driver:2.6.2
+    - name: csi-attacher
+      image: registry.k8s.io/sig-storage/csi-attacher:v4.3.0
+    - name: csi-node-driver-registrar
+      image: registry.k8s.io/sig-storage/csi-node-driver-registrar:v2.10.0
+    - name: csi-node-driver-registrar
+      image: registry.k8s.io/sig-storage/csi-node-driver-registrar:v2.8.0
+    - name: csi-provisioner
+      image: registry.k8s.io/sig-storage/csi-provisioner:v3.5.0
+    - name: csi-resizer
+      image: registry.k8s.io/sig-storage/csi-resizer:v1.8.0
+    - name: csi-resizer
+      image: registry.k8s.io/sig-storage/csi-resizer:v1.9.3
+    - name: csi-snapshotter
+      image: registry.k8s.io/sig-storage/csi-snapshotter:v6.2.2
+    - name: csi-snapshotter
+      image: registry.k8s.io/sig-storage/csi-snapshotter:v6.3.3
+    - name: snapshot-controller
+      image: registry.k8s.io/sig-storage/snapshot-controller:v6.2.2
+    - name: snapshot-controller
+      image: registry.k8s.io/sig-storage/snapshot-controller:v6.3.3
