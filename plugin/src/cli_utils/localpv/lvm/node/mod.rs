@@ -1,7 +1,5 @@
+use super::{CliArgs, Error, GetVolumeGroupsArg};
 pub(crate) mod types;
-use super::CliArgs;
-use super::Error;
-use super::GetVolumeGroupsArg;
 use plugin::resources::utils::{print_table, CreateRows, GetHeaderRow};
 use types::{LvmNode, VolumeGroupRecord};
 

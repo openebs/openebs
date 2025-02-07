@@ -1,8 +1,6 @@
-pub(crate) mod types;
-use super::CliArgs;
-use super::Error;
-use super::{GetVolumeArg, GetVolumesArg};
+use super::{CliArgs, Error, GetVolumeArg, GetVolumesArg};
 use plugin::resources::utils::{print_table, CreateRows, GetHeaderRow};
+pub(crate) mod types;
 use types::{HostPathVolume, HostPathVolumeRecord};
 
 use anyhow::anyhow;

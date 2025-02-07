@@ -1953,6 +1953,7 @@ dependencies = [
  "clap",
  "k8s-openapi 0.22.0",
  "kube 0.94.2",
+ "kube-proxy",
  "kubectl-plugin",
  "lazy_static",
  "prettytable-rs",

@@ -3,8 +3,8 @@ use plugin::ExecuteOperation;
 pub(crate) mod volume;
 
 use clap::Parser;
-use kube::Client;
 use snafu::Snafu;
+use std::path::PathBuf;
 
 /// LocalPV Hostpath operations.
 #[derive(Parser, Debug)]
@@ -32,6 +32,10 @@ pub struct CliArgs {
     /// The Output, viz yaml, json.
     #[clap(global = true, default_value = OutputFormat::None.as_ref(), short, long)]
     pub output: OutputFormat,
+
+    /// Path to kubeconfig file.
+    #[clap(skip)]
+    pub kube_config_path: Option<PathBuf>,
 }
 
 #[async_trait::async_trait(?Send)]
@@ -78,9 +82,11 @@ impl ExecuteOperation for HosthpathGet {
     type Error = Error;
 
     async fn execute(&self, cli_args: &CliArgs) -> Result<(), Error> {
-        let client = Client::try_default()
+        let client = kube_proxy::client_from_kubeconfig(cli_args.kube_config_path.clone())
             .await
-            .map_err(|err| Error::Kube { source: err })?;
+            .map_err(|err| Error::Generic {
+                source: anyhow::anyhow!("{err}"),
+            })?;
         match self {
             HosthpathGet::Volume(volume_arg) => {
                 volume::volume(cli_args, volume_arg, client).await?;
