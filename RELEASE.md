@@ -2,8 +2,8 @@
 
 OpenEBS is the umbrella project repository that houses:
 1. The OpenEBS Umbrella helm chart.
-2. The Unified Kubectl Plugin, `kubectl-openebs` for management and observability of OpenEBS Storage Engines.
-   NOTE: The Unified Plugin is currently in [openebsctl](https://github.com/openebs/openebsctl), which is undergoing overhaul and would eventually be available from `openebs/openebs` repository.
+2. The Unified Kubectl Plugin, `kubectl-openebs` for management and observability of OpenEBS Storage Engines.<br>
+   **NOTE**: The Unified Plugin is currently in [openebsctl](https://github.com/openebs/openebsctl), which is undergoing overhaul and would eventually be available from `openebs/openebs` repository.
 
 ## Release Tagging
 
