@@ -1,0 +1,5 @@
+# Default code owners
+* @openebs/openebs-reviewers
+
+# CODEOWNERS file owner
+/.github/CODEOWNERS @openebs/org-maintainers
