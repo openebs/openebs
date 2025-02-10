@@ -74,7 +74,7 @@ These features make OpenEBS a robust and flexible solution for managing persiste
 
 ## Activity dashboard
 
-![Alt](https://repobeats.axiom.co/api/embed/1e565d4d1fdfeacd2cf810f10bcb6cde7368c9ea.svg "Repobeats analytics image")
+![Alt](https://repobeats.axiom.co/api/embed/27af71ce20c687fd31105fff04146a50826e2852.svg "Repobeats analytics image")
 
 ## License Compliance
 
