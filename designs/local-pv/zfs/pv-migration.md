@@ -99,7 +99,7 @@ With this feature, the ZFS driver will start using the new key (for e.g. `guid.z
 1. Implement replacement with fresh node
 
 ### Phase 2
-1. Implement replacement with exisitng node (implement Migrator).
+1. Implement replacement with existing node (implement Migrator).
 
 ## Test Plan
 

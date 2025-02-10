@@ -37,7 +37,7 @@ This proposal charts out workflow details to provision dynamic volumes with requ
   and creates a LVM volume resource with best fit VolumeGroup.
   - Corresponding LVM controller creates LVM volume on matching VolumeGroup and updates the status
     of LVM volume resource to `Ready`.
-- After wathing `Ready` status on LVM volume resource CSI driver will retrun success response to
+- After wathing `Ready` status on LVM volume resource CSI driver will return success response to
   gRPC request.
 
 **Note**: If matching VolumeGroups doesn't have enough available space then PVC will remains Pending.
