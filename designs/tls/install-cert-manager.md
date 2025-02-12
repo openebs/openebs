@@ -84,7 +84,7 @@ Cert-manager installation shall be done using [helm charts][certManagerHelmChart
 
 ##### Example of certificate deployment with cert-manager
 
-1. With cert-manager installed we will use certificate and issuer resources to create root certificate
+1. With cert-manager installed we will use the certificate and issuer custom resources to create root certificate
 
 ```yaml
 {{- if .Values.base.tls.enabled }}
@@ -164,6 +164,14 @@ In this example:
 #### HTTP as default
 
 Components should be implemented in such a way that they will communicate using HTTP if tls is not enabled and HTTPS if tls is enabled.
+
+#### REST
+
+First phase will be to identify and configure components using rest comms to enable TLS.
+
+#### gRPC
+
+Second phase will be to configure components using gRPC comms to enable TLS
 
 #### etcd
 
