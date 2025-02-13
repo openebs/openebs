@@ -6,6 +6,9 @@ on:
       - develop
       - "release/**"
 
+env:
+  CI: 1
+
 jobs:
   markdown-spell-check:
     runs-on: ubuntu-latest
