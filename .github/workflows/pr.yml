@@ -5,7 +5,6 @@ on:
     branches:
       - develop
       - "release/**"
-      - main
 
 jobs:
   markdown-spell-check:

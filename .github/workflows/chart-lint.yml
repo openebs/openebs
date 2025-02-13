@@ -4,9 +4,9 @@ on:
   push:
     branches:
       - develop
+      - 'release/**'
   pull_request:
-    branches:
-      - develop
+    types: [ 'opened', 'edited', 'reopened', 'synchronize' ]
 
 jobs:
   lint-test:
