@@ -30,7 +30,7 @@ Please refer the GitHub project [OpenEBS Roadmap Tracking]<https://github.com/or
 | Data protection | Able to backup and restore OpenEBS volume data to/from an S3 end-point | All | v4.2 (Q1 2025) | Completed |
 | Unified kubectl plugin | Unified kubectl plugin to manage all OpenEBS components | All | v4.3 (Q2 2025) | In progress |
 | Local PV LVM cloning | Able to do K8s restore of Local PV LVM snapshot | Local PV LVM | v4.3 (Q2 2025) | |
-| DiskPool resize | Able to increase pool capacity by expansion of underlying disk pool device(s) with I/O continuity | Replicated PV  Mayastor | v4.3 (Q2 2025) | In progress |
+| DiskPool resize | Able to increase pool capacity by expansion of underlying disk pool device(s) with I/O continuity | Replicated PV Mayastor | v4.3 (Q2 2025) | In progress |
 | At-rest encryption | Provision encrypted data-at-rest volumes | Replicated PV Mayastor | v4.3 (Q2 2025) | In progress |
 | Observability enhancements/fixes | Logging, monitoring and alerting | All | v4.3 (Q2 2025) | In progress |
 | Handle Pool media transfer | Support for handling scenarios where pool block device is disconnected from one node and reconnected to a different node | All | 2025 | |
