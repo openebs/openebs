@@ -2,9 +2,6 @@ name: Rust CI
 on:
   pull_request:
     types: [ 'opened', 'edited', 'reopened', 'synchronize' ]
-    paths:
-      - 'plugin/**'
-      - '**.nix'
   push:
     branches:
       - develop
@@ -13,6 +10,7 @@ on:
 env:
   CARGO_TERM_COLOR: always
   CARGO_INCREMENTAL: 0
+  CI: 1
 
 jobs:
   rust-linter-build:
@@ -21,18 +19,42 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: 'recursive'
+      - uses: dorny/paths-filter@v3
+        id: changes
+        with:
+          filters: |
+            rust:
+              - 'plugin/**'
+              - 'nix/**'
+              - shell.nix
+              - default.nix
+              - Cargo.toml
+              - Cargo.lock
+              - 'mayastor/**'
       - uses: DeterminateSystems/nix-installer-action@v14
+        if: steps.changes.outputs.rust == 'true'
       - uses: DeterminateSystems/magic-nix-cache-action@v8
+        if: steps.changes.outputs.rust == 'true'
       - name: Pre-populate nix-shell
+        if: steps.changes.outputs.rust == 'true'
         run: |
           export NIX_PATH=nixpkgs=$(jq '.nixpkgs.url' nix/sources.json -r)
           echo "NIX_PATH=$NIX_PATH" >> $GITHUB_ENV
           nix-shell --run "echo" shell.nix
       - name: Handle Rust dependencies caching
+        if: steps.changes.outputs.rust == 'true'
         uses: Swatinem/rust-cache@v2
         with:
           save-if: ${{ startsWith(github.ref_name, 'release/') || github.ref_name == 'develop' }}
       - name: Lint rust code
+        if: steps.changes.outputs.rust == 'true'
         run: nix-shell --run "./scripts/rust/linter.sh"
       - name: Build rust binaries
+        if: steps.changes.outputs.rust == 'true'
         run: nix-shell --run "./scripts/rust/builder.sh"
+      - name: Ensure Cargo.lock is up to date
+        run: |
+          if git diff --name-only | grep -q 'Cargo.lock'; then
+            echo "Cargo.lock is not up to date!"
+            exit 1
+          fi

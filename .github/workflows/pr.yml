@@ -5,7 +5,9 @@ on:
     branches:
       - develop
       - "release/**"
-      - main
+
+env:
+  CI: 1
 
 jobs:
   markdown-spell-check:

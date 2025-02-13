@@ -1,0 +1,30 @@
+name: Nix Lint CI
+on:
+  pull_request:
+    types: [ 'opened', 'edited', 'reopened', 'synchronize' ]
+  push:
+    branches:
+      - develop
+      - 'release/**'
+
+env:
+  CI: 1
+
+jobs:
+  nix-linter:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: 'recursive'
+      - uses: dorny/paths-filter@v3
+        id: changes
+        with:
+          filters: |
+            nix:
+              - '**.nix'
+      - uses: DeterminateSystems/nix-installer-action@v14
+        if: steps.changes.outputs.nix == 'true'
+      - name: Lint nix code
+        if: steps.changes.outputs.nix == 'true'
+        run: nix-shell -p nixpkgs-fmt --run "nixpkgs-fmt --check ."
