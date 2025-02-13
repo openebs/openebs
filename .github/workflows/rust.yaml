@@ -52,3 +52,9 @@ jobs:
       - name: Build rust binaries
         if: steps.changes.outputs.rust == 'true'
         run: nix-shell --run "./scripts/rust/builder.sh"
+      - name: Ensure Cargo.lock is up to date
+        run: |
+          if git diff --name-only | grep -q 'Cargo.lock'; then
+            echo "Cargo.lock is not up to date!"
+            exit 1
+          fi

@@ -32,6 +32,7 @@ jobs:
           export NIX_PATH=nixpkgs=$(jq '.nixpkgs.url' nix/sources.json -r)
           echo "NIX_PATH=$NIX_PATH" >> $GITHUB_ENV
       - name: Pre-populate K8s nix-shell
+        if: steps.changes.outputs.chart == 'true'
         run: nix-shell ./scripts/k8s/shell.nix --run "echo"
       - name: Pre-populate helm nix-shell
         run: nix-shell ./scripts/helm/shell.nix --run "echo"
