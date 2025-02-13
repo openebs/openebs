@@ -14,7 +14,7 @@ OpenEBS follows a release cadence with a new minor release every 3-4 months.
 
 _Note_: This document should not be construed as a binding commitment to delivery. Rather, its primary purpose is to provide insight into the project's intended objectives and strategic direction. The planned release timelines, version numbers and feature priorities are subject to change as the project maintainers/leadership/community continuously update and adjust in response to Kubernetes industry movements, trends and our community influence.
 
-Please refer the GitHub project [OpenEBS Roadmap Tracking]<https://github.com/orgs/openebs/projects/78> for the execution status of the roadmap items. The project also provides the release mapping and timelines for the issues and enhancement requests raised bu the users and community.
+Please refer the GitHub project [OpenEBS Roadmap Tracking]<https://github.com/orgs/openebs/projects/78> for the execution status of the roadmap items. The project also provides the release mapping and timelines for the issues and enhancement requests raised by the community.
 
 | Feature | Description | Local or Replicated | Release timeline | Status |
 | :------ | :---------- | :------------------ | :--------------- | :----- |
