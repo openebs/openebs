@@ -66,14 +66,16 @@ spec:
             snapshot of a persistent volume, or binding to a pre-existing snapshot.
           properties:
             apiVersion:
-              description: 'APIVersion defines the versioned schema of this representation
-              of an object. Servers should convert recognized schemas to the latest
-              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+              description: |
+                APIVersion defines the versioned schema of this representation
+                of an object. Servers should convert recognized schemas to the latest
+                internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
               type: string
             kind:
-              description: 'Kind is a string value representing the REST resource this
-              object represents. Servers may infer this from the endpoint the client
-              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+              description: |
+                Kind is a string value representing the REST resource this
+                object represents. Servers may infer this from the endpoint the client
+                submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
               type: string
             spec:
               description: 'spec defines the desired characteristics of a snapshot requested
@@ -106,17 +108,18 @@ spec:
                       type: string
                   type: object
                 volumeSnapshotClassName:
-                  description: 'VolumeSnapshotClassName is the name of the VolumeSnapshotClass
-                  requested by the VolumeSnapshot. VolumeSnapshotClassName may be
-                  left nil to indicate that the default SnapshotClass should be used.
-                  A given cluster may have multiple default Volume SnapshotClasses:
-                  one default per CSI Driver. If a VolumeSnapshot does not specify
-                  a SnapshotClass, VolumeSnapshotSource will be checked to figure
-                  out what the associated CSI Driver is, and the default VolumeSnapshotClass
-                  associated with that CSI Driver will be used. If more than one VolumeSnapshotClass
-                  exist for a given CSI Driver and more than one have been marked
-                  as default, CreateSnapshot will fail and generate an event. Empty
-                  string is not allowed for this field.'
+                  description: |
+                    VolumeSnapshotClassName is the name of the VolumeSnapshotClass
+                    requested by the VolumeSnapshot. VolumeSnapshotClassName may be
+                    left nil to indicate that the default SnapshotClass should be used.
+                    A given cluster may have multiple default Volume SnapshotClasses:
+                    one default per CSI Driver. If a VolumeSnapshot does not specify
+                    a SnapshotClass, VolumeSnapshotSource will be checked to figure
+                    out what the associated CSI Driver is, and the default VolumeSnapshotClass
+                    associated with that CSI Driver will be used. If more than one VolumeSnapshotClass
+                    exist for a given CSI Driver and more than one have been marked
+                    as default, CreateSnapshot will fail and generate an event. Empty
+                    string is not allowed for this field.
                   type: string
               required:
                 - source
@@ -128,14 +131,15 @@ spec:
                 point at each other) before using this object.
               properties:
                 boundVolumeSnapshotContentName:
-                  description: 'boundVolumeSnapshotContentName is the name of the VolumeSnapshotContent
-                  object to which this VolumeSnapshot object intends to bind to. If
-                  not specified, it indicates that the VolumeSnapshot object has not
-                  been successfully bound to a VolumeSnapshotContent object yet. NOTE:
-                  To avoid possible security issues, consumers must verify binding
-                  between VolumeSnapshot and VolumeSnapshotContent objects is successful
-                  (by validating that both VolumeSnapshot and VolumeSnapshotContent
-                  point at each other) before using this object.'
+                  description: |
+                    boundVolumeSnapshotContentName is the name of the VolumeSnapshotContent
+                    object to which this VolumeSnapshot object intends to bind to. If
+                    not specified, it indicates that the VolumeSnapshot object has not
+                    been successfully bound to a VolumeSnapshotContent object yet. NOTE:
+                    To avoid possible security issues, consumers must verify binding
+                    between VolumeSnapshot and VolumeSnapshotContent objects is successful
+                    (by validating that both VolumeSnapshot and VolumeSnapshotContent
+                    point at each other) before using this object.
                   type: string
                 creationTime:
                   description: creationTime is the timestamp when the point-in-time
@@ -253,19 +257,22 @@ spec:
             snapshot of a persistent volume, or binding to a pre-existing snapshot.
           properties:
             apiVersion:
-              description: 'APIVersion defines the versioned schema of this representation
-              of an object. Servers should convert recognized schemas to the latest
-              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+              description: |
+                APIVersion defines the versioned schema of this representation
+                of an object. Servers should convert recognized schemas to the latest
+                internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
               type: string
             kind:
-              description: 'Kind is a string value representing the REST resource this
-              object represents. Servers may infer this from the endpoint the client
-              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+              description: |
+                Kind is a string value representing the REST resource this
+                object represents. Servers may infer this from the endpoint the client
+                submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
               type: string
             spec:
-              description: 'spec defines the desired characteristics of a snapshot requested
-              by a user. More info: https://kubernetes.io/docs/concepts/storage/volume-snapshots#volumesnapshots
-              Required.'
+              description: |
+                spec defines the desired characteristics of a snapshot requested
+                by a user. More info: https://kubernetes.io/docs/concepts/storage/volume-snapshots#volumesnapshots
+                Required.
               properties:
                 source:
                   description: source specifies where a snapshot will be created from.
@@ -288,17 +295,18 @@ spec:
                       type: string
                   type: object
                 volumeSnapshotClassName:
-                  description: 'VolumeSnapshotClassName is the name of the VolumeSnapshotClass
-                  requested by the VolumeSnapshot. VolumeSnapshotClassName may be
-                  left nil to indicate that the default SnapshotClass should be used.
-                  A given cluster may have multiple default Volume SnapshotClasses:
-                  one default per CSI Driver. If a VolumeSnapshot does not specify
-                  a SnapshotClass, VolumeSnapshotSource will be checked to figure
-                  out what the associated CSI Driver is, and the default VolumeSnapshotClass
-                  associated with that CSI Driver will be used. If more than one VolumeSnapshotClass
-                  exist for a given CSI Driver and more than one have been marked
-                  as default, CreateSnapshot will fail and generate an event. Empty
-                  string is not allowed for this field.'
+                  description: |
+                    VolumeSnapshotClassName is the name of the VolumeSnapshotClass
+                    requested by the VolumeSnapshot. VolumeSnapshotClassName may be
+                    left nil to indicate that the default SnapshotClass should be used.
+                    A given cluster may have multiple default Volume SnapshotClasses:
+                    one default per CSI Driver. If a VolumeSnapshot does not specify
+                    a SnapshotClass, VolumeSnapshotSource will be checked to figure
+                    out what the associated CSI Driver is, and the default VolumeSnapshotClass
+                    associated with that CSI Driver will be used. If more than one VolumeSnapshotClass
+                    exist for a given CSI Driver and more than one have been marked
+                    as default, CreateSnapshot will fail and generate an event. Empty
+                    string is not allowed for this field.
                   type: string
               required:
                 - source
@@ -310,14 +318,15 @@ spec:
                 point at each other) before using this object.
               properties:
                 boundVolumeSnapshotContentName:
-                  description: 'boundVolumeSnapshotContentName is the name of the VolumeSnapshotContent
-                  object to which this VolumeSnapshot object intends to bind to. If
-                  not specified, it indicates that the VolumeSnapshot object has not
-                  been successfully bound to a VolumeSnapshotContent object yet. NOTE:
-                  To avoid possible security issues, consumers must verify binding
-                  between VolumeSnapshot and VolumeSnapshotContent objects is successful
-                  (by validating that both VolumeSnapshot and VolumeSnapshotContent
-                  point at each other) before using this object.'
+                  description: |
+                    boundVolumeSnapshotContentName is the name of the VolumeSnapshotContent
+                    object to which this VolumeSnapshot object intends to bind to. If
+                    not specified, it indicates that the VolumeSnapshot object has not
+                    been successfully bound to a VolumeSnapshotContent object yet. NOTE:
+                    To avoid possible security issues, consumers must verify binding
+                    between VolumeSnapshot and VolumeSnapshotContent objects is successful
+                    (by validating that both VolumeSnapshot and VolumeSnapshotContent
+                    point at each other) before using this object.
                   type: string
                 creationTime:
                   description: creationTime is the timestamp when the point-in-time
@@ -340,9 +349,10 @@ spec:
                     will be cleared.
                   properties:
                     message:
-                      description: 'message is a string detailing the encountered error
-                      during snapshot creation if specified. NOTE: message may be
-                      logged, and it should not contain sensitive information.'
+                      description: |
+                        message is a string detailing the encountered error
+                        during snapshot creation if specified. NOTE: message may be
+                        logged, and it should not contain sensitive information.
                       type: string
                     time:
                       description: time is the timestamp when the error was encountered.
