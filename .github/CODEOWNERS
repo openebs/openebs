@@ -1,0 +1,14 @@
+# Default code owners
+*                           @openebs/org-maintainers @openebs/localpv-hostpath-approvers @openebs/localpv-zfs-approvers @openebs/localpv-lvm-approvers @openebs/mayastor-approvers @openebs/ci-buildscript-approvers
+
+# CODEOWNERS file owners
+/.github/CODEOWNERS         @openebs/org-maintainers
+
+# Policy docs owners
+/CODE_OF_CONDUCT.md         @openebs/org-maintainers
+/CONTRIBUTING.md            @openebs/org-maintainers
+/GOVERNANCE.md              @openebs/org-maintainers
+/LICENSE                    @openebs/org-maintainers
+/MAINTAINERS.md             @openebs/org-maintainers
+/SECURITY.md                @openebs/org-maintainers
+/SECURITY_CONTACTS.md       @openebs/org-maintainers
