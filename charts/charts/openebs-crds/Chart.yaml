@@ -1,4 +1,4 @@
 apiVersion: v2
 name: openebs-crds
-version: 4.1.3
+version: 4.2.0
 description: A Helm chart that collects CustomResourceDefinitions (CRDs) from OpenEBS.
