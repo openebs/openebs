@@ -1,0 +1,7 @@
+[workspace]
+members = [
+    "plugin",
+]
+
+exclude = ["./mayastor"]
+resolver = "1"

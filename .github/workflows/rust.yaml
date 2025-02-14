@@ -51,7 +51,7 @@ jobs:
         run: nix-shell --run "./scripts/rust/linter.sh"
       - name: Build rust binaries
         if: steps.changes.outputs.rust == 'true'
-        run: nix-shell --run "./scripts/rust/builder.sh"
+        run: nix-shell --run "cargo build --bins"
       - name: Ensure Cargo.lock is up to date
         run: |
           if git diff --name-only | grep -q 'Cargo.lock'; then
