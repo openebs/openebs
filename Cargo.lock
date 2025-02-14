@@ -1996,6 +1996,7 @@ dependencies = [
  "console-logger",
  "constants",
  "humantime",
+ "kube 0.94.2",
  "kube-forward",
  "kube-proxy",
  "openapi",
