@@ -9,7 +9,7 @@ owners:
 editor: TBD
 creation-date: 2025-01-24
 last-updated: 2025-01-24
-status: provisional
+status: implementable
 ---
 
 # OpenEBS Enhancement Proposal for Mayastor At-Rest Encryption of data
