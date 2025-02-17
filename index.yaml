@@ -1,6 +1,119 @@
 apiVersion: v1
 entries:
   openebs:
+  - annotations:
+      helm.sh/images: |
+        - name: bats
+          image: bats/bats:1.8.2
+        - name: etcd
+          image: docker.io/bitnami/etcd:3.5.6-debian-11-r10
+        - name: kubectl
+          image: docker.io/bitnami/kubectl:1.25.15
+        - name: promtail
+          image: docker.io/grafana/promtail:2.8.3
+        - name: alpine-bash
+          image: docker.io/openebs/alpine-bash:4.1.0
+        - name: alpine-sh
+          image: docker.io/openebs/alpine-sh:4.1.0
+        - name: mayastor-agent-core
+          image: docker.io/openebs/mayastor-agent-core:v2.8.0
+        - name: mayastor-agent-ha-cluster
+          image: docker.io/openebs/mayastor-agent-ha-cluster:v2.8.0
+        - name: mayastor-agent-ha-node
+          image: docker.io/openebs/mayastor-agent-ha-node:v2.8.0
+        - name: mayastor-api-rest
+          image: docker.io/openebs/mayastor-api-rest:v2.8.0
+        - name: mayastor-csi-controller
+          image: docker.io/openebs/mayastor-csi-controller:v2.8.0
+        - name: mayastor-csi-node
+          image: docker.io/openebs/mayastor-csi-node:v2.8.0
+        - name: mayastor-io-engine
+          image: docker.io/openebs/mayastor-io-engine:v2.8.0
+        - name: mayastor-metrics-exporter-io-engine
+          image: docker.io/openebs/mayastor-metrics-exporter-io-engine:v2.8.0
+        - name: mayastor-obs-callhome-stats
+          image: docker.io/openebs/mayastor-obs-callhome-stats:v2.8.0
+        - name: mayastor-obs-callhome
+          image: docker.io/openebs/mayastor-obs-callhome:v2.8.0
+        - name: mayastor-operator-diskpool
+          image: docker.io/openebs/mayastor-operator-diskpool:v2.8.0
+        - name: loki
+          image: grafana/loki:2.6.1
+        - name: nats
+          image: nats:2.9.17-alpine
+        - name: nats-box
+          image: natsio/nats-box:0.13.8
+        - name: nats-server-config-reloader
+          image: natsio/nats-server-config-reloader:0.10.1
+        - name: prometheus-nats-exporter
+          image: natsio/prometheus-nats-exporter:0.11.0
+        - name: linux-utils
+          image: openebs/linux-utils:4.1.0
+        - name: lvm-driver
+          image: openebs/lvm-driver:1.6.1
+        - name: provisioner-localpv
+          image: openebs/provisioner-localpv:4.2.0
+        - name: zfs-driver
+          image: openebs/zfs-driver:2.7.1
+        - name: csi-attacher
+          image: registry.k8s.io/sig-storage/csi-attacher:v4.3.0
+        - name: csi-node-driver-registrar
+          image: registry.k8s.io/sig-storage/csi-node-driver-registrar:v2.10.0
+        - name: csi-node-driver-registrar
+          image: registry.k8s.io/sig-storage/csi-node-driver-registrar:v2.8.0
+        - name: csi-provisioner
+          image: registry.k8s.io/sig-storage/csi-provisioner:v3.5.0
+        - name: csi-resizer
+          image: registry.k8s.io/sig-storage/csi-resizer:v1.8.0
+        - name: csi-resizer
+          image: registry.k8s.io/sig-storage/csi-resizer:v1.9.3
+        - name: csi-snapshotter
+          image: registry.k8s.io/sig-storage/csi-snapshotter:v6.2.2
+        - name: csi-snapshotter
+          image: registry.k8s.io/sig-storage/csi-snapshotter:v6.3.3
+        - name: snapshot-controller
+          image: registry.k8s.io/sig-storage/snapshot-controller:v6.2.2
+        - name: snapshot-controller
+          image: registry.k8s.io/sig-storage/snapshot-controller:v6.3.3
+    apiVersion: v2
+    appVersion: 4.2.0
+    created: "2025-02-17T10:09:59.344910538Z"
+    dependencies:
+    - name: openebs-crds
+      repository: ""
+      version: 4.2.0
+    - name: localpv-provisioner
+      repository: https://openebs.github.io/dynamic-localpv-provisioner
+      version: 4.2.0
+    - condition: engines.local.zfs.enabled
+      name: zfs-localpv
+      repository: https://openebs.github.io/zfs-localpv
+      version: 2.7.1
+    - condition: engines.local.lvm.enabled
+      name: lvm-localpv
+      repository: https://openebs.github.io/lvm-localpv
+      version: 1.6.2
+    - condition: engines.replicated.mayastor.enabled
+      name: mayastor
+      repository: https://openebs.github.io/mayastor-extensions
+      version: 2.8.0
+    description: Containerized Attached Storage for Kubernetes
+    digest: a85facf57a002483887938f6c9cec06adb2e9b2dfaf4b4c87fc1db8b42550291
+    home: https://www.openebs.io/
+    icon: https://raw.githubusercontent.com/cncf/artwork/HEAD/projects/openebs/icon/color/openebs-icon-color.png
+    keywords:
+    - cloud-native-storage
+    - block-storage
+    - local-storage
+    - NVMe
+    - storage
+    - kubernetes
+    name: openebs
+    sources:
+    - https://github.com/openebs/openebs
+    urls:
+    - https://github.com/openebs/openebs/releases/download/openebs-4.2.0/openebs-4.2.0.tgz
+    version: 4.2.0
   - apiVersion: v2
     appVersion: 4.1.3
     created: "2025-01-29T13:50:30.254377948Z"
@@ -235,4 +348,4 @@ entries:
     urls:
     - https://github.com/openebs/openebs/releases/download/openebs-4.0.0/openebs-4.0.0.tgz
     version: 4.0.0
-generated: "2025-01-29T13:50:30.254395641Z"
+generated: "2025-02-17T10:09:59.344957015Z"
