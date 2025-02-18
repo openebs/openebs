@@ -72,7 +72,7 @@ To view the chart and get the following output.
 helm ls -n openebs 
 
 NAME    NAMESPACE       REVISION        UPDATED                                 STATUS          CHART           APP VERSION
-openebs openebs         1               2024-03-25 09:13:00.903321318 +0000 UTC deployed        openebs-4.0.0   4.0.0
+openebs openebs         1               2025-01-10 09:13:00.903321318 +0000 UTC deployed        openebs-4.2.0   4.2.0
 ```
 
 As a next step [verify the installation](https://openebs.io/docs/quickstart-guide/installation#verifying-openebs-installation) and do the [post installation](https://openebs.io/docs/quickstart-guide/installation#post-installation-considerations) steps.
@@ -87,3 +87,37 @@ helm delete `<RELEASE NAME>` -n `<RELEASE NAMESPACE>`
 ```
 
 > **Tip**: Prior to deleting the Helm chart, make sure all the storage volumes and pools are deleted.
+
+## Requirements
+
+| Repository | Name | Version |
+|------------|------|---------|
+|  | openebs-crds | 4.2.0 |
+| https://openebs.github.io/dynamic-localpv-provisioner | localpv-provisioner | 4.2.0 |
+| https://openebs.github.io/lvm-localpv | lvm-localpv | 1.6.2 |
+| https://openebs.github.io/mayastor-extensions | mayastor | 2.8.0 |
+| https://openebs.github.io/zfs-localpv | zfs-localpv | 2.7.1 |
+
+## Values
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| engines.local.lvm.enabled | bool | `true` |  |
+| engines.local.zfs.enabled | bool | `true` |  |
+| engines.replicated.mayastor.enabled | bool | `true` |  |
+| localpv-provisioner.rbac.create | bool | `true` |  |
+| lvm-localpv.crds.csi.volumeSnapshots.enabled | bool | `false` |  |
+| lvm-localpv.crds.lvmLocalPv.enabled | bool | `true` |  |
+| mayastor.crds.csi.volumeSnapshots.enabled | bool | `false` |  |
+| mayastor.csi.node.initContainers.enabled | bool | `true` |  |
+| mayastor.etcd.clusterDomain | string | `"cluster.local"` | Kubernetes Cluster Domain |
+| mayastor.localpv-provisioner.enabled | bool | `false` |  |
+| openebs-crds.csi.volumeSnapshots.enabled | bool | `true` |  |
+| openebs-crds.csi.volumeSnapshots.keep | bool | `true` |  |
+| preUpgradeHook | object | `{"image":{"pullPolicy":"IfNotPresent","registry":"docker.io","repo":"bitnami/kubectl","tag":"1.25.15"}}` | Configuration options for pre-upgrade helm hook job. |
+| preUpgradeHook.image.pullPolicy | string | `"IfNotPresent"` | The imagePullPolicy for the container |
+| preUpgradeHook.image.registry | string | `"docker.io"` | The container image registry URL for the hook job |
+| preUpgradeHook.image.repo | string | `"bitnami/kubectl"` | The container repository for the hook job |
+| preUpgradeHook.image.tag | string | `"1.25.15"` | The container image tag for the hook job |
+| zfs-localpv.crds.csi.volumeSnapshots.enabled | bool | `false` |  |
+| zfs-localpv.crds.zfsLocalPv.enabled | bool | `true` |  |
