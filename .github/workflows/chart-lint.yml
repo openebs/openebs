@@ -68,4 +68,4 @@ jobs:
 
       - name: Run chart-testing (install)
         if: steps.list-changed.outputs.changed == 'true'
-        run: ct install --config ct.yaml
+        run: ct install --config ct.yaml --helm-extra-set-args "--set localpv-provisioner.analytics.enabled=false,lvm-localpv.analytics.enabled=false,mayastor.etcd.livenessProbe.initialDelaySeconds=5,mayastor.etcd.readinessProbe.initialDelaySeconds=5,mayastor.etcd.replicaCount=1,mayastor.obs.callhome.sendReport=false,mayastor.nats.cluster.enabled=false,mayastor.nats.cluster.replicas=1,zfs-localpv.analytics.enabled=false"
