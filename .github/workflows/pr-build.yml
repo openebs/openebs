@@ -1,0 +1,20 @@
+name: Build image
+on:
+  pull_request:
+    branches:
+      - develop
+      - 'release/**'
+jobs:
+  plugin-build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: recursive
+      - uses: DeterminateSystems/nix-installer-action@v14
+      - uses: DeterminateSystems/magic-nix-cache-action@v8
+      - name: Test building the static binaries
+        run: nix-build -A utils.debug.x86_64.linux-musl.kubectl-openebs --arg incremental false
+

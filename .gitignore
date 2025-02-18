@@ -23,6 +23,7 @@ charts/Chart.lock
 /charts/charts/*
 
 # Build files
+/result*
 **/target
 result
 plugin/target/
