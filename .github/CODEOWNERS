@@ -1,5 +1,5 @@
 # Default code owners
-*                           @openebs/org-maintainers @openebs/localpv-hostpath-approvers @openebs/localpv-zfs-approvers @openebs/localpv-lvm-approvers @openebs/mayastor-approvers @openebs/ci-buildscript-approvers
+*                           @openebs/localpv-hostpath-approvers @openebs/localpv-zfs-approvers @openebs/localpv-lvm-approvers @openebs/mayastor-approvers @openebs/ci-buildscript-approvers
 
 # CODEOWNERS file owners
 /.github/CODEOWNERS         @openebs/org-maintainers
