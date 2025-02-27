@@ -38,7 +38,7 @@ pub struct CliArgs {
 
     /// Path to kubeconfig file.
     #[clap(skip)]
-    pub kube_config_path: Option<PathBuf>,
+    pub kubeconfig: Option<PathBuf>,
 }
 
 #[async_trait::async_trait(?Send)]
@@ -94,7 +94,7 @@ impl ExecuteOperation for LvmGet {
     type Error = Error;
 
     async fn execute(&self, cli_args: &CliArgs) -> Result<(), Error> {
-        let client = kube_proxy::client_from_kubeconfig(cli_args.kube_config_path.clone())
+        let client = kube_proxy::client_from_kubeconfig(cli_args.kubeconfig.clone())
             .await
             .map_err(|err| Error::Generic {
                 source: anyhow::anyhow!("{err}"),

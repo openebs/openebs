@@ -18,7 +18,7 @@ struct CliArgs {
 
     /// Path to kubeconfig file.
     #[clap(global = true, long, short = 'k')]
-    kube_config_path: Option<PathBuf>,
+    kubeconfig: Option<PathBuf>,
 }
 
 impl CliArgs {
@@ -27,29 +27,29 @@ impl CliArgs {
         let ns = match args.namespace {
             Some(ref namespace) => namespace.to_string(),
             None => {
-                let client = kube_proxy::client_from_kubeconfig(args.kube_config_path.clone())
+                let client = kube_proxy::client_from_kubeconfig(args.kubeconfig.clone())
                     .await
                     .map_err(|err| anyhow::anyhow!("{err}"))?;
                 client.default_namespace().to_string()
             }
         };
-        let path = args.kube_config_path.clone();
+        let path = args.kubeconfig.clone();
         match args.operations {
             cli_utils::Operations::Mayastor(ref mut operations) => {
                 operations.cli_args.namespace = ns;
-                operations.cli_args.kube_config_path = path
+                operations.cli_args.kubeconfig = path
             }
             cli_utils::Operations::LocalpvLvm(ref mut operations) => {
                 operations.cli_args.namespace = ns;
-                operations.cli_args.kube_config_path = path
+                operations.cli_args.kubeconfig = path
             }
             cli_utils::Operations::LocalpvZfs(ref mut operations) => {
                 operations.cli_args.namespace = ns;
-                operations.cli_args.kube_config_path = path
+                operations.cli_args.kubeconfig = path
             }
             cli_utils::Operations::LocalpvHostpath(ref mut operations) => {
                 operations.cli_args.namespace = ns;
-                operations.cli_args.kube_config_path = path
+                operations.cli_args.kubeconfig = path
             }
         }
         Ok(args)
