@@ -23,7 +23,6 @@ mkShell {
     cargo-expand
     cargo-udeps
     commitlint
-    cowsay
     git
     nixpkgs-fmt
     paperclip
