@@ -5,7 +5,8 @@ use snafu::{ensure, ResultExt};
 use std::{collections::HashMap, fs::Metadata, path::Path, process::Output};
 use tokio::{fs, process::Command, task::JoinHandle};
 
-pub(crate) async fn exec_tokio_command(
+/// This executes a tokio::Command and handles execution and command error.
+pub async fn exec_tokio_command(
     command: String,
     args: Vec<String>,
     envs: Option<HashMap<String, String>>,
@@ -34,10 +35,9 @@ pub(crate) async fn exec_tokio_command(
     Ok(output)
 }
 
-pub(crate) async fn check_path(
-    path: impl AsRef<Path>,
-    predicate: fn(&Metadata) -> bool,
-) -> Result<bool> {
+/// This checks a Unix-like path against a predicate function. Useful when trying to check if a path
+/// is that of a file, symlink etc.
+pub async fn check_path(path: impl AsRef<Path>, predicate: fn(&Metadata) -> bool) -> Result<bool> {
     fs::metadata(path.as_ref())
         .await
         .map(|ref metadata| predicate(metadata))
@@ -46,7 +46,8 @@ pub(crate) async fn check_path(
         })
 }
 
-pub(crate) async fn flatten_task<T>(handle: JoinHandle<Result<T>>) -> Result<T> {
+/// Flatten join errors and tokio task errors.
+pub async fn flatten_task<T>(handle: JoinHandle<Result<T>>) -> Result<T> {
     match handle.await.context(FailedTokioSpawn) {
         Ok(Ok(result)) => Ok(result),
         Ok(Err(err)) => Err(err),

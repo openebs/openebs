@@ -96,6 +96,27 @@ pub enum UpgradeError {
     FailedUpgrade {
         source: upgrade::common::error::Error,
     },
+
+    #[snafu(display("Failed to create temp. file {path}", path = path.display()))]
+    FailedTempFileCreation {
+        source: std::io::Error,
+        path: PathBuf,
+    },
+
+    #[snafu(display("Failed to check/install CRDs"))]
+    FailedCheckingInstallingCRDs {
+        source: upgrade::common::error::Error,
+    },
+
+    #[snafu(display("Failed to list Events"))]
+    ListEventsWithLabelAndField {
+        source: upgrade::common::error::Error,
+    },
+
+    #[snafu(display("Failed to create kubernetes client"))]
+    FailedToCreateKubernetesClient {
+        source: upgrade::common::error::Error,
+    },
 }
 
 pub type Result<T, E = UpgradeError> = std::result::Result<T, E>;

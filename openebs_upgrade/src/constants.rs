@@ -5,3 +5,5 @@ pub const UMBRELLA_CHART_VERSION_LOWERBOUND: Version = Version::new(3, 0, 0);
 pub const HELM_STORAGE_DRIVER_ENV: &str = "HELM_DRIVER";
 pub const PARTIAL_REBUILD_DISABLE_EXTENTS: (Version, Version) =
     (Version::new(3, 7, 0), Version::new(3, 10, 0));
+pub const HTTP_DATA_PAGE_SIZE: usize = 500;
+pub const FOUR_DOT_O: Version = Version::new(4, 0, 0);

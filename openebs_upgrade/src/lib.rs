@@ -13,7 +13,8 @@ pub use crate::helm::{
 pub mod constants;
 pub mod error;
 pub mod helm;
-pub(crate) mod utils;
+pub mod kube;
+pub mod utils;
 
 pub async fn validate_and_upgrade(
     helm_upgrade_config: HelmUpgradeConfig,

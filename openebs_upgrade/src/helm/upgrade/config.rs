@@ -5,7 +5,10 @@ use crate::{
         FailedToGetLocalChartVersion, InvalidChartStatus, InvalidChartVersion, InvalidHelmChart,
         InvalidHelmVersion, MalformedHelmChartDir, ParseSemverVersion, Result,
     },
-    helm::{metadata::HelmChartMetadata, upgrade::upgrader::UmbrellaUpgrader},
+    helm::{
+        metadata::HelmChartMetadata, upgrade::upgrader::UmbrellaUpgrader,
+        values::generate_values_file,
+    },
     utils::{check_path, exec_tokio_command, flatten_task},
 };
 use semver::Version;
@@ -59,7 +62,7 @@ impl HelmUpgradeConfig {
         }
 
         Ok(UmbrellaUpgrader {
-            chart_dir: self.chart_dir,
+            chart_dir: self.chart_dir.clone(),
             release_name: self.release_name,
             client: HelmReleaseClient::builder()
                 .with_namespace(self.namespace)
@@ -73,6 +76,21 @@ impl HelmUpgradeConfig {
                 self.helm_command_config
                     .args_set_file
                     .map(|val| ["--set-file".to_string(), val]),
+                Some(
+                    [
+                        "-f",
+                        generate_values_file(
+                            self.chart_dir.as_path(),
+                            &source_version,
+                            &target_version,
+                        )
+                        .await?
+                        .path()
+                        .to_str()
+                        .unwrap(),
+                    ]
+                    .map(ToString::to_string),
+                ),
                 Some(["--atomic", "--reset-then-reuse-values"].map(ToString::to_string)),
             ]
             .into_iter()
