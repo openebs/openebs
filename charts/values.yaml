@@ -43,6 +43,8 @@ mayastor:
 
 # -- Configuration options for pre-upgrade helm hook job.
 preUpgradeHook:
+  # -- Labels to be added to the pod hook job
+  podLabels: {}
   image:
     # -- The container image registry URL for the hook job
     registry: docker.io
