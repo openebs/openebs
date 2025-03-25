@@ -1,0 +1,284 @@
+name: Release Workflow Dispatcher
+on:
+  workflow_dispatch:
+    inputs:
+      openebs-crds-version:
+        required: true
+        default: ""
+      localpv-provisioner-version:
+        required: true
+        default: 4.2.0
+      zfs-localpv-version:
+        required: true
+        default: 2.7.1
+      lvm-localpv-version:
+        required: true
+        default: 1.6.2
+      mayastor-version:
+        required: true
+        default: 2.8.0
+      release-branch:
+        required: true
+        default: release/4.2
+      helm-version:
+        required: true
+      app-version:
+        required: true
+  push:
+    branches:
+      - "release/**"
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+**"
+
+jobs:
+  create-release-branch:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    outputs:
+      branch_exists: ${{ steps.check-branch.outputs.exists }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: develop # Adjust if your default branch is different
+          fetch-depth: 0
+          submodules: recursive
+      - name: Check if branch exists
+        id: check-branch
+        run: |
+          if git ls-remote --exit-code --heads origin ${{ github.event.inputs.release-branch }}; then
+            echo "Branch already exists: ${{ github.event.inputs.release-branch }}"
+            echo "exists=true" >> $GITHUB_ENV
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_ENV
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+      - name: Create and push new branch
+        if: env.exists == 'false'
+        run: |
+          git checkout -b ${{ github.event.inputs.release-branch }}
+          git push origin ${{ github.event.inputs.release-branch }}
+
+  update-helm-chart:
+    needs: create-release-branch
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.release-branch }}
+          fetch-depth: 0
+          submodules: recursive
+
+      - uses: cachix/install-nix-action@v22
+      - name: Pre-populate nix-shell
+        run: |
+              export NIX_PATH=nixpkgs=$(jq '.nixpkgs.url' nix/sources.json -r)
+              echo "NIX_PATH=$NIX_PATH" >> $GITHUB_ENV
+              nix-shell --pure --run "echo" ./shell.nix
+    
+      - name: Test the chart version updater script
+        run: |
+              nix-shell --pure --run "./scripts/helm/test-update-chart-version.sh" ./shell.nix
+
+      - name: Update Dependecies Helm Chart version
+        run: |
+          branch_name=${{ github.event.inputs.release-branch }}
+          nix-shell --pure --run "./scripts/helm/update-chart-version.sh --branch $branch_name --type release --chart-version ${VERSION}-develop  --localpv-provisioner-version ${LOCALPV_PROVISIONER_VERSION} --zfs-localpv-version ${ZFS_LOCALPV_VERSION} --lvm-localpv-version ${LVM_LOCALPV_VERSION} --mayastor-version ${MAYASTOR_VERSION}" ./shell.nix
+        env:
+          VERSION: ${{ github.event.inputs.helm-version }}
+          LOCALPV_PROVISIONER_VERSION: ${{ github.event.inputs.localpv-provisioner-version }}
+          ZFS_LOCALPV_VERSION: ${{ github.event.inputs.zfs-localpv-version }}
+          LVM_LOCALPV_VERSION: ${{ github.event.inputs.lvm-localpv-version }}
+          MAYASTOR_VERSION: ${{ github.event.inputs.mayastor-version }}
+
+        #   yq -i ".version = \"${VERSION}-prerelease\" | .appVersion = \"${APP_VERSION}-prerelease\"" charts/Chart.yaml
+        #   yq -i ".version = \"${APP_VERSION}-prerelease\"" charts/charts/openebs-crds/Chart.yaml
+        #   yq -i "(.dependencies[] | select(.name == \"openebs-crds\") | .version) = \"${OPENEBS_CRDS_VERSION}-prerelease\"" charts/Chart.yaml
+        #   yq -i "(.dependencies[] | select(.name == \"localpv-provisioner\") | .version) = \"${LOCALPV_PROVISIONER_VERSION}-prerelease\"" charts/Chart.yaml
+        #   yq -i "(.dependencies[] | select(.name == \"zfs-localpv\") | .version) = \"${ZFS_LOCALPV_VERSION}-prerelease\"" charts/Chart.yaml
+        #   yq -i "(.dependencies[] | select(.name == \"lvm-localpv\") | .version) = \"${LVM_LOCALPV_VERSION}-prerelease\"" charts/Chart.yaml
+        #   yq -i "(.dependencies[] | select(.name == \"mayastor\") | .version) = \"${MAYASTOR_VERSION}-prerelease\"" charts/Chart.yaml
+
+        # env:
+        #   VERSION: ${{ github.event.inputs.helm-version }}
+        #   APP_VERSION: ${{ github.event.inputs.app-version }}
+        #   OPENEBS_CRDS_VERSION: ${{ github.event.inputs.openebs-crds-version }}
+        #   LOCALPV_PROVISIONER_VERSION: ${{ github.event.inputs.localpv-provisioner-version }}
+        #   ZFS_LOCALPV_VERSION: ${{ github.event.inputs.zfs-localpv-version }}
+        #   LVM_LOCALPV_VERSION: ${{ github.event.inputs.lvm-localpv-version }}
+        #   MAYASTOR_VERSION: ${{ github.event.inputs.mayastor-version }}
+
+      - name: Create Pull Request to release
+        id: cpr
+        uses: peter-evans/create-pull-request@v5
+        with:
+          base: ${{ github.event.inputs.release-branch }}
+          commit-message: "chore(ci): update helm chart versions and/or git submodules"
+          committer: GitHub <noreply@github.com>
+          author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
+          title: "Prepare ${{ github.event.inputs.release-branch }} branch"
+          labels: |
+            prepare-release-branch
+            automated-pr
+          draft: false
+          signoff: true
+          branch: "create-pull-request/patch-${{ github.event.inputs.release-branch }}"
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+  update_develop_branch_on_release_branch_creation:
+    runs-on: ubuntu-22.04
+    outputs:
+      localpv_provisioner_version: ${{ steps.extract-versions.outputs.localpv_provisioner_version }}
+      zfs_localpv_version: ${{ steps.extract-versions.outputs.zfs_localpv_version }}
+      lvm_localpv_version: ${{ steps.extract-versions.outputs.lvm_localpv_version }}
+      mayastor_version: ${{ steps.extract-versions.outputs.mayastor_version }}
+    if: github.ref_type == 'branch' && github.event_name == 'push'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: recursive
+      - run: |
+          git checkout develop
+
+      - uses: cachix/install-nix-action@v22
+      - name: Pre-populate nix-shell
+        run: |
+          export NIX_PATH=nixpkgs=$(jq '.nixpkgs.url' nix/sources.json -r)
+          echo "NIX_PATH=$NIX_PATH" >> $GITHUB_ENV
+          nix-shell --pure --run "echo" ./shell.nix
+
+      - name: Get dependencies version from develop
+        id: extract-versions
+        run: |
+          GITHUB_API_URL="https://raw.githubusercontent.com"
+
+          # Define output file for GitHub Actions
+          OUTPUT_FILE="$GITHUB_OUTPUT"
+
+          # Fetch and extract versions
+          echo "Fetching versions from respective repositories..."
+
+          echo "localpv_provisioner_version=$(curl -s $GITHUB_API_URL/openebs/dynamic-localpv-provisioner/refs/heads/develop/deploy/helm/charts/Chart.yaml | yq '.version')" >> "$OUTPUT_FILE"
+          echo "zfs_localpv_version=$(curl -s $GITHUB_API_URL/openebs/zfs-localpv/refs/heads/develop/deploy/helm/charts/Chart.yaml | yq '.version')" >> "$OUTPUT_FILE"
+          echo "lvm_localpv_version=$(curl -s $GITHUB_API_URL/openebs/lvm-localpv/refs/heads/develop/deploy/helm/charts/Chart.yaml | yq '.version')" >> "$OUTPUT_FILE"
+          echo "mayastor_version=$(curl -s $GITHUB_API_URL/openebs/mayastor-extensions/refs/heads/develop/chart/Chart.yaml | yq '.version')" >> "$OUTPUT_FILE"
+
+      - name: Debug extracted versions
+        run: |
+          echo "Extracted LocalPV Provisioner Version: ${{ steps.extract-versions.outputs.localpv_provisioner_version }}"
+          echo "Extracted ZFS LocalPV Version: ${{ steps.extract-versions.outputs.zfs_localpv_version }}"
+          echo "Extracted LVM LocalPV Version: ${{ steps.extract-versions.outputs.lvm_localpv_version }}"
+          echo "Extracted Mayastor Version: ${{ steps.extract-versions.outputs.mayastor_version }}"
+
+      - name: Test the chart version updater script
+        run: |
+          nix-shell --pure --run "./scripts/helm/test-update-chart-version.sh" ./shell.nix
+
+      - name: Modify the chart version based on the branch name for develop
+        run: |
+          branch_name=${{ github.ref_name }}
+          nix-shell --pure --run "./scripts/helm/update-chart-version.sh --branch $branch_name --type develop --localpv-provisioner-version ${LOCALPV_PROVISIONER_VERSION} --zfs-localpv-version ${ZFS_LOCALPV_VERSION} --lvm-localpv-version ${LVM_LOCALPV_VERSION} --mayastor-version ${MAYASTOR_VERSION}" ./shell.nix
+        env:
+          LOCALPV_PROVISIONER_VERSION: ${{ steps.extract-versions.outputs.localpv_provisioner_version }}
+          ZFS_LOCALPV_VERSION: ${{ steps.extract-versions.outputs.zfs_localpv_version }}
+          LVM_LOCALPV_VERSION: ${{ steps.extract-versions.outputs.lvm_localpv_version }}
+          MAYASTOR_VERSION: ${{ steps.extract-versions.outputs.mayastor_version }}
+
+      - name: Create Pull Request to develop
+        id: cpr
+        uses: peter-evans/create-pull-request@v5
+        with:
+          base: develop
+          commit-message: "chore(ci): update helm chart versions and/or git submodules"
+          committer: GitHub <noreply@github.com>
+          author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
+          title: "Prepare develop branch on ${{ github.ref_name }} creation"
+          labels: |
+            update-develop-branch
+            automated-pr
+          draft: false
+          signoff: true
+          branch: "create-pull-request/patch-develop"
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+  update_release_branch_after_release:
+    outputs:
+      localpv_provisioner_version: ${{ steps.extract-versions-from-tag.outputs.localpv_provisioner_version }}
+      zfs_localpv_version: ${{ steps.extract-versions-from-tag.outputs.zfs_localpv_version }}
+      lvm_localpv_version: ${{ steps.extract-versions-from-tag.outputs.lvm_localpv_version }}
+      mayastor_version: ${{ steps.extract-versions-from-tag.outputs.mayastor_version }}
+    runs-on: ubuntu-22.04
+    if: github.ref_type == 'tag' && github.event_name == 'push' && !contains(github.ref_name, 'rc')
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          #ref: ${{ github.ref_name }}
+          fetch-depth: 0
+          submodules: recursive
+
+      - uses: cachix/install-nix-action@v22
+      - name: Pre-populate nix-shell
+        run: |
+          export NIX_PATH=nixpkgs=$(jq '.nixpkgs.url' nix/sources.json -r)
+          echo "NIX_PATH=$NIX_PATH" >> $GITHUB_ENV
+          nix-shell --pure --run "echo" ./shell.nix
+
+      - name: Get dependencies version from release tag
+        id: extract-versions-from-tag
+        run: |
+          GITHUB_API_URL="https://api.github.com/repos"
+
+          # Define output file for GitHub Actions
+          OUTPUT_FILE="$GITHUB_OUTPUT"
+
+          # Fetch and extract versions
+          echo "Fetching versions from respective repositories..."
+
+          echo "localpv_provisioner_version=$(curl -s $GITHUB_API_URL/openebs/dynamic-localpv-provisioner/releases/latest | jq -r '.tag_name')" >> "$OUTPUT_FILE"
+          echo "zfs_localpv_version=$(curl -s $GITHUB_API_URL/openebs/zfs-localpv/releases/latest | jq -r '.tag_name')" >> "$OUTPUT_FILE"
+          echo "lvm_localpv_version=$(curl -s $GITHUB_API_URL/openebs/lvm-localpv/releases/latest | jq -r '.tag_name')" >> "$OUTPUT_FILE"
+          echo "mayastor_version=$(curl -s $GITHUB_API_URL/openebs/mayastor-extensions/releases/latest | jq -r '.tag_name')" >> "$OUTPUT_FILE"
+
+      - name: Debug extracted versions from tag
+        run: |
+          echo "Extracted LocalPV Provisioner Version: ${{ steps.extract-versions-from-tag.outputs.localpv_provisioner_version }}"
+          echo "Extracted ZFS LocalPV Version: ${{ steps.extract-versions-from-tag.outputs.zfs_localpv_version }}"
+          echo "Extracted LVM LocalPV Version: ${{ steps.extract-versions-from-tag.outputs.lvm_localpv_version }}"
+          echo "Extracted Mayastor Version: ${{ steps.extract-versions-from-tag.outputs.mayastor_version }}"
+
+      - name: Test the chart version updater script
+        run: |
+          nix-shell --pure --run "./scripts/helm/test-update-chart-version.sh" ./shell.nix
+
+      - name: Modify the chart version based on the tag
+        run: |
+          tag=${{ github.ref_name }}
+          echo "Tag is $tag"
+          echo "BASE=$(nix-shell --pure --run "./scripts/helm/update-chart-version.sh --tag $tag" --localpv-provisioner-version ${LOCALPV_PROVISIONER_VERSION} --zfs-localpv-version ${ZFS_LOCALPV_VERSION} --lvm-localpv-version ${LVM_LOCALPV_VERSION} --mayastor-version ${MAYASTOR_VERSION} ./shell.nix | head -n 1)" >> $GITHUB_ENV
+          echo "BASE: $BASE"
+        env:
+          LOCALPV_PROVISIONER_VERSION: ${{ steps.extract-versions-from-tag.outputs.localpv_provisioner_version }}
+          ZFS_LOCALPV_VERSION: ${{ steps.extract-versions-from-tag.outputs.zfs_localpv_version }}
+          LVM_LOCALPV_VERSION: ${{ steps.extract-versions-from-tag.outputs.lvm_localpv_version }}
+          MAYASTOR_VERSION: ${{ steps.extract-versions-from-tag.outputs.mayastor_version }}
+
+      - name: Create Pull Request to release
+        if: ${{ env.BASE }}
+        id: cpr
+        uses: peter-evans/create-pull-request@v5
+        with:
+          base: ${{ env.BASE }}
+          commit-message: "chore(ci): update helm chart versions and/or git submodules"
+          committer: GitHub <noreply@github.com>
+          author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
+          title: "Prepare release branch after release ${{ github.ref_name }}"
+          labels: |
+            update-release-branch
+            automated-pr
+          draft: false
+          signoff: true
+          branch: "create-pull-request/patch-${{ env.BASE }}"
+          token: ${{ secrets.GITHUB_TOKEN }}

@@ -1,0 +1,47 @@
+name: Publish chart upon release creation
+
+on:
+  release:
+    types:
+      - "created"
+
+jobs:
+  release-chart:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+            fetch-depth: 0
+            submodules: recursive
+
+      - uses: cachix/install-nix-action@v22
+      - name: Pre-populate nix-shell
+        run: |
+          export NIX_PATH=nixpkgs=$(jq '.nixpkgs.url' nix/sources.json -r)
+          echo "NIX_PATH=$NIX_PATH" >> $GITHUB_ENV
+          nix-shell --pure --run "echo" ./shell.nix
+
+      - name: Remove prerelease label from dependencies
+        run: |
+            yq -i '(.dependencies[] | select(.name == "localpv-provisioner") | .version) |= sub("-prerelease$", "")' charts/Chart.yaml
+            yq -i '(.dependencies[] | select(.name == "zfs-localpv") | .version) |= sub("-prerelease$", "")' charts/Chart.yaml
+            yq -i '(.dependencies[] | select(.name == "lvm-localpv") | .version) |= sub("-prerelease$", "")' charts/Chart.yaml
+            yq -i '(.dependencies[] | select(.name == "mayastor") | .version) |= sub("-prerelease$", "")' charts/Chart.yaml
+
+      - name: Check if the chart is publishable
+        run: |
+          TAG=${{ github.event.release.tag_name }}
+          nix-shell --pure --run "./scripts/helm/update-chart-version.sh --tag $TAG --publish-release" ./shell.nix
+
+      - name: Install Helm
+        run: |
+            curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+
+      - name: Debug Workflow Directory
+        run: ls -l ./charts
+
+      - name: Publish openebs umbrella helm chart
+        uses: stefanprodan/helm-gh-pages@master
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          charts_dir: .
