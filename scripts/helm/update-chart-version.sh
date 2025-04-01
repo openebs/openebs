@@ -144,7 +144,7 @@ update_chart_yaml() {
   local LVM_LOCALPV_VERSION=$5
   local MAYASTOR_VERSION=$6
 
- if [[ "$VERSION" =~ (-develop|-prerelease) ]]; then
+  if [[ "$VERSION" =~ (-develop|-prerelease) ]]; then
     SUFFIX="${BASH_REMATCH[1]}"
     LOCALPV_PROVISIONER_VERSION="$LOCALPV_PROVISIONER_VERSION$SUFFIX"
     ZFS_LOCALPV_VERSION="$ZFS_LOCALPV_VERSION$SUFFIX"
