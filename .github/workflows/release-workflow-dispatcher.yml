@@ -93,23 +93,6 @@ jobs:
           LVM_LOCALPV_VERSION: ${{ github.event.inputs.lvm-localpv-version }}
           MAYASTOR_VERSION: ${{ github.event.inputs.mayastor-version }}
 
-        #   yq -i ".version = \"${VERSION}-prerelease\" | .appVersion = \"${APP_VERSION}-prerelease\"" charts/Chart.yaml
-        #   yq -i ".version = \"${APP_VERSION}-prerelease\"" charts/charts/openebs-crds/Chart.yaml
-        #   yq -i "(.dependencies[] | select(.name == \"openebs-crds\") | .version) = \"${OPENEBS_CRDS_VERSION}-prerelease\"" charts/Chart.yaml
-        #   yq -i "(.dependencies[] | select(.name == \"localpv-provisioner\") | .version) = \"${LOCALPV_PROVISIONER_VERSION}-prerelease\"" charts/Chart.yaml
-        #   yq -i "(.dependencies[] | select(.name == \"zfs-localpv\") | .version) = \"${ZFS_LOCALPV_VERSION}-prerelease\"" charts/Chart.yaml
-        #   yq -i "(.dependencies[] | select(.name == \"lvm-localpv\") | .version) = \"${LVM_LOCALPV_VERSION}-prerelease\"" charts/Chart.yaml
-        #   yq -i "(.dependencies[] | select(.name == \"mayastor\") | .version) = \"${MAYASTOR_VERSION}-prerelease\"" charts/Chart.yaml
-
-        # env:
-        #   VERSION: ${{ github.event.inputs.helm-version }}
-        #   APP_VERSION: ${{ github.event.inputs.app-version }}
-        #   OPENEBS_CRDS_VERSION: ${{ github.event.inputs.openebs-crds-version }}
-        #   LOCALPV_PROVISIONER_VERSION: ${{ github.event.inputs.localpv-provisioner-version }}
-        #   ZFS_LOCALPV_VERSION: ${{ github.event.inputs.zfs-localpv-version }}
-        #   LVM_LOCALPV_VERSION: ${{ github.event.inputs.lvm-localpv-version }}
-        #   MAYASTOR_VERSION: ${{ github.event.inputs.mayastor-version }}
-
       - name: Create Pull Request to release
         id: cpr
         uses: peter-evans/create-pull-request@v5
@@ -120,15 +103,15 @@ jobs:
           author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
           title: "Prepare ${{ github.event.inputs.release-branch }} branch"
           labels: |
-            prepare-release-branch
-            automated-pr
+            area/helm
+            kind/ci
           draft: false
           signoff: true
           branch: "create-pull-request/patch-${{ github.event.inputs.release-branch }}"
           token: ${{ secrets.GITHUB_TOKEN }}
 
   update_develop_branch_on_release_branch_creation:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     outputs:
       localpv_provisioner_version: ${{ steps.extract-versions.outputs.localpv_provisioner_version }}
       zfs_localpv_version: ${{ steps.extract-versions.outputs.zfs_localpv_version }}
@@ -197,8 +180,8 @@ jobs:
           author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
           title: "Prepare develop branch on ${{ github.ref_name }} creation"
           labels: |
-            update-develop-branch
-            automated-pr
+            area/helm
+            kind/ci
           draft: false
           signoff: true
           branch: "create-pull-request/patch-develop"
@@ -210,12 +193,11 @@ jobs:
       zfs_localpv_version: ${{ steps.extract-versions-from-tag.outputs.zfs_localpv_version }}
       lvm_localpv_version: ${{ steps.extract-versions-from-tag.outputs.lvm_localpv_version }}
       mayastor_version: ${{ steps.extract-versions-from-tag.outputs.mayastor_version }}
-    runs-on: ubuntu-22.04
-    if: github.ref_type == 'tag' && github.event_name == 'push' && !contains(github.ref_name, 'rc')
+    runs-on: ubuntu-latest
+    if: github.ref_type == 'tag'
     steps:
       - uses: actions/checkout@v4
         with:
-          #ref: ${{ github.ref_name }}
           fetch-depth: 0
           submodules: recursive
 
@@ -276,8 +258,8 @@ jobs:
           author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
           title: "Prepare release branch after release ${{ github.ref_name }}"
           labels: |
-            update-release-branch
-            automated-pr
+            area/helm
+            kind/ci
           draft: false
           signoff: true
           branch: "create-pull-request/patch-${{ env.BASE }}"

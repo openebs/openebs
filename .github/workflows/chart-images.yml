@@ -6,6 +6,9 @@ on:
       - 'release/**'
   pull_request:
     types: [ 'opened', 'edited', 'reopened', 'synchronize' ]
+  release:
+    types:
+      created
 
 env:
   CI: 1

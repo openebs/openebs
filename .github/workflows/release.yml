@@ -7,7 +7,7 @@ on:
 
 jobs:
   release-chart:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
@@ -23,19 +23,12 @@ jobs:
 
       - name: Remove prerelease label from dependencies
         run: |
-            yq -i '(.dependencies[] | select(.name == "localpv-provisioner") | .version) |= sub("-prerelease$", "")' charts/Chart.yaml
-            yq -i '(.dependencies[] | select(.name == "zfs-localpv") | .version) |= sub("-prerelease$", "")' charts/Chart.yaml
-            yq -i '(.dependencies[] | select(.name == "lvm-localpv") | .version) |= sub("-prerelease$", "")' charts/Chart.yaml
-            yq -i '(.dependencies[] | select(.name == "mayastor") | .version) |= sub("-prerelease$", "")' charts/Chart.yaml
+            nix-shell --pure --run "./scripts/helm/update-dependencies-version-upon-release.sh --localpv-provisioner-version ${LOCALPV_PROVISIONER_VERSION} --zfs-localpv-version ${ZFS_LOCALPV_VERSION} --lvm-localpv-version ${LVM_LOCALPV_VERSION} --mayastor-version ${MAYASTOR_VERSION}" ./shell.nix
 
       - name: Check if the chart is publishable
         run: |
           TAG=${{ github.event.release.tag_name }}
           nix-shell --pure --run "./scripts/helm/update-chart-version.sh --tag $TAG --publish-release" ./shell.nix
-
-      - name: Install Helm
-        run: |
-            curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
 
       - name: Debug Workflow Directory
         run: ls -l ./charts
