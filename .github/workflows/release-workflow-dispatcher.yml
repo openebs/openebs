@@ -239,7 +239,7 @@ jobs:
         run: |
           tag=${{ github.ref_name }}
           echo "Tag is $tag"
-          echo "BASE=$(nix-shell --pure --run "./scripts/helm/update-chart-version.sh --tag $tag" --localpv-provisioner-version ${LOCALPV_PROVISIONER_VERSION} --zfs-localpv-version ${ZFS_LOCALPV_VERSION} --lvm-localpv-version ${LVM_LOCALPV_VERSION} --mayastor-version ${MAYASTOR_VERSION} ./shell.nix | head -n 1)" >> $GITHUB_ENV
+          echo "BASE=$(nix-shell --pure --run "./scripts/helm/update-chart-version.sh --tag $tag --localpv-provisioner-version ${LOCALPV_PROVISIONER_VERSION} --zfs-localpv-version ${ZFS_LOCALPV_VERSION} --lvm-localpv-version ${LVM_LOCALPV_VERSION} --mayastor-version ${MAYASTOR_VERSION}" ./shell.nix | head -n 1)" >> $GITHUB_ENV
           echo "BASE: $BASE"
         env:
           LOCALPV_PROVISIONER_VERSION: ${{ steps.extract-versions-from-tag.outputs.localpv_provisioner_version }}
