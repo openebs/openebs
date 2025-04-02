@@ -41,14 +41,12 @@ yq_ibl()
 }
 
 update_chart_yaml() {
-
-
   echo "Updating Helm Chart.yaml dependencies versions for release publish"
 
-  yq_ibl "(.dependencies[] | select(.name == \"localpv-provisioner\") | .version) |= sub("-prerelease$", "")" "$CHART_YAML"
-  yq_ibl "(.dependencies[] | select(.name == \"zfs-localpv\") | .version) |= sub("-prerelease$", "")" "$CHART_YAML"
-  yq_ibl "(.dependencies[] | select(.name == \"lvm-localpv\") | .version) |= sub("-prerelease$", "")" "$CHART_YAML"
-  yq_ibl "(.dependencies[] | select(.name == \"mayastor\") | .version) |= sub("-prerelease$", "")" "$CHART_YAML"
+  yq_ibl '(.dependencies[] | select(.name == "localpv-provisioner") | .version) |= sub("-prerelease$"; "")' "$CHART_YAML"
+  yq_ibl '(.dependencies[] | select(.name == "zfs-localpv") | .version) |= sub("-prerelease$"; "")' "$CHART_YAML"
+  yq_ibl '(.dependencies[] | select(.name == "lvm-localpv") | .version) |= sub("-prerelease$"; "")' "$CHART_YAML"
+  yq_ibl '(.dependencies[] | select(.name == "mayastor") | .version) |= sub("-prerelease$"; "")' "$CHART_YAML"
 }
 
 set -euo pipefail

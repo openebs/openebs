@@ -11,6 +11,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+            ref: ${{ github.event.release.tag_name }}
             fetch-depth: 0
             submodules: recursive
 
@@ -23,7 +24,7 @@ jobs:
 
       - name: Remove prerelease label from dependencies
         run: |
-            nix-shell --pure --run "./scripts/helm/update-dependencies-version-upon-release.sh --localpv-provisioner-version ${LOCALPV_PROVISIONER_VERSION} --zfs-localpv-version ${ZFS_LOCALPV_VERSION} --lvm-localpv-version ${LVM_LOCALPV_VERSION} --mayastor-version ${MAYASTOR_VERSION}" ./shell.nix
+            nix-shell --pure --run "./scripts/helm/update-dependencies-version-upon-release.sh" ./shell.nix
 
       - name: Check if the chart is publishable
         run: |

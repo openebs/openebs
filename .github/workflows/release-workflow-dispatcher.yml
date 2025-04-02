@@ -144,10 +144,10 @@ jobs:
           # Fetch and extract versions
           echo "Fetching versions from respective repositories..."
 
-          echo "localpv_provisioner_version=$(curl -s $GITHUB_API_URL/openebs/dynamic-localpv-provisioner/refs/heads/develop/deploy/helm/charts/Chart.yaml | yq '.version')" >> "$OUTPUT_FILE"
-          echo "zfs_localpv_version=$(curl -s $GITHUB_API_URL/openebs/zfs-localpv/refs/heads/develop/deploy/helm/charts/Chart.yaml | yq '.version')" >> "$OUTPUT_FILE"
-          echo "lvm_localpv_version=$(curl -s $GITHUB_API_URL/openebs/lvm-localpv/refs/heads/develop/deploy/helm/charts/Chart.yaml | yq '.version')" >> "$OUTPUT_FILE"
-          echo "mayastor_version=$(curl -s $GITHUB_API_URL/openebs/mayastor-extensions/refs/heads/develop/chart/Chart.yaml | yq '.version')" >> "$OUTPUT_FILE"
+          echo "localpv_provisioner_version=$(curl -s $GITHUB_API_URL/openebs/dynamic-localpv-provisioner/refs/heads/develop/deploy/helm/charts/Chart.yaml | yq '(.version | sub("-develop$"; ""))')" >> "$OUTPUT_FILE"
+          echo "zfs_localpv_version=$(curl -s $GITHUB_API_URL/openebs/zfs-localpv/refs/heads/develop/deploy/helm/charts/Chart.yaml | yq '(.version | sub("-develop$"; ""))')" >> "$OUTPUT_FILE"
+          echo "lvm_localpv_version=$(curl -s $GITHUB_API_URL/openebs/lvm-localpv/refs/heads/develop/deploy/helm/charts/Chart.yaml | yq '(.version | sub("-develop$"; ""))')" >> "$OUTPUT_FILE"
+          echo "mayastor_version=$(curl -s $GITHUB_API_URL/openebs/mayastor-extensions/refs/heads/develop/chart/Chart.yaml | yq '(.version | sub("-develop$"; ""))')" >> "$OUTPUT_FILE"
 
       - name: Debug extracted versions
         run: |
