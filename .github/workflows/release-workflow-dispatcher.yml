@@ -219,10 +219,10 @@ jobs:
           # Fetch and extract versions
           echo "Fetching versions from respective repositories..."
 
-          echo "localpv_provisioner_version=$(curl -s $GITHUB_API_URL/openebs/dynamic-localpv-provisioner/releases/latest | jq -r '.tag_name')" >> "$OUTPUT_FILE"
-          echo "zfs_localpv_version=$(curl -s $GITHUB_API_URL/openebs/zfs-localpv/releases/latest | jq -r '.tag_name')" >> "$OUTPUT_FILE"
-          echo "lvm_localpv_version=$(curl -s $GITHUB_API_URL/openebs/lvm-localpv/releases/latest | jq -r '.tag_name')" >> "$OUTPUT_FILE"
-          echo "mayastor_version=$(curl -s $GITHUB_API_URL/openebs/mayastor-extensions/releases/latest | jq -r '.tag_name')" >> "$OUTPUT_FILE"
+          echo "localpv_provisioner_version=$(curl -s $GITHUB_API_URL/openebs/dynamic-localpv-provisioner/releases/latest | jq -r '.tag_name' | sed -E 's/^[^0-9]*//')" >> "$OUTPUT_FILE"
+          echo "zfs_localpv_version=$(curl -s $GITHUB_API_URL/openebs/zfs-localpv/releases/latest | jq -r '.tag_name' | sed -E 's/^[^0-9]*//')" >> "$OUTPUT_FILE"
+          echo "lvm_localpv_version=$(curl -s $GITHUB_API_URL/openebs/lvm-localpv/releases/latest | jq -r '.tag_name' | sed -E 's/^[^0-9]*//')" >> "$OUTPUT_FILE"
+          echo "mayastor_version=$(curl -s $GITHUB_API_URL/openebs/mayastor-extensions/releases/latest | jq -r '.tag_name' | sed -E 's/^[^0-9]*//')" >> "$OUTPUT_FILE"
 
       - name: Debug extracted versions from tag
         run: |
@@ -240,7 +240,7 @@ jobs:
           tag=${{ github.ref_name }}
           echo "Tag is $tag"
           echo "BASE=$(nix-shell --pure --run "./scripts/helm/update-chart-version.sh --tag $tag --localpv-provisioner-version ${LOCALPV_PROVISIONER_VERSION} --zfs-localpv-version ${ZFS_LOCALPV_VERSION} --lvm-localpv-version ${LVM_LOCALPV_VERSION} --mayastor-version ${MAYASTOR_VERSION}" ./shell.nix | head -n 1)" >> $GITHUB_ENV
-          echo "BASE: $BASE"
+          echo "BASE: ${{ env.BASE }}"
         env:
           LOCALPV_PROVISIONER_VERSION: ${{ steps.extract-versions-from-tag.outputs.localpv_provisioner_version }}
           ZFS_LOCALPV_VERSION: ${{ steps.extract-versions-from-tag.outputs.zfs_localpv_version }}

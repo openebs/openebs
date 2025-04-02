@@ -150,16 +150,6 @@ update_chart_yaml() {
     ZFS_LOCALPV_VERSION="$ZFS_LOCALPV_VERSION$SUFFIX"
     LVM_LOCALPV_VERSION="$LVM_LOCALPV_VERSION$SUFFIX"
   fi
-  echo "Updating Helm Chart.yaml versions..."
-
-  # Debug: Print variables
-  echo "Helm Version: $VERSION"
-  echo "App Version: $APP_VERSION"
-  echo "OpenEBS CRDS Version: $APP_VERSION"
-  echo "LocalPV Provisioner Version: $LOCALPV_PROVISIONER_VERSION"
-  echo "ZFS LocalPV Version: $ZFS_LOCALPV_VERSION"
-  echo "LVM LocalPV Version: $LVM_LOCALPV_VERSION"
-  echo "Mayastor Version: $MAYASTOR_VERSION"
 
   yq_ibl ".version = \"$VERSION\" | .appVersion = \"$APP_VERSION\"" "$CHART_YAML"
   yq_ibl "(.dependencies[] | select(.name == \"openebs-crds\") | .version) = \"$APP_VERSION\"" "$CHART_YAML"
