@@ -17,6 +17,8 @@ jobs:
           echo "ShouldUpdateKrew:"${{ !github.event.release.prerelease && (steps.latest-release.outputs.latestTag == github.event.release.tag_name) }}
           echo "latestTag=$LATEST_VERSION" >> "$GITHUB_OUTPUT"
       - uses: actions/checkout@v4
+        with:
+          submodules: recursive
       - name: Download Artifacts
         run: |
           echo "Release Tag: ${{ github.event.release.tag_name }}"
