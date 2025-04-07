@@ -6,6 +6,8 @@ use k8s_openapi::api::events::v1::Event;
 use kube::api::{Api, ListParams};
 use snafu::ResultExt;
 use upgrade::common::kube::client::{client, paginated_list};
+
+/// List Kubernetes Events in a paginated manner.
 pub async fn list_events(
     namespace: String,
     label_selector: Option<String>,

@@ -8,6 +8,7 @@ use upgrade::helm::{
     upgrade::{HelmUpgradeRunner, HelmUpgrader},
 };
 
+/// Type for upgrading an umbrella chart (openebs/openebs).
 #[derive(Clone, Debug)]
 pub struct UmbrellaUpgrader {
     pub(crate) chart_dir: PathBuf,
@@ -20,6 +21,7 @@ pub struct UmbrellaUpgrader {
 
 #[async_trait]
 impl HelmUpgrader for UmbrellaUpgrader {
+    /// Run the helm upgrade command with `--dry-run`.
     async fn dry_run(self: Box<Self>) -> upgrade::common::error::Result<HelmUpgradeRunner> {
         info!("Running helm upgrade dry-run...");
         self.client
@@ -56,10 +58,12 @@ impl HelmUpgrader for UmbrellaUpgrader {
         }))
     }
 
+    /// Returns the source version of the UmbrellaUpgrader.
     fn source_version(&self) -> Version {
         self.source_version.clone()
     }
 
+    /// Returns the target version of the UmbrellaUpgrader.
     fn target_version(&self) -> Version {
         self.target_version.clone()
     }

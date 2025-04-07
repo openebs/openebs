@@ -2,6 +2,7 @@ use semver::Version;
 use snafu::Snafu;
 use std::{collections::HashMap, path::PathBuf};
 
+/// Error encountered throughout this crate.
 #[derive(Debug, Snafu)]
 #[snafu(visibility(pub), context(suffix(false)))]
 pub enum UpgradeError {

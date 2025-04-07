@@ -16,6 +16,7 @@ pub mod helm;
 pub mod kube;
 pub mod utils;
 
+/// Validate OpenEBS deployment and upgrade it.
 pub async fn validate_and_upgrade(
     helm_upgrade_config: HelmUpgradeConfig,
     data_plane_upgrader: Option<DataPlaneUpgrader>,

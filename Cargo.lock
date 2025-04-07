@@ -2344,7 +2344,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "openebs_upgrade"
+name = "openebs-upgrade"
 version = "0.1.0"
 dependencies = [
  "async-trait",
@@ -2353,7 +2353,7 @@ dependencies = [
  "constants",
  "futures",
  "k8s-openapi 0.20.0",
- "kube 0.94.2",
+ "kube 0.87.2",
  "semver",
  "serde",
  "serde_yaml",

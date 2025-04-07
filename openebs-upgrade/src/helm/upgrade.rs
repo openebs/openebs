@@ -18,6 +18,8 @@ use upgrade::{
 pub mod config;
 pub mod upgrader;
 
+/// The catch-all upgrade subroutine.
+/// This is essentially what happens in the upgrade-job end-to-end.
 pub async fn upgrade(
     helm_upgrader: Box<dyn HelmUpgrader>,
     data_plane_upgrader: Option<DataPlaneUpgrader>,

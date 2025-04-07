@@ -1,12 +1,15 @@
 use k8s_openapi::api::core::v1::Pod;
 use upgrade::{helm::chart::HelmValuesCollection, upgrade_data_plane::upgrade_data_plane};
 use url::Url;
+
+/// Instances of this type can upgrade the mayastor data plane.
 pub struct DataPlaneUpgrader {
     pub namespace: String,
     pub rest_endpoint: Url,
 }
 
 impl DataPlaneUpgrader {
+    /// Run Mayastor data-plane upgrade.
     pub async fn run(
         self,
         final_values: Box<dyn HelmValuesCollection>,

@@ -47,7 +47,7 @@ pub async fn check_path(path: impl AsRef<Path>, predicate: fn(&Metadata) -> bool
 }
 
 /// Flatten join errors and tokio task errors.
-pub async fn flatten_task<T>(handle: JoinHandle<Result<T>>) -> Result<T> {
+pub async fn joined_flatten<T>(handle: JoinHandle<Result<T>>) -> Result<T> {
     match handle.await.context(FailedTokioSpawn) {
         Ok(Ok(result)) => Ok(result),
         Ok(Err(err)) => Err(err),

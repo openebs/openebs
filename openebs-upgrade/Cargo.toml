@@ -1,5 +1,5 @@
 [package]
-name = "openebs_upgrade"
+name = "openebs-upgrade"
 version = "0.1.0"
 edition = "2021"
 

@@ -9,6 +9,7 @@ use snafu::ResultExt;
 use std::collections::HashMap;
 use tracing::debug;
 
+/// This type is used to deserialize `helm get metadata` command outputs.
 #[derive(Debug, Clone, Deserialize)]
 pub struct HelmChartMetadata {
     pub chart: String,
@@ -17,6 +18,7 @@ pub struct HelmChartMetadata {
 }
 
 impl HelmChartMetadata {
+    /// This performs a helm get metadata and deserializes the output into the Self type.
     pub async fn new(release_name: &str, ns: &str, storage_driver: &str) -> Result<Self> {
         let command: &str = "helm";
         let args: &[&str] = &["get", "metadata", release_name, "-n", ns, "-oyaml"];

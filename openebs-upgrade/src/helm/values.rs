@@ -11,6 +11,7 @@ use upgrade::{
     helm::yaml::yq::{YamlKey, YqV4},
 };
 
+/// Generate values file to override select helm values options.
 pub(crate) async fn generate_values_file<P: AsRef<Path>>(
     chart_dir: P,
     source_version: &Version,

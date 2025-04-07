@@ -9,7 +9,7 @@ use crate::{
         metadata::HelmChartMetadata, upgrade::upgrader::UmbrellaUpgrader,
         values::generate_values_file,
     },
-    utils::{check_path, exec_tokio_command, flatten_task},
+    utils::{check_path, exec_tokio_command, joined_flatten},
 };
 use semver::Version;
 use snafu::{ensure, ResultExt};
@@ -21,6 +21,7 @@ use upgrade::{
     upgrade_path::version_from_chart_yaml_file,
 };
 
+/// Configuration for helm upgrade.
 #[derive(Clone, Debug)]
 pub struct HelmUpgradeConfig {
     pub release_name: String,
@@ -30,6 +31,7 @@ pub struct HelmUpgradeConfig {
     pub helm_command_config: HelmCommandConfig,
 }
 
+/// Configuration related to the upgrade command and arguments.
 #[derive(Clone, Debug)]
 pub struct HelmCommandConfig {
     pub args_set: Option<String>,
@@ -38,6 +40,7 @@ pub struct HelmCommandConfig {
 }
 
 impl HelmUpgradeConfig {
+    /// Builds an instance of upgrade::helm::upgrade::HelmUpgrader.
     pub async fn validate_and_build_helm_upgrader(self) -> Result<impl HelmUpgrader> {
         let chart_metadata = HelmChartMetadata::new(
             self.release_name.as_str(),
@@ -110,9 +113,9 @@ impl HelmUpgradeConfig {
         let helm_chart_dir_check = spawn(check_helm_chart_dir(self.chart_dir.clone()));
 
         try_join!(
-            flatten_task(helm_version_check),
-            flatten_task(helm_release_check),
-            flatten_task(helm_chart_dir_check)
+            joined_flatten(helm_version_check),
+            joined_flatten(helm_release_check),
+            joined_flatten(helm_chart_dir_check)
         )?;
 
         Ok(())
