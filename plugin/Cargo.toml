@@ -35,4 +35,4 @@ serde = "1.0.214"
 serde_json = {version = "1.0.132"}
 serde_yaml = "0.9.34"
 snafu = "0.8.5"
-tokio = { version = "1.41.0", features=["full"] }
+tokio = { version = "1.43.1", features=["full"] }
