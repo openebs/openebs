@@ -54,7 +54,7 @@ jobs:
 
   update-helm-chart:
     needs: create-release-branch
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest-8-cores
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -124,7 +124,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
   update_develop_branch_on_release_branch_creation:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest-8-cores
     outputs:
       localpv_provisioner_version: ${{ steps.extract-versions.outputs.localpv_provisioner_version }}
       zfs_localpv_version: ${{ steps.extract-versions.outputs.zfs_localpv_version }}
@@ -227,7 +227,7 @@ jobs:
       zfs_localpv_version: ${{ steps.extract-versions-from-tag.outputs.zfs_localpv_version }}
       lvm_localpv_version: ${{ steps.extract-versions-from-tag.outputs.lvm_localpv_version }}
       mayastor_version: ${{ steps.extract-versions-from-tag.outputs.mayastor_version }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest-8-cores
     if: github.ref_type == 'tag'
     steps:
       - uses: actions/checkout@v4
