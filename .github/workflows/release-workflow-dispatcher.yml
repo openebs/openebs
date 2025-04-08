@@ -85,8 +85,26 @@ jobs:
           LVM_LOCALPV_VERSION: ${{ github.event.inputs.lvm-localpv-version }}
           MAYASTOR_VERSION: ${{ github.event.inputs.mayastor-version }}
 
-      - name: update chart metadata
-        uses: ./.github/workflows/chart-images.yml
+      - name: Pre-populate helm nix-shell
+        run: nix-shell ./scripts/helm/shell.nix --run "echo"
+
+      - name: Generate image list
+        run: nix-shell ./scripts/helm/shell.nix --run "./scripts/helm/images.sh generate --dependency-update --exit-code"
+
+      - name: Patch chart/Chart.yaml
+        run: nix-shell ./scripts/helm/shell.nix --run "./scripts/helm/images.sh patch --exit-code"
+
+      - name: BootStrap k8s cluster
+        run: |
+          sudo debconf-communicate <<< "set man-db/auto-update false" || true
+          sudo dpkg-reconfigure man-db || true
+          nix-shell ./scripts/k8s/shell.nix --run "./scripts/k8s/deployer.sh start --mayastor --zfs --lvm --label"
+
+      - name: Install helm chart
+        run: nix-shell ./scripts/helm/shell.nix --run "./scripts/helm/install.sh --mayastor --zfs --lvm --wait"
+
+      - name: Verify image list
+        run: nix-shell ./scripts/helm/shell.nix --run "./scripts/helm/images.sh verify"
 
       - name: Create Pull Request to release
         id: cpr
@@ -165,8 +183,26 @@ jobs:
           LVM_LOCALPV_VERSION: ${{ steps.extract-versions.outputs.lvm_localpv_version }}
           MAYASTOR_VERSION: ${{ steps.extract-versions.outputs.mayastor_version }}
 
-      - name: update chart metadata
-        uses: ./.github/workflows/chart-images.yml
+      - name: Pre-populate helm nix-shell
+        run: nix-shell ./scripts/helm/shell.nix --run "echo"
+
+      - name: Generate image list
+        run: nix-shell ./scripts/helm/shell.nix --run "./scripts/helm/images.sh generate --dependency-update --exit-code"
+
+      - name: Patch chart/Chart.yaml
+        run: nix-shell ./scripts/helm/shell.nix --run "./scripts/helm/images.sh patch --exit-code"
+
+      - name: BootStrap k8s cluster
+        run: |
+            sudo debconf-communicate <<< "set man-db/auto-update false" || true
+            sudo dpkg-reconfigure man-db || true
+            nix-shell ./scripts/k8s/shell.nix --run "./scripts/k8s/deployer.sh start --mayastor --zfs --lvm --label"
+
+      - name: Install helm chart
+        run: nix-shell ./scripts/helm/shell.nix --run "./scripts/helm/install.sh --mayastor --zfs --lvm --wait"
+
+      - name: Verify image list
+        run: nix-shell ./scripts/helm/shell.nix --run "./scripts/helm/images.sh verify"
 
       - name: Create Pull Request to develop
         id: cpr
@@ -245,8 +281,26 @@ jobs:
           LVM_LOCALPV_VERSION: ${{ steps.extract-versions-from-tag.outputs.lvm_localpv_version }}
           MAYASTOR_VERSION: ${{ steps.extract-versions-from-tag.outputs.mayastor_version }}
 
-      - name: update chart metadata
-        uses: ./.github/workflows/chart-images.yml
+      - name: Pre-populate helm nix-shell
+        run: nix-shell ./scripts/helm/shell.nix --run "echo"
+
+      - name: Generate image list
+        run: nix-shell ./scripts/helm/shell.nix --run "./scripts/helm/images.sh generate --dependency-update --exit-code"
+
+      - name: Patch chart/Chart.yaml
+        run: nix-shell ./scripts/helm/shell.nix --run "./scripts/helm/images.sh patch --exit-code"
+
+      - name: BootStrap k8s cluster
+        run: |
+          sudo debconf-communicate <<< "set man-db/auto-update false" || true
+          sudo dpkg-reconfigure man-db || true
+          nix-shell ./scripts/k8s/shell.nix --run "./scripts/k8s/deployer.sh start --mayastor --zfs --lvm --label"
+
+      - name: Install helm chart
+        run: nix-shell ./scripts/helm/shell.nix --run "./scripts/helm/install.sh --mayastor --zfs --lvm --wait"
+
+      - name: Verify image list
+        run: nix-shell ./scripts/helm/shell.nix --run "./scripts/helm/images.sh verify"
 
       - name: Create Pull Request to release
         if: ${{ env.BASE }}

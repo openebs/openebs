@@ -6,7 +6,6 @@ on:
       - 'release/**'
   pull_request:
     types: [ 'opened', 'edited', 'reopened', 'synchronize' ]
-  workflow_call:
 
 env:
   CI: 1
