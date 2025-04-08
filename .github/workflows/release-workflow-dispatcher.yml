@@ -1,25 +1,17 @@
-name: Release Workflow Dispatcher
+name: Branch Preparation
 on:
   workflow_dispatch:
     inputs:
-      openebs-crds-version:
-        required: true
-        default: ""
       localpv-provisioner-version:
         required: true
-        default: 4.2.0
       zfs-localpv-version:
         required: true
-        default: 2.7.1
       lvm-localpv-version:
         required: true
-        default: 1.6.2
       mayastor-version:
         required: true
-        default: 2.8.0
       release-branch:
         required: true
-        default: release/4.2
       helm-version:
         required: true
       app-version:
@@ -82,7 +74,7 @@ jobs:
         run: |
               nix-shell --pure --run "./scripts/helm/test-update-chart-version.sh" ./shell.nix
 
-      - name: Update Dependecies Helm Chart version
+      - name: Modify chart version upon release branch creation.
         run: |
           branch_name=${{ github.event.inputs.release-branch }}
           nix-shell --pure --run "./scripts/helm/update-chart-version.sh --branch $branch_name --type release --chart-version ${VERSION}-develop  --localpv-provisioner-version ${LOCALPV_PROVISIONER_VERSION} --zfs-localpv-version ${ZFS_LOCALPV_VERSION} --lvm-localpv-version ${LVM_LOCALPV_VERSION} --mayastor-version ${MAYASTOR_VERSION}" ./shell.nix
@@ -92,6 +84,9 @@ jobs:
           ZFS_LOCALPV_VERSION: ${{ github.event.inputs.zfs-localpv-version }}
           LVM_LOCALPV_VERSION: ${{ github.event.inputs.lvm-localpv-version }}
           MAYASTOR_VERSION: ${{ github.event.inputs.mayastor-version }}
+
+      - name: update chart metadata
+        uses: ./.github/workflows/chart-images.yml
 
       - name: Create Pull Request to release
         id: cpr
@@ -170,6 +165,9 @@ jobs:
           LVM_LOCALPV_VERSION: ${{ steps.extract-versions.outputs.lvm_localpv_version }}
           MAYASTOR_VERSION: ${{ steps.extract-versions.outputs.mayastor_version }}
 
+      - name: update chart metadata
+        uses: ./.github/workflows/chart-images.yml
+
       - name: Create Pull Request to develop
         id: cpr
         uses: peter-evans/create-pull-request@v5
@@ -246,6 +244,9 @@ jobs:
           ZFS_LOCALPV_VERSION: ${{ steps.extract-versions-from-tag.outputs.zfs_localpv_version }}
           LVM_LOCALPV_VERSION: ${{ steps.extract-versions-from-tag.outputs.lvm_localpv_version }}
           MAYASTOR_VERSION: ${{ steps.extract-versions-from-tag.outputs.mayastor_version }}
+
+      - name: update chart metadata
+        uses: ./.github/workflows/chart-images.yml
 
       - name: Create Pull Request to release
         if: ${{ env.BASE }}
