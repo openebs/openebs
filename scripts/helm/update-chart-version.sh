@@ -243,13 +243,6 @@ while [ "$#" -gt 0 ]; do
   esac
 done
 
-# # Validate required arguments
-# if [[ -z "$LOCALPV_PROVISIONER_VERSION" || -z "$ZFS_LOCALPV_VERSION" || -z "$LVM_LOCALPV_VERSION" || -z "$MAYASTOR_VERSION" ]]; then
-#   echo "Error: All mandatory dependencies versions must be provided."
-#   help
-#   exit 1
-# fi
-
 if [[ -z $CURRENT_CHART_VERSION ]]; then
   CURRENT_CHART_VERSION=$(yq e '.version' "$CHART_YAML")
 fi

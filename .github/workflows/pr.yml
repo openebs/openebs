@@ -33,10 +33,10 @@ jobs:
       - uses: cachix/install-nix-action@v22
       - name: Pre-populate nix-shell
         run: |
-              export NIX_PATH=nixpkgs=$(jq '.nixpkgs.url' nix/sources.json -r)
-              echo "NIX_PATH=$NIX_PATH" >> $GITHUB_ENV
-              nix-shell --pure --run "echo" ./shell.nix
+          export NIX_PATH=nixpkgs=$(jq '.nixpkgs.url' nix/sources.json -r)
+          echo "NIX_PATH=$NIX_PATH" >> $GITHUB_ENV
+          nix-shell --pure --run "echo" ./shell.nix
 
       - name: Test the chart version updater script
         run: |
-              nix-shell --pure --run "./scripts/helm/test-update-chart-version.sh" ./shell.nix
+          nix-shell --pure --run "./scripts/helm/test-update-chart-version.sh" ./shell.nix

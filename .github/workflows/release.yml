@@ -11,9 +11,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-            ref: ${{ github.event.release.tag_name }}
-            fetch-depth: 0
-            submodules: recursive
+          ref: ${{ github.event.release.tag_name }}
+          fetch-depth: 0
+          submodules: recursive
 
       - uses: cachix/install-nix-action@v22
       - name: Pre-populate nix-shell
@@ -24,7 +24,7 @@ jobs:
 
       - name: Remove prerelease label from dependencies
         run: |
-            nix-shell --pure --run "./scripts/helm/update-dependencies-version-upon-release.sh" ./shell.nix
+          nix-shell --pure --run "./scripts/helm/update-dependencies-version-upon-release.sh" ./shell.nix
 
       - name: Check if the chart is publishable
         run: |

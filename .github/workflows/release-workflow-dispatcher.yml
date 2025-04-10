@@ -66,13 +66,13 @@ jobs:
       - uses: cachix/install-nix-action@v22
       - name: Pre-populate nix-shell
         run: |
-              export NIX_PATH=nixpkgs=$(jq '.nixpkgs.url' nix/sources.json -r)
-              echo "NIX_PATH=$NIX_PATH" >> $GITHUB_ENV
-              nix-shell --pure --run "echo" ./shell.nix
-    
+          export NIX_PATH=nixpkgs=$(jq '.nixpkgs.url' nix/sources.json -r)
+          echo "NIX_PATH=$NIX_PATH" >> $GITHUB_ENV
+          nix-shell --pure --run "echo" ./shell.nix
+
       - name: Test the chart version updater script
         run: |
-              nix-shell --pure --run "./scripts/helm/test-update-chart-version.sh" ./shell.nix
+          nix-shell --pure --run "./scripts/helm/test-update-chart-version.sh" ./shell.nix
 
       - name: Modify chart version upon release branch creation.
         run: |
@@ -89,10 +89,10 @@ jobs:
         run: nix-shell ./scripts/helm/shell.nix --run "echo"
 
       - name: Generate image list
-        run: nix-shell ./scripts/helm/shell.nix --run "./scripts/helm/images.sh generate --dependency-update --exit-code"
+        run: nix-shell ./scripts/helm/shell.nix --run "./scripts/helm/images.sh generate --dependency-update"
 
       - name: Patch chart/Chart.yaml
-        run: nix-shell ./scripts/helm/shell.nix --run "./scripts/helm/images.sh patch --exit-code"
+        run: nix-shell ./scripts/helm/shell.nix --run "./scripts/helm/images.sh patch"
 
       - name: BootStrap k8s cluster
         run: |
@@ -187,16 +187,16 @@ jobs:
         run: nix-shell ./scripts/helm/shell.nix --run "echo"
 
       - name: Generate image list
-        run: nix-shell ./scripts/helm/shell.nix --run "./scripts/helm/images.sh generate --dependency-update --exit-code"
+        run: nix-shell ./scripts/helm/shell.nix --run "./scripts/helm/images.sh generate --dependency-update"
 
       - name: Patch chart/Chart.yaml
-        run: nix-shell ./scripts/helm/shell.nix --run "./scripts/helm/images.sh patch --exit-code"
+        run: nix-shell ./scripts/helm/shell.nix --run "./scripts/helm/images.sh patch"
 
       - name: BootStrap k8s cluster
         run: |
-            sudo debconf-communicate <<< "set man-db/auto-update false" || true
-            sudo dpkg-reconfigure man-db || true
-            nix-shell ./scripts/k8s/shell.nix --run "./scripts/k8s/deployer.sh start --mayastor --zfs --lvm --label"
+          sudo debconf-communicate <<< "set man-db/auto-update false" || true
+          sudo dpkg-reconfigure man-db || true
+          nix-shell ./scripts/k8s/shell.nix --run "./scripts/k8s/deployer.sh start --mayastor --zfs --lvm --label"
 
       - name: Install helm chart
         run: nix-shell ./scripts/helm/shell.nix --run "./scripts/helm/install.sh --mayastor --zfs --lvm --wait"
@@ -285,10 +285,10 @@ jobs:
         run: nix-shell ./scripts/helm/shell.nix --run "echo"
 
       - name: Generate image list
-        run: nix-shell ./scripts/helm/shell.nix --run "./scripts/helm/images.sh generate --dependency-update --exit-code"
+        run: nix-shell ./scripts/helm/shell.nix --run "./scripts/helm/images.sh generate --dependency-update"
 
       - name: Patch chart/Chart.yaml
-        run: nix-shell ./scripts/helm/shell.nix --run "./scripts/helm/images.sh patch --exit-code"
+        run: nix-shell ./scripts/helm/shell.nix --run "./scripts/helm/images.sh patch"
 
       - name: BootStrap k8s cluster
         run: |
