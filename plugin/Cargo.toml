@@ -1,5 +1,6 @@
 [package]
 name = "kubectl-openebs"
+description = "Kubectl Plugin (kubectl-openebs)"
 version = "0.7.0"
 edition = "2021"
 
