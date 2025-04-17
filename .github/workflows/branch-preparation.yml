@@ -1,0 +1,138 @@
+name: Branch Preparation
+
+on:
+  workflow_dispatch:
+    inputs:
+      localpv-provisioner-version:
+        required: true
+      zfs-localpv-version:
+        required: true
+      lvm-localpv-version:
+        required: true
+      mayastor-version:
+        required: true
+      branch:
+        required: true
+      helm-version:
+        required: true
+      app-version:
+        required: true
+
+jobs:
+  create-release-branch:
+    runs-on: ubuntu-latest
+    outputs:
+      branch_exists: ${{ steps.check-branch.outputs.exists }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: develop
+          fetch-depth: 0
+          submodules: recursive
+
+      - name: Check if branch exists
+        id: check-branch
+        run: |
+          if git ls-remote --exit-code --heads origin ${{ github.event.inputs.branch}}; then
+            echo "Branch already exists: ${{ github.event.inputs.branch}}"
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create and push new branch
+        if: steps.check-branch.outputs.exists == 'false'
+        run: |
+          git checkout -b ${{ github.event.inputs.branch}}
+          git push origin ${{ github.event.inputs.branch}}
+
+  prepare-branch:
+    needs: create-release-branch
+    runs-on: ubuntu-latest-8-cores
+    outputs:
+      pr_title: ${{ steps.set-title.outputs.title }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.branch}}
+          fetch-depth: 0
+          submodules: recursive
+
+      - uses: cachix/install-nix-action@v22
+
+      - name: Pre-populate nix-shell
+        run: |
+          export NIX_PATH=nixpkgs=$(jq '.nixpkgs.url' nix/sources.json -r)
+          echo "NIX_PATH=$NIX_PATH" >> $GITHUB_ENV
+          nix-shell --pure --run "echo" ./shell.nix
+
+      - name: Modify chart version upon release branch creation
+        run: |
+          nix-shell --pure --run "./scripts/helm/update-chart-version.sh \
+            --chart-version ${VERSION} \
+            --app-version ${APP_VERSION} \
+            --localpv-provisioner-version ${LOCALPV_HOSTPATH_VERSION} \
+            --zfs-localpv-version ${LOCALPV_ZFS_VERSION} \
+            --lvm-localpv-version ${LOCALPV_LVM_VERSION} \
+            --mayastor-version ${MAYASTOR_VERSION}" ./shell.nix
+        env:
+          VERSION: ${{ github.event.inputs.helm-version }}
+          APP_VERSION: ${{ github.event.inputs.app-version }}
+          LOCALPV_HOSTPATH_VERSION: ${{ github.event.inputs.localpv-provisioner-version }}
+          LOCALPV_ZFS_VERSION: ${{ github.event.inputs.zfs-localpv-version }}
+          LOCALPV_LVM_VERSION: ${{ github.event.inputs.lvm-localpv-version }}
+          MAYASTOR_VERSION: ${{ github.event.inputs.mayastor-version }}
+
+      - name: Pre-populate helm nix-shell
+        run: nix-shell ./scripts/helm/shell.nix --run "echo"
+
+      - name: Generate image list
+        run: nix-shell ./scripts/helm/shell.nix --run "./scripts/helm/images.sh generate --dependency-update"
+
+      - name: Patch chart/Chart.yaml
+        run: nix-shell ./scripts/helm/shell.nix --run "./scripts/helm/images.sh patch"
+
+      - name: BootStrap k8s cluster
+        run: |
+          set -euo pipefail
+          sudo debconf-communicate <<< "set man-db/auto-update false" || true
+          sudo dpkg-reconfigure man-db || true
+          nix-shell ./scripts/k8s/shell.nix --run "./scripts/k8s/deployer.sh start --mayastor --zfs --lvm --label"
+
+      - name: Install helm chart
+        run: nix-shell ./scripts/helm/shell.nix --run "./scripts/helm/install.sh --mayastor --zfs --lvm --wait"
+
+      - name: Verify image list
+        run: nix-shell ./scripts/helm/shell.nix --run "./scripts/helm/images.sh verify"
+
+      - name: Set PR title based on branch
+        id: set-title
+        run: |
+          if [[ "${BRANCH_EXISTS}" == "false" && "${{ github.event.inputs.branch }}" != "develop" ]]; then
+            echo "title=Prepare ${{ github.event.inputs.branch}} branch on release branch creation" >> $GITHUB_OUTPUT
+          elif [[ "${BRANCH_EXISTS}" == "true" && "${{ github.event.inputs.branch }}" != "develop" ]]; then
+            echo "title=Prepare ${{ github.event.inputs.branch }} branch on release" >> $GITHUB_OUTPUT
+          elif [[ "${{ github.event.inputs.branch }}" == "develop" ]]; then
+            echo "title=Prepare develop branch on release branch creation" >> $GITHUB_OUTPUT
+          fi
+        env:
+          BRANCH_EXISTS: ${{ needs.create-release-branch.outputs.branch_exists }}
+
+      - name: Create Pull Request to release
+        id: cpr
+        uses: peter-evans/create-pull-request@v5
+        with:
+          base: ${{ github.event.inputs.branch}}
+          commit-message: "chore(ci): update helm chart versions and/or git submodules"
+          committer: GitHub <noreply@github.com>
+          author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
+          title: ${{ steps.set-title.outputs.title }}
+          labels: |
+            area/helm
+            kind/ci
+          draft: false
+          signoff: true
+          branch: "create-pull-request/patch-${{ github.event.inputs.branch}}"
+          token: ${{ secrets.GITHUB_TOKEN }}

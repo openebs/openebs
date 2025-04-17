@@ -1,0 +1,41 @@
+name: Publish chart upon release creation
+
+on:
+  release:
+    types:
+      - "created"
+
+jobs:
+  release-chart:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.release.tag_name }}
+          fetch-depth: 0
+          submodules: recursive
+
+      - uses: cachix/install-nix-action@v22
+      - name: Pre-populate nix-shell
+        run: |
+          export NIX_PATH=nixpkgs=$(jq '.nixpkgs.url' nix/sources.json -r)
+          echo "NIX_PATH=$NIX_PATH" >> $GITHUB_ENV
+          nix-shell --pure --run "echo" ./shell.nix
+
+      - name: Remove prerelease label from dependencies
+        run: |
+          nix-shell --pure --run "./scripts/helm/update-version-upon-release.sh" ./shell.nix
+
+      - name: Debug Workflow Directory and Charts
+        run: |
+          ls -l ./charts
+          echo "=== Chart.yaml ==="
+          cat ./charts/Chart.yaml
+          echo "=== Openebs CRDs Chart.yaml ==="
+          cat ./charts/charts/openebs-crds/Chart.yaml
+
+      - name: Publish openebs umbrella helm chart
+        uses: stefanprodan/helm-gh-pages@master
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          charts_dir: .
