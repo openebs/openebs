@@ -6,7 +6,7 @@
 [![OpenSSF Best Practices](https://www.bestpractices.dev/projects/1754/badge)](https://www.bestpractices.dev/projects/1754)
 [![CLOMonitor](https://img.shields.io/endpoint?url=https://clomonitor.io/api/projects/cncf/openebs/badge)](https://clomonitor.io/projects/cncf/openebs)
 [![Slack](https://img.shields.io/badge/chat-slack-ff1493.svg?style=flat-square)](https://kubernetes.slack.com/messages/openebs)
-[![Community Meetings](https://img.shields.io/badge/Community-Meetings-blue)](https://us05web.zoom.us/j/87535654586?pwd=CigbXigJPn38USc6Vuzt7qSVFoO79X.1)
+[![Community Meetings](https://img.shields.io/badge/Community-Meetings-blue)](#community)
 [![Artifact HUB](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/openebs)](https://artifacthub.io/packages/helm/openebs/openebs)
 [![Release Charts](https://github.com/openebs/openebs/actions/workflows/chart-release.yml/badge.svg)](https://github.com/openebs/openebs/actions/workflows/chart-release.yml)
 
