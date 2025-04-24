@@ -67,9 +67,8 @@ These features make OpenEBS a robust and flexible solution for managing persiste
   - [#openebs](https://kubernetes.slack.com/messages/openebs)
   - [#openebs-dev](https://kubernetes.slack.com/messages/openebs-dev)
 - Twitter: [@openebs](https://twitter.com/intent/follow?screen_name=openebs)
-- Community Meeting: OpenEBS holds a monthly [community meeting](https://us05web.zoom.us/j/87535654586?pwd=CigbXigJPn38USc6Vuzt7qSVFoO79X.1) via Zoom on the last Thursday of the month, at 14:00 UTC.
-  - [Google Calendar](https://calendar.google.com/calendar/event?action=TEMPLATE&tmeid=ZDhqbDB0YjZtNmpvanJjN2Y2bWw3NnY0ajRfMjAyNTAyMjdUMTQwMDAwWiBvcGVuZWJzLnRlYW1AbQ&tmsrc=openebs.team%40gmail.com&scp=ALL)
-  - [Other Calendars](https://openebs.github.io/community/community_meeting.ics)
+- Community Meeting: OpenEBS holds a monthly [community meeting](https://zoom-lfx.platform.linuxfoundation.org/meeting/99475226462?password=f57455ef-fed1-49b1-a38b-110dab2b42cc) via Zoom on the last Thursday of the month, at 14:00 UTC.
+  - [Add to calendar](https://zoom-lfx.platform.linuxfoundation.org/meetings/openebs?view=list)
 - Community Meeting Recordings: [Youtube](https://www.youtube.com/@openebscommunity6021)
 
 ## Star History
