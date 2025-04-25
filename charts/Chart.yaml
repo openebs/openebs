@@ -1,7 +1,7 @@
 apiVersion: v2
-version: 4.2.0
+version: 4.3.0-develop
 name: openebs
-appVersion: 4.2.0
+appVersion: 4.3.0-develop
 description: Containerized Attached Storage for Kubernetes
 icon: https://raw.githubusercontent.com/cncf/artwork/HEAD/projects/openebs/icon/color/openebs-icon-color.png
 home: https://www.openebs.io/
@@ -16,20 +16,20 @@ sources:
   - https://github.com/openebs/openebs
 dependencies:
   - name: openebs-crds
-    version: 4.2.0
+    version: 4.3.0-develop
   - name: localpv-provisioner
-    version: 4.2.0
+    version: 4.3.0-develop
     repository: "https://openebs.github.io/dynamic-localpv-provisioner"
   - name: zfs-localpv
-    version: 2.7.1
+    version: 2.8.0-develop
     repository: "https://openebs.github.io/zfs-localpv"
     condition: engines.local.zfs.enabled
   - name: lvm-localpv
-    version: 1.6.2
+    version: 1.7.0-develop
     repository: "https://openebs.github.io/lvm-localpv"
     condition: engines.local.lvm.enabled
   - name: mayastor
-    version: 2.8.0
+    version: 0.0.0
     repository: "https://openebs.github.io/mayastor-extensions"
     condition: engines.replicated.mayastor.enabled
 annotations:
@@ -47,27 +47,27 @@ annotations:
     - name: alpine-sh
       image: docker.io/openebs/alpine-sh:4.1.0
     - name: mayastor-agent-core
-      image: docker.io/openebs/mayastor-agent-core:v2.8.0
+      image: docker.io/openebs/mayastor-agent-core:develop
     - name: mayastor-agent-ha-cluster
-      image: docker.io/openebs/mayastor-agent-ha-cluster:v2.8.0
+      image: docker.io/openebs/mayastor-agent-ha-cluster:develop
     - name: mayastor-agent-ha-node
-      image: docker.io/openebs/mayastor-agent-ha-node:v2.8.0
+      image: docker.io/openebs/mayastor-agent-ha-node:develop
     - name: mayastor-api-rest
-      image: docker.io/openebs/mayastor-api-rest:v2.8.0
+      image: docker.io/openebs/mayastor-api-rest:develop
     - name: mayastor-csi-controller
-      image: docker.io/openebs/mayastor-csi-controller:v2.8.0
+      image: docker.io/openebs/mayastor-csi-controller:develop
     - name: mayastor-csi-node
-      image: docker.io/openebs/mayastor-csi-node:v2.8.0
+      image: docker.io/openebs/mayastor-csi-node:develop
     - name: mayastor-io-engine
-      image: docker.io/openebs/mayastor-io-engine:v2.8.0
+      image: docker.io/openebs/mayastor-io-engine:develop
     - name: mayastor-metrics-exporter-io-engine
-      image: docker.io/openebs/mayastor-metrics-exporter-io-engine:v2.8.0
+      image: docker.io/openebs/mayastor-metrics-exporter-io-engine:develop
     - name: mayastor-obs-callhome-stats
-      image: docker.io/openebs/mayastor-obs-callhome-stats:v2.8.0
+      image: docker.io/openebs/mayastor-obs-callhome-stats:develop
     - name: mayastor-obs-callhome
-      image: docker.io/openebs/mayastor-obs-callhome:v2.8.0
+      image: docker.io/openebs/mayastor-obs-callhome:develop
     - name: mayastor-operator-diskpool
-      image: docker.io/openebs/mayastor-operator-diskpool:v2.8.0
+      image: docker.io/openebs/mayastor-operator-diskpool:develop
     - name: loki
       image: grafana/loki:2.6.1
     - name: nats
@@ -79,13 +79,17 @@ annotations:
     - name: prometheus-nats-exporter
       image: natsio/prometheus-nats-exporter:0.11.0
     - name: linux-utils
+      image: openebs/linux-utils:4.0.0
+    - name: linux-utils
       image: openebs/linux-utils:4.1.0
     - name: lvm-driver
-      image: openebs/lvm-driver:1.6.1
+      image: openebs/lvm-driver:1.7.0-develop
     - name: provisioner-localpv
-      image: openebs/provisioner-localpv:4.2.0
+      image: openebs/provisioner-localpv:4.1.2
+    - name: provisioner-localpv
+      image: openebs/provisioner-localpv:4.3.0-develop
     - name: zfs-driver
-      image: openebs/zfs-driver:2.7.1
+      image: openebs/zfs-driver:2.8.0-develop
     - name: csi-attacher
       image: registry.k8s.io/sig-storage/csi-attacher:v4.3.0
     - name: csi-node-driver-registrar
