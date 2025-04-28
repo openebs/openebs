@@ -1,0 +1,33 @@
+{{- if and (.Values.loki.localpvScConfig.enabled) (.Values.loki.singleBinary.persistence.enabled) (.Values.loki.enabled) }}
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  annotations:
+    cas.openebs.io/config: |
+      - name: StorageType
+        value: "hostpath"
+      - name: BasePath
+        value: {{ tpl ( .Values.loki.localpvScConfig.loki.basePath | quote ) . }}
+    openebs.io/cas-type: local
+  name: {{ tpl .Values.loki.localpvScConfig.loki.name . | required "StorageClass name for loki localpv storage cannot be empty" }}
+provisioner: openebs.io/local
+reclaimPolicy: {{ .Values.loki.localpvScConfig.loki.reclaimPolicy }}
+volumeBindingMode: {{ .Values.loki.localpvScConfig.loki.volumeBindingMode }}
+{{- end }}
+---
+{{- if and (.Values.loki.localpvScConfig.enabled) (.Values.loki.minio.persistence.enabled) (.Values.loki.enabled) }}
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  annotations:
+    cas.openebs.io/config: |
+      - name: StorageType
+        value: "hostpath"
+      - name: BasePath
+        value: {{ tpl ( .Values.loki.localpvScConfig.minio.basePath | quote ) . }}
+    openebs.io/cas-type: local
+  name: {{ tpl .Values.loki.localpvScConfig.minio.name . | required "StorageClass name for loki localpv storage cannot be empty" }}
+provisioner: openebs.io/local
+reclaimPolicy: {{ .Values.loki.localpvScConfig.minio.reclaimPolicy }}
+volumeBindingMode: {{ .Values.loki.localpvScConfig.minio.volumeBindingMode }}
+{{- end }}

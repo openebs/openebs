@@ -17,6 +17,14 @@ sources:
 dependencies:
   - name: openebs-crds
     version: 4.3.0-develop
+  - name: loki
+    version: 6.29.0
+    repository: https://grafana.github.io/helm-charts
+    condition: loki.enabled
+  - name: alloy
+    version: 1.0.1
+    repository: https://grafana.github.io/helm-charts
+    condition: alloy.enabled
   - name: localpv-provisioner
     version: 4.3.0-develop
     repository: "https://openebs.github.io/dynamic-localpv-provisioner"
@@ -32,6 +40,7 @@ dependencies:
     version: 0.0.0
     repository: "https://openebs.github.io/mayastor-extensions"
     condition: engines.replicated.mayastor.enabled
+
 annotations:
   helm.sh/images: |
     - name: bats
@@ -40,6 +49,10 @@ annotations:
       image: docker.io/bitnami/etcd:3.5.6-debian-11-r10
     - name: kubectl
       image: docker.io/bitnami/kubectl:1.25.15
+    - name: alloy
+      image: docker.io/grafana/alloy:v1.8.1
+    - name: loki
+      image: docker.io/grafana/loki:3.4.2
     - name: promtail
       image: docker.io/grafana/promtail:2.8.3
     - name: alpine-bash
@@ -70,6 +83,8 @@ annotations:
       image: docker.io/openebs/mayastor-operator-diskpool:develop
     - name: loki
       image: grafana/loki:2.6.1
+    - name: k8s-sidecar
+      image: kiwigrid/k8s-sidecar:1.30.2
     - name: nats
       image: nats:2.9.17-alpine
     - name: nats-box
@@ -90,6 +105,12 @@ annotations:
       image: openebs/provisioner-localpv:4.3.0-develop
     - name: zfs-driver
       image: openebs/zfs-driver:2.8.0-develop
+    - name: mc
+      image: quay.io/minio/mc:RELEASE.2024-11-21T17-21-54Z
+    - name: minio
+      image: quay.io/minio/minio:RELEASE.2024-12-18T13-15-44Z
+    - name: prometheus-config-reloader
+      image: quay.io/prometheus-operator/prometheus-config-reloader:v0.81.0
     - name: csi-attacher
       image: registry.k8s.io/sig-storage/csi-attacher:v4.3.0
     - name: csi-node-driver-registrar

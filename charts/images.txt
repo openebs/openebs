@@ -1,6 +1,8 @@
 bats/bats:1.8.2
 docker.io/bitnami/etcd:3.5.6-debian-11-r10
 docker.io/bitnami/kubectl:1.25.15
+docker.io/grafana/alloy:v1.8.1
+docker.io/grafana/loki:3.4.2
 docker.io/grafana/promtail:2.8.3
 docker.io/openebs/alpine-bash:4.1.0
 docker.io/openebs/alpine-sh:4.1.0
@@ -16,6 +18,7 @@ docker.io/openebs/mayastor-obs-callhome-stats:develop
 docker.io/openebs/mayastor-obs-callhome:develop
 docker.io/openebs/mayastor-operator-diskpool:develop
 grafana/loki:2.6.1
+kiwigrid/k8s-sidecar:1.30.2
 nats:2.9.17-alpine
 natsio/nats-box:0.13.8
 natsio/nats-server-config-reloader:0.10.1
@@ -26,6 +29,9 @@ openebs/lvm-driver:1.7.0-develop
 openebs/provisioner-localpv:4.1.2
 openebs/provisioner-localpv:4.3.0-develop
 openebs/zfs-driver:2.8.0-develop
+quay.io/minio/mc:RELEASE.2024-11-21T17-21-54Z
+quay.io/minio/minio:RELEASE.2024-12-18T13-15-44Z
+quay.io/prometheus-operator/prometheus-config-reloader:v0.81.0
 registry.k8s.io/sig-storage/csi-attacher:v4.3.0
 registry.k8s.io/sig-storage/csi-node-driver-registrar:v2.10.0
 registry.k8s.io/sig-storage/csi-node-driver-registrar:v2.8.0
