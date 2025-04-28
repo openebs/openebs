@@ -79,7 +79,7 @@ let
     "mayastor/dependencies/control-plane/utils/utils-lib"
     "mayastor/dependencies/control-plane/utils/hyper-body"
     "mayastor/dependencies/control-plane/utils/shutdown"
-    "mayastor/dependencies/control-plane/utils/platform"
+    "mayastor/dependencies/control-plane/utils/dependencies/platform"
     "mayastor/dependencies/control-plane/utils/pstor"
     "mayastor/dependencies/control-plane/rpc"
     "mayastor/dependencies/control-plane/k8s/forward"
