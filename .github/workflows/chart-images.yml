@@ -13,7 +13,7 @@ env:
 
 jobs:
   helm-images:
-    runs-on: ubuntu-latest-8-cores
+    runs-on: oracle-8cpu-32gb-x86-64
     steps:
       - uses: actions/checkout@v4
         with:
