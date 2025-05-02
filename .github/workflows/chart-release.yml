@@ -16,16 +16,18 @@ jobs:
         with:
           fetch-depth: 0
           submodules: recursive
-
-      - uses: cachix/install-nix-action@v22
-      - name: Pre-populate nix-shell
+          
+      - name: Block publish if version is a develop pre-release
         run: |
-          export NIX_PATH=nixpkgs=$(jq '.nixpkgs.url' nix/sources.json -r)
-          echo "NIX_PATH=$NIX_PATH" >> $GITHUB_ENV
-          nix-shell --pure --run "echo" ./shell.nix
+          VERSION=$(yq '.version' charts/Chart.yaml)
+          if [[ "$VERSION" == *-develop* ]]; then
+            echo "Chart version is a develop prerelease: $VERSION"
+            echo "Aborting chart release on a release branch"
+            exit 1
+          fi
 
       - name: Publish openebs develop or prerelease umbrella helm chart
-        uses: stefanprodan/helm-gh-pages@master
+        uses: stefanprodan/helm-gh-pages@v1.7.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           charts_dir: .

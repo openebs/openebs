@@ -26,16 +26,8 @@ jobs:
         run: |
           nix-shell --pure --run "./scripts/helm/update-version-upon-release.sh" ./shell.nix
 
-      - name: Debug Workflow Directory and Charts
-        run: |
-          ls -l ./charts
-          echo "=== Chart.yaml ==="
-          cat ./charts/Chart.yaml
-          echo "=== Openebs CRDs Chart.yaml ==="
-          cat ./charts/charts/openebs-crds/Chart.yaml
-
       - name: Publish openebs umbrella helm chart
-        uses: stefanprodan/helm-gh-pages@master
+        uses: stefanprodan/helm-gh-pages@v1.7.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           charts_dir: .

@@ -20,9 +20,9 @@ jobs:
       - uses: cachix/install-nix-action@v22
       - name: Pre-populate nix-shell
         run: |
-            export NIX_PATH=nixpkgs=$(jq '.nixpkgs.url' nix/sources.json -r)
-            echo "NIX_PATH=$NIX_PATH" >> $GITHUB_ENV
-            nix-shell --pure --run "echo" ./charts/shell.nix
+          export NIX_PATH=nixpkgs=$(jq '.nixpkgs.url' nix/sources.json -r)
+          echo "NIX_PATH=$NIX_PATH" >> $GITHUB_ENV
+          nix-shell --pure --run "echo" ./charts/shell.nix
 
       - name: Set root submodules branch
         run: |
