@@ -6,7 +6,6 @@ on:
     branches:
       - develop
       - 'release/**'
-      - staging
 
 jobs:
   submodule-branch:
