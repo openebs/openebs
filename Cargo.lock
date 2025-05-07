@@ -1698,17 +1698,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "k8s-operators"
-version = "1.0.0"
-dependencies = [
- "k8s-openapi",
- "kube",
- "schemars",
- "serde",
- "serde_json",
-]
-
-[[package]]
 name = "kube"
 version = "0.94.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2374,6 +2363,12 @@ dependencies = [
  "smallvec",
  "windows-targets 0.52.6",
 ]
+
+[[package]]
+name = "parse-size"
+version = "1.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "487f2ccd1e17ce8c1bfab3a65c89525af41cfad4c8659021a1e9a2aacd73b89b"
 
 [[package]]
 name = "pem"
@@ -3298,15 +3293,16 @@ dependencies = [
  "hyper-body",
  "hyper-util",
  "k8s-openapi",
- "k8s-operators",
  "kube",
  "kube-proxy",
  "lazy_static",
  "once_cell",
  "openapi",
+ "parse-size",
  "platform",
  "pstor",
  "rest-plugin",
+ "schemars",
  "serde",
  "serde_json",
  "serde_yaml",
