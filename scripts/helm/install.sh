@@ -143,6 +143,9 @@ zfs_args() {
 hostpath_args() {
   echo -n "$(openebs_set_args "$(hostpath_analytics_disable)")"
 }
+loki_args() {
+  echo -n "$(openebs_set_args "loki.loki.commonConfig.replication_factor=2,loki.singleBinary.replicas=2,loki.minio.replicas=2")"
+}
 
 helm_installed() {
   if ! helm ls &>/dev/null; then
@@ -169,7 +172,8 @@ helm_install() {
         $(mayastor_args) \
         $(lvm_args) \
         $(zfs_args) \
-        $(hostpath_args)" \
+        $(hostpath_args) \
+        $(loki_args)" \
         | xargs)
   if [ -z "$DRY_RUN" ] && [ "$action" != "template" ]; then
     set -x
