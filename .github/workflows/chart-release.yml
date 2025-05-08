@@ -23,7 +23,8 @@ jobs:
         id: check_version
         run: |
           VERSION=$(yq '.version' charts/Chart.yaml)
-          if [[ "$VERSION" == *-develop* ]]; then
+          BRANCH="${GITHUB_REF#refs/heads/}"
+          if [[ "$BRANCH" == release/* && "$VERSION" == *-develop* ]]; then
             echo "Chart version is a develop prerelease: $VERSION"
             echo "Skipping Publish"
             echo "skip=true" >> "$GITHUB_OUTPUT"
