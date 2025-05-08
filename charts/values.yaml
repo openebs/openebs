@@ -125,6 +125,7 @@ loki:
     limits_config:
       ingestion_burst_size_mb: 1000
       ingestion_rate_mb: 10000
+      max_label_names_per_series: 20
 
   singleBinary:
     replicas: 3

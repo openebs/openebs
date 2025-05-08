@@ -40,7 +40,7 @@ For **HA (High Availability)** deployments, **object storage** is **mandatory**.
 
 - **Recommended for**: Production environments with multiple Loki instances, where high availability and horizontal scaling are required.
 
-By default with openebs loki is deployed in this mode, i.e with multiple replicas and with an minio distributed object storage.
+By default with openebs loki is deployed in this mode, i.e with multiple replicas and with a minio distributed object storage.
 
 ---
 
