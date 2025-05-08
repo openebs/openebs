@@ -8,8 +8,6 @@ openebs-crds:
 localpv-provisioner:
   rbac:
     create: true
-  analytics:
-    enabled: true
 
 # Refer to https://github.com/openebs/zfs-localpv/blob/v2.7.1/deploy/helm/charts/values.yaml for complete set of values.
 zfs-localpv:
@@ -19,8 +17,6 @@ zfs-localpv:
     csi:
       volumeSnapshots:
         enabled: false
-  analytics:
-    enabled: true
 
 # Refer to https://github.com/openebs/lvm-localpv/blob/lvm-localpv-1.6.2/deploy/helm/charts/values.yaml for complete set of values.
 lvm-localpv:
@@ -30,8 +26,6 @@ lvm-localpv:
     csi:
       volumeSnapshots:
         enabled: false
-  analytics:
-    enabled: true
 
 # Refer to https://github.com/openebs/mayastor-extensions/blob/v2.8.0/chart/values.yaml for complete set of values.
 mayastor:
@@ -82,6 +76,7 @@ engines:
 
 loki:
   enabled: true
+  # NOTE: For all possible storage options for loki, check https://github.com/openebs/openebs/blob/HEAD/charts/loki-storage.md
   # Configuration for loki's localpv hostpath storage class.
   localpvScConfig:
     enabled: true
@@ -116,8 +111,13 @@ loki:
             period: 24h
     commonConfig:
       replication_factor: 3
+
     ingester:
       chunk_encoding: snappy
+      # Configure these if a quicker ingestion is needed, i.e. faster push to your bucket.
+      # chunk_idle_period: 3m
+      # chunk_retain_period: 1m
+      # max_chunk_age: 6m
     tracing:
       enabled: true
     querier:
@@ -130,20 +130,27 @@ loki:
     replicas: 3
     drivesPerNode: 1
     persistence:
+      # -- Enabled persistence for loki
       enabled: true
+      # -- Storage class for loki storage
       storageClass: "openebs-loki-localpv"
       accessModes:
         - ReadWriteOnce
+      # -- Size of loki local storage volume
       size: 2Gi
 
   minio:
     replicas: 3
     drivesPerNode: 1
     mode: distributed
+    # Disable this if you want to enabled external s3 bucket, and uncomment the storage section above.
     enabled: true
     persistence:
+      # -- Enabled persistence for minio
       enabled: true
+      # -- Storage class for minio storage
       storageClass: "openebs-minio-localpv"
+      # -- Size of minio local storage volume
       size: 2Gi
 
   deploymentMode: SingleBinary
@@ -193,7 +200,7 @@ alloy:
   enabled: true
 
   logging_config:
-    # -- Enable debugging on alloy components.
+    # Enable debugging on alloy components.
     debugging: false
     # -- Labels to enable scraping on, at-least one of these labels should be present.
     labels:

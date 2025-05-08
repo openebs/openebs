@@ -58,7 +58,7 @@ helm repo update
 helm install openebs --namespace openebs openebs/openebs --create-namespace
 ```
 
-The above commands will install OpenEBS LocalPV Hostpath, OpenEBS LocalPV LVM, OpenEBS LocalPV ZFS and OpenEBS Mayastor components in openebs namespace with chart name as openebs. 
+The above commands will install OpenEBS LocalPV Hostpath, OpenEBS LocalPV LVM, OpenEBS LocalPV ZFS and OpenEBS Mayastor components in openebs namespace with chart name as openebs.
 
 Replicated PV Mayastor can be excluded during the installation with the following command:
 
@@ -69,7 +69,7 @@ helm install openebs --namespace openebs openebs/openebs --set engines.replicate
 To view the chart and get the following output.
 
 ```bash
-helm ls -n openebs 
+helm ls -n openebs
 
 NAME    NAMESPACE       REVISION        UPDATED                                 STATUS          CHART           APP VERSION
 openebs openebs         1               2025-01-10 09:13:00.903321318 +0000 UTC deployed        openebs-4.2.0   4.2.0
@@ -92,32 +92,47 @@ helm delete `<RELEASE NAME>` -n `<RELEASE NAMESPACE>`
 
 | Repository | Name | Version |
 |------------|------|---------|
-|  | openebs-crds | 4.2.0 |
-| https://openebs.github.io/dynamic-localpv-provisioner | localpv-provisioner | 4.2.0 |
-| https://openebs.github.io/lvm-localpv | lvm-localpv | 1.6.2 |
-| https://openebs.github.io/mayastor-extensions | mayastor | 2.8.0 |
-| https://openebs.github.io/zfs-localpv | zfs-localpv | 2.7.1 |
+|  | openebs-crds | 4.3.0-develop |
+| https://grafana.github.io/helm-charts | alloy | 1.0.1 |
+| https://grafana.github.io/helm-charts | loki | 6.29.0 |
+| https://openebs.github.io/dynamic-localpv-provisioner | localpv-provisioner | 4.3.0-develop |
+| https://openebs.github.io/lvm-localpv | lvm-localpv | 1.7.0-develop |
+| https://openebs.github.io/mayastor-extensions | mayastor | 0.0.0 |
+| https://openebs.github.io/zfs-localpv | zfs-localpv | 2.8.0-develop |
 
 ## Values
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
+| alloy.enabled | bool | `true` |  |
+| alloy.logging_config.labels | object | `{"openebs.io/logging":true}` | Labels to enable scraping on, at-least one of these labels should be present. |
+| alloy.logging_config.tenant_id | string | `"openebs"` | X-Scope-OrgID to pe populated which pushing logs. Make sure the caller also uses the same. |
 | engines.local.lvm.enabled | bool | `true` |  |
 | engines.local.zfs.enabled | bool | `true` |  |
 | engines.replicated.mayastor.enabled | bool | `true` |  |
-| localpv-provisioner.rbac.create | bool | `true` |  |
-| lvm-localpv.crds.csi.volumeSnapshots.enabled | bool | `false` |  |
-| lvm-localpv.crds.lvmLocalPv.enabled | bool | `true` |  |
-| mayastor.crds.csi.volumeSnapshots.enabled | bool | `false` |  |
-| mayastor.csi.node.initContainers.enabled | bool | `true` |  |
-| mayastor.etcd.clusterDomain | string | `"cluster.local"` | Kubernetes Cluster Domain |
-| mayastor.localpv-provisioner.enabled | bool | `false` |  |
+| loki.localpvScConfig.enabled | bool | `true` |  |
+| loki.localpvScConfig.loki.basePath | string | `"/var/local/{{ .Release.Name }}/localpv-hostpath/loki"` | Host path where local loki data is stored in. |
+| loki.localpvScConfig.loki.name | string | `"openebs-loki-localpv"` |  |
+| loki.localpvScConfig.loki.reclaimPolicy | string | `"Delete"` | ReclaimPolicy of loki's localpv hostpath storage class. |
+| loki.localpvScConfig.loki.volumeBindingMode | string | `"WaitForFirstConsumer"` | VolumeBindingMode of loki's localpv hostpath storage class. |
+| loki.localpvScConfig.minio.basePath | string | `"/var/local/{{ .Release.Name }}/localpv-hostpath/minio"` | Host path where local minio data is stored in. |
+| loki.localpvScConfig.minio.name | string | `"openebs-minio-localpv"` |  |
+| loki.localpvScConfig.minio.reclaimPolicy | string | `"Delete"` | ReclaimPolicy of minio's localpv hostpath storage class. |
+| loki.localpvScConfig.minio.volumeBindingMode | string | `"WaitForFirstConsumer"` | VolumeBindingMode of minio's localpv hostpath storage class. |
+| loki.loki.commonConfig.replication_factor | int | `3` |  |
+| loki.minio.persistence.enabled | bool | `true` | Enable persistence for minio |
+| loki.minio.persistence.size | string | `"2Gi"` | Size of minio local storage volume |
+| loki.minio.persistence.storageClass | string | `"openebs-minio-localpv"` | Storage class for minio storage |
+| loki.minio.replicas | int | `3` |  |
+| loki.singleBinary.persistence.enabled | bool | `true` | Enable persistence for loki |
+| loki.singleBinary.persistence.size | string | `"2Gi"` | Size of loki local storage volume |
+| loki.singleBinary.persistence.storageClass | string | `"openebs-loki-localpv"` | Storage class for loki storage |
+| loki.singleBinary.replicas | int | `3` |  |
 | openebs-crds.csi.volumeSnapshots.enabled | bool | `true` |  |
 | openebs-crds.csi.volumeSnapshots.keep | bool | `true` |  |
-| preUpgradeHook | object | `{"image":{"pullPolicy":"IfNotPresent","registry":"docker.io","repo":"bitnami/kubectl","tag":"1.25.15"}}` | Configuration options for pre-upgrade helm hook job. |
+| preUpgradeHook | object | `{"image":{"pullPolicy":"IfNotPresent","registry":"docker.io","repo":"bitnami/kubectl","tag":"1.25.15"},"podLabels":{}}` | Configuration options for pre-upgrade helm hook job. |
 | preUpgradeHook.image.pullPolicy | string | `"IfNotPresent"` | The imagePullPolicy for the container |
 | preUpgradeHook.image.registry | string | `"docker.io"` | The container image registry URL for the hook job |
 | preUpgradeHook.image.repo | string | `"bitnami/kubectl"` | The container repository for the hook job |
 | preUpgradeHook.image.tag | string | `"1.25.15"` | The container image tag for the hook job |
-| zfs-localpv.crds.csi.volumeSnapshots.enabled | bool | `false` |  |
-| zfs-localpv.crds.zfsLocalPv.enabled | bool | `true` |  |
+| preUpgradeHook.podLabels | object | `{}` | Labels to be added to the pod hook job |
