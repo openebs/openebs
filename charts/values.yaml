@@ -40,8 +40,6 @@ mayastor:
     enabled: false
   crds:
     enabled: false
-  loki-stack: #### TODO: Remove this once mayastor vNext is released #####
-    enabled: false
   loki:
     enabled: false
   alloy:
@@ -100,6 +98,10 @@ loki:
       volumeBindingMode: WaitForFirstConsumer
 
   loki:
+    serviceLabels:
+      app: loki
+    podLabels:
+      app: loki
     schemaConfig:
       configs:
         - from: 2024-04-01

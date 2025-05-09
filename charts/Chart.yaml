@@ -43,8 +43,6 @@ dependencies:
 
 annotations:
   helm.sh/images: |
-    - name: bats
-      image: bats/bats:1.8.2
     - name: etcd
       image: docker.io/bitnami/etcd:3.5.6-debian-11-r10
     - name: kubectl
@@ -53,8 +51,6 @@ annotations:
       image: docker.io/grafana/alloy:v1.8.1
     - name: loki
       image: docker.io/grafana/loki:3.4.2
-    - name: promtail
-      image: docker.io/grafana/promtail:2.8.3
     - name: alpine-bash
       image: docker.io/openebs/alpine-bash:4.1.0
     - name: alpine-sh
@@ -81,8 +77,6 @@ annotations:
       image: docker.io/openebs/mayastor-obs-callhome:develop
     - name: mayastor-operator-diskpool
       image: docker.io/openebs/mayastor-operator-diskpool:develop
-    - name: loki
-      image: grafana/loki:2.6.1
     - name: k8s-sidecar
       image: kiwigrid/k8s-sidecar:1.30.2
     - name: nats
@@ -94,13 +88,11 @@ annotations:
     - name: prometheus-nats-exporter
       image: natsio/prometheus-nats-exporter:0.11.0
     - name: linux-utils
-      image: openebs/linux-utils:4.0.0
-    - name: linux-utils
       image: openebs/linux-utils:4.1.0
     - name: lvm-driver
       image: openebs/lvm-driver:1.7.0-develop
     - name: provisioner-localpv
-      image: openebs/provisioner-localpv:4.1.2
+      image: openebs/provisioner-localpv:4.2.0
     - name: provisioner-localpv
       image: openebs/provisioner-localpv:4.3.0-develop
     - name: zfs-driver
