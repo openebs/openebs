@@ -1,12 +1,13 @@
 extern crate core;
 
+use kubectl_plugin::resources;
+
+use clap::Parser;
+use std::{env, path::PathBuf};
+
 pub(crate) mod cli_utils;
 pub mod console_logger;
 pub mod constants;
-
-use clap::Parser;
-use kubectl_plugin::resources;
-use std::{env, path::PathBuf};
 
 #[derive(Parser, Debug)]
 #[clap(name = utils::package_description!(), version = utils::version_info_str!())]
@@ -43,7 +44,7 @@ impl CliArgs {
                 operations.cli_args.namespace = ns;
                 operations.cli_args.kubeconfig = path.clone();
                 if let resources::Operations::Dump(ref mut dump_args) = operations.ops {
-                    dump_args.args.kubeconfig = path
+                    dump_args.args.set_kube_config_path(path)
                 }
             }
             cli_utils::Operations::LocalpvLvm(ref mut operations) => {
@@ -61,6 +62,10 @@ impl CliArgs {
             cli_utils::Operations::Upgrade(ref mut upgrade_args) => {
                 upgrade_args.cli_args.namespace = ns;
                 upgrade_args.cli_args.kubeconfig = path;
+            }
+            cli_utils::Operations::Dump(ref mut dump_args) => {
+                dump_args.args.set_kube_config_path(path);
+                dump_args.args.set_namespace(ns);
             }
         }
         Ok(args)

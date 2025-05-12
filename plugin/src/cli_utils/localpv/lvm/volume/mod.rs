@@ -1,6 +1,5 @@
 use super::{CliArgs, Error, GetVolumeArg, GetVolumesArg};
 use plugin::resources::utils::{print_table, CreateRows, GetHeaderRow};
-pub(crate) mod types;
 use types::{LvmVolRecord, LvmVolume, LvmVolumeObject};
 
 use k8s_openapi::api::core::v1::PersistentVolume;
@@ -8,6 +7,8 @@ use kube::ResourceExt;
 use kube::{api::ListParams, Api, Client};
 use lazy_static::lazy_static;
 use prettytable::{row, Row};
+
+pub(crate) mod types;
 
 lazy_static! {
     pub(crate) static ref LVM_VOLUME_HEADER: Row =
@@ -21,7 +22,7 @@ pub(crate) async fn volumes(
     client: Client,
 ) -> Result<(), Error> {
     let volume_handle: Api<LvmVolume> = Api::namespaced(client.clone(), &cli_args.namespace);
-    let vol_list = lvm_volumes(volume_handle, volumes_arg)
+    let vol_list = lvm_volumes(volume_handle, Some(volumes_arg.clone()))
         .await
         .map_err(|err| Error::Kube { source: err })?;
     match get_lvm_vol_output(vol_list, &client).await {
@@ -62,18 +63,18 @@ async fn lvm_volume(
 }
 
 /// Lists lvm volume cr from the k8s cluster. Retuns volumes from specific node if node is specified.
-async fn lvm_volumes(
+pub(crate) async fn lvm_volumes(
     volume_handle: Api<LvmVolume>,
-    volumes_arg: &GetVolumesArg,
+    volumes_arg: Option<GetVolumesArg>,
 ) -> Result<Vec<LvmVolume>, kube::Error> {
     let max_entries = 500i32;
-    let mut lp: ListParams = if let Some(node_id) = &volumes_arg.node_id {
-        ListParams::default()
-            .labels(format!("kubernetes.io/nodename={}", node_id).as_str())
-            .limit(max_entries as u32)
-    } else {
-        ListParams::default().limit(max_entries as u32)
+    let mut lp: ListParams = ListParams::default().limit(max_entries as u32);
+    if let Some(args) = volumes_arg {
+        if let Some(node_id) = &args.node_id {
+            lp = lp.labels(format!("kubernetes.io/nodename={}", node_id).as_str())
+        }
     };
+
     let mut vol_list = Vec::new();
     loop {
         let list = volume_handle.list(&lp).await?;

@@ -1,11 +1,12 @@
 use super::{CliArgs, Error, GetZpoolsArg};
 use plugin::resources::utils::{print_table, CreateRows, GetHeaderRow};
-pub(crate) mod types;
 use types::{ZfsNode, ZfsPoolRecord};
 
 use kube::{api::ListParams, Api, Client};
 use lazy_static::lazy_static;
 use prettytable::{row, Row};
+
+pub(crate) mod types;
 
 lazy_static! {
     static ref ZPOOL_HEADER: Row = row!["NAME", "NODE", "UUID", "FREE", "USED",];
@@ -38,7 +39,7 @@ async fn zfs_node(node_handle: Api<ZfsNode>, node_id: &str) -> Result<ZfsNode, k
 }
 
 /// Lists all zfsnodes from the cluster.
-async fn zfs_nodes(node_handle: Api<ZfsNode>) -> Result<Vec<ZfsNode>, kube::Error> {
+pub(crate) async fn zfs_nodes(node_handle: Api<ZfsNode>) -> Result<Vec<ZfsNode>, kube::Error> {
     let max_entries = 500i32;
     let mut lp: ListParams = ListParams::default().limit(max_entries as u32);
     let mut node_list = Vec::new();

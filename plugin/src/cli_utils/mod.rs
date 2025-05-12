@@ -3,12 +3,14 @@ use localpv::hostpath;
 use localpv::lvm;
 use localpv::zfs;
 use plugin::{init_tracing_with_jaeger, ExecuteOperation};
+use supportability::DumpArgs;
 use upgrade::cli::Upgrade;
 
 use clap::Parser;
 
 pub mod localpv;
 pub(crate) mod mayastor;
+pub mod supportability;
 pub mod upgrade;
 
 /// Storage engines supported.
@@ -20,6 +22,7 @@ pub enum Operations {
     LocalpvZfs(zfs::Zfs),
     LocalpvHostpath(hostpath::Hostpath),
     Upgrade(Upgrade),
+    Dump(DumpArgs),
 }
 
 impl Operations {
@@ -40,6 +43,9 @@ impl Operations {
                 hostpath.ops.execute(&hostpath.cli_args).await?;
             }
             Operations::Upgrade(upgrade) => upgrade.execute().await?,
+            Operations::Dump(args) => {
+                args.execute().await?;
+            }
         }
         Ok(())
     }

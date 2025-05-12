@@ -23,6 +23,7 @@ openapi = { path = "../mayastor//dependencies/control-plane/openapi", default-fe
 kube-proxy = { path = "../mayastor/dependencies/control-plane/k8s/proxy" }
 utils = { path = "../mayastor/dependencies/control-plane/utils/utils-lib" }
 upgrade = { path = "../mayastor/k8s/upgrade" }
+supportability = { path = "../mayastor/k8s/supportability" }
 openebs-upgrade = { path = "../openebs-upgrade" }
 constants = { path = "../mayastor/constants" }
 byte-unit = "4.0.19"
@@ -43,3 +44,4 @@ base64 = "0.22.1"
 flate2 = "1.0.35"
 nu-ansi-term = "0.46.0"
 semver = "1.0.26"
+humantime = "2.1.0"

@@ -1,11 +1,13 @@
+use plugin::resources::utils::OutputFormat;
 use plugin::ExecuteOperation;
-pub(crate) mod node;
-pub(crate) mod volume;
 
 use clap::Parser;
-use plugin::resources::utils::OutputFormat;
 use snafu::Snafu;
 use std::path::PathBuf;
+
+pub(crate) mod node;
+pub(crate) mod supportability;
+pub(crate) mod volume;
 
 /// LocalPV zfs operations.
 #[derive(Parser, Debug)]

@@ -1,11 +1,12 @@
 use super::{CliArgs, Error, GetVolumeGroupsArg};
-pub(crate) mod types;
 use plugin::resources::utils::{print_table, CreateRows, GetHeaderRow};
 use types::{LvmNode, VolumeGroupRecord};
 
 use kube::{api::ListParams, Api, Client};
 use lazy_static::lazy_static;
 use prettytable::{row, Row};
+
+pub(crate) mod types;
 
 lazy_static! {
     static ref VOLUME_GROUP_HEADER: Row = row![
@@ -47,7 +48,7 @@ async fn lvm_node(node_handle: Api<LvmNode>, node_id: &str) -> Result<LvmNode, k
 }
 
 /// Lists all lvmnodes from the cluster.
-async fn lvm_nodes(node_handle: Api<LvmNode>) -> Result<Vec<LvmNode>, kube::Error> {
+pub(crate) async fn lvm_nodes(node_handle: Api<LvmNode>) -> Result<Vec<LvmNode>, kube::Error> {
     let max_entries = 500i32;
     let mut lp: ListParams = ListParams::default().limit(max_entries as u32);
     let mut node_list = Vec::new();

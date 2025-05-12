@@ -1,11 +1,13 @@
-use clap::Parser;
-use plugin::ExecuteOperation;
-pub(crate) mod node;
-pub(crate) mod volume;
 use plugin::resources::utils::OutputFormat;
+use plugin::ExecuteOperation;
 
+use clap::Parser;
 use snafu::Snafu;
 use std::path::PathBuf;
+
+pub(crate) mod node;
+pub(crate) mod supportability;
+pub(crate) mod volume;
 
 /// LocalPV lvm operations.
 #[derive(Parser, Debug)]
