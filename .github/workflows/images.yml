@@ -11,8 +11,8 @@ jobs:
   image-build-push:
     runs-on: ubuntu-latest
     permissions:
-        contents: read
-        id-token: write
+      contents: read
+      id-token: write
 
     steps:
       - uses: actions/checkout@v4
@@ -28,15 +28,25 @@ jobs:
 
       - uses: DeterminateSystems/nix-installer-action@v14
         with:
-            github-token: '' 
+          github-token: ''
+
+      - name: Inject github token to nix config
+        run: |
+          cat <<EOF | sudo tee -a /etc/nix/nix.conf
+          access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
+          trusted-users = root runner
+          EOF
+
+      - name: Restart Nix daemon
+        run: sudo systemctl restart nix-daemon
 
       - uses: DeterminateSystems/magic-nix-cache-action@v8
 
       - name: Pre-populate nix-shell
         run: |
-            export NIX_PATH=nixpkgs=$(jq '.nixpkgs.url' nix/sources.json -r)
-            echo "NIX_PATH=$NIX_PATH" >> $GITHUB_ENV
-            nix-shell --run "echo" shell.nix
+          export NIX_PATH=nixpkgs=$(jq '.nixpkgs.url' nix/sources.json -r)
+          echo "NIX_PATH=$NIX_PATH" >> $GITHUB_ENV
+          nix-shell --run "echo" shell.nix
 
       - name: Login to Docker Hub
         uses: docker/login-action@v3
@@ -46,5 +56,11 @@ jobs:
 
       - name: Build and push the release images
         run: |
-          TAG=$(nix-shell --run "cat charts/Chart.yaml | yq .appVersion")
+          if [[ "${{ github.ref_type }}" == "tag" ]]; then
+            # Remove 'refs/tags/' prefix to get the tag name
+            TAG="${GITHUB_REF#refs/tags/}"
+            TAG="${TAG#v}"
+          else
+            TAG=$(nix-shell --run "yq '.appVersion' charts/Chart.yaml")
+          fi
           nix-shell --run "./scripts/release.sh --image upgrade.job --tag v${TAG}"
