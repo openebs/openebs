@@ -44,9 +44,6 @@ mayastor:
     enabled: false
   alloy:
     enabled: false
-  obs:
-    callhome:
-      enabled: false
 
 # -- Configuration options for pre-upgrade helm hook job.
 preUpgradeHook:
