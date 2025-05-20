@@ -29,9 +29,9 @@ pub struct SupportArgs {
     #[clap(global = true, long, short = 'd', default_value = "./")]
     output_directory_path: String,
 
-    /// Kubernetes namespace of openebs service
-    #[clap(global = true, long, short = 'n', default_value = "openebs")]
-    namespace: String,
+    /// Namespace where openebs is installed.
+    #[arg(skip)]
+    pub namespace: String,
 
     /// Path to kubeconfig file.
     #[clap(skip)]

@@ -108,9 +108,15 @@ annotations:
     - name: csi-node-driver-registrar
       image: registry.k8s.io/sig-storage/csi-node-driver-registrar:v2.10.0
     - name: csi-node-driver-registrar
+      image: registry.k8s.io/sig-storage/csi-node-driver-registrar:v2.13.0
+    - name: csi-node-driver-registrar
       image: registry.k8s.io/sig-storage/csi-node-driver-registrar:v2.8.0
     - name: csi-provisioner
       image: registry.k8s.io/sig-storage/csi-provisioner:v3.5.0
+    - name: csi-provisioner
+      image: registry.k8s.io/sig-storage/csi-provisioner:v5.2.0
+    - name: csi-resizer
+      image: registry.k8s.io/sig-storage/csi-resizer:v1.11.2
     - name: csi-resizer
       image: registry.k8s.io/sig-storage/csi-resizer:v1.8.0
     - name: csi-resizer
@@ -119,7 +125,11 @@ annotations:
       image: registry.k8s.io/sig-storage/csi-snapshotter:v6.2.2
     - name: csi-snapshotter
       image: registry.k8s.io/sig-storage/csi-snapshotter:v6.3.3
+    - name: csi-snapshotter
+      image: registry.k8s.io/sig-storage/csi-snapshotter:v7.0.0
     - name: snapshot-controller
       image: registry.k8s.io/sig-storage/snapshot-controller:v6.2.2
     - name: snapshot-controller
       image: registry.k8s.io/sig-storage/snapshot-controller:v6.3.3
+    - name: snapshot-controller
+      image: registry.k8s.io/sig-storage/snapshot-controller:v7.0.0

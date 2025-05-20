@@ -24,14 +24,16 @@ async fn dump_typed_lvm_nodes(k8s_client: &ClientSet, root_dir: &Path) -> Result
         ))
     })?;
 
-    create_file_and_write(
-        root_dir.to_path_buf(),
-        "lvm_nodes.yaml".to_string(),
-        serde_yaml::to_string(&result).map_err(|e| {
-            Error::K8sResourceDumperError(K8sResourceDumperError::YamlSerializationError(e))
-        })?,
-    )
-    .map_err(K8sResourceDumperError::IOError)?;
+    if !result.is_empty() {
+        create_file_and_write(
+            root_dir.to_path_buf(),
+            "lvm_nodes.yaml".to_string(),
+            serde_yaml::to_string(&result).map_err(|e| {
+                Error::K8sResourceDumperError(K8sResourceDumperError::YamlSerializationError(e))
+            })?,
+        )
+        .map_err(K8sResourceDumperError::IOError)?;
+    }
 
     Ok(())
 }
@@ -46,14 +48,16 @@ async fn dump_typed_lvm_volumes(k8s_client: &ClientSet, root_dir: &Path) -> Resu
         ))
     })?;
 
-    create_file_and_write(
-        root_dir.to_path_buf(),
-        "lvm_volumes.yaml".to_string(),
-        serde_yaml::to_string(&result).map_err(|e| {
-            Error::K8sResourceDumperError(K8sResourceDumperError::YamlSerializationError(e))
-        })?,
-    )
-    .map_err(K8sResourceDumperError::IOError)?;
+    if !result.is_empty() {
+        create_file_and_write(
+            root_dir.to_path_buf(),
+            "lvm_volumes.yaml".to_string(),
+            serde_yaml::to_string(&result).map_err(|e| {
+                Error::K8sResourceDumperError(K8sResourceDumperError::YamlSerializationError(e))
+            })?,
+        )
+        .map_err(K8sResourceDumperError::IOError)?;
+    }
 
     Ok(())
 }
@@ -87,6 +91,7 @@ async fn dump_lvm_vscont_and_vs_class(
     Ok(())
 }
 
+/// Dump lvm localpv specific CRs, VolumeSnapshotContents and VolumeSnapshotClasses.
 pub async fn lvm_dump(k8s_client: &ClientSet, root_dir: &Path) -> Result<(), Error> {
     log("Collecting LVM LocalPV Specific Resources...".to_string());
     let mut errors = Vec::new();
