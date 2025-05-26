@@ -1,13 +1,13 @@
-use supportability::collect::error::Error;
-use supportability::collect::k8s_resources::client::ClientSet;
-use supportability::collect::k8s_resources::k8s_resource_dump::{
-    create_file_and_write, K8sResourceDumperError,
+use supportability::collect::{
+    error::Error,
+    k8s_resources::{
+        client::ClientSet,
+        k8s_resource_dump::{create_file_and_write, K8sResourceDumperError},
+    },
+    utils::log,
 };
-use supportability::collect::utils::log;
 
-use kube::api::ListParams;
-use kube::core::DynamicObject;
-use kube::Api;
+use kube::{api::ListParams, core::DynamicObject};
 use std::path::Path;
 
 pub async fn dump_dynamic_resource(
@@ -21,12 +21,22 @@ pub async fn dump_dynamic_resource(
     log(format!("\t Collecting {} resources", kind));
 
     let mut list_params = ListParams::default().limit(100);
-    let api: Api<DynamicObject> = k8s_client
+    let api = match k8s_client
         .dynamic_object_api(Some(k8s_client.namespace()), group, version, kind)
         .await
-        .map_err(|err| {
-            Error::K8sResourceDumperError(K8sResourceDumperError::K8sResourceError(err))
-        })?;
+    {
+        Ok(api_opt) => match api_opt {
+            Some(api) => api,
+            None => {
+                return Ok(());
+            }
+        },
+        Err(error) => {
+            return Err(Error::K8sResourceDumperError(
+                K8sResourceDumperError::K8sResourceError(error),
+            ));
+        }
+    };
 
     let mut all_items: Vec<DynamicObject> = Vec::new();
     loop {

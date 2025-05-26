@@ -18,11 +18,18 @@ async fn dump_typed_zfs_nodes(k8s_client: &ClientSet, root_dir: &Path) -> Result
     log("\t Collecting ZFS Node Resources".to_string());
 
     let api: Api<ZfsNode> = Api::namespaced(k8s_client.kube_client(), k8s_client.namespace());
-    let result = zfs_nodes(api).await.map_err(|error| {
-        Error::K8sResourceDumperError(K8sResourceDumperError::K8sResourceError(
-            K8sResourceError::ClientError(error),
-        ))
-    })?;
+
+    let result = match zfs_nodes(api).await {
+        Ok(val) => val,
+        Err(kube::Error::Api(ref e)) if e.code == 404 => {
+            return Ok(());
+        }
+        Err(err) => {
+            return Err(Error::K8sResourceDumperError(
+                K8sResourceDumperError::K8sResourceError(K8sResourceError::ClientError(err)),
+            ));
+        }
+    };
 
     if !result.is_empty() {
         create_file_and_write(
@@ -42,11 +49,18 @@ async fn dump_typed_zfs_volumes(k8s_client: &ClientSet, root_dir: &Path) -> Resu
     log("\t Collecting ZFS Volume Resources".to_string());
 
     let api: Api<ZfsVolume> = Api::namespaced(k8s_client.kube_client(), k8s_client.namespace());
-    let result = zfs_volumes(api, None).await.map_err(|error| {
-        Error::K8sResourceDumperError(K8sResourceDumperError::K8sResourceError(
-            K8sResourceError::ClientError(error),
-        ))
-    })?;
+
+    let result = match zfs_volumes(api, None).await {
+        Ok(val) => val,
+        Err(kube::Error::Api(ref e)) if e.code == 404 => {
+            return Ok(());
+        }
+        Err(err) => {
+            return Err(Error::K8sResourceDumperError(
+                K8sResourceDumperError::K8sResourceError(K8sResourceError::ClientError(err)),
+            ));
+        }
+    };
 
     if !result.is_empty() {
         create_file_and_write(
@@ -136,10 +150,10 @@ pub async fn zfs_dump(k8s_client: &ClientSet, root_dir: &Path) -> Result<(), Err
     }
 
     if !errors.is_empty() {
-        log("Failed to dump zfs resources".to_string());
+        log("Failed to dump ZFS resources".to_string());
         return Err(Error::MultipleErrors(errors));
     }
 
-    log("Completed collection of LVM LocalPV Specific Resources".to_string());
+    log("Completed collection of ZFS LocalPV Specific Resources".to_string());
     Ok(())
 }

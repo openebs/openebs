@@ -18,11 +18,18 @@ async fn dump_typed_lvm_nodes(k8s_client: &ClientSet, root_dir: &Path) -> Result
     log("\t Collecting LVM Node Resources...".to_string());
 
     let api: Api<LvmNode> = Api::namespaced(k8s_client.kube_client(), k8s_client.namespace());
-    let result = lvm_nodes(api).await.map_err(|error| {
-        Error::K8sResourceDumperError(K8sResourceDumperError::K8sResourceError(
-            K8sResourceError::ClientError(error),
-        ))
-    })?;
+
+    let result = match lvm_nodes(api).await {
+        Ok(val) => val,
+        Err(kube::Error::Api(ref e)) if e.code == 404 => {
+            return Ok(());
+        }
+        Err(err) => {
+            return Err(Error::K8sResourceDumperError(
+                K8sResourceDumperError::K8sResourceError(K8sResourceError::ClientError(err)),
+            ));
+        }
+    };
 
     if !result.is_empty() {
         create_file_and_write(
@@ -42,11 +49,18 @@ async fn dump_typed_lvm_volumes(k8s_client: &ClientSet, root_dir: &Path) -> Resu
     log("\t Collecting LVM Volume Resources".to_string());
 
     let api: Api<LvmVolume> = Api::namespaced(k8s_client.kube_client(), k8s_client.namespace());
-    let result = lvm_volumes(api, None).await.map_err(|error| {
-        Error::K8sResourceDumperError(K8sResourceDumperError::K8sResourceError(
-            K8sResourceError::ClientError(error),
-        ))
-    })?;
+
+    let result = match lvm_volumes(api, None).await {
+        Ok(val) => val,
+        Err(kube::Error::Api(ref e)) if e.code == 404 => {
+            return Ok(());
+        }
+        Err(err) => {
+            return Err(Error::K8sResourceDumperError(
+                K8sResourceDumperError::K8sResourceError(K8sResourceError::ClientError(err)),
+            ));
+        }
+    };
 
     if !result.is_empty() {
         create_file_and_write(
