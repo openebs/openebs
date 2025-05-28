@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: DeterminateSystems/nix-installer-action@v14
+      - uses: cachix/install-nix-action@v31.3.0
       - name: Pre-populate nix-shell
         run: |
           export NIX_PATH=nixpkgs=$(jq '.nixpkgs.url' nix/sources.json -r)
@@ -48,7 +48,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: 'recursive'
-      - uses: DeterminateSystems/nix-installer-action@v14
+      - uses: cachix/install-nix-action@v31.3.0
         if: needs.plugin-changed.outputs.rust_changed == 'true'
       - name: Test building the static binaries
         if: needs.plugin-changed.outputs.rust_changed == 'true'
@@ -62,7 +62,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: 'recursive'
-      - uses: DeterminateSystems/nix-installer-action@v14
+      - uses: cachix/install-nix-action@v31.3.0
         if: needs.plugin-changed.outputs.rust_changed == 'true'
       - name: Test building the static binaries
         if: needs.plugin-changed.outputs.rust_changed == 'true'

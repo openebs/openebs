@@ -29,9 +29,9 @@ jobs:
             git fetch -f origin ${{ github.ref }}:${{ github.ref }}
           fi
 
-      - uses: DeterminateSystems/nix-installer-action@v14
+      - uses: cachix/install-nix-action@v31.3.0
         with:
-          github-token: ''
+          github_access_token: ''
 
       - name: Inject github token to nix config
         run: |
@@ -43,7 +43,7 @@ jobs:
       - name: Restart Nix daemon
         run: sudo systemctl restart nix-daemon
 
-      - uses: DeterminateSystems/magic-nix-cache-action@v8
+      - uses: cachix/install-nix-action@v31.3.0
 
       - name: Pre-populate nix-shell
         run: |

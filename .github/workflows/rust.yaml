@@ -33,9 +33,7 @@ jobs:
               - Cargo.toml
               - Cargo.lock
               - 'mayastor/**'
-      - uses: DeterminateSystems/nix-installer-action@v14
-        if: steps.changes.outputs.rust == 'true'
-      - uses: DeterminateSystems/magic-nix-cache-action@v8
+      - uses: cachix/install-nix-action@v31.3.0
         if: steps.changes.outputs.rust == 'true'
       - name: Pre-populate nix-shell
         if: steps.changes.outputs.rust == 'true'

@@ -23,10 +23,9 @@ jobs:
           filters: |
             chart:
               - 'charts/**'
-      - uses: DeterminateSystems/nix-installer-action@v11
+      - uses: cachix/install-nix-action@v31.3.0
         with:
-          kvm: true
-      - uses: DeterminateSystems/magic-nix-cache-action@v6
+          enable_kvm: true
       - name: Setup Nix Path
         run: |
           export NIX_PATH=nixpkgs=$(jq '.nixpkgs.url' nix/sources.json -r)

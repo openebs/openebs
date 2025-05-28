@@ -23,7 +23,7 @@ jobs:
           filters: |
             nix:
               - '**.nix'
-      - uses: DeterminateSystems/nix-installer-action@v14
+      - uses: cachix/install-nix-action@v31.3.0
         if: steps.changes.outputs.nix == 'true'
       - name: Lint nix code
         if: steps.changes.outputs.nix == 'true'

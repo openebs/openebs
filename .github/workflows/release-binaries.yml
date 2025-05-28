@@ -56,10 +56,9 @@ jobs:
           if [ "${{ github.ref_type }}" == "tag" ]; then
             git fetch -f origin ${{ github.ref }}:${{ github.ref }}
           fi
-      - uses: DeterminateSystems/nix-installer-action@v11
+      - uses: cachix/install-nix-action@v31.3.0
         with:
-          kvm: false
-      - uses: DeterminateSystems/magic-nix-cache-action@v6
+          enable_kvm: false
       - run: |
           nix-build -A utils.release.${{ matrix.arch }}.${{ matrix.target }}.kubectl-openebs --arg incremental false
       - name: Archive executable

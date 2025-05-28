@@ -15,7 +15,7 @@ jobs:
           fetch-depth: 0
           submodules: recursive
 
-      - uses: cachix/install-nix-action@v22
+      - uses: cachix/install-nix-action@v31.3.0
       - name: Pre-populate nix-shell
         run: |
           export NIX_PATH=nixpkgs=$(jq '.nixpkgs.url' nix/sources.json -r)
