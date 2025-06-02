@@ -73,7 +73,7 @@ mayastor_branch() {
    fi
 }
 
-BRANCH=`git rev-parse --abbrev-ref HEAD`
+BRANCH=
 SET_BRANCH=
 CLEAR_BRANCH=
 UPDATE=
@@ -97,10 +97,6 @@ while [ "$#" -gt 0 ]; do
       ;;
   esac
 done
-
-if [ "$BRANCH" == "develop" ] || [ "${BRANCH#release/}" != "${BRANCH}" ]; then
-  SET_BRANCH="${BRANCH}"
-fi
 
 if [ -n "$UPDATE" ]; then
   submodule_update
