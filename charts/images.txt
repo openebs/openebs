@@ -20,12 +20,11 @@ nats:2.9.17-alpine
 natsio/nats-box:0.13.8
 natsio/nats-server-config-reloader:0.10.1
 natsio/prometheus-nats-exporter:0.11.0
-openebs/linux-utils:4.1.0
 openebs/linux-utils:4.2.0
-openebs/lvm-driver:1.7.0-develop
+openebs/lvm-driver:1.8.0-develop
 openebs/provisioner-localpv:4.3.0
-openebs/provisioner-localpv:4.3.0-develop
-openebs/zfs-driver:2.8.0-develop
+openebs/provisioner-localpv:4.4.0-develop
+openebs/zfs-driver:2.9.0-develop
 quay.io/minio/mc:RELEASE.2024-11-21T17-21-54Z
 quay.io/minio/minio:RELEASE.2024-12-18T13-15-44Z
 quay.io/prometheus-operator/prometheus-config-reloader:v0.81.0
