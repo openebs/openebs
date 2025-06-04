@@ -49,7 +49,7 @@ jobs:
 
   prepare-branch:
     needs: create-release-branch
-    runs-on: oracle-8cpu-32gb-x86-64
+    runs-on: oracle-vm-8cpu-32gb-x86-64
     outputs:
       pr_title: ${{ steps.set-title.outputs.title }}
     steps:
