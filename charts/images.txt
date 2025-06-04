@@ -32,10 +32,10 @@ natsio/nats-box:0.13.8
 natsio/nats-server-config-reloader:0.10.1
 natsio/prometheus-nats-exporter:0.11.0
 openebs/linux-utils:4.2.0
-openebs/lvm-driver:1.7.1-prerelease
+openebs/lvm-driver:1.7.0-prerelease
 openebs/provisioner-localpv:4.3.0
-openebs/provisioner-localpv:4.3.1-prerelease
-openebs/zfs-driver:2.8.1-prerelease
+openebs/provisioner-localpv:4.3.0-prerelease
+openebs/zfs-driver:2.8.0-prerelease
 quay.io/minio/mc:RELEASE.2024-11-21T17-21-54Z
 quay.io/minio/minio:RELEASE.2024-12-18T13-15-44Z
 quay.io/prometheus-operator/prometheus-config-reloader:v0.81.0
