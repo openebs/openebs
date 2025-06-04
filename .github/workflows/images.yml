@@ -63,6 +63,7 @@ jobs:
             # Remove 'refs/tags/' prefix to get the tag name
             TAG="${GITHUB_REF#refs/tags/}"
             TAG="${TAG#v}"
+            nix-shell --pure --run "./scripts/helm/update-version-upon-release.sh"
           else
             TAG=$(nix-shell --run "yq '.appVersion' charts/Chart.yaml")
           fi
