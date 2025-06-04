@@ -12,9 +12,9 @@ EOF
 }
 
 update_chart_yaml() {
-  yq_ibl '.version = sub("-prerelease$"; "") | .appVersion = sub("-prerelease$"; "")' "$CHART_YAML"
-  yq_ibl '(.dependencies[] | select(.name == \"openebs-crds\") | .version) = sub("-prerelease$"; "")' "$CHART_YAML"
-  yq_ibl '.version = sub("-prerelease$"; "")' "$CRD_CHART_YAML"
+  yq_ibl '.version |= sub("-prerelease$"; "") | .appVersion |= sub("-prerelease$"; "")' "$CHART_YAML"
+  yq_ibl '(.dependencies[] | select(.name == "openebs-crds") | .version) |= sub("-prerelease$"; "")' "$CHART_YAML"
+  yq_ibl '.version |= sub("-prerelease$"; "")' "$CRD_CHART_YAML"
   yq_ibl '(.dependencies[] | select(.name == "localpv-provisioner") | .version) |= sub("-prerelease$"; "")' "$CHART_YAML"
   yq_ibl '(.dependencies[] | select(.name == "zfs-localpv") | .version) |= sub("-prerelease$"; "")' "$CHART_YAML"
   yq_ibl '(.dependencies[] | select(.name == "lvm-localpv") | .version) |= sub("-prerelease$"; "")' "$CHART_YAML"

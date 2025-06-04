@@ -3,7 +3,7 @@ name: Publish chart upon release creation
 on:
   release:
     types:
-      - "created"
+      - "published"
 
 jobs:
   release-chart:
@@ -28,6 +28,8 @@ jobs:
 
       - name: Publish openebs umbrella helm chart
         uses: stefanprodan/helm-gh-pages@v1.7.0
+        env:
+          TMPDIR: /tmp
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           charts_dir: .
