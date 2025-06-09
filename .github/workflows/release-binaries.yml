@@ -60,7 +60,12 @@ jobs:
         with:
           enable_kvm: false
       - run: |
-          nix-build -A utils.release.${{ matrix.arch }}.${{ matrix.target }}.kubectl-openebs --arg incremental false
+         - run: |
+          if [ "${{ github.ref_type }}" == "tag" ]; then
+            nix-build -A utils.release.${{ matrix.arch }}.${{ matrix.target }}.kubectl-openebs --arg incremental false --tag "${GITHUB_REF##refs/tags/}"
+          else
+            nix-build -A utils.release.${{ matrix.arch }}.${{ matrix.target }}.kubectl-openebs --arg incremental false
+          fi
       - name: Archive executable
         run: |
           # NOTE: Update the .krew.yaml file (if required) when making changes here.
