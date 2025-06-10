@@ -15,21 +15,32 @@ When deploying **Loki as a single replica**, you can use a **filesystem volume**
 Below is an example to use a filesystem volume with single replica loki.
 
 ```yaml
-loki:
-  enabled: true
-
   loki:
-    commonConfig:
-      replication_factor: 1
+    enabled: true
 
-  singleBinary:
-    replicas: 1
-    drivesPerNode: 1
-    persistence:
-      enabled: true
+    loki:
+      schemaConfig:
+        configs:
+          - from: 2024-04-01
+            store: tsdb
+            object_store: filesystem
+            schema: v13
+            index:
+              prefix: loki_index_
+              period: 24h
+      commonConfig:
+        replication_factor: 1
+      storage:
+        type: filesystem
 
-  minio:
-    enabled: false
+    singleBinary:
+      replicas: 1
+      drivesPerNode: 1
+      persistence:
+        enabled: true
+
+    minio:
+      enabled: false
 ```
 
 ---
