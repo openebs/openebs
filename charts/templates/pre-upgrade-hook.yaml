@@ -92,7 +92,10 @@ spec:
         - "-c"
         args:
         - "(kubectl annotate --overwrite crd volumesnapshots.snapshot.storage.k8s.io volumesnapshotclasses.snapshot.storage.k8s.io volumesnapshotcontents.snapshot.storage.k8s.io helm.sh/resource-policy=keep || true) && (kubectl -n {{ .Release.Namespace }} delete deploy -l openebs.io/component-name=openebs-localpv-provisioner --ignore-not-found)"
-{{- if .Values.preUpgradeHook.tolerations }}
+        {{- if .Values.preUpgradeHook.tolerations }}
         tolerations:
-{{ toYaml .Values.preUpgradeHook.tolerations | indent 10 }}
-{{- end }}
+        {{ toYaml .Values.preUpgradeHook.tolerations | indent 10 }}
+        {{- end }}
+      {{- if .Values.preUpgradeHook.imagePullSecrets }}
+      imagePullSecrets: {{ toYaml .Values.preUpgradeHook.imagePullSecrets | nindent 8 }}
+      {{- end }}

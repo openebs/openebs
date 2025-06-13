@@ -47,6 +47,14 @@ mayastor:
 
 # -- Configuration options for pre-upgrade helm hook job.
 preUpgradeHook:
+  # -- Node tolerations for server scheduling to nodes with taints
+  ## Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
+  ##
+  tolerations: []
+  # -- Optional array of imagePullSecrets containing private registry credentials
+  ## Ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+  imagePullSecrets: []
+  # - name: secretName
   # -- Labels to be added to the pod hook job
   podLabels: {}
   image:
