@@ -1,7 +1,7 @@
 apiVersion: v2
-version: 4.3.0-rc.0-prerelease
+version: 4.3.0-prerelease
 name: openebs
-appVersion: 4.3.0-rc.0-prerelease
+appVersion: 4.3.0-prerelease
 description: Containerized Attached Storage for Kubernetes
 icon: https://raw.githubusercontent.com/cncf/artwork/HEAD/projects/openebs/icon/color/openebs-icon-color.png
 home: https://www.openebs.io/
@@ -16,7 +16,7 @@ sources:
   - https://github.com/openebs/openebs
 dependencies:
   - name: openebs-crds
-    version: 4.3.0-rc.0-prerelease
+    version: 4.3.0-prerelease
   - name: loki
     version: 6.29.0
     repository: https://grafana.github.io/helm-charts
@@ -37,7 +37,7 @@ dependencies:
     repository: "https://openebs.github.io/lvm-localpv"
     condition: engines.local.lvm.enabled
   - name: mayastor
-    version: 2.9.0-rc.0
+    version: 2.9.0
     repository: "https://openebs.github.io/mayastor-extensions"
     condition: engines.replicated.mayastor.enabled
 
@@ -56,49 +56,27 @@ annotations:
     - name: alpine-sh
       image: docker.io/openebs/alpine-sh:4.2.0
     - name: mayastor-agent-core
-      image: docker.io/openebs/mayastor-agent-core:release-2.9
-    - name: mayastor-agent-core
-      image: docker.io/openebs/mayastor-agent-core:v2.9.0-rc.0
+      image: docker.io/openebs/mayastor-agent-core:v2.9.0
     - name: mayastor-agent-ha-cluster
-      image: docker.io/openebs/mayastor-agent-ha-cluster:release-2.9
-    - name: mayastor-agent-ha-cluster
-      image: docker.io/openebs/mayastor-agent-ha-cluster:v2.9.0-rc.0
+      image: docker.io/openebs/mayastor-agent-ha-cluster:v2.9.0
     - name: mayastor-agent-ha-node
-      image: docker.io/openebs/mayastor-agent-ha-node:release-2.9
-    - name: mayastor-agent-ha-node
-      image: docker.io/openebs/mayastor-agent-ha-node:v2.9.0-rc.0
+      image: docker.io/openebs/mayastor-agent-ha-node:v2.9.0
     - name: mayastor-api-rest
-      image: docker.io/openebs/mayastor-api-rest:release-2.9
-    - name: mayastor-api-rest
-      image: docker.io/openebs/mayastor-api-rest:v2.9.0-rc.0
+      image: docker.io/openebs/mayastor-api-rest:v2.9.0
     - name: mayastor-csi-controller
-      image: docker.io/openebs/mayastor-csi-controller:release-2.9
-    - name: mayastor-csi-controller
-      image: docker.io/openebs/mayastor-csi-controller:v2.9.0-rc.0
+      image: docker.io/openebs/mayastor-csi-controller:v2.9.0
     - name: mayastor-csi-node
-      image: docker.io/openebs/mayastor-csi-node:release-2.9
-    - name: mayastor-csi-node
-      image: docker.io/openebs/mayastor-csi-node:v2.9.0-rc.0
+      image: docker.io/openebs/mayastor-csi-node:v2.9.0
     - name: mayastor-io-engine
-      image: docker.io/openebs/mayastor-io-engine:release-2.9
-    - name: mayastor-io-engine
-      image: docker.io/openebs/mayastor-io-engine:v2.9.0-rc.0
+      image: docker.io/openebs/mayastor-io-engine:v2.9.0
     - name: mayastor-metrics-exporter-io-engine
-      image: docker.io/openebs/mayastor-metrics-exporter-io-engine:release-2.9
-    - name: mayastor-metrics-exporter-io-engine
-      image: docker.io/openebs/mayastor-metrics-exporter-io-engine:v2.9.0-rc.0
+      image: docker.io/openebs/mayastor-metrics-exporter-io-engine:v2.9.0
     - name: mayastor-obs-callhome-stats
-      image: docker.io/openebs/mayastor-obs-callhome-stats:release-2.9
-    - name: mayastor-obs-callhome-stats
-      image: docker.io/openebs/mayastor-obs-callhome-stats:v2.9.0-rc.0
+      image: docker.io/openebs/mayastor-obs-callhome-stats:v2.9.0
     - name: mayastor-obs-callhome
-      image: docker.io/openebs/mayastor-obs-callhome:release-2.9
-    - name: mayastor-obs-callhome
-      image: docker.io/openebs/mayastor-obs-callhome:v2.9.0-rc.0
+      image: docker.io/openebs/mayastor-obs-callhome:v2.9.0
     - name: mayastor-operator-diskpool
-      image: docker.io/openebs/mayastor-operator-diskpool:release-2.9
-    - name: mayastor-operator-diskpool
-      image: docker.io/openebs/mayastor-operator-diskpool:v2.9.0-rc.0
+      image: docker.io/openebs/mayastor-operator-diskpool:v2.9.0
     - name: k8s-sidecar
       image: kiwigrid/k8s-sidecar:1.30.2
     - name: nats
