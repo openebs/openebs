@@ -60,9 +60,8 @@ jobs:
         with:
           enable_kvm: false
       - run: |
-         - run: |
           if [ "${{ github.ref_type }}" == "tag" ]; then
-            nix-build -A utils.release.${{ matrix.arch }}.${{ matrix.target }}.kubectl-openebs --arg incremental false --tag "${GITHUB_REF##refs/tags/}"
+            nix-build -A utils.release.${{ matrix.arch }}.${{ matrix.target }}.kubectl-openebs --arg incremental false --argstr tag "${{ github.ref_name }}"
           else
             nix-build -A utils.release.${{ matrix.arch }}.${{ matrix.target }}.kubectl-openebs --arg incremental false
           fi
