@@ -9,6 +9,7 @@ use serde::Deserialize;
 #[derive(Deserialize, Debug)]
 pub struct HelmRelease {
     chart: HelmChart,
+    config: Option<HelmConfigValues>,
 }
 
 #[derive(Deserialize, Debug)]
@@ -29,7 +30,6 @@ struct HelmValues {
 
 #[derive(Deserialize, Debug)]
 struct Engines {
-    // local: LocalEngines,
     replicated: ReplicatedEngines,
 }
 
@@ -41,6 +41,26 @@ struct ReplicatedEngines {
 #[derive(Deserialize, Debug)]
 struct EngineEnabled {
     enabled: bool,
+}
+
+#[derive(Deserialize, Debug)]
+struct HelmConfigValues {
+    engines: Option<HelmConfigValuesEngines>,
+}
+
+#[derive(Deserialize, Debug)]
+struct HelmConfigValuesEngines {
+    replicated: Option<HelmConfigValuesEnginesReplicated>,
+}
+
+#[derive(Deserialize, Debug)]
+struct HelmConfigValuesEnginesReplicated {
+    mayastor: Option<HelmConfigEngineEnabled>,
+}
+
+#[derive(Deserialize, Debug)]
+struct HelmConfigEngineEnabled {
+    enabled: Option<bool>,
 }
 
 impl HelmRelease {
@@ -64,7 +84,13 @@ impl HelmRelease {
 
     /// Returns if the Mayastor storage engine is enabled in the helm values.
     pub fn mayastor_is_enabled(&self) -> bool {
-        self.chart.values.engines.replicated.mayastor.enabled
+        self.config
+            .as_ref()
+            .and_then(|cfg| cfg.engines.as_ref())
+            .and_then(|eng| eng.replicated.as_ref())
+            .and_then(|rep| rep.mayastor.as_ref())
+            .and_then(|ms| ms.enabled)
+            .unwrap_or(self.chart.values.engines.replicated.mayastor.enabled)
     }
 
     /// Returns the chart version
