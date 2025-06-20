@@ -72,7 +72,7 @@ To view the chart and get the following output.
 helm ls -n openebs
 
 NAME    NAMESPACE       REVISION        UPDATED                                 STATUS          CHART           APP VERSION
-openebs openebs         1               2025-01-10 09:13:00.903321318 +0000 UTC deployed        openebs-4.2.0   4.2.0
+openebs openebs         1               2025-01-10 09:13:00.903321318 +0000 UTC deployed        openebs-4.3.1   4.3.1
 ```
 
 As a next step [verify the installation](https://openebs.io/docs/quickstart-guide/installation#verifying-openebs-installation) and do the [post installation](https://openebs.io/docs/quickstart-guide/installation#post-installation-considerations) steps.
@@ -92,13 +92,13 @@ helm delete `<RELEASE NAME>` -n `<RELEASE NAMESPACE>`
 
 | Repository | Name | Version |
 |------------|------|---------|
-|  | openebs-crds | 4.3.0-develop |
-| https://grafana.github.io/helm-charts | alloy | 1.0.1 |
-| https://grafana.github.io/helm-charts | loki | 6.29.0 |
-| https://openebs.github.io/dynamic-localpv-provisioner | localpv-provisioner | 4.3.0-develop |
-| https://openebs.github.io/lvm-localpv | lvm-localpv | 1.7.0-develop |
-| https://openebs.github.io/mayastor-extensions | mayastor | 0.0.0 |
-| https://openebs.github.io/zfs-localpv | zfs-localpv | 2.8.0-develop |
+|  | openebs-crds | 4.3.1   |
+| https://grafana.github.io/helm-charts | alloy | 1.0.1   |
+| https://grafana.github.io/helm-charts | loki | 6.29.0  |
+| https://openebs.github.io/dynamic-localpv-provisioner | localpv-provisioner | 4.3.0   |
+| https://openebs.github.io/lvm-localpv | lvm-localpv | 1.7.0   |
+| https://openebs.github.io/mayastor-extensions | mayastor | 0.0.0   |
+| https://openebs.github.io/zfs-localpv | zfs-localpv | 2.8.0   |
 
 ## Values
 
