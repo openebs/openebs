@@ -1,7 +1,7 @@
 apiVersion: v2
-version: 4.3.1
+version: 4.3.2
 name: openebs
-appVersion: 4.3.1
+appVersion: 4.3.2
 description: Containerized Attached Storage for Kubernetes
 icon: https://raw.githubusercontent.com/cncf/artwork/HEAD/projects/openebs/icon/color/openebs-icon-color.png
 home: https://www.openebs.io/
@@ -16,7 +16,7 @@ sources:
   - https://github.com/openebs/openebs
 dependencies:
   - name: openebs-crds
-    version: 4.3.1
+    version: 4.3.2
   - name: loki
     version: 6.29.0
     repository: https://grafana.github.io/helm-charts
