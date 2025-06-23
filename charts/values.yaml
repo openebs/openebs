@@ -222,16 +222,18 @@ alloy:
     configMap:
       create: true
       content: |
+        {{- $releaseName := .Release.Name | replace "-" "_" -}}
+
         livedebugging {
           enabled = {{ .Values.logging_config.debugging }}
         }
 
-        discovery.kubernetes "{{ .Release.Name }}_pods_name" {
+        discovery.kubernetes "{{ $releaseName }}_pods_name" {
           role = "pod"
         }
 
-        discovery.relabel "{{ .Release.Name }}_pods_name" {
-          targets = discovery.kubernetes.{{ .Release.Name }}_pods_name.targets
+        discovery.relabel "{{ $releaseName }}_pods_name" {
+          targets = discovery.kubernetes.{{ $releaseName }}_pods_name.targets
 
           {{- $labels := .Values.logging_config.labels }}
           {{- if $labels }}
@@ -289,16 +291,16 @@ alloy:
           }
         }
 
-        local.file_match "{{ .Release.Name }}_pod_files" {
-          path_targets = discovery.relabel.{{ .Release.Name }}_pods_name.output
+        local.file_match "{{ $releaseName }}_pod_files" {
+          path_targets = discovery.relabel.{{ $releaseName }}_pods_name.output
         }
 
-        loki.source.file "{{ .Release.Name }}_pod_logs" {
-          targets    = local.file_match.{{ .Release.Name }}_pod_files.targets
-          forward_to = [loki.process.{{ .Release.Name }}_process_logs.receiver]
+        loki.source.file "{{ $releaseName }}_pod_logs" {
+          targets    = local.file_match.{{ $releaseName }}_pod_files.targets
+          forward_to = [loki.process.{{ $releaseName }}_process_logs.receiver]
         }
 
-        loki.process "{{ .Release.Name }}_process_logs" {
+        loki.process "{{ $releaseName }}_process_logs" {
           forward_to = [loki.write.default.receiver]
 
           stage.docker { }
