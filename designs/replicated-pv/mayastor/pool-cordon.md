@@ -7,7 +7,7 @@ owners:
   - "@tiagolobocastro"
 editor: TBD
 creation-date: 28/02/2025
-last-updated: 19/06/2025
+last-updated: 07/07/2025
 status: implementable
 ---
 
@@ -43,18 +43,8 @@ and diskpool labels. The goal of this OEP is not to solve this issue, and theref
 
 Add a new resource (pool) to the existing cordon and uncordon kubectl-mayastor plugin subcommands:
 
-1. kubectl-mayastor cordon pool xxxx
-2. kubectl-mayastor uncordon pool xxxx
-
-These new commands should follow the same logic of the node resource.
-Similar to the node cordon, you may add multiple cordon labels if different "actors" need the pool to be cordoned. Only when the last label is removed,
-is the pool uncordoned.
-
-### Special Labels
-
-When cordoning we may give the pool additional cordon labels, which could extend the cordoning behaviour.
-For example, we may not want to attempt pool import should the io-engine restart. In this case a special label, i.e. `openebs.io/no-import` could
-be used to specify this behaviour.
+1. kubectl-mayastor cordon pool
+2. kubectl-mayastor uncordon pool
 
 ### User Stories
 
@@ -74,6 +64,14 @@ this by:
 4. Scale the volumes back down by -1 replica
 
 ### Implementation Details/Notes/Constraints
+
+A mayastor pool may host 3 different resources:
+
+1. Replicas
+2. Snapshots
+3. Clones
+
+By default we can constrain replicas and clones, but allow for snapshots.
 
 The proposal is to extend the pool services with the cordoning operations:
 
@@ -118,21 +116,30 @@ Add cordon handlers to the [PoolGrpc](https://github.com/openebs/mayastor-contro
 Example:
 
 ```protobuf
-// Existing Node Cordon labels aren't like K8s labels, they may allow for different
-// values for the same key, ie only the entire value is considered.
-message LabelValues {
-  repeated string values = 1;
-}
 message CordonPoolRequest {
   optional string node_id = 1;
   string pool_id = 2;
-  map<string, LabelValues> labels = 3;
+  bool replicas = 3;
+  bool snapshots = 4;
+  bool restores = 5;
+  bool imports = 6;
 }
 message CordonPoolReply {
   oneof reply {
     Pool pool = 1;
     common.ReplyError error = 2;
   }
+}
+
+message CordonedState {
+  // New replicas can't be created
+  bool replicas = 1;
+  // New snapshots can't be created
+  bool snapshots = 2;
+  // New restores can't be created
+  bool restores = 3;
+  // Pool is not to be imported
+  bool imports = 4;
 }
 
 service PoolGrpc {
@@ -144,7 +151,8 @@ service PoolGrpc {
 #### Public OpenAPI
 
 ```openapi
-  '/pools/{pool_id}/cordon/{key}={value}':
+paths:
+  '/pools/{pool_id}/cordon':
     put:
       tags:
         - Pools
@@ -155,20 +163,11 @@ service PoolGrpc {
           required: true
           schema:
             type: string
-        - in: path
-          name: key
-          required: true
-          schema:
-            type: string
-          x-actix-tail-match: true
-          description: The key of the label to be added.
-        - in: path
-          name: value
-          required: true
-          schema:
-            type: string
-          x-actix-tail-match: true
-          description: The value of the label to be added.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PoolCordonReq'
       responses:
         '200':
           description: OK
@@ -192,19 +191,11 @@ service PoolGrpc {
           required: true
           schema:
             type: string
-        - in: path
-          name: key
-          required: true
-          schema:
-            type: string
-          x-actix-tail-match: true
-          description: The key of the label to be removed.
-        - in: path
-          name: value
-          required: false
-          schema:
-            type: string
-          x-actix-tail-match: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PoolCordonReq'
       responses:
         '200':
           description: OK
@@ -218,6 +209,23 @@ service PoolGrpc {
           $ref: '#/components/responses/ServerError'
       security:
         - JWT: [ ]
+components:
+  schemas:
+    PoolCordonReq:
+      description: Cordon or uncordon the following resources
+      type: object
+      properties:
+        replicas:
+          type: boolean
+        snapshots:
+          type: boolean
+        restores:
+          type: boolean
+      required:
+        - replicas
+        - snapshots
+        - restores
+        - imports
 ```
 
 #### Kubectl Plugin
@@ -231,6 +239,88 @@ If there are multiple options available, what if the scheduler always picks the 
 
 Other than this scenario, there's probably nothing specific we need to test around this, other than
 ensuring the cordon and uncordon operations are in fact working and affect the scheduling.
+
+#### Behaviour specification
+
+```gherkin
+Feature: Pool Cordoning
+
+  Background:
+    Given multiple uncordoned nodes
+
+  Scenario: Cordoning a pool
+    Given an uncordoned pool
+    When we issue a cordon command
+    Then the command will succeed
+    And new resources cannot be scheduled on the cordoned pool
+
+  Scenario Outline: Cordoning a pool with resources
+    Given an uncordoned pool with test resources
+    When we issue a cordon command with resource <resource>
+    Then the command will succeed
+    And new <resource> resources cannot be scheduled on the cordoned pool
+    But other resources can
+    Examples:
+      | resource  |
+      | replicas  |
+      | snapshots |
+      | restores  |
+
+  Scenario: Cordoning a cordoned pool
+    Given a cordoned pool
+    When we issue a cordon command with additional constraints
+    Then the command will succeed
+    And the pool should remain cordoned
+    And new resources cannot be scheduled on the cordoned pool
+
+  Scenario: Uncordoning a pool
+    Given a cordoned pool
+    When we issue an uncordon command with the cordoned resources
+    Then the command will succeed
+    And new resources can be scheduled on the cordoned pool
+
+  Scenario: Deleting resources on a cordoned pool
+    Given a cordoned pool with resources
+    When we attempt to delete resources on the cordoned pool
+    Then the resources should be deleted
+
+  Scenario: Restarting a cordoned pool
+    Given a cordoned pool with resources
+    When the cordoned pool is restarted
+    Then the pool should be imported successfully
+    And all pool resources should be Online
+
+  Scenario: No replica rebuild due to pool cordon
+    Given a published volume with multiple replicas
+    And a cordoned pool, otherwise schedulable for the volume
+    When the volume becomes degraded
+    And there are insufficient uncordoned pools to accommodate new replicas
+    Then the volume will remain in a degraded state
+    When the pool is uncordoned
+    Then the volume shall eventually rebuild become healthy
+
+  Scenario: No replica count increase due to pool cordon
+    Given a published volume with multiple replicas
+    And a cordoned pool, otherwise schedulable for the volume
+    When we attempt to increase the replica count
+    And there are insufficient uncordoned pools to accommodate new replicas
+    Then the request should fail with insufficient storage
+    When the pool is uncordoned
+    And we attempt to increase the replica count
+    Then a new set-replica request should succeed
+
+  Scenario: Pool should be cordoned if there is at least one cordon applied
+    Given a cordoned pool with multiple cordon resources
+    When we issue an uncordon command without all resources
+    Then the command will succeed
+    And the pool should remain cordoned
+
+  Scenario: Pool should be uncordoned when all cordons have been removed
+    Given a cordoned pool with multiple cordon resources
+    When we issue an uncordon command with all resources
+    Then the command will succeed
+    And the pool should be uncordoned
+```
 
 ### Risks and Mitigations
 
