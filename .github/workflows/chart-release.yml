@@ -1,33 +1,39 @@
 name: Release Charts
 on:
   push:
-    paths:
-      - 'charts/**'
     branches:
       - develop
+      - "release/**"
+  workflow_call:
 
 jobs:
   release:
     runs-on: ubuntu-latest
+    outputs:
+      skip: ${{ steps.check_version.outputs.skip }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          submodules: recursive
 
-      - name: Configure Git
+      - name: Block publish if version is a develop pre-release
+        id: check_version
         run: |
-          git config user.name "$GITHUB_ACTOR"
-          git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
+          VERSION=$(yq '.version' charts/Chart.yaml)
+          BRANCH="${GITHUB_REF#refs/heads/}"
+          if [[ "$BRANCH" == release/* && "$VERSION" == *-develop* ]]; then
+            echo "Chart version is a develop prerelease: $VERSION"
+            echo "Skipping Publish"
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
 
-      - name: Set up Helm
-        uses: azure/setup-helm@v4
+      - name: Publish openebs develop or prerelease umbrella helm chart
+        if: steps.check_version.outputs.skip != 'true'
+        uses: stefanprodan/helm-gh-pages@v1.7.0
         with:
-          version: v3.14.3
-
-      - name: Run chart-releaser
-        uses: helm/chart-releaser-action@v1.6.0
-        env:
-          CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
-        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
           charts_dir: .

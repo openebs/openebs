@@ -256,7 +256,7 @@ case "$COMMAND" in
     sed -i 's/  helm.sh\/images:/  helm.sh\/images: |/' "$CHART"
 
     if [ "$EXIT_CODE" = "true" ]; then
-      git diff --exit-code "$IMAGES"
+      git diff --exit-code "$CHART"
     fi
 
     echo "Finished patching $CHART"

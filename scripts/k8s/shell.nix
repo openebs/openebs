@@ -12,14 +12,13 @@ pkgs.mkShell {
     kubectl
     kind
     jq
-    nvme-cli
-  ] ++ pkgs.lib.optional (inPureNixShell) [
+  ] ++ pkgs.lib.optional (inPureNixShell && pkgs.system != "aarch64-darwin") [
     kmod
     procps
     docker
     util-linux
     sudo
-  ];
+  ] ++ pkgs.lib.optional (pkgs.system != "aarch64-darwin") nvme-cli;
 
   SUDO = "sudo";
   shellHook = ''

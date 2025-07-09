@@ -6,33 +6,26 @@ on:
       - 'release/**'
   pull_request:
     types: [ 'opened', 'edited', 'reopened', 'synchronize' ]
+  workflow_call:
 
 env:
   CI: 1
 
 jobs:
   helm-images:
-    runs-on: ubuntu-latest-8-cores
+    runs-on: oracle-vm-8cpu-32gb-x86-64
     steps:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
-      - uses: dorny/paths-filter@v3
-        id: changes
+      - uses: cachix/install-nix-action@v31.3.0
         with:
-          filters: |
-            chart:
-              - 'charts/**'
-      - uses: DeterminateSystems/nix-installer-action@v11
-        with:
-          kvm: true
-      - uses: DeterminateSystems/magic-nix-cache-action@v6
+          enable_kvm: true
       - name: Setup Nix Path
         run: |
           export NIX_PATH=nixpkgs=$(jq '.nixpkgs.url' nix/sources.json -r)
           echo "NIX_PATH=$NIX_PATH" >> $GITHUB_ENV
       - name: Pre-populate K8s nix-shell
-        if: steps.changes.outputs.chart == 'true'
         run: nix-shell ./scripts/k8s/shell.nix --run "echo"
       - name: Pre-populate helm nix-shell
         run: nix-shell ./scripts/helm/shell.nix --run "echo"
@@ -41,14 +34,11 @@ jobs:
       - name: Patch chart/Chart.yaml
         run: nix-shell ./scripts/helm/shell.nix --run "./scripts/helm/images.sh patch --exit-code"
       - name: BootStrap k8s cluster
-        if: steps.changes.outputs.chart == 'true'
         run: |
           sudo debconf-communicate <<< "set man-db/auto-update false" || true
           sudo dpkg-reconfigure man-db || true
           nix-shell ./scripts/k8s/shell.nix --run "./scripts/k8s/deployer.sh start --mayastor --zfs --lvm --label"
       - name: Install helm chart
-        if: steps.changes.outputs.chart == 'true'
         run: nix-shell ./scripts/helm/shell.nix --run "./scripts/helm/install.sh --mayastor --zfs --lvm --wait"
       - name: Verify image list
-        if: steps.changes.outputs.chart == 'true'
         run: nix-shell ./scripts/helm/shell.nix --run "./scripts/helm/images.sh verify"

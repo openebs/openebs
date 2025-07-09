@@ -1,0 +1,57 @@
+name: Submodule/Chart Update
+on:
+  workflow_dispatch:
+
+jobs:
+  submodule:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    outputs:
+      pull-request-number: ${{ steps.cpr.outputs.pull-request-number }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: recursive
+      - uses: cachix/install-nix-action@v31.3.0
+      - name: Pre-populate nix-shell
+        run: |
+          export NIX_PATH=nixpkgs=$(jq '.nixpkgs.url' nix/sources.json -r)
+          echo "NIX_PATH=$NIX_PATH" >> $GITHUB_ENV
+      - name: Update submodules
+        run: |
+          ./scripts/git/set-submodule-branches.sh -u
+      - id: set-target
+        run: |
+          version=$(nix-shell -p yq-go --run "yq '.appVersion' charts/Chart.yaml")
+          echo "branch=${version}_mod_update" >> $GITHUB_OUTPUT
+      - name: Create Pull Request
+        id: cpr
+        uses: peter-evans/create-pull-request@v7
+        with:
+          commit-message: "chore(ci): update git submodules"
+          committer: GitHub <noreply@github.com>
+          title: "[CI] Update git submodules"
+          draft: false
+          signoff: true
+          delete-branch: true
+          branch: ${{ steps.set-target.outputs.branch }}
+          token: ${{ secrets.ORG_CI_GITHUB }}
+      - name: Approve Pull Request by CI Bot
+        if: ${{ steps.cpr.outputs.pull-request-number }}
+        run: |
+          gh pr review ${{ steps.cpr.outputs.pull-request-number }} --approve
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+  chart-images:
+    needs: submodule
+    if: ${{ needs.submodule.outputs.pull-request-number == '' }}
+    uses: ./.github/workflows/chart-images.yml
+
+  release-chart:
+    needs: chart-images
+    secrets: inherit
+    uses: ./.github/workflows/chart-release.yml

@@ -36,6 +36,19 @@ let
         pname = "kubectl-openebs";
       };
     };
+    upgrade = rec {
+      recurseForDerivations = true;
+      upgrade_builder = { buildType, builder, cargoBuildFlags ? [ "-p openebs-upgrade" ] }: builder.build { inherit buildType cargoBuildFlags; };
+      upgrade_installer = { pname, src }: installer { inherit pname src; };
+      job = upgrade_installer {
+        src =
+          if allInOne then
+            upgrade_builder { inherit buildType builder; }
+          else
+            upgrade_builder { inherit buildType builder; cargoBuildFlags = [ "--bin upgrade-job" ]; };
+        pname = "upgrade-job";
+      };
+    };
   };
 in
 {

@@ -57,6 +57,7 @@ let
     "Cargo.lock"
     "Cargo.toml"
     "plugin"
+    "openebs-upgrade"
     "mayastor/dependencies/control-plane/openapi/Cargo.toml"
     "mayastor/dependencies/control-plane/openapi/build.rs"
     "mayastor/dependencies/control-plane/openapi/src/lib.rs"
@@ -78,7 +79,7 @@ let
     "mayastor/dependencies/control-plane/utils/utils-lib"
     "mayastor/dependencies/control-plane/utils/hyper-body"
     "mayastor/dependencies/control-plane/utils/shutdown"
-    "mayastor/dependencies/control-plane/utils/platform"
+    "mayastor/dependencies/control-plane/utils/dependencies/platform"
     "mayastor/dependencies/control-plane/utils/pstor"
     "mayastor/dependencies/control-plane/rpc"
     "mayastor/dependencies/control-plane/k8s/forward"
@@ -119,8 +120,8 @@ let
       preBuild = ''
         # don't run during the dependency build phase
         if [ ! -f build.rs ]; then
-          patchShebangs .mayastor/dependencies/control-plane/scripts/rust/
-          .mayastor/dependencies/control-plane/scripts/rust/generate-openapi-bindings.sh --skip-git-diff
+          patchShebangs ./mayastor/dependencies/control-plane/scripts/rust/
+          ./mayastor/dependencies/control-plane/scripts/rust/generate-openapi-bindings.sh --skip-git-diff
         fi
       '';
       doCheck = false;
@@ -130,7 +131,7 @@ let
     rustPlatform.buildRustPackage (buildProps // {
       inherit buildType cargoBuildFlags;
       preBuild = ''
-        patchShebangs .mayastor/dependencies/control-plane/scripts/rust/
+        patchShebangs ./mayastor/dependencies/control-plane/scripts/rust/
       '' + pkgs.lib.optionalString (static) ''
         # the rust builder from nixpkgks does not parse target and just uses the host target...
         export NIX_CC_WRAPPER_TARGET_HOST_${builtins.replaceStrings [ "-" ] [ "_" ] hostTarget}=
@@ -156,7 +157,7 @@ in
 
   build = { buildType, cargoBuildFlags ? [ ] }:
     if buildAllInOne then
-      builder { inherit buildType; cargoBuildFlags = [ "-p kubectl-openebs" ]; }
+      builder { inherit buildType; cargoBuildFlags = [ "-p kubectl-openebs" "-p openebs-upgrade" ]; }
     else
       builder { inherit buildType cargoBuildFlags; };
 }

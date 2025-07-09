@@ -1,6 +1,5 @@
 use super::{CliArgs, Error, GetVolumeArg, GetVolumesArg};
 use plugin::resources::utils::{print_table, CreateRows, GetHeaderRow};
-pub(crate) mod types;
 use types::{ZfsVolRecord, ZfsVolume, ZfsVolumeObject};
 
 use k8s_openapi::api::core::v1::PersistentVolume;
@@ -8,6 +7,8 @@ use kube::ResourceExt;
 use kube::{api::ListParams, Api, Client};
 use lazy_static::lazy_static;
 use prettytable::{row, Row};
+
+pub(crate) mod types;
 
 lazy_static! {
     pub(crate) static ref ZFS_VOLUME_HEADER: Row =
@@ -21,7 +22,7 @@ pub(crate) async fn volumes(
     client: Client,
 ) -> Result<(), Error> {
     let volume_handle: Api<ZfsVolume> = Api::namespaced(client.clone(), &cli_args.namespace);
-    let vols = zfs_volumes(volume_handle, volumes_arg)
+    let vols = zfs_volumes(volume_handle, Some(volumes_arg.clone()))
         .await
         .map_err(|err| Error::Kube { source: err })?;
     match get_zfs_vol_record(vols, &client).await {
@@ -62,18 +63,18 @@ async fn zfs_volume(
 }
 
 /// Lists zfsvolume cr. Filters based on node if specified.
-async fn zfs_volumes(
+pub(crate) async fn zfs_volumes(
     volume_handle: Api<ZfsVolume>,
-    volumes_arg: &GetVolumesArg,
+    volumes_arg: Option<GetVolumesArg>,
 ) -> Result<Vec<ZfsVolume>, kube::Error> {
     let max_entries = 500i32;
-    let mut lp: ListParams = if let Some(node_id) = &volumes_arg.node_id {
-        ListParams::default()
-            .labels(format!("kubernetes.io/nodename={}", node_id).as_str())
-            .limit(max_entries as u32)
-    } else {
-        ListParams::default().limit(max_entries as u32)
+    let mut lp: ListParams = ListParams::default().limit(max_entries as u32);
+    if let Some(args) = volumes_arg {
+        if let Some(node_id) = &args.node_id {
+            lp = lp.labels(format!("kubernetes.io/nodename={}", node_id).as_str())
+        }
     };
+
     let mut vol_list = Vec::new();
     loop {
         let list = volume_handle.list(&lp).await?;

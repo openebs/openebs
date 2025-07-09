@@ -1,6 +1,8 @@
 ---
 name: OpenEBS Enhancement Proposal [ OEP ]
 about: Create the tracking parent issue for an OEP
+title: "[OEP XXXX]: "
+labels: ["kind/oep"]
 
 ---
 
@@ -12,7 +14,7 @@ about: Create the tracking parent issue for an OEP
 - Primary contact (assignee):
 - Responsible OWNERs:
 - Targeted milestone:
-  - OpenEBS vx.y:
+  - OpenEBS vx.y
 - [ ] Targets
   - [ ] OEP update PR(s):
   - [ ] Code update PR(s):

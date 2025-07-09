@@ -1,0 +1,70 @@
+name: Image Push
+on:
+  push:
+    branches:
+      - develop
+      - 'release/**'
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+**'
+
+env:
+  CI: 1
+
+jobs:
+  image-build-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: 'recursive'
+          fetch-depth: 0
+      - run: |
+          # BUG: HEAD tag is fetched as lightweight instead of annotated
+          # https://github.com/actions/checkout/issues/290
+          if [ "${{ github.ref_type }}" == "tag" ]; then
+            git fetch -f origin ${{ github.ref }}:${{ github.ref }}
+          fi
+
+      - uses: cachix/install-nix-action@v31.3.0
+        with:
+          github_access_token: ''
+
+      - name: Inject github token to nix config
+        run: |
+          cat <<EOF | sudo tee -a /etc/nix/nix.conf
+          access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
+          trusted-users = root runner
+          EOF
+
+      - name: Restart Nix daemon
+        run: sudo systemctl restart nix-daemon
+
+      - uses: cachix/install-nix-action@v31.3.0
+
+      - name: Pre-populate nix-shell
+        run: |
+          export NIX_PATH=nixpkgs=$(jq '.nixpkgs.url' nix/sources.json -r)
+          echo "NIX_PATH=$NIX_PATH" >> $GITHUB_ENV
+          nix-shell --run "echo" shell.nix
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push the release images
+        run: |
+          if [[ "${{ github.ref_type }}" == "tag" ]]; then
+            # Remove 'refs/tags/' prefix to get the tag name
+            TAG="${GITHUB_REF#refs/tags/}"
+            TAG="${TAG#v}"
+            nix-shell --pure --run "./scripts/helm/update-version-upon-release.sh"
+          else
+            TAG=$(nix-shell --run "yq '.appVersion' charts/Chart.yaml")
+          fi
+          nix-shell --run "./scripts/release.sh --tag v${TAG}"

@@ -18,6 +18,7 @@ INS_MAYASTOR=
 INS_LVM=
 INS_ZFS=
 INS_HOSTPATH="true"
+INS_LOKI="true"
 HELM="helm"
 KUBECTL="kubectl"
 TEMPLATE=
@@ -41,6 +42,7 @@ Options:
   --lvm                                 Install the local pv lvm.
   --zfs                                 Install the local pv zfs.
   --hostpath                            Install the local pv hostpath (always enabled!).
+  --no-loki                             Don't deploy Loki.
   --helm            <stringArray>       Pass Helm Args directly to the install/upgrade commands.
 
 Examples:
@@ -143,6 +145,34 @@ zfs_args() {
 hostpath_args() {
   echo -n "$(openebs_set_args "$(hostpath_analytics_disable)")"
 }
+loki_args() {
+  local replicas=1
+  local minio="true"
+  local mode="standalone"
+  if [ "$replicas" != 1 ]; then
+    mode="distributed"
+  fi
+
+  if [ "$replicas" = "0" ] || [ "$INS_LOKI" = "false" ]; then
+    echo -n "$(openebs_set_args "loki.enabled=false,alloy.enabled=false")"
+    return 0
+  fi
+
+  echo -n "$(openebs_set_args "loki.loki.commonConfig.replication_factor=$replicas")" \
+          "$(openebs_set_args "loki.singleBinary.replicas=$replicas")" \
+          "$(openebs_set_args "loki.minio.mode=$mode") "
+
+  if [ "$minio" = "true" ]; then
+    echo -n "$(openebs_set_args "loki.minio.enabled=true,loki.minio.replicas=$replicas")"
+  else
+    echo -n "$(openebs_set_args "loki.loki.storage.type=filesystem")" \
+            "$(openebs_set_args "loki.singleBinary.persistence.enabled=true")" \
+            "$(openebs_set_args "loki.minio.enabled=false")"
+  fi
+}
+nats_args() {
+  echo -n "$(openebs_set_args "mayastor.nats.cluster.enabled=false,mayastor.nats.cluster.replicas=1")"
+}
 
 helm_installed() {
   if ! helm ls &>/dev/null; then
@@ -169,7 +199,9 @@ helm_install() {
         $(mayastor_args) \
         $(lvm_args) \
         $(zfs_args) \
-        $(hostpath_args)" \
+        $(hostpath_args) \
+        $(nats_args) \
+        $(loki_args)" \
         | xargs)
   if [ -z "$DRY_RUN" ] && [ "$action" != "template" ]; then
     set -x
@@ -230,6 +262,9 @@ while [ "$#" -gt 0 ]; do
       shift;;
     --hostpath)
       INS_HOSTPATH="true"
+      shift;;
+    --no-loki)
+      INS_LOKI="false"
       shift;;
     --template)
       TEMPLATE="true"

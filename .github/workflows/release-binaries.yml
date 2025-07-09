@@ -18,10 +18,10 @@ jobs:
       matrix:
         include:
           # NOTE: Update the .krew.yaml file (if required) when making changes here.
-          - os: ubuntu-latest-8-cores
+          - os: oracle-vm-8cpu-32gb-x86-64
             target: linux-musl
             arch: x86_64
-          - os: ubuntu-latest-8-cores
+          - os: oracle-vm-8cpu-32gb-x86-64
             target: linux-musl
             arch: aarch64
           - os: macos-14
@@ -30,7 +30,7 @@ jobs:
           - os: macos-13
             target: apple-darwin
             arch: x86_64
-          - os: ubuntu-latest-8-cores
+          - os: oracle-vm-8cpu-32gb-x86-64
             target: windows-gnu
             arch: x86_64
             suffix: .exe
@@ -56,12 +56,15 @@ jobs:
           if [ "${{ github.ref_type }}" == "tag" ]; then
             git fetch -f origin ${{ github.ref }}:${{ github.ref }}
           fi
-      - uses: DeterminateSystems/nix-installer-action@v11
+      - uses: cachix/install-nix-action@v31.3.0
         with:
-          kvm: false
-      - uses: DeterminateSystems/magic-nix-cache-action@v6
+          enable_kvm: false
       - run: |
-          nix-build -A utils.release.${{ matrix.arch }}.${{ matrix.target }}.kubectl-openebs --arg incremental false
+          if [ "${{ github.ref_type }}" == "tag" ]; then
+            nix-build -A utils.release.${{ matrix.arch }}.${{ matrix.target }}.kubectl-openebs --arg incremental false --argstr tag "${{ github.ref_name }}"
+          else
+            nix-build -A utils.release.${{ matrix.arch }}.${{ matrix.target }}.kubectl-openebs --arg incremental false
+          fi
       - name: Archive executable
         run: |
           # NOTE: Update the .krew.yaml file (if required) when making changes here.

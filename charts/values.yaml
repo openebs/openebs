@@ -40,9 +40,21 @@ mayastor:
     enabled: false
   crds:
     enabled: false
+  loki:
+    enabled: false
+  alloy:
+    enabled: false
 
 # -- Configuration options for pre-upgrade helm hook job.
 preUpgradeHook:
+  # -- Node tolerations for server scheduling to nodes with taints
+  ## Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
+  ##
+  tolerations: []
+  # -- Optional array of imagePullSecrets containing private registry credentials
+  ## Ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+  imagePullSecrets: []
+  # - name: secretName
   # -- Labels to be added to the pod hook job
   podLabels: {}
   image:
@@ -64,3 +76,272 @@ engines:
   replicated:
     mayastor:
       enabled: true
+
+loki:
+  enabled: true
+  # NOTE: For all possible storage options for loki, check https://github.com/openebs/openebs/blob/HEAD/charts/loki-storage.md
+  # Configuration for loki's localpv hostpath storage class.
+  localpvScConfig:
+    enabled: true
+    loki:
+      # Name of loki's localpv hostpath storage class.
+      name: "openebs-loki-localpv"
+      # -- Host path where local loki data is stored in.
+      basePath: "/var/local/{{ .Release.Name }}/localpv-hostpath/loki"
+      # -- ReclaimPolicy of loki's localpv hostpath storage class.
+      reclaimPolicy: Delete
+      # -- VolumeBindingMode of loki's localpv hostpath storage class.
+      volumeBindingMode: WaitForFirstConsumer
+    minio:
+      # Name of minio's localpv hostpath storage class.
+      name: "openebs-minio-localpv"
+      # -- Host path where local minio data is stored in.
+      basePath: "/var/local/{{ .Release.Name }}/localpv-hostpath/minio"
+      # -- ReclaimPolicy of minio's localpv hostpath storage class.
+      reclaimPolicy: Delete
+      # -- VolumeBindingMode of minio's localpv hostpath storage class.
+      volumeBindingMode: WaitForFirstConsumer
+
+  loki:
+    serviceLabels:
+      app: loki
+    podLabels:
+      app: loki
+    schemaConfig:
+      configs:
+        - from: 2024-04-01
+          store: tsdb
+          object_store: s3
+          schema: v13
+          index:
+            prefix: loki_index_
+            period: 24h
+    commonConfig:
+      replication_factor: 3
+
+    ingester:
+      chunk_encoding: snappy
+      # Configure these if a quicker ingestion is needed, i.e. faster push to your bucket.
+      # chunk_idle_period: 3m
+      # chunk_retain_period: 1m
+      # max_chunk_age: 6m
+    tracing:
+      enabled: true
+    querier:
+      max_concurrent: 1
+    limits_config:
+      ingestion_burst_size_mb: 1000
+      ingestion_rate_mb: 10000
+      max_label_names_per_series: 20
+
+  singleBinary:
+    replicas: 3
+    drivesPerNode: 1
+    persistence:
+      # -- Enabled persistence for loki
+      enabled: true
+      # -- Storage class for loki storage
+      storageClass: "openebs-loki-localpv"
+      accessModes:
+        - ReadWriteOnce
+      # -- Size of loki local storage volume
+      size: 2Gi
+
+  minio:
+    replicas: 3
+    drivesPerNode: 1
+    mode: distributed
+    # Disable this if you want to enabled external s3 bucket, and uncomment the storage section above.
+    enabled: true
+    persistence:
+      # -- Enabled persistence for minio
+      enabled: true
+      # -- Storage class for minio storage
+      storageClass: "openebs-minio-localpv"
+      # -- Size of minio local storage volume
+      size: 2Gi
+
+  deploymentMode: SingleBinary
+
+  lokiCanary:
+    enabled: false
+
+  chunksCache:
+    enabled: false
+
+  test:
+    enabled: false
+
+  gateway:
+    enabled: false
+
+  resultsCache:
+    enabled: false
+
+  backend:
+    replicas: 0
+  read:
+    replicas: 0
+  write:
+    replicas: 0
+
+  ingester:
+    replicas: 0
+  querier:
+    replicas: 0
+  queryFrontend:
+    replicas: 0
+  queryScheduler:
+    replicas: 0
+  distributor:
+    replicas: 0
+  compactor:
+    replicas: 0
+  indexGateway:
+    replicas: 0
+  bloomCompactor:
+    replicas: 0
+  bloomGateway:
+    replicas: 0
+
+alloy:
+  enabled: true
+
+  logging_config:
+    # Enable debugging on alloy components.
+    debugging: false
+    # -- Labels to enable scraping on, at-least one of these labels should be present.
+    labels:
+      openebs.io/logging: true
+    # -- X-Scope-OrgID to pe populated which pushing logs. Make sure the caller also uses the same.
+    tenant_id: openebs
+
+  alloy:
+    mounts:
+      varlog: true
+    configMap:
+      create: true
+      content: |
+        {{- $releaseName := .Release.Name | replace "-" "_" -}}
+
+        livedebugging {
+          enabled = {{ .Values.logging_config.debugging }}
+        }
+
+        discovery.kubernetes "{{ $releaseName }}_pods_name" {
+          role = "pod"
+        }
+
+        discovery.relabel "{{ $releaseName }}_pods_name" {
+          targets = discovery.kubernetes.{{ $releaseName }}_pods_name.targets
+
+          {{- $labels := .Values.logging_config.labels }}
+          {{- if $labels }}
+          {{- $keys := (keys $labels | sortAlpha) }}
+
+          rule {
+            source_labels = [
+              {{- range $key := $keys }}
+              "__meta_kubernetes_pod_label_{{ $key | replace "." "_" | replace "/" "_" }}",
+              {{- end }}
+            ]
+            separator     = ";"
+            regex         = "^{{ include "regex_or" (dict "labels" $labels "keys" $keys) }}$"
+            action        = "keep"
+          }
+
+          {{- end }}
+
+          rule {
+            regex  = "__meta_kubernetes_pod_label_(.+)"
+            action = "labelmap"
+          }
+
+          rule {
+            regex  = "__meta_kubernetes_pod_label_(.+)"
+            action = "labelmap"
+          }
+
+          rule {
+            source_labels = ["__meta_kubernetes_namespace"]
+            separator     = "/"
+            target_label  = "job"
+          }
+
+          rule {
+            source_labels = ["__meta_kubernetes_pod_name"]
+            target_label  = "pod"
+          }
+
+          rule {
+            source_labels = ["__meta_kubernetes_pod_container_name"]
+            target_label  = "container"
+          }
+
+          rule {
+            source_labels = ["__meta_kubernetes_pod_node_name"]
+            target_label  = "hostname"
+          }
+
+          rule {
+            source_labels = ["__meta_kubernetes_pod_uid", "__meta_kubernetes_pod_container_name"]
+            separator     = "/"
+            target_label  = "__path__"
+            replacement   = "/var/log/pods/*$1/*.log"
+          }
+        }
+
+        local.file_match "{{ $releaseName }}_pod_files" {
+          path_targets = discovery.relabel.{{ $releaseName }}_pods_name.output
+        }
+
+        loki.source.file "{{ $releaseName }}_pod_logs" {
+          targets    = local.file_match.{{ $releaseName }}_pod_files.targets
+          forward_to = [loki.process.{{ $releaseName }}_process_logs.receiver]
+        }
+
+        loki.process "{{ $releaseName }}_process_logs" {
+          forward_to = [loki.write.default.receiver]
+
+          stage.docker { }
+
+          stage.replace {
+            expression = "(\\n)"
+            replace = ""
+          }
+
+          stage.multiline {
+            firstline = "^  \\x1b\\[2m(\\d{4})-(\\d{2})-(\\d{2})T(\\d{2}):(\\d{2}):(\\d{2}).(\\d{6})Z"
+          }
+
+          stage.multiline {
+            firstline = "^  (\\d{4})-(\\d{2})-(\\d{2})T(\\d{2}):(\\d{2}):(\\d{2}).(\\d{6})Z"
+          }
+        }
+
+        loki.write "default" {
+            endpoint {
+            url       = "http://{{ .Release.Name }}-loki:3100/loki/api/v1/push"
+            tenant_id = "{{ .Values.logging_config.tenant_id }}"
+          }
+          external_labels = {}
+        }
+
+        {{- define "regex_or" -}}
+        {{- $labels := .labels -}}
+        {{- $keys := .keys -}}
+        {{- $numKeys := len $keys -}}
+        {{- $regexParts := list -}}
+        {{- range $i, $key := $keys -}}
+        {{- $part := list -}}
+        {{- range $j := until $numKeys -}}
+        {{- if eq $j $i -}}
+        {{- $part = append $part (get $labels $key) -}}
+        {{- else -}}
+        {{- $part = append $part ".*" -}}
+        {{- end -}}
+        {{- end -}}
+        {{- $regexParts = append $regexParts (join ";" $part) -}}
+        {{- end -}}
+        {{- join "|" $regexParts -}}
+        {{- end -}}

@@ -13,6 +13,7 @@ let
 in
 self: super: {
   sourcer = super.callPackage ./lib/sourcer.nix { };
+  images = super.callPackage ./pkgs/images { inherit img_tag img_org; };
   openebs = super.callPackage ./pkgs/openebs { inherit allInOne incremental static tag rustFlags; };
   paperclip = super.callPackage ./../mayastor/dependencies/control-plane/nix/pkgs/paperclip { };
   utils = super.callPackage ./pkgs/utils { inherit incremental; };

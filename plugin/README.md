@@ -532,7 +532,7 @@ kubectl openebs mayastor dump system -d <output_directory> -n <mayastor_namespac
 4. Get Volume Groups by Node-id
 
 ```
-❯  kubectl-openebs localpv-lvm get volume-groups node-2-309787  -n puls8
+❯  kubectl-openebs localpv-lvm get volume-groups node-2-309787  -n openebs
  NAME  NODE           UUID                                    TOTAL-SIZE  FREE-SIZE  LV-COUNT  PV-COUNT  SNAP-COUNT
  data  node-2-309787  NbWcos-TcId-B0QN-bqPs-PgGi-XNeu-VactuK  30716Mi     26620Mi    2         1         0
  ```

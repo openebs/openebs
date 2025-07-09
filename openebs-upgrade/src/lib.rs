@@ -1,0 +1,37 @@
+use crate::{
+    error::{FailedUpgrade, Result},
+    helm::upgrade::upgrade,
+};
+use upgrade::events::event_recorder::EventRecorder;
+
+use snafu::ResultExt;
+
+pub use crate::helm::{
+    data_plane_upgrader::DataPlaneUpgrader,
+    upgrade::config::{HelmCommandConfig, HelmUpgradeConfig},
+};
+
+pub mod constants;
+pub mod error;
+pub mod helm;
+pub mod kube;
+pub mod utils;
+
+/// Validate OpenEBS deployment and upgrade it.
+pub async fn validate_and_upgrade(
+    helm_upgrade_config: HelmUpgradeConfig,
+    data_plane_upgrader: Option<DataPlaneUpgrader>,
+    ev: Option<&mut EventRecorder>,
+) -> Result<()> {
+    upgrade(
+        Box::new(
+            helm_upgrade_config
+                .validate_and_build_helm_upgrader()
+                .await?,
+        ),
+        data_plane_upgrader,
+        ev,
+    )
+    .await
+    .context(FailedUpgrade)
+}

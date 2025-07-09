@@ -17,5 +17,5 @@ in
   inherit whitelistSource;
 
   git-src = whitelistSource ../../. [ ".git" ];
-  repo-org = whitelistSource ../../dependencies/control-plane/utils/dependencies/scripts [ "git-org-name.sh" ];
+  repo-org = whitelistSource ../../mayastor/dependencies/control-plane/utils/dependencies/scripts [ "git-org-name.sh" ];
 }

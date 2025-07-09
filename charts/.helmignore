@@ -24,3 +24,4 @@ OWNERS
 # Nix Shell
 *.nix
 images.txt
+loki-storage.md

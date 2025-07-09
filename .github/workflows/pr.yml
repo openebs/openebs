@@ -1,4 +1,4 @@
-name: Pull Request
+name: Pull Request CI
 on:
   pull_request:
     branches:
@@ -13,10 +13,57 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: DeterminateSystems/nix-installer-action@v14
+      - uses: cachix/install-nix-action@v31.3.0
       - name: Pre-populate nix-shell
         run: |
           export NIX_PATH=nixpkgs=$(jq '.nixpkgs.url' nix/sources.json -r)
           echo "NIX_PATH=$NIX_PATH" >> $GITHUB_ENV
       - name: Run spell check
         run: nix-shell -p codespell --run "git ls-files '*.md' | xargs codespell --ignore-words '.codespell-ignores.txt'"
+  plugin-changed:
+    runs-on: ubuntu-latest
+    outputs:
+      rust_changed: ${{ steps.changes.outputs.rust }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: dorny/paths-filter@v3
+        id: changes
+        with:
+          filters: |
+            rust:
+              - 'plugin/**'
+              - 'nix/**'
+              - shell.nix
+              - default.nix
+              - Cargo.toml
+              - Cargo.lock
+              - 'mayastor/**'
+  plugin-build-utils:
+    needs: plugin-changed
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: 'recursive'
+      - uses: cachix/install-nix-action@v31.3.0
+        if: needs.plugin-changed.outputs.rust_changed == 'true'
+      - name: Test building the static binaries
+        if: needs.plugin-changed.outputs.rust_changed == 'true'
+        # todo: modify downstream release.sh to build plugin via utils
+        #  perhaps it's time to rename utils or convert all to the utils build
+        run: nix-build -A utils.debug.x86_64.linux-musl.kubectl-openebs --arg incremental false
+  plugin-build-script:
+    needs: plugin-changed
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: 'recursive'
+      - uses: cachix/install-nix-action@v31.3.0
+        if: needs.plugin-changed.outputs.rust_changed == 'true'
+      - name: Test building the static binaries
+        if: needs.plugin-changed.outputs.rust_changed == 'true'
+        run: ./scripts/release.sh --skip-images --build-bins --debug

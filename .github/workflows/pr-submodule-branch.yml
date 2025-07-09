@@ -1,0 +1,34 @@
+name: Submodule Branch Check
+on:
+  pull_request:
+    types: ['opened', 'edited', 'reopened', 'synchronize']
+  push:
+    branches:
+      - develop
+      - 'release/**'
+
+jobs:
+  submodule-branch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: recursive
+
+      - uses: cachix/install-nix-action@v31.3.0
+      - name: Pre-populate nix-shell
+        run: |
+          export NIX_PATH=nixpkgs=$(jq '.nixpkgs.url' nix/sources.json -r)
+          echo "NIX_PATH=$NIX_PATH" >> $GITHUB_ENV
+          nix-shell --pure --run "echo" ./charts/shell.nix
+
+      - name: Set root submodules branch
+        run: |
+          nix-shell --pure --run "./scripts/git/set-submodule-branches.sh" ./charts/shell.nix
+          cat .gitmodules
+          git diff --exit-code ".gitmodules"
+
+      - name: Check submodules HEAD points to branch
+        run: |
+          ./scripts/git/check-submodule-branches.sh
