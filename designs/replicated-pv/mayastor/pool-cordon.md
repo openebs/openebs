@@ -7,11 +7,8 @@ owners:
   - "@tiagolobocastro"
 editor: TBD
 creation-date: 28/02/2025
-<<<<<<< HEAD
 last-updated: 19/06/2025
-=======
 last-updated: 07/07/2025
->>>>>>> d7024141 (fix(docs): updated community meeting link to LFX and CNCF calendar)
 status: implementable
 ---
 
@@ -47,7 +44,6 @@ and diskpool labels. The goal of this OEP is not to solve this issue, and theref
 
 Add a new resource (pool) to the existing cordon and uncordon kubectl-mayastor plugin subcommands:
 
-<<<<<<< HEAD
 1. kubectl-mayastor cordon pool xxxx
 2. kubectl-mayastor uncordon pool xxxx
 
@@ -60,10 +56,9 @@ is the pool uncordoned.
 When cordoning we may give the pool additional cordon labels, which could extend the cordoning behaviour.
 For example, we may not want to attempt pool import should the io-engine restart. In this case a special label, i.e. `openebs.io/no-import` could
 be used to specify this behaviour.
-=======
+
 1. kubectl-mayastor cordon pool
 2. kubectl-mayastor uncordon pool
->>>>>>> d7024141 (fix(docs): updated community meeting link to LFX and CNCF calendar)
 
 ### User Stories
 
@@ -84,8 +79,6 @@ this by:
 
 ### Implementation Details/Notes/Constraints
 
-<<<<<<< HEAD
-=======
 A mayastor pool may host 3 different resources:
 
 1. Replicas
@@ -94,7 +87,6 @@ A mayastor pool may host 3 different resources:
 
 By default we can constrain replicas and clones, but allow for snapshots.
 
->>>>>>> d7024141 (fix(docs): updated community meeting link to LFX and CNCF calendar)
 The proposal is to extend the pool services with the cordoning operations:
 
 1. Cordon a pool
@@ -138,7 +130,6 @@ Add cordon handlers to the [PoolGrpc](https://github.com/openebs/mayastor-contro
 Example:
 
 ```protobuf
-<<<<<<< HEAD
 // Existing Node Cordon labels aren't like K8s labels, they may allow for different
 // values for the same key, ie only the entire value is considered.
 message LabelValues {
@@ -148,7 +139,6 @@ message CordonPoolRequest {
   optional string node_id = 1;
   string pool_id = 2;
   map<string, LabelValues> labels = 3;
-=======
 message CordonPoolRequest {
   optional string node_id = 1;
   string pool_id = 2;
@@ -156,7 +146,6 @@ message CordonPoolRequest {
   bool snapshots = 4;
   bool restores = 5;
   bool imports = 6;
->>>>>>> d7024141 (fix(docs): updated community meeting link to LFX and CNCF calendar)
 }
 message CordonPoolReply {
   oneof reply {
@@ -164,9 +153,6 @@ message CordonPoolReply {
     common.ReplyError error = 2;
   }
 }
-
-<<<<<<< HEAD
-=======
 message CordonedState {
   // New replicas can't be created
   bool replicas = 1;
@@ -178,7 +164,6 @@ message CordonedState {
   bool imports = 4;
 }
 
->>>>>>> d7024141 (fix(docs): updated community meeting link to LFX and CNCF calendar)
 service PoolGrpc {
     rpc CordonPool (CordonPoolRequest) returns (CordonPoolReply) {}
     rpc UncordonPool (CordonPoolRequest) returns (CordonPoolReply) {}
@@ -188,12 +173,9 @@ service PoolGrpc {
 #### Public OpenAPI
 
 ```openapi
-<<<<<<< HEAD
   '/pools/{pool_id}/cordon/{key}={value}':
-=======
 paths:
   '/pools/{pool_id}/cordon':
->>>>>>> d7024141 (fix(docs): updated community meeting link to LFX and CNCF calendar)
     put:
       tags:
         - Pools
@@ -204,7 +186,6 @@ paths:
           required: true
           schema:
             type: string
-<<<<<<< HEAD
         - in: path
           name: key
           required: true
@@ -219,13 +200,11 @@ paths:
             type: string
           x-actix-tail-match: true
           description: The value of the label to be added.
-=======
       requestBody:
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/PoolCordonReq'
->>>>>>> d7024141 (fix(docs): updated community meeting link to LFX and CNCF calendar)
       responses:
         '200':
           description: OK
@@ -249,7 +228,6 @@ paths:
           required: true
           schema:
             type: string
-<<<<<<< HEAD
         - in: path
           name: key
           required: true
@@ -263,13 +241,11 @@ paths:
           schema:
             type: string
           x-actix-tail-match: true
-=======
       requestBody:
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/PoolCordonReq'
->>>>>>> d7024141 (fix(docs): updated community meeting link to LFX and CNCF calendar)
       responses:
         '200':
           description: OK
@@ -283,8 +259,8 @@ paths:
           $ref: '#/components/responses/ServerError'
       security:
         - JWT: [ ]
-<<<<<<< HEAD
-=======
+
+
 components:
   schemas:
     PoolCordonReq:
@@ -302,7 +278,6 @@ components:
         - snapshots
         - restores
         - imports
->>>>>>> d7024141 (fix(docs): updated community meeting link to LFX and CNCF calendar)
 ```
 
 #### Kubectl Plugin
@@ -317,8 +292,6 @@ If there are multiple options available, what if the scheduler always picks the 
 Other than this scenario, there's probably nothing specific we need to test around this, other than
 ensuring the cordon and uncordon operations are in fact working and affect the scheduling.
 
-<<<<<<< HEAD
-=======
 #### Behaviour specification
 
 ```gherkin
@@ -401,7 +374,6 @@ Feature: Pool Cordoning
     And the pool should be uncordoned
 ```
 
->>>>>>> d7024141 (fix(docs): updated community meeting link to LFX and CNCF calendar)
 ### Risks and Mitigations
 
 TODO

@@ -63,7 +63,7 @@ These features make OpenEBS a robust and flexible solution for managing persiste
 
 - Homepage: [openebs.io](https://openebs.io/)
 - Maintainers' email: openebs-team@googlegroups.com
-- Slack:
+- - Slack:
   - [#openebs](https://kubernetes.slack.com/messages/openebs)
   - [#openebs-dev](https://kubernetes.slack.com/messages/openebs-dev)
 - Twitter: [@openebs](https://twitter.com/intent/follow?screen_name=openebs)
@@ -74,7 +74,7 @@ These features make OpenEBS a robust and flexible solution for managing persiste
 
 #### 📅 OpenEBS Community Meetings
 
-- Held **monthly on the last Thursday** of every month  
+- Held **monthly on the last Thursday** of every month.  
 - 🕒 Time: **14:00 – 14:45 UTC**
 - 📍 [Join Zoom Meeting](https://us05web.zoom.us/j/87535654586?pwd=CigbXigJPn38USc6Vuzt7qSVFoO79X.1)
 - 📆 Add to Calendar:  
