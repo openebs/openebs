@@ -61,15 +61,26 @@ These features make OpenEBS a robust and flexible solution for managing persiste
 
 ### Community
 
-- Homepage: [openebs.io](https://openebs.io/)
-- Maintainers' email: openebs-team@googlegroups.com
-- Slack:
+Join the OpenEBS community to contribute, collaborate, and learn!
+
+- 🌐 Homepage: [openebs.io](https://openebs.io/)
+- 📧 Maintainers' email: openebs-team@googlegroups.com
+- 💬 Slack Channels:
   - [#openebs](https://kubernetes.slack.com/messages/openebs)
   - [#openebs-dev](https://kubernetes.slack.com/messages/openebs-dev)
-- Twitter: [@openebs](https://twitter.com/intent/follow?screen_name=openebs)
-- Community Meeting: OpenEBS holds a monthly [community meeting](https://zoom-lfx.platform.linuxfoundation.org/meeting/99475226462?password=f57455ef-fed1-49b1-a38b-110dab2b42cc) via Zoom on the last Thursday of the month, at 14:00 UTC.
-  - [Add to calendar](https://zoom-lfx.platform.linuxfoundation.org/meetings/openebs?view=list)
-- Community Meeting Recordings: [Youtube](https://www.youtube.com/@openebscommunity6021)
+- 🐦 Twitter: [@openebs](https://twitter.com/intent/follow?screen_name=openebs)
+
+#### 📅 Monthly Community Meetings
+
+The OpenEBS community meets monthly to share updates, help newcomers, and plan the roadmap.
+
+- 🕒 **When:** Last Thursday of every month @ 14:00 UTC  
+- 📹 **Zoom:** [Join Meeting](https://us05web.zoom.us/j/87535654586?pwd=CigbXigJPn38USc6Vuzt7qSVFoO79X.1)  
+- 📅 **CNCF Calendar:** [View Upcoming Meeting](https://www.cncf.io/cncf-calendar/) → Search “OpenEBS”  
+- 📥 **.ics Calendar Support:** [Download .ics File](https://niladrih.github.io/openebs-community/community_meeting.ics)  
+- ▶️ **Past Meetings Playlist:** [YouTube Channel](https://www.youtube.com/@openebscommunity6021)
+
+> 🔔 **Note:** Zoom link and calendar info may be updated on the CNCF calendar near each month's end. Always refer there for latest info.
 
 ## Star History
 
