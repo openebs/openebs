@@ -27,6 +27,13 @@ lvm-localpv:
       volumeSnapshots:
         enabled: false
 
+# Refer to https://github.com/openebs/rawfile-localpv/blob/v0.11.0/deploy/helm/rawfile-localpv/values.yaml for complete set of values.
+rawfile-localpv:
+  crds:
+    csi:
+      volumeSnapshots:
+        enabled: false
+
 # Refer to https://github.com/openebs/mayastor-extensions/blob/v2.8.0/chart/values.yaml for complete set of values.
 mayastor:
   csi:
@@ -73,6 +80,9 @@ engines:
       enabled: true
     zfs:
       enabled: true
+    rawfile:
+      # Disabled by default since rawfile is not marked as stable yet.
+      enabled: false
   replicated:
     mayastor:
       enabled: true

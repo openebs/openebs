@@ -39,6 +39,6 @@ jobs:
           sudo dpkg-reconfigure man-db || true
           nix-shell ./scripts/k8s/shell.nix --run "./scripts/k8s/deployer.sh start --mayastor --zfs --lvm --label"
       - name: Install helm chart
-        run: nix-shell ./scripts/helm/shell.nix --run "./scripts/helm/install.sh --mayastor --zfs --lvm --wait"
+        run: nix-shell ./scripts/helm/shell.nix --run "./scripts/helm/install.sh --mayastor --zfs --lvm --rawfile --wait"
       - name: Verify image list
         run: nix-shell ./scripts/helm/shell.nix --run "./scripts/helm/images.sh verify"

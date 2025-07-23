@@ -16,6 +16,7 @@ HELM_UPGRADE=
 HELM_ARGS=
 INS_MAYASTOR=
 INS_LVM=
+INS_RAWFILE=
 INS_ZFS=
 INS_HOSTPATH="true"
 INS_LOKI="true"
@@ -64,7 +65,7 @@ ins_replicated() {
   [ "$INS_MAYASTOR" = "true" ]
 }
 ins_locals() {
-  [ "$INS_LVM" = "true" ] || [ "$INS_ZFS" = "true" ] || [ "$INS_HOSTPATH" = "true" ]
+  [ "$INS_LVM" = "true" ] || [ "$INS_ZFS" = "true" ] || [ "$INS_HOSTPATH" = "true" ] || [ "$INS_RAWFILE" = "true" ]
 }
 
 prefix_args() {
@@ -90,6 +91,9 @@ make_zfs_args() {
 make_lvm_args() {
   prefix_args "lvm-localpv" "$@"
 }
+make_rawfile_args() {
+  prefix_args "rawfile-localpv" "$@"
+}
 make_hostpath_args() {
   prefix_args "localpv-provisioner" "$@"
 }
@@ -108,6 +112,9 @@ mayastor_analytics_disable() {
 }
 lvm_analytics_disable() {
   make_lvm_args "analytics.enabled=false"
+}
+rawfile_analytics_disable() {
+  make_rawfile_args "global.analytics.enabled=false"
 }
 zfs_analytics_disable() {
   make_zfs_args "analytics.enabled=false"
@@ -133,6 +140,14 @@ lvm_args() {
   fi
   echo -n "$(openebs_set_args "engines.local.lvm.enabled=true")" \
           "$(openebs_set_args "$(lvm_analytics_disable)")"
+}
+rawfile_args() {
+  if ! [ "$INS_RAWFILE" = "true" ]; then
+    openebs_set_args "engines.local.rawfile.enabled=false"
+    return 0
+  fi
+  echo -n "$(openebs_set_args "engines.local.rawfile.enabled=true")" \
+          "$(openebs_set_args "$(rawfile_analytics_disable)")"
 }
 zfs_args() {
   if ! [ "$INS_ZFS" = "true" ]; then
@@ -199,6 +214,7 @@ helm_install() {
         $(mayastor_args) \
         $(lvm_args) \
         $(zfs_args) \
+        $(rawfile_args) \
         $(hostpath_args) \
         $(nats_args) \
         $(loki_args)" \
@@ -252,6 +268,7 @@ while [ "$#" -gt 0 ]; do
     --locals)
       INS_LVM="true"
       INS_ZFS="true"
+      INS_RAWFILE="true"
       INS_HOSTPATH="true"
       shift;;
     --lvm)
@@ -259,6 +276,9 @@ while [ "$#" -gt 0 ]; do
       shift;;
     --zfs)
       INS_ZFS="true"
+      shift;;
+    --rawfile)
+      INS_RAWFILE="true"
       shift;;
     --hostpath)
       INS_HOSTPATH="true"

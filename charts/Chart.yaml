@@ -36,6 +36,10 @@ dependencies:
     version: 1.8.0-develop
     repository: "https://openebs.github.io/lvm-localpv"
     condition: engines.local.lvm.enabled
+  - name: rawfile-localpv
+    version: 0.11.0
+    repository: "https://openebs.github.io/rawfile-localpv"
+    condition: engines.local.rawfile.enabled
   - name: mayastor
     version: 0.0.0
     repository: "https://openebs.github.io/mayastor-extensions"
@@ -44,7 +48,7 @@ dependencies:
 annotations:
   helm.sh/images: |
     - name: etcd
-      image: docker.io/bitnami/etcd:3.5.6-debian-11-r10
+      image: docker.io/bitnami/etcd:3.6.2-debian-12-r0
     - name: kubectl
       image: docker.io/bitnami/kubectl:1.25.15
     - name: alloy
@@ -77,6 +81,8 @@ annotations:
       image: docker.io/openebs/mayastor-obs-callhome:develop
     - name: mayastor-operator-diskpool
       image: docker.io/openebs/mayastor-operator-diskpool:develop
+    - name: rawfile-localpv
+      image: docker.io/openebs/rawfile-localpv:v0.11.0
     - name: k8s-sidecar
       image: kiwigrid/k8s-sidecar:1.30.2
     - name: nats
@@ -117,7 +123,11 @@ annotations:
       image: registry.k8s.io/sig-storage/csi-snapshotter:v7.0.0
     - name: csi-snapshotter
       image: registry.k8s.io/sig-storage/csi-snapshotter:v8.2.0
+    - name: csi-snapshotter
+      image: registry.k8s.io/sig-storage/csi-snapshotter:v8.2.1
     - name: snapshot-controller
       image: registry.k8s.io/sig-storage/snapshot-controller:v7.0.0
     - name: snapshot-controller
       image: registry.k8s.io/sig-storage/snapshot-controller:v8.2.0
+    - name: snapshot-controller
+      image: registry.k8s.io/sig-storage/snapshot-controller:v8.2.1
