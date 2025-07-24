@@ -4,30 +4,33 @@ on:
     branches:
       - develop
       - 'release/**'
-    tags:
-      - 'v[0-9]+.[0-9]+.[0-9]+**'
+  workflow_call:
+    inputs:
+      tag:
+        description: 'Tag to build, example: v4.2.0'
+        required: true
+        type: string
+      namespace:
+        description: 'Namespace, example: ghcr.io/openebs/dev'
+        required: true
+        type: string
 
 env:
   CI: 1
 
 jobs:
   image-build-push:
-    runs-on: ubuntu-latest
+    runs-on: oracle-vm-8cpu-32gb-x86-64
     permissions:
       contents: read
       id-token: write
+      packages: write
 
     steps:
       - uses: actions/checkout@v4
         with:
           submodules: 'recursive'
           fetch-depth: 0
-      - run: |
-          # BUG: HEAD tag is fetched as lightweight instead of annotated
-          # https://github.com/actions/checkout/issues/290
-          if [ "${{ github.ref_type }}" == "tag" ]; then
-            git fetch -f origin ${{ github.ref }}:${{ github.ref }}
-          fi
 
       - uses: cachix/install-nix-action@v31.3.0
         with:
@@ -52,19 +55,26 @@ jobs:
           nix-shell --run "echo" shell.nix
 
       - name: Login to Docker Hub
+        if: ${{ github.event_name == 'push' }}
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      - name: Login to GHCR
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Build and push the release images
         run: |
-          if [[ "${{ github.ref_type }}" == "tag" ]]; then
-            # Remove 'refs/tags/' prefix to get the tag name
-            TAG="${GITHUB_REF#refs/tags/}"
-            TAG="${TAG#v}"
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
             nix-shell --pure --run "./scripts/helm/update-version-upon-release.sh"
-          else
+            nix-shell --run "./scripts/release.sh --tag ${{ inputs.tag }} --registry ${{ inputs.namespace }}"
+          elif [[ "${{ github.event_name }}" == "push" ]]; then
             TAG=$(nix-shell --run "yq '.appVersion' charts/Chart.yaml")
+            nix-shell --run "./scripts/release.sh --tag v${TAG}"
           fi
-          nix-shell --run "./scripts/release.sh --tag v${TAG}"

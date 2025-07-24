@@ -16,6 +16,7 @@ let
   rust = rust_chan.${rust-profile};
   k8sShellAttrs = import ./scripts/k8s/shell.nix { inherit pkgs; };
   helmShellAttrs = import ./charts/shell.nix { inherit pkgs; };
+  stagingShellAttrs = import ./scripts/staging/shell.nix { inherit pkgs; };
 in
 mkShell {
   name = "openebs-shell";
@@ -33,7 +34,7 @@ mkShell {
     which
     codespell
   ] ++ pkgs.lib.optional (!norust) channel.default_src.nightly
-  ++ k8sShellAttrs.buildInputs ++ helmShellAttrs.buildInputs
+  ++ k8sShellAttrs.buildInputs ++ helmShellAttrs.buildInputs ++ stagingShellAttrs.buildInputs
   ++ pkgs.lib.optional (system == "aarch64-darwin") darwin.apple_sdk.frameworks.Security;
 
   PROTOC = "${protobuf}/bin/protoc";

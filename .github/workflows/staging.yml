@@ -1,0 +1,104 @@
+name: Staging Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to be released (e.g. v4.2.0)'
+        required: true
+        type: string
+
+env:
+  TAG: ${{ inputs.tag }}
+
+jobs:
+  build-images:
+    uses: ./.github/workflows/images.yml
+    with:
+      tag: ${{ inputs.tag }}
+      namespace: ghcr.io/${{ github.repository_owner }}/dev
+    secrets: inherit
+
+  build-binaries:
+    uses: ./.github/workflows/release-binaries.yml
+    with:
+      tag: ${{ inputs.tag }}
+    secrets: inherit
+
+  push-kubectl-to-ghcr:
+    runs-on: ubuntu-latest
+    needs: [build-binaries]
+    permissions:
+      id-token: write
+      contents: read
+      packages: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: recursive
+
+      - uses: cachix/install-nix-action@v31.3.0
+      - name: Pre-populate nix-shell
+        run: |
+          export NIX_PATH=nixpkgs=$(jq '.nixpkgs.url' nix/sources.json -r)
+          echo "NIX_PATH=$NIX_PATH" >> $GITHUB_ENV
+          nix-shell --pure --run "echo" ./scripts/staging/shell.nix
+
+      - name: Download kubectl artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          pattern: kubectl-openebs-*
+          merge-multiple: true
+
+      - name: Push kubectl binaries to GHCR
+        run: |
+          nix-shell --pure --run "./scripts/staging/kubectl-oci.sh push\
+            --tag ${TAG} \
+            --namespace ghcr.io/${{ github.repository_owner }}/dev/kubectl-openebs \
+            --username ${{ github.actor }} \
+            --password ${{ secrets.GITHUB_TOKEN }}" ./scripts/staging/shell.nix
+
+  release-staging-chart:
+    runs-on: ubuntu-latest
+    needs: [build-images, push-kubectl-to-ghcr]
+    permissions:
+      id-token: write
+      contents: read
+      packages: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: recursive
+
+      - uses: cachix/install-nix-action@v31.3.0
+      - name: Pre-populate nix-shell
+        run: |
+          export NIX_PATH=nixpkgs=$(jq '.nixpkgs.url' nix/sources.json -r)
+          echo "NIX_PATH=$NIX_PATH" >> $GITHUB_ENV
+          nix-shell --pure --run "echo" ./scripts/helm/shell.nix
+
+      - name: Update version for staging
+        run: |
+          nix-shell --pure --run "./scripts/helm/update-version-upon-release.sh" ./scripts/helm/shell.nix
+
+      - name: Set Chart Version
+        run: |
+          CHART_VERSION=$(awk -F': ' '/^version:/ {print $2}' charts/Chart.yaml)
+          echo "CHART_VERSION=$CHART_VERSION" >> $GITHUB_ENV
+
+      - name: Push chart to staging repo
+        uses: appany/helm-oci-chart-releaser@v0.4.2
+        with:
+          name: openebs
+          repository: ${{ github.repository_owner }}/helm
+          tag: ${{ env.CHART_VERSION }}
+          path: ./charts
+          registry: ghcr.io
+          registry_username: ${{ github.actor }}
+          registry_password: ${{ secrets.GITHUB_TOKEN }}
+          update_dependencies: 'true'

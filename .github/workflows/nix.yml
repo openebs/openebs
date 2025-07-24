@@ -25,6 +25,13 @@ jobs:
               - '**.nix'
       - uses: cachix/install-nix-action@v31.3.0
         if: steps.changes.outputs.nix == 'true'
+
+      - name: Set NIX_PATH
+        if: steps.changes.outputs.nix == 'true'
+        run: |
+          export NIX_PATH=nixpkgs=$(jq '.nixpkgs.url' nix/sources.json -r)
+          echo "NIX_PATH=$NIX_PATH" >> $GITHUB_ENV
+
       - name: Lint nix code
         if: steps.changes.outputs.nix == 'true'
         run: nix-shell -p nixpkgs-fmt --run "nixpkgs-fmt --check ."
