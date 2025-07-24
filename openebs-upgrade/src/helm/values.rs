@@ -80,7 +80,7 @@ async fn safe_crd_install(path: &Path) -> upgrade::common::error::Result<()> {
             .iter()
             .any(|name| crd_set.contains(&name.as_str()))
         {
-            yq.set_literal_value(helm_toggle, false, path)?;
+            yq.set_unquoted_value(helm_toggle, false, path)?;
         }
     }
 

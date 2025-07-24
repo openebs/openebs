@@ -3895,6 +3895,7 @@ dependencies = [
  "console-logger",
  "constants",
  "flate2",
+ "futures",
  "humantime",
  "k8s-openapi",
  "kube",
