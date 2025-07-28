@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: {{ .Release.Name }}-pre-upgrade-hook
+  name: openebs-pre-upgrade-hook
   namespace: {{ .Release.Namespace }}
   labels:
     app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
@@ -16,7 +16,7 @@ metadata:
 kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  name: {{ .Release.Name }}-pre-upgrade-hook
+  name: openebs-pre-upgrade-hook
   labels:
     app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
     app.kubernetes.io/instance: {{ .Release.Name | quote }}
@@ -37,7 +37,7 @@ rules:
 kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  name: {{ .Release.Name }}-pre-upgrade-hook
+  name: openebs-pre-upgrade-hook
   labels:
     app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
     app.kubernetes.io/instance: {{ .Release.Name | quote }}
@@ -49,17 +49,17 @@ metadata:
     "helm.sh/hook-delete-policy": hook-succeeded
 subjects:
 - kind: ServiceAccount
-  name: {{ .Release.Name }}-pre-upgrade-hook
+  name: openebs-pre-upgrade-hook
   namespace: {{ .Release.Namespace }}
 roleRef:
   kind: ClusterRole
-  name: {{ .Release.Name }}-pre-upgrade-hook
+  name: openebs-pre-upgrade-hook
   apiGroup: rbac.authorization.k8s.io
 ---
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: "{{ .Release.Name }}-pre-upgrade-hook"
+  name: "openebs-pre-upgrade-hook"
   labels:
     app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
     app.kubernetes.io/instance: {{ .Release.Name | quote }}
@@ -72,7 +72,7 @@ metadata:
 spec:
   template:
     metadata:
-      name: "{{ .Release.Name }}-pre-upgrade-hook"
+      name: "openebs-pre-upgrade-hook"
       labels:
         app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
         app.kubernetes.io/instance: {{ .Release.Name | quote }}
@@ -81,7 +81,7 @@ spec:
         {{ toYaml . | nindent 8 }}
         {{- end }}
     spec:
-      serviceAccountName: "{{ .Release.Name }}-pre-upgrade-hook"
+      serviceAccountName: "openebs-pre-upgrade-hook"
       {{- with .Values.preUpgradeHook.tolerations }}
       tolerations:
       {{- toYaml . | nindent 6 }}
