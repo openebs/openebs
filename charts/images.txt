@@ -1,5 +1,4 @@
 docker.io/bitnami/etcd:3.6.2-debian-12-r0
-docker.io/bitnami/kubectl:1.25.15
 docker.io/grafana/alloy:v1.8.1
 docker.io/grafana/loki:3.4.2
 docker.io/openebs/alpine-bash:4.2.0

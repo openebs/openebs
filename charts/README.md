@@ -102,37 +102,27 @@ helm delete `<RELEASE NAME>` -n `<RELEASE NAMESPACE>`
 
 ## Values
 
-| Key | Type | Default | Description |
-|-----|------|---------|-------------|
-| alloy.enabled | bool | `true` |  |
-| alloy.logging_config.labels | object | `{"openebs.io/logging":true}` | Labels to enable scraping on, at-least one of these labels should be present. |
-| alloy.logging_config.tenant_id | string | `"openebs"` | X-Scope-OrgID to pe populated which pushing logs. Make sure the caller also uses the same. |
-| engines.local.lvm.enabled | bool | `true` |  |
-| engines.local.zfs.enabled | bool | `true` |  |
-| engines.replicated.mayastor.enabled | bool | `true` |  |
-| loki.localpvScConfig.enabled | bool | `true` |  |
-| loki.localpvScConfig.loki.basePath | string | `"/var/local/{{ .Release.Name }}/localpv-hostpath/loki"` | Host path where local loki data is stored in. |
-| loki.localpvScConfig.loki.name | string | `"openebs-loki-localpv"` |  |
-| loki.localpvScConfig.loki.reclaimPolicy | string | `"Delete"` | ReclaimPolicy of loki's localpv hostpath storage class. |
-| loki.localpvScConfig.loki.volumeBindingMode | string | `"WaitForFirstConsumer"` | VolumeBindingMode of loki's localpv hostpath storage class. |
-| loki.localpvScConfig.minio.basePath | string | `"/var/local/{{ .Release.Name }}/localpv-hostpath/minio"` | Host path where local minio data is stored in. |
-| loki.localpvScConfig.minio.name | string | `"openebs-minio-localpv"` |  |
-| loki.localpvScConfig.minio.reclaimPolicy | string | `"Delete"` | ReclaimPolicy of minio's localpv hostpath storage class. |
-| loki.localpvScConfig.minio.volumeBindingMode | string | `"WaitForFirstConsumer"` | VolumeBindingMode of minio's localpv hostpath storage class. |
-| loki.loki.commonConfig.replication_factor | int | `3` |  |
-| loki.minio.persistence.enabled | bool | `true` | Enable persistence for minio |
-| loki.minio.persistence.size | string | `"2Gi"` | Size of minio local storage volume |
-| loki.minio.persistence.storageClass | string | `"openebs-minio-localpv"` | Storage class for minio storage |
-| loki.minio.replicas | int | `3` |  |
-| loki.singleBinary.persistence.enabled | bool | `true` | Enable persistence for loki |
-| loki.singleBinary.persistence.size | string | `"2Gi"` | Size of loki local storage volume |
-| loki.singleBinary.persistence.storageClass | string | `"openebs-loki-localpv"` | Storage class for loki storage |
-| loki.singleBinary.replicas | int | `3` |  |
-| openebs-crds.csi.volumeSnapshots.enabled | bool | `true` |  |
-| openebs-crds.csi.volumeSnapshots.keep | bool | `true` |  |
-| preUpgradeHook | object | `{"image":{"pullPolicy":"IfNotPresent","registry":"docker.io","repo":"bitnami/kubectl","tag":"1.25.15"},"podLabels":{}}` | Configuration options for pre-upgrade helm hook job. |
-| preUpgradeHook.image.pullPolicy | string | `"IfNotPresent"` | The imagePullPolicy for the container |
-| preUpgradeHook.image.registry | string | `"docker.io"` | The container image registry URL for the hook job |
-| preUpgradeHook.image.repo | string | `"bitnami/kubectl"` | The container repository for the hook job |
-| preUpgradeHook.image.tag | string | `"1.25.15"` | The container image tag for the hook job |
-| preUpgradeHook.podLabels | object | `{}` | Labels to be added to the pod hook job |
++| Key | Description | Default |
++|:----|:------------|:--------|
++| alloy.&ZeroWidthSpace;logging_config.&ZeroWidthSpace;labels | Labels to enable scraping on, at-least one of these labels should be present. | <pre>{<br>"openebs.io/logging":true<br>}</pre> |
++| alloy.&ZeroWidthSpace;logging_config.&ZeroWidthSpace;tenant_id | X-Scope-OrgID to pe populated which pushing logs. Make sure the caller also uses the same. | `"openebs"` |
++| loki.&ZeroWidthSpace;localpvScConfig.&ZeroWidthSpace;loki.&ZeroWidthSpace;basePath | Host path where local loki data is stored in. | `"/var/local/{{ .Release.Name }}/localpv-hostpath/loki"` |
++| loki.&ZeroWidthSpace;localpvScConfig.&ZeroWidthSpace;loki.&ZeroWidthSpace;reclaimPolicy | ReclaimPolicy of loki's localpv hostpath storage class. | `"Delete"` |
++| loki.&ZeroWidthSpace;localpvScConfig.&ZeroWidthSpace;loki.&ZeroWidthSpace;volumeBindingMode | VolumeBindingMode of loki's localpv hostpath storage class. | `"WaitForFirstConsumer"` |
++| loki.&ZeroWidthSpace;localpvScConfig.&ZeroWidthSpace;minio.&ZeroWidthSpace;basePath | Host path where local minio data is stored in. | `"/var/local/{{ .Release.Name }}/localpv-hostpath/minio"` |
++| loki.&ZeroWidthSpace;localpvScConfig.&ZeroWidthSpace;minio.&ZeroWidthSpace;reclaimPolicy | ReclaimPolicy of minio's localpv hostpath storage class. | `"Delete"` |
++| loki.&ZeroWidthSpace;localpvScConfig.&ZeroWidthSpace;minio.&ZeroWidthSpace;volumeBindingMode | VolumeBindingMode of minio's localpv hostpath storage class. | `"WaitForFirstConsumer"` |
++| loki.&ZeroWidthSpace;minio.&ZeroWidthSpace;persistence.&ZeroWidthSpace;enabled | Enabled persistence for minio | `true` |
++| loki.&ZeroWidthSpace;minio.&ZeroWidthSpace;persistence.&ZeroWidthSpace;size | Size of minio local storage volume | `"2Gi"` |
++| loki.&ZeroWidthSpace;minio.&ZeroWidthSpace;persistence.&ZeroWidthSpace;storageClass | Storage class for minio storage | `"openebs-minio-localpv"` |
++| loki.&ZeroWidthSpace;singleBinary.&ZeroWidthSpace;persistence.&ZeroWidthSpace;enabled | Enabled persistence for loki | `true` |
++| loki.&ZeroWidthSpace;singleBinary.&ZeroWidthSpace;persistence.&ZeroWidthSpace;size | Size of loki local storage volume | `"2Gi"` |
++| loki.&ZeroWidthSpace;singleBinary.&ZeroWidthSpace;persistence.&ZeroWidthSpace;storageClass | Storage class for loki storage | `"openebs-loki-localpv"` |
++| mayastor.&ZeroWidthSpace;etcd.&ZeroWidthSpace;clusterDomain | Kubernetes Cluster Domain | `"cluster.local"` |
++| preUpgradeHook.&ZeroWidthSpace;enabled | Enable/Disable openebs pre-upgrade hook | `true` |
++| preUpgradeHook.&ZeroWidthSpace;image.&ZeroWidthSpace;pullPolicy | The imagePullPolicy for the container | `"IfNotPresent"` |
++| preUpgradeHook.&ZeroWidthSpace;image.&ZeroWidthSpace;registry | The container image registry URL for the hook job | `"docker.io"` |
++| preUpgradeHook.&ZeroWidthSpace;image.&ZeroWidthSpace;repo | The container repository for the hook job | `"bitnami/kubectl"` |
++| preUpgradeHook.&ZeroWidthSpace;image.&ZeroWidthSpace;tag | The container image tag for the hook job | `"1.25.15"` |
++| preUpgradeHook.&ZeroWidthSpace;imagePullSecrets | Optional array of imagePullSecrets containing private registry credentials # Ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/ | `[]` |
++| preUpgradeHook.&ZeroWidthSpace;tolerations | Node tolerations for server scheduling to nodes with taints # Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/ # | `[]` |

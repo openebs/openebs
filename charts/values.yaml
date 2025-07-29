@@ -52,8 +52,10 @@ mayastor:
   alloy:
     enabled: false
 
-# -- Configuration options for pre-upgrade helm hook job.
+# This runs only for upgrades from openebs v3 to v4. Uses the localpv-provisioner deployment to decide if it's v3 or v4.
 preUpgradeHook:
+  # -- Enable/Disable openebs pre-upgrade hook
+  enabled: true
   # -- Node tolerations for server scheduling to nodes with taints
   ## Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
   ##
@@ -62,8 +64,12 @@ preUpgradeHook:
   ## Ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
   imagePullSecrets: []
   # - name: secretName
-  # -- Labels to be added to the pod hook job
-  podLabels: {}
+  # Labels to be added to the pod hook job
+  podLabels:
+    openebs.io/logging: "true"
+  # This helps in debugging by leaving the Job/Pod instances lying around
+  annotations:
+    "helm.sh/hook-delete-policy": "hook-succeeded,before-hook-creation"
   image:
     # -- The container image registry URL for the hook job
     registry: docker.io
