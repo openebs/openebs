@@ -81,8 +81,15 @@ impl ImageProperties {
          * specific sections.
          */
 
-        let hostpath_localpv_image_name = format!("{release_name}-localpv-provisioner");
+        // From https://github.com/openebs/dynamic-localpv-provisioner/blob/develop/deploy/helm/charts/templates/deployment.yaml#L50
+        let hostpath_localpv_image_name: String = if release_name.contains("localpv-provisioner") {
+            "localpv-provisioner".to_string()
+        } else {
+            format!("{release_name}-localpv-provisioner")
+        };
         let openebs_containers: HashSet<&str> = [
+            // From https://github.com/openebs/charts/blob/main/charts/openebs/templates/localprovisioner/deployment-local-provisioner.yaml#L42
+            "openebs-localpv-provisioner",
             "api-rest",
             "openebs-zfs-plugin",
             "openebs-lvm-plugin",
@@ -93,7 +100,7 @@ impl ImageProperties {
 
         // The 'app in <labels>' is used to pick out the CSI Controllers from the LocalPV, Mayastor
         // and the Hostpath Provisioner.
-        let openebs_pod_spec = list_pods(args.namespace.clone(), Some("app in (api-rest,localpv-provisioner,openebs-zfs-controller,openebs-lvm-controller)".to_string()), None).await
+        let openebs_pod_spec = list_pods(args.namespace.clone(), Some("app in (openebs,api-rest,localpv-provisioner,openebs-zfs-controller,openebs-lvm-controller)".to_string()), None).await
             .map_err(|error| anyhow!(error))?
             .into_iter()
             .filter_map(|pod| pod.spec)

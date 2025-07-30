@@ -1,16 +1,17 @@
-use crate::constants::{FOUR_DOT_THREE, THREE_DOT_FOUR_DOT_ONE};
+use crate::constants::{FOUR_DOT_O, FOUR_DOT_THREE, THREE_DOT_FOUR_DOT_ONE};
 use upgrade::{
-    common::kube::client::delete_loki_sts,
+    common::kube::client::{delete_loki_sts, list_pods},
     helm::{
         chart::{HelmValuesCollection, UmbrellaValues},
         client::HelmReleaseClient,
         upgrade::{HelmUpgradeRunner, HelmUpgrader},
     },
+    vec_to_strings,
 };
 
 use async_trait::async_trait;
 use semver::Version;
-use std::path::PathBuf;
+use std::{iter::once as iter_once, path::PathBuf};
 use tempfile::NamedTempFile;
 use tracing::info;
 
@@ -42,7 +43,7 @@ impl HelmUpgrader for UmbrellaUpgrader {
                     self.helm_upgrade_extra_args
                         .iter()
                         .cloned()
-                        .chain(std::iter::once("--dry-run".to_string()))
+                        .chain(iter_once("--dry-run".to_string()))
                         .collect(),
                 ),
             )
@@ -59,13 +60,64 @@ impl HelmUpgrader for UmbrellaUpgrader {
             }
 
             info!("Starting helm upgrade...");
-            self.client
-                .upgrade(
-                    self.release_name.as_str(),
-                    self.chart_dir,
-                    Some(self.helm_upgrade_extra_args),
-                )
-                .await?;
+            // This is what we do for upgrades from openebs v3
+            //
+            // Mayastor was disabled by default for OpenEBS v3. If the chart is a v3 one and
+            // there are no Etcd Pods, we disable the Etcd preUpgradeJob and perform a helm upgrade.
+            // If we don't do this, the Etcd preUpgradeJob gets stuck trying to mount the Etcd
+            // JWT token. After helm helm upgrade, we perform a same version upgrade to the same
+            // version (target version) again with the preUpgradeJob enabled, so that future
+            // upgrades with helm upgrade --reuse-values and such flags don't keep the Etcd
+            // preUpgradeJob disabled. Values for disabling the engines have changed since v3, so
+            // disabling mayastor in v3 won't hold in v4.
+            if self.source_version.lt(&FOUR_DOT_O) && {
+                let etcd_selector = format!(
+                    "app.kubernetes.io/name=etcd,app.kubernetes.io/instance={}",
+                    self.release_name
+                );
+                let etcd_pods = list_pods(self.namespace, Some(etcd_selector), None).await?;
+                etcd_pods.is_empty()
+            } {
+                self.client
+                    .upgrade(
+                        self.release_name.as_str(),
+                        self.chart_dir.clone(),
+                        Some(
+                            self.helm_upgrade_extra_args
+                                .iter()
+                                .cloned()
+                                .chain(vec_to_strings!(
+                                    "--set",
+                                    "mayastor.etcd.preUpgradeJob.enabled=false"
+                                ))
+                                .collect(),
+                        ),
+                    )
+                    .await?;
+                self.client
+                    .upgrade(
+                        self.release_name.as_str(),
+                        self.chart_dir,
+                        Some(
+                            self.helm_upgrade_extra_args
+                                .into_iter()
+                                .chain(vec_to_strings!(
+                                    "--set",
+                                    "mayastor.etcd.preUpgradeJob.enabled=false"
+                                ))
+                                .collect(),
+                        ),
+                    )
+                    .await?;
+            } else {
+                self.client
+                    .upgrade(
+                        self.release_name.as_str(),
+                        self.chart_dir,
+                        Some(self.helm_upgrade_extra_args),
+                    )
+                    .await?;
+            }
             info!("Helm upgrade successful!");
 
             self.client

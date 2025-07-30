@@ -25,7 +25,9 @@ struct HelmChartMetadata {
 
 #[derive(Deserialize, Debug)]
 struct HelmValues {
-    engines: Engines,
+    mayastor: Option<EngineEnabled>,
+    // This is made optional, because this key is absent in openebs v3.
+    engines: Option<Engines>,
 }
 
 #[derive(Deserialize, Debug)]
@@ -45,6 +47,7 @@ struct EngineEnabled {
 
 #[derive(Deserialize, Debug)]
 struct HelmConfigValues {
+    mayastor: Option<HelmConfigEngineEnabled>,
     engines: Option<HelmConfigValuesEngines>,
 }
 
@@ -84,13 +87,42 @@ impl HelmRelease {
 
     /// Returns if the Mayastor storage engine is enabled in the helm values.
     pub fn mayastor_is_enabled(&self) -> bool {
+        // configs are values users have set explicitly using --set or -f.
+        // values are values which ship with the chart as default
+        //
+        // This is the order of keys we check, when trying to determine if mayastor is enabled
+        // 1. config: engines.replicated.mayastor.enabled
+        // 2. config: mayastor.enabled (openebs v3)
+        // 3. values: engines.replicated.mayastor.enabled
+        // 4. values: mayastor.enabled (openebs v3)
+        // 5. clearly the chart knows nothing of mayastor, mayastor is disabled.
         self.config
             .as_ref()
             .and_then(|cfg| cfg.engines.as_ref())
             .and_then(|eng| eng.replicated.as_ref())
             .and_then(|rep| rep.mayastor.as_ref())
             .and_then(|ms| ms.enabled)
-            .unwrap_or(self.chart.values.engines.replicated.mayastor.enabled)
+            .unwrap_or(
+                self.config
+                    .as_ref()
+                    .and_then(|cfg| cfg.mayastor.as_ref())
+                    .and_then(|ms| ms.enabled)
+                    .unwrap_or(
+                        self.chart
+                            .values
+                            .engines
+                            .as_ref()
+                            .map(|eng| eng.replicated.mayastor.enabled)
+                            .unwrap_or(
+                                self.chart
+                                    .values
+                                    .mayastor
+                                    .as_ref()
+                                    .map(|ms| ms.enabled)
+                                    .unwrap_or(false),
+                            ),
+                    ),
+            )
     }
 
     /// Returns the chart version
