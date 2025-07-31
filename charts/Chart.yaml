@@ -1,7 +1,7 @@
 apiVersion: v2
-version: 4.3.2
+version: 4.3.3-prerelease
 name: openebs
-appVersion: 4.3.2
+appVersion: 4.3.3-prerelease
 description: Containerized Attached Storage for Kubernetes
 icon: https://raw.githubusercontent.com/cncf/artwork/HEAD/projects/openebs/icon/color/openebs-icon-color.png
 home: https://www.openebs.io/
@@ -16,7 +16,7 @@ sources:
   - https://github.com/openebs/openebs
 dependencies:
   - name: openebs-crds
-    version: 4.3.2
+    version: 4.3.3-prerelease
   - name: loki
     version: 6.29.0
     repository: https://grafana.github.io/helm-charts
@@ -26,14 +26,14 @@ dependencies:
     repository: https://grafana.github.io/helm-charts
     condition: alloy.enabled
   - name: localpv-provisioner
-    version: 4.3.0
+    version: 4.3.1-prerelease
     repository: "https://openebs.github.io/dynamic-localpv-provisioner"
   - name: zfs-localpv
-    version: 2.8.0
+    version: 2.8.1-prerelease
     repository: "https://openebs.github.io/zfs-localpv"
     condition: engines.local.zfs.enabled
   - name: lvm-localpv
-    version: 1.7.0
+    version: 1.7.1-prerelease
     repository: "https://openebs.github.io/lvm-localpv"
     condition: engines.local.lvm.enabled
   - name: mayastor
@@ -90,11 +90,13 @@ annotations:
     - name: linux-utils
       image: openebs/linux-utils:4.2.0
     - name: lvm-driver
-      image: openebs/lvm-driver:1.7.0
+      image: openebs/lvm-driver:1.7.1-prerelease
     - name: provisioner-localpv
       image: openebs/provisioner-localpv:4.3.0
+    - name: provisioner-localpv
+      image: openebs/provisioner-localpv:4.3.1-prerelease
     - name: zfs-driver
-      image: openebs/zfs-driver:2.8.0
+      image: openebs/zfs-driver:2.8.1-prerelease
     - name: mc
       image: quay.io/minio/mc:RELEASE.2024-11-21T17-21-54Z
     - name: minio
