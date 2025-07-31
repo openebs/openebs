@@ -15,12 +15,44 @@ on:
         required: true
       helm-version:
         required: true
-      app-version:
-        required: true
 
 jobs:
+  validate-inputs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate version formats
+        run: |
+          HELM_VERSION="${{ inputs.helm-version }}"
+          BRANCH="${{ inputs.branch }}"
+
+          echo "Validating helm-version: $HELM_VERSION"
+          echo "Validating branch: $BRANCH"
+
+          if [[ ! "$HELM_VERSION" =~ -(prerelease|develop)$ ]]; then
+            echo "❌ Error: helm-version must end with either '-prerelease' or '-develop'"
+            echo "Current value: $HELM_VERSION"
+            exit 1
+          fi
+
+          if [[ "$BRANCH" == "develop" ]]; then
+            if [[ ! "$HELM_VERSION" =~ -develop$ ]]; then
+              echo "❌ Error: develop branch requires helm-version to end with '-develop'"
+              echo "Branch: $BRANCH, Version: $HELM_VERSION"
+              exit 1
+            fi
+          elif [[ "$BRANCH" =~ release ]]; then
+            if [[ ! "$HELM_VERSION" =~ -prerelease$ ]]; then
+              echo "❌ Error: release branch requires helm-version to end with '-prerelease'"
+              echo "Branch: $BRANCH, Version: $HELM_VERSION"
+              exit 1
+            fi
+          fi
+
+          echo "✅ All version formats are valid"
+
   create-release-branch:
     runs-on: ubuntu-latest
+    needs: validate-inputs
     outputs:
       branch_exists: ${{ steps.check-branch.outputs.exists }}
     steps:
@@ -48,8 +80,8 @@ jobs:
           git push origin ${{ github.event.inputs.branch}}
 
   prepare-branch:
-    needs: create-release-branch
-    runs-on: oracle-vm-8cpu-32gb-x86-64
+    needs: [create-release-branch, validate-inputs]
+    runs-on: ubuntu-latest-8-cores
     outputs:
       pr_title: ${{ steps.set-title.outputs.title }}
     steps:
@@ -72,14 +104,13 @@ jobs:
         run: |
           nix-shell --pure --run "./scripts/helm/update-chart-version.sh \
             --chart-version ${VERSION} \
-            --app-version ${APP_VERSION} \
+            --app-version ${VERSION} \
             --localpv-provisioner-version ${LOCALPV_HOSTPATH_VERSION} \
             --zfs-localpv-version ${LOCALPV_ZFS_VERSION} \
             --lvm-localpv-version ${LOCALPV_LVM_VERSION} \
             --mayastor-version ${MAYASTOR_VERSION}" ./shell.nix
         env:
           VERSION: ${{ github.event.inputs.helm-version }}
-          APP_VERSION: ${{ github.event.inputs.app-version }}
           LOCALPV_HOSTPATH_VERSION: ${{ github.event.inputs.localpv-provisioner-version }}
           LOCALPV_ZFS_VERSION: ${{ github.event.inputs.zfs-localpv-version }}
           LOCALPV_LVM_VERSION: ${{ github.event.inputs.lvm-localpv-version }}
