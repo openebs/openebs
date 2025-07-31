@@ -23,11 +23,24 @@ jobs:
         run: |
           VERSION=$(yq '.version' charts/Chart.yaml)
           BRANCH="${GITHUB_REF#refs/heads/}"
-          if [[ "$BRANCH" == release/* && "$VERSION" == *-develop* ]]; then
-            echo "Chart version is a develop prerelease: $VERSION"
+
+          if [[ ! "$VERSION" =~ -(prerelease|develop)$ ]]; then
+            echo "Version doesn't end with -prerelease or -develop: $VERSION"
+            echo "Skipping Publish"
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          elif [[ "$BRANCH" == release/* && "$VERSION" =~ -develop$ ]]; then
+            echo "Release branch cannot have -develop version"
+            echo "Branch: $BRANCH, Version: $VERSION"
+            echo "Skipping Publish"
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          elif [[ "$BRANCH" == "develop" && "$VERSION" =~ -prerelease$ ]]; then
+            echo "Develop branch cannot have -prerelease version"
+            echo "Branch: $BRANCH, Version: $VERSION"
             echo "Skipping Publish"
             echo "skip=true" >> "$GITHUB_OUTPUT"
           else
+            echo "Version and branch combination valid"
+            echo "Branch: $BRANCH, Version: $VERSION"
             echo "skip=false" >> "$GITHUB_OUTPUT"
           fi
 
