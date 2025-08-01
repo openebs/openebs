@@ -55,6 +55,7 @@ jobs:
     needs: submodule
     if: ${{ needs.submodule.outputs.pull-request-number == '' }}
     uses: ./.github/workflows/chart-images.yml
+    secrets: inherit
 
   release-chart:
     needs: chart-images
