@@ -71,7 +71,7 @@ pub(crate) async fn lvm_volumes(
     let mut lp: ListParams = ListParams::default().limit(max_entries as u32);
     if let Some(args) = volumes_arg {
         if let Some(node_id) = &args.node_id {
-            lp = lp.labels(format!("kubernetes.io/nodename={}", node_id).as_str())
+            lp = lp.labels(format!("kubernetes.io/nodename={node_id}").as_str())
         }
     };
 

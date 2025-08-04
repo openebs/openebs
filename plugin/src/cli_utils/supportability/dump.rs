@@ -18,7 +18,7 @@ pub async fn dump_dynamic_resource(
     kind: &str,
     file_name: &str,
 ) -> Result<(), Error> {
-    log(format!("\t Collecting {} resources", kind));
+    log(format!("\t Collecting {kind} resources"));
 
     let mut list_params = ListParams::default().limit(100);
     let api = match k8s_client
@@ -44,8 +44,7 @@ pub async fn dump_dynamic_resource(
             Ok(val) => val,
             Err(error) => {
                 log(format!(
-                    "\t Encountered error while collecting {} objects: {}",
-                    kind, error
+                    "\t Encountered error while collecting {kind} objects: {error}"
                 ));
                 break;
             }

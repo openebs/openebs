@@ -1,4 +1,4 @@
-{ norust ? false, devrustup ? true, rust-profile ? "nightly" }:
+{ norust ? false, devrustup ? true, rust-profile ? "stable" }:
 let
   sources = import ./nix/sources.nix;
   pkgs = import sources.nixpkgs {
@@ -33,13 +33,12 @@ mkShell {
     pre-commit
     which
     codespell
-  ] ++ pkgs.lib.optional (!norust) channel.default_src.nightly
+  ] ++ pkgs.lib.optional (!norust) rust
   ++ k8sShellAttrs.buildInputs ++ helmShellAttrs.buildInputs ++ stagingShellAttrs.buildInputs
   ++ pkgs.lib.optional (system == "aarch64-darwin") darwin.apple_sdk.frameworks.Security;
 
   PROTOC = "${protobuf}/bin/protoc";
   PROTOC_INCLUDE = "${protobuf}/include";
-  NODE_PATH = "${nodePackages."@commitlint/config-conventional"}/lib/node_modules";
 
   # using the nix rust toolchain
   USE_NIX_RUST = "${toString (!norust)}";

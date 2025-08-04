@@ -90,10 +90,10 @@ async fn main() {
                         }
                         resources::Error::Generic(error) => eprintln!("{error}"),
                     },
-                    cli_utils::Error::LocalpvLvm(error) => eprintln!("{}", error),
-                    cli_utils::Error::LocalpvZfs(error) => eprintln!("{}", error),
-                    cli_utils::Error::Hostpath(error) => eprintln!("{}", error),
-                    cli_utils::Error::Generic(error) => eprintln!("{}", error),
+                    cli_utils::Error::LocalpvLvm(error) => eprintln!("{error}"),
+                    cli_utils::Error::LocalpvZfs(error) => eprintln!("{error}"),
+                    cli_utils::Error::Hostpath(error) => eprintln!("{error}"),
+                    cli_utils::Error::Generic(error) => eprintln!("{error}"),
                 }
                 std::process::exit(exit_code);
             }
