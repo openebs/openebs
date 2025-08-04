@@ -63,7 +63,7 @@ jobs:
         run: |
           nix-shell --pure --run "./scripts/staging/kubectl-oci.sh pull \
             --tag ${{ github.ref_name }} \
-            --namespace ${{ github.repository_owner }}/dev \
+            --namespace ${{ github.repository_owner }}/dev/plugin \
             --username ${{ github.actor }} \
             --password ${{ secrets.GITHUB_TOKEN }}" ./scripts/staging/shell.nix
 
@@ -99,7 +99,7 @@ jobs:
           rm -rf charts
           mkdir -p charts-staged charts-final charts
 
-          CHART_REF=oci://ghcr.io/${IMAGE_ORG}/helm/openebs
+          CHART_REF=oci://ghcr.io/${IMAGE_ORG}/dev/helm/openebs
           helm pull "$CHART_REF" \
             --version ${VERSION} \
             --destination charts-staged

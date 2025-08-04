@@ -58,7 +58,7 @@ jobs:
         run: |
           nix-shell --pure --run "./scripts/staging/kubectl-oci.sh push\
             --tag ${TAG} \
-            --namespace ${{ github.repository_owner }}/dev \
+            --namespace ${{ github.repository_owner }}/dev/plugin \
             --username ${{ github.actor }} \
             --password ${{ secrets.GITHUB_TOKEN }}" ./scripts/staging/shell.nix
 
@@ -96,7 +96,7 @@ jobs:
         uses: appany/helm-oci-chart-releaser@v0.4.2
         with:
           name: openebs
-          repository: ${{ github.repository_owner }}/helm
+          repository: ${{ github.repository_owner }}/dev/helm
           tag: ${{ env.CHART_VERSION }}
           path: ./charts
           registry: ghcr.io

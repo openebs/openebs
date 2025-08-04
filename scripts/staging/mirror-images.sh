@@ -6,11 +6,12 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(dirname "$(realpath "${BASH_SOURCE[0]:-"$0"}")")"
+CURRENT_ROOT_DIR="${SCRIPT_DIR}/../.."
 
 # if ROOT_DIR is not defined use the one below
-: "${ROOT_DIR:=${SCRIPT_DIR}/../..}"
+: "${ROOT_DIR:=$CURRENT_ROOT_DIR}"
 
-source "$ROOT_DIR/mayastor/scripts/utils/log.sh"
+source "$CURRENT_ROOT_DIR/mayastor/scripts/utils/log.sh"
 NO_RUN=true . "$ROOT_DIR/scripts/release.sh"
 
 IMAGES=()
