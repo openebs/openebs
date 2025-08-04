@@ -48,7 +48,9 @@ dependencies:
 annotations:
   helm.sh/images: |
     - name: etcd
-      image: docker.io/bitnami/etcd:3.6.2-debian-12-r0
+      image: docker.io/bitnamilegacy/etcd:3.6.4-debian-12-r0
+    - name: kubectl
+      image: docker.io/bitnamilegacy/kubectl:1.25.15
     - name: alloy
       image: docker.io/grafana/alloy:v1.8.1
     - name: loki
