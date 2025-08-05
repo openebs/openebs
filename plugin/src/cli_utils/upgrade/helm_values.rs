@@ -25,7 +25,7 @@ struct HelmChartMetadata {
 
 #[derive(Deserialize, Debug)]
 struct HelmValues {
-    mayastor: Option<EngineEnabled>,
+    mayastor: Option<HelmConfigEngineEnabled>,
     // This is made optional, because this key is absent in openebs v3.
     engines: Option<Engines>,
 }
@@ -118,7 +118,7 @@ impl HelmRelease {
                                     .values
                                     .mayastor
                                     .as_ref()
-                                    .map(|ms| ms.enabled)
+                                    .and_then(|ms| ms.enabled)
                                     .unwrap_or(false),
                             ),
                     ),
