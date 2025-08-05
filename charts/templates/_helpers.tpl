@@ -73,13 +73,21 @@ Usage:
   {{- end -}}
 
   {{- if not $deploy -}}
-    {{/* There just is no localpv-provisioner deployment. This is unexpected. We err on the side caution and match */}}
+    {{/* There just is no localpv-provisioner deployment. This is unexpected. We err on the side of caution and match */}}
     matched
-  {{- end -}}
-
-  {{/* Validate chart label matches v3.x.y */}}
-  {{- $chart := index $deploy.metadata.labels "chart" | default "" -}}
-  {{- if regexMatch "^(openebs|localpv-provisioner)-3\\.[0-9]+\\.[0-9]+.*$" $chart -}}
-    matched
+  {{- else -}}
+    {{/* Validate chart label matches v3.x.y */}}
+    {{- if and $deploy.metadata $deploy.metadata.labels -}}
+      {{- $chart := index $deploy.metadata.labels "chart" | default "" -}}
+      {{- if regexMatch "^(openebs|localpv-provisioner)-3\\.[0-9]+\\.[0-9]+.*$" $chart -}}
+        matched
+      {{- end -}}
+    {{- else -}}
+      {{/*
+      Localpv deployment exists, but doesn't have .metadata or .metadata.labels for some reason.
+      This may happen in a dry-run due to how lookup behaves. Erring on the side of caution and matching.
+      */}}
+      matched
+    {{- end -}}
   {{- end -}}
 {{- end -}}
