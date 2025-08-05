@@ -6,17 +6,17 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(dirname "$(realpath "${BASH_SOURCE[0]:-"$0"}")")"
-CURRENT_ROOT_DIR="${SCRIPT_DIR}/../.."
+ROOT_DIR="${SCRIPT_DIR}/../.."
 
-# if ROOT_DIR is not defined use the one below
-: "${ROOT_DIR:=$CURRENT_ROOT_DIR}"
+# if PARENT_ROOT_DIR is not defined use the one below
+: "${PARENT_ROOT_DIR:=$ROOT_DIR}"
 
-source "$CURRENT_ROOT_DIR/mayastor/scripts/utils/log.sh"
-NO_RUN=true . "$ROOT_DIR/scripts/release.sh"
+source "$ROOT_DIR/mayastor/scripts/utils/log.sh"
+NO_RUN=true . "$PARENT_ROOT_DIR/scripts/release.sh"
 
 IMAGES=()
 for name in $DEFAULT_IMAGES; do
-  image=$($NIX_EVAL -f "$ROOT_DIR" "images.$BUILD_TYPE.$name.imageName" --raw --quiet --argstr product_prefix "$PRODUCT_PREFIX")
+  image=$($NIX_EVAL -f "$PARENT_ROOT_DIR" "images.$BUILD_TYPE.$name.imageName" --raw --quiet --argstr product_prefix "$PRODUCT_PREFIX")
   IMAGES+=("${image##*/}")
 done
 
