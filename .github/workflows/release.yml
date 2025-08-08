@@ -5,8 +5,37 @@ on:
     types: [ created ]
 
 jobs:
+  preflight-checks:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: recursive
+
+      - uses: cachix/install-nix-action@v31.3.0
+      - name: Pre-populate nix-shell
+        run: |
+          export NIX_PATH=nixpkgs=$(jq '.nixpkgs.url' nix/sources.json -r)
+          echo "NIX_PATH=$NIX_PATH" >> $GITHUB_ENV
+          nix-shell --pure --run "echo" ./scripts/staging/shell.nix
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}  
+
+      - name: Validate if the release should be even made
+        run: |
+          nix-shell --pure --run "./scripts/staging/validate.sh \
+            --tag ${{ github.ref_name }} \
+            --type release" ./scripts/staging/shell.nix
+
   release-images:
     runs-on: ubuntu-latest
+    needs: preflight-checks
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -43,6 +72,7 @@ jobs:
 
   release-kubectl-binaries:
     runs-on: ubuntu-latest
+    needs: preflight-checks
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -75,7 +105,7 @@ jobs:
 
   release-helm-chart:
     runs-on: ubuntu-latest
-    needs: [release-images]
+    needs: [release-images, preflight-checks]
     steps:
       - uses: actions/checkout@v4
         with:

@@ -81,7 +81,7 @@ jobs:
 
   prepare-branch:
     needs: [create-release-branch, validate-inputs]
-    runs-on: ubuntu-latest-8-cores
+    runs-on: ubuntu-latest
     outputs:
       pr_title: ${{ steps.set-title.outputs.title }}
     steps:

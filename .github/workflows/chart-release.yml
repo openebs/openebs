@@ -9,8 +9,6 @@ on:
 jobs:
   release:
     runs-on: ubuntu-latest
-    outputs:
-      skip: ${{ steps.check_version.outputs.skip }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -18,34 +16,25 @@ jobs:
           fetch-depth: 0
           submodules: recursive
 
-      - name: Block publish if version is a develop pre-release
-        id: check_version
+      - uses: cachix/install-nix-action@v31.3.0
+      - name: Pre-populate nix-shell
         run: |
-          VERSION=$(yq '.version' charts/Chart.yaml)
-          BRANCH="${GITHUB_REF#refs/heads/}"
+          export NIX_PATH=nixpkgs=$(jq '.nixpkgs.url' nix/sources.json -r)
+          echo "NIX_PATH=$NIX_PATH" >> $GITHUB_ENV
+          nix-shell --pure --run "echo" ./scripts/staging/shell.nix
 
-          if [[ ! "$VERSION" =~ -(prerelease|develop)$ ]]; then
-            echo "Version doesn't end with -prerelease or -develop: $VERSION"
-            echo "Skipping Publish"
-            echo "skip=true" >> "$GITHUB_OUTPUT"
-          elif [[ "$BRANCH" == release/* && "$VERSION" =~ -develop$ ]]; then
-            echo "Release branch cannot have -develop version"
-            echo "Branch: $BRANCH, Version: $VERSION"
-            echo "Skipping Publish"
-            echo "skip=true" >> "$GITHUB_OUTPUT"
-          elif [[ "$BRANCH" == "develop" && "$VERSION" =~ -prerelease$ ]]; then
-            echo "Develop branch cannot have -prerelease version"
-            echo "Branch: $BRANCH, Version: $VERSION"
-            echo "Skipping Publish"
-            echo "skip=true" >> "$GITHUB_OUTPUT"
+      - name: Validate if the chart release is allowed
+        run: |
+          if [[ "${{ github.ref_name }}" == "develop" ]]; then
+            TRIGGER_TYPE="develop"
           else
-            echo "Version and branch combination valid"
-            echo "Branch: $BRANCH, Version: $VERSION"
-            echo "skip=false" >> "$GITHUB_OUTPUT"
+            TRIGGER_TYPE="prerelease"
           fi
 
+          nix-shell --pure --run "./scripts/staging/validate.sh \
+            --trigger ${TRIGGER_TYPE}" ./scripts/staging/shell.nix
+
       - name: Publish openebs develop or prerelease umbrella helm chart
-        if: steps.check_version.outputs.skip != 'true'
         uses: stefanprodan/helm-gh-pages@v1.7.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}

@@ -12,7 +12,36 @@ env:
   TAG: ${{ inputs.tag }}
 
 jobs:
+  preflight-checks:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: recursive
+
+      - uses: cachix/install-nix-action@v31.3.0
+      - name: Pre-populate nix-shell
+        run: |
+          export NIX_PATH=nixpkgs=$(jq '.nixpkgs.url' nix/sources.json -r)
+          echo "NIX_PATH=$NIX_PATH" >> $GITHUB_ENV
+          nix-shell --pure --run "echo" ./scripts/staging/shell.nix
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}  
+
+      - name: Validate if the staging should be even made
+        run: |
+          nix-shell --pure --run "./scripts/staging/validate.sh \
+            --tag ${TAG} \
+            --type staging" ./scripts/staging/shell.nix
+
   build-images:
+    needs: preflight-checks
     uses: ./.github/workflows/images.yml
     with:
       tag: ${{ inputs.tag }}
@@ -21,6 +50,7 @@ jobs:
     secrets: inherit
 
   build-binaries:
+    needs: preflight-checks
     uses: ./.github/workflows/release-binaries.yml
     with:
       tag: ${{ inputs.tag }}
