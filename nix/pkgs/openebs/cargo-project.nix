@@ -31,7 +31,7 @@ let
     rustc = channel.default.stable;
     cargo = channel.default.stable;
   };
-  static-target = pkgs.rust.toRustTargetSpec pkgs.pkgsStatic.hostPlatform;
+  static-target = channel.makeRustTarget pkgs.pkgsStatic.hostPlatform;
   static-channel = channel.rust_default {
     override = { targets = [ "${static-target}" ]; };
   };
@@ -93,7 +93,7 @@ let
   static_ssl = (pkgs.pkgsStatic.openssl.override {
     static = true;
   });
-  hostTarget = pkgs.rust.toRustTargetSpec pkgs.hostPlatform;
+  hostTarget = channel.makeRustTarget pkgs.hostPlatform;
   buildProps = rec {
     name = "extensions-${version}";
     inherit version src;
