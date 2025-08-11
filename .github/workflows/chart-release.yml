@@ -36,6 +36,8 @@ jobs:
 
       - name: Publish openebs develop or prerelease umbrella helm chart
         uses: stefanprodan/helm-gh-pages@v1.7.0
+        env:
+          TMPDIR: /tmp
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           charts_dir: .

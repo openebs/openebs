@@ -25,7 +25,7 @@ jobs:
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}  
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Validate if the release should be even made
         run: |
@@ -140,6 +140,8 @@ jobs:
 
       - name: Publish openebs umbrella helm chart
         uses: stefanprodan/helm-gh-pages@v1.7.0
+        env:
+          TMPDIR: /tmp
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           charts_dir: .
