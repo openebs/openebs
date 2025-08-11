@@ -34,10 +34,6 @@ pub struct UpgradeCommonArgs {
     #[arg(long, hide = true, default_value_t = false)]
     pub allow_unstable: bool,
 
-    /// Display all the validations output but will not execute upgrade.
-    #[arg(long, short, default_value_t = false)]
-    pub dry_run: bool,
-
     /// If set then upgrade will skip the io-engine pods restart.
     #[arg(long, default_value_t = false)]
     pub skip_data_plane_restart: bool,
