@@ -1,9 +1,9 @@
-docker.io/bitnami/kubectl:1.25.15
 docker.io/grafana/alloy:v1.8.1
 docker.io/grafana/loki:3.4.2
 docker.io/openebs/alpine-bash:4.2.0
 docker.io/openebs/alpine-sh:4.2.0
 docker.io/openebs/etcd:3.5.6-debian-11-r10
+docker.io/openebs/kubectl:1.25.15
 docker.io/openebs/mayastor-agent-core:v2.9.2
 docker.io/openebs/mayastor-agent-ha-cluster:v2.9.2
 docker.io/openebs/mayastor-agent-ha-node:v2.9.2

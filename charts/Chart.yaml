@@ -43,8 +43,6 @@ dependencies:
 
 annotations:
   helm.sh/images: |
-    - name: kubectl
-      image: docker.io/bitnami/kubectl:1.25.15
     - name: alloy
       image: docker.io/grafana/alloy:v1.8.1
     - name: loki
@@ -55,6 +53,8 @@ annotations:
       image: docker.io/openebs/alpine-sh:4.2.0
     - name: etcd
       image: docker.io/openebs/etcd:3.5.6-debian-11-r10
+    - name: kubectl
+      image: docker.io/openebs/kubectl:1.25.15
     - name: mayastor-agent-core
       image: docker.io/openebs/mayastor-agent-core:v2.9.2
     - name: mayastor-agent-ha-cluster
