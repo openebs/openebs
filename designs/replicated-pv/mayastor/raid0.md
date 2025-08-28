@@ -1,6 +1,6 @@
 ---
 oep-number: OEP 4011
-title: Add Raid0 DiskPool support to OpenEBS Mayastore
+title: Add Raid0 DiskPool support to OpenEBS Mayastor
 authors:
   - "@urso"
 owners:
@@ -11,7 +11,7 @@ last-updated: 2025-08-26
 status: provisional
 ---
 
-# Add Raid0 DiskPool support to OpenEBS Mayastore
+# Add Raid0 DiskPool support to OpenEBS Mayastor
 
 ## Table of Contents
 
@@ -49,7 +49,7 @@ Mayastor currently requires separate disk pools per device, resulting in multipl
 
 ### Non-Goals
 
-- RAID0 device replacement maybe future enhancement)
+- RAID0 device replacement maybe future enhancement
 - Migration from existing single-device pools to RAID0
 - Other RAID levels (RAID1, RAID5) - separate OEPs
 
