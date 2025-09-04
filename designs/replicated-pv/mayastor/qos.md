@@ -7,7 +7,7 @@ owners:
   - "@urso"
 editor: TBD
 creation-date: 2025-08-27
-last-updated: 2025-08-27
+last-updated: 2025-09-04
 status: provisional
 ---
 
@@ -22,16 +22,16 @@ status: provisional
   * [Non-Goals](#non-goals)
 * [Proposal](#proposal)
   * [User Stories](#user-stories)
-     * [Story 1: StorageClass with QoS Parameters](#story-1-storageclass-with-qos-parameters)
+     * [Story 1: Volume Creation with QoS](#story-1-volume-creation-with-qos)
      * [Story 2: Runtime QoS Modification](#story-2-runtime-qos-modification)
-     * [Story 3: Adding QoS to Non-QoS StorageClass](#story-3-adding-qos-to-non-qos-storageclass)
+     * [Story 3: Adding QoS to Existing Volume](#story-3-adding-qos-to-existing-volume)
   * [Implementation Details](#implementation-details)
   * [Risks and Mitigations](#risks-and-mitigations)
 * [Testing](#testing)
 
 ## Summary
 
-This proposal adds Quality of Service (QoS) support to Mayastor volumes, enabling users to set IOPS and bandwidth rate limits per volume. QoS limits can be configured via StorageClass parameters at provisioning time or modified through PVC annotations at runtime without disrupting active workloads. This provides resource isolation and predictable performance characteristics for applications in multi-tenant storage environments.
+This proposal adds Quality of Service (QoS) support to Mayastor volumes, enabling users to set IOPS and bandwidth rate limits per volume. QoS limits can be configured through Volume Attribute Classes at provisioning time or modified at runtime without disrupting active workloads. This provides resource isolation and predictable performance characteristics for applications in multi-tenant storage environments.
 
 ## Motivation
 
@@ -40,7 +40,7 @@ Mayastor needs QoS controls to enable resource isolation and predictable perform
 ### Goals
 
 - Implement IOPS and bandwidth rate limiting per volume using SPDK's native QoS capabilities
-- Enable runtime QoS modification via PVC annotations without volume restart
+- Enable runtime QoS modification via Volume Attribute Classes without volume restart
 
 ### Non-Goals
 
@@ -50,29 +50,28 @@ Mayastor needs QoS controls to enable resource isolation and predictable perform
 
 ## Proposal
 
-This is where we get down to the nitty gritty of what the proposal actually is.
+**Kubernetes Version Support:**
+Volume Attribute Classes is supported in Kubernetes 1.31+ (beta) and 1.34+ (stable).
 
 ### User Stories
 
-#### Story 1: StorageClass with QoS Parameters
+#### Story 1: Volume Creation with QoS
 
-As a user, I want to create a storage class with QoS parameters so that volumes provisioned from this StorageClass have IOPS and bandwidth limits applied.
+As a user, I want to create a volume with IOPS and bandwidth limits applied so that my application has predictable storage performance.
 
-**StorageClass:**
+**Volume Attribute Class:**
 ```yaml
-apiVersion: storage.k8s.io/v1
-kind: StorageClass
+apiVersion: storage.k8s.io/v1beta1
+kind: VolumeAttributesClass
 metadata:
-  name: mayastor
-provisioner: io.openebs.csi-mayastor
+  name: standard-performance
+driverName: io.openebs.csi-mayastor
 parameters:
-  protocol: "nvmf"
-  repl: "3"
   qos-iops-limit: "5000"
   qos-bandwidth-limit-mb: "200"
 ```
 
-**PVC using the StorageClass:**
+**PVC with QoS:**
 ```yaml
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -80,98 +79,79 @@ metadata:
   name: app-storage
 spec:
   storageClassName: mayastor
+  volumeAttributesClassName: standard-performance
   ...
 ```
 
 #### Story 2: Runtime QoS Modification
 
-As a user, I want to modify QoS annotations on an existing PVC so that I can override StorageClass settings, increase/decrease limits, or disable QoS without disrupting the volume.
+As a user, I want to modify QoS settings on an existing volume so that I can increase/decrease limits without disrupting the volume.
 
-**Original StorageClass:**
+**Higher performance tier:**
 ```yaml
-apiVersion: storage.k8s.io/v1
-kind: StorageClass
+apiVersion: storage.k8s.io/v1beta1
+kind: VolumeAttributesClass
 metadata:
-  name: mayastor
-provisioner: io.openebs.csi-mayastor
+  name: high-performance
+driverName: io.openebs.csi-mayastor
 parameters:
-  protocol: "nvmf"
-  repl: "3"
-  qos-iops-limit: "2000"
-  qos-bandwidth-limit-mb: "100"
+  qos-iops-limit: "8000"
+  qos-bandwidth-limit-mb: "300"
 ```
 
-**PVC with runtime QoS override:**
-```yaml
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: database-storage
-  annotations:
-    openebs.io/qos-iops-limit: "8000"      # Override: increased from 2000
-    openebs.io/qos-bandwidth-limit-mb: "300"  # Override: increased from 100
-spec:
-  storageClassName: mayastor
-  ...
+**Upgrade existing PVC to higher tier:**
+```bash
+kubectl patch pvc app-storage -p '{"spec":{"volumeAttributesClassName":"high-performance"}}'
 ```
 
-#### Story 3: Adding QoS to Non-QoS StorageClass
+#### Story 3: Adding QoS to Existing Volume
 
-As a user, I want to add QoS annotations to a PVC that uses a StorageClass without QoS limits so that I can apply performance controls to volumes that didn't originally have them.
+As a user, I want to add QoS limits to an existing volume that was originally created without performance controls.
 
-**StorageClass without QoS:**
+**Analytics performance tier:**
 ```yaml
-apiVersion: storage.k8s.io/v1
-kind: StorageClass
+apiVersion: storage.k8s.io/v1beta1
+kind: VolumeAttributesClass
 metadata:
-  name: mayastor
-provisioner: io.openebs.csi-mayastor
+  name: analytics-tier
+driverName: io.openebs.csi-mayastor
 parameters:
-  protocol: "nvmf"
-  repl: "2"
+  qos-iops-limit: "3000"
+  qos-bandwidth-limit-mb: "150"
 ```
 
-**PVC adding QoS via annotations:**
-```yaml
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: analytics-storage
-  annotations:
-    openebs.io/qos-iops-limit: "3000"
-    openebs.io/qos-bandwidth-limit-mb: "150"
-spec:
-  storageClassName: mayastor-basic
-  ...
+**Add QoS to existing PVC:**
+```bash
+kubectl patch pvc analytics-storage -p '{"spec":{"volumeAttributesClassName":"analytics-tier"}}'
 ```
 
 ### Implementation Details
 
 **CSI Integration:**
-- CSI driver processes StorageClass parameters for initial QoS configuration
+- CSI driver implements `MODIFY_VOLUME` capability to support Volume Attribute Classes
+- Initial QoS configuration processed via VolumeAttributesClass parameters during `CreateVolume`
+- Runtime modifications handled through `ControllerModifyVolume` CSI RPC
 - SPDK QoS integration via existing JsonGrpc proxy
 - VolumeSpec integration for persistence
 
 **QoS Parameters:**
-- SPDK rate limit types (`rw_ios_per_sec`, `rw_mbytes_per_sec`, `r_mbytes_per_sec`, `w_mbytes_per_sec`) mapped to new StorageClass parameters and PVC annotations
-- Annotation names match StorageClass parameter names using `openebs.io/` namespace prefix
-- `qos-iops-limit` / `openebs.io/qos-iops-limit` - IOPS rate limit, becomes `rw_ios_per_sec`
-- `qos-bandwidth-limit-mb` / `openebs.io/qos-bandwidth-limit-mb` - Combined read/write bandwidth limit, becomes `rw_mbytes_per_sec`
-- `qos-read-bandwidth-limit-mb` / `openebs.io/qos-read-bandwidth-limit-mb` - Read-only bandwidth limit, becomes `r_mbytes_per_sec`
-- `qos-write-bandwidth-limit-mb` / `openebs.io/qos-write-bandwidth-limit-mb` - Write-only bandwidth limit, becomes `w_mbytes_per_sec`
+- SPDK rate limit types (`rw_ios_per_sec`, `rw_mbytes_per_sec`, `r_mbytes_per_sec`, `w_mbytes_per_sec`) mapped to VolumeAttributesClass parameters
+- `qos-iops-limit` - IOPS rate limit, becomes `rw_ios_per_sec`
+- `qos-bandwidth-limit-mb` - Combined read/write bandwidth limit, becomes `rw_mbytes_per_sec`
+- `qos-read-bandwidth-limit-mb` - Read-only bandwidth limit, becomes `r_mbytes_per_sec`
+- `qos-write-bandwidth-limit-mb` - Write-only bandwidth limit, becomes `w_mbytes_per_sec`
 
-**PVC Annotation Monitoring:**
-- Dedicated PVC watcher added to CSI driver monitors annotation changes on existing PVCs
-- Detects QoS annotation additions, modifications, and removals
-- Validates parameters before applying changes to live volumes
-- Applies changes to live volumes without restart via JsonGrpc → SPDK RPC calls
-- Updates VolumeSpec persistence layer to maintain consistency
-- Reports validation errors and operation status via PVC status field
+**Volume Modification Workflow:**
+- Kubernetes triggers `ControllerModifyVolume` RPC when PVC's `volumeAttributesClassName` changes
+- CSI driver validates new VolumeAttributesClass parameters
+- Parameters applied to live volumes without restart via JsonGrpc → SPDK RPC calls
+- VolumeSpec persistence layer updated to maintain consistency
+- Operation status reported back to Kubernetes via RPC response
 
 **Status Reporting:**
 - Applied QoS limits added to volume status when configured for operational visibility
-- Validation errors and conflicts reported in PVC status field
-- Status reflects actual SPDK-applied limits regardless of source (StorageClass or PVC annotations)
+- Validation errors and conflicts reported via `ControllerModifyVolume` RPC response
+- Status reflects actual SPDK-applied limits from VolumeAttributesClass parameters
 
 **Validation and Constraints:**
 - Parameter validation ensures non-negative values and meets SPDK minimum limits
@@ -195,8 +175,8 @@ spec:
 
 ## Testing
 
-- Volume creation with StorageClass QoS parameters applies limits correctly
-- PVC annotation changes update live volume QoS without restart
-- Invalid QoS parameters are rejected and reported in PVC status
+- Volume creation with VolumeAttributesClass QoS parameters applies limits correctly
+- `ControllerModifyVolume` workflow updates live volume QoS without restart
+- Invalid QoS parameters are rejected and reported via RPC response
 - QoS settings persist across io-engine restart
 - Verify actual SPDK QoS state matches configuration using `bdev_get_qos_rate_limits`
