@@ -7,7 +7,7 @@ owners:
   - "@urso"
 editor: TBD
 creation-date: 2025-08-27
-last-updated: 2025-09-04
+last-updated: 2025-09-09
 status: provisional
 ---
 
@@ -68,7 +68,7 @@ metadata:
 driverName: io.openebs.csi-mayastor
 parameters:
   qos-iops-limit: "5000"
-  qos-bandwidth-limit-mb: "200"
+  qos-bandwidth-per-sec: "200MiB"
 ```
 
 **PVC with QoS:**
@@ -96,7 +96,7 @@ metadata:
 driverName: io.openebs.csi-mayastor
 parameters:
   qos-iops-limit: "8000"
-  qos-bandwidth-limit-mb: "300"
+  qos-bandwidth-per-sec: "300MiB"
 ```
 
 **Upgrade existing PVC to higher tier:**
@@ -117,7 +117,7 @@ metadata:
 driverName: io.openebs.csi-mayastor
 parameters:
   qos-iops-limit: "3000"
-  qos-bandwidth-limit-mb: "150"
+  qos-bandwidth-per-sec: "150MiB"
 ```
 
 **Add QoS to existing PVC:**
@@ -137,9 +137,9 @@ kubectl patch pvc analytics-storage -p '{"spec":{"volumeAttributesClassName":"an
 **QoS Parameters:**
 - SPDK rate limit types (`rw_ios_per_sec`, `rw_mbytes_per_sec`, `r_mbytes_per_sec`, `w_mbytes_per_sec`) mapped to VolumeAttributesClass parameters
 - `qos-iops-limit` - IOPS rate limit, becomes `rw_ios_per_sec`
-- `qos-bandwidth-limit-mb` - Combined read/write bandwidth limit, becomes `rw_mbytes_per_sec`
-- `qos-read-bandwidth-limit-mb` - Read-only bandwidth limit, becomes `r_mbytes_per_sec`
-- `qos-write-bandwidth-limit-mb` - Write-only bandwidth limit, becomes `w_mbytes_per_sec`
+- `qos-bandwidth-per-sec` - Combined read/write bandwidth limit, becomes `rw_mbytes_per_sec`
+- `qos-read-bandwidth-per-sec` - Read-only bandwidth limit, becomes `r_mbytes_per_sec`
+- `qos-write-bandwidth-per-sec` - Write-only bandwidth limit, becomes `w_mbytes_per_sec`
 
 **Volume Modification Workflow:**
 - Kubernetes triggers `ControllerModifyVolume` RPC when PVC's `volumeAttributesClassName` changes
