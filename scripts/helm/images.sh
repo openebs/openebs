@@ -226,6 +226,7 @@ case "$COMMAND" in
     # Second let's get all images which are statically deployed by the chart. IOW, any images which are part of
     # a pod or pod-controller which gets deployed by the chart.
     $SCRIPT_DIR/install.sh --locals --replicated --template --helm "--kubeconfig $CHART_DIR/fake" | grep -Po "^[ \t]*image: \K(.*:.*)$" | tr -d \" | LC_ALL=C sort | uniq >> "$TEMPLATE_IMAGES"
+    $HELM template "$CHART_DIR" --set "$ENABLE_ANALYTICS" --kubeconfig "$CHART_DIR/fake" --is-upgrade | grep -Po "^[ \t]*image: \K(.*:.*)$" | tr -d \" | LC_ALL=C sort | uniq >> "$TEMPLATE_IMAGES"
 
     # Third, we handle images which are deployed on-demand by the product and its dependencies.
     # An example of this is the init pod's deployed by the localpv-provisioner in order to prepare the filesystem for
