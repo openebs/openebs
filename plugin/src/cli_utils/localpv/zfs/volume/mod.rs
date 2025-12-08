@@ -124,8 +124,8 @@ async fn list_pv(pv_handle: Api<PersistentVolume>) -> Result<Vec<PersistentVolum
             .map_err(|err| Error::Kube { source: err })?;
         vol_list.extend(list.items);
         match list.metadata.continue_ {
-            Some(token) => list_param = list_param.continue_token(&token),
-            None => break,
+            Some(token) if !token.is_empty() => list_param = list_param.continue_token(&token),
+            _ => break,
         }
     }
     Ok(vol_list)
