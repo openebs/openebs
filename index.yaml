@@ -18,9 +18,9 @@ entries:
         - name: prometheus-nats-exporter
           image: docker.io/natsio/prometheus-nats-exporter:0.11.0
         - name: alpine-bash
-          image: docker.io/openebs/alpine-bash:4.3.0
+          image: docker.io/openebs/alpine-bash:4.4.0
         - name: alpine-sh
-          image: docker.io/openebs/alpine-sh:4.3.0
+          image: docker.io/openebs/alpine-sh:4.4.0
         - name: etcd
           image: docker.io/openebs/etcd:3.6.4-debian-12-r0
         - name: kubectl
@@ -89,7 +89,7 @@ entries:
           image: registry.k8s.io/sig-storage/snapshot-controller:v8.2.1
     apiVersion: v2
     appVersion: 4.5.0-develop
-    created: "2026-02-04T00:48:25.951216935Z"
+    created: "2026-02-04T15:15:51.724713438Z"
     dependencies:
     - name: openebs-crds
       repository: ""
@@ -122,7 +122,7 @@ entries:
       repository: https://openebs.github.io/mayastor-extensions
       version: 0.0.0
     description: Containerized Attached Storage for Kubernetes
-    digest: 8ebd0e6b0cf0b901b643e45acc65c47b426aec43d377bb8bca1206482908df27
+    digest: be35e501a3ec0a4581f9211be438dbcea3b18a2d910f5aba0707bc7c41dddb28
     home: https://www.openebs.io/
     icon: https://raw.githubusercontent.com/cncf/artwork/HEAD/projects/openebs/icon/color/openebs-icon-color.png
     keywords:
@@ -2482,4 +2482,4 @@ entries:
     urls:
     - https://github.com/openebs/openebs/releases/download/openebs-4.0.0/openebs-4.0.0.tgz
     version: 4.0.0
-generated: "2026-02-04T00:48:48.009600402Z"
+generated: "2026-02-04T15:15:51.678586419Z"
