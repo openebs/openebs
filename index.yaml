@@ -27,6 +27,8 @@ entries:
           image: docker.io/openebs/kubectl:1.25.15
         - name: linux-utils
           image: docker.io/openebs/linux-utils:4.3.0
+        - name: linux-utils
+          image: docker.io/openebs/linux-utils:4.4.0
         - name: lvm-driver
           image: docker.io/openebs/lvm-driver:1.9.0-develop
         - name: mayastor-agent-core
@@ -89,7 +91,7 @@ entries:
           image: registry.k8s.io/sig-storage/snapshot-controller:v8.2.1
     apiVersion: v2
     appVersion: 4.5.0-develop
-    created: "2026-02-05T11:28:41.536987813Z"
+    created: "2026-02-05T16:29:42.719584469Z"
     dependencies:
     - name: openebs-crds
       repository: ""
@@ -122,7 +124,7 @@ entries:
       repository: https://openebs.github.io/mayastor-extensions
       version: 0.0.0
     description: Containerized Attached Storage for Kubernetes
-    digest: 1ed240038e6bd2d5a6aaef3a215903ecb903deab2f3511b7bd5f10c766781f05
+    digest: c0fc701f0a232ee99f1b6c3abd93610fb450a60e07557d6257582a300096aab2
     home: https://www.openebs.io/
     icon: https://raw.githubusercontent.com/cncf/artwork/HEAD/projects/openebs/icon/color/openebs-icon-color.png
     keywords:
@@ -2482,4 +2484,4 @@ entries:
     urls:
     - https://github.com/openebs/openebs/releases/download/openebs-4.0.0/openebs-4.0.0.tgz
     version: 4.0.0
-generated: "2026-02-05T11:28:41.489573072Z"
+generated: "2026-02-05T16:29:42.674482712Z"
