@@ -73,10 +73,12 @@ entries:
           image: registry.k8s.io/sig-storage/csi-node-driver-registrar:v2.13.0
         - name: csi-provisioner
           image: registry.k8s.io/sig-storage/csi-provisioner:v5.2.0
-        - name: csi-resizer
-          image: registry.k8s.io/sig-storage/csi-resizer:v1.11.2
+        - name: csi-provisioner
+          image: registry.k8s.io/sig-storage/csi-provisioner:v6.1.0
         - name: csi-resizer
           image: registry.k8s.io/sig-storage/csi-resizer:v1.13.2
+        - name: csi-resizer
+          image: registry.k8s.io/sig-storage/csi-resizer:v2.0.0
         - name: csi-snapshotter
           image: registry.k8s.io/sig-storage/csi-snapshotter:v7.0.0
         - name: csi-snapshotter
@@ -91,7 +93,7 @@ entries:
           image: registry.k8s.io/sig-storage/snapshot-controller:v8.2.1
     apiVersion: v2
     appVersion: 4.5.0-develop
-    created: "2026-02-26T00:48:33.047780113Z"
+    created: "2026-03-02T10:26:07.179423632Z"
     dependencies:
     - name: openebs-crds
       repository: ""
@@ -124,7 +126,7 @@ entries:
       repository: https://openebs.github.io/mayastor-extensions
       version: 0.0.0
     description: Containerized Attached Storage for Kubernetes
-    digest: 1b13609be37d871d287f68d118a4baea971001830a2a23d79bd723057dfbffee
+    digest: 80a1de80bae84b39bdf36284858e18490070bfa55025648971a7f313a8588a24
     home: https://www.openebs.io/
     icon: https://raw.githubusercontent.com/cncf/artwork/HEAD/projects/openebs/icon/color/openebs-icon-color.png
     keywords:
@@ -2484,4 +2486,4 @@ entries:
     urls:
     - https://github.com/openebs/openebs/releases/download/openebs-4.0.0/openebs-4.0.0.tgz
     version: 4.0.0
-generated: "2026-03-02T10:05:46.039269743Z"
+generated: "2026-03-02T10:26:07.136904194Z"
