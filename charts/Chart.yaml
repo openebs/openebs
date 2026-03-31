@@ -28,6 +28,7 @@ dependencies:
   - name: localpv-provisioner
     version: 4.5.0-develop
     repository: "https://openebs.github.io/dynamic-localpv-provisioner"
+    condition: engines.local.hostpath.enabled
   - name: zfs-localpv
     version: 2.10.0-develop
     repository: "https://openebs.github.io/zfs-localpv"

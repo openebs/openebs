@@ -1,4 +1,4 @@
-{{- if and (.Values.loki.localpvScConfig.enabled) (.Values.loki.singleBinary.persistence.enabled) (.Values.loki.enabled) }}
+{{- if and (.Values.engines.local.hostpath.enabled) (.Values.loki.localpvScConfig.enabled) (.Values.loki.singleBinary.persistence.enabled) (.Values.loki.enabled) }}
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
@@ -15,7 +15,7 @@ reclaimPolicy: {{ .Values.loki.localpvScConfig.loki.reclaimPolicy }}
 volumeBindingMode: {{ .Values.loki.localpvScConfig.loki.volumeBindingMode }}
 {{- end }}
 ---
-{{- if and (.Values.loki.localpvScConfig.enabled) (.Values.loki.minio.persistence.enabled) (.Values.loki.enabled) }}
+{{- if and (.Values.engines.local.hostpath.enabled) (.Values.loki.localpvScConfig.enabled) (.Values.loki.minio.persistence.enabled) (.Values.loki.enabled) }}
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
