@@ -1,4 +1,4 @@
-{{- if .Values.preUpgradeHook.enabled }}
+{{- if and .Values.preUpgradeHook.enabled .Values.engines.local.hostpath.enabled }}
 {{- if .Release.IsUpgrade }}
 {{- if include "hostpath_is_v3" . }}
 apiVersion: v1

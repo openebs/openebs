@@ -93,6 +93,9 @@ engines:
       # Disabled by default since rawfile is not marked as stable yet.
       # -- Enable/Disable LocalPV Rawfile Storage Engine
       enabled: false
+    hostpath:
+      # -- Enable/Disable Dynamic LocalPV Provisioner
+      enabled: true
   replicated:
     mayastor:
       # -- Enable/Disable Replicated PV Mayastor Storage Engine
