@@ -3,11 +3,7 @@
 set -e
 
 FMT_ERROR=
-SCRIPT_DIR="$(dirname "$0")"
-ROOT_DIR="${SCRIPT_DIR}/../.."
-PLUGIN_DIR="${ROOT_DIR}/plugin"
-
-cd "${PLUGIN_DIR}"
+FMT_OPTS=${FMT_OPTS:-"--config imports_granularity=Crate"}
 
 OP="${1:-}"
 
@@ -23,9 +19,9 @@ cargo fmt -- --version
 cargo clippy -- --version
 
 if [ -z "$OP" ] || [  "$OP" = "fmt" ]; then
-  cargo fmt --all --check || FMT_ERROR=$?
+  cargo fmt --all --check -- $FMT_OPTS || FMT_ERROR=$?
   if [ -n "$FMT_ERROR" ]; then
-    cargo fmt --all
+    cargo fmt --all -- $FMT_OPTS
   fi
 fi
 
@@ -34,3 +30,4 @@ if [ -z "$OP" ] || [  "$OP" = "clippy" ]; then
 fi
 
 exit ${FMT_ERROR:-0}
+
