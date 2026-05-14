@@ -18,9 +18,9 @@ entries:
         - name: prometheus-nats-exporter
           image: docker.io/natsio/prometheus-nats-exporter:0.11.0
         - name: alpine-bash
-          image: docker.io/openebs/alpine-bash:4.4.0
+          image: docker.io/openebs/alpine-bash:4.5.0
         - name: alpine-sh
-          image: docker.io/openebs/alpine-sh:4.4.0
+          image: docker.io/openebs/alpine-sh:4.5.0
         - name: etcd
           image: docker.io/openebs/etcd:3.6.4-debian-12-r0
         - name: kubectl
@@ -28,7 +28,7 @@ entries:
         - name: linux-utils
           image: docker.io/openebs/linux-utils:4.3.0
         - name: linux-utils
-          image: docker.io/openebs/linux-utils:4.4.0
+          image: docker.io/openebs/linux-utils:4.5.0
         - name: lvm-driver
           image: docker.io/openebs/lvm-driver:1.9.0-develop
         - name: mayastor-agent-core
@@ -93,7 +93,7 @@ entries:
           image: registry.k8s.io/sig-storage/snapshot-controller:v8.2.1
     apiVersion: v2
     appVersion: 4.5.0-develop
-    created: "2026-05-13T11:15:57.187653901Z"
+    created: "2026-05-14T08:25:48.756750797Z"
     dependencies:
     - name: openebs-crds
       repository: ""
@@ -126,7 +126,7 @@ entries:
       repository: https://openebs.github.io/mayastor-extensions
       version: 0.0.0
     description: Containerized Attached Storage for Kubernetes
-    digest: ff7a4f4e90a7da28d0048cf13fe838d16a00eabbd4f4a6c9e78f6f3e4932721a
+    digest: 76ce55f4dafa230c23543ac9b2b1cda270715a2da670d90a220d5bb730c82155
     home: https://www.openebs.io/
     icon: https://raw.githubusercontent.com/cncf/artwork/HEAD/projects/openebs/icon/color/openebs-icon-color.png
     keywords:
@@ -2486,4 +2486,4 @@ entries:
     urls:
     - https://github.com/openebs/openebs/releases/download/openebs-4.0.0/openebs-4.0.0.tgz
     version: 4.0.0
-generated: "2026-05-14T01:11:38.496294657Z"
+generated: "2026-05-14T08:25:48.712129832Z"
