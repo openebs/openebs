@@ -26,8 +26,6 @@ entries:
         - name: kubectl
           image: docker.io/openebs/kubectl:1.25.15
         - name: linux-utils
-          image: docker.io/openebs/linux-utils:4.3.0
-        - name: linux-utils
           image: docker.io/openebs/linux-utils:4.5.0
         - name: lvm-driver
           image: docker.io/openebs/lvm-driver:1.9.0-develop
@@ -54,7 +52,7 @@ entries:
         - name: mayastor-operator-diskpool
           image: docker.io/openebs/mayastor-operator-diskpool:develop
         - name: provisioner-localpv
-          image: docker.io/openebs/provisioner-localpv:4.4.0
+          image: docker.io/openebs/provisioner-localpv:4.5.0
         - name: provisioner-localpv
           image: docker.io/openebs/provisioner-localpv:4.5.0-develop
         - name: rawfile-localpv
@@ -93,7 +91,7 @@ entries:
           image: registry.k8s.io/sig-storage/snapshot-controller:v8.2.1
     apiVersion: v2
     appVersion: 4.5.0-develop
-    created: "2026-05-15T07:12:35.745528877Z"
+    created: "2026-05-21T08:47:50.248698225Z"
     dependencies:
     - name: openebs-crds
       repository: ""
@@ -126,7 +124,7 @@ entries:
       repository: https://openebs.github.io/mayastor-extensions
       version: 0.0.0
     description: Containerized Attached Storage for Kubernetes
-    digest: a4de372f16d2bed9dcd7ed123454810deea7b0eb4f1f8438482ba3ac02363128
+    digest: a883567b5dd9dfc6e554f07ab2a77bcadc3458bfa87443f7eb0339227ab46564
     home: https://www.openebs.io/
     icon: https://raw.githubusercontent.com/cncf/artwork/HEAD/projects/openebs/icon/color/openebs-icon-color.png
     keywords:
@@ -2486,4 +2484,4 @@ entries:
     urls:
     - https://github.com/openebs/openebs/releases/download/openebs-4.0.0/openebs-4.0.0.tgz
     version: 4.0.0
-generated: "2026-05-21T01:15:48.471421897Z"
+generated: "2026-05-21T08:47:50.205084565Z"
