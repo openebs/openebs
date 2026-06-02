@@ -1,4 +1,4 @@
 [submodule "mayastor"]
 	path = mayastor
 	url = ../mayastor-extensions.git
-	branch = develop
+	branch = v2.11.0-rc.0
