@@ -11,7 +11,7 @@ use crate::{
         },
     },
     console_logger,
-    constants::{get_destination_version_tag, upgrade_obj_suffix, UPGRADE_JOB_IMAGE_REPO},
+    constants::{get_destination_version_tag, upgrade_obj_suffix},
     upgrade_labels,
 };
 use upgrade::common::kube::client::{list_pods, paginated_list_metadata};
@@ -137,8 +137,9 @@ async fn upgrade_job(
     let image_properties: ImageProperties =
         ImageProperties::new_from_helm_release(release_name, args).await?;
     let upgrade_image = format!(
-        "{image_registry}/{UPGRADE_JOB_IMAGE_REPO}/openebs-upgrade-job:{image_tag}",
+        "{image_registry}/{namespace}/openebs-upgrade-job:{image_tag}",
         image_registry = image_properties.registry,
+        namespace = args.repo_namespace,
         image_tag = get_destination_version_tag()
     );
 

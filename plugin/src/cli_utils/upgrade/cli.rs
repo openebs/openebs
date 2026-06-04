@@ -5,6 +5,7 @@ use crate::{
         upgrade_preflight_check,
     },
     console_logger,
+    constants::UPGRADE_JOB_IMAGE_REPO,
 };
 use upgrade::common::kube::client::client;
 
@@ -28,6 +29,10 @@ pub struct UpgradeCommonArgs {
     /// Specify the container registry for the upgrade-job image.
     #[arg(long)]
     pub registry: Option<String>,
+
+    /// Specify the container namespace for the upgrade-job image.
+    #[arg(long, default_value = UPGRADE_JOB_IMAGE_REPO)]
+    pub repo_namespace: String,
 
     /// Allow upgrade from stable versions to unstable versions. This is implied when the
     /// '--skip-upgrade-path-validation-for-unsupported-version' option is used.

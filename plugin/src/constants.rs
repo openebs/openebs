@@ -16,8 +16,7 @@ pub fn upgrade_obj_suffix() -> String {
 
 /// The default image tag to the upgrade-job image.
 pub const UPGRADE_JOB_IMAGE_TAG: &str = "develop";
-/// The default image registry for container images.
-pub const DEFAULT_IMAGE_REGISTRY: &str = "docker.io";
+
 /// ConfigMap mount path for upgrade.
 pub const UPGRADE_CONFIG_MAP_MOUNT_PATH: &str = "/upgrade-config-map";
 /// Name of the product.
