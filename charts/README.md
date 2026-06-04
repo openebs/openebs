@@ -88,7 +88,7 @@ helm delete `<RELEASE NAME>` -n `<RELEASE NAMESPACE>`
 | https://grafana.github.io/helm-charts | loki | 6.29.0 |
 | https://openebs.github.io/dynamic-localpv-provisioner | localpv-provisioner | 4.5.0 |
 | https://openebs.github.io/lvm-localpv | lvm-localpv | 1.9.0 |
-| https://openebs.github.io/mayastor-extensions | mayastor | 2.11.0-rc.0 |
+| https://openebs.github.io/mayastor-extensions | mayastor | 2.11.0-rc.1 |
 | https://openebs.github.io/rawfile-localpv | rawfile-localpv | 0.14.0 |
 | https://openebs.github.io/zfs-localpv | zfs-localpv | 2.10.0 |
 
