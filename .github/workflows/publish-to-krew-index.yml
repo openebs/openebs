@@ -6,6 +6,11 @@ jobs:
   publish-artifacts:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: recursive
       - name: Get Latest Release Tag
         id: latest-release
         env:
