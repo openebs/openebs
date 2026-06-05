@@ -35,11 +35,38 @@ submodule_set_branch_all() {
 
 submodule_update() {
   for mod in `git config --file .gitmodules --get-regexp path | awk '{ print $2 }'`; do
-    git submodule update --remote "$mod"
+    local error=0
+    git submodule update --remote "$mod" || error=$?
+    if [ $error -ne 0 ]; then
+      if [ $error -ne 128 ]; then
+         die "Failed to update submodule $mod with error code $error"
+      fi
+      if mod_branch_is_tag "$mod"; then
+        echo_stderr "Submodule $mod is on a tag, skipping update"
+      else
+         die "Failed to update submodule $mod with error code $error"
+      fi
+    fi
     pushd "$mod" >/dev/null
     git submodule update --init --recursive .
     popd >/dev/null
   done
+}
+
+mod_branch_is_tag() {
+  local mod="$1"
+  local ref
+  local rc=0
+
+  ref="$(git config --file .gitmodules "submodule.$mod.branch" 2>/dev/null || true)"
+  [ -n "$ref" ] || return 1
+
+  pushd "$mod" >/dev/null
+  git fetch --tags origin >/dev/null 2>&1 || true
+  git show-ref --tags --verify --quiet "refs/tags/$ref" || rc=$?
+  popd >/dev/null
+
+  return $rc
 }
 
 mayastor_branch_exists() {
