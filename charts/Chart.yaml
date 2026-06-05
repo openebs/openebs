@@ -1,7 +1,7 @@
 apiVersion: v2
-version: 4.5.0-prerelease
+version: 2.11.0-release-unstable-2026-06-05-11-04-35
 name: openebs
-appVersion: 4.5.0-prerelease
+appVersion: 2.11.0-release-unstable-2026-06-05-11-04-35
 description: Containerized Attached Storage for Kubernetes
 icon: https://raw.githubusercontent.com/cncf/artwork/HEAD/projects/openebs/icon/color/openebs-icon-color.png
 home: https://www.openebs.io/
@@ -42,8 +42,8 @@ dependencies:
     repository: "https://openebs.github.io/rawfile-localpv"
     condition: engines.local.rawfile.enabled
   - name: mayastor
-    version: 2.11.0
-    repository: "https://openebs.github.io/mayastor-extensions"
+    version: 2.11.0-release-unstable-2026-06-05-11-04-35
+    repository: https://openebs.github.io/mayastor-chart-donotuse
     condition: engines.replicated.mayastor.enabled
 
 annotations:
