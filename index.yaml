@@ -275,7 +275,7 @@ entries:
           image: registry.k8s.io/sig-storage/snapshot-controller:v8.2.1
     apiVersion: v2
     appVersion: 4.5.0-prerelease
-    created: "2026-06-07T01:21:43.931155549Z"
+    created: "2026-06-08T01:21:13.636974675Z"
     dependencies:
     - name: openebs-crds
       repository: ""
@@ -309,7 +309,7 @@ entries:
       repository: https://openebs.github.io/mayastor-extensions
       version: 2.11.0
     description: Containerized Attached Storage for Kubernetes
-    digest: f97bea7b2386e39917d281fca6cb572cdc8ee51e08ae591927ef5b11ed7925f6
+    digest: 25cb9885f402bb2b462ffb3e6ce7c49462e0f2c06d88c76701dd3f6e591ff9dc
     home: https://www.openebs.io/
     icon: https://raw.githubusercontent.com/cncf/artwork/HEAD/projects/openebs/icon/color/openebs-icon-color.png
     keywords:
@@ -2809,4 +2809,4 @@ entries:
     urls:
     - https://github.com/openebs/openebs/releases/download/openebs-4.0.0/openebs-4.0.0.tgz
     version: 4.0.0
-generated: "2026-06-08T01:20:54.991343271Z"
+generated: "2026-06-08T01:21:13.574380711Z"
