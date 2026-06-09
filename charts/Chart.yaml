@@ -1,7 +1,7 @@
 apiVersion: v2
-version: 4.5.0-prerelease
+version: 4.5.1-prerelease
 name: openebs
-appVersion: 4.5.0-prerelease
+appVersion: 4.5.1-prerelease
 description: Containerized Attached Storage for Kubernetes
 icon: https://raw.githubusercontent.com/cncf/artwork/HEAD/projects/openebs/icon/color/openebs-icon-color.png
 home: https://www.openebs.io/
@@ -16,7 +16,7 @@ sources:
   - https://github.com/openebs/openebs
 dependencies:
   - name: openebs-crds
-    version: 4.5.0-prerelease
+    version: 4.5.1-prerelease
   - name: loki
     version: 6.29.0
     repository: https://grafana.github.io/helm-charts
@@ -26,15 +26,15 @@ dependencies:
     repository: https://grafana.github.io/helm-charts
     condition: alloy.enabled
   - name: localpv-provisioner
-    version: 4.5.0
+    version: 4.5.1-prerelease
     repository: "https://openebs.github.io/dynamic-localpv-provisioner"
     condition: engines.local.hostpath.enabled
   - name: zfs-localpv
-    version: 2.10.0
+    version: 2.10.1-prerelease
     repository: "https://openebs.github.io/zfs-localpv"
     condition: engines.local.zfs.enabled
   - name: lvm-localpv
-    version: 1.9.0
+    version: 1.9.1-prerelease
     repository: "https://openebs.github.io/lvm-localpv"
     condition: engines.local.lvm.enabled
   - name: rawfile-localpv
@@ -73,7 +73,7 @@ annotations:
     - name: linux-utils
       image: docker.io/openebs/linux-utils:4.5.0
     - name: lvm-driver
-      image: docker.io/openebs/lvm-driver:1.9.0
+      image: docker.io/openebs/lvm-driver:1.9.1-prerelease
     - name: mayastor-agent-core
       image: docker.io/openebs/mayastor-agent-core:v2.11.0
     - name: mayastor-agent-ha-cluster
@@ -98,10 +98,12 @@ annotations:
       image: docker.io/openebs/mayastor-operator-diskpool:v2.11.0
     - name: provisioner-localpv
       image: docker.io/openebs/provisioner-localpv:4.5.0
+    - name: provisioner-localpv
+      image: docker.io/openebs/provisioner-localpv:4.5.1-prerelease
     - name: rawfile-localpv
       image: docker.io/openebs/rawfile-localpv:v0.14.0
     - name: zfs-driver
-      image: docker.io/openebs/zfs-driver:2.10.0
+      image: docker.io/openebs/zfs-driver:2.10.1-prerelease
     - name: alpine-sh
       image: ghcr.io/openebs/mayastor/dev/alpine-sh:4.5.0
     - name: mayastor-agent-core
