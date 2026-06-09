@@ -10,7 +10,7 @@ docker.io/openebs/alpine-sh:4.5.0
 docker.io/openebs/etcd:3.6.4-debian-12-r0
 docker.io/openebs/kubectl:1.25.15
 docker.io/openebs/linux-utils:4.5.0
-docker.io/openebs/lvm-driver:1.9.0
+docker.io/openebs/lvm-driver:1.9.1-prerelease
 docker.io/openebs/mayastor-agent-core:v2.11.0
 docker.io/openebs/mayastor-agent-ha-cluster:v2.11.0
 docker.io/openebs/mayastor-agent-ha-node:v2.11.0
@@ -23,8 +23,9 @@ docker.io/openebs/mayastor-obs-callhome-stats:v2.11.0
 docker.io/openebs/mayastor-obs-callhome:v2.11.0
 docker.io/openebs/mayastor-operator-diskpool:v2.11.0
 docker.io/openebs/provisioner-localpv:4.5.0
+docker.io/openebs/provisioner-localpv:4.5.1-prerelease
 docker.io/openebs/rawfile-localpv:v0.14.0
-docker.io/openebs/zfs-driver:2.10.0
+docker.io/openebs/zfs-driver:2.10.1-prerelease
 ghcr.io/openebs/mayastor/dev/alpine-sh:4.5.0
 ghcr.io/openebs/mayastor/dev/mayastor-agent-core:v2.11.0
 ghcr.io/openebs/mayastor/dev/mayastor-agent-ha-cluster:v2.11.0
