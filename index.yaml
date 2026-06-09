@@ -28,6 +28,146 @@ entries:
         - name: linux-utils
           image: docker.io/openebs/linux-utils:4.5.0
         - name: lvm-driver
+          image: docker.io/openebs/lvm-driver:1.10.0-develop
+        - name: mayastor-agent-core
+          image: docker.io/openebs/mayastor-agent-core:develop
+        - name: mayastor-agent-ha-cluster
+          image: docker.io/openebs/mayastor-agent-ha-cluster:develop
+        - name: mayastor-agent-ha-node
+          image: docker.io/openebs/mayastor-agent-ha-node:develop
+        - name: mayastor-api-rest
+          image: docker.io/openebs/mayastor-api-rest:develop
+        - name: mayastor-csi-controller
+          image: docker.io/openebs/mayastor-csi-controller:develop
+        - name: mayastor-csi-node
+          image: docker.io/openebs/mayastor-csi-node:develop
+        - name: mayastor-io-engine
+          image: docker.io/openebs/mayastor-io-engine:develop
+        - name: mayastor-metrics-exporter-io-engine
+          image: docker.io/openebs/mayastor-metrics-exporter-io-engine:develop
+        - name: mayastor-obs-callhome-stats
+          image: docker.io/openebs/mayastor-obs-callhome-stats:develop
+        - name: mayastor-obs-callhome
+          image: docker.io/openebs/mayastor-obs-callhome:develop
+        - name: mayastor-operator-diskpool
+          image: docker.io/openebs/mayastor-operator-diskpool:develop
+        - name: provisioner-localpv
+          image: docker.io/openebs/provisioner-localpv:4.5.0
+        - name: provisioner-localpv
+          image: docker.io/openebs/provisioner-localpv:4.6.0-develop
+        - name: rawfile-localpv
+          image: docker.io/openebs/rawfile-localpv:v0.14.0
+        - name: zfs-driver
+          image: docker.io/openebs/zfs-driver:2.11.0-develop
+        - name: mc
+          image: quay.io/minio/mc:RELEASE.2024-11-21T17-21-54Z
+        - name: minio
+          image: quay.io/minio/minio:RELEASE.2024-12-18T13-15-44Z
+        - name: prometheus-config-reloader
+          image: quay.io/prometheus-operator/prometheus-config-reloader:v0.81.0
+        - name: csi-attacher
+          image: registry.k8s.io/sig-storage/csi-attacher:v4.8.1
+        - name: csi-node-driver-registrar
+          image: registry.k8s.io/sig-storage/csi-node-driver-registrar:v2.13.0
+        - name: csi-provisioner
+          image: registry.k8s.io/sig-storage/csi-provisioner:v5.2.0
+        - name: csi-provisioner
+          image: registry.k8s.io/sig-storage/csi-provisioner:v6.1.0
+        - name: csi-resizer
+          image: registry.k8s.io/sig-storage/csi-resizer:v1.13.2
+        - name: csi-resizer
+          image: registry.k8s.io/sig-storage/csi-resizer:v2.0.0
+        - name: csi-snapshotter
+          image: registry.k8s.io/sig-storage/csi-snapshotter:v7.0.0
+        - name: csi-snapshotter
+          image: registry.k8s.io/sig-storage/csi-snapshotter:v8.2.0
+        - name: csi-snapshotter
+          image: registry.k8s.io/sig-storage/csi-snapshotter:v8.2.1
+        - name: snapshot-controller
+          image: registry.k8s.io/sig-storage/snapshot-controller:v7.0.0
+        - name: snapshot-controller
+          image: registry.k8s.io/sig-storage/snapshot-controller:v8.2.0
+        - name: snapshot-controller
+          image: registry.k8s.io/sig-storage/snapshot-controller:v8.2.1
+    apiVersion: v2
+    appVersion: 4.6.0-develop
+    created: "2026-06-09T08:53:32.512187762Z"
+    dependencies:
+    - name: openebs-crds
+      repository: ""
+      version: 4.6.0-develop
+    - condition: loki.enabled
+      name: loki
+      repository: https://grafana.github.io/helm-charts
+      version: 6.29.0
+    - condition: alloy.enabled
+      name: alloy
+      repository: https://grafana.github.io/helm-charts
+      version: 1.0.1
+    - condition: engines.local.hostpath.enabled
+      name: localpv-provisioner
+      repository: https://openebs.github.io/dynamic-localpv-provisioner
+      version: 4.6.0-develop
+    - condition: engines.local.zfs.enabled
+      name: zfs-localpv
+      repository: https://openebs.github.io/zfs-localpv
+      version: 2.11.0-develop
+    - condition: engines.local.lvm.enabled
+      name: lvm-localpv
+      repository: https://openebs.github.io/lvm-localpv
+      version: 1.10.0-develop
+    - condition: engines.local.rawfile.enabled
+      name: rawfile-localpv
+      repository: https://openebs.github.io/rawfile-localpv
+      version: 0.14.0
+    - condition: engines.replicated.mayastor.enabled
+      name: mayastor
+      repository: https://openebs.github.io/mayastor-extensions
+      version: 0.0.0
+    description: Containerized Attached Storage for Kubernetes
+    digest: dbf3820c074574206861d2bf6aa33995ca52f0708b7ef47a29d05b81c63f4f84
+    home: https://www.openebs.io/
+    icon: https://raw.githubusercontent.com/cncf/artwork/HEAD/projects/openebs/icon/color/openebs-icon-color.png
+    keywords:
+    - cloud-native-storage
+    - block-storage
+    - local-storage
+    - NVMe
+    - storage
+    - kubernetes
+    name: openebs
+    sources:
+    - https://github.com/openebs/openebs
+    urls:
+    - https://openebs.github.io/openebs/openebs-4.6.0-develop.tgz
+    version: 4.6.0-develop
+  - annotations:
+      helm.sh/images: |
+        - name: alloy
+          image: docker.io/grafana/alloy:v1.8.1
+        - name: loki
+          image: docker.io/grafana/loki:3.4.2
+        - name: k8s-sidecar
+          image: docker.io/kiwigrid/k8s-sidecar:1.30.2
+        - name: nats
+          image: docker.io/nats:2.9.17-alpine
+        - name: nats-box
+          image: docker.io/natsio/nats-box:0.13.8
+        - name: nats-server-config-reloader
+          image: docker.io/natsio/nats-server-config-reloader:0.10.1
+        - name: prometheus-nats-exporter
+          image: docker.io/natsio/prometheus-nats-exporter:0.11.0
+        - name: alpine-bash
+          image: docker.io/openebs/alpine-bash:4.5.0
+        - name: alpine-sh
+          image: docker.io/openebs/alpine-sh:4.5.0
+        - name: etcd
+          image: docker.io/openebs/etcd:3.6.4-debian-12-r0
+        - name: kubectl
+          image: docker.io/openebs/kubectl:1.25.15
+        - name: linux-utils
+          image: docker.io/openebs/linux-utils:4.5.0
+        - name: lvm-driver
           image: docker.io/openebs/lvm-driver:1.9.0
         - name: mayastor-agent-core
           image: docker.io/openebs/mayastor-agent-core:v2.11.0
@@ -2809,4 +2949,4 @@ entries:
     urls:
     - https://github.com/openebs/openebs/releases/download/openebs-4.0.0/openebs-4.0.0.tgz
     version: 4.0.0
-generated: "2026-06-09T01:13:14.129568503Z"
+generated: "2026-06-09T08:53:32.466469974Z"
