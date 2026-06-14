@@ -52,7 +52,7 @@ entries:
         - name: mayastor-operator-diskpool
           image: docker.io/openebs/mayastor-operator-diskpool:develop
         - name: provisioner-localpv
-          image: docker.io/openebs/provisioner-localpv:4.5.0
+          image: docker.io/openebs/provisioner-localpv:4.5.1
         - name: provisioner-localpv
           image: docker.io/openebs/provisioner-localpv:4.6.0-develop
         - name: rawfile-localpv
@@ -91,7 +91,7 @@ entries:
           image: registry.k8s.io/sig-storage/snapshot-controller:v8.2.1
     apiVersion: v2
     appVersion: 4.6.0-develop
-    created: "2026-06-09T08:53:32.512187762Z"
+    created: "2026-06-14T02:56:40.345381505Z"
     dependencies:
     - name: openebs-crds
       repository: ""
@@ -125,7 +125,7 @@ entries:
       repository: https://openebs.github.io/mayastor-extensions
       version: 0.0.0
     description: Containerized Attached Storage for Kubernetes
-    digest: dbf3820c074574206861d2bf6aa33995ca52f0708b7ef47a29d05b81c63f4f84
+    digest: 5495bb70ac50cf7f8281e4c317258cc99d57b77e5975504dbde3618064a1472b
     home: https://www.openebs.io/
     icon: https://raw.githubusercontent.com/cncf/artwork/HEAD/projects/openebs/icon/color/openebs-icon-color.png
     keywords:
@@ -3113,4 +3113,4 @@ entries:
     urls:
     - https://github.com/openebs/openebs/releases/download/openebs-4.0.0/openebs-4.0.0.tgz
     version: 4.0.0
-generated: "2026-06-14T01:23:20.405096492Z"
+generated: "2026-06-14T02:56:40.299862267Z"
