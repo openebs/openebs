@@ -168,61 +168,59 @@ entries:
         - name: linux-utils
           image: docker.io/openebs/linux-utils:4.5.0
         - name: lvm-driver
-          image: docker.io/openebs/lvm-driver:1.9.1-prerelease
+          image: docker.io/openebs/lvm-driver:1.9.1
         - name: mayastor-agent-core
-          image: docker.io/openebs/mayastor-agent-core:v2.11.0
+          image: docker.io/openebs/mayastor-agent-core:v2.11.1
         - name: mayastor-agent-ha-cluster
-          image: docker.io/openebs/mayastor-agent-ha-cluster:v2.11.0
+          image: docker.io/openebs/mayastor-agent-ha-cluster:v2.11.1
         - name: mayastor-agent-ha-node
-          image: docker.io/openebs/mayastor-agent-ha-node:v2.11.0
+          image: docker.io/openebs/mayastor-agent-ha-node:v2.11.1
         - name: mayastor-api-rest
-          image: docker.io/openebs/mayastor-api-rest:v2.11.0
+          image: docker.io/openebs/mayastor-api-rest:v2.11.1
         - name: mayastor-csi-controller
-          image: docker.io/openebs/mayastor-csi-controller:v2.11.0
+          image: docker.io/openebs/mayastor-csi-controller:v2.11.1
         - name: mayastor-csi-node
-          image: docker.io/openebs/mayastor-csi-node:v2.11.0
+          image: docker.io/openebs/mayastor-csi-node:v2.11.1
         - name: mayastor-io-engine
-          image: docker.io/openebs/mayastor-io-engine:v2.11.0
+          image: docker.io/openebs/mayastor-io-engine:v2.11.1
         - name: mayastor-metrics-exporter-io-engine
-          image: docker.io/openebs/mayastor-metrics-exporter-io-engine:v2.11.0
+          image: docker.io/openebs/mayastor-metrics-exporter-io-engine:v2.11.1
         - name: mayastor-obs-callhome-stats
-          image: docker.io/openebs/mayastor-obs-callhome-stats:v2.11.0
+          image: docker.io/openebs/mayastor-obs-callhome-stats:v2.11.1
         - name: mayastor-obs-callhome
-          image: docker.io/openebs/mayastor-obs-callhome:v2.11.0
+          image: docker.io/openebs/mayastor-obs-callhome:v2.11.1
         - name: mayastor-operator-diskpool
-          image: docker.io/openebs/mayastor-operator-diskpool:v2.11.0
+          image: docker.io/openebs/mayastor-operator-diskpool:v2.11.1
         - name: provisioner-localpv
-          image: docker.io/openebs/provisioner-localpv:4.5.0
-        - name: provisioner-localpv
-          image: docker.io/openebs/provisioner-localpv:4.5.1-prerelease
+          image: docker.io/openebs/provisioner-localpv:4.5.1
         - name: rawfile-localpv
-          image: docker.io/openebs/rawfile-localpv:v0.14.0
+          image: docker.io/openebs/rawfile-localpv:v0.14.1
         - name: zfs-driver
-          image: docker.io/openebs/zfs-driver:2.10.1-prerelease
+          image: docker.io/openebs/zfs-driver:2.10.1
         - name: alpine-sh
           image: ghcr.io/openebs/mayastor/dev/alpine-sh:4.5.0
         - name: mayastor-agent-core
-          image: ghcr.io/openebs/mayastor/dev/mayastor-agent-core:v2.11.0
+          image: ghcr.io/openebs/mayastor/dev/mayastor-agent-core:v2.11.1
         - name: mayastor-agent-ha-cluster
-          image: ghcr.io/openebs/mayastor/dev/mayastor-agent-ha-cluster:v2.11.0
+          image: ghcr.io/openebs/mayastor/dev/mayastor-agent-ha-cluster:v2.11.1
         - name: mayastor-agent-ha-node
-          image: ghcr.io/openebs/mayastor/dev/mayastor-agent-ha-node:v2.11.0
+          image: ghcr.io/openebs/mayastor/dev/mayastor-agent-ha-node:v2.11.1
         - name: mayastor-api-rest
-          image: ghcr.io/openebs/mayastor/dev/mayastor-api-rest:v2.11.0
+          image: ghcr.io/openebs/mayastor/dev/mayastor-api-rest:v2.11.1
         - name: mayastor-csi-controller
-          image: ghcr.io/openebs/mayastor/dev/mayastor-csi-controller:v2.11.0
+          image: ghcr.io/openebs/mayastor/dev/mayastor-csi-controller:v2.11.1
         - name: mayastor-csi-node
-          image: ghcr.io/openebs/mayastor/dev/mayastor-csi-node:v2.11.0
+          image: ghcr.io/openebs/mayastor/dev/mayastor-csi-node:v2.11.1
         - name: mayastor-io-engine
-          image: ghcr.io/openebs/mayastor/dev/mayastor-io-engine:v2.11.0
+          image: ghcr.io/openebs/mayastor/dev/mayastor-io-engine:v2.11.1
         - name: mayastor-metrics-exporter-io-engine
-          image: ghcr.io/openebs/mayastor/dev/mayastor-metrics-exporter-io-engine:v2.11.0
+          image: ghcr.io/openebs/mayastor/dev/mayastor-metrics-exporter-io-engine:v2.11.1
         - name: mayastor-obs-callhome-stats
-          image: ghcr.io/openebs/mayastor/dev/mayastor-obs-callhome-stats:v2.11.0
+          image: ghcr.io/openebs/mayastor/dev/mayastor-obs-callhome-stats:v2.11.1
         - name: mayastor-obs-callhome
-          image: ghcr.io/openebs/mayastor/dev/mayastor-obs-callhome:v2.11.0
+          image: ghcr.io/openebs/mayastor/dev/mayastor-obs-callhome:v2.11.1
         - name: mayastor-operator-diskpool
-          image: ghcr.io/openebs/mayastor/dev/mayastor-operator-diskpool:v2.11.0
+          image: ghcr.io/openebs/mayastor/dev/mayastor-operator-diskpool:v2.11.1
         - name: mc
           image: quay.io/minio/mc:RELEASE.2024-11-21T17-21-54Z
         - name: minio
@@ -255,7 +253,7 @@ entries:
           image: registry.k8s.io/sig-storage/snapshot-controller:v8.2.1
     apiVersion: v2
     appVersion: 4.5.1-prerelease
-    created: "2026-06-17T01:24:58.015796365Z"
+    created: "2026-06-17T05:20:57.011711265Z"
     dependencies:
     - name: openebs-crds
       repository: ""
@@ -271,25 +269,25 @@ entries:
     - condition: engines.local.hostpath.enabled
       name: localpv-provisioner
       repository: https://openebs.github.io/dynamic-localpv-provisioner
-      version: 4.5.1-prerelease
+      version: 4.5.1
     - condition: engines.local.zfs.enabled
       name: zfs-localpv
       repository: https://openebs.github.io/zfs-localpv
-      version: 2.10.1-prerelease
+      version: 2.10.1
     - condition: engines.local.lvm.enabled
       name: lvm-localpv
       repository: https://openebs.github.io/lvm-localpv
-      version: 1.9.1-prerelease
+      version: 1.9.1
     - condition: engines.local.rawfile.enabled
       name: rawfile-localpv
       repository: https://openebs.github.io/rawfile-localpv
-      version: 0.14.0
+      version: 0.14.1
     - condition: engines.replicated.mayastor.enabled
       name: mayastor
       repository: https://openebs.github.io/mayastor-extensions
-      version: 2.11.0
+      version: 2.11.1
     description: Containerized Attached Storage for Kubernetes
-    digest: 313954133e9d641669542da01c02d761c0dba6afa450924b3eb6a7a8829b9899
+    digest: 28e52b0ef96d902b500d2027101f97964e49d180453017033c897bf91ad6345f
     home: https://www.openebs.io/
     icon: https://raw.githubusercontent.com/cncf/artwork/HEAD/projects/openebs/icon/color/openebs-icon-color.png
     keywords:
@@ -3113,4 +3111,4 @@ entries:
     urls:
     - https://github.com/openebs/openebs/releases/download/openebs-4.0.0/openebs-4.0.0.tgz
     version: 4.0.0
-generated: "2026-06-17T01:24:57.954352738Z"
+generated: "2026-06-17T05:20:56.963496732Z"
