@@ -101,7 +101,6 @@ mayastor_branch() {
 }
 
 BRANCH=
-SET_BRANCH=
 CLEAR_BRANCH=
 UPDATE=
 while [ "$#" -gt 0 ]; do
@@ -129,8 +128,8 @@ if [ -n "$UPDATE" ]; then
   submodule_update
 elif [ -n "$CLEAR_BRANCH" ]; then
   submodule_set_branch_all ""
-elif [ -n "$SET_BRANCH" ]; then
-  submodule_set_branch_all "$SET_BRANCH"
+elif [ -n "$BRANCH" ]; then
+  submodule_set_branch_all "$BRANCH"
 else
   # If nothing is specified do it from the charts.
   mayastor_branch
