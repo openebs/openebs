@@ -56,7 +56,7 @@ entries:
         - name: provisioner-localpv
           image: docker.io/openebs/provisioner-localpv:4.6.0-develop
         - name: rawfile-localpv
-          image: docker.io/openebs/rawfile-localpv:v0.14.0
+          image: docker.io/openebs/rawfile-localpv:v0.14.1
         - name: zfs-driver
           image: docker.io/openebs/zfs-driver:2.11.0-develop
         - name: mc
@@ -87,7 +87,7 @@ entries:
           image: registry.k8s.io/sig-storage/snapshot-controller:v8.2.1
     apiVersion: v2
     appVersion: 4.6.0-develop
-    created: "2026-06-21T01:34:13.320173415Z"
+    created: "2026-06-22T10:28:18.578005254Z"
     dependencies:
     - name: openebs-crds
       repository: ""
@@ -115,13 +115,13 @@ entries:
     - condition: engines.local.rawfile.enabled
       name: rawfile-localpv
       repository: https://openebs.github.io/rawfile-localpv
-      version: 0.14.0
+      version: 0.14.1
     - condition: engines.replicated.mayastor.enabled
       name: mayastor
       repository: https://openebs.github.io/mayastor-extensions
       version: 0.0.0
     description: Containerized Attached Storage for Kubernetes
-    digest: 0c1c1a4c6c371b3238191eca78a495da84cac225b508c33b952f2e0ee977d7b7
+    digest: 52147bc2e786baf3f65ade6bcd70db77d4746e6cd09f02eb076ea7de609e3670
     home: https://www.openebs.io/
     icon: https://raw.githubusercontent.com/cncf/artwork/HEAD/projects/openebs/icon/color/openebs-icon-color.png
     keywords:
@@ -3269,4 +3269,4 @@ entries:
     urls:
     - https://github.com/openebs/openebs/releases/download/openebs-4.0.0/openebs-4.0.0.tgz
     version: 4.0.0
-generated: "2026-06-22T01:26:07.534806443Z"
+generated: "2026-06-22T10:28:18.534400589Z"
