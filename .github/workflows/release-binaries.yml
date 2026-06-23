@@ -43,7 +43,7 @@ jobs:
             suffix: .exe
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         env:
           checkout_token: ${{ secrets.ORG_CI_GITHUB }}
         if: ${{ env.checkout_token == '' }}
@@ -51,7 +51,7 @@ jobs:
           fetch-depth: 0
           submodules: recursive
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         env:
           checkout_token: ${{ secrets.ORG_CI_GITHUB }}
         if: ${{ env.checkout_token != '' }}
@@ -78,7 +78,7 @@ jobs:
         run: |
           tar -czvf kubectl-openebs-${{ matrix.arch }}-${{ matrix.target }}.tar.gz LICENSE -C result/bin kubectl-openebs${{ matrix.suffix }}
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: kubectl-openebs-${{ matrix.arch }}-${{ matrix.target }}
           path: kubectl-openebs-${{ matrix.arch }}-${{ matrix.target }}.tar.gz

@@ -9,9 +9,9 @@ jobs:
   fossa-scan:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           submodules: recursive
-      - uses: fossas/fossa-action@v1.4.0
+      - uses: fossas/fossa-action@v1.6.0
         with:
           api-key: ${{ secrets.FOSSA_API_KEY }}

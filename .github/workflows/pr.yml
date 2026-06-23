@@ -12,7 +12,7 @@ jobs:
   markdown-spell-check:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - id: nixpath
         run: echo "nix_path=nixpkgs=$(jq -r '.nixpkgs.url' nix/sources.json)" >> $GITHUB_OUTPUT
       - uses: cachix/install-nix-action@v31.3.0
@@ -26,10 +26,10 @@ jobs:
       rust_changed: ${{ steps.changes.outputs.rust }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           submodules: recursive
-      - uses: dorny/paths-filter@v3
+      - uses: dorny/paths-filter@v4
         id: changes
         with:
           filters: |
@@ -46,7 +46,7 @@ jobs:
     needs: plugin-changed
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           submodules: 'recursive'
       - id: nixpath
@@ -64,7 +64,7 @@ jobs:
     needs: plugin-changed
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           submodules: 'recursive'
       - id: nixpath

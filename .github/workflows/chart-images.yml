@@ -15,7 +15,7 @@ jobs:
   helm-images:
     runs-on: oracle-vm-8cpu-32gb-x86-64
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           submodules: recursive
       - id: nixpath
