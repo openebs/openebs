@@ -41,6 +41,8 @@ entries:
           image: docker.io/openebs/mayastor-csi-controller:develop
         - name: mayastor-csi-node
           image: docker.io/openebs/mayastor-csi-node:develop
+        - name: mayastor-eventing-aggregator
+          image: docker.io/openebs/mayastor-eventing-aggregator:develop
         - name: mayastor-io-engine
           image: docker.io/openebs/mayastor-io-engine:develop
         - name: mayastor-metrics-exporter-io-engine
@@ -87,7 +89,7 @@ entries:
           image: registry.k8s.io/sig-storage/snapshot-controller:v8.2.1
     apiVersion: v2
     appVersion: 4.6.0-develop
-    created: "2026-06-26T06:33:17.747196396Z"
+    created: "2026-06-26T20:17:50.534068964Z"
     dependencies:
     - name: openebs-crds
       repository: ""
@@ -121,7 +123,7 @@ entries:
       repository: https://openebs.github.io/mayastor-extensions
       version: 0.0.0
     description: Containerized Attached Storage for Kubernetes
-    digest: 38dbfe7ccd367dffa5a2ea249d2e28f4db205b79651ce0d84fd63f5219e143f7
+    digest: d1716f4a4ce251850988cf8c74aec9d77fe17e71d74258ee8673d53e3043f5d5
     home: https://www.openebs.io/
     icon: https://raw.githubusercontent.com/cncf/artwork/HEAD/projects/openebs/icon/color/openebs-icon-color.png
     keywords:
@@ -3269,4 +3271,4 @@ entries:
     urls:
     - https://github.com/openebs/openebs/releases/download/openebs-4.0.0/openebs-4.0.0.tgz
     version: 4.0.0
-generated: "2026-06-26T06:33:17.70293542Z"
+generated: "2026-06-26T20:17:50.489982524Z"
