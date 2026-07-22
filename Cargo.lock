@@ -1944,6 +1944,7 @@ dependencies = [
  "tokio",
  "upgrade",
  "utils",
+ "uuid",
 ]
 
 [[package]]
