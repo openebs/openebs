@@ -7,8 +7,8 @@ owners:
   - "@krishnaGajabi"
 editor: "@krishnaGajabi"
 creation-date: 2026-07-14
-last-updated: 2026-07-23
-status: provisional
+last-updated: 2026-07-29
+status: implementable
 ---
 
 # Pool Pattern (`poolpattern`) based Volume Provisioning
