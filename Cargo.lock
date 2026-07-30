@@ -3379,6 +3379,7 @@ dependencies = [
  "strum",
  "strum_macros",
  "tar",
+ "tokio",
  "tower 0.5.1",
  "urlencoding",
  "utils",
