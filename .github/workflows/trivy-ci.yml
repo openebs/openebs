@@ -23,7 +23,7 @@ jobs:
           submodules: recursive
           fetch-depth: 0
 
-      - uses: cachix/install-nix-action@v31.10.6
+      - uses: cachix/install-nix-action@v31.11.0
 
       - name: Pre-populate nix-shell
         run: |
@@ -55,7 +55,7 @@ jobs:
           severity: HIGH,CRITICAL
 
       - name: Upload Helm SARIF
-        uses: github/codeql-action/upload-sarif@v4
+        uses: github/codeql-action/upload-sarif@v4.37.3
         with:
           sarif_file: trivy-helm.sarif
           category: trivy-helm
@@ -71,7 +71,7 @@ jobs:
           submodules: 'recursive'
           fetch-depth: 0
 
-      - uses: cachix/install-nix-action@v31.10.6
+      - uses: cachix/install-nix-action@v31.11.0
 
       - name: Pre-populate nix-shell
         run: |
@@ -113,7 +113,7 @@ jobs:
           cache: true
 
       - name: Upload Image SARIF
-        uses: github/codeql-action/upload-sarif@v4
+        uses: github/codeql-action/upload-sarif@v4.37.3
         with:
           sarif_file: trivy-image.sarif
           category: trivy-image-${{ matrix.image }}

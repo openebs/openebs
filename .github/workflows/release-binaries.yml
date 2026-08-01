@@ -60,7 +60,7 @@ jobs:
           submodules: recursive
           token: ${{ secrets.ORG_CI_GITHUB }}
 
-      - uses: cachix/install-nix-action@v31.10.6
+      - uses: cachix/install-nix-action@v31.11.0
         with:
           enable_kvm: false
       - run: |

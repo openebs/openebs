@@ -36,7 +36,7 @@ jobs:
           submodules: 'recursive'
           fetch-depth: 0
 
-      - uses: cachix/install-nix-action@v31.10.6
+      - uses: cachix/install-nix-action@v31.11.0
 
       - name: Pre-populate nix-shell
         run: |
