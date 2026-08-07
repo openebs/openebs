@@ -7,7 +7,7 @@ owners:
   - "@krishnaGajabi"
 editor: "@krishnaGajabi"
 creation-date: 2026-07-14
-last-updated: 2026-07-29
+last-updated: 2026-08-07
 status: implementable
 ---
 
@@ -56,10 +56,13 @@ matching pools per node.
 2. `getNodeMap(scheduler, pool)` ([pkg/driver/schd_helper.go](../pkg/driver/schd_helper.go))
    builds a `node -> weight` map for that single pool by scanning all `ZFSVolume`
    CRs — `VolumeWeighted` counts volumes, `CapacityWeighted` sums their capacity.
+   These are the only two algorithms today, and both weigh a node by what has
+   already been provisioned into its pool, never by what is left in it.
    Note that `CapacityWeighted` therefore reflects only the volumes *this driver*
    has provisioned into the pool, not the zpool's real on-disk usage; any data in
    the pool that did not come through the driver is invisible to the weight. There
-   is also no free-capacity fit check on this path today. This OEP changes both.
+   is also no free-capacity fit check on this path today. This OEP changes both,
+   and adds a third algorithm that weighs by free space.
 3. `schd.Scheduler(req, nmap)` (`github.com/openebs/lib-csi/pkg/scheduler`) filters
    nodes by topology and returns them ordered least-loaded-first. It only orders
    **nodes**; the pool is uniform across the returned list.
@@ -124,11 +127,13 @@ output, not by omission from the weight map.
 
 * **Weight map — ordering only** (`nmap[node] += ...`), including every node that has a
   matching pool so the order is never distorted:
-  * `CapacityWeighted` → `+= pool.Used`, the pool's real on-disk usage from the
-    `ZFSNode` CR.
+  * `CapacityWeighted` (**default**) → `+= pool.Used`, the pool's real on-disk usage from
+    the `ZFSNode` CR.
   * `VolumeWeighted` → count of `ZFSVolume`s whose pool root matches (`ZFSNode` carries
     no volume count, so this one consults the `ZFSVolume` list; its `Spec.PoolName` is
     parsed to the root before matching, like every other match).
+  * `SpaceWeighted` (**new**) → the `Free` capacity of the node's roomiest matching pool
+    (`maxFree`), *inverted* into a weight: `math.MaxInt64 - maxFree`. See below.
 * **Suitable-node set — filtering**, for space-reserving volumes only, computed once in
   the controller via `getSuitableNodes(pattern, size)`: a node is *suitable* iff the
   largest `Free` among its matching pools (`maxFree`) is `> size` (a **single** pool must
@@ -136,6 +141,38 @@ output, not by omission from the weight map.
   **intersects the scheduler's ordered output with this set**, dropping nodes that cannot
   fit while preserving the weighted order of the survivors. This intersection is the only
   step that actually removes a node from consideration.
+
+**The `SpaceWeighted` algorithm.** `VolumeWeighted` and `CapacityWeighted` both order by
+what has already been put *into* a pool; neither says anything about what is *left*. A node
+with a small, untouched pool therefore outranks a node with a large, moderately used one,
+even though the latter has far more room for the volume. `SpaceWeighted` orders by the free
+capacity of the node's roomiest matching pool instead — the same pool `resolvePool` would
+place the volume in, so the metric matches where the volume actually lands. It is the ZFS
+analog of lvm-localpv's [`SpaceWeighted`](https://github.com/openebs/lvm-localpv/blob/develop/pkg/driver/schd_helper.go),
+and it applies to `poolname` and `poolpattern` alike.
+
+Two properties of it are load-bearing:
+
+* **The weight is inverted.** `lib-csi`'s `Scheduler` sorts *ascending* and prefers the
+  least-weighted node, so free capacity — where more is better — has to be flipped to be
+  usable as a weight at all: `nmap[node] = math.MaxInt64 - maxFree`. Overflow is not a
+  concern (`Free` is non-negative).
+* **A node whose matching pool is full keeps its entry** (weight `math.MaxInt64`, i.e. last),
+  rather than being dropped from the map. This is a deliberate divergence from lvm-localpv,
+  whose `getSpaceWeightedMap` omits such nodes and folds the fit check into the weight map.
+  Under `lib-csi` semantics omission does not exclude a node — it promotes it to the front
+  (see above) — so omitting the full nodes would order the *emptiest* pools first and the
+  *fullest* pools even earlier, inverting the intent of the algorithm. Deciding whether a
+  volume fits stays the job of the suitability intersection, exactly as for the other two
+  algorithms; the weight maps remain pure ordering functions.
+
+Free capacity is taken as the node's **largest** matching pool, not the sum of its matching
+pools, consistent with `getSuitableNodes` and `resolvePool`: a volume lives in one pool and
+can only use that pool's space. All three share a single `maxFreePool` helper so the three
+uses of "the node's roomiest matching pool" cannot drift apart.
+
+`SpaceWeighted` is **opt-in** via `scheduler: "SpaceWeighted"`; `CapacityWeighted` remains
+the default (see [Resolved Decisions](#resolved-decisions)).
 
 Whether a volume reserves space (and so must pass the fit filter) is volume-type
 dependent in ZFS, unlike LVM's single flag — the helper `reservesSpace` encodes it:
@@ -226,8 +263,20 @@ func getSuitableNodes(pattern *regexp.Regexp, size int64) (suitable map[string]b
 func getVolumeWeightedMap(pattern *regexp.Regexp) (map[string]int64, error)
 func getCapacityWeightedMap(pattern *regexp.Regexp) (map[string]int64, error)
 
-// dispatch only — switch on scheduler, forward the pattern.
+// getSpaceWeightedMap weighs a node by the Free capacity of its roomiest matching pool,
+// inverted (math.MaxInt64 - maxFree) so that lib-csi's ascending sort yields most-free-first.
+// A node with a full matching pool still gets an entry (weight math.MaxInt64), so that it
+// sorts last instead of being promoted to the front as an unweighted node.
+func getSpaceWeightedMap(pattern *regexp.Regexp) (map[string]int64, error)
+
+// dispatch only — switch on scheduler, forward the pattern; CapacityWeighted when unset
+// or unrecognised.
 func getNodeMap(scheduler string, pattern *regexp.Regexp) (map[string]int64, error)
+
+// maxFreePool returns the matching pool on the node with the largest Free, and that Free
+// ("" when nothing matches). Single definition of "the node's roomiest matching pool",
+// shared by resolvePool, getSuitableNodes and getSpaceWeightedMap.
+func maxFreePool(pools []apis.Pool, pattern *regexp.Regexp) (string, int64)
 
 // resolvePool returns the matching pool on `node` with the largest Free (the pool behind
 // that node's maxFree), or "" if no pool on the node matches the pattern.
@@ -326,7 +375,10 @@ all as `codes.InvalidArgument`:
    the pool root; `CapacityWeighted` weight becomes summed per-pool `Used`; the weight
    maps stay **ordering-only** (every node with a matching pool, no fit logic). Add
    `reservesSpace`, `getSuitableNodes(pattern, size) → (suitable, matched, err)`, and
-   `resolvePool` for pattern-mode concrete pool selection. Fold the exact-name
+   `resolvePool` for pattern-mode concrete pool selection, sharing one `maxFreePool`
+   helper. Add the `SpaceWeighted` algorithm (`getSpaceWeightedMap`, inverted
+   `maxFree`, full-pool nodes retained) and its `getNodeMap` case, leaving
+   `CapacityWeighted` as the default. Fold the exact-name
    (`poolname`, compiled as `^`+`QuoteMeta`+`$`) and regex (`poolpattern`) cases into
    one `*regexp.Regexp`. `VolumeWeighted` still counts `ZFSVolume`s, parsing
    `Spec.PoolName` to its root before matching.
@@ -354,7 +406,11 @@ all as `codes.InvalidArgument`:
 * Unit: pattern matching against pool roots; exact-`poolname` `QuoteMeta` anchoring
   (a `.` in a pool name must not over-match); rejection of both-set and neither-set
   (`InvalidArgument`); `Used`-based
-  weighting under both algorithms; concrete max-`Free` pool selection; `reservesSpace`
+  weighting under both existing algorithms; **`SpaceWeighted`** — that the inverted weight
+  sorts most-free-first under an ascending sort, that a node's largest matching pool decides
+  rather than the sum of its pools, and that a node with a *full* matching pool still gets
+  an entry (weight `math.MaxInt64`) instead of being dropped and front-loaded;
+  concrete max-`Free` pool selection; `reservesSpace`
   across the zvol/dataset × `yes`/`no`/unset matrix; **suitability intersection** —
   that an unsuitable node dropped from `nmap` is *not* silently promoted (guards against
   the `lib-csi` front-loading behaviour), that the survivors keep weighted order, and
@@ -369,7 +425,11 @@ all as `codes.InvalidArgument`:
 ## Docs
 
 Update [docs/storageclasses.md](../docs/storageclasses.md) and
-[docs/scheduler.md](../docs/scheduler.md); add a sample StorageClass.
+[docs/scheduler.md](../docs/scheduler.md); add a sample StorageClass. Both currently
+document "two scheduling algorithms" and must be rewritten for **three**, covering when
+`SpaceWeighted` is the right choice over the `CapacityWeighted` default (ordering by the
+room a pool has left rather than by what has been written to it) and noting that
+`CapacityWeighted` remains the default.
 
 ## Resolved Decisions
 
@@ -421,3 +481,22 @@ Update [docs/storageclasses.md](../docs/storageclasses.md) and
   `ZFSNode` are refreshed periodically by the node-agent, so both the weight and the
   fit filter track real usage with the node-agent's sync latency; the fit filter
   already relies on the same source.
+* **`SpaceWeighted` scheduler**: **added as a third algorithm, and opt-in —
+  `CapacityWeighted` stays the default.** It weighs a node by the `Free` capacity of its
+  roomiest matching pool (`maxFree`, not the sum across a node's pools — a volume lives in
+  one pool), so nodes are ordered by the room a pool has *left* rather than by what has
+  already been written into it, which is what the other two algorithms measure. Because
+  `lib-csi` prefers the *least*-weighted node, the metric is inverted as
+  `math.MaxInt64 - maxFree`, matching lvm-localpv's implementation. Two deliberate
+  divergences from lvm-localpv: (1) **it is not the default** — lvm-localpv defaults to
+  `SpaceWeighted`, but zfs-localpv already defaults to `CapacityWeighted` and this OEP is
+  *already* changing that algorithm's metric on upgrade (see the compatibility decision
+  above); silently re-ordering every existing StorageClass a second time, by a different
+  axis, is one change too many for a single release. Users opt in with
+  `scheduler: "SpaceWeighted"`. Revisit making it the default in a later release, once the
+  `Used`-metric change has field feedback. (2) **A node whose matching pool is full keeps
+  its map entry** (weight `math.MaxInt64`, sorting last) instead of being omitted as
+  lvm-localpv does — under `lib-csi`, omitting a node promotes it to the front of the list
+  rather than excluding it, so omission would order the fullest pools *first* and invert
+  the algorithm. Deciding fit remains the suitability intersection's job, keeping every
+  weight map a pure ordering function.
