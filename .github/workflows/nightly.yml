@@ -37,7 +37,7 @@ jobs:
           RUN_NAME: "GitMod Update - ${{ matrix.branch }}"
         with:
           run-name: ${{ env.RUN_NAME }}
-          token: ${{ secrets.ORG_CI_GITHUB }}
+          token: ${{ secrets.CI_BOT_1_WF_DISPATCH }}
           ref: ${{ matrix.branch }}
           workflow: mod-update.yml
           wait-for-completion: true

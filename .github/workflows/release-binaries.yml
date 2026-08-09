@@ -44,21 +44,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v7
-        env:
-          checkout_token: ${{ secrets.ORG_CI_GITHUB }}
-        if: ${{ env.checkout_token == '' }}
         with:
           fetch-depth: 0
           submodules: recursive
-
-      - uses: actions/checkout@v7
-        env:
-          checkout_token: ${{ secrets.ORG_CI_GITHUB }}
-        if: ${{ env.checkout_token != '' }}
-        with:
-          fetch-depth: 0
-          submodules: recursive
-          token: ${{ secrets.ORG_CI_GITHUB }}
 
       - uses: cachix/install-nix-action@v31.11.0
         with:
