@@ -17,7 +17,7 @@ jobs:
       - name: Publish Incremental Umbrella Helm chart
         uses: stefanprodan/helm-gh-pages@v1.7.0
         with:
-          token: ${{ secrets.ORG_CI_GITHUB }}
+          token: ${{ secrets.CI_BOT_1_TEST_GH_PAGES }}
           charts_dir: .
           repository: mayastor-chart-donotuse
           branch: gh-pages

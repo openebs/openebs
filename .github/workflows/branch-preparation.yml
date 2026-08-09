@@ -178,4 +178,4 @@ jobs:
           draft: false
           signoff: true
           branch: "ci-bot/branch-prep/${{ github.event.inputs.branch}}"
-          token: ${{ secrets.ORG_CI_GITHUB }}
+          token: ${{ secrets.CI_BOT_1_RAISE_PRS }}
