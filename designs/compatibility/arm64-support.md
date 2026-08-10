@@ -2,15 +2,15 @@
 
 oep-number: OEP 3817
 title: Support `arm64` OpenEBS Deployments
-authors:  
+authors:
   - "@maxwnewcomer"
 owners:
   - "@maxwnewcomer"
   - "@tiagolobocastro"
 editor: TBD
 creation-date: 2024-12-13
-last-updated: 2024-12-13
-status: provisional
+last-updated: 2024-08-09
+status: implementable
 see-also:
 replaces:
 superseded-by:
@@ -79,7 +79,7 @@ This proposal involves extending current build and release workflows to produce 
 **As an operator** managing AWS Graviton-based EKS clusters, I need a storage solution that runs natively and efficiently on `arm64`. With official `arm64` support in OpenEBS, I can deploy OpenEBS alongside my other Arm-native applications, simplifying my environment and reducing operational overhead related to mixed-architecture maintenance.
 
 ### Implementation Details/Notes/Constraints
-  
+
 - **Dependency Checks**:
   - Verify that all external dependencies (`spdk-rs`, `bitnami-shell`, etc.) provide `arm64` binaries or have acceptable fallbacks.
 
@@ -87,7 +87,7 @@ This proposal involves extending current build and release workflows to produce 
   - Add/Verify `arm64` support for data-plane, control-plane, and core extension components required for running:
     - All `LocalPV*` except for `LocalPV-RawFile` storage engines.
     - The `ReplicatedPV-Mayastor` storage engine
-  
+
 - **Testing Strategy**:
   - Introduce `arm64` test nodes for integration tests.
   - Run key conformance tests and functional tests on `arm64` platforms to ensure feature parity.
@@ -100,7 +100,7 @@ This proposal involves extending current build and release workflows to produce 
 
 - **Risk: CI Complexity**: Adding `arm64` pipelines may increase build time and complexity.
   - *Mitigation*: Use cloud-based ARM runners or Arm-enabled CI platforms, and possibly maintain separate test schedules for `arm64` to reduce load.
-  
+
 - **Risk: Limited Community Hardware**: Some maintainers and community members might not have immediate access to native `arm64` hardware for debugging.
   - *Mitigation*: Add dedicated `arm64` special maintainers tasked with addressing `arm64` issues the community may run into.
 
