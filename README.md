@@ -73,7 +73,7 @@ These features make OpenEBS a robust and flexible solution for managing persiste
 
 ## Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=openebs/openebs&type=Date)](https://star-history.com/#openebs/openebs&Date)
+[![Star History Chart](https://star-history.dera.page/svg?repos=openebs/openebs&type=Date)](https://star-history.dera.page/#openebs/openebs&Date)
 
 ## Activity dashboard
 
