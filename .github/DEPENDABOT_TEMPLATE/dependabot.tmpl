@@ -6,16 +6,24 @@ updates:
       - "/"
       - "/.github/actions/*"
     schedule:
-      interval: "monthly"
+      interval: monthly
     groups:
       github-actions:
         patterns:
           - "*"
 
+  - package-ecosystem: "docker"
+    schedule:
+      interval: monthly
+    directory: "/"
+    groups:
+      docker:
+        patterns: ["*"]
+
   - package-ecosystem: "{{ECOSYSTEM}}"
     directory: "/"
     schedule:
-      interval: "weekly"
+      interval: weekly
     open-pull-requests-limit: 0
     groups:
       {{GROUP_NAME}}:
