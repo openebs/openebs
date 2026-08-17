@@ -34,7 +34,29 @@ jobs:
           nix-shell --pure --run "./scripts/staging/validate.sh \
             --trigger ${TRIGGER_TYPE}" ./scripts/staging/shell.nix
 
-      - name: Publish openebs develop or prerelease umbrella helm chart
+      - name: Publish openebs umbrella helm chart
+        uses: stefanprodan/helm-gh-pages@v1.7.0
+        continue-on-error: true
+        id: publish
+        env:
+          TMPDIR: /tmp
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          charts_dir: .
+
+      - name: Retry Publish openebs umbrella helm chart
+        uses: stefanprodan/helm-gh-pages@v1.7.0
+        continue-on-error: true
+        id: publish2
+        if: steps.publish.outcome == 'failure'
+        env:
+          TMPDIR: /tmp
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          charts_dir: .
+
+      - name: Retry Again Publish openebs umbrella helm chart
+        if: steps.publish2.outcome == 'failure'
         uses: stefanprodan/helm-gh-pages@v1.7.0
         env:
           TMPDIR: /tmp
