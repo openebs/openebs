@@ -1918,6 +1918,7 @@ name = "kubectl-plugin"
 version = "1.0.0"
 dependencies = [
  "anyhow",
+ "async-nats",
  "async-trait",
  "chrono",
  "clap",
@@ -1942,6 +1943,7 @@ dependencies = [
  "strum",
  "strum_macros",
  "supportability",
+ "time",
  "tokio",
  "upgrade",
  "utils",
