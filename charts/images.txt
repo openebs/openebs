@@ -5,11 +5,10 @@ docker.io/nats:2.9.17-alpine
 docker.io/natsio/nats-box:0.13.8
 docker.io/natsio/nats-server-config-reloader:0.10.1
 docker.io/natsio/prometheus-nats-exporter:0.11.0
-docker.io/openebs/alpine-bash:4.5.0
-docker.io/openebs/alpine-sh:4.5.0
+docker.io/openebs/alpine-bash:4.6.0
+docker.io/openebs/alpine-sh:4.6.0
 docker.io/openebs/etcd:3.6.4-debian-12-r0
 docker.io/openebs/kubectl:1.25.15
-docker.io/openebs/linux-utils:4.5.0
 docker.io/openebs/linux-utils:4.6.0
 docker.io/openebs/lvm-driver:1.10.0-develop
 docker.io/openebs/mayastor-agent-core:develop
@@ -24,7 +23,7 @@ docker.io/openebs/mayastor-metrics-exporter-io-engine:develop
 docker.io/openebs/mayastor-obs-callhome-stats:develop
 docker.io/openebs/mayastor-obs-callhome:develop
 docker.io/openebs/mayastor-operator-diskpool:develop
-docker.io/openebs/provisioner-localpv:4.5.1
+docker.io/openebs/provisioner-localpv:4.6.0
 docker.io/openebs/provisioner-localpv:4.6.0-develop
 docker.io/openebs/rawfile-localpv:v0.14.1
 docker.io/openebs/zfs-driver:2.11.0-develop
