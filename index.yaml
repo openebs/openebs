@@ -18,15 +18,13 @@ entries:
         - name: prometheus-nats-exporter
           image: docker.io/natsio/prometheus-nats-exporter:0.11.0
         - name: alpine-bash
-          image: docker.io/openebs/alpine-bash:4.5.0
+          image: docker.io/openebs/alpine-bash:4.6.0
         - name: alpine-sh
-          image: docker.io/openebs/alpine-sh:4.5.0
+          image: docker.io/openebs/alpine-sh:4.6.0
         - name: etcd
           image: docker.io/openebs/etcd:3.6.4-debian-12-r0
         - name: kubectl
           image: docker.io/openebs/kubectl:1.25.15
-        - name: linux-utils
-          image: docker.io/openebs/linux-utils:4.5.0
         - name: linux-utils
           image: docker.io/openebs/linux-utils:4.6.0
         - name: lvm-driver
@@ -56,7 +54,7 @@ entries:
         - name: mayastor-operator-diskpool
           image: docker.io/openebs/mayastor-operator-diskpool:develop
         - name: provisioner-localpv
-          image: docker.io/openebs/provisioner-localpv:4.5.1
+          image: docker.io/openebs/provisioner-localpv:4.6.0
         - name: provisioner-localpv
           image: docker.io/openebs/provisioner-localpv:4.6.0-develop
         - name: rawfile-localpv
@@ -91,7 +89,7 @@ entries:
           image: registry.k8s.io/sig-storage/snapshot-controller:v8.2.1
     apiVersion: v2
     appVersion: 4.6.0-develop
-    created: "2026-08-18T02:02:16.695053639Z"
+    created: "2026-08-19T10:28:58.217529717Z"
     dependencies:
     - name: openebs-crds
       repository: ""
@@ -125,7 +123,7 @@ entries:
       repository: https://openebs.github.io/mayastor-extensions
       version: 0.0.0
     description: Containerized Attached Storage for Kubernetes
-    digest: 14f7b18fe4ea40e247ab64257025e31c4906916c3d05764598cf5f0025af43a7
+    digest: 751eff6dd8412ec688a93f1fbfb9c61704618e99c82b805c26093112da34ca01
     home: https://www.openebs.io/
     icon: https://raw.githubusercontent.com/cncf/artwork/HEAD/projects/openebs/icon/color/openebs-icon-color.png
     keywords:
@@ -3273,4 +3271,4 @@ entries:
     urls:
     - https://github.com/openebs/openebs/releases/download/openebs-4.0.0/openebs-4.0.0.tgz
     version: 4.0.0
-generated: "2026-08-19T00:28:52.061376939Z"
+generated: "2026-08-19T10:28:58.172536557Z"
