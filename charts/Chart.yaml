@@ -63,15 +63,13 @@ annotations:
     - name: prometheus-nats-exporter
       image: docker.io/natsio/prometheus-nats-exporter:0.11.0
     - name: alpine-bash
-      image: docker.io/openebs/alpine-bash:4.5.0
+      image: docker.io/openebs/alpine-bash:4.6.0
     - name: alpine-sh
-      image: docker.io/openebs/alpine-sh:4.5.0
+      image: docker.io/openebs/alpine-sh:4.6.0
     - name: etcd
       image: docker.io/openebs/etcd:3.6.4-debian-12-r0
     - name: kubectl
       image: docker.io/openebs/kubectl:1.25.15
-    - name: linux-utils
-      image: docker.io/openebs/linux-utils:4.5.0
     - name: linux-utils
       image: docker.io/openebs/linux-utils:4.6.0
     - name: lvm-driver
@@ -101,7 +99,7 @@ annotations:
     - name: mayastor-operator-diskpool
       image: docker.io/openebs/mayastor-operator-diskpool:develop
     - name: provisioner-localpv
-      image: docker.io/openebs/provisioner-localpv:4.5.1
+      image: docker.io/openebs/provisioner-localpv:4.6.0
     - name: provisioner-localpv
       image: docker.io/openebs/provisioner-localpv:4.6.0-develop
     - name: rawfile-localpv
