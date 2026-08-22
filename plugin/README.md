@@ -3,9 +3,9 @@
 ## Overview
 The kubectl plugin has been created in accordance with the instructions outlined in the [official documentation](https://kubernetes.io/docs/tasks/extend-kubectl/kubectl-plugins/).
 
-This plugin simplifies storage management for OpenEBS users who have deployed their clusters using the OpenEBS umbrella chart. It provides a unified interface for all OpenEBS storage engines like Mayastor, LocalPV-LVM, LocalPV-ZFS, and LocalPV-HostPath.
+This plugin simplifies storage management for OpenEBS users who have deployed their clusters using the OpenEBS umbrella chart. It provides a unified interface for all OpenEBS storage engines like Mayastor, LocalPV-LVM, LocalPV-ZFS, LocalPV-HostPath, and LocalPV-Rawfile.
 
-This plugin leverages the existing ```kubectl mayastor``` codebase for Mayastor engine commands. For other engines (LocalPV-LVM, LocalPV-ZFS, and LocalPV-Hostpath), new code has been developed, drawing inspiration from the current ```kubectl openebs``` plugin.
+This plugin leverages the existing ```kubectl mayastor``` codebase for Mayastor engine commands. For other engines (LocalPV-LVM, LocalPV-ZFS, LocalPV-Hostpath, and LocalPV-Rawfile), new code has been developed, drawing inspiration from the current ```kubectl openebs``` plugin.
 
 While the original kubectl-openebs plugin only supported LocalPV engines, this plugin extends that support to include Mayastor and organizes commands by engine type for improved clarity and usability. Mayastor commands from `kubectl mayastor` are now available under the alias `kubectl openebs mayastor`.
 
@@ -18,6 +18,8 @@ This allows users to manage OpenEBS installations in any namespace. For example,
 ```
 kubectl config set-context --namespace=storage --current
 ```
+
+`localpv-rawfile` is the one exception: it reads its state from the rawfile-localpv api-server rather than from kubernetes resources, and falls back to the `openebs` namespace, where the rawfile-localpv chart installs the service exposing that api-server. `--namespace` overrides it as usual.
 
 ## Output format
 
@@ -49,6 +51,7 @@ Commands:
   localpv-lvm       LocalPV lvm operations
   localpv-zfs       LocalPV zfs operations
   localpv-hostpath  LocalPV Hostpath operations
+  localpv-rawfile   LocalPV rawfile operations
   help              Print this message or the help of the given subcommand(s)
 
 Options:
@@ -587,4 +590,92 @@ pvc-1771831c-b1f9-45d9-91b2-e8de98372586  node-0-309787  Ready   4.00 GiB  zfspv
 ❯  kubectl openebs localpv-hostpath get volumes
 NAME                                      NODE                         STATUS  CAPACITY  PATH                                                                               PVC-NAME                SC-NAME
  pvc-8fdd870a-b71b-45af-9106-33ad114121ad  node-0-309787  Bound   10Gi      /var/local/openebs/localpv-hostpath/loki/pvc-8fdd870a-b71b-45af-9106-33ad114121ad  storage-openebs-loki-0  mayastor-loki-localpv
+```
+
+</details>
+
+### LocalPV-Rawfile
+
+LocalPV-Rawfile keeps its state in its own api-server instead of in kubernetes resources, so these
+commands read it from the `rawfile-localpv-controller` service, through the kube-apiserver service
+proxy. That means:
+
+- the rawfile-localpv chart must be installed with `capabilities.apiServer.enabled=true`, which is
+  what creates that service;
+- you need permission to `get services/proxy` in the namespace of the service;
+- the namespace defaults to `openebs` rather than to the namespace of the current context, since
+  that is where the chart installs the service. `-n/--namespace` overrides it, and `--service` and
+  `--port` override the name and port of the service.
+
+Storage pools are reported by the api-server as part of the node hosting them, so there is no
+namespaced pool resource to get by name. Commands that walk more than one node skip the nodes the
+api-server cannot reach, naming them on stderr, so a partially reachable cluster still lists what
+it can.
+
+<details>
+<summary> General Resources operations </summary>
+
+1. Get Nodes
+```
+❯  kubectl openebs localpv-rawfile get nodes
+ NAME           IP           STATUS   POOLS    CAPACITY
+ node-0-309787  10.244.1.7   Online   default  29.30 GiB
+ node-1-309787  10.244.2.4   Online   default  29.30 GiB
+ node-2-309787  10.244.3.9   Offline  <none>   <none>
+```
+2. Get Node by name
+```
+❯  kubectl openebs localpv-rawfile get node node-0-309787
+ NAME           IP          STATUS  POOLS    CAPACITY
+ node-0-309787  10.244.1.7  Online  default  29.30 GiB
+```
+3. Get Pools (All pools in the cluster are listed)
+```
+❯  kubectl openebs localpv-rawfile get pools
+ NAME     NODE           PATH                        CAPACITY   RESERVED  RESERVED-MODE  COW-SUPPORTED
+ default  node-0-309787  /var/lib/rawfile-localpv    29.30 GiB  10        percentage     Yes
+ default  node-1-309787  /var/lib/rawfile-localpv    29.30 GiB  10        percentage     Yes
+```
+4. Get Pools by node
+```
+❯  kubectl openebs localpv-rawfile get pools node-0-309787
+ NAME     NODE           PATH                      CAPACITY   RESERVED  RESERVED-MODE  COW-SUPPORTED
+ default  node-0-309787  /var/lib/rawfile-localpv  29.30 GiB  10        percentage     Yes
+```
+5. Get Volumes (All volumes in the cluster are listed)
+```
+❯  kubectl openebs localpv-rawfile get volumes
+ NAME                                      NODE           POOL     STATUS  SIZE      USED       PHYSICAL-SIZE  THIN  COW  CREATED-AT
+ pvc-27940181-6ad5-49e9-8661-197359f36403  node-0-309787  default  Ready   1.00 GiB  32.00 MiB  32.00 MiB      Yes   No   2026-08-12T09:14:03Z
+ pvc-5d13e956-5ee0-44aa-ad01-d66272c2dfc4  node-1-309787  default  Ready   2.00 GiB  64.00 MiB  64.00 MiB      Yes   Yes  2026-08-12T11:02:47Z
+```
+6. Get Volumes by node and pool
+```
+❯  kubectl openebs localpv-rawfile get volumes node-0-309787 --pool default
+ NAME                                      NODE           POOL     STATUS  SIZE      USED       PHYSICAL-SIZE  THIN  COW  CREATED-AT
+ pvc-27940181-6ad5-49e9-8661-197359f36403  node-0-309787  default  Ready   1.00 GiB  32.00 MiB  32.00 MiB      Yes   No   2026-08-12T09:14:03Z
+```
+7. Get Volume by name
+
+The volume is looked for on every pool of every node, unless `--node` and `--pool` narrow it down.
+```
+❯  kubectl openebs localpv-rawfile get volume pvc-27940181-6ad5-49e9-8661-197359f36403
+ NAME                                      NODE           POOL     STATUS  SIZE      USED       PHYSICAL-SIZE  THIN  COW  CREATED-AT
+ pvc-27940181-6ad5-49e9-8661-197359f36403  node-0-309787  default  Ready   1.00 GiB  32.00 MiB  32.00 MiB      Yes   No   2026-08-12T09:14:03Z
+```
+8. Get Tasks (Tasks queued on all nodes are listed)
+```
+❯  kubectl openebs localpv-rawfile get tasks
+ ID    NODE           TASK        STATE    RETRIES  ARGS
+ 0f0c  node-0-309787  expand      pending  0        pvc-27940181-6ad5-49e9-8661-197359f36403 2147483648
+ 1a2b  node-1-309787  delete      running  2        pvc-5d13e956-5ee0-44aa-ad01-d66272c2dfc4
+```
+9. Get Task by id
+```
+❯  kubectl openebs localpv-rawfile get task 0f0c --node node-0-309787
+ ID    NODE           TASK    STATE    RETRIES  ARGS
+ 0f0c  node-0-309787  expand  pending  0        pvc-27940181-6ad5-49e9-8661-197359f36403 2147483648
+```
+
+</details>
 
