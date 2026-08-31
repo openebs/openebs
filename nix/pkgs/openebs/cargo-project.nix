@@ -46,10 +46,7 @@ let
         rustc = stable_channel.rustc;
         cargo = stable_channel.cargo;
       };
-  naersk = pkgs.callPackage sources.naersk {
-    rustc = stable_channel.rustc;
-    cargo = stable_channel.cargo;
-  };
+  naersk = channel.naersk_package channel.default;
   PROTOC = "${protobuf}/bin/protoc";
   PROTOC_INCLUDE = "${protobuf}/include";
   version = gitVersions.version;
@@ -148,6 +145,12 @@ let
     });
   cargoDeps = rustPlatform.importCargoLock {
     lockFile = ../../../Cargo.lock;
+    # Use static.crates.io (CDN) instead of crates.io/api to avoid the 1 req/sec
+    # rate limit on the API servers, which currently returns intermittent 403s.
+    # See https://github.com/rust-lang/crates.io/issues/13482
+    extraRegistries = {
+      "https://github.com/rust-lang/crates.io-index" = "https://static.crates.io/crates";
+    };
   };
   builder =
     if static then build_with_default
