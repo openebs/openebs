@@ -23,7 +23,7 @@ jobs:
           submodules: recursive
       - id: nixpath
         run: echo "nix_path=nixpkgs=$(jq -r '.nixpkgs.url' nix/sources.json)" >> $GITHUB_OUTPUT
-      - uses: cachix/install-nix-action@v31.11.0
+      - uses: cachix/install-nix-action@v31.11.1
         with:
           nix_path: "${{ steps.nixpath.outputs.nix_path }}"
       - name: Prefetch Nix-Shell
