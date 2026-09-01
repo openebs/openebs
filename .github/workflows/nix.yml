@@ -23,7 +23,7 @@ jobs:
           filters: |
             nix:
               - '**.nix'
-      - uses: cachix/install-nix-action@v31.11.0
+      - uses: cachix/install-nix-action@v31.11.1
         if: steps.changes.outputs.nix == 'true'
 
       - name: Set NIX_PATH
