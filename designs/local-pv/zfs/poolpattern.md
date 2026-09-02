@@ -7,7 +7,7 @@ owners:
   - "@krishnaGajabi"
 editor: "@krishnaGajabi"
 creation-date: 2026-07-14
-last-updated: 2026-08-07
+last-updated: 2026-08-31
 status: implementable
 ---
 
@@ -23,6 +23,7 @@ status: implementable
   - [Proposal](#proposal)
     - [StorageClass API](#storageclass-api)
     - [Pool Resolution and Scheduling](#pool-resolution-and-scheduling)
+      - [Pool selection within a node](#pool-selection-within-a-node)
     - [Capacity Tracking](#capacity-tracking)
     - [Clone / Snapshot Paths](#clone--snapshot-paths)
     - [Validation](#validation)
@@ -126,7 +127,9 @@ removed — so suitability filtering must be applied by the controller to the sc
 output, not by omission from the weight map.
 
 * **Weight map — ordering only** (`nmap[node] += ...`), including every node that has a
-  matching pool so the order is never distorted:
+  matching pool so the order is never distorted. It orders **nodes**; the same algorithm
+  orders the **pools** within the chosen node, see [Pool selection within a
+  node](#pool-selection-within-a-node):
   * `CapacityWeighted` (**default**) → `+= pool.Used`, the pool's real on-disk usage from
     the `ZFSNode` CR.
   * `VolumeWeighted` → count of `ZFSVolume`s whose pool root matches (`ZFSNode` carries
@@ -146,9 +149,10 @@ output, not by omission from the weight map.
 what has already been put *into* a pool; neither says anything about what is *left*. A node
 with a small, untouched pool therefore outranks a node with a large, moderately used one,
 even though the latter has far more room for the volume. `SpaceWeighted` orders by the free
-capacity of the node's roomiest matching pool instead — the same pool `resolvePool` would
-place the volume in, so the metric matches where the volume actually lands. It is the ZFS
-analog of lvm-localpv's [`SpaceWeighted`](https://github.com/openebs/lvm-localpv/blob/develop/pkg/driver/schd_helper.go),
+capacity of the node's roomiest matching pool instead — under `SpaceWeighted` that is also
+the pool `resolvePool` then places the volume in, so the metric matches where the volume
+actually lands. It is the ZFS analog of lvm-localpv's
+[`SpaceWeighted`](https://github.com/openebs/lvm-localpv/blob/develop/pkg/driver/schd_helper.go),
 and it applies to `poolname` and `poolpattern` alike.
 
 Two properties of it are load-bearing:
@@ -167,9 +171,9 @@ Two properties of it are load-bearing:
   algorithms; the weight maps remain pure ordering functions.
 
 Free capacity is taken as the node's **largest** matching pool, not the sum of its matching
-pools, consistent with `getSuitableNodes` and `resolvePool`: a volume lives in one pool and
-can only use that pool's space. All three share a single `maxFreePool` helper so the three
-uses of "the node's roomiest matching pool" cannot drift apart.
+pools, consistent with `getSuitableNodes`: a volume lives in one pool and can only use that
+pool's space. Both share a single `maxFreePool` helper so the two uses of "the node's
+roomiest matching pool" cannot drift apart.
 
 `SpaceWeighted` is **opt-in** via `scheduler: "SpaceWeighted"`; `CapacityWeighted` remains
 the default (see [Resolved Decisions](#resolved-decisions)).
@@ -203,13 +207,16 @@ Decisions](#resolved-decisions) — this changes the existing path's behaviour o
 stores it in `ZFSVolume.Spec.PoolName` (see [Current Behaviour](#current-behaviour));
 the node agent does no matching. So in `poolpattern` mode, after `schd.Scheduler`
 orders the nodes and the suitability intersection has run, the provisioning loop resolves
-the concrete pool **per candidate node** via `resolvePool` — the matching pool on *that*
-node with the largest `Free` — and builds the `ZFSVolume` with `WithPoolName(thatPool)`.
-Because the pool is always taken from the chosen node's own `ZFSNode.Pools`, a node can
-never be paired with a pool that is not on it. For a reserving volume every remaining
-node already has a fitting matching pool (the intersection guaranteed it), so `resolvePool`
-returns non-empty; for a non-reserving volume no intersection ran, so `resolvePool` returns
-`""` for any front-loaded node that has no matching pool at all and the loop skips it.
+the concrete pool **per candidate node** via `resolvePool` and builds the `ZFSVolume` with
+`WithPoolName(thatPool)`. Because the pool is always taken from the chosen node's own
+`ZFSNode.Pools`, a node can never be paired with a pool that is not on it. For a reserving
+volume every remaining node already has a fitting matching pool (the intersection
+guaranteed it), so `resolvePool` returns non-empty; for a non-reserving volume no
+intersection ran, so `resolvePool` returns `""` for any front-loaded node that has no
+matching pool at all and the loop skips it.
+
+Which of a node's matching pools it picks is the scheduling algorithm's decision too, see
+[Pool selection within a node](#pool-selection-within-a-node) below.
 
 `lib-csi` is not modified — it continues to order nodes; the suitability filter and
 concrete pool selection stay in this repo.
@@ -275,22 +282,39 @@ func getNodeMap(scheduler string, pattern *regexp.Regexp) (map[string]int64, err
 
 // maxFreePool returns the matching pool on the node with the largest Free, and that Free
 // ("" when nothing matches). Single definition of "the node's roomiest matching pool",
-// shared by resolvePool, getSuitableNodes and getSpaceWeightedMap.
+// shared by getSuitableNodes and getSpaceWeightedMap, which both rank whole nodes by it.
 func maxFreePool(pools []apis.Pool, pattern *regexp.Regexp) (string, int64)
 
-// resolvePool returns the matching pool on `node` with the largest Free (the pool behind
-// that node's maxFree), or "" if no pool on the node matches the pattern.
-func resolvePool(node string, pattern *regexp.Regexp) (string, error)
+// resolvePool returns the matching pool on `node` that the scheduling algorithm prefers
+// among those with Free > minFree, or "" if no pool on the node qualifies. minFree is the
+// volume size for a reserving volume and 0 otherwise.
+func resolvePool(scheduler, node string, pattern *regexp.Regexp, minFree int64) (string, error)
+
+// getPoolMap is getNodeMap's per-pool counterpart: pool name -> weight over the pools of
+// one node, same "lowest weight wins" convention, CapacityWeighted when unset.
+// SpaceWeighted inverts Free per pool, as getSpaceWeightedMap does per node.
+func getPoolMap(scheduler, node string, pools []apis.Pool) (map[string]int64, error)
+
+// getPoolVolumeMap counts the ZFSVolumes on `node` per pool root — the per-pool
+// counterpart of getVolumeWeightedMap, and the only weight the ZFSNode CR cannot answer.
+func getPoolVolumeMap(node string) (map[string]int64, error)
+
+// poolForNode picks the lowest-weighted matching pool with Free > minFree. A strict <
+// keeps the first pool on a tie, which is the lowest name: ZFSNode.Pools is name-sorted.
+func poolForNode(pools []apis.Pool, pattern *regexp.Regexp, minFree int64, weights map[string]int64) string
 ```
 
 Sketch of the controller flow (reserving volume):
 
 ```go
 reserves := reservesSpace(vtype, thinprovision)
-nmap, _ := getNodeMap(schld, pattern)          // ordering
+nmap, _ := getNodeMap(schld, pattern)          // ordering, by node
 ordered := schd.Scheduler(req, nmap)           // all topology nodes, weighted order
 if len(ordered) == 0 { /* generic Internal — no topology-eligible node */ }
+
+minFree := int64(0)                            // the fit floor resolvePool selects within
 if reserves {
+    minFree = size
     suitable, matched, _ := getSuitableNodes(pattern, size)
     ordered = filterKeep(ordered, suitable)    // preserve order, drop unfit
     if len(ordered) == 0 {
@@ -298,7 +322,7 @@ if reserves {
     }
 }
 for _, node := range ordered {
-    pool, _ := resolvePool(node, pattern)
+    pool, _ := resolvePool(schld, node, pattern, minFree)   // same algorithm, by pool
     if pool == "" { continue }                 // non-reserving path: skip non-matching nodes
     // build ZFSVolume with WithPoolName(pool); try provision
 }
@@ -306,6 +330,65 @@ for _, node := range ordered {
 
 `CreateZFSVolume` returns the resolved pool (new return value) so `CreateVolume`
 can set the response context (`PoolNameKey`) and log line correctly in pattern mode.
+
+#### Pool selection within a node
+
+**The scheduling algorithm picks the pool as well as the node.** A node usually advertises
+more than one matching pool, so choosing the node only gets the volume half-way. The
+algorithm the StorageClass names therefore runs a second time, over the matching pools of
+the chosen node, via a `getPoolMap` that is the per-pool counterpart of `getNodeMap`:
+
+| `scheduler` | node ordering (`getNodeMap`) | pool choice (`getPoolMap`) |
+| --- | --- | --- |
+| `CapacityWeighted` (default) | least summed `Used` over the node's matching pools | the matching pool with the least `Used` |
+| `VolumeWeighted` | fewest `ZFSVolume`s in the node's matching pools | the matching pool holding the fewest `ZFSVolume`s |
+| `SpaceWeighted` | most `Free` in the node's roomiest matching pool | the matching pool with the most `Free` |
+
+Both maps use the same "lowest weight wins" convention, so `SpaceWeighted` inverts `Free`
+per pool (`math.MaxInt64 - pool.Free`) exactly as `getSpaceWeightedMap` does per node.
+`VolumeWeighted` is the only one that cannot be answered from the `ZFSNode` CR — it counts
+the `ZFSVolume`s whose `Spec.OwnerNodeID` is this node, keyed by their pool root. Under
+`SpaceWeighted` the result is the roomiest matching pool, which is what `resolvePool`
+always returned before this amendment; the other two algorithms are what change.
+
+This closes a gap in the original design, where `resolvePool` always returned the pool with
+the largest `Free`: a StorageClass asking for `CapacityWeighted` got its **node** by used
+capacity and then its **pool** by free space, so the algorithm it named was silently
+overridden one level down.
+
+**Fit first, then the algorithm.** For a volume that reserves space, `resolvePool` considers
+only the matching pools with `Free > size` and runs the algorithm over those; the controller
+passes that size as `minFree`, and `0` for a non-reserving volume, which is filtered no more
+than it is at the node level. Both levels then have the same shape — keep what fits, order
+what is left by weight — and cannot disagree about which pools are eligible.
+
+Without the pool-level test they would. A node is admitted on its **roomiest** matching pool,
+so the algorithm could then name a much smaller one. Take a 50Gi thick volume under
+`CapacityWeighted`, on a node advertising two matching pools:
+
+| pool | `Used` | `Free` | least used? | holds a 50Gi reservation? |
+| --- | --- | --- | --- | --- |
+| `zfspv-pool-a` | 10Gi | 20Gi | yes | no |
+| `zfspv-pool-b` | 400Gi | 600Gi | no | yes |
+
+`getSuitableNodes` admits the node on `zfspv-pool-b`, so it survives the intersection.
+Unfiltered, the algorithm would then name `zfspv-pool-a` — 20Gi free against a 50Gi
+reservation — and `zfs create` would fail on a node admitted on the strength of a different
+pool. The test drops `zfspv-pool-a` before any weight is compared. It cannot drop
+everything: the pool the node was admitted on clears the same `Free > size` test that
+admitted it, so a reserving volume always has at least one candidate left.
+
+This is a failure the amendment *introduces* — while `resolvePool` always returned the
+roomiest pool, it returned by construction the very pool suitability had judged, so the two
+could not disagree. Letting the algorithm choose is what breaks that link.
+
+**Ties keep the first matching pool**, which is the lowest pool name: the node agent lists
+pools with `zfs list -s name`, so `ZFSNode.Pools` arrives already sorted and a strict
+`<` comparison on the weight is deterministic on its own. No tie-break on free space is
+added, deliberately — that would let "roomiest wins" back in through the tie case, which is
+the policy this amendment exists to remove. Ties are self-correcting anyway under
+`VolumeWeighted`, where every empty pool weighs `0`: once a volume lands, that pool's count
+is `1` and the next volume goes elsewhere.
 
 ### Capacity Tracking
 
@@ -329,8 +412,9 @@ the node-agent then executes `zfs clone <sourcepool>/<snap> <sourcepool>/<clone>
 also a ZFS hard constraint — a clone must live in the same pool as its origin snapshot, it
 cannot cross pools. **`getNodeMap`, `getSuitableNodes`, and `resolvePool` therefore must
 not run on these paths.** (An implementation that mistakenly routes a pattern-mode clone
-through normal scheduling could have `resolvePool` pick a *different* matching pool by
-`maxFree`, breaking the clone — so this is called out deliberately.)
+through normal scheduling could have `resolvePool` pick a *different* matching pool —
+whichever one the scheduling algorithm prefers — breaking the clone, so this is called out
+deliberately.)
 
 The only thing the `poolname`/`poolpattern` parameter drives here is a **sanity-check
 guard** — *"does the pool this SC declares cover where the clone will actually go (the
@@ -362,12 +446,30 @@ than an empty string; it is not required for correctness and may be deferred.
 
 ### Validation
 
-In `validateVolumeCreateReq` ([controller.go:1189](https://github.com/openebs/zfs-localpv/blob/develop/pkg/driver/controller.go#1189)),
-all as `codes.InvalidArgument`:
+Three cases are rejected with `codes.InvalidArgument`:
 
-* reject when **both** `poolname` and `poolpattern` are set (ambiguous);
-* reject when **neither** is set;
-* reject a `poolpattern` that fails to compile.
+* **both** `poolname` and `poolpattern` set (ambiguous);
+* **neither** set;
+* a `poolpattern` that fails to compile.
+
+`compilePoolPattern` returns exactly these three errors, and every path that
+provisions a volume — `CreateZFSVolume`, `CreateVolClone` and `CreateSnapClone` —
+calls it before it needs the compiled pattern, so the rejection happens there.
+
+An earlier revision of this OEP put the same three checks in
+`validateVolumeCreateReq` instead. That is **not** what was implemented, and
+deliberately so: each path needs the compiled `*regexp.Regexp` afterwards, so a
+separate validator would either compile the same expression a second time or have
+to thread the compiled pattern down into three call sites, for no change in what
+the caller sees. Validating where the value is produced keeps one source of truth,
+the same reasoning applied to the resolved pool in [Clone / Snapshot
+Paths](#clone--snapshot-paths).
+
+One consequence is worth stating: `CreateZFSVolume` returns early when the volume
+already exists and is `Ready`, before compiling, so a misconfigured StorageClass
+is not reported on that idempotent retry. This is correct — the volume does exist,
+and CSI expects `CreateVolume` to succeed idempotently — but it does mean the
+error surfaces on the first create rather than on every call.
 
 ## Implementation Plan
 
@@ -375,10 +477,10 @@ all as `codes.InvalidArgument`:
    the pool root; `CapacityWeighted` weight becomes summed per-pool `Used`; the weight
    maps stay **ordering-only** (every node with a matching pool, no fit logic). Add
    `reservesSpace`, `getSuitableNodes(pattern, size) → (suitable, matched, err)`, and
-   `resolvePool` for pattern-mode concrete pool selection, sharing one `maxFreePool`
-   helper. Add the `SpaceWeighted` algorithm (`getSpaceWeightedMap`, inverted
-   `maxFree`, full-pool nodes retained) and its `getNodeMap` case, leaving
-   `CapacityWeighted` as the default. Fold the exact-name
+   `resolvePool` for pattern-mode concrete pool selection, with `getSuitableNodes` and
+   `getSpaceWeightedMap` sharing one `maxFreePool` helper. Add the `SpaceWeighted`
+   algorithm (`getSpaceWeightedMap`, inverted `maxFree`, full-pool nodes retained) and its
+   `getNodeMap` case, leaving `CapacityWeighted` as the default. Fold the exact-name
    (`poolname`, compiled as `^`+`QuoteMeta`+`$`) and regex (`poolpattern`) cases into
    one `*regexp.Regexp`. `VolumeWeighted` still counts `ZFSVolume`s, parsing
    `Spec.PoolName` to its root before matching.
@@ -388,7 +490,15 @@ all as `codes.InvalidArgument`:
    `getSuitableNodes` and, when the intersection is empty, replace the generic
    `codes.Internal` at [controller.go:292](../pkg/driver/controller.go#L292) with the
    capacity-aware fail-fast (`ResourceExhausted` when `matched`, `FailedPrecondition`
-   otherwise); call `resolvePool` per candidate node in the provisioning loop.
+   otherwise); call `resolvePool` per candidate node in the provisioning loop, passing the
+   scheduler name and the fit floor (`size` when reserving, `0` otherwise).
+
+   Back in `schd_helper.go`, run the scheduling algorithm over the pools of the chosen
+   node too: `getPoolMap` (with `getPoolVolumeMap` for `VolumeWeighted`) and
+   `poolForNode`, replacing `resolvePool`'s unconditional largest-`Free` choice. See
+   [Pool selection within a node](#pool-selection-within-a-node). This was added as an
+   amendment after review of the fresh-create PR; it belongs with this step rather than
+   step 1 because it changes `resolvePool`'s signature and its only caller is here.
 3. `controller.go` (clone/snapshot paths) — **required:** change the guard so
    `CreateVolClone`/`CreateSnapClone` accept a source pool that matches `poolpattern`
    (keep exact `== poolname` otherwise); do **not** schedule or `resolvePool` these paths
@@ -398,7 +508,10 @@ all as `codes.InvalidArgument`:
    the chosen pool; may be deferred (unconsumed by the driver).
 4. `GetCapacity` — accept `poolpattern` (regex-match pool roots, max `Free` across
    matching pools) alongside the existing exact-`poolname` path.
-5. `validateVolumeCreateReq` — reject both-set / neither-set + regex-compile validation.
+5. Validation — reject both-set / neither-set / invalid regex with
+   `InvalidArgument`. Delivered by `compilePoolPattern` in step 1, which every
+   create path calls, rather than by a separate check in
+   `validateVolumeCreateReq`; see [Validation](#validation).
 6. Docs (see below) and samples.
 
 ## Test Plan
@@ -410,7 +523,13 @@ all as `codes.InvalidArgument`:
   sorts most-free-first under an ascending sort, that a node's largest matching pool decides
   rather than the sum of its pools, and that a node with a *full* matching pool still gets
   an entry (weight `math.MaxInt64`) instead of being dropped and front-loaded;
-  concrete max-`Free` pool selection; `reservesSpace`
+  **per-pool selection** — that each algorithm picks the pool its node-level counterpart
+  implies (least `Used` for `CapacityWeighted`, fewest volumes for `VolumeWeighted`, most
+  `Free` for `SpaceWeighted`, `CapacityWeighted` when the parameter is unset), that the
+  `minFree` floor keeps a reserving volume out of a matching pool too small for it even
+  when that pool wins on weight, that a non-reserving volume passes `0` and is not floored,
+  and that a tie keeps the first (lowest-named) matching pool rather than the roomiest;
+  `reservesSpace`
   across the zvol/dataset × `yes`/`no`/unset matrix; **suitability intersection** —
   that an unsuitable node dropped from `nmap` is *not* silently promoted (guards against
   the `lib-csi` front-loading behaviour), that the survivors keep weighted order, and
@@ -448,10 +567,32 @@ room a pool has left rather than by what has been written to it) and noting that
   membership and would promote an omitted node to the front, so omission is the wrong
   lever. The `maxFree > size` test is **best-effort**: `ZFSNode.Free` is a periodic
   snapshot and two concurrent creates can both pass it, so `zfs create` remains the
-  final arbiter (a losing create still fails and CSI retries). Non-reserving volumes
+  final arbiter (a losing create still fails and CSI retries). The same size is passed to
+  `resolvePool` as its `minFree` floor, so the pool the algorithm settles on is one that
+  clears the filter the node was admitted by. Non-reserving volumes
   (thin zvols, quota-only datasets) skip the filter entirely — their create succeeds
   regardless of free space, so gating on `Free` would wrongly leave them Pending;
   pattern matching, weighted ordering, and concrete-pool resolution all still apply.
+* **Pool selection follows the scheduling algorithm** (amended 2026-08-24, after review of
+  [zfs-localpv#743](https://github.com/openebs/zfs-localpv/pull/743)): the algorithm named
+  by `scheduler` picks the **pool within the chosen node**, not just the node.
+  Originally `resolvePool` always returned the matching pool with the largest `Free`, which
+  made every StorageClass behave like `SpaceWeighted` at the pool level: a
+  `CapacityWeighted` StorageClass picked its node by used capacity and then its pool by
+  free space, silently overriding the choice one level down. Reviewers asked for the two
+  levels to agree, and they are right — the parameter names one policy, so it should hold
+  wherever placement is decided. `getPoolMap` is therefore the per-pool counterpart of
+  `getNodeMap` (see [Pool selection within a node](#pool-selection-within-a-node)); under
+  `SpaceWeighted` the outcome is unchanged, so only the `CapacityWeighted` and
+  `VolumeWeighted` pool choice moves. Choosing a pool *within* a node is itself new in this
+  OEP — no released behaviour changes here, and the upgrade impact stays exactly the one
+  recorded in the compatibility decision below. The alternative, keeping
+  largest-`Free` as a fixed pool policy (what lvm-localpv effectively does, since its
+  `vgpattern` selection is free-space based), was rejected: it is defensible on its own
+  terms — free space is the only metric that predicts whether a create will *succeed* —
+  but that argument is already served by the `minFree` fit floor, which bounds the
+  algorithm's choice to pools that can hold the volume. Once fit is guaranteed, which of
+  the fitting pools to prefer is exactly the question `scheduler` exists to answer.
 * **Fail-fast when nothing fits**: **for a reserving volume, an empty suitability
   intersection fails the `CreateVolume` immediately** rather than attempting
   provisioning on ineligible nodes. The trigger is the intersection going empty, not an
