@@ -32,6 +32,7 @@ bytes = { workspace = true }
 anyhow = { workspace = true }
 async-trait = { workspace = true }
 clap = { workspace = true, features = ["color", "derive"] }
+http = "1.2"
 k8s-openapi = { workspace = true }
 kube = { workspace = true, features = ["derive", "runtime"] }
 lazy_static = { workspace = true }

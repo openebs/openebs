@@ -39,6 +39,9 @@ impl CliArgs {
             cli_utils::Operations::LocalpvHostpath(ref mut operations) => {
                 operations.cli_args.ctx = args.ctx.clone();
             }
+            cli_utils::Operations::LocalpvRawfile(ref mut operations) => {
+                operations.cli_args.ctx = args.ctx.clone();
+            }
             cli_utils::Operations::Upgrade(ref mut upgrade_args) => {
                 upgrade_args.cli_args.namespace = ns().await?;
                 upgrade_args.cli_args.ctx = args.ctx.clone();
@@ -73,6 +76,7 @@ async fn main() {
                     cli_utils::Error::LocalpvLvm(error) => eprintln!("{error}"),
                     cli_utils::Error::LocalpvZfs(error) => eprintln!("{error}"),
                     cli_utils::Error::Hostpath(error) => eprintln!("{error}"),
+                    cli_utils::Error::LocalpvRawfile(error) => eprintln!("{error}"),
                     cli_utils::Error::Generic(error) => eprintln!("{error}"),
                 }
                 std::process::exit(exit_code);
