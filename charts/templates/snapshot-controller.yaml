@@ -1,0 +1,120 @@
+{{- if .Values.snapshotController.enabled }}
+{{- $distributed := and .Values.engines.local.rawfile.enabled (dig "capabilities" "snapshots" "enabled" false ((index .Values "rawfile-localpv") | default dict)) }}
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: openebs-snapshot-controller
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
+    app.kubernetes.io/instance: {{ .Release.Name | quote }}
+    app.kubernetes.io/version: {{ .Chart.AppVersion }}
+    helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+---
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: openebs-snapshot-controller
+  labels:
+    app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
+    app.kubernetes.io/instance: {{ .Release.Name | quote }}
+    app.kubernetes.io/version: {{ .Chart.AppVersion }}
+    helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+rules:
+- apiGroups: [""]
+  resources: ["persistentvolumes"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: [""]
+  resources: ["persistentvolumeclaims"]
+  verbs: ["get", "list", "watch", "update"]
+- apiGroups: [""]
+  resources: ["events"]
+  verbs: ["list", "watch", "create", "update", "patch"]
+- apiGroups: ["snapshot.storage.k8s.io"]
+  resources: ["volumesnapshotclasses"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["snapshot.storage.k8s.io"]
+  resources: ["volumesnapshotcontents"]
+  verbs: ["create", "get", "list", "watch", "update", "delete", "patch"]
+- apiGroups: ["snapshot.storage.k8s.io"]
+  resources: ["volumesnapshotcontents/status"]
+  verbs: ["patch"]
+- apiGroups: ["snapshot.storage.k8s.io"]
+  resources: ["volumesnapshots"]
+  verbs: ["create", "get", "list", "watch", "update", "patch", "delete"]
+- apiGroups: ["snapshot.storage.k8s.io"]
+  resources: ["volumesnapshots/status"]
+  verbs: ["update", "patch"]
+- apiGroups: ["coordination.k8s.io"]
+  resources: ["leases"]
+  verbs: ["get", "watch", "list", "delete", "update", "create"]
+{{- if $distributed }}
+# Required by --enable-distributed-snapshotting.
+- apiGroups: [""]
+  resources: ["nodes"]
+  verbs: ["get", "list", "watch"]
+{{- end }}
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: openebs-snapshot-controller
+  labels:
+    app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
+    app.kubernetes.io/instance: {{ .Release.Name | quote }}
+    app.kubernetes.io/version: {{ .Chart.AppVersion }}
+    helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+subjects:
+- kind: ServiceAccount
+  name: openebs-snapshot-controller
+  namespace: {{ .Release.Namespace }}
+roleRef:
+  kind: ClusterRole
+  name: openebs-snapshot-controller
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: openebs-snapshot-controller
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
+    app.kubernetes.io/instance: {{ .Release.Name | quote }}
+    app.kubernetes.io/version: {{ .Chart.AppVersion }}
+    helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+spec:
+  replicas: {{ .Values.snapshotController.replicas }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: openebs-snapshot-controller
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: openebs-snapshot-controller
+        app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
+        app.kubernetes.io/instance: {{ .Release.Name | quote }}
+        helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    spec:
+      serviceAccountName: openebs-snapshot-controller
+      containers:
+      - name: snapshot-controller
+        image: {{ include "openebs.common.image" (dict "imageRoot" .Values.snapshotController.image "global" .Values.global) }}
+        imagePullPolicy: {{ default .Values.snapshotController.image.pullPolicy .Values.global.imagePullPolicy }}
+        args:
+        - "--v=2"
+        - "--leader-election=true"
+        {{- if $distributed }}
+        # LocalPV Rawfile needs this
+        - "--enable-distributed-snapshotting=true"
+        {{- end }}
+        {{- range .Values.snapshotController.extraArgs }}
+        - {{ tpl . $ | quote }}
+        {{- end }}
+        resources:
+        {{- toYaml .Values.snapshotController.resources | nindent 10 }}
+      {{- if or .Values.global.imagePullSecrets .Values.snapshotController.imagePullSecrets }}
+      imagePullSecrets:
+      {{- include "openebs.common.pullSecrets" (dict "images" (list .Values.snapshotController) "global" .Values.global) | indent 6 }}
+      {{- end }}
+{{- end }}
