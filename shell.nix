@@ -33,7 +33,6 @@ mkShellNoCC {
     git
     nixpkgs-fmt
     paperclip
-    openssl
     pkg-config
     which
     codespell

@@ -237,10 +237,10 @@ async fn upgrade_job(
                     volumes: Some(vec![Volume {
                         name: "upgrade-config-map".to_string(),
                         config_map: Some(ConfigMapVolumeSource {
-                            name: Some(format!(
+                            name: format!(
                                 "{release_name}-upgrade-config-map-{version}",
                                 version = upgrade_obj_suffix()
-                            )),
+                            ),
                             ..Default::default()
                         }),
                         ..Default::default()
@@ -481,7 +481,7 @@ async fn already_cordoned_nodes_validation(client: &ApiClient) -> Result<()> {
         }
     }
     if !cordoned_nodes_list.is_empty() {
-        let data = format!("One or more nodes in this cluster are in a Mayastor cordoned state. This implies that the storage space of DiskPools on these nodes cannot be utilized for volume replica rebuilds. Please ensure remaining storage nodes have enough available DiskPool space to accommodate volume replica rebuilds, that get triggered during the upgrade process. To skip this validation, please re-run with '--skip-cordoned-node-validation` flag. Below is a list of the Mayastor cordoned nodes:\n{cordoned_nodes}", cordoned_nodes = &cordoned_nodes_list.join("\n"));
+        let data = format!("One or more nodes in this cluster are in a Mayastor cordoned state. This implies that the storage space of DiskPools on these nodes cannot be utilized for volume replica rebuilds. Please ensure remaining storage nodes have enough available DiskPool space to accommodate volume replica rebuilds, that get triggered during the upgrade process. To skip this validation, please re-run with '--skip-cordoned-node-validation` flag. Below is a list of the Mayastor cordoned nodes:\n{cordoned_nodes}", cordoned_nodes = cordoned_nodes_list.join("\n"));
         console_logger::error("Error", data.as_str());
         return Err(anyhow!("Nodes are in cordoned state"));
     }
