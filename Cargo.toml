@@ -9,8 +9,8 @@ resolver = "1"
 
 [workspace.dependencies]
 # k8s
-kube = { version = "0.94.2", features = ["derive", "runtime"] }
-k8s-openapi = { version = "0.22.0", features = ["v1_24"] }
+k8s-openapi = { version = "0.24.0", default-features = false, features = ["v1_28", "schemars"] }
+kube = { version = "0.99.0", default-features = false, features = ["runtime", "derive", "client", "rustls-tls", "aws-lc-rs"] }
 
 # async
 tokio = { version = "1.45.1", features = ["full"] }
