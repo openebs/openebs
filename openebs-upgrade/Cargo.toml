@@ -20,7 +20,7 @@ color-eyre = { workspace = true }
 constants = { path = "../mayastor/constants" }
 futures = { workspace = true }
 k8s-openapi = { workspace = true }
-kube = { workspace = true, default-features = true, features = ["derive", "runtime"] }
+kube = { workspace = true, features = ["derive", "runtime"] }
 semver = { workspace = true }
 serde = { workspace = true }
 serde_yaml = { workspace = true }
