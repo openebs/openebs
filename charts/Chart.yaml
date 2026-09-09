@@ -1,7 +1,7 @@
 apiVersion: v2
-version: 4.6.0-develop
+version: 4.7.0-develop
 name: openebs
-appVersion: 4.6.0-develop
+appVersion: 4.7.0-develop
 description: Containerized Attached Storage for Kubernetes
 icon: https://raw.githubusercontent.com/cncf/artwork/HEAD/projects/openebs/icon/color/openebs-icon-color.png
 home: https://www.openebs.io/
@@ -16,7 +16,7 @@ sources:
   - https://github.com/openebs/openebs
 dependencies:
   - name: openebs-crds
-    version: 4.6.0-develop
+    version: 4.7.0-develop
   - name: loki
     version: 6.29.0
     repository: https://grafana.github.io/helm-charts
@@ -26,19 +26,19 @@ dependencies:
     repository: https://grafana.github.io/helm-charts
     condition: alloy.enabled
   - name: localpv-provisioner
-    version: 4.6.0-develop
+    version: 4.7.0-develop
     repository: "https://openebs.github.io/dynamic-localpv-provisioner"
     condition: engines.local.hostpath.enabled
   - name: zfs-localpv
-    version: 2.11.0-develop
+    version: 2.12.0-develop
     repository: "https://openebs.github.io/zfs-localpv"
     condition: engines.local.zfs.enabled
   - name: lvm-localpv
-    version: 1.10.0-develop
+    version: 1.11.0-develop
     repository: "https://openebs.github.io/lvm-localpv"
     condition: engines.local.lvm.enabled
   - name: rawfile-localpv
-    version: 0.14.1
+    version: 0.15.1
     repository: "https://openebs.github.io/rawfile-localpv"
     condition: engines.local.rawfile.enabled
   - name: mayastor
@@ -73,7 +73,7 @@ annotations:
     - name: linux-utils
       image: docker.io/openebs/linux-utils:4.6.0
     - name: lvm-driver
-      image: docker.io/openebs/lvm-driver:1.10.0-develop
+      image: docker.io/openebs/lvm-driver:1.11.0-develop
     - name: mayastor-agent-core
       image: docker.io/openebs/mayastor-agent-core:develop
     - name: mayastor-agent-ha-cluster
@@ -101,11 +101,11 @@ annotations:
     - name: provisioner-localpv
       image: docker.io/openebs/provisioner-localpv:4.6.0
     - name: provisioner-localpv
-      image: docker.io/openebs/provisioner-localpv:4.6.0-develop
+      image: docker.io/openebs/provisioner-localpv:4.7.0-develop
     - name: rawfile-localpv
-      image: docker.io/openebs/rawfile-localpv:v0.14.1
+      image: docker.io/openebs/rawfile-localpv:v0.15.1
     - name: zfs-driver
-      image: docker.io/openebs/zfs-driver:2.11.0-develop
+      image: docker.io/openebs/zfs-driver:2.12.0-develop
     - name: mc
       image: quay.io/minio/mc:RELEASE.2024-11-21T17-21-54Z
     - name: minio
@@ -116,19 +116,25 @@ annotations:
       image: registry.k8s.io/sig-storage/csi-attacher:v4.8.1
     - name: csi-node-driver-registrar
       image: registry.k8s.io/sig-storage/csi-node-driver-registrar:v2.13.0
+    - name: csi-node-driver-registrar
+      image: registry.k8s.io/sig-storage/csi-node-driver-registrar:v2.17.0
     - name: csi-provisioner
       image: registry.k8s.io/sig-storage/csi-provisioner:v5.2.0
     - name: csi-provisioner
       image: registry.k8s.io/sig-storage/csi-provisioner:v6.1.0
+    - name: csi-provisioner
+      image: registry.k8s.io/sig-storage/csi-provisioner:v6.3.0
     - name: csi-resizer
       image: registry.k8s.io/sig-storage/csi-resizer:v1.13.2
     - name: csi-resizer
       image: registry.k8s.io/sig-storage/csi-resizer:v2.0.0
+    - name: csi-resizer
+      image: registry.k8s.io/sig-storage/csi-resizer:v2.2.1
     - name: csi-snapshotter
       image: registry.k8s.io/sig-storage/csi-snapshotter:v8.2.0
     - name: csi-snapshotter
-      image: registry.k8s.io/sig-storage/csi-snapshotter:v8.2.1
+      image: registry.k8s.io/sig-storage/csi-snapshotter:v8.6.0
     - name: snapshot-controller
       image: registry.k8s.io/sig-storage/snapshot-controller:v8.2.0
     - name: snapshot-controller
-      image: registry.k8s.io/sig-storage/snapshot-controller:v8.2.1
+      image: registry.k8s.io/sig-storage/snapshot-controller:v8.6.0
