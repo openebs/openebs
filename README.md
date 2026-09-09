@@ -59,6 +59,26 @@ These features make OpenEBS a robust and flexible solution for managing persiste
 - [Release Process](./RELEASE.md)
 - [Roadmap Tracker](https://github.com/orgs/openebs/projects/78)
 
+### Local Development
+
+The Rust workspace depends on the `mayastor` submodule and its nested submodules. If you want to build or test the workspace locally, clone the repository with submodules:
+
+```bash
+git clone --recurse-submodules https://github.com/openebs/openebs.git
+```
+
+For an existing checkout, initialize them before running `cargo` commands:
+
+```bash
+git submodule update --init --recursive
+```
+
+You can also use the helper script:
+
+```bash
+./scripts/nix/git-submodule-init.sh
+```
+
 ### Community
 
 - Homepage: [openebs.io](https://openebs.io/)
