@@ -1,5 +1,5 @@
 use kubectl_plugin::resources;
-use localpv::{hostpath, lvm, zfs};
+use localpv::{hostpath, lvm, rawfile, zfs};
 use plugin::{init_tracing_with_jaeger, ExecuteOperation};
 use supportability::DumpArgs;
 use upgrade::cli::Upgrade;
@@ -69,6 +69,7 @@ pub enum Operations {
     LocalpvLvm(lvm::Lvm),
     LocalpvZfs(zfs::Zfs),
     LocalpvHostpath(hostpath::Hostpath),
+    LocalpvRawfile(rawfile::Rawfile),
     Upgrade(Upgrade),
     Dump(DumpArgs),
 }
@@ -90,6 +91,9 @@ impl Operations {
             Operations::LocalpvHostpath(hostpath) => {
                 hostpath.ops.execute(&hostpath.cli_args).await?;
             }
+            Operations::LocalpvRawfile(rawfile) => {
+                rawfile.ops.execute(&rawfile.cli_args).await?;
+            }
             Operations::Upgrade(upgrade) => upgrade.execute().await?,
             Operations::Dump(args) => {
                 args.execute().await?;
@@ -109,6 +113,8 @@ pub enum Error {
     LocalpvZfs(zfs::Error),
     /// Localpv-hostpath stem specific errors.
     Hostpath(hostpath::Error),
+    /// Localpv-rawfile stem specific errors.
+    LocalpvRawfile(rawfile::Error),
     /// Plugin specific error.
     Generic(anyhow::Error),
 }
@@ -143,6 +149,12 @@ impl From<zfs::Error> for Error {
 impl From<hostpath::Error> for Error {
     fn from(err: hostpath::Error) -> Self {
         Error::Hostpath(err)
+    }
+}
+
+impl From<rawfile::Error> for Error {
+    fn from(err: rawfile::Error) -> Self {
+        Error::LocalpvRawfile(err)
     }
 }
 
