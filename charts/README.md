@@ -83,14 +83,14 @@ helm delete `<RELEASE NAME>` -n `<RELEASE NAMESPACE>`
 
 | Repository | Name | Version |
 |------------|------|---------|
-|  | openebs-crds | 4.6.0-prerelease |
+|  | openebs-crds | 4.6.1-prerelease |
 | https://grafana.github.io/helm-charts | alloy | 1.0.1 |
 | https://grafana.github.io/helm-charts | loki | 6.29.0 |
 | https://openebs.github.io/dynamic-localpv-provisioner | localpv-provisioner | 4.6.0 |
-| https://openebs.github.io/lvm-localpv | lvm-localpv | 1.10.0 |
-| https://openebs.github.io/mayastor-extensions | mayastor | 2.12.0 |
-| https://openebs.github.io/rawfile-localpv | rawfile-localpv | 0.15.0 |
-| https://openebs.github.io/zfs-localpv | zfs-localpv | 2.11.0 |
+| https://openebs.github.io/lvm-localpv | lvm-localpv | 1.10.1 |
+| https://openebs.github.io/mayastor-extensions | mayastor | 2.12.1 |
+| https://openebs.github.io/rawfile-localpv | rawfile-localpv | 0.15.1 |
+| https://openebs.github.io/zfs-localpv | zfs-localpv | 2.11.1 |
 
 ## Values
 
