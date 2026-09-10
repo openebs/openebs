@@ -46,7 +46,7 @@ jobs:
     with:
       tag: ${{ inputs.tag }}
       registry: ghcr.io
-      namespace: ${{ github.repository_owner }}/dev
+      namespace: dev
     secrets: inherit
 
   build-binaries:
@@ -77,6 +77,15 @@ jobs:
           echo "NIX_PATH=$NIX_PATH" >> $GITHUB_ENV
           nix-shell --pure --run "echo" ./scripts/staging/shell.nix
 
+      # oras logs itself in below; this is what leaves the credentials where
+      # cosign can find them when it signs what oras pushed.
+      - name: Login to GHCR
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Download kubectl artifacts
         uses: actions/download-artifact@v8
         with:
@@ -91,6 +100,15 @@ jobs:
             --namespace ${{ github.repository_owner }}/dev/plugin \
             --username ${{ github.actor }} \
             --password ${{ secrets.GITHUB_TOKEN }}" ./scripts/staging/shell.nix
+
+      - name: Sign the kubectl bundle and attest its SBOMs
+        env:
+          PLUGIN: openebs
+        run: |
+          ./mayastor/scripts/github/attest-kubectl-oci.sh \
+            --tag ${TAG} \
+            --namespace ${{ github.repository_owner }}/dev/plugin \
+            --sbom-dir artifacts
 
   release-staging-chart:
     runs-on: ubuntu-latest

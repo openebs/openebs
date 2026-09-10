@@ -32,3 +32,8 @@ plugin/target/
 
 # artifacts
 /artifacts/
+/sbom/
+*.cdx.json
+# never commit a signing key
+cosign.key
+cosign.pub
