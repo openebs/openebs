@@ -118,6 +118,12 @@ jobs:
           nix-shell --pure --run "./scripts/helm/update-version-upon-release.sh \
             --tag ${TAG}" ./scripts/helm/shell.nix
 
+      - name: Update the umbrella images for staging
+        run: |
+          nix-shell --pure --run "./scripts/helm/images.sh generate --openebs-registry ghcr.io \
+            --openebs-namespace ${{ github.repository_owner }}/dev" ./scripts/helm/shell.nix
+          nix-shell --pure --run "./scripts/helm/images.sh patch" ./scripts/helm/shell.nix
+
       - name: Set Chart Version
         run: |
           CHART_VERSION=$(awk -F': ' '/^version:/ {print $2}' charts/Chart.yaml)
