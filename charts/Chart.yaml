@@ -98,6 +98,8 @@ annotations:
       image: docker.io/openebs/mayastor-obs-callhome:develop
     - name: mayastor-operator-diskpool
       image: docker.io/openebs/mayastor-operator-diskpool:develop
+    - name: mayastor-upgrade-job
+      image: docker.io/openebs/mayastor-upgrade-job:develop
     - name: provisioner-localpv
       image: docker.io/openebs/provisioner-localpv:4.6.0
     - name: provisioner-localpv
