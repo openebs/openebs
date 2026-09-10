@@ -160,6 +160,11 @@ jobs:
 
           mv charts-final/openebs/* charts
 
+      - name: Update the umbrella images for release
+        run: |
+          nix-shell --pure --run "./scripts/helm/images.sh generate" ./scripts/helm/shell.nix
+          nix-shell --pure --run "./scripts/helm/images.sh patch" ./scripts/helm/shell.nix
+
       - name: Publish openebs umbrella helm chart
         uses: stefanprodan/helm-gh-pages@v1.7.0
         env:
