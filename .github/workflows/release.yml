@@ -184,3 +184,106 @@ jobs:
           registry_username: ${{ github.actor }}
           registry_password: ${{ secrets.GITHUB_TOKEN }}
           update_dependencies: 'false'
+
+  chart-sboms:
+    runs-on: ubuntu-latest
+    needs: [release-helm-chart, release-kubectl-binaries]
+    permissions:
+      # To upload the bundle to the release, and to attest it.
+      contents: write
+      id-token: write
+      attestations: write
+      packages: read
+
+    env:
+      TAG: ${{ github.ref_name }}
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          submodules: recursive
+
+      - uses: cachix/install-nix-action@v31.11.1
+      - name: Pre-populate nix-shell
+        run: |
+          export NIX_PATH=nixpkgs=$(jq '.nixpkgs.url' nix/sources.json -r)
+          echo "NIX_PATH=$NIX_PATH" >> $GITHUB_ENV
+          nix-shell --pure --run "echo" ./scripts/staging/shell.nix
+
+      - name: Login to GHCR
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # Most of the chart comes from Docker Hub; logging in keeps the anonymous
+      # pull limit out of the picture, which otherwise starts failing to resolve
+      # images partway through and reports them as unresolved.
+      - name: Login to Docker Hub
+        uses: docker/login-action@v4
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Set Chart Version
+        run: echo "CHART_VERSION=${TAG#v}" >> $GITHUB_ENV
+
+      # Against the released chart, so the inventory matches what was published
+      # rather than what staging happened to hold. The kubectl bundle is only
+      # ever pushed to the staging namespace, so that is where it is read from.
+      #
+      # --verify requires that every attestation found, whoever published it,
+      # verifies against an openebs workflow identity. An artefact with no
+      # attestation is reported rather than fatal, since most of the umbrella's
+      # images are still in that state. The default shell has no pipefail, and
+      # without it the status below would be tee's, never the script's.
+      - name: Collect the SBOMs of everything the chart deploys
+        id: sboms
+        env:
+          PLUGIN: openebs
+        run: |
+          set -o pipefail
+          {
+            echo '### Chart SBOM coverage'
+            echo
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          rc=0
+          ./mayastor/scripts/github/chart-sboms.sh \
+            --chart oci://ghcr.io/${{ github.repository_owner }}/charts/openebs \
+            --version "${CHART_VERSION}" \
+            --registry ghcr.io \
+            --namespace ${{ github.repository_owner }}/dev/plugin \
+            --tag "${TAG}" \
+            --verify | tee -a "$GITHUB_STEP_SUMMARY" || rc=$?
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          echo "rc=$rc" >> "$GITHUB_OUTPUT"
+
+      # Without the marker the script leaves for itself to recognise its output.
+      - name: Bundle the SBOMs
+        run: tar -czf "sboms-${TAG}.tar.gz" --exclude=.chart-sboms -C sboms .
+
+      # Provenance of the bundle itself, the same way the kubectl archives are
+      # attested in release-binaries.yml. This says the collection came from this
+      # workflow. The documents inside are the bare SBOMs, unwrapped from their
+      # attestations: what vouches for each is the cosign attestation left on the
+      # artefact in the registry, and the summary.json alongside says which were
+      # verified against it and which were not.
+      - name: Attest the SBOM bundle
+        uses: actions/attest-build-provenance@v4
+        with:
+          subject-path: sboms-${{ github.ref_name }}.tar.gz
+
+      - name: Upload the SBOM bundle to the release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release upload "${TAG}" --clobber "sboms-${TAG}.tar.gz"
+
+      - name: Fail if an attestation did not verify
+        if: steps.sboms.outputs.rc != '0'
+        run: |
+          echo "The SBOM collection is attached to the release, but verification"
+          echo "failed - see the coverage table in the job summary."
+          exit 1
