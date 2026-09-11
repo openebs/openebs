@@ -18,26 +18,28 @@ jobs:
       id-token: write
       contents: read
       packages: write
+      # Required to record the build provenance of the archives.
+      attestations: write
 
     strategy:
       fail-fast: false
       matrix:
         include:
           # NOTE: Update the .krew.yaml file (if required) when making changes here.
-          - os: oracle-vm-8cpu-32gb-x86-64
+          - os: cncf-ubuntu-8-32-x86
             target: linux-musl
             arch: x86_64
-          - os: oracle-vm-8cpu-32gb-x86-64
+          - os: cncf-ubuntu-8-32-arm
             target: linux-musl
             arch: aarch64
-          - os: macos-14
+          - os: macos-15
             target: apple-darwin
             arch: aarch64
-          - os: macos-14
+          - os: macos-15-intel
             target: apple-darwin
             arch: x86_64
             platform: x86_64-darwin
-          - os: oracle-vm-8cpu-32gb-x86-64
+          - os: cncf-ubuntu-8-32-x86
             target: windows-gnu
             arch: x86_64
             suffix: .exe
@@ -66,9 +68,28 @@ jobs:
         run: |
           tar -czvf kubectl-openebs-${{ matrix.arch }}-${{ matrix.target }}.tar.gz LICENSE -C result/bin kubectl-openebs${{ matrix.suffix }}
 
+      - name: Generate the SBOM
+        run: |
+          ./mayastor/scripts/github/kubectl-plugin-sbom.sh \
+            --binary result/bin/kubectl-openebs${{ matrix.suffix }} \
+            --output kubectl-openebs-${{ matrix.arch }}-${{ matrix.target }}.cdx.json
+
+      # Binds the archive to the workflow, repository and commit which built it,
+      # keylessly, and is verified with "gh attestation verify".
+      # Only when called with a tag, ie for a staging release: a push build is
+      # never published, so there is nothing for its provenance to say.
+      - name: Attest the build provenance
+        if: inputs.tag != ''
+        uses: actions/attest-build-provenance@v4
+        with:
+          subject-path: kubectl-openebs-${{ matrix.arch }}-${{ matrix.target }}.tar.gz
+
+      # The SBOM travels with the archive: staging bundles whatever is here into
+      # the OCI artifact, which the release then mirrors into the release assets.
       - uses: actions/upload-artifact@v7
         with:
           name: kubectl-openebs-${{ matrix.arch }}-${{ matrix.target }}
-          path: kubectl-openebs-${{ matrix.arch }}-${{ matrix.target }}.tar.gz
+          path: |
+            kubectl-openebs-${{ matrix.arch }}-${{ matrix.target }}.tar.gz
+            kubectl-openebs-${{ matrix.arch }}-${{ matrix.target }}.cdx.json
           if-no-files-found: error
-

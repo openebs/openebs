@@ -9,6 +9,8 @@ pkgs.mkShellNoCC {
     crane
     yq-go
     jq
+    # Used to verify the signature and SBOM attestation of the mirrored images.
+    cosign
   ] ++ pkgs.lib.optional (builtins.getEnv "IN_NIX_SHELL" == "pure" && pkgs.system != "aarch64-darwin") [
     docker
     git

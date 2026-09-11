@@ -4,6 +4,24 @@ on:
     branches:
       - develop
       - 'release/**'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to build, example: v4.2.0'
+        required: false
+        type: string
+      registry:
+        description: 'Registry host (no slash), example: ghcr.io'
+        required: false
+        type: string
+      owner:
+        description: 'Repository owner (defaults to github.repository_owner if empty)'
+        required: false
+        type: string
+      namespace:
+        description: 'Namespace, example: dev'
+        required: false
+        type: string
   workflow_call:
     inputs:
       tag:
@@ -11,11 +29,15 @@ on:
         required: true
         type: string
       registry:
-        description: 'Registry, example: ghcr.io'
+        description: 'Registry host (no slash), example: ghcr.io'
         required: true
         type: string
+      owner:
+        description: 'Repository owner (defaults to github.repository_owner if empty)'
+        required: false
+        type: string
       namespace:
-        description: 'Namespace, example: openebs/dev'
+        description: 'Namespace, example: dev'
         required: true
         type: string
 
@@ -23,13 +45,51 @@ env:
   CI: 1
 
 jobs:
-  image-build-push:
-    runs-on: oracle-vm-8cpu-32gb-x86-64
-    permissions:
-      contents: read
-      id-token: write
-      packages: write
+  vars:
+    runs-on: ubuntu-latest
+    outputs:
+      registry: ${{ steps.registry.outputs.registry }}
+      tag: ${{ steps.tag.outputs.tag }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          submodules: 'recursive'
 
+      - name: Compose the registry
+        id: registry
+        uses: ./mayastor/dependencies/control-plane/utils/dependencies/.github/actions/registry-compose
+        with:
+          registry: ${{ inputs.registry }}
+          owner: ${{ inputs.owner || github.repository_owner }}
+          namespace: ${{ inputs.namespace }}
+
+      # A push build is given no tag, and the release script would then fall
+      # back to tagging the images with the commit hash, aliased to the branch.
+      # The chart's appVersion is used instead, as the single-job build did:
+      # that tag is also baked into the plugin binary, which is where it looks
+      # for the upgrade job image. Here rather than in each job below only to
+      # keep the one reading of the chart in one place.
+      - name: Resolve the image tag
+        id: tag
+        env:
+          TAG_IN: ${{ inputs.tag }}
+        run: |
+          tag="$TAG_IN"
+          if [ -z "$tag" ]; then
+            tag="v$(awk -F': ' '/^appVersion:/ {print $2}' charts/Chart.yaml)"
+          fi
+          echo "Tag: $tag"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+
+  image-build:
+    needs: vars
+    strategy:
+      fail-fast: false
+      matrix:
+        runner:
+          - ubuntu-latest
+          - ubuntu-24.04-arm
+    runs-on: ${{ matrix.runner }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -38,37 +98,42 @@ jobs:
 
       - uses: cachix/install-nix-action@v31.11.1
 
-      - name: Pre-populate nix-shell
+      # The upgrade job image carries the chart, so the chart versions must be
+      # settled before it is built. Only for a release: a push build ships
+      # whatever the branch says.
+      - name: Update the chart versions
+        if: inputs.tag != ''
         run: |
           export NIX_PATH=nixpkgs=$(jq '.nixpkgs.url' nix/sources.json -r)
-          echo "NIX_PATH=$NIX_PATH" >> $GITHUB_ENV
-          nix-shell --run "echo" ./scripts/staging/shell.nix
+          nix-shell --pure --run "./scripts/helm/update-version-upon-release.sh" ./scripts/staging/shell.nix
 
-      - name: Login to Docker Hub
-        if: ${{ github.event_name == 'push' }}
-        uses: docker/login-action@v4
+      - name: Build the release images
+        uses: ./mayastor/dependencies/control-plane/utils/dependencies/.github/actions/image-build
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          tag: ${{ needs.vars.outputs.tag }}
+          registry: ${{ needs.vars.outputs.registry }}
+          sbom: 'true'
 
-      - name: Login to GHCR
-        if: ${{ github.event_name == 'workflow_dispatch' }}
-        uses: docker/login-action@v4
+  manifest-push:
+    needs: [vars, image-build]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      # Required for cosign to get an OIDC token for keyless signing.
+      id-token: write
+    steps:
+      - uses: actions/checkout@v7
         with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          submodules: 'recursive'
+          fetch-depth: 0
 
-      - name: Build and push the release images
-        run: |
-          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-            nix-shell --pure --run "./scripts/helm/update-version-upon-release.sh" ./scripts/staging/shell.nix
-            nix-shell --run "./scripts/release.sh --tag ${{ inputs.tag }} --registry ${{ inputs.registry }}/${{ inputs.namespace }}" ./scripts/staging/shell.nix
-          elif [[ "${{ github.event_name }}" == "push" ]]; then
-            nix-shell --run './scripts/release.sh --tag v$(yq '.appVersion' charts/Chart.yaml)' ./scripts/staging/shell.nix
-          fi
-      # debugging
-      # - name: Setup tmate session
-      #   if: ${{ failure() }}
-      #   timeout-minutes: 120
-      #   uses: mxschmitt/action-tmate@v3
+      - name: Assemble and push the multi-arch images
+        uses: ./mayastor/dependencies/control-plane/utils/dependencies/.github/actions/image-manifest-push
+        with:
+          tag: ${{ needs.vars.outputs.tag }}
+          registry: ${{ needs.vars.outputs.registry }}
+          dockerhub-username: ${{ secrets.DOCKERHUB_USERNAME }}
+          dockerhub-password: ${{ secrets.DOCKERHUB_TOKEN }}
+          ghcr-token: ${{ secrets.GITHUB_TOKEN }}
+          attest: 'true'
