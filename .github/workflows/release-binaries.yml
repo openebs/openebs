@@ -32,10 +32,10 @@ jobs:
           - os: cncf-ubuntu-8-32-arm
             target: linux-musl
             arch: aarch64
-          - os: macos-14
+          - os: macos-15
             target: apple-darwin
             arch: aarch64
-          - os: macos-14
+          - os: macos-15-intel
             target: apple-darwin
             arch: x86_64
             platform: x86_64-darwin
