@@ -131,4 +131,13 @@ helm delete `<RELEASE NAME>` -n `<RELEASE NAMESPACE>`
 | preUpgradeHook.&ZeroWidthSpace;image.&ZeroWidthSpace;tag | The container image tag for the hook job | `"1.25.15"` |
 | preUpgradeHook.&ZeroWidthSpace;imagePullSecrets | Optional array of imagePullSecrets containing private registry credentials # Ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/ | `[]` |
 | preUpgradeHook.&ZeroWidthSpace;tolerations | Node tolerations for server scheduling to nodes with taints # Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/ # | `[]` |
+| snapshotController.&ZeroWidthSpace;enabled | Enable/Disable the snapshot-controller. Disable if the cluster already runs one. | `true` |
+| snapshotController.&ZeroWidthSpace;extraArgs | Additional arguments for the snapshot-controller | `[]` |
+| snapshotController.&ZeroWidthSpace;image.&ZeroWidthSpace;pullPolicy | The imagePullPolicy for the container | `"IfNotPresent"` |
+| snapshotController.&ZeroWidthSpace;image.&ZeroWidthSpace;registry | The container image registry URL for the snapshot-controller | `"registry.k8s.io"` |
+| snapshotController.&ZeroWidthSpace;image.&ZeroWidthSpace;repo | The container repository for the snapshot-controller | `"sig-storage/snapshot-controller"` |
+| snapshotController.&ZeroWidthSpace;image.&ZeroWidthSpace;tag | The container image tag for the snapshot-controller | `"v8.2.1"` |
+| snapshotController.&ZeroWidthSpace;imagePullSecrets | Optional registry credentials | `[]` |
+| snapshotController.&ZeroWidthSpace;replicas | Number of snapshot-controller replicas | `1` |
+| snapshotController.&ZeroWidthSpace;resources | Resource requests and limits for the snapshot-controller | <pre>{<br><br>}</pre> |
 
