@@ -68,8 +68,14 @@ pub(crate) struct LvmVolSpec {
 pub(crate) struct LvmVolStatus {
     /// LVM volume resource state.
     state: String,
-    /// LVM volume resource error. if present.
-    error: Option<String>,
+    /// LVM volume resource error, if present.
+    error: Option<LvmVolumeError>,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+struct LvmVolumeError {
+    code: String,
+    message: String,
 }
 
 /// Struct to construct cli result from.
@@ -221,5 +227,44 @@ impl TryFrom<(&LvmVolume, PersistentVolume)> for LvmVolumeObject {
                 source: anyhow::anyhow!("PV vol mode missing for {}", pv_name),
             })?,
         })
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::LvmVolume;
+    use serde_json::json;
+
+    #[test]
+    fn deserializes_failed_volume() {
+        let volume = json!({
+            "apiVersion": "local.openebs.io/v1alpha1",
+            "kind": "LVMVolume",
+            "metadata": {
+                "name": "pvc-test",
+                "namespace": "openebs"
+            },
+            "spec": {
+                "capacity": "1073741824",
+                "ownerNodeID": "worker-1",
+                "shared": "no",
+                "thinProvision": "no",
+                "vgPattern": "",
+                "volGroup": "vg0"
+            },
+            "status": {
+                "state": "Failed",
+                "error": {
+                    "code": "InsufficientCapacity",
+                    "message": "insufficient free space"
+                }
+            }
+        });
+
+        let volume: LvmVolume = serde_json::from_value(volume).unwrap();
+        assert_eq!(volume.status.state, "Failed");
+        let error = volume.status.error.unwrap();
+        assert_eq!(error.code, "InsufficientCapacity");
+        assert_eq!(error.message, "insufficient free space");
     }
 }
