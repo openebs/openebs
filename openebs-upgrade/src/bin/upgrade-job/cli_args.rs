@@ -66,4 +66,8 @@ pub(crate) struct CliArgs {
     /// Add process service tags to the traces.
     #[clap(short, long, env = "TRACING_TAGS", value_delimiter=',', value_parser = parse_key_value)]
     pub(crate) tracing_tags: Vec<KeyValue>,
+
+    /// Crypto options.
+    #[clap(flatten)]
+    pub(crate) crypto: utils::CryptoArgs,
 }

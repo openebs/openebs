@@ -12,6 +12,13 @@ resolver = "1"
 k8s-openapi = { version = "0.24.0", default-features = false, features = ["v1_28", "schemars"] }
 kube = { version = "0.99.0", default-features = false, features = ["runtime", "derive", "client", "rustls-tls", "aws-lc-rs"] }
 
+# crypto: these put every transitive user of them onto the FIPS validated
+# backend. The fips crate inherits its own pins from whichever workspace
+# builds it, so keep these in step with the ones in
+# mayastor/dependencies/control-plane.
+aws-lc-rs = { version = "1.18", default-features = false, features = ["alloc", "ring-io", "ring-sig-verify", "fips"] }
+rustls = { version = "0.23", default-features = false, features = ["aws_lc_rs", "fips"] }
+
 # async
 tokio = { version = "1.45.1", features = ["full"] }
 futures = "0.3.31"

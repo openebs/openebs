@@ -18,6 +18,7 @@ async fn main() -> Result<()> {
     print_package_info!();
     color_eyre::install()?;
     let cli_args = CliArgs::parse();
+    cli_args.crypto.init_or_exit();
 
     TracingTelemetry::builder()
         .with_writer(FmtLayer::Stdout)
