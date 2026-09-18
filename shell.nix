@@ -28,6 +28,10 @@ mkShellNoCC {
   buildInputs = [
     cargo-expand
     cargo-udeps
+    # aws-lc-rs fips
+    cmake
+    go
+    perl
     commitlint
     cowsay
     git

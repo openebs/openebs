@@ -5,6 +5,9 @@
 , channel
 , pkgs
 , clang
+, cmake
+, go
+, perl
 , llvmPackages
 , git
 , gitVersions
@@ -77,6 +80,7 @@ let
     "mayastor/dependencies/control-plane/utils/dependencies/git-version-macro"
     "mayastor/dependencies/control-plane/utils/dependencies/tracing-filter"
     "mayastor/dependencies/control-plane/utils/dependencies/version-info"
+    "mayastor/dependencies/control-plane/utils/dependencies/fips"
     "mayastor/dependencies/control-plane/utils/utils-lib"
     "mayastor/dependencies/control-plane/utils/cert-watcher"
     "mayastor/dependencies/control-plane/utils/hyper-body"
@@ -90,13 +94,16 @@ let
   ];
   src = sourcer.whitelistSource ../../../. src_list;
   hostTarget = channel.makeRustTarget pkgs.hostPlatform;
+  fips = [ cmake go perl ];
   buildProps = rec {
     name = "extensions-${version}";
     inherit version src;
     GIT_VERSION_LONG = "${gitVersions.long}";
     GIT_VERSION = "${gitVersions.tag_or_long}";
 
-    nativeBuildInputs = [ clang pkg-config git paperclip which protobuf ];
+    nativeBuildInputs = fips ++ [ clang pkg-config git paperclip which protobuf ];
+    # cmake is for aws-lc-fips-sys' own build, it must not take over ours.
+    dontUseCmakeConfigure = true;
     buildInputs = [ llvmPackages.libclang utillinux ];
     doCheck = false;
   };

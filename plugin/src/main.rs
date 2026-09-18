@@ -18,6 +18,10 @@ struct CliArgs {
 
     #[clap(flatten)]
     ctx: K8sCtxArgs,
+
+    /// Crypto options.
+    #[clap(flatten)]
+    crypto: utils::CryptoArgs,
 }
 
 impl CliArgs {
@@ -57,6 +61,7 @@ async fn main() {
     let mut exit_code = 1;
     match CliArgs::args().await {
         Ok(cli_args) => {
+            cli_args.crypto.init_or_exit();
             if let Err(error) = cli_args.execute().await {
                 match error {
                     cli_utils::Error::Mayastor(err_variants) => match err_variants {
