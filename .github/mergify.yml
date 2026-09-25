@@ -1,4 +1,51 @@
 queue_rules:
+  # Fork pull requests, matched first so they never pick up `update_bot_account`.
+  # GitHub refuses an OAuth token on its rebase API for a fork, so rebasing on
+  # behalf of a user means impersonating them to force-push the contributor's
+  # branch. Mergify does not do that (and removed the git-based fallback), so
+  # the update is pushed by the Mergify app itself.
+  #
+  # `merge_conditions` must stay identical to `queue_conditions` (in every
+  # queue), otherwise Mergify treats it as a two-step CI and checks the pull
+  # request on a draft PR rather than in place, which "Require branches to be up
+  # to date before merging" does not allow.
+  - name: fork
+    update_method: rebase
+    branch_protection_injection_mode: merge
+    batch_size: 1
+    commit_message_format:
+      title: inherit
+      body: pr-body
+      trailers:
+        - co-authored-by
+    merge_conditions:
+      - check-success = markdown-spell-check
+      - check-success = plugin-build-script
+      - check-success = helm-images
+      - check-success = lint-test
+      - check-success = nix-linter
+      - check-success = submodule-branch
+      - check-success = rust-linter-build
+      - -label ~= do-not-merge
+      - -draft
+      - check-success = DCO
+      - from-fork
+    queue_conditions:
+      - check-success = markdown-spell-check
+      - check-success = plugin-build-script
+      - check-success = helm-images
+      - check-success = lint-test
+      - check-success = nix-linter
+      - check-success = submodule-branch
+      - check-success = rust-linter-build
+      - -label ~= do-not-merge
+      - -draft
+      - check-success = DCO
+      - from-fork
+  # Pull requests from branches in this repository, which includes the
+  # bot-created ones (dependabot). "Require branches to be up to date before
+  # merging" is not compatible with update_method=rebase for bot-created pull
+  # requests unless `update_bot_account` is set.
   - name: default
     update_method: rebase
     branch_protection_injection_mode: merge
