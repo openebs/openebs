@@ -7,7 +7,7 @@ owners:
   - "@abhilashshetty04"
 editor: "@abhilashshetty04"
 creation-date: 2026-06-23
-last-updated: 2026-07-28
+last-updated: 2026-09-24
 status: implementable
 ---
 
@@ -75,8 +75,8 @@ leaving existing rebuilds undisrupted, and preserving topology constraints.
   are. Allocation cannot reach zero, so the pool settles in the terminal `PartiallyDrained` state.
 - Expose **`--accept-snapshot-loss`** to destroy the snapshots left on the pool once every replica has
   been evacuated, so allocation reaches zero and the pool reaches `Drained`.
-- Reject a drain of a pool holding snapshots when **neither** snapshot flag is set, so snapshot loss
-  or retention is always an explicit user choice rather than a default.
+- Allow updating the existing drain spec if pool is not already in `Draining` or in the terminal state (`Drained`,
+  `Cancelled` or `AwaitingCleanup`)
 
 ### Non-Goals
 
@@ -88,12 +88,12 @@ leaving existing rebuilds undisrupted, and preserving topology constraints.
 
 A drain request lands the pool in a persisted `Queued` state and immediately self-cordons the pool
 (blocking new replicas, snapshots, and restores from landing on it). A dedicated reconciler on pool
-module will promote queued pools to `Draining` in FIFO order, up to a configurable `--pool-drain-limit`.
+module will promote queued pools to `Draining` in FIFO order, up to a configurable `--max-concurrent-pool-drain`.
 A dedicated pool-drain reconciler then migrates every replica off draining pool up to --pool-replica-move-limit
 at a time. It sets ReplicaMoveConfig in VolumeSpec, Thus triggering a Full rebuild.
 When the rebuild completes, associated volume replica from the `Draining` pool is removed. When
-the pool's replica allocation reaches zero, the pool transitions to `Drained` (or `PartiallyDrained`
-when snapshots are intentionally left behind).
+the pool's replica allocation reaches zero, the pool transitions to `Drained` or `PartiallyDrained`
+(when we have to dequeue the pool if we can't make progress on the drain procedure).
 
 The `DrainPhase` state machine has the states:
 
@@ -103,16 +103,19 @@ The `DrainPhase` state machine has the states:
 - `Drained` — replica allocation reached zero (terminal).
 - `PartiallyDrained` — replicas evacuated, snapshots intentionally left behind (reported when
   allocation cannot reach zero because snapshots remain).
-- `Aborted` — a transient cleanup phase entered when a drain is cancelled. `drain_spec` is **retained**
-  (with `phase = Aborted`) throughout cleanup — not cleared up front — so the pool stays discoverable
-  and self-cordoned while the drain's changes are unwound; only once cleanup completes are
-  `drain_spec` and the `PoolDrainRecord` cleared. Unlike `Drained` this is not a retained terminal
-  state (see *Abort support*).
+- `Cancelled` — a transient cleanup phase entered when a drain is cancelled. The `Drain` variant is
+  **retained** (with `phase = Cancelled`) throughout cleanup — not cleared up front — so the pool stays
+  discoverable and self-cordoned while the drain's changes are unwound; only once cleanup completes
+  is it replaced by the restored user cordon and the `PoolDrainRecord` cleared. Unlike `Drained` this
+  is not a retained terminal state (see *Cancel support*).
+- `AwaitingCleanup` - When all replicas are evacuated from the volume ownership perspective, drain does
+   have anything to do more. We are just waiting on replicas to be garbage collected.
 
-**Pre-requisites:** the pool must not already be in an `Aborted` state.
+**Pre-requisites:** the pool must not already be in `Draining` or any of the Terminal (`Drained`, `Cancelled`
+or `AwaitingCleanup`) state.
 
-Blocking on `Aborted` means a fresh drain cannot start until the previous drain's cleanup has fully
-torn down (`drain_spec` deleted), which serializes the two and prevents a new drain's `replica_move`
+Blocking on `Cancelled` means a fresh drain cannot start until the previous drain's cleanup has fully
+torn down (`Drain` variant released), which serializes the two and prevents a new drain's `replica_move`
 markers from being confused with the aborting drain's leftovers.
 
 ### User Stories
@@ -146,7 +149,7 @@ Because the scale-up adds a replica *above* the volume's configured replica coun
 able to tell that the extra replica is one it created. This is tracked as a managed `replica_move`
 marker on the volume's runtime metadata (`VolumeSpec.metadata.runtime`), persisted across restarts
 via the pool's `PoolDrainRecord` (see below), initialized when a drain-move begins — with
-`draining_replica = Some(id)` — to start the full rebuild (over-replicate). Existing
+`moving_replica = Some(id)` — to start the full rebuild (over-replicate). Existing
 replica-count-specific reconcilers need changes to cooperate with this marker.
 
 #### Reconciler changes
@@ -160,23 +163,23 @@ add/remove and now additionally read the `replica_move` marker.
 **New reconcilers**
 
 - **Queue-promotion reconciler (pool module).** Scans pools in `Queued`, counts pools already
-  `Draining`, and promotes in FIFO order by `request_timestamp` up to `--pool-drain-limit`.
+  `Draining`, and promotes in FIFO order by `request_timestamp` up to `--max-concurrent-pool-drain`.
 - **Pool-drain (evacuation) reconciler.** The core per-replica loop for each `Draining` pool:
   enumerate replicas, set the per-volume single-slot `replica_move` marker through the per-pool
   `ResourceMove` admission gate, then *watch* the marker the count reconcilers drive and tear it down
-  on `draining_replica → None`. It also handles the spare-dropped-mid-rebuild reset
+  on `moving_replica → None`. It also handles the spare-dropped-mid-rebuild reset
   (`spare_replica → SpareReplica {replica_id: None}`), the `spare_replica = None` marker for `unsafe_evict`,
   and the terminal transition to `Drained`/`PartiallyDrained`. Its replica enumeration must also **classify** each
   replica: one that another drain's marker names as its `spare_replica` is not a move candidate but a
   foreign spare, handled per *The spare's own pool enters a drain* (set `unwind = Some(Respare)` while
   it is still rebuilding, otherwise defer).
-- **Abort/cleanup reconciler.** Driven by `DrainPhase: Aborted`, and purely an orchestrator: on
-  every tick it (re-)asserts `unwind = Some(Abort)` on each volume's runtime `replica_move` slot —
+- **Cancelled/cleanup reconciler.** Driven by `DrainPhase: Cancelled`, and purely an orchestrator: on
+  every tick it (re-)asserts `unwind = Some(Cancelled)` on each volume's runtime `replica_move` slot —
   re-asserting rather than setting once, since the field is not persisted and must be rebuilt from
   `phase` after a restart — waits for the delegated unwind to signal completion via
-  `spare_replica → None`, clears the markers, then clears
-  `PoolSpec.drain_spec` (dropping the self-cordon with it) and the `PoolDrainRecord`, leaving
-  `cordon_drain` untouched.
+  `spare_replica → None`, clears the markers, then replaces the `Drain` variant with the user's
+  cordon restored from `DrainSpec.user_cordon` (dropping the self-cordon) and clears the
+  `PoolDrainRecord` (see *Cancel support*).
 - **Snapshot-removal reconciler (policy-driven).** Runs once a draining pool's replicas are all
   evacuated but snapshots remain — so it never races the moves — and enacts the snapshot policy:
   destroy the remaining replica-snapshots under `--accept-snapshot-loss` (pool becomes `Drained`),
@@ -206,19 +209,15 @@ add/remove and now additionally read the `replica_move` marker.
 
 The per-replica evacuation flow below answers "how is *one* replica moved". At the pool level, the
 three policy flags (`--ignore-snapshots`, `--accept-snapshot-loss`, `--unsafe-rebuild-otherwise-evict`) operate at two
-different altitudes: the snapshot policy gates **admission** (reject if snapshots exist and neither
-flag is set) and decides the **terminal state** (`Drained` vs `PartiallyDrained`), while `--unsafe-rebuild-otherwise-evict`
+different altitudes: the snapshot policy never rejects a request — with neither flag set it defaults to
+`Ignore`, exactly as `--ignore-snapshots` — and decides only the **terminal state** (`Drained` vs
+`PartiallyDrained`), while `--unsafe-rebuild-otherwise-evict`
 fires only at the per-replica "no eligible destination" branch. The flow chart below shows how all
 three thread through the lifecycle.
 
 ```mermaid
 flowchart TD
-    Start[Drain pool requested] --> Snap{Pool has snapshots?}
-    Snap -- No --> Q[Queued + self-cordon]
-    Snap -- Yes --> Pol{Snapshot policy flag?}
-    Pol -- "Neither flag" --> Rej[Reject request]
-    Pol -- "--ignore-snapshots" --> Q
-    Pol -- "--accept-snapshot-loss" --> Q
+    Start[Drain pool requested] --> Q[Queued + self-cordon<br/>snapshot policy recorded,<br/>Ignore if no flag given]
 
     Q --> Slot{Concurrency slot free?<br/>FIFO by request_timestamp}
     Slot -- No --> Q
@@ -231,43 +230,55 @@ flowchart TD
     Foreign -- "Yes, already Online" --> Wait
     Foreign -- "Yes, still rebuilding" --> Resp["Set unwind=Respare<br/>count reconciler drops the spare (replica_id=None),<br/>clears unwind, resets placement_started_at=None<br/>owning drain re-places elsewhere"] --> Loop
     Claim -- No --> Unsafe{"--unsafe-evict set?"}
-    Unsafe -- Yes --> Direct["Set marker: placement_started_at=None (never stamped),<br/>spare_replica=None<br/>count reconciler evicts draining_replica"] --> Loop
+    Unsafe -- Yes --> Direct["Set marker: placement_started_at=None (never stamped),<br/>spare_replica=None<br/>count reconciler evicts moving_replica"] --> Loop
     Unsafe -- No --> Mark["Set marker: placement_started_at=None,<br/>spare_replica=Some, replica_id=None"]
     Mark --> Attempt["Placement attempt"]
     Attempt --> Place{"Spare placed?<br/>spare_replica.replica_id set"}
     Place -- Yes --> Reb{Spare still Online<br/>in nexus?}
-    Reb -- "Yes (rebuilding/done)" --> Move[count reconciler: rebuild → remove draining_replica<br/>→ sets draining_replica=None<br/>drain sees None → clears marker] --> Loop
+    Reb -- "Yes (rebuilding/done)" --> Move[count reconciler: rebuild → remove moving_replica<br/>→ sets moving_replica=None<br/>drain sees None → clears marker] --> Loop
     Reb -- "No — spare dropped mid-rebuild" --> Reset["GC orphaned spare<br/>reset replica_id=None (spare_replica stays Some)<br/>reset placement_started_at=None — placement had<br/>succeeded, so the next round gets its own attempt"] --> Attempt
     Place -- No --> Verdict{"No candidate, or a transient failure?"}
     Verdict -- "Transient" --> Wait2[Keep trying to place<br/>stay Draining] --> Attempt
     Verdict -- "No candidate" --> Stamp["Stamp placement_started_at=now if unset"]
     Stamp --> Once{"--unsafe-rebuild-otherwise-evict set<br/>and not volume's only Online copy?"}
     Once -- No --> Wait2
-    Once -- Yes --> Force["Downgrade marker to spare_replica=None<br/>count reconciler evicts draining_replica<br/>accept transient degrade"] --> Loop
+    Once -- Yes --> Force["Downgrade marker to spare_replica=None<br/>count reconciler evicts moving_replica<br/>accept transient degrade"] --> Loop
 
     Loop -- No --> SnapLeft{Snapshots left on pool?}
     SnapLeft -- No --> Drained[Drained — allocation = 0]
     SnapLeft -- "--accept-snapshot-loss" --> Destroy[Destroy snapshots] --> Drained
-    SnapLeft -- "--ignore-snapshots" --> Partial[PartiallyDrained<br/>snapshots remain, pool online]
+    SnapLeft -- "--ignore-snapshots<br/>or no flag (default)" --> Partial[PartiallyDrained<br/>snapshots remain, pool online]
 ```
 
-#### Abort support
+#### Cancel support
 
 There is no dedicated abort command — a user cancels a drain by uncordoning it with the drain scope
-(`uncordon pool <id> --drain`), which sets `DrainPhase: Aborted` and drives the undo of the drain's
+(`uncordon pool <id> --drain`), which sets `DrainPhase: Cancelled` and drives the undo of the drain's
 changes on affected volumes (if any): already-evacuated replicas stay evacuated, ongoing unrelated
 rebuilds are not changed, and any extra replica the drain added is unwound.
 
-**The abort rule reduces to a single predicate — *have we already removed `draining_replica`?*** If
+**The abort rule reduces to a single predicate — *have we already removed `moving_replica`?*** If
 not, the original copy is kept and the spare (if one was ever created) is destroyed regardless of its
 rebuild state — even a fully-`Online` spare is unwound, so an abort never quietly completes a move.
-If `draining_replica` was already removed, the move is effectively complete and there is nothing to
+If `moving_replica` was already removed, the move is effectively complete and there is nothing to
 unwind.
 
 As with `Respare`, the abort/cleanup reconciler does not remove the spare child itself — it sets
-`unwind = Some(Abort)` on each affected volume's `replica_move` marker and lets the count reconciler do
-the removal, then waits for `spare_replica → None` as the completion signal before clearing the markers,
-`PoolSpec.drain_spec` (dropping the self-cordon with it) and the `PoolDrainRecord`.
+`unwind = Some(Cancelled)` on each affected volume's `replica_move` marker and lets the count reconciler do
+the removal, then waits for `spare_replica → None` as the completion signal before clearing the markers
+and the `PoolDrainRecord` and releasing the drain's cordon.
+
+**Releasing the cordon restores the user's cordon.** The drain's self-cordon is dropped, and the user's
+cordon is **restored**, not dropped: `cordon_drain` goes from `Drain(spec)` back to
+`Cordoned(spec.user_cordon)` when `user_cordon` is `Some` (including any changes the user made to it
+mid-drain), and to `None` otherwise. A pool the user cordoned before draining is therefore still
+cordoned after the abort, exactly as the user left it.
+
+**Uncordoning a non Draining pool with --drain is a release, not an abort.** `uncordon pool <id> --drain` on a pool
+that is already `Queued`, `Drained`, `AwaitingCleanup` or `PartiallyDrained` has nothing to unwind — every move is complete — so it
+skips the `Cancelled` phase and releases the drain immediately: the user's cordon is restored as above
+and the `PoolDrainRecord` is cleared. This is how a drained pool is reopened for scheduling, for example
+to restore from snapshots a `PartiallyDrained` pool retained.
 
 #### Evacuation candidates
 
@@ -294,14 +305,14 @@ history**, not replica count:
   draining-pool child and add a replacement on an eligible pool.
 
 **Snapshot replicas.** Snapshots cannot be migrated in Phase 1 and a moved replica leaves its snapshots
-behind on the pool, so the user must choose a policy — a drain of a pool holding snapshots with
-**neither** flag set is **rejected**:
+behind on the pool. by default, we will assume `Ignore` if none specified.
 
 - `--accept-snapshot-loss` — move all replicas, then destroy the snapshots left on the pool; allocation
   reaches zero and the pool reaches `Drained`.
-- `--ignore-snapshots` — move all replicas and leave the snapshots; the pool reaches `PartiallyDrained`, stays
-  online serving them, and can be uncordoned and restored from later. Because allocation stays non-zero,
-  `DestroyPool` still fails (*"please drain the diskpool before attempting destroy"*) until the user re-drains with `--accept-snapshot-loss`.
+- `--ignore-snapshots` — move all replicas and leave the snapshots; the pool reaches `PartiallyDrained` with
+  `SnapshotsRetained` as the phase reason, Pool stays online serving them, and can be uncordoned and restore
+  from later. Because allocation stays non-zero, `DestroyPool` still fails (*"please drain the diskpool before
+  attempting destroy"*) until the user re-drains with `--accept-snapshot-loss`.
 
 (A volume with multiple replicas keeps its snapshot on the other replicas. The platform does support restoring volume from fewer
 replica snapshots if volume restore policy is `besteffort`)
@@ -321,7 +332,7 @@ judged independently. When the reconciler begins a `spare_replica = Some` move i
 `placement_started_at = None`; the existing volume hotspare reconciler then tries to find a pool to
 place the spare, and **stamps `placement_started_at = now`.
 
-- **Placed:** `spare_replica` is populated, its rebuild runs, and on completion `draining_replica` is
+- **Placed:** `spare_replica` is populated, its rebuild runs, and on completion `moving_replica` is
   scaled down and the marker cleared. No eviction, and nothing is ever stamped.
 - **Not placed:** once `placement_started_at` is `Some` with `spare_replica` still
   `Some(SpareReplica(None))`, the replica is treated as unplaceable and is force-evicted on the next
@@ -352,7 +363,7 @@ completes: the spare replica's node or pool goes down while the child is still r
 rebuilding child carries **no rebuild/write log**, the nexus does not wait for it to return — it is
 dropped from the nexus outright, and even if that exact replica later came back it would need a
 *fresh full rebuild*, not a log-based catch-up. Critically, this is **not** a loss of redundancy: the
-spare is the extra, over-replicated copy, and all `num_replicas` original copies (including `draining_replica`)
+spare is the extra, over-replicated copy, and all `num_replicas` original copies (including `moving_replica`)
 stayed `Online` throughout. Only the in-flight over-replication attempt was lost.
 
 The move therefore recovers by **resetting the marker's `spare_replica.replica_id` to `None`** rather than
@@ -392,7 +403,7 @@ flowchart TD
     B -- Yes --> H{Volume healthy?}
     H -- Yes --> SU[Scale up: add spare replica]
     SU --> RB[Full rebuild]
-    RB --> SD[Count reconciler removes draining replica<br/>sets draining_replica=None<br/>→ drain reconciler clears marker]
+    RB --> SD[Count reconciler removes draining replica<br/>sets moving_replica=None<br/>→ drain reconciler clears marker]
 
     H -- No --> UR{Degradation is our drain spare<br/>rebuilding? OutOfSync child,<br/>replica_move set}
     UR -- No --> W1[Unrelated/pre-existing degradation —<br/>wait until volume healthy]
@@ -424,15 +435,15 @@ of the likely impact** — how many replicas would move, how many would have no 
 #### Progress visibility
 
 A drain spans many reconciler ticks and minutes of rebuild, so users get read-only visibility via a
-get-drain-progress API and the `kubectl mayastor get drain pool <pool-id>` command. Progress is the
-`PoolDrainRecord`'s baseline (`initial_stats`, captured once at queue time) diffed against values read
+`GET /pools/{id}/drain` API and the `kubectl mayastor get drain pool <pool-id>` command. Progress is the
+`PoolDrainRecord`'s baseline (`initial_stats`, captured once when the pool enters `Draining`) diffed against values read
 live from the data plane on each query (`PoolState::current()`), which keeps the reconciler free of
 progress bookkeeping.
 
 #### Concurrency limits
 
 Draining many pools at once would oversubscribe rebuild bandwidth and risk availability, so drains
-are rate-limited cluster-wide via a configurable `--pool-drain-limit`. A request is
+are rate-limited cluster-wide via a configurable `--max-concurrent-pool-drain`. A request is
 admitted into `Draining` only when the number of pools already `Draining` is below the limit; queued
 pools are promoted in FIFO order by request timestamp, which guarantees no queued pool is starved.
 The cluster-wide rebuild backpressure remains a finer second line of defense that throttles
@@ -446,59 +457,60 @@ admission gate in the concurrency section for the mechanics.
 
 #### Resource model changes
 
-On the pool spec, the drain lives on its **own new field** — the existing `cordon_drain` field (which
-carries the *user* cordon) is left untouched, so currently-cordoned pools and all existing cordon
-code paths are unaffected.
+On the pool spec, the drain does **not** get a field of its own: it is a new `Drain` variant of the
+existing `cordon_drain` field's `CordonDrainState` enum, alongside the existing `Cordoned` variant.
+Admitting a drain switches `cordon_drain` to `Drain(DrainSpec)` and moves the user's cordon, if any,
+into `DrainSpec.user_cordon`. The variant is additive, so currently-cordoned pools deserialize
+unchanged as `Cordoned(..)`, but every code path that reads the cordon must now handle both variants.
 
 ```rust
-pub struct PoolUSpec {
-    // ...
-    /// User-applied cordon.
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub cordon_drain: Option<CordonDrainState>,
-    /// Desired drain: self-cordon + drain policy.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub drain_spec: Option<DrainSpec>,
+/// Enum variant encompassing data related to a cordoned or draining pool.
+#[derive(Clone, Serialize, Deserialize, Debug, PartialEq)]
+pub enum CordonDrainState {
+    /// The pool is being cordoned.
+    Cordoned(CordonedState),
+    /// The pool is being drained.
+    Drain(DrainSpec),
 }
 
-/// Desired drain recorded on `PoolUSpec`: when it was requested, the self-cordon
-/// applied at admission, and the user-chosen policy. Held on its own field, separate
-/// from the user-applied `cordon_drain`.
+/// Drain spec applied on the pool.
+#[derive(Clone, Serialize, Deserialize, Debug, PartialEq)]
 pub struct DrainSpec {
-    /// Self-applied cordon, set when the drain request is admitted.
-    pub self_cordon: CordonedState,
-    /// When the drain was requested; used for FIFO promotion out of the queue.
+    /// Timestamp when the drain was requested.
     pub request_timestamp: SystemTime,
-    /// User-chosen drain policy.
+    /// Drain policy applied on the pool.
     pub policy: DrainPolicy,
+    /// Holds user applied cordon configs if present before starting drain.
+    pub user_cordon: Option<CordonedState>,
 }
 
-/// The user's drain policy — the knobs chosen at request time, each of which alters what
-/// the drain is permitted to do. Request metadata (the timestamp) lives on `DrainSpec`.
+/// The user's drain policy, each of which alters what the drain is permitted to do.
+#[derive(Clone, Serialize, Deserialize, Debug, PartialEq, Default)]
 pub struct DrainPolicy {
-    /// Destroy snapshots left on the pool once all replicas are evacuated.
-    pub accept_snapshot_loss: bool,
-    /// Move replicas only, leaving snapshots in place.
-    pub ignore_snapshots: bool,
+    /// What to do with the snapshots left on the pool once all replicas are evacuated.
+    /// Defaults to `Ignore`, which leaves them in place.
+    pub snapshot_policy: SnapshotPolicy,
     /// Grace period after which an unplaceable replica is force-evicted.
-    /// `None` disables forced eviction entirely. Must be a strictly positive
-    /// duration when set; a zero duration is rejected at admission.
+    /// `None` disables forced eviction entirely.
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub unsafe_rebuild_otherwise_evict: Option<Duration>,
     /// Skip the safe over-replicate flow and evict replicas directly.
     pub unsafe_evict: bool,
 }
 ```
 
-Because cordon-ness is now split across two fields, scheduling decisions must consult an
-**`effective_cordon()`** that ORs the two `CordonedState` bitmaps per resource — the user cordon in
-`cordon_drain` and the drain's `drain_spec.self_cordon`. A resource is blocked if **either** bitmap
-blocks it. Concretely, the drain's `self_cordon` blocks new `replicas`, `snapshots`, and `restores`
+Because a draining pool carries two cordons in one variant, scheduling decisions must consult an
+**`effective_cordon()`** that ORs two `CordonedState` bitmaps per resource — the user cordon
+(`Cordoned(..)`, or `DrainSpec.user_cordon` while draining) and the drain's fixed self-cordon, implied
+by the `Drain` variant itself. A resource is blocked if **either** bitmap blocks it. Concretely, the
+drain's self-cordon blocks new `replicas`, `snapshots`, and `restores`
 (nothing new should land on a pool being emptied) but deliberately leaves `import = false`: a
 draining pool must still be importable so it can be brought back online after a node/engine restart
 and continue serving I/O while it drains. The user cordon retains full say over imports — if the
 user cordoned the pool with `import = true`, `effective_cordon().import` stays `true` and the pool
 remains blocked for imports, since the OR keeps whichever field is more restrictive. So the drain
-never *relaxes* a user-imposed import block; it only refrains from adding one of its own.
+never *relaxes* a user-imposed import block; In case pool blocked on import by user cordon get Offline
+mid drain gets into `PartiallyDrained` phase with phase reason set to `ImportCordoned`
 
 **Serialisation of moves per volume (concurrency).** A volume carries **at most one**
 `replica_move` at a time, and this single-slot marker is what serialises drain moves for a
@@ -507,7 +519,7 @@ owning `VolumeSpec`: if `replica_move.is_some()`, a move for that volume is alre
 the reconciler **defers** this replica and does not add a second marker — it retries on a later tick
 once the in-flight move has cleared the marker.
 
-**One teardown signal for every mode: `draining_replica → None`.** The marker is cleared as soon as
+**One teardown signal for every mode: `moving_replica → None`.** The marker is cleared as soon as
 the count reconciler reports the replica gone from the draining pool, and this is uniform across all
 three ways a move can end — there is no mode-dependent clear rule.
 
@@ -523,66 +535,50 @@ volume from thick -> thin visa-versa.
 ```rust
 pub struct VolumeRuntimeMetadata {
     // ...
-    /// Set while a drain move for this volume is in flight (over-replicate or
-    /// direct evict). At most one is present at a time — the single slot is what
-    /// serialises drain moves for the volume (a second move defers until cleared).
-    pub replica_move: Option<ReplicaMoveConfig>,
+    /// Configuration for the replica move operation, if any.
+    replica_move: Option<ReplicaMoveRequester>,
 }
 
-/// A single in-flight replica move. Held on `VolumeRuntimeMetadata.replica_move`
-/// (at most one per volume) and persisted via `PoolDrainRecord.replica_moves`.
-pub struct ReplicaMoveConfig {
-    /// Which feature requested the move, plus its per-feature data.
-    /// The number of extra replicas is *derived* from the requester rather than
-    /// stored — for `PoolDrain`, 1 while the spare is meant to exist, else 0.
-    pub requester: ReplicaMoveRequester,
-}
-
-/// The feature that requested a replica move, carrying its per-feature data.
+/// The entity on whose behalf a replica move is being carried out, along with the move
+/// configuration specific to it.
+#[derive(Debug, Clone, PartialEq)]
 pub enum ReplicaMoveRequester {
+    /// The move was requested by a pool drain.
     PoolDrain(DrainConfig),
-    // Extended in future (e.g. capacity rebalancing, pool-type migration, thick<->thin).
 }
 
-/// Per-replica state for a pool-drain move.
+/// Configuration of a single replica move carried out as part of a pool drain.
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub struct DrainConfig {
-    /// Stamped on the *first placement attempt* for this move, not when the marker is
-    /// created — so the forced-eviction grace can never elapse before the scheduler has
-    /// actually tried at least once. `None` until then.
+    /// When this move first attempted to place its spare.
     pub placement_started_at: Option<SystemTime>,
-    /// Volume this move belongs to.
+    /// Id of the volume moving_replica belongs to.
     pub volume: VolumeId,
-    /// Replica on the draining pool.
-    pub draining_replica: Option<ReplicaId>,
-    /// Pool being drained.
+    /// Id of the pool moving_replica belongs to.
     pub pool: PoolId,
-    /// `None` if the user explicitly chose the unsafe_evict option — no spare is ever
-    /// wanted for this move. `Some` for the safe over-replicate flow, whose inner
-    /// `replica_id` gets populated once the spare replica is created by the scheduler.
+    /// Id of the moving replica. It's None when it's evacuated successfully.
+    pub moving_replica: Option<ReplicaId>,
+    /// Id of the spare replica created as part of drain procedure.
     pub spare_replica: Option<SpareReplica>,
-    /// Set while this move's `spare_replica` is being torn down, naming *why* so the
-    /// observer knows what to do once it is gone. `None` in steady state. Both variants
-    /// drive the same removal in the count reconciler.
-    ///
-    /// Runtime-only — deliberately **not persisted** (see `PoolDrainRecord.replica_moves`),
-    /// though it is still reported over REST as `PoolReplicaMove.unwind`.
+    /// Why a move's over-replicated spare is being removed.
     #[serde(skip)]
-    pub unwind: Option<UnwindSpare>,
+    pub unwind_spare: Option<UnwindSpare>,
 }
 
-/// The over-replicated spare of a move. Its presence (`Option<SpareReplica>` on
-/// `DrainConfig`) says a spare is wanted; `replica_id` says whether one is currently
-/// placed — `None` until the scheduler places it, and back to `None` if it was dropped
-/// mid-rebuild or displaced by a `Respare` unwind.
+/// Spare replica reference for this drain.
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Default)]
 pub struct SpareReplica {
+    /// Replica Id of the spare, if placed.
     pub replica_id: Option<ReplicaId>,
 }
 
-/// Why a move's over-replicated spare is being removed.
+/// Contains the reason for unwinding a spare replica, which is used to determine how to proceed with
+/// the drain procedure.
+#[derive(Debug, Clone, PartialEq)]
 pub enum UnwindSpare {
-    /// The drain was aborted (`DrainPhase → Aborted`): remove the spare and end the
-    /// move, keeping `draining_replica` where it is. Derives `N = 0`.
-    Abort,
+    /// The drain was aborted (`DrainPhase → Cancelled`): remove the spare and end the
+    /// move, keeping `moving_replica` where it is.
+    Cancelled,
     /// The pool hosting the still-rebuilding spare has itself entered a drain: remove
     /// the spare and let this move place a fresh one on another eligible pool.
     Respare,
@@ -590,51 +586,38 @@ pub enum UnwindSpare {
 ```
 
 ```rust
-pub struct PoolConfig {
-    ..
-    /// Health of the pool. (already there)
-    pub diag: Option<PoolDiag>,
-    /// Control-plane-owned drain state.
+/// Pool meta information.
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Default)]
+pub struct PoolPersistedMetadata {
+    /// Populated when drain request is submitted.
+    /// Stores states driving the drain procedure.
+    #[serde(default, skip_serializing_if = "super::is_default")]
     pub drain_record: Option<PoolDrainRecord>,
 }
 
-/// Drain state for a pool: the current phase, the immutable usage baseline, and the
-/// in-flight replica moves. Held in-memory on `store::PoolState.drain_record` **and**
-/// persisted to etcd (keyed by `pool_id`) so a drain survives a core-agent restart.
-/// A single type serves both roles — there is no separate `DrainProgress`.
-#[derive(Serialize, Deserialize, Debug, PartialEq, Default, Clone)]
+/// Record of an in-progress pool drain, driving the drain procedure and tracking its progress.
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub struct PoolDrainRecord {
-    /// Pool being drained; the etcd key for this record. Redundant with
-    /// `PoolState.pool.id()` when embedded, but retained so the record is self-keying
-    /// and can be persisted/rehydrated as-is.
-    pub pool_id: PoolId,
     /// Current phase of the drain state machine.
     pub phase: DrainPhase,
-    /// Immutable baseline captured at queue time. Current usage is NOT stored here — it
-    /// is read live from the embedded `transport::PoolState` via `PoolState::current()`.
-    pub initial_stats: PoolUsageStats,
-    /// In-flight replica moves for this drain. This is the persisted home for the
-    /// per-volume `replica_move` markers (which live in the non-persisted
-    /// `VolumeRuntimeMetadata`). On core-agent restart each entry is re-applied to its
-    /// volume's runtime `replica_move` slot by matching `DrainConfig.volume
-    ///
-    /// The length of this vector *is* the pool's in-flight move count, it is held at or
-    /// below the globally-configured `--pool-replica-move-limit`, and an enqueue is
-    /// refused once that limit is reached. The limit itself is never stored here — it
-    /// is read from core-agent config.
-    pub replica_moves: Vec<ReplicaMoveConfig>,
+    /// Why pool is in the aforementioned phase.
+    pub phase_reason: Option<PhaseReason>,
+    /// The initial usage stats of the pool when the pool transitions into Draining state.
+    pub initial_stats: Option<PoolUsage>,
+    /// In-flight replica moves for this drain.
+    pub replica_moves: Vec<DrainConfig>,
 }
 
-/// Pool usage snapshot. Captured once at queue time as the drain baseline
-/// (`initial_stats`); the same shape is projected off `transport::PoolState` for the
-/// live `current()` view, so field names/types mirror `transport::PoolState`.
-#[derive(Serialize, Deserialize, Debug, PartialEq, Default, Clone)]
-pub struct PoolUsageStats {
-    pub repl_count: Option<u64>,
-    pub snap_count: Option<u64>,
-    /// Used bytes (allocation).
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Default)]
+pub struct PoolUsage {
+    /// Number of replicas present on pool.
+    pub repl_count: u64,
+    /// Number of snapshots present on pool.
+    pub snap_count: u64,
+    /// Used capacity, in bytes.
     pub used: u64,
-    /// Total pool commitment (accrued size of replicas).
+    /// Committed capacity, in bytes.
+    /// `None` when the pool state does not report a commitment.
     pub committed: Option<u64>,
 }
 ```
@@ -643,10 +626,14 @@ pub struct PoolUsageStats {
 
 - **REST**: `PUT /pools/{id}/drain` and `GET /pools/{id}/drain`, the former carrying the request
   options (ignore-snapshots, accept-snapshot-loss, unsafe-rebuild-otherwise-evict, unsafe-evict,
-  dry-run). `PUT` returns the `Pool`; `GET` returns `PoolDrainProgress`, which expands each in-flight
-  move rather than listing replica ids — see *REST / OpenAPI model* below.
+  dry-run). `PUT` returns the `Pool`, whose `meta.drain` carries the compact drain record (phase,
+  reason, baseline usage and the ids of the replicas being moved). `GET` returns `PoolDrainDetail`, the
+  full picture of the drain: the requested spec and policy, phase and reason, baseline versus live
+  usage, and every in-flight move expanded (volume, draining replica, spare, placement start, unwind
+  reason) rather than listed as replica ids — see *REST / OpenAPI model* below.
 - **gRPC**: `DrainPool` and `GetDrainProgress` RPCs on the pool service, with the drain response a
-  `oneof` so a dry-run returns the analysis instead of the pool.
+  `oneof` so a dry-run returns the analysis instead of the pool; `GetDrainProgress` returns the same
+  detail as the REST `GET`.
 - **kubectl plugin**: `drain pool <id>` (with the flags, `unsafe-evict` among them as a hidden one) and
   `get drain pool <pool-id>`; a drain is cancelled with `uncordon pool <id> --drain`; `get pools` shows
   the drain state.
@@ -657,10 +644,18 @@ pub struct PoolUsageStats {
 
 The drain splits across the API exactly as it does internally: the **desired** drain (request +
 policy) hangs off `PoolSpec` mirroring `PoolUSpec.drain_spec`, and the **observed** drain (phase +
-progress) is a new `PoolDrain` mirroring `PoolDrainRecord`.
+progress) is the new `PoolDrainRecord` schema, mirroring the store's `PoolDrainRecord`.
 
-`PoolDrain` is embedded into the existing `PoolMeta` in the OpenAPI spec, rather than added as another
-field on `Pool`.
+The observed drain is exposed at two levels of detail:
+
+- **`Pool.meta.drain`** — the compact `PoolDrainRecord`, embedded into the existing `PoolMeta` rather
+  than added as another field on `Pool`. It is returned wherever a `Pool` is (`GET /pools`, `PUT
+  /pools/{id}/drain`, …), so it stays small: phase, reason, baseline usage and the ids of the replicas
+  currently being moved.
+- **`GET /pools/{id}/drain`** — `PoolDrainDetail`, the whole picture for one pool's drain. It adds the
+  requested spec and policy, live usage alongside the baseline, and each in-flight move expanded into a
+  `PoolReplicaMove` (the persisted `DrainConfig`), so a user can see *why* a drain is not progressing —
+  a move waiting on placement, how long it has been failing to place, or a spare being unwound.
 
 ```yaml
     Pool:
@@ -680,100 +675,148 @@ field on `Pool`.
       description: Pool object, comprised of a spec and a state
       properties:
         # ... existing meta fields
-        poolDrain:                             # new
+        drain:
           description: |-
-            Observed drain state of the pool. Absent when the pool has no drain.
+            The pool's drain, if one has been admitted. Persists after the drain reaches a
+            terminal phase as the pool's last-drain artifact, so read `phase` before treating
+            a pool as actively draining.
           allOf:
-            - $ref: '#/components/schemas/PoolDrain'
+            - $ref: '#/components/schemas/PoolDrainRecord'
 
-    PoolDrain:
+    PoolDrainRecord:
       description: |-
-        Observed state of a pool drain: phase and progress.
+        Progress of a pool drain.
       type: object
       properties:
         phase:
           $ref: '#/components/schemas/PoolDrainPhase'
-        statistics:
-          $ref: '#/components/schemas/PoolDrainStatistics'
+        phaseReason:
+          $ref: '#/components/schemas/PoolDrainPhaseReason'
+        initial:
+          description: |-
+            Pool usage captured when the drain entered the Draining phase. Absent while the
+            drain is still queued.
+          allOf:
+            - $ref: '#/components/schemas/PoolDrainUsage'
         movingReplicas:
           description: |-
-            Replicas still resident on this pool and currently under move. Not the pool's
-            in-flight move count - see Progress visibility.
+            The replicas this drain is currently moving off the pool.
           type: array
           items:
             $ref: '#/components/schemas/ReplicaId'
       required:
         - phase
-        - statistics
         - movingReplicas
 
     PoolDrainPhase:
-      description: Phase of the pool drain state machine
+      description: The phase of the pool drain state machine
       type: string
       enum:
+        - Unknown
         - Queued
         - Draining
-        - Drained
+        - AwaitingCleanup
         - PartiallyDrained
-        - Aborted
+        - Drained
+        - Cancelled
+
+    PoolDrainPhaseReason:
+      description: Why the pool is in its current drain phase
+      type: string
+      enum:
+        - Unknown
+        - WaitingForSlot
+        - OfflinePool
+        - SingleReplicaUnsafeEviction
+        - ImportCordoned
+        - SnapshotsRetained
+
+    PoolDrainUsage:
+      description: Pool usage snapshot
+      type: object
+      properties:
+        replicaCount:
+          description: Number of replicas present on the pool
+          type: integer
+          format: uint64
+        snapshotCount:
+          description: Number of snapshots present on the pool
+          type: integer
+          format: uint64
+        used:
+          description: Used capacity, in bytes
+          type: integer
+          format: uint64
+        committed:
+          description: |-
+            Committed capacity, in bytes
+          type: integer
+          format: uint64
+      required:
+        - replicaCount
+        - snapshotCount
+        - used
+
+    PoolDrainDetail:
+      description: |-
+        Full view of a pool's drain.
+      type: object
+      properties:
+        spec:
+          description: The requested drain - request time, policy and the user's own cordon.
+          allOf:
+            - $ref: '#/components/schemas/PoolDrainSpec'
+        phase:
+          $ref: '#/components/schemas/PoolDrainPhase'
+        phaseReason:
+          $ref: '#/components/schemas/PoolDrainPhaseReason'
+        statistics:
+          $ref: '#/components/schemas/PoolDrainStatistics'
+        replicaMoves:
+          description: |-
+            The moves currently in flight for this drain, bounded by
+            --pool-replica-move-limit. Empty while queued and once the drain is terminal.
+          type: array
+          items:
+            $ref: '#/components/schemas/PoolReplicaMove'
+      required:
+        - spec
+        - phase
+        - statistics
+        - replicaMoves
 
     PoolDrainStatistics:
-      description: Baseline captured at queue time, versus live pool usage.
+      description: Baseline captured when the drain entered Draining, versus live pool usage.
       type: object
       properties:
         initial:
-          $ref: '#/components/schemas/PoolUsageStats'
+          description: |-
+            Usage captured when the drain entered the Draining phase. Absent while the drain
+            is still queued.
+          allOf:
+            - $ref: '#/components/schemas/PoolDrainUsage'
         current:
           description: |-
             Live usage projected from the pool state. Absent when the pool has no reported
             state (node offline / not imported) - progress is then unknown, not zero.
           allOf:
-            - $ref: '#/components/schemas/PoolUsageStats'
-      required:
-        - initial
-
-    PoolDrainProgress:
-      description: |-
-        The full drain picture, returned by GET /pools/{id}/drain.
-      type: object
-      properties:
-        phase:
-          $ref: '#/components/schemas/PoolDrainPhase'
-        statistics:
-          $ref: '#/components/schemas/PoolDrainStatistics'
-        movingReplicas:
-          description: |-
-            Every move currently enqueued for this drain. Unlike PoolDrain.movingReplicas
-            this also carries moves whose draining replica has already been removed, so its
-            length is the count enforced against --pool-replica-move-limit.
-          type: array
-          items:
-            $ref: '#/components/schemas/PoolReplicaMove'
-      required:
-        - phase
-        - statistics
-        - movingReplicas
+            - $ref: '#/components/schemas/PoolDrainUsage'
 
     PoolReplicaMove:
       description: |-
         A single in-flight replica move, projecting the DrainConfig carried by the pool's
-        ReplicaMoveConfig. The requester wrapper is not exposed - this endpoint only ever
-        reports pool-drain moves - and the pool is the one being queried.
+        ReplicaMoveConfig.
       type: object
       properties:
         volume:
           description: Volume this move belongs to.
           $ref: '#/components/schemas/VolumeId'
-        placement_started_at:
+        placementStartedAt:
           description: |-
-            When this move first attempted to place its spare. Anchors the per-replica
-            unsafeRebuildOtherwiseEvict grace, so it is what shows how long a move has been
-            failing to place. Absent until that first attempt, and for a direct unsafeEvict
-            move, which never places a spare. Reset by a Respare unwind, which grants the
-            re-placement a fresh window.
+            When this move first attempted to place its spare.
           type: string
           format: date-time
-        drainingReplica:
+        movingReplica:
           description: |-
             Replica on the draining pool. Absent once it has been removed - for an
             over-replicate move that means the move succeeded; for a direct eviction the
@@ -783,7 +826,7 @@ field on `Pool`.
         spareReplica:
           description: |-
             Present for the safe over-replicate flow (add a spare, rebuild, then scale down
-            the draining replica); absent for direct eviction.
+            the moving replica); absent for direct eviction.
           allOf:
             - $ref: '#/components/schemas/PoolSpareReplica'
         unwind:
@@ -809,37 +852,14 @@ field on `Pool`.
 
     PoolUnwindSpare:
       description: |-
-        Why an in-flight move's over-replicated spare is being removed. Abort - the drain was
+        Why an in-flight move's over-replicated spare is being removed. Cancelled - the drain was
         aborted, so the spare goes and the move ends. Respare - the pool hosting the still
         rebuilding spare has itself entered a drain, so the spare goes and this move places a
         fresh one elsewhere.
       type: string
       enum:
-        - Abort
+        - Cancelled
         - Respare
-
-    PoolUsageStats:
-      description: Pool usage snapshot. Field names mirror PoolState.
-      type: object
-      properties:
-        replicaCount:
-          type: integer
-          format: uint64
-        snapshotCount:
-          type: integer
-          format: uint64
-        used:
-          description: used bytes from the pool
-          type: integer
-          format: int64
-          minimum: 0
-        committed:
-          description: accrued size of all replicas contained in this pool
-          type: integer
-          format: int64
-          minimum: 0
-      required:
-        - used
 
     PoolSpec:
       properties:
@@ -850,41 +870,51 @@ field on `Pool`.
             - $ref: '#/components/schemas/PoolDrainSpec'
 
     PoolDrainSpec:
-      description: The requested drain - when it was requested, what it cordons, and its policy
+      description: The drain specification for a pool
       type: object
       properties:
         requestTimestamp:
-          description: When the drain was requested; orders FIFO promotion out of the queue.
+          description: Time at which the drain was requested (UTC)
           type: string
           format: date-time
-        selfCordon:
-          $ref: '#/components/schemas/PoolCordon'
         policy:
           $ref: '#/components/schemas/PoolDrainPolicy'
+        userCordon:
+          description: |-
+            The user's own cordon, set before the drain began and restored if the drain is
+            aborted. Absent when the pool was not cordoned before the drain. Gets updated
+            if the user changes the cordon while the drain is in progress.
+          allOf:
+            - $ref: '#/components/schemas/PoolCordon'
       required:
         - requestTimestamp
-        - selfCordon
-        - policy
 
     PoolDrainPolicy:
-      description: The user's drain policy - the knobs chosen at request time
+      description: The drain policy for a draining pool
       type: object
       properties:
-        acceptSnapshotLoss:
-          type: boolean
-        ignoreSnapshots:
-          type: boolean
+        snapshotPolicy:
+          $ref: '#/components/schemas/PoolDrainSnapshotPolicy'
         unsafeRebuildOtherwiseEvict:
           description: |-
-            Grace period after which an unplaceable replica is force-evicted.
-            Absent disables forced eviction; must be strictly positive when set.
-          type: string
+            Grace period in seconds, after which an unplaceable replica is force-evicted.
+            Absent disables forced eviction entirely.
+          type: integer
+          format: uint64
         unsafeEvict:
+          description: Skip the safe over-replicate flow and evict replicas directly
           type: boolean
       required:
-        - acceptSnapshotLoss
-        - ignoreSnapshots
+        - snapshotPolicy
         - unsafeEvict
+    PoolDrainSnapshotPolicy:
+      description: |-
+        What the drain does with the snapshots left on the pool once all replicas are
+        evacuated. Ignore leaves them in place, AcceptLoss destroys them from the pool.
+      type: string
+      enum:
+        - Ignore
+        - AcceptLoss
 ```
 
 ## Future Improvements
