@@ -7,8 +7,8 @@ owners:
   - "@patrickdk77"
 editor: TBD
 creation-date: 30/07/2026
-last-updated: 30/07/2026
-status: provisional
+last-updated: 28/09/2026
+status: implementable
 see-also:
   - OEP 4074
   - OEP 3843
