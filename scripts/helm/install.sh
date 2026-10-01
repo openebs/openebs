@@ -19,8 +19,7 @@ INS_LVM=
 INS_RAWFILE=
 INS_ZFS=
 INS_HOSTPATH="true"
-# disable minio for now as the minio images have been pulled from quay.io and are not available!
-INS_LOKI="false"
+INS_LOKI="true"
 HELM="helm"
 KUBECTL="kubectl"
 TEMPLATE=
