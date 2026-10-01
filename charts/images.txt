@@ -23,6 +23,8 @@ docker.io/openebs/mayastor-metrics-exporter-io-engine:v2.12.1
 docker.io/openebs/mayastor-obs-callhome-stats:v2.12.1
 docker.io/openebs/mayastor-obs-callhome:v2.12.1
 docker.io/openebs/mayastor-operator-diskpool:v2.12.1
+docker.io/openebs/mc:RELEASE.2024-11-21T17-21-54Z
+docker.io/openebs/minio:RELEASE.2024-12-18T13-15-44Z
 docker.io/openebs/provisioner-localpv:4.6.0
 docker.io/openebs/provisioner-localpv:4.6.1-prerelease
 docker.io/openebs/rawfile-localpv:v0.15.1
