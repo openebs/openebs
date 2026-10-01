@@ -202,6 +202,10 @@ loki:
       storageClass: "openebs-minio-localpv"
       # -- Size of minio local storage volume
       size: 2Gi
+    image:
+      repository: docker.io/openebs/minio
+    mcImage:
+      repository: docker.io/openebs/mc
 
   deploymentMode: SingleBinary
 
