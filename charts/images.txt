@@ -30,8 +30,6 @@ docker.io/openebs/provisioner-localpv:4.6.0
 docker.io/openebs/provisioner-localpv:4.7.0-develop
 docker.io/openebs/rawfile-localpv:v0.15.1
 docker.io/openebs/zfs-driver:2.12.0-develop
-quay.io/minio/mc:RELEASE.2024-11-21T17-21-54Z
-quay.io/minio/minio:RELEASE.2024-12-18T13-15-44Z
 quay.io/prometheus-operator/prometheus-config-reloader:v0.81.0
 registry.k8s.io/sig-storage/csi-attacher:v4.8.1
 registry.k8s.io/sig-storage/csi-node-driver-registrar:v2.13.0

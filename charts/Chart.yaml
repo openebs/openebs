@@ -112,10 +112,6 @@ annotations:
       image: docker.io/openebs/rawfile-localpv:v0.15.1
     - name: zfs-driver
       image: docker.io/openebs/zfs-driver:2.12.0-develop
-    - name: mc
-      image: quay.io/minio/mc:RELEASE.2024-11-21T17-21-54Z
-    - name: minio
-      image: quay.io/minio/minio:RELEASE.2024-12-18T13-15-44Z
     - name: prometheus-config-reloader
       image: quay.io/prometheus-operator/prometheus-config-reloader:v0.81.0
     - name: csi-attacher
