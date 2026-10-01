@@ -67,10 +67,6 @@ entries:
           image: docker.io/openebs/rawfile-localpv:v0.15.1
         - name: zfs-driver
           image: docker.io/openebs/zfs-driver:2.12.0-develop
-        - name: mc
-          image: quay.io/minio/mc:RELEASE.2024-11-21T17-21-54Z
-        - name: minio
-          image: quay.io/minio/minio:RELEASE.2024-12-18T13-15-44Z
         - name: prometheus-config-reloader
           image: quay.io/prometheus-operator/prometheus-config-reloader:v0.81.0
         - name: csi-attacher
@@ -101,7 +97,7 @@ entries:
           image: registry.k8s.io/sig-storage/snapshot-controller:v8.6.0
     apiVersion: v2
     appVersion: 4.7.0-develop
-    created: "2026-10-01T08:39:47.353543044Z"
+    created: "2026-10-01T11:07:51.883766175Z"
     dependencies:
     - name: openebs-crds
       repository: ""
@@ -135,7 +131,7 @@ entries:
       repository: https://openebs.github.io/mayastor-extensions
       version: 0.0.0
     description: Containerized Attached Storage for Kubernetes
-    digest: 93a3ab806aa5a59358ee24d19fc5f97258661f53e0265b840f5155b408cd0f93
+    digest: 8f878dc8581d0f304d810a1a0e37d3dc2adba2acfbbdd62849a2c649144cf66b
     home: https://www.openebs.io/
     icon: https://raw.githubusercontent.com/cncf/artwork/HEAD/projects/openebs/icon/color/openebs-icon-color.png
     keywords:
@@ -4133,4 +4129,4 @@ entries:
     urls:
     - https://github.com/openebs/openebs/releases/download/openebs-4.0.0/openebs-4.0.0.tgz
     version: 4.0.0
-generated: "2026-10-01T08:39:47.308282017Z"
+generated: "2026-10-01T11:07:51.838158345Z"
