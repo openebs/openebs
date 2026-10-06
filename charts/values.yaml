@@ -14,7 +14,7 @@ openebs-crds:
       enabled: true
       keep: true
 
-# Refer to https://github.com/openebs/dynamic-localpv-provisioner/blob/v4.2.0/deploy/helm/charts/values.yaml for complete set of values.
+# Refer to https://github.com/openebs/dynamic-localpv-provisioner/blob/v4.6.0/deploy/helm/charts/values.yaml for complete set of values.
 localpv-provisioner:
   rbac:
     create: true
@@ -26,7 +26,7 @@ localpv-provisioner:
     image:
       registry: "docker.io"
 
-# Refer to https://github.com/openebs/zfs-localpv/blob/v2.7.1/deploy/helm/charts/values.yaml for complete set of values.
+# Refer to https://github.com/openebs/zfs-localpv/blob/v2.11.2/deploy/helm/charts/values.yaml for complete set of values.
 zfs-localpv:
   crds:
     zfsLocalPv:
@@ -35,7 +35,7 @@ zfs-localpv:
       volumeSnapshots:
         enabled: false
 
-# Refer to https://github.com/openebs/lvm-localpv/blob/lvm-localpv-1.6.2/deploy/helm/charts/values.yaml for complete set of values.
+# Refer to https://github.com/openebs/lvm-localpv/blob/v1.10.1/deploy/helm/charts/values.yaml for complete set of values.
 lvm-localpv:
   crds:
     lvmLocalPv:
@@ -44,14 +44,14 @@ lvm-localpv:
       volumeSnapshots:
         enabled: false
 
-# Refer to https://github.com/openebs/rawfile-localpv/blob/v0.11.0/deploy/helm/rawfile-localpv/values.yaml for complete set of values.
+# Refer to https://github.com/openebs/rawfile-localpv/blob/v0.15.3/deploy/helm/rawfile-localpv/values.yaml for complete set of values.
 rawfile-localpv:
   crds:
     csi:
       volumeSnapshots:
         enabled: false
 
-# Refer to https://github.com/openebs/mayastor-extensions/blob/v2.8.0/chart/values.yaml for complete set of values.
+# Refer to https://github.com/openebs/mayastor-extensions/blob/v2.12.2/chart/values.yaml for complete set of values.
 mayastor:
   csi:
     node:
