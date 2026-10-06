@@ -174,7 +174,7 @@ entries:
         - name: linux-utils
           image: docker.io/openebs/linux-utils:4.6.0
         - name: lvm-driver
-          image: docker.io/openebs/lvm-driver:1.10.2-prerelease
+          image: docker.io/openebs/lvm-driver:1.10.1
         - name: mayastor-agent-core
           image: docker.io/openebs/mayastor-agent-core:v2.12.2
         - name: mayastor-agent-ha-cluster
@@ -205,12 +205,10 @@ entries:
           image: docker.io/openebs/minio:RELEASE.2024-12-18T13-15-44Z
         - name: provisioner-localpv
           image: docker.io/openebs/provisioner-localpv:4.6.0
-        - name: provisioner-localpv
-          image: docker.io/openebs/provisioner-localpv:4.6.1-prerelease
         - name: rawfile-localpv
-          image: docker.io/openebs/rawfile-localpv:v0.15.1
+          image: docker.io/openebs/rawfile-localpv:v0.15.3
         - name: zfs-driver
-          image: docker.io/openebs/zfs-driver:2.11.2-prerelease
+          image: docker.io/openebs/zfs-driver:2.11.2
         - name: prometheus-config-reloader
           image: quay.io/prometheus-operator/prometheus-config-reloader:v0.81.0
         - name: csi-attacher
@@ -241,7 +239,7 @@ entries:
           image: registry.k8s.io/sig-storage/snapshot-controller:v8.6.0
     apiVersion: v2
     appVersion: 4.6.2-prerelease
-    created: "2026-10-06T09:06:08.542886142Z"
+    created: "2026-10-06T16:28:25.906115291Z"
     dependencies:
     - name: openebs-crds
       repository: ""
@@ -257,25 +255,25 @@ entries:
     - condition: engines.local.hostpath.enabled
       name: localpv-provisioner
       repository: https://openebs.github.io/dynamic-localpv-provisioner
-      version: 4.6.1-prerelease
+      version: 4.6.0
     - condition: engines.local.zfs.enabled
       name: zfs-localpv
       repository: https://openebs.github.io/zfs-localpv
-      version: 2.11.2-prerelease
+      version: 2.11.2
     - condition: engines.local.lvm.enabled
       name: lvm-localpv
       repository: https://openebs.github.io/lvm-localpv
-      version: 1.10.2-prerelease
+      version: 1.10.1
     - condition: engines.local.rawfile.enabled
       name: rawfile-localpv
       repository: https://openebs.github.io/rawfile-localpv
-      version: 0.15.1
+      version: 0.15.3
     - condition: engines.replicated.mayastor.enabled
       name: mayastor
       repository: https://openebs.github.io/mayastor-extensions
       version: 2.12.2
     description: Containerized Attached Storage for Kubernetes
-    digest: 4250792ea3eedc555c6b484c480f41fc4d6636654c04883e66fb82db6f923fca
+    digest: dd1ffa97d6503b47432994739a90ea059f756525737a6f35aa0b9a34eed5e579
     home: https://www.openebs.io/
     icon: https://raw.githubusercontent.com/cncf/artwork/HEAD/projects/openebs/icon/color/openebs-icon-color.png
     keywords:
@@ -4129,4 +4127,4 @@ entries:
     urls:
     - https://github.com/openebs/openebs/releases/download/openebs-4.0.0/openebs-4.0.0.tgz
     version: 4.0.0
-generated: "2026-10-06T09:06:08.495530425Z"
+generated: "2026-10-06T16:28:25.860956039Z"
