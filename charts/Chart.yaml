@@ -26,19 +26,19 @@ dependencies:
     repository: https://grafana.github.io/helm-charts
     condition: alloy.enabled
   - name: localpv-provisioner
-    version: 4.6.1-prerelease
+    version: 4.6.0
     repository: "https://openebs.github.io/dynamic-localpv-provisioner"
     condition: engines.local.hostpath.enabled
   - name: zfs-localpv
-    version: 2.11.2-prerelease
+    version: 2.11.2
     repository: "https://openebs.github.io/zfs-localpv"
     condition: engines.local.zfs.enabled
   - name: lvm-localpv
-    version: 1.10.2-prerelease
+    version: 1.10.1
     repository: "https://openebs.github.io/lvm-localpv"
     condition: engines.local.lvm.enabled
   - name: rawfile-localpv
-    version: 0.15.1
+    version: 0.15.3
     repository: "https://openebs.github.io/rawfile-localpv"
     condition: engines.local.rawfile.enabled
   - name: mayastor
@@ -73,7 +73,7 @@ annotations:
     - name: linux-utils
       image: docker.io/openebs/linux-utils:4.6.0
     - name: lvm-driver
-      image: docker.io/openebs/lvm-driver:1.10.2-prerelease
+      image: docker.io/openebs/lvm-driver:1.10.1
     - name: mayastor-agent-core
       image: docker.io/openebs/mayastor-agent-core:v2.12.2
     - name: mayastor-agent-ha-cluster
@@ -104,12 +104,10 @@ annotations:
       image: docker.io/openebs/minio:RELEASE.2024-12-18T13-15-44Z
     - name: provisioner-localpv
       image: docker.io/openebs/provisioner-localpv:4.6.0
-    - name: provisioner-localpv
-      image: docker.io/openebs/provisioner-localpv:4.6.1-prerelease
     - name: rawfile-localpv
-      image: docker.io/openebs/rawfile-localpv:v0.15.1
+      image: docker.io/openebs/rawfile-localpv:v0.15.3
     - name: zfs-driver
-      image: docker.io/openebs/zfs-driver:2.11.2-prerelease
+      image: docker.io/openebs/zfs-driver:2.11.2
     - name: prometheus-config-reloader
       image: quay.io/prometheus-operator/prometheus-config-reloader:v0.81.0
     - name: csi-attacher
