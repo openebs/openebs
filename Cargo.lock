@@ -2214,6 +2214,7 @@ dependencies = [
  "async-trait",
  "cert-watcher",
  "dyn-clonable",
+ "fips",
  "futures",
  "http-body",
  "http-body-util",
