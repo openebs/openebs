@@ -7,7 +7,7 @@ owners:
   - "@rdegez"
 editor: "@rdegez"
 creation-date: 2026-10-05
-last-updated: 2026-10-13
+last-updated: 2026-10-15
 status: provisional
 ---
 
@@ -129,6 +129,8 @@ The controller resolves the key source in a fixed order, so one StorageClass can
 
 A warning is logged when both are set. If the annotation references a missing or invalid Secret, provisioning fails; it never falls back to a generated key.
 
+A key can be shared on purpose: several PVCs can reference the same Secret, for example through an annotation in a StatefulSet's `volumeClaimTemplate`, which is copied to every replica's PVC. Since the driver never deletes a user Secret, sharing is safe, at the cost of per-volume crypto-erase. A generated key is always per volume.
+
 ### Provisioning (controller)
 
 At CreateVolume the controller, which learns the PVC through the external-provisioner's `--extra-create-metadata`:
@@ -222,7 +224,7 @@ A finalizer on the Secret was tried first and dropped: a deleted Secret stays re
 The driver only reads keys from Kubernetes Secrets; [External Secrets Operator] bridges them to an external KMS (HashiCorp Vault, OpenBao, cloud KMSs, …). The documentation will cover both directions:
 
 - **Pull (Secret mode)**: an `ExternalSecret` materialises a key held in the KMS as the Secret referenced by the PVC annotation. It must exist before the PVC, and its value must never change while the volume exists, so it uses `refreshPolicy: CreatedOnce`.
-- **Push (auto mode, key escrow)**: a single `PushSecret` in the driver namespace selects the managed Secrets by label and copies each key to its own KMS entry, named after its volume. ESO applies the same remote reference to every Secret a label selector matches, so the `PushSecret` template builds a per-volume entry from the `volume` and `key` data of each Secret — this is why the volume name is repeated in the data — and `dataTo` pushes it. With `deletionPolicy: None`, the copy stays in the KMS after the volume is deleted.
+- **Push (auto mode, key escrow)**: a single `PushSecret` in the driver namespace selects the managed Secrets by label and copies each key to its own KMS entry, named after its volume. ESO applies the same remote reference to every Secret a label selector matches, so the `PushSecret` template builds a per-volume entry from the `volume` and `key` data of each Secret — this is why the volume name is repeated in the data — and `dataTo` pushes it. With `deletionPolicy: None`, the copy stays in the KMS after the volume is deleted. `deletionPolicy: Delete`, which would remove the copy together with the volume, does not work with a label selector as of ESO 2.12: each reconcile deletes the entries pushed for the other matched Secrets, so only one key stays in the KMS ([external-secrets#7123]). The docs recommend `None` until it is fixed.
 
 ```yaml
 apiVersion: external-secrets.io/v1alpha1
@@ -311,13 +313,13 @@ Three pull requests, each building and passing the tests on its own, in this ord
 
 - More configuration surface: one StorageClass parameter, one PVC annotation, one CR field, one admission policy.
 - Keys live in etcd, which some users may not expect.
-- The ESO push pattern relies on a `PushSecret` template, because ESO cannot yet name a remote entry after the source Secret when a label selector matches several Secrets.
+- The ESO push pattern relies on a `PushSecret` template, because ESO cannot yet name a remote entry after the source Secret when a label selector matches several Secrets, and it has to use `deletionPolicy: None` ([external-secrets#7123]), so the KMS copy of a destroyed volume's key is not removed automatically.
 
 ## Alternatives
 
 - **Status quo, one key per StorageClass.** Does not provide per-volume crypto-erase, isolation or tenant keys.
 - **An in-tree KMS client** (a Vault KV v2 provider was prototyped, and validated against OpenBao and OVHcloud OKMS). Dropped after review: it duplicates what ESO already covers, and maintaining KMS clients in-tree, as ceph-csi does for many backends, is a burden the project does not want to take on.
-- **A gRPC KMS-plugin interface**, where the driver calls an out-of-tree plugin to get and store keys, the way the Kubernetes KMS provider works for etcd encryption. A good shape if in-driver KMS support is wanted later; a possible follow-up OEP if there is demand.
+- **A gRPC KMS-plugin interface**, where the driver calls an out-of-tree plugin to get and store keys, the way the Kubernetes KMS provider works for etcd encryption. A good shape if in-driver KMS support is wanted later, and a possible follow-up OEP if there is demand. It would keep vendor neutrality (a plugin could replace ESO), and keep keys out of Secrets, and so out of etcd, altogether: generated per-volume keys stored in the KMS, created and deleted with their data as in the auto mode; user-provided keys read from it. Looking keys up by a name set on the PVC (such as `encryption.openebs.io/kms-key-name`), scoped to the PVC's namespace, would also allow shared keys; these would be created in the KMS by the user beforehand and only read by the driver, since creating a shared key on the first PVC would race when replicas are provisioned in parallel, and the driver could not know when to delete it.
 - **A ceph-csi style KMS layer with data-key wrapping.** Unneeded: ZFS already wraps its master key, so a per-volume key store is enough.
 - **An OwnerReference from the managed Secret to its ZFSVolume.** Deletes the key whenever the CR is deleted, including when the CR is deleted to keep the dataset; replaced by node-side deletion after `zfs destroy`.
 - **A finalizer on the managed Secret.** Tried and dropped: a finalizer the driver fails to clear leaves the Secret `Terminating` forever.
@@ -340,6 +342,7 @@ Questions for the maintainers:
 3. Raw backups are tracked in [zfs-localpv#774]; should the Velero plugin update (carrying the key source on restore) be tracked as its own issue?
 
 [External Secrets Operator]: https://external-secrets.io/
+[external-secrets#7123]: https://github.com/external-secrets/external-secrets/issues/7123
 [import-existing-volume.md]: https://github.com/openebs/zfs-localpv/blob/develop/docs/import-existing-volume.md
 [OEP 4340]: https://github.com/openebs/openebs/issues/4340
 [openebs#4341]: https://github.com/openebs/openebs/pull/4341
