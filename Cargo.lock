@@ -1932,6 +1932,7 @@ dependencies = [
  "clap",
  "constants",
  "flate2",
+ "http",
  "humantime",
  "k8s-openapi",
  "kube",

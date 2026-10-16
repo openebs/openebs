@@ -1,5 +1,6 @@
 pub mod hostpath;
 pub mod lvm;
+pub mod rawfile;
 pub mod zfs;
 
 use byte_unit::Byte;
