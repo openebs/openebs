@@ -112,7 +112,7 @@ As a security officer, I want the source of truth, or a recovery copy, of every 
 |---|---|
 | `autoCreateEncryptionKey: "true"` | The driver generates the key and stores it in a Secret it manages. |
 
-**PVC annotation**: `local.zfs.openebs.io/encryption-secret: <name>` names a Secret in the PVC's namespace whose data key `key` holds 64 hex characters. The annotation's name is an open question, see [below](#known-limitations-and-open-questions).
+**PVC annotation**: `encryption.openebs.io/secret-name: <name>` names a Secret in the PVC's namespace whose data key `key` holds 64 hex characters. The annotation's name is an open question, see [below](#known-limitations-and-open-questions).
 
 **ZFSVolume** (`VolumeInfo`, v1 and v1alpha1) gains one optional field that records where the key is — never the key itself: `encryptionKeyRef: {name, namespace}`, a Secret reference following the usual Kubernetes shape. It is optional, so existing CRs stay valid and no conversion is needed.
 
