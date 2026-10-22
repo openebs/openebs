@@ -7,7 +7,7 @@ owners:
   - "@rdegez"
 editor: "@rdegez"
 creation-date: 2026-10-05
-last-updated: 2026-10-15
+last-updated: 2026-10-22
 status: provisional
 ---
 
@@ -42,7 +42,7 @@ status: provisional
   - [Drawbacks](#drawbacks)
   - [Alternatives](#alternatives)
   - [Infrastructure Needed](#infrastructure-needed)
-  - [Known Limitations and Open Questions](#known-limitations-and-open-questions)
+  - [Known Limitations](#known-limitations)
 
 ## Summary
 
@@ -81,7 +81,7 @@ Per-volume keys also make encryption usable by operators and StatefulSets that c
 - **Automated key rotation.** There is no CSI trigger for it, and an interrupted `zfs change-key` can make data unrecoverable without a two-phase protocol. A manual runbook is documented instead.
 - **Re-encrypting existing data.** `zfs change-key` re-wraps the master key only.
 - **Changing the key source of an existing volume.**
-- **Backup and restore through Velero.** See [Known Limitations](#known-limitations-and-open-questions): the OpenEBS Velero plugin drops the key source on restore, and the backup stream is not encrypted (raw sends are proposed separately in [zfs-localpv#774]).
+- **Backup and restore through Velero.** See [Known Limitations](#known-limitations): the OpenEBS Velero plugin drops the key source on restore, and the backup stream is not encrypted (raw sends are proposed separately in [zfs-localpv#774]).
 - **Key formats other than hex** for the per-volume key. The existing StorageClass `keyformat` (`passphrase`/`raw`/`hex`) is unchanged.
 
 ## Current Behaviour
@@ -112,13 +112,15 @@ As a security officer, I want the source of truth, or a recovery copy, of every 
 |---|---|
 | `autoCreateEncryptionKey: "true"` | The driver generates the key and stores it in a Secret it manages. |
 
-**PVC annotation**: `encryption.openebs.io/secret-name: <name>` names a Secret in the PVC's namespace whose data key `key` holds 64 hex characters. The annotation's name is an open question, see [below](#known-limitations-and-open-questions).
+**PVC annotation**: `encryption.openebs.io/secret-name: <name>` names a Secret in the PVC's namespace whose data key `key` holds 64 hex characters.
 
 **ZFSVolume** (`VolumeInfo`, v1 and v1alpha1) gains one optional field that records where the key is — never the key itself: `encryptionKeyRef: {name, namespace}`, a Secret reference following the usual Kubernetes shape. It is optional, so existing CRs stay valid and no conversion is needed.
 
-**PV marker**: encrypted volumes carry `openebs.io/encrypted: "true"` in the PV's `spec.csi.volumeAttributes`, a boolean marker only.
+**PV marker**: volumes encrypted by the driver carry `openebs.io/encrypted` in the PV's `spec.csi.volumeAttributes`: `"volume"` for a per-volume key (a clone shares its source volume's key), `"storageclass"` for the StorageClass-level `keylocation`. A volume only encrypted by its pool or parent dataset is not marked, since the driver does not set that encryption up; a `"pool"` value would need the node to report the dataset's actual encryption root, and is left for later.
 
-**Driver-managed Secret**: `zfs-enc-<volume>` in the driver namespace, immutable, labelled `local.zfs.openebs.io/auto-managed=true`, with two data entries: `key` (same format as a user Secret) and `volume` (the volume name, used to back the key up, see [below](#external-kms-through-the-external-secrets-operator)).
+**Driver-managed Secret**: `zfs-enc-<volume>` in the driver namespace, immutable, labelled `encryption.openebs.io/auto-managed=true`, with two data entries: `key` (same format as a user Secret) and `volume` (the volume name, used to back the key up, see [below](#external-kms-through-the-external-secrets-operator)).
+
+**Engine-neutral names**: the annotation, labels and break-glass annotation all use the `encryption.openebs.io/` prefix, so other engines (Mayastor, and later LVM or rawfile) can reuse the same contract, along the lines discussed in [mayastor#2027]: a key Secret referenced by a PVC annotation in the PVC's namespace, clones sharing their source's key, ESO for external KMS. The Secret contents may differ per engine (ZFS takes a 32-byte hex key for `aes-256-gcm`, SPDK's crypto vbdev takes cipher-specific keys), but the way users reference and manage the key stays the same.
 
 ### Key Sources and Precedence
 
@@ -135,13 +137,13 @@ A key can be shared on purpose: several PVCs can reference the same Secret, for 
 
 At CreateVolume the controller, which learns the PVC through the external-provisioner's `--extra-create-metadata`:
 
-1. reads both signals; a non-boolean `autoCreateEncryptionKey` is rejected with `InvalidArgument`;
+1. reads both signals: a non-boolean `autoCreateEncryptionKey` is rejected with `InvalidArgument`, and so is an annotation that is empty or does not lead to a valid Secret (see step 3);
 2. **fails closed**: a key source without the `encryption` parameter is rejected with `InvalidArgument`, instead of provisioning a plaintext volume; so is `encryption` with no key source at all and no legacy `keylocation`;
 3. resolves the source:
    - **Secret**: validates it (present, 64 hex characters after trimming surrounding whitespace) and fails fast with `InvalidArgument` otherwise;
    - **auto**: records the reference to `zfs-enc-<volume>` only; the key itself is created by the node (see [Key Lifecycle](#key-lifecycle));
 4. forces `keyformat=hex`, records the reference on the CR, and does not persist an unused legacy `keylocation`;
-5. returns `openebs.io/encrypted: "true"` in the volume context.
+5. returns `openebs.io/encrypted` in the volume context: `"volume"` for a per-volume key, `"storageclass"` for the StorageClass-level `keylocation`.
 
 The controller has read-only access to Secrets.
 
@@ -155,6 +157,8 @@ The controller has read-only access to Secrets.
 ### Snapshots and Clones
 
 Snapshots are encrypted with their volume. A clone, from a volume or from a snapshot, shares its parent's encryption root and key source; `zfs clone` needs the parent key loaded, which is not the case after a reboot until the parent is mounted, so the node loads the parent key before cloning.
+
+The key source travels with the snapshot: the `ZFSSnapshot` CR carries a copy of its volume's spec, `encryptionKeyRef` included, and a restore takes it from there. A clone or a restore cannot pick another key: if its PVC carries a `encryption.openebs.io/secret-name` annotation naming another Secret than its source's, the controller rejects it with `InvalidArgument` instead of silently ignoring it.
 
 ### Key Lifecycle
 
@@ -174,7 +178,7 @@ The node only deletes Secrets that carry the managed label, and only the one nam
 The managed Secret holds the only in-cluster copy of a generated key, so it is protected two ways:
 
 - `immutable: true` blocks an edit that would silently replace the key.
-- A **ValidatingAdmissionPolicy** shipped with the chart (`admissionregistration.k8s.io/v1`, GA since Kubernetes 1.30, no webhook to run), on by default, denies deleting a Secret labelled `local.zfs.openebs.io/auto-managed=true` in the driver namespace to everyone but the node agent's service account — cluster-admin and the namespace controller included — and denies removing that label, which would otherwise bypass the policy:
+- A **ValidatingAdmissionPolicy** shipped with the chart (`admissionregistration.k8s.io/v1`, GA since Kubernetes 1.30, no webhook to run), on by default, denies deleting a Secret labelled `encryption.openebs.io/auto-managed=true` in the driver namespace to everyone but the node agent's service account — cluster-admin and the namespace controller included — and denies removing that label, which would otherwise bypass the policy:
 
 ```yaml
 apiVersion: admissionregistration.k8s.io/v1
@@ -195,13 +199,13 @@ spec:
     - name: driver-managed-key
       expression: >-
         has(oldObject.metadata.labels) &&
-        'local.zfs.openebs.io/auto-managed' in oldObject.metadata.labels &&
-        oldObject.metadata.labels['local.zfs.openebs.io/auto-managed'] == 'true'
+        'encryption.openebs.io/auto-managed' in oldObject.metadata.labels &&
+        oldObject.metadata.labels['encryption.openebs.io/auto-managed'] == 'true'
     - name: protection-not-lifted
       expression: >-
         !(has(oldObject.metadata.annotations) &&
-        'local.zfs.openebs.io/allow-key-deletion' in oldObject.metadata.annotations &&
-        oldObject.metadata.annotations['local.zfs.openebs.io/allow-key-deletion'] == 'true')
+        'encryption.openebs.io/allow-key-deletion' in oldObject.metadata.annotations &&
+        oldObject.metadata.annotations['encryption.openebs.io/allow-key-deletion'] == 'true')
   validations:
     - expression: >-
         request.operation != 'DELETE' ||
@@ -210,12 +214,12 @@ spec:
     - expression: >-
         request.operation != 'UPDATE' ||
         (has(object.metadata.labels) &&
-        'local.zfs.openebs.io/auto-managed' in object.metadata.labels &&
-        object.metadata.labels['local.zfs.openebs.io/auto-managed'] == 'true')
+        'encryption.openebs.io/auto-managed' in object.metadata.labels &&
+        object.metadata.labels['encryption.openebs.io/auto-managed'] == 'true')
       message: the auto-managed label of a driver-managed key cannot be removed
 ```
 
-A `ValidatingAdmissionPolicyBinding` limits it to the driver namespace. Annotating a Secret with `local.zfs.openebs.io/allow-key-deletion=true` lifts the protection (break-glass). The policy guards against mistakes; it is not a security boundary against cluster administrators, who can lift it. It cannot protect user Secrets, since a policy cannot follow the PVC → Secret reference; their owner is responsible for them, and the ESO pull pattern below keeps their source of truth in the KMS.
+A `ValidatingAdmissionPolicyBinding` limits it to the driver namespace. Annotating a Secret with `encryption.openebs.io/allow-key-deletion=true` lifts the protection (break-glass). The policy guards against mistakes; it is not a security boundary against cluster administrators, who can lift it. It cannot protect user Secrets, since a policy cannot follow the PVC → Secret reference; their owner is responsible for them, and the ESO pull pattern below keeps their source of truth in the KMS.
 
 A finalizer on the Secret was tried first and dropped: a deleted Secret stays readable while `Terminating`, but a finalizer the driver fails to clear leaves it `Terminating` forever.
 
@@ -241,7 +245,7 @@ spec:
     secret:
       selector:
         matchLabels:
-          local.zfs.openebs.io/auto-managed: "true"
+          encryption.openebs.io/auto-managed: "true"
   template:
     templateFrom:
       - target: Data
@@ -273,6 +277,8 @@ Keeping the key material out of etcd is then a matter of [etcd encryption at res
 | A managed key left behind. | Deleted after `zfs destroy`, and at once when the dataset cannot be created. |
 | A key that no longer matches. | Hex validation at create and at every load-key; an explicit wrong-key error instead of a bare `zfs` failure. |
 | Cluster-wide Secret read. | `get` only, not `list`; write rights are the node's only, namespaced to the driver namespace. |
+| Reading a managed key through the API (including backup tools that copy Secrets). | Admission control cannot block reads. RBAC limits them to principals with access to Secrets in the driver namespace; cluster administrators can still read them. Keeping keys out of Secrets altogether is left to a KMS plugin (see [Alternatives](#alternatives)). |
+| The KMS copy of a generated key may be missing: nothing checks that ESO pushed it, and a `PushSecret` status can report it as synced when it is not ([external-secrets#7123]). | Documented as a limitation; monitor the backup on the KMS side, not only ESO's status. A KMS plugin would store the key in the KMS before the volume is created. |
 | Kubernetes < 1.30. | The chart skips the policy; the other safeguards still apply. |
 | Downgrade to a release without the new field. | Documented as unsupported: structural-schema pruning would drop the field from existing CRs and make encrypted volumes unmountable. |
 
@@ -286,10 +292,10 @@ Three pull requests, each building and passing the tests on its own, in this ord
 
 ## Test Plan
 
-- **Unit** (existing): create-argument builders (`prompt` vs legacy file); key validation and trimming; `UsesManagedKey`; managed Secret creation (labels, immutability, `volume` entry, no owner reference, no finalizer), idempotency and refusal to adopt an unmanaged Secret; which volume owns a managed key (own key, clone, user Secret); managed Secret removal (never an unlabelled Secret, already-gone is fine); zvol device wait (appears, times out, context cancelled).
+- **Unit** (existing): create-argument builders (`prompt` vs legacy file); key validation and trimming; `UsesManagedKey`; managed Secret creation (labels, immutability, `volume` entry, no owner reference, no finalizer), idempotency and refusal to adopt an unmanaged Secret; empty annotation rejected; PV marker values; a clone's annotation naming another key rejected; which volume owns a managed key (own key, clone, user Secret); managed Secret removal (never an unlabelled Secret, already-gone is fine); zvol device wait (appears, times out, context cancelled).
 - **Unit** (to add): the parent-key guard of `EnsureParentKeyLoaded`.
 - **BDD** (to add, in `tests/` so it runs in the existing minikube + ZFS CI): provision and mount with a user Secret and in auto mode; fail-closed and missing-Secret rejections; unique keys across StatefulSet replicas; managed key deleted with the volume and kept when the ZFSVolume is deleted without its dataset; clone of an encrypted volume.
-- **Manual e2e** (done on a single-node Talos cluster, Kubernetes 1.33, OpenZFS 2.3.3, with a real ZFS pool): both modes on filesystem and raw block volumes; fail-closed and hardening cases; keys created by the node only; the admission policy (deletion and label removal denied to cluster-admin, unrelated Secrets unaffected, break-glass, node allowed); keys unloaded then reloaded at mount; managed key deleted after `zfs destroy`; ZFSVolume deleted without its dataset, key kept, dataset re-imported and read back; no key left behind by a failing `zfs create`; clones and snapshot restores sharing their parent's key, parent destroyed only after them; snapshot lifecycle; **node reboot** (every volume remounted on the first attempt, no zvol ENOENT, data read back); ESO 2.12 pull with OpenBao, and push with OpenBao and OVHcloud OKMS (mTLS), every key in its own entry, kept after the volume's deletion, restored to the exact key; upgrade from the stock chart; and the Velero investigation described below.
+- **Manual e2e** (done on a single-node Talos cluster, Kubernetes 1.33, OpenZFS 2.3.3, with a real ZFS pool): both modes on filesystem and raw block volumes; fail-closed and hardening cases; keys created by the node only; the admission policy (deletion and label removal denied to cluster-admin, unrelated Secrets unaffected, break-glass, node allowed); keys unloaded then reloaded at mount; managed key deleted after `zfs destroy`; ZFSVolume deleted without its dataset, key kept, dataset re-imported and read back; no key left behind by a failing `zfs create`; clones and snapshot restores sharing their parent's key, parent destroyed only after them, and rejected when their PVC names another key; an empty annotation rejected; the PV marker (`volume`, `storageclass`); snapshot lifecycle; **node reboot** (every volume remounted on the first attempt, no zvol ENOENT, data read back); ESO 2.12 pull with OpenBao, and push with OpenBao and OVHcloud OKMS (mTLS), every key in its own entry, kept after the volume's deletion, restored to the exact key; upgrade from the stock chart; and the Velero investigation described below.
 
 ## Docs
 
@@ -297,7 +303,7 @@ Three pull requests, each building and passing the tests on its own, in this ord
 
 ## Graduation Criteria
 
-- **implementable**: this OEP approved, including the annotation naming question below.
+- **implementable**: this OEP approved.
 - **implemented**: the three phases merged with unit tests, BDD coverage of both modes and of clones, docs and a changelog entry.
 
 ## Implementation History
@@ -308,6 +314,8 @@ Three pull requests, each building and passing the tests on its own, in this ord
 - 2026-09-27: maintainer go-ahead to raise an OEP, then the PRs.
 - 2026-10-05: tracking issue [OEP 4340] opened, OEP submitted in [openebs#4341].
 - 2026-10-13: revised after review: in-tree KMS dropped in favour of ESO, managed key tied to the dataset and created and deleted by the node, ValidatingAdmissionPolicy; re-validated end to end.
+- 2026-10-15: shared keys, the ESO `deletionPolicy` limitation and the KMS plugin discussion added.
+- 2026-10-22: approved by the maintainers; annotations and labels renamed to the engine-neutral `encryption.openebs.io/` prefix, PV marker values, empty annotation and clone key checks, new risks; re-validated end to end.
 
 ## Drawbacks
 
@@ -328,18 +336,14 @@ Three pull requests, each building and passing the tests on its own, in this ord
 
 None.
 
-## Known Limitations and Open Questions
+## Known Limitations
 
 - **Backup and restore through Velero are not supported.** Tested with Velero 1.14 and velero-plugin 3.6.0 on a Secret-mode, an auto-mode and an unencrypted control volume:
   - restore fails for the per-volume key modes, while the control volume restores intact. The plugin rebuilds the restored ZFSVolume with its vendored zfs-localpv API types (v1.6.1, 2021), which drop the key source, so `zfs recv` fails (`Cannot use 'prompt' keylocation because stdin is in use`);
-  - backups are stored **in clear text**: the backup path uses a non-raw `zfs send`, which decrypts on the fly — also reported in [zfs-localpv#430], and true of the existing StorageClass encryption. Raw sends (`zfs send -w`), which keep backups encrypted, are proposed in [zfs-localpv#774]. For per-volume keys, a raw backup can only be restored with the volume's original key, which the auto mode deletes together with the volume unless it was backed up to a KMS, and the plugin must carry the key source; supporting restore therefore still needs an updated plugin. The restore step proposed in [zfs-localpv#774] (reloading the key from the pool's `keylocation`, then re-attaching the volume to the pool's encryption root) must also skip volumes that have their own key.
+  - backups are stored **in clear text**: the backup path uses a non-raw `zfs send`, which decrypts on the fly — also reported in [zfs-localpv#430], and true of the existing StorageClass encryption. Raw sends (`zfs send -w`), which keep backups encrypted, are proposed in [zfs-localpv#774]. For per-volume keys, a raw backup can only be restored with the volume's original key, which the auto mode deletes together with the volume unless it was backed up to a KMS, and the plugin must carry the key source; supporting restore therefore still needs an updated plugin, a follow-up tracked in [OEP 4340]. The restore step proposed in [zfs-localpv#774] (reloading the key from the pool's `keylocation`, then re-attaching the volume to the pool's encryption root) must also skip volumes that have their own key.
 - **Driver namespace deletion** is blocked by the admission policy while managed keys exist, which is intended; the break-glass annotation lifts it.
-
-Questions for the maintainers:
-
-1. **A common contract with Mayastor.** No per-volume encryption OEP exists for Mayastor yet, and the discussion in [mayastor#2027] converged on the same model (a key Secret referenced by a PVC annotation with a fixed data key, clones sharing their source's Secret, ESO for external KMS). Should this OEP define it for both engines, with an engine-neutral annotation such as `encryption.openebs.io/secret-name` instead of `local.zfs.openebs.io/encryption-secret`? The Secret contents cannot be identical (ZFS takes a 32-byte hex key for `aes-256-gcm`, SPDK's crypto vbdev takes cipher-specific keys), but the way users reference and manage the key can be.
-2. Is shipping the admission policy enabled by default, with a values toggle, the right default?
-3. Raw backups are tracked in [zfs-localpv#774]; should the Velero plugin update (carrying the key source on restore) be tracked as its own issue?
+- **ESO backups are not verified** by the driver, and a `PushSecret` status can be wrong ([external-secrets#7123]); monitor them on the KMS side.
+- **The admission policy** is only rendered when the cluster serves the `ValidatingAdmissionPolicy` API (Kubernetes 1.30+), and is enabled by default, with `encryptionKeyProtection.enabled` to turn it off. Rendering the chart without a cluster (`helm template`, the static `deploy/zfs-operator.yaml`) leaves it out.
 
 [External Secrets Operator]: https://external-secrets.io/
 [external-secrets#7123]: https://github.com/external-secrets/external-secrets/issues/7123
