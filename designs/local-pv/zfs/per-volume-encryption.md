@@ -129,7 +129,7 @@ The controller resolves the key source in a fixed order, so one StorageClass can
 1. the PVC annotation (user Secret), else
 2. `autoCreateEncryptionKey` (driver-managed Secret).
 
-A warning is logged when both are set. If the annotation references a missing or invalid Secret, provisioning fails; it never falls back to a generated key.
+A warning is logged when both are set. If the annotation references a missing or invalid Secret, or if the PVC cannot be read, provisioning fails; it never falls back to a generated key.
 
 A key can be shared on purpose: several PVCs can reference the same Secret, for example through an annotation in a StatefulSet's `volumeClaimTemplate`, which is copied to every replica's PVC. Since the driver never deletes a user Secret, sharing is safe, at the cost of per-volume crypto-erase. A generated key is always per volume.
 
@@ -137,7 +137,7 @@ A key can be shared on purpose: several PVCs can reference the same Secret, for 
 
 At CreateVolume the controller, which learns the PVC through the external-provisioner's `--extra-create-metadata`:
 
-1. reads both signals: a non-boolean `autoCreateEncryptionKey` is rejected with `InvalidArgument`, and so is an annotation that is empty or does not lead to a valid Secret (see step 3);
+1. reads both signals: a non-boolean `autoCreateEncryptionKey` is rejected with `InvalidArgument`, and so is an annotation that is empty or does not lead to a valid Secret (see step 3); a PVC that cannot be read fails the provisioning (it is retried), since it may name its own key;
 2. **fails closed**: a key source without the `encryption` parameter is rejected with `InvalidArgument`, instead of provisioning a plaintext volume; so is `encryption` with no key source at all and no legacy `keylocation`;
 3. resolves the source:
    - **Secret**: validates it (present, 64 hex characters after trimming surrounding whitespace) and fails fast with `InvalidArgument` otherwise;
@@ -165,7 +165,7 @@ The key source travels with the snapshot: the `ZFSSnapshot` CR carries a copy of
 A driver-managed key lives exactly as long as its data, so its lifecycle is owned by the node agent, the component that runs `zfs create` and `zfs destroy`:
 
 - **Creation**: the node generates the key and stores it in the managed Secret right before `zfs create`. It is idempotent across retries, and a pre-existing Secret of that name without the managed label is never adopted.
-- **Deletion**: the node deletes the Secret only after `zfs destroy` succeeded, before releasing the ZFSVolume finalizer. If that delete fails, the finalizer is kept and the deletion retried.
+- **Deletion**: the node deletes the Secret only after `zfs destroy` succeeded, before releasing the ZFSVolume finalizer. Since deleting a key cannot be undone, it requires positive proof that the dataset is gone: its parent dataset is available and `zfs list` reports the dataset as missing. Any other outcome, or a failed delete, keeps the finalizer and the key, and the deletion is retried.
 - **Failed creation**: if the dataset cannot be created, the node deletes the key at once. The ZFSVolume of a failed volume carries no finalizer, so its deletion never reaches the destroy path; without this, a PVC deleted while its provisioning keeps failing would leave its key behind.
 - **Keeping the data**: deleting a ZFSVolume whose finalizer was removed first, as [import-existing-volume.md] documents to keep a dataset, does not run `zfs destroy`, so the key is kept too and the dataset can be imported again.
 - **Clones** share their parent's Secret and never create nor delete it. ZFS refuses to destroy a parent that still has clones, so the parent's key outlives them.
@@ -262,9 +262,9 @@ Keeping the key material out of etcd is then a matter of [etcd encryption at res
 
 ### Helm and RBAC
 
-- Controller: its existing cluster-wide `get` on Secrets is reused to validate user Secrets. No write access to Secrets.
+- Controller: its existing cluster-wide `get`/`list` on Secrets (needed by the CSI sidecars) is reused to validate user Secrets. No write access to Secrets.
 - Node: `get secrets` cluster-wide (a user Secret lives in the PVC's namespace; `get` only, not `list`), and `create`/`delete` on Secrets through a Role scoped to the driver namespace, for the managed keys.
-- `encryptionKeyProtection.enabled` (default `true`) renders the ValidatingAdmissionPolicy and its binding, only when the cluster serves the API. The static `deploy/zfs-operator.yaml` does not include them; the docs give the two objects to apply by hand.
+- `encryptionKeyProtection.enabled` (default `true`) renders the ValidatingAdmissionPolicy and its binding, only when the cluster serves the API. Like the chart's CRDs, they carry `helm.sh/resource-policy: keep`: `helm uninstall` leaves them in place, since the keys outlive the driver, and a later `helm install` adopts them again. The static `deploy/zfs-operator.yaml` does not include them; the docs give the two objects to apply by hand.
 
 ### Risks and Mitigations
 
@@ -273,7 +273,8 @@ Keeping the key material out of etcd is then a matter of [etcd encryption at res
 | Keys live in etcd (base64). | Documented; recommend etcd encryption at rest with a KMS provider when key custody matters. |
 | A plaintext volume created by mistake. | Fail closed on any key source without `encryption`, and on `encryption` without a key source. |
 | The managed Secret is the only copy of a key. | `immutable: true`, the ValidatingAdmissionPolicy, and an optional ESO `PushSecret` copy in the KMS. |
-| A managed key deleted while its data still exists. | Deletion is tied to `zfs destroy` on the node, not to the ZFSVolume object. |
+| A managed key deleted while its data still exists. | Deletion is tied to `zfs destroy` on the node, not to the ZFSVolume object, and requires `zfs list` to report the dataset as missing. |
+| The driver namespace deleted, or the driver reinstalled elsewhere, while volumes use generated keys. | The admission policy, kept on `helm uninstall`, blocks the deletion; documented: back the keys up first. |
 | A managed key left behind. | Deleted after `zfs destroy`, and at once when the dataset cannot be created. |
 | A key that no longer matches. | Hex validation at create and at every load-key; an explicit wrong-key error instead of a bare `zfs` failure. |
 | Cluster-wide Secret read. | `get` only, not `list`; write rights are the node's only, namespaced to the driver namespace. |
@@ -292,7 +293,7 @@ Three pull requests, each building and passing the tests on its own, in this ord
 
 ## Test Plan
 
-- **Unit** (existing): create-argument builders (`prompt` vs legacy file); key validation and trimming; `UsesManagedKey`; managed Secret creation (labels, immutability, `volume` entry, no owner reference, no finalizer), idempotency and refusal to adopt an unmanaged Secret; empty annotation rejected; PV marker values; a clone's annotation naming another key rejected; which volume owns a managed key (own key, clone, user Secret); managed Secret removal (never an unlabelled Secret, already-gone is fine); zvol device wait (appears, times out, context cancelled).
+- **Unit** (existing): create-argument builders (`prompt` vs legacy file); key validation and trimming; `UsesManagedKey`; managed Secret creation (labels, immutability, `volume` entry, no owner reference, no finalizer), idempotency and refusal to adopt an unmanaged Secret; empty annotation rejected; unreadable PVC rejected; "dataset does not exist" classification before a key is deleted; PV marker values; a clone's annotation naming another key rejected; which volume owns a managed key (own key, clone, user Secret); managed Secret removal (never an unlabelled Secret, already-gone is fine); zvol device wait (appears, times out, context cancelled).
 - **Unit** (to add): the parent-key guard of `EnsureParentKeyLoaded`.
 - **BDD** (to add, in `tests/` so it runs in the existing minikube + ZFS CI): provision and mount with a user Secret and in auto mode; fail-closed and missing-Secret rejections; unique keys across StatefulSet replicas; managed key deleted with the volume and kept when the ZFSVolume is deleted without its dataset; clone of an encrypted volume.
 - **Manual e2e** (done on a single-node Talos cluster, Kubernetes 1.33, OpenZFS 2.3.3, with a real ZFS pool): both modes on filesystem and raw block volumes; fail-closed and hardening cases; keys created by the node only; the admission policy (deletion and label removal denied to cluster-admin, unrelated Secrets unaffected, break-glass, node allowed); keys unloaded then reloaded at mount; managed key deleted after `zfs destroy`; ZFSVolume deleted without its dataset, key kept, dataset re-imported and read back; no key left behind by a failing `zfs create`; clones and snapshot restores sharing their parent's key, parent destroyed only after them, and rejected when their PVC names another key; an empty annotation rejected; the PV marker (`volume`, `storageclass`); snapshot lifecycle; **node reboot** (every volume remounted on the first attempt, no zvol ENOENT, data read back); ESO 2.12 pull with OpenBao, and push with OpenBao and OVHcloud OKMS (mTLS), every key in its own entry, kept after the volume's deletion, restored to the exact key; upgrade from the stock chart; and the Velero investigation described below.
@@ -315,7 +316,7 @@ Three pull requests, each building and passing the tests on its own, in this ord
 - 2026-10-05: tracking issue [OEP 4340] opened, OEP submitted in [openebs#4341].
 - 2026-10-13: revised after review: in-tree KMS dropped in favour of ESO, managed key tied to the dataset and created and deleted by the node, ValidatingAdmissionPolicy; re-validated end to end.
 - 2026-10-15: shared keys, the ESO `deletionPolicy` limitation and the KMS plugin discussion added.
-- 2026-10-22: approved by the maintainers; annotations and labels renamed to the engine-neutral `encryption.openebs.io/` prefix, PV marker values, empty annotation and clone key checks, new risks; re-validated end to end.
+- 2026-10-22: approved by the maintainers; annotations and labels renamed to the engine-neutral `encryption.openebs.io/` prefix, PV marker values, empty annotation and clone key checks, new risks; then a full review pass of the implementation (positive proof before a key is deleted, no fallback to a generated key on an unreadable PVC, admission policy kept on `helm uninstall`); re-validated end to end.
 
 ## Drawbacks
 
@@ -341,7 +342,7 @@ None.
 - **Backup and restore through Velero are not supported.** Tested with Velero 1.14 and velero-plugin 3.6.0 on a Secret-mode, an auto-mode and an unencrypted control volume:
   - restore fails for the per-volume key modes, while the control volume restores intact. The plugin rebuilds the restored ZFSVolume with its vendored zfs-localpv API types (v1.6.1, 2021), which drop the key source, so `zfs recv` fails (`Cannot use 'prompt' keylocation because stdin is in use`);
   - backups are stored **in clear text**: the backup path uses a non-raw `zfs send`, which decrypts on the fly — also reported in [zfs-localpv#430], and true of the existing StorageClass encryption. Raw sends (`zfs send -w`), which keep backups encrypted, are proposed in [zfs-localpv#774]. For per-volume keys, a raw backup can only be restored with the volume's original key, which the auto mode deletes together with the volume unless it was backed up to a KMS, and the plugin must carry the key source; supporting restore therefore still needs an updated plugin, a follow-up tracked in [OEP 4340]. The restore step proposed in [zfs-localpv#774] (reloading the key from the pool's `keylocation`, then re-attaching the volume to the pool's encryption root) must also skip volumes that have their own key.
-- **Driver namespace deletion** is blocked by the admission policy while managed keys exist, which is intended; the break-glass annotation lifts it.
+- **Driver namespace deletion** is blocked by the admission policy while managed keys exist, which is intended, including after `helm uninstall`; the break-glass annotation lifts it. Generated keys live in the driver namespace: reinstalling the driver in another namespace needs the keys moved or restored first.
 - **ESO backups are not verified** by the driver, and a `PushSecret` status can be wrong ([external-secrets#7123]); monitor them on the KMS side.
 - **The admission policy** is only rendered when the cluster serves the `ValidatingAdmissionPolicy` API (Kubernetes 1.30+), and is enabled by default, with `encryptionKeyProtection.enabled` to turn it off. Rendering the chart without a cluster (`helm template`, the static `deploy/zfs-operator.yaml`) leaves it out.
 
