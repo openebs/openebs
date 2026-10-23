@@ -1,0 +1,2076 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A DR cycle, step by step</title>
+</head>
+<body>
+<style>
+  :root {
+    --ink:#16212b; --soft:#4b5965; --faint:#8794a0;
+    --paper:#f6f7f8; --panel:#ffffff; --rule:#dde3e6;
+    --accent:#0b5d63; --accent-dim:#e0eded; --accent-soft:#7fb3b6;
+    --flag:#9a7220; --flag-dim:#f5eedc;
+    --empty:#e8ecee; --carried:#b8c4ca;
+    --c1:#0b5d63; --c2:#2f6690; --c3:#7a3b52; --c4:#5d6b2f;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --ink:#eaf0f4; --soft:#aab7c1; --faint:#78858f;
+            --paper:#0d141a; --panel:#141d26; --rule:#263239;
+            --accent:#79cdd0; --accent-dim:#14343a; --accent-soft:#2d6f72;
+            --flag:#dcb163; --flag-dim:#2d2718;
+            --empty:#1b242c; --carried:#3b4a53;
+            --c1:#79cdd0; --c2:#8ab6dc; --c3:#d49ab0; --c4:#b3c276; }
+  }
+  :root[data-theme="dark"] { --ink:#eaf0f4; --soft:#aab7c1; --faint:#78858f;
+    --paper:#0d141a; --panel:#141d26; --rule:#263239; --accent:#79cdd0;
+    --accent-dim:#14343a; --accent-soft:#2d6f72; --flag:#dcb163; --flag-dim:#2d2718;
+    --empty:#1b242c; --carried:#3b4a53;
+    --c1:#79cdd0; --c2:#8ab6dc; --c3:#d49ab0; --c4:#b3c276; }
+  :root[data-theme="light"] { --ink:#16212b; --soft:#4b5965; --faint:#8794a0;
+    --paper:#f6f7f8; --panel:#ffffff; --rule:#dde3e6; --accent:#0b5d63;
+    --accent-dim:#e0eded; --accent-soft:#7fb3b6; --flag:#9a7220; --flag-dim:#f5eedc;
+    --empty:#e8ecee; --carried:#b8c4ca;
+    --c1:#0b5d63; --c2:#2f6690; --c3:#7a3b52; --c4:#5d6b2f; }
+
+  * { box-sizing: border-box; }
+  body {
+    margin:0; background:var(--paper); color:var(--ink);
+    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+    line-height:1.6; -webkit-font-smoothing:antialiased;
+  }
+  .wrap { max-width:60rem; margin:0 auto; padding:3rem 1.25rem 5rem; }
+
+  .eyebrow { font-size:.72rem; letter-spacing:.14em; text-transform:uppercase;
+             font-weight:600; color:var(--accent); margin:0 0 .5rem; }
+  h1 { font-family: ui-serif, Georgia, "Times New Roman", serif; font-weight:600;
+       font-size:clamp(1.8rem,4vw,2.5rem); line-height:1.14; letter-spacing:-.02em;
+       margin:0 0 .7rem; text-wrap:balance; }
+  .lede { color:var(--soft); max-width:60ch; margin:0 0 2rem; font-size:1.05rem; }
+
+  /* ---------- the second stage: one chunk, up close ---------- */
+  .sect2 { margin-top:3.5rem; padding-top:2.2rem; border-top:1px solid var(--rule); }
+  .secth { font-family:ui-serif, Georgia, "Times New Roman", serif; font-weight:600;
+           font-size:1.5rem; letter-spacing:-.015em; margin:0 0 .6rem; text-wrap:balance; }
+  .secthp { color:var(--soft); max-width:66ch; margin:0 0 1.4rem; }
+  .rail2 { display:grid; grid-template-columns:1fr 1.5fr .9fr; gap:1.1rem;
+           align-items:start; min-width:44rem; }
+
+  .facts { display:flex; flex-direction:column; gap:2px;
+           font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+           font-size:.68rem; }
+  .facts div { display:flex; justify-content:space-between; gap:.6rem;
+               padding:.16rem .45rem; border-radius:4px; background:var(--paper); }
+  .facts span { color:var(--faint); }
+  .facts b { font-weight:600; font-variant-numeric:tabular-nums; }
+
+  /* the chunk buffer, one cell per 64 KiB segment */
+  .buf { display:grid; grid-template-columns:repeat(16,1fr); gap:2px; }
+  .buf.narrow { grid-template-columns:repeat(8,1fr); }
+  .buf i { height:14px; border-radius:2px; background:var(--empty); font-style:normal;
+           transition:background-color .3s ease, box-shadow .25s ease; }
+  .buf i.data { background:var(--accent); }
+  .buf i.hole { background:var(--carried); }
+  .buf i.now { box-shadow:0 0 0 2px var(--flag); }
+  .buf.hashing i { box-shadow:0 0 0 1px var(--flag); }
+  .buflegend { display:flex; gap:.9rem; font-size:.68rem; color:var(--faint);
+               font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; }
+  .buflegend i { display:inline-block; width:8px; height:8px; border-radius:2px;
+                 margin-right:.3rem; vertical-align:middle; font-style:normal; }
+  .k-data { background:var(--accent); } .k-hole { background:var(--carried); }
+  .k-none { background:var(--empty); }
+
+  .bits { font-size:.6rem; letter-spacing:.06em; text-transform:uppercase;
+          font-weight:700; padding:.08rem .34rem; border-radius:3px;
+          background:var(--accent-dim); color:var(--accent); }
+  .app.busy .bits { background:var(--flag-dim); color:var(--flag); }
+  /* the pipeline timeline */
+  .tlwrap { margin-top:1.6rem; padding:1rem 1.1rem; border:1px solid var(--rule);
+            border-radius:8px; background:var(--panel); }
+  .tlhead { display:flex; flex-wrap:wrap; align-items:center; gap:.6rem;
+            justify-content:space-between; margin-bottom:.8rem; }
+  .tlhead h3 { margin:0; font-size:.95rem; font-weight:650; font-family:inherit; }
+  .tl { display:flex; flex-direction:column; gap:4px; }
+  .tlrow { display:flex; align-items:center; gap:.6rem; }
+  .tllab { width:3.4rem; flex:none; text-align:right; font-size:.68rem; color:var(--faint);
+           font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; }
+  .tlane { position:relative; flex:1; height:20px; border-radius:3px;
+           background:var(--empty); overflow:hidden; }
+  .tlane b { position:absolute; top:0; bottom:0; border-radius:2px; font-weight:400;
+             transition:opacity .3s ease; }
+  .t-read, .tlane b.read { background:var(--accent); }
+  .t-hash, .tlane b.hash { background:var(--flag); }
+  .t-net, .tlane b.net { background:var(--c2); }
+  .t-stall, .tlane b.stall { background:repeating-linear-gradient(45deg,
+      var(--empty) 0 4px, var(--rule) 4px 8px); }
+  .tlane b.pending { opacity:.18; }
+  .tlfoot { display:flex; flex-wrap:wrap; gap:.9rem; margin-top:.6rem; font-size:.68rem;
+            color:var(--faint); font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; }
+  .tlkey i { display:inline-block; width:9px; height:9px; border-radius:2px;
+             margin-right:.3rem; vertical-align:middle; font-style:normal; }
+  .tltotal { margin-left:auto; color:var(--ink); font-weight:600; }
+
+  .digestcap { font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+               font-size:.64rem; color:var(--faint); min-height:1rem; }
+  .digest { font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+            font-size:.64rem; color:var(--accent); word-break:break-all; min-height:2.2rem;
+            line-height:1.5; }
+  .aside { font-size:.74rem; color:var(--faint); margin:.5rem 0 0; }
+
+  .toc { display:flex; flex-wrap:wrap; gap:.4rem .5rem; margin:0 0 1.4rem;
+         padding:.7rem .85rem; border:1px solid var(--rule); border-radius:8px;
+         background:var(--panel); font-size:.84rem; }
+  .toc a { color:var(--soft); text-decoration:none; padding:.18rem .5rem;
+           border-radius:999px; border:1px solid transparent; }
+  .toc a:hover { color:var(--accent); border-color:var(--accent); }
+  html { scroll-behavior:smooth; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior:auto; } }
+  [id^="part-"] { scroll-margin-top:1rem; }
+
+  /* ---------- mode knobs ---------- */
+  .knobs { display:flex; flex-wrap:wrap; align-items:center; gap:.5rem .8rem;
+           margin:0 0 1rem; padding:.8rem .9rem; border:1px solid var(--rule);
+           border-radius:8px; background:var(--panel); }
+  .klabel { font-size:.7rem; letter-spacing:.09em; text-transform:uppercase;
+            font-weight:650; color:var(--faint); }
+  .seg { display:inline-flex; border:1px solid var(--rule); border-radius:6px;
+         overflow:hidden; }
+  .seg button { font:inherit; font-size:.8rem; font-weight:600; cursor:pointer;
+                border:0; border-radius:0; padding:.34rem .7rem;
+                background:transparent; color:var(--soft); }
+  .seg button + button { border-left:1px solid var(--rule); }
+  .seg button:hover { background:var(--accent-dim); color:var(--ink); }
+  .seg button.on { background:var(--accent); color:var(--paper); }
+  .kdesc { flex-basis:100%; margin:.25rem 0 0; font-size:.86rem; color:var(--soft);
+           max-width:74ch; }
+  .kdesc code { font-size:.86em; }
+  .kx { color:var(--faint); }
+
+  /* ---------- stage ---------- */
+  .stage { position:relative; background:var(--panel); border:1px solid var(--rule);
+           border-radius:10px; padding:1.4rem; overflow-x:auto; }
+  .rail { display:grid; grid-template-columns:1fr 1.15fr 1fr; gap:1.1rem;
+          align-items:start; min-width:46rem; }
+  .col { display:flex; flex-direction:column; gap:.6rem; }
+  .colhead { display:flex; align-items:baseline; justify-content:space-between; gap:.5rem; }
+  .colhead h2 { font-size:.82rem; letter-spacing:.07em; text-transform:uppercase;
+                font-weight:650; color:var(--soft); margin:0; font-family:inherit; }
+  .tag { font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+         font-size:.68rem; color:var(--faint); }
+
+  /* the writer */
+  .app { display:flex; align-items:center; gap:.45rem; padding:.42rem .6rem;
+         border:1px solid var(--rule); border-radius:6px; background:var(--paper);
+         font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+         font-size:.68rem; color:var(--soft); transition:border-color .3s ease; }
+  .app .led, .sched .led { width:7px; height:7px; border-radius:50%; background:var(--rule);
+              flex:none; transition:background-color .3s ease, box-shadow .3s ease; }
+  .app .io { margin-left:auto; color:var(--faint); }
+  .pitslot { display:inline-flex; gap:.3rem; }
+  .bin { display:inline-flex; align-items:center; gap:.2rem; color:var(--faint);
+         padding:.08rem .3rem; border-radius:4px;
+         transition:color .3s ease, background-color .3s ease, transform .3s ease; }
+  .bin svg { width:12px; height:12px; fill:none; stroke:currentColor;
+             stroke-width:1.2; stroke-linecap:round; stroke-linejoin:round; }
+  .bin b { font-weight:600; font-variant-numeric:tabular-nums; }
+  .bin.bump { color:var(--flag); background:var(--flag-dim); transform:scale(1.2); }
+  .app.busy { border-color:var(--c, var(--accent)); }
+  .app.busy .led { background:var(--c, var(--accent));
+                   box-shadow:0 0 0 3px color-mix(in srgb, var(--c, var(--accent)) 25%, transparent); }
+
+  /* the replication schedule */
+  .sched { display:flex; flex-direction:column; gap:.34rem; padding:.42rem .6rem;
+           border:1px solid var(--rule); border-radius:6px; background:var(--paper);
+           font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+           font-size:.68rem; color:var(--soft);
+           transition:border-color .25s ease, background-color .25s ease; }
+  .sched .srow { display:flex; align-items:center; gap:.45rem; }
+  .sched .clk { margin-left:auto; color:var(--faint); font-variant-numeric:tabular-nums; }
+  .sched .track { height:4px; border-radius:2px; background:var(--empty); overflow:hidden; }
+  .sched .track i { display:block; height:100%; width:0; background:var(--accent-soft);
+                    transition:background-color .25s ease; }
+  .sched.firing { border-color:var(--accent); background:var(--accent-dim); }
+  .sched.firing .clk { color:var(--accent); }
+  .sched.firing .track i { background:var(--accent); }
+  .sched.firing .led { background:var(--accent);
+                       box-shadow:0 0 0 4px color-mix(in srgb, var(--accent) 22%, transparent); }
+
+  /* volume grid */
+  .grid { display:grid; grid-template-columns:repeat(8,1fr); gap:3px;
+          outline:2px solid transparent; outline-offset:4px;
+          transition:outline-color .25s ease; }
+  .grid.frozen { outline-color:var(--accent); }
+  .cell { aspect-ratio:1; border-radius:2px; background:var(--empty);
+          display:flex; align-items:center; justify-content:center;
+          font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+          font-size:.47rem; letter-spacing:-.04em; color:transparent;
+          transition:background-color .35s ease, box-shadow .25s ease, transform .25s ease; }
+  .cell.has { color:var(--paper); }
+  .cell.has { background:var(--c, var(--carried)); }
+  .cell.fresh { box-shadow:0 0 0 2px var(--paper) inset, 0 0 0 3px var(--c, var(--accent)); }
+  .cell.target { box-shadow:0 0 0 2px var(--accent) inset; }
+  .cell.pop { transform:scale(1.22); }
+
+  /* local snapshot layers under the volume */
+  .snaps { display:flex; flex-direction:column; gap:3px; }
+  .snaphead { font-size:.68rem; color:var(--faint); letter-spacing:.05em;
+              font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; }
+  .snaprow { display:flex; align-items:center; gap:.4rem; opacity:0;
+             transform:translateY(-5px); border-radius:3px;
+             outline:1px solid transparent; outline-offset:3px;
+             transition:opacity .3s ease, transform .3s ease, outline-color .3s ease; }
+  .snaprow.in { opacity:1; transform:none; }
+  .snaprow.born { outline-color:var(--accent); }
+  .snaprow.born .lbl { color:var(--accent); }
+  .snaprow .lbl { font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+                  font-size:.62rem; color:var(--faint); width:3.4rem; flex:none; }
+  .snaprow .own { display:grid; grid-template-columns:repeat(32,1fr); gap:1px; flex:1; }
+  .snaprow .own i { height:7px; border-radius:1px; background:var(--empty); font-style:normal;
+                    transition:background-color .3s ease, box-shadow .2s ease; }
+  .snaprow .own i.held { background:var(--c, var(--accent-soft)); }
+  .snaprow .own i.reading { box-shadow:0 0 0 1px var(--accent); }
+  .snaprow .none { font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+                   font-size:.62rem; color:var(--faint); }
+
+  .meta { font-size:.74rem; color:var(--faint);
+          font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; }
+
+  /* snapshot pin */
+  .pin { display:flex; align-items:center; gap:.4rem; font-size:.72rem;
+         color:var(--faint); min-height:1.3rem;
+         font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; }
+  .pin.on { color:var(--accent); }
+  .pin .dot { width:7px; height:7px; border-radius:50%; background:var(--rule); }
+  .pin.on .dot { background:var(--accent); }
+
+  /* object store */
+  .store { background:var(--paper); border:1px dashed var(--rule); border-radius:8px;
+           padding:.7rem; min-height:9.4rem;
+           transition:border-color .3s ease, box-shadow .3s ease; }
+  .chunks { display:flex; flex-wrap:wrap; gap:4px; }
+  .chunk { font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+           font-size:.66rem; padding:.2rem .4rem; border-radius:3px;
+           background:var(--c, var(--accent)); color:var(--paper);
+           box-shadow:0 0 0 0 transparent;
+           transition:transform .3s ease, box-shadow .3s ease, opacity .3s ease,
+                      background .35s ease; }
+  .chunk.pending { opacity:0; }
+  .chunk.hit { box-shadow:0 0 0 3px var(--flag); transform:scale(1.14); }
+  /* no surviving point's delta names it */
+  .chunk.orphan { background:transparent; color:var(--soft);
+                  box-shadow:inset 0 0 0 1px var(--faint); }
+  .chunk.watch { box-shadow:0 0 0 3px var(--flag-dim); }
+  .chunk.atrisk { box-shadow:inset 0 0 0 2px var(--flag); }
+  .chunk.losing { box-shadow:0 0 0 3px var(--flag); transform:scale(1.12); }
+  .chunk.cand { box-shadow:inset 0 0 0 1px var(--faint), 0 0 0 3px var(--flag-dim); }
+  /* kept only because a later point carries the entry forward */
+  .chunk.carried { background:var(--carried); color:var(--ink); box-shadow:none; }
+  .chunk.doomed { box-shadow:0 0 0 3px var(--flag); transform:scale(1.1); }
+  .chunk.swept { opacity:0; transform:scale(.3); }
+
+  /* phase banner - sits over the top of the stage so a collection cannot be missed */
+  .phase { position:absolute; z-index:9; left:.6rem; right:.6rem; top:.6rem;
+           display:flex; align-items:center; gap:.7rem; pointer-events:none;
+           padding:.6rem .9rem; border-radius:7px;
+           background:var(--flag); color:var(--paper);
+           box-shadow:0 6px 20px -6px rgba(0,0,0,.35);
+           opacity:0; transform:translateY(-8px);
+           transition:opacity .35s ease, transform .35s ease; }
+  .phase.on { opacity:1; transform:none; }
+  .phase .ptitle { font-weight:700; font-size:.92rem; letter-spacing:.08em;
+                   text-transform:uppercase; }
+  .phase .pmode { font-size:.7rem; padding:.1rem .45rem; border-radius:4px;
+                  background:color-mix(in srgb, var(--paper) 25%, transparent);
+                  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; }
+  .phase .psub { margin-left:auto; font-size:.74rem; opacity:.9;
+                 font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; }
+  .phase .pdot { width:9px; height:9px; border-radius:50%; background:var(--paper);
+                 flex:none; animation:pulse 1.4s ease-in-out infinite; }
+  @keyframes pulse { 0%,100% { opacity:1; transform:scale(1); }
+                     50% { opacity:.4; transform:scale(.7); } }
+  @media (prefers-reduced-motion: reduce) { .phase .pdot { animation:none; } }
+
+  /* the collector: an actor like the application, in the flag colour so it reads as
+     a different kind of thing from a replication cycle */
+  .store.collecting { border-style:solid; border-color:var(--flag);
+                      box-shadow:0 0 0 3px var(--flag-dim); }
+  .chip.probe { outline:2px solid var(--flag); outline-offset:2px; }
+  .chip.holds { outline:2px solid var(--accent); outline-offset:2px; }
+  .chunk.inspect { box-shadow:0 0 0 3px var(--flag); transform:scale(1.16); }
+
+  /* retained points, and what a chunk looks like on its way out */
+  .retain { border:1px solid var(--rule); border-radius:6px; padding:.6rem .7rem;
+            background:var(--paper); }
+  .rhead { font-size:.7rem; color:var(--faint); margin-bottom:.4rem;
+           font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+           display:flex; justify-content:space-between; gap:.5rem; }
+  .chips { display:flex; flex-wrap:wrap; gap:4px; min-height:1.4rem; align-items:center; }
+  .chip { font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+          font-size:.64rem; padding:.16rem .4rem; border-radius:3px;
+          background:var(--c, var(--accent)); color:var(--paper);
+          transition:opacity .4s ease, transform .4s ease, filter .4s ease; }
+  .chip.stale { filter:grayscale(1); opacity:.55; text-decoration:line-through; }
+  .chip.active { opacity:.9; outline:2px solid var(--flag); outline-offset:2px; }
+  .chip.expiring { filter:grayscale(1); opacity:0; transform:translateX(-10px); }
+  .chips .none { font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+                 font-size:.64rem; color:var(--faint); }
+
+  /* the point */
+  .point { border:1px solid var(--rule); border-radius:6px; padding:.6rem .7rem;
+           background:var(--paper); }
+  .point .lbl { font-size:.7rem; color:var(--faint); margin-bottom:.35rem;
+                font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; }
+  .bar { display:flex; height:11px; border-radius:3px; overflow:hidden; background:var(--empty); }
+  .bar .ch { background:var(--accent); transition:width .4s ease; }
+  .bar .fu { background:var(--carried); transition:width .4s ease; }
+  .legend { display:flex; gap:.9rem; margin-top:.4rem; font-size:.68rem; color:var(--faint);
+            font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; }
+  .legend i { display:inline-block; width:8px; height:8px; border-radius:2px;
+              margin-right:.3rem; vertical-align:middle; font-style:normal; }
+
+  /* flying packets */
+  .fly { position:absolute; z-index:5; pointer-events:none;
+         font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+         font-size:.64rem; padding:.16rem .36rem; border-radius:3px;
+         background:var(--c, var(--accent)); color:var(--paper); white-space:nowrap;
+         transition:transform var(--ms,.62s) cubic-bezier(.33,.02,.2,1), opacity .3s ease; }
+
+  /* ---------- narration + controls ---------- */
+  .narrate { margin-top:1rem; display:flex; align-items:flex-start; gap:.7rem;
+             min-height:3.1rem; padding:.55rem .8rem .55rem .7rem; border-radius:6px;
+             border-left:3px solid var(--rule); background:transparent;
+             transition:background-color .7s ease, border-left-color .7s ease; }
+  .narrate.flash { background:var(--accent-dim); border-left-color:var(--accent);
+                   transition:background-color .12s ease, border-left-color .12s ease; }
+  /* a step whose only effect is the words gets a stronger cue and a longer beat */
+  .narrate.reading { border-left-color:var(--flag); }
+  .narrate.reading.flash { background:var(--flag-dim); border-left-color:var(--flag); }
+  .step-no { font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+             font-size:.7rem; color:var(--accent); font-weight:600; padding-top:.18rem;
+             white-space:nowrap; }
+  .step-txt { margin:0; color:var(--ink); max-width:62ch; }
+  .step-txt b { font-weight:650; }
+
+  .controls { display:flex; flex-wrap:wrap; gap:.5rem; align-items:center; margin-top:1rem; }
+  button { font:inherit; font-size:.86rem; font-weight:600; cursor:pointer;
+           border:1px solid var(--rule); background:var(--panel); color:var(--ink);
+           padding:.42rem .9rem; border-radius:5px; }
+  button.primary { background:var(--accent); border-color:var(--accent); color:var(--paper); }
+  button:hover { border-color:var(--accent); }
+  button:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+  button[disabled] { opacity:.45; cursor:default; }
+  .scrub { display:flex; align-items:center; gap:.6rem; margin-top:.7rem;
+           font-size:.78rem; color:var(--faint); }
+  .scrub input[type=range] { flex:1; min-width:8rem; }
+  .chapters { display:flex; flex-wrap:wrap; gap:.35rem; margin-top:.5rem; }
+  .chapters button { font:inherit; font-size:.74rem; font-weight:600; cursor:pointer;
+                     border:1px solid var(--rule); background:var(--panel);
+                     color:var(--soft); padding:.22rem .55rem; border-radius:999px; }
+  .chapters button:hover { border-color:var(--accent); color:var(--ink); }
+  .chapters button.on { background:var(--accent-dim); border-color:var(--accent);
+                        color:var(--accent); }
+  .chapters button.sub { font-size:.7rem; font-weight:500; padding:.2rem .5rem;
+                         color:var(--faint); border-color:color-mix(in srgb, var(--rule) 60%, transparent); }
+  .chapters button.sub.on { background:var(--accent-dim); border-color:var(--accent);
+                            color:var(--accent); font-weight:600; }
+  .chapters button.gc { border-style:dashed; }
+  .chapters button.gc.on { background:var(--flag-dim); border-color:var(--flag);
+                           color:var(--flag); border-style:solid; }
+  .posn { font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+          font-variant-numeric:tabular-nums; min-width:4.5rem; text-align:right; }
+  .speed { margin-left:auto; font-size:.78rem; color:var(--faint); display:flex;
+           align-items:center; gap:.4rem; }
+
+  .notes { margin-top:2.2rem; display:grid; grid-template-columns:repeat(auto-fit,minmax(15rem,1fr));
+           gap:1rem; }
+  .note { background:var(--panel); border:1px solid var(--rule); border-radius:8px;
+          padding:.9rem 1rem; }
+  .note h3 { margin:0 0 .3rem; font-size:.95rem; font-weight:650; font-family:inherit; }
+  .note p { margin:0; font-size:.88rem; color:var(--soft); }
+  code { font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:.85em;
+         background:var(--accent-dim); padding:.08em .3em; border-radius:3px; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cell, .chunk, .fly, .bar .ch, .bar .fu { transition-duration: 1ms !important; }
+  }
+</style>
+
+<div class="wrap">
+  <p class="eyebrow">Mayastor &middot; asynchronous disaster recovery</p>
+  <h1>One replication cycle, step by step</h1>
+  <p class="lede">
+    An application writes to a volume. On a schedule, a snapshot pins what it wrote. Only the chunks the
+    store does not already hold are uploaded. The destination fetches only what differs
+    from the point it already has.
+  </p>
+
+  <nav class="toc">
+    <a href="#part-cycle">1 &middot; The replication cycle</a>
+    <a href="#part-chunk">2 &middot; Inside one chunk: segments and the hash</a>
+    <a href="#part-notes">3 &middot; Notes</a>
+  </nav>
+
+  <div class="knobs" id="part-cycle">
+    <span class="klabel">upload format</span>
+    <span class="seg">
+      <button id="fmt-full">Synthetic full</button><button id="fmt-inc" class="on">Incremental only</button>
+    </span>
+    <span class="klabel">dedup</span>
+    <span class="seg">
+      <button id="dd-on">on</button><button id="dd-off" class="on">off</button>
+    </span>
+    <p class="kdesc" id="kdesc"></p>
+  </div>
+
+  <div class="stage" id="stage">
+    <div class="phase" id="phase">
+      <span class="pdot"></span>
+      <span class="ptitle">Garbage collection</span>
+      <span class="pmode" id="phase-mode"></span>
+      <span class="psub" id="phase-sub"></span>
+    </div>
+    <div class="rail">
+
+      <div class="col">
+        <div class="app" id="app">
+          <span class="led"></span><span>application</span>
+          <span class="io" id="app-io">idle</span>
+        </div>
+        <div class="colhead">
+          <h2>Source volume</h2><span class="tag" id="src-tag">128 MiB</span>
+        </div>
+        <div class="grid" id="src"></div>
+        <div class="meta" id="src-meta">&nbsp;</div>
+        <div class="sched" id="sched">
+          <div class="srow">
+            <span class="led"></span><span>replication schedule</span>
+            <span class="clk" id="sched-clk">0:00 / 5:00</span>
+          </div>
+          <div class="track"><i id="sched-fill"></i></div>
+        </div>
+        <div class="snaphead">local snapshots — which clusters each one owns</div>
+        <div class="snaps" id="snaps"></div>
+        <div class="pin" id="src-pin"><span class="dot"></span><span>no snapshot</span></div>
+      </div>
+
+      <div class="col">
+        <div class="colhead">
+          <h2>Object store</h2><span class="tag" id="store-tag">0 objects</span>
+        </div>
+        <div class="store" id="store"><div class="chunks" id="chunks"></div></div>
+        <div class="retain" id="retain">
+          <div class="rhead"><span>retained points</span><span>ttl 15 min</span></div>
+          <div class="chips" id="chips"><span class="none">none yet</span></div>
+        </div>
+        <div class="app" id="coll">
+          <span class="led"></span><span>garbage collector</span>
+          <span class="pitslot" id="coll-pit"></span>
+          <span class="io" id="coll-io">idle</span>
+          <span class="bin" id="bin" title="objects reclaimed">
+            <svg viewBox="0 0 14 14" aria-hidden="true">
+              <path d="M2.5 3.5h9M5.5 3.5V2.2h3v1.3M3.6 3.5l.6 8.3h5.6l.6-8.3M6 5.8v4M8 5.8v4"/>
+            </svg><b id="bin-n">0</b>
+          </span>
+        </div>
+        <div class="point">
+          <div class="lbl" id="point-lbl">no point committed</div>
+          <div class="bar"><div class="ch" id="bar-ch" style="width:0%"></div><div class="fu" id="bar-fu" style="width:0%"></div></div>
+          <div class="legend">
+            <span><i style="background:var(--accent)"></i>changed</span>
+            <span><i style="background:var(--carried)"></i>carried</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="col">
+        <div class="colhead">
+          <h2>Destination volume</h2><span class="tag" id="dst-tag">behind</span>
+        </div>
+        <div class="grid" id="dst"></div>
+        <div class="meta" id="dst-meta">&nbsp;</div>
+        <div class="pin" id="dst-pin"><span class="dot"></span><span>no snapshot</span></div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="controls">
+    <button class="primary" id="run">Run</button>
+    <button id="back">Back</button>
+    <button id="step">Step</button>
+    <button id="replay">Replay</button>
+    <span class="speed">
+      <label for="spd">speed</label>
+      <input id="spd" type="range" min="50" max="400" value="100" step="10">
+      <span class="posn" id="spd-lbl">1.0x</span>
+    </span>
+  </div>
+  <div class="scrub">
+    <label for="pos">step</label>
+    <input id="pos" type="range" min="0" max="1" value="0" step="1" list="chapter-ticks">
+    <datalist id="chapter-ticks"></datalist>
+    <span class="posn" id="pos-lbl">0 / 0</span>
+  </div>
+  <div class="chapters" id="chapters"></div>
+
+  <div class="narrate" id="narrate">
+    <span class="step-no" id="step-no">—</span>
+    <p class="step-txt" id="step-txt">Press <b>Run</b> to start the first cycle.</p>
+  </div>
+
+  <div class="notes" id="part-notes">
+    <div class="note">
+      <h3>Same name, same bytes</h3>
+      <p>Every cluster carries the name of what it holds, so identical content reads as
+         identical across all three columns &mdash; the two volumes and the store. Watch
+         <code>a1f0</code> appear at offsets&nbsp;0 and&nbsp;16 in cycle&nbsp;1 and then at
+         offset&nbsp;9 in cycle&nbsp;2: three places, one object.</p>
+    </div>
+    <div class="note">
+      <h3>Two different things the colours say</h3>
+      <p>On <em>either volume</em>, a cluster carries a band for <em>every snapshot that
+         wrote that offset</em>, newest last — so offset&nbsp;2 ends up petrol and plum,
+         and offset&nbsp;9 petrol and slate. The two grids therefore look identical once
+         they are in sync, which is the whole point. In the <em>store</em>, a chunk's
+         bands are the points whose delta uploaded it — the reference set the collector
+         consults. Different questions: what happened at this offset, versus who put this
+         object here.</p>
+    </div>
+    <div class="note">
+      <h3>The interval is a floor, not the RPO</h3>
+      <p>The schedule fires every five minutes, which is the soonest a new point can
+         <em>exist</em>. What the destination can actually recover to is that plus however
+         long the upload and the fetch take — which is why the clock restarts when the
+         snapshot is taken, not when the cycle finishes.</p>
+    </div>
+    <div class="note" id="note-dedup"></div>
+    <div class="note" id="note-point"></div>
+    <div class="note">
+      <h3>Why the first cycle is different</h3>
+      <p>A snapshot's own layer is its difference against its <em>parent</em>. On a volume
+         that already had snapshots that layer describes only the newest writes — so the
+         very first DR cycle has to read the whole chain instead. Getting it wrong is
+         silent: the point is internally consistent and wrong about what the volume
+         holds.</p>
+    </div>
+    <div class="note">
+      <h3>Checking is not the whole protocol</h3>
+      <p>Here the collector and the cycles take turns. In a real store they overlap — a
+         chunk can be claimed by a cycle at the moment it is being considered for
+         deletion. The design handles that by <em>ordering</em>: a delete intent is raised
+         before the check, and a cycle must place its reference before clearing any
+         intent, so a concurrent claim is always seen. It does not rely on the collector
+         waiting a while first.</p>
+    </div>
+    <div class="note">
+      <h3>An idle cycle costs nothing</h3>
+      <p>Cycle&nbsp;4 writes nothing. The schedule fires anyway — it cannot know — so the
+         source snapshots, finds no change, and commits no point at all — a copy of the one before it would say nothing new.</p>
+    </div>
+  </div>
+
+  <section class="sect2" id="part-chunk">
+    <h2 class="secth">Inside one chunk: segments in, one name out</h2>
+    <p class="secthp">
+      The diagram above treats a chunk as atomic. It is not. The engine reads the
+      snapshot in fixed <b>64&nbsp;KiB segments</b> &mdash; SPDK's
+      <code>SPDK_BDEV_LARGE_BUF_MAX_SIZE</code>, sixteen of them in flight at once
+      &mdash; and the mover buffers a whole chunk before it can name it, because the
+      name <em>is</em> the hash and there is no hash until the last segment lands.
+    </p>
+
+    <div class="knobs">
+      <span class="klabel">pool cluster size</span>
+      <span class="seg">
+        <button id="cl-1">1 MiB</button><button id="cl-4" class="on">4 MiB</button><button id="cl-32">32 MiB</button>
+      </span>
+      <p class="kdesc" id="cl-desc"></p>
+    </div>
+
+    <div class="stage" id="stage2">
+      <div class="rail2">
+        <div class="col">
+          <div class="colhead"><h2>Engine</h2><span class="tag">unix socket</span></div>
+          <div class="facts">
+            <div><span>segment size</span><b>64 KiB</b></div>
+            <div><span>reads in flight</span><b>16</b></div>
+            <div><span>segments / chunk</span><b id="f-segs">64</b></div>
+            <div><span>delivered</span><b id="f-done">0 / 64</b></div>
+          </div>
+          <div class="app" id="clusterbox">
+            <span class="led"></span><span id="cl-state">cluster @4 MiB</span>
+            <span class="io" id="cl-alloc">allocated</span>
+          </div>
+          <p class="aside" id="aside-eng"></p>
+        </div>
+
+        <div class="col">
+          <div class="colhead"><h2>Chunk buffer</h2><span class="tag" id="buf-tag">4 MiB</span></div>
+          <div class="buf" id="buf"></div>
+          <div class="buflegend">
+            <span><i class="k-data"></i>segment carrying bytes</span><span><i class="k-hole"></i>hole</span><span><i class="k-none"></i>not yet delivered</span>
+          </div>
+          <div class="meta" id="buf-meta">covered 0 / 4096 KiB &middot; held 0 KiB</div>
+          <div class="app" id="hashbox">
+            <span class="led"></span><span>BLAKE3</span><span class="bits">256-bit</span>
+            <span class="io" id="hash-io">nothing to hash yet</span>
+          </div>
+          <div class="digest" id="digest"></div>
+          <div class="digestcap" id="digest-cap"></div>
+        </div>
+
+        <div class="col">
+          <div class="colhead"><h2>Object store</h2><span class="tag" id="s2-tag">0 chunks</span></div>
+          <div class="store" id="store2"><div class="chunks" id="chunks2"></div></div>
+          <p class="aside" id="aside2"></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <button class="primary" id="run2">Run</button>
+      <button id="back2">Back</button>
+      <button id="step2">Step</button>
+      <button id="replay2">Replay</button>
+      <span class="posn" id="pos2-lbl">0 / 0</span>
+    </div>
+
+    <div class="narrate" id="narrate2">
+      <span class="step-no" id="step-no2">&mdash;</span>
+      <p class="step-txt" id="step-txt2">Press <b>Run</b> to stream one chunk.</p>
+    </div>
+
+    <div class="tlwrap">
+      <div class="tlhead">
+        <h3>What that costs: eight consecutive chunks</h3>
+        <span class="seg">
+          <button id="tl-seq" class="on">sequential (today)</button><button id="tl-pipe">pipelined</button>
+        </span>
+      </div>
+      <div class="tl">
+        <div class="tlrow"><span class="tllab">engine</span><div class="tlane" id="tl-eng"></div></div>
+        <div class="tlrow"><span class="tllab">store</span><div class="tlane" id="tl-store"></div></div>
+      </div>
+      <div class="tlfoot">
+        <span class="tlkey"><i class="t-read"></i>read segments</span>
+        <span class="tlkey"><i class="t-hash"></i>BLAKE3</span>
+        <span class="tlkey"><i class="t-net"></i>HEAD + PUT</span>
+        <span class="tlkey"><i class="t-stall"></i>stalled</span>
+        <span class="tltotal" id="tl-total"></span>
+      </div>
+      <p class="aside" id="tl-note"></p>
+    </div>
+  </section>
+
+</div>
+
+<script>
+(function () {
+  const N = 32;
+  const $ = (id) => document.getElementById(id);
+  const stage = $('stage');
+
+  // Deterministic script, so the narrative lands the same way every run.
+  // [offset, content] — content labels stand in for checksums.
+  const CYCLES = [
+    { writes: [[0,'a1f0'],[2,'3fa1'],[9,'5e2b'],[16,'a1f0']] },
+    { writes: [[1,'4b7c'],[9,'a1f0'],[25,'0f3e']] },
+    { writes: [[2,'dd51'],[18,'4b7c']] },
+    { writes: [] },
+  ];
+  const HUE = ['var(--c1)', 'var(--c2)', 'var(--c3)', 'var(--c4)'];
+
+  // The two knobs from the design. `full` is SyntheticFull - a point carries the
+  // entries its cycle changed plus the ones it carried forward, so every point is
+  // the whole layout. `dedup` decides whether a chunk is named by its contents and
+  // shared, or written into the point that wrote it.
+  const MODE = { full: false, dedup: false };
+  const pad4 = (n) => String(n).padStart(4, '0');
+  const keyAt = (o, seq) => pad4(seq) + '/@' + o;
+  const objKey = (o, seq, h) => (MODE.dedup ? h : keyAt(o, seq));
+  const objWord = (k) => (MODE.dedup ? 'chunk' : 'object') + (k === 1 ? '' : 's');
+
+  // Durations. The two moves inside the source - application into the volume, and
+  // volume into the snapshot - are deliberately the slowest things here: they are
+  // the steps people asked to actually see happen rather than infer.
+  const T_WRITE = 1000, T_WRITE_GAP = 130;
+  const T_FIRE = 1100, T_FREEZE = 420, T_BORN = 820;
+  const T_SNAP = 1150, T_SNAP_GAP = 140;
+  const T_UP = 600, T_UP_GAP = 0;
+  const T_DOWN = 480;
+  const T_REF = 900, T_REF_GAP = 720;
+  const T_PROBE = 420, T_PROBE_GAP = 300;
+  const T_CHIP = 1400, T_BIN = 700;
+  const T_COPY = 460, T_COPY_GAP = 260;
+  const T_CHIP_GAP = 520;
+  const PRUNE = 2;            // how many points fall out of the window at once
+
+  // The schedule: a 5 minute interval, drawn as a bar that fills and fires. Writes
+  // take it to WRITE_MARK; the firing step runs the rest, and the snapshot is what
+  // the firing produces.
+  const SCHED_SEC = 300, WRITE_MARK = 0.72;
+  let clockRaf = null, clockPct = 0;
+
+  // Stepping back and scrubbing both work by replaying from the start with the
+  // animation suppressed, so every step has to be able to run instantly. `gen` is
+  // bumped on every rebuild so work deferred by a step that has since been rewound
+  // does not land on the new state.
+  let INSTANT = false;
+  const EP = { main: 0, chunk: 0 };
+
+  // The speed control is a rate: it divides every duration on the page, including
+  // the packet flights, not only the pause between steps.
+  const GAP = 900;
+  const rate = () => +$('spd').value / 100;
+  const scale = (ms) => Math.round(ms / rate());
+
+  const after = (ms, fn, key) => {
+    if (INSTANT) return fn();
+    const k = key || 'main';
+    const g = EP[k];
+    setTimeout(() => { if (g === EP[k]) fn(); }, scale(ms));
+  };
+
+  // refs[hash] = the snapshots that name this chunk, in the order they named it.
+  // A stored chunk is striped with their colours: that set is exactly what makes it
+  // unsafe to delete.
+  // layouts[] = the retained points, oldest first, each with the set of chunks its
+  // layout lists. A chunk no surviving layout lists is what the collector is after.
+  // savedBy[hash] = the point whose layout kept this chunk alive when its last
+  // reference went. When that point is itself collected, the chunk is decided again.
+  let src, dst, store, refs, layouts, srcHist, dstHist, binCount, savedBy, probed, timer, running;
+  let steps = [], pos = 0, chapters = [];
+  let srcNodes, dstNodes;
+
+  // While an offset waits on its fetch it shows neither the old nor the new colour.
+  function clearDstBands(o) {
+    dstNodes[o].style.background = '';
+    dstNodes[o].style.setProperty('--c', '');
+    dstNodes[o].textContent = '';
+    dstNodes[o].title = '';
+  }
+
+  function cells(host) {
+    host.innerHTML = '';
+    for (let i = 0; i < N; i++) {
+      const d = document.createElement('div');
+      d.className = 'cell';
+      host.appendChild(d);
+    }
+    return [...host.children];
+  }
+
+  // One band per referencing point, as hard stops.
+  function bandCss(cols, deg) {
+    if (cols.length === 1) return cols[0];
+    return `linear-gradient(${deg}deg, ` + cols.map((c, i) =>
+      `${c} ${(100 * i / cols.length).toFixed(2)}% ${(100 * (i + 1) / cols.length).toFixed(2)}%`
+    ).join(', ') + ')';
+  }
+
+  // A store tile is banded by the points whose delta uploaded it - that is the
+  // reference set the collector consults.
+  function paintChunk(h) {
+    const tile = chunkNode(h);
+    const cols = (refs[h] || []).map((r) => r.col);
+    if (tile && cols.length) {
+      tile.style.background = bandCss(cols, 100);
+      tile.title = 'uploaded by point ' + refs[h].map((r) => r.seq).join(', point ');
+    }
+  }
+
+  // Either volume's cluster is banded by every snapshot that wrote that offset,
+  // newest last. It is the offset's history, not the chunk's - which is why the two
+  // volumes look identical once they are in sync.
+  function paintCell(nodes, hist, o) {
+    const cell = nodes[o];
+    const seen = hist[o] || [];
+    cell.style.background = seen.length ? bandCss(seen.map((x) => x.col), 135) : '';
+    cell.title = seen.length
+      ? (cell.textContent ? cell.textContent + ' . ' : '')
+        + 'written by snapshot ' + seen.map((x) => x.seq).join(', ')
+      : '';
+  }
+  const paintSrc = (o) => paintCell(srcNodes, srcHist, o);
+  const paintDst = (o) => paintCell(dstNodes, dstHist, o);
+
+  function chunkNode(hash) {
+    return [...$('chunks').children].find((c) => c.dataset.hash === hash);
+  }
+
+  // Animate a labelled packet between two elements. `onArrive` is what makes the
+  // destination appear on landing rather than before the packet sets off.
+  function fly(fromEl, toEl, label, o) {
+    o = o || {};
+    if (INSTANT) { if (o.onArrive) o.onArrive(); return; }
+    const ek = o.epoch || 'main';
+    const g = EP[ek];
+    const host = o.stage || stage;
+    const s = host.getBoundingClientRect();
+    const a = fromEl.getBoundingClientRect();
+    const b = toEl.getBoundingClientRect();
+    const ms = scale(o.ms || 620), delay = scale(o.delay || 0);
+    const el = document.createElement('div');
+    el.className = 'fly';
+    el.textContent = label;
+    if (o.color) el.style.setProperty('--c', o.color);
+    el.style.setProperty('--ms', ms + 'ms');
+    el.style.left = (a.left - s.left + a.width / 2) + 'px';
+    el.style.top = (a.top - s.top + a.height / 2 - 9) + 'px';
+    el.style.transform = 'translate(-50%,0)';
+    el.style.opacity = '0';
+    host.appendChild(el);
+    const dx = (b.left - a.left) + (b.width - a.width) / 2;
+    const dy = (b.top - a.top) + (b.height - a.height) / 2;
+    setTimeout(() => {
+      if (g !== EP[ek]) { el.remove(); return; }
+      el.style.opacity = '1';
+      requestAnimationFrame(() => {
+        el.style.transform = `translate(calc(-50% + ${dx}px), ${dy}px)`;
+      });
+      setTimeout(() => {
+        if (g !== EP[ek]) { el.remove(); return; }
+        if (o.onArrive) o.onArrive();
+        el.style.opacity = '0';
+        setTimeout(() => el.remove(), 320);
+      }, ms);
+    }, delay);
+  }
+
+  // One snapshot layer. Cells start empty and fill as clusters land in them.
+  function snapRow(n, count, defer) {
+    const row = document.createElement('div');
+    row.className = 'snaprow';
+    row.dataset.seq = n;
+    const lbl = document.createElement('span');
+    lbl.className = 'lbl'; lbl.textContent = 'snap ' + n;
+    row.appendChild(lbl);
+    if (count === 0) {
+      const none = document.createElement('span');
+      none.className = 'none'; none.textContent = 'nothing allocated';
+      row.appendChild(none);
+    } else {
+      const own = document.createElement('span');
+      own.className = 'own';
+      for (let i = 0; i < N; i++) own.appendChild(document.createElement('i'));
+      row.appendChild(own);
+    }
+    $('snaps').appendChild(row);
+    // Deferred rows hold their slot in the layout invisibly, so the packet the
+    // schedule throws has somewhere to land and the row appears when it arrives.
+    if (!defer) { if (INSTANT) row.classList.add('in'); else requestAnimationFrame(() => row.classList.add('in')); }
+    return row;
+  }
+  function snapCell(n, off) {
+    const row = [...$('snaps').children].find((r) => r.dataset.seq === String(n));
+    const own = row && row.querySelector('.own');
+    return own ? own.children[off] : row;
+  }
+
+  const mmss = (sec) => Math.floor(sec / 60) + ':' + String(Math.floor(sec % 60)).padStart(2, '0');
+
+  function setClock(pct) {
+    clockPct = pct;
+    $('sched-fill').style.width = (pct * 100).toFixed(1) + '%';
+    $('sched-clk').textContent = mmss(pct * SCHED_SEC) + ' / ' + mmss(SCHED_SEC);
+  }
+
+  // Advance the schedule to `to` over `ms`, then call `done`. Driven by rAF so it
+  // reads as time passing rather than as a bar jumping to a new value.
+  function runClock(to, ms, done) { // eslint-disable-line no-param-reassign
+    if (clockRaf) cancelAnimationFrame(clockRaf);
+    if (INSTANT) { setClock(to); if (done) done(); return; }
+    ms = scale(ms);
+    const from = clockPct;
+    let t0 = null;
+    const frame = (t) => {
+      if (t0 === null) t0 = t;
+      const k = ms <= 0 ? 1 : Math.min(1, (t - t0) / ms);
+      setClock(from + (to - from) * k);
+      if (k < 1) clockRaf = requestAnimationFrame(frame);
+      else { clockRaf = null; if (done) done(); }
+    };
+    clockRaf = requestAnimationFrame(frame);
+  }
+
+  // The interval elapses and a snapshot is taken: the same step, because the second
+  // is caused by the first. The clock then restarts - the upload and the fetch that
+  // follow all happen inside the next interval.
+  function fireSchedule(n, count, label, col) {
+    const sched = $('sched');
+    runClock(1, T_FIRE, () => {
+      sched.classList.add('firing');
+      // The instant itself: the volume's own layer stops accepting writes.
+      $('src').classList.add('frozen');
+      const row = snapRow(n + 1, count, true);
+      fly(sched, row, 'snapshot ' + (n + 1), {
+        ms: T_BORN, delay: T_FREEZE, color: col,
+        onArrive: () => {
+          row.classList.add('in', 'born');
+          pin('src', label, true);
+          $('src').classList.remove('frozen');
+          sched.classList.remove('firing');
+          setClock(0);
+          after(1300, () => row.classList.remove('born'));
+        },
+      });
+    });
+    return T_FIRE + T_FREEZE + T_BORN + 300;
+  }
+
+  // Every step changes this text, and on a step that changes nothing else it is the
+  // only thing that happens - so the box flashes, and `reading` marks the steps where
+  // the words are the whole point.
+  let lastSaid = '', lastReading = false;
+  function say(no, html, reading) {
+    lastReading = !!reading;
+    $('step-no').textContent = no;
+    $('step-txt').innerHTML = html;
+    lastSaid = $('step-txt').textContent || '';
+    const box = $('narrate');
+    box.classList.toggle('reading', !!reading);
+    box.classList.remove('flash');
+    if (INSTANT) return;
+    // force a reflow so re-adding the class restarts the transition
+    void box.offsetWidth;
+    box.classList.add('flash');
+    after(700, () => box.classList.remove('flash'));
+  }
+
+  // How long to leave a wall of text up, when the step itself asked for nothing.
+  const readMs = () => Math.min(3400, Math.max(1200, lastSaid.length * 20));
+
+  function pin(which, text, on) {
+    const el = $(which + '-pin');
+    el.classList.toggle('on', !!on);
+    el.lastElementChild.textContent = text;
+  }
+
+  // ---- build the step queue for one cycle -------------------------------
+  // Each step may return extra milliseconds to hold before the next one.
+  // `marks` collects chapter boundaries as offsets into this cycle's own step list;
+  // buildAll turns them into absolute positions.
+  function buildCycle(n, marks) {
+    const spec = CYCLES[n];
+    const tag = 'cycle ' + (n + 1);
+    const col = HUE[n % HUE.length];
+    const steps = [];
+    const mark = (label, sub) => marks && marks.push({ label, rel: steps.length, sub });
+
+    if (spec.writes.length === 0) {
+      mark('Idle cycle');
+      steps.push(() => {
+        $('app-io').textContent = 'idle';
+        runClock(WRITE_MARK, T_WRITE * 1.6);
+        say(tag, 'The application writes <b>nothing</b> this cycle. The schedule runs regardless.');
+        return T_WRITE * 1.6;
+      });
+      steps.push(() => {
+        say(tag, 'The interval elapses and the source <b>snapshots anyway</b> — the schedule does not know whether anything changed. The volume wrote nothing, so this snapshot <b>owns no clusters at all</b>.');
+        return fireSchedule(n, 0, 'snapshot ' + (n + 1) + ' — owns nothing', col);
+      });
+      steps.push(() => say(tag, 'Its own layer is empty, so there is <b>nothing to read and nothing to upload</b>. No cluster moves, no object is written.', true));
+      steps.push(() => say(tag, 'No point is committed either: it would be a copy of the one before it, entry for entry. <b>An idle cycle costs nothing</b> — not a byte of transfer, not an object in the store, not a row in the retained list.', true));
+      steps.push(() => {
+        $('dst-tag').textContent = 'in sync';
+        say(tag, 'The destination sees the head unmoved and does nothing either. It was already at point 3, and point 3 is still the newest, so there is nothing to fetch and nothing to apply.', true);
+      });
+      return steps;
+    }
+
+    const changed = spec.writes.map(([o]) => o);
+
+    // 1. the application writes: one packet per cluster, into the volume's own layer
+    mark('Cycle ' + (n + 1));
+    steps.push(() => {
+      const app = $('app');
+      app.style.setProperty('--c', col);
+      app.classList.add('busy');
+      $('app-io').textContent = 'writing ' + changed.length + ' x 4 MiB';
+      $('dst-tag').textContent = 'behind';
+      runClock(WRITE_MARK, T_WRITE + changed.length * T_WRITE_GAP);
+      let landed = 0;
+      spec.writes.forEach(([o, h], k) => {
+        fly(app, srcNodes[o], '@' + o, {
+          ms: T_WRITE, delay: k * T_WRITE_GAP, color: col,
+          onArrive: () => {
+            src[o] = h;
+            srcHist[o] = (srcHist[o] || []).concat({ seq: n + 1, col });
+            srcNodes[o].style.setProperty('--c', col);
+            srcNodes[o].textContent = h;
+            srcNodes[o].title = 'offset ' + o + ' holds ' + h;
+            srcNodes[o].classList.add('has', 'fresh', 'pop');
+            paintSrc(o);
+            after(300, () => srcNodes[o].classList.remove('pop'));
+            landed++;
+            $('src-meta').textContent = landed + ' cluster' + (landed === 1 ? '' : 's') + ' in the volume layer';
+            if (landed === changed.length) {
+              app.classList.remove('busy');
+              $('app-io').textContent = 'idle';
+            }
+          },
+        });
+      });
+      say(tag, `The application writes <b>${changed.length} clusters</b> while the interval runs. Each one is allocated in the volume's own layer as it lands. Every cycle has its own colour, so you can see whose data is whose.`);
+      return T_WRITE + changed.length * T_WRITE_GAP;
+    });
+
+    // 2. the interval elapses, and that is what takes the snapshot
+    steps.push(() => {
+      say(tag, `Five minutes after the last one, <b>the schedule fires</b>. The volume's own layer is frozen at that instant — the outline — and the firing <b>creates snapshot ${n + 1}</b>, which arrives empty; the clusters move into it next. Anything written from here belongs to the following cycle, so the clock restarts straight away: the upload and the fetch below all happen inside that next interval.`);
+      return fireSchedule(n, changed.length, 'snapshot ' + (n + 1) + ' taken', col);
+    });
+
+    // 3. the snapshot takes ownership — slow, staggered, one cluster at a time
+    steps.push(() => {
+      let left = changed.length;
+      changed.forEach((o, k) => {
+        fly(srcNodes[o], snapCell(n + 1, o), '@' + o, {
+          ms: T_SNAP, delay: k * T_SNAP_GAP, color: col,
+          onArrive: () => {
+            const c = snapCell(n + 1, o);
+            c.style.setProperty('--c', col);
+            c.classList.add('held');
+            srcNodes[o].classList.remove('fresh');
+            left--;
+            $('src-meta').textContent = left + ' in the volume layer, '
+              + (changed.length - left) + ' one layer down';
+          },
+        });
+      });
+      const before = CYCLES.slice(0, n).flatMap((c) => c.writes.map(([o]) => o));
+      const again = changed.filter((o) => before.includes(o));
+      const extra = again.length
+        ? ` Offset${again.length > 1 ? 's' : ''} ${again.join(', ')} w${again.length > 1 ? 'ere' : 'as'} written before, so the older snapshot <b>still holds its own version</b> — that is what a retained snapshot costs a thin pool.`
+        : '';
+      say(tag, `A snapshot is taken, and the clusters move out of the volume and into it. The volume is a thin clone again with an <b>empty layer of its own</b>; reading those offsets still returns the same bytes, one layer down.` + extra);
+      return T_SNAP + changed.length * T_SNAP_GAP;
+    });
+
+    // 4. the cycle reads that layer, and only that layer
+    steps.push(() => {
+      changed.forEach((o) => snapCell(n + 1, o).classList.add('reading'));
+      say(tag, `The cycle reads <b>snapshot ${n + 1}'s own layer</b> and nothing else. That layer <i>is</i> the delta against its parent, which is why a cycle costs what changed rather than what the volume holds. Nothing has been hashed yet — that happens as each cluster is read.`);
+    });
+
+    // 5. each cluster travels to the store, or is found already there
+    mark('C' + (n + 1) + ' upload', true);
+    spec.writes.forEach(([o, h]) => {
+      steps.push(() => {
+        const key = objKey(o, n + 1, h);
+        if (MODE.dedup && store.has(key)) {
+          const node = chunkNode(key);
+          node.classList.add('hit');
+          after(800, () => node.classList.remove('hit'));
+          const already = refs[key].some((r) => r.seq === n + 1);
+          if (!already) { refs[key].push({ seq: n + 1, col }); paintChunk(key); }
+          const whose = already
+            ? `uploaded moments ago by this same snapshot. Nothing is transferred, and the stored chunk stays one colour: one snapshot names it, twice`
+            : `already there from an earlier cycle. Nothing is transferred — but <b>snapshot ${n + 1} now names it too</b>, so the stored chunk takes on a band of its colour alongside the earlier one`;
+          say(tag, `Offset ${o} hashes to <code>${h}</code>, which the store <b>already holds</b> — ${whose}.`);
+          return { hold: 380, gapScale: 0.5 };
+        }
+        store.add(key); refs[key] = [{ seq: n + 1, col }];
+        // The tile is laid out but invisible, so the packet has somewhere to land.
+        const tile = document.createElement('div');
+        tile.className = 'chunk pending';
+        tile.dataset.hash = key;
+        tile.textContent = MODE.dedup ? h : key;
+        tile.style.setProperty('--c', col);
+        if (!MODE.dedup) tile.title = 'contents ' + h;
+        $('chunks').appendChild(tile);
+        fly(snapCell(n + 1, o), tile, MODE.dedup ? h : key, {
+          ms: T_UP, color: col,
+          onArrive: () => {
+            tile.classList.remove('pending');
+            paintChunk(key);
+            $('store-tag').textContent = store.size + ' ' + objWord(store.size);
+          },
+        });
+        const dupe = !MODE.dedup && spec.writes.some(([o2, h2]) => h2 === h && o2 < o);
+        say(tag, MODE.dedup
+          ? `Offset ${o} hashes to <code>${h}</code>. Not present, so the cluster is <b>uploaded</b>, under its own hash.`
+          : `Offset ${o} is written <b>into the point itself</b>, as <code>${key}</code> — named by where it sits, not by what it contains. With dedup off the store is never consulted first.`
+            + (dupe ? ` These are the same bytes an earlier offset already stored, <b>and they are stored again</b>: that is what dedup buys.` : ''));
+        return { hold: T_UP, gapScale: 0.16 };
+      });
+    });
+
+    // 5b. Under SyntheticFull with nothing shared, the entries this cycle did not
+    //     change still have to exist under this point's own prefix - so they are
+    //     copied, object to object, inside the store. This is the full physical copy
+    //     per point that the design excludes the combination for.
+    const allocatedOffs = [];
+    CYCLES.slice(0, n + 1).forEach((c) => c.writes.forEach(([o]) => {
+      if (!allocatedOffs.includes(o)) allocatedOffs.push(o);
+    }));
+    const carriedOffs = allocatedOffs.filter((o) => !changed.includes(o)).sort((a, b) => a - b);
+    if (MODE.full && !MODE.dedup && carriedOffs.length) {
+      steps.push(() => {
+        carriedOffs.forEach((o, k) => {
+          const key = keyAt(o, n + 1);
+          const from = chunkNode(keyAt(o, n)) || $('chunks');
+          store.add(key); refs[key] = [{ seq: n + 1, col }];
+          const tile = document.createElement('div');
+          tile.className = 'chunk pending';
+          tile.dataset.hash = key;
+          tile.textContent = key;
+          tile.style.setProperty('--c', col);
+          tile.title = 'copied forward from ' + keyAt(o, n);
+          $('chunks').appendChild(tile);
+          fly(from, tile, key, {
+            ms: T_COPY, delay: k * T_COPY_GAP, color: col,
+            onArrive: () => {
+              tile.classList.remove('pending');
+              paintChunk(key);
+              $('store-tag').textContent = store.size + ' ' + objWord(store.size);
+            },
+          });
+        });
+        say(tag, `The other <b>${carriedOffs.length} entries</b> did not change — but with nothing shared they must still exist under <code>${pad4(n + 1)}/</code>, so they are <b>copied inside the store</b>, object by object. Nothing is read from the volume, and nothing new is learnt: this is the full physical copy per point.`);
+        return { hold: T_COPY + carriedOffs.length * T_COPY_GAP + 300, gapScale: 0.6 };
+      });
+    }
+
+    // 6. commit
+    steps.push(() => {
+      changed.forEach((o) => snapCell(n + 1, o).classList.remove('reading'));
+      const allocated = src.filter((v) => v !== null).length;
+      const entries = MODE.full ? allocated : changed.length;
+      layouts.push({
+        seq: n + 1,
+        set: MODE.full
+          ? (MODE.dedup
+              ? new Set(src.filter((v) => v !== null))
+              : new Set(src.map((v, o) => (v === null ? null : keyAt(o, n + 1))).filter(Boolean)))
+          : new Set(changed.map((o) => objKey(o, n + 1, src[o]))),
+      });
+      const none = $('chips').querySelector('.none');
+      if (none) none.remove();
+      const chip = document.createElement('span');
+      chip.className = 'chip'; chip.dataset.seq = n + 1;
+      chip.textContent = String(n + 1).padStart(4, '0');
+      chip.style.setProperty('--c', col);
+      chip.title = entries + ' entries';
+      $('chips').appendChild(chip);
+      $('point-lbl').textContent = `pits/${String(n + 1).padStart(16, '0')} — ${entries} entries`
+        + (MODE.full ? `, ${changed.length} changed` : ' (this cycle only)');
+      $('bar-ch').style.width = (100 * changed.length / entries) + '%';
+      $('bar-fu').style.width = (100 * (entries - changed.length) / entries) + '%';
+      say(tag, !MODE.full
+        ? `Point ${n + 1} is committed: <b>${changed.length} entries</b> — only what this cycle changed, and nothing carried forward. There is no base anywhere in the store, so the points are a <b>window of history</b> rather than a copy of the volume.`
+        : allocated === changed.length
+          ? `Point ${n + 1} is committed: <b>${allocated} entries</b>, all of them new — there is no earlier point to carry anything forward from. It still describes the <b>whole volume</b>, because that is all the volume holds.`
+          : `Point ${n + 1} is committed: <b>${allocated} entries</b>, of which ${changed.length} changed and ${allocated - changed.length} are carried forward from the point before. Either way it describes the <b>whole volume</b>.`);
+    });
+
+    // 7. the destination joins and marks what differs
+    mark('C' + (n + 1) + ' fetch', true);
+    steps.push(() => {
+      changed.forEach((o) => { dstNodes[o].classList.add('target'); clearDstBands(o); });
+      say(tag, 'The destination joins its own point against this one. Offsets whose checksum agrees are <b>already correct and never touched</b>.');
+    });
+
+    // 8. each chunk travels back down, and the cell fills when it lands
+    spec.writes.forEach(([o, h]) => {
+      steps.push(() => {
+        const key = objKey(o, n + 1, h);
+        const node = chunkNode(key);
+        fly(node, dstNodes[o], MODE.dedup ? h : key, {
+          ms: T_DOWN, color: col,
+          onArrive: () => {
+            dst[o] = h;
+            dstHist[o] = (dstHist[o] || []).concat({ seq: n + 1, col });
+            dstNodes[o].style.setProperty('--c', col);
+            // the volume holds bytes whatever the store calls them, so the cluster
+            // is named by its contents in every mode
+            dstNodes[o].textContent = h;
+            dstNodes[o].classList.add('has');
+            dstNodes[o].classList.remove('target');
+            paintDst(o);
+            $('dst-meta').textContent = dst.filter((v) => v !== null).length + ' clusters held';
+          },
+        });
+        const first = refs[key] && refs[key][0];
+        const older = first && first.seq !== n + 1;
+        say(tag, `Fetches <code>${MODE.dedup ? h : key}</code> and writes it at offset ${o}.`
+          + (older ? ` The object was uploaded by point ${first.seq} and never re-sent — only this point's reference to it is new.` : ''));
+        return { hold: T_DOWN, gapScale: 0.12 };
+      });
+    });
+
+    // 9. applied
+    steps.push(() => {
+      changed.forEach((o) => dstNodes[o].classList.remove('target'));
+      pin('dst', 'snapshot ' + (n + 1), true);
+      $('dst-tag').textContent = 'in sync';
+      say(tag, `Applied. The destination pins its own snapshot, and <b>that snapshot is its position</b> — the same fact as the data it describes.`);
+    });
+
+    return steps;
+  }
+
+  function blank() {
+    clearTimeout(timer);
+    EP.main++;
+    src = Array(N).fill(null); dst = Array(N).fill(null);
+    store = new Set(); refs = {}; layouts = []; srcHist = Array(N).fill(null); dstHist = Array(N).fill(null);
+    binCount = 0; savedBy = {}; probed = 0; $('bin-n').textContent = '0'; $('bin').classList.remove('bump');
+    $('chips').innerHTML = '<span class="none">none yet</span>';
+    srcNodes = cells($('src'));
+    dstNodes = cells($('dst'));
+    $('chunks').innerHTML = '';
+    $('snaps').innerHTML = '';
+    $('store-tag').textContent = '0 ' + objWord(0);
+    $('src-meta').innerHTML = '&nbsp;'; $('dst-meta').innerHTML = '&nbsp;';
+    $('point-lbl').textContent = 'no point committed';
+    $('bar-ch').style.width = '0%'; $('bar-fu').style.width = '0%';
+    $('dst-tag').textContent = 'behind';
+    pin('src', 'no snapshot', false); pin('dst', 'no snapshot', false);
+    $('app').classList.remove('busy'); $('app-io').textContent = 'idle';
+    $('coll').classList.remove('busy'); $('coll-io').textContent = 'idle';
+    $('store').classList.remove('collecting');
+    $('phase').classList.remove('on'); $('phase-sub').textContent = '';
+    $('coll-pit').innerHTML = '';
+    if (clockRaf) { cancelAnimationFrame(clockRaf); clockRaf = null; }
+    $('sched').classList.remove('firing'); setClock(0);
+    $('src').classList.remove('frozen');
+    [...stage.querySelectorAll('.fly')].forEach((e) => e.remove());
+  }
+
+  // ---- retention, then collection ---------------------------------------
+  // The oldest point passes the ttl and is pruned. Chunks it named lose that
+  // reference; the ones left with none are candidates, and only the ones no
+  // surviving layout lists either are actually deleted.
+  // Replay the script with no DOM, so the collection's shape is known before any
+  // step has run. Stepping back needs the step list to exist up front.
+  function planGc() {
+    const s2 = Array(N).fill(null), st = new Set(), rf = {}, ly = [];
+    CYCLES.forEach((spec, n) => {
+      if (!spec.writes.length) return;
+      spec.writes.forEach(([o, h]) => { s2[o] = h; });
+      spec.writes.forEach(([o, h]) => {
+        const k = objKey(o, n + 1, h);
+        if (st.has(k)) { if (!rf[k].includes(n + 1)) rf[k].push(n + 1); }
+        else { st.add(k); rf[k] = [n + 1]; }
+      });
+      ly.push({
+        seq: n + 1,
+        set: MODE.full
+          ? (MODE.dedup
+              ? new Set(s2.filter((v) => v !== null))
+              : new Set(s2.map((v, o) => (v === null ? null : keyAt(o, n + 1))).filter(Boolean)))
+          : new Set(spec.writes.map(([o, h]) => objKey(o, n + 1, h))),
+      });
+    });
+    const goneSeqs = ly.slice(0, PRUNE).map((l) => l.seq);
+    // One round per expiring point. `work` is that point's whole entry list;
+    // `withdraw` is the part of it the point actually uploaded, which under
+    // SyntheticFull is smaller - the rest it only carried.
+    const rounds = goneSeqs.map((q) => {
+      const mine = ly.find((l) => l.seq === q);
+      const work = [...mine.set];
+      const withdraw = work.filter((h) => rf[h] && rf[h].includes(q));
+      return {
+        seq: q,
+        work,
+        withdraw,
+        // rounds run oldest first, so anything with no reference beyond this point
+        // is left hollow by this round
+        dies: withdraw.filter((h) => !rf[h].some((x) => x > q)),
+        live: ly.filter((l) => l.seq > q).map((l) => l.seq),
+      };
+    });
+    return { goneSeqs, rounds };
+  }
+
+  // ---- retention, then collection, one expiring point at a time ----------
+  // Each point is handed over on its own, its references withdrawn, and its entry
+  // list walked against whatever is still retained. Doing them one at a time is
+  // what makes the fallback legible: point 0002 saves 3fa1 in the first round, and
+  // losing point 0002 is what kills it in the second.
+  function buildGc() {
+    const steps = [];
+    const { goneSeqs, rounds } = planGc();
+
+    rounds.forEach((rd, ri) => {
+      const pid = pad4(rd.seq);
+      const pcol = HUE[(rd.seq - 1) % HUE.length];
+
+      // 1. this point passes the ttl and is handed to the collector
+      steps.push(() => {
+        $('phase').classList.add('on');
+        $('phase-sub').textContent = 'point ' + pid + '  .  round ' + (ri + 1)
+          + ' of ' + rounds.length;
+        $('coll').style.setProperty('--c', 'var(--flag)');
+        $('coll').classList.add('busy');
+        $('store').classList.add('collecting');
+        $('coll-io').textContent = 'taking ' + pid;
+        // every point the collector has taken stays in its hands, struck through;
+        // only the one being worked on is ringed
+        [...$('coll-pit').children].forEach((c) => c.classList.remove('active'));
+        const chip = [...$('chips').children].find((c) => c.dataset.seq === String(rd.seq));
+        if (chip) {
+          chip.classList.add('stale');
+          fly(chip, $('coll-pit'), pid, {
+            ms: T_CHIP, delay: 320, color: 'var(--flag)',
+            onArrive: () => {
+              chip.remove();
+              const held = document.createElement('span');
+              held.className = 'chip stale active';
+              held.dataset.seq = rd.seq;
+              held.textContent = pid;
+              held.title = 'pruned - being collected';
+              held.style.setProperty('--c', pcol);
+              $('coll-pit').appendChild(held);
+            },
+          });
+        }
+        const atRisk = rd.work.filter((h) => savedBy[h] === rd.seq && chunkNode(h));
+        rd.work.forEach((h) => {
+          const t = chunkNode(h);
+          if (t) t.classList.add(savedBy[h] === rd.seq ? 'atrisk' : 'watch');
+        });
+        say('gc', ri === 0
+          ? `The store keeps the last <b>ttl</b> of history, not all of it, and point <code>${pid}</code> has passed it. It is <b>struck off the retained list and handed to the garbage collector</b>, which takes <b>one expired point at a time</b>. Its entry list — the <b>${rd.work.length} ${objWord(rd.work.length)}</b> now outlined — is the whole of this round's work. The <i>local</i> snapshot is untouched: what expires here is the point in the store.`
+          : `That round is done. Point <code>${pid}</code> has passed the <b>ttl</b> as well, so it is handed over in its turn — <b>${rd.work.length} ${objWord(rd.work.length)}</b> in its entry list, and only <code>${pad4(rd.live[0])}</code> left to answer for them.`
+            + (atRisk.length
+              ? ` <code>${atRisk.join('</code>, <code>')}</code> ${atRisk.length === 1 ? 'is still in the store only because' : 'are still in the store only because'} <code>${pid}</code> listed ${atRisk.length === 1 ? 'it' : 'them'} — that is what spared ${atRisk.length === 1 ? 'it' : 'them'} last round, and it is about to go. ${atRisk.length === 1 ? 'It is ringed' : 'They are ringed'} solid.`
+              : ''));
+        return { hold: T_CHIP + 800, gapScale: 1 };
+      });
+
+      if (MODE.dedup && !MODE.full) {
+
+      // 2''. IncrementalOnly: no point lists anything it did not upload, so a
+      //      reference is the whole truth. A chunk follows its last one to the bin
+      //      in the same movement - there is nothing left to ask.
+      // 2''a. every reference this point placed comes off first, so the full effect
+      //       of losing it is on screen before anything is removed
+      steps.push(() => {
+        layouts.shift();
+        $('coll-io').textContent = 'withdrawing ' + rd.withdraw.length;
+        rd.withdraw.forEach((h, k) => {
+          const tile = chunkNode(h);
+          const held = [...$('coll-pit').children].find((c) => c.dataset.seq === String(rd.seq));
+          fly(tile || $('chunks'), held || $('coll'), pid, {
+            ms: T_REF, delay: k * T_REF_GAP, color: pcol,
+            onArrive: () => {
+              refs[h] = (refs[h] || []).filter((r) => r.seq !== rd.seq);
+              if (!tile) return;
+              tile.classList.remove('watch', 'atrisk');
+              tile.classList.add('losing');
+              after(620, () => tile.classList.remove('losing'));
+              if (refs[h].length) { paintChunk(h); return; }
+              tile.style.background = '';
+              tile.classList.add('orphan');
+              tile.title = 'no reference left';
+            },
+          });
+        });
+        const lives = rd.withdraw.filter((h) => !rd.dies.includes(h));
+        say('gc', `Point <code>${pid}</code>'s <b>${rd.withdraw.length} references</b> are withdrawn, one at a time, and that is all that happens in this step. <b>${rd.dies.length}</b> of them — <code>${rd.dies.join('</code>, <code>')}</code> — ${rd.dies.length === 1 ? 'is' : 'are'} left <b>hollow</b>, with no reference at all`
+          + (lives.length ? `, while <code>${lives.join('</code>, <code>')}</code> still ${lives.length === 1 ? 'carries a band from a point that is staying' : 'carry bands from points that are staying'}.` : '.'));
+        return { hold: T_REF + rd.withdraw.length * T_REF_GAP + 700, gapScale: 1 };
+      });
+
+      // 2''b. only now do the hollow ones move
+      steps.push(() => {
+        $('coll-io').textContent = 'reclaiming ' + rd.dies.length;
+        rd.dies.forEach((h, k) => {
+          const tile = chunkNode(h);
+          if (!tile) return;
+          tile.classList.add('doomed');
+          after(260 + k * 300, () => {
+            fly(tile, $('bin'), h, {
+              ms: T_BIN, color: 'var(--flag)',
+              onArrive: () => {
+                tile.remove(); store.delete(h); delete refs[h];
+                binCount++;
+                $('bin-n').textContent = String(binCount);
+                $('bin').classList.add('bump');
+                after(600, () => $('bin').classList.remove('bump'));
+                $('store-tag').textContent = store.size + ' ' + objWord(store.size);
+              },
+            });
+            tile.classList.add('swept');
+          });
+        });
+        say('gc', `Now the hollow ones go. In this format a point lists nothing it did not upload, so <b>a reference is the whole truth</b> — there is no layout anywhere that could still be naming them, and nothing to ask. <b>${rd.dies.length} ${objWord(rd.dies.length)}</b> straight to the bin.`);
+        return { hold: 260 + rd.dies.length * 300 + T_BIN + 600, gapScale: 1 };
+      });
+
+      } else if (MODE.dedup) {
+
+      // 2. SyntheticFull: the references come off, but a point can still list a
+      //    chunk it never uploaded, so losing them all decides nothing yet
+      steps.push(() => {
+        layouts.shift();
+        $('coll-io').textContent = 'withdrawing ' + rd.withdraw.length;
+        rd.withdraw.forEach((h, k) => {
+          const tile = chunkNode(h);
+          const held = [...$('coll-pit').children].find((c) => c.dataset.seq === String(rd.seq));
+          fly(tile || $('chunks'), held || $('coll'), pid, {
+            ms: T_REF, delay: k * T_REF_GAP, color: pcol,
+            onArrive: () => {
+              refs[h] = (refs[h] || []).filter((r) => r.seq !== rd.seq);
+              if (tile) {
+                tile.classList.add('losing');
+                after(620, () => tile.classList.remove('losing'));
+              }
+              if (refs[h].length) paintChunk(h);
+              else if (tile) {
+                tile.style.background = '';
+                tile.classList.remove('carried');
+                tile.classList.add('orphan');
+                tile.title = 'no surviving point names it';
+              }
+            },
+          });
+        });
+        const carriedOnly = rd.work.filter((h) => !rd.withdraw.includes(h));
+        say('gc', `Point <code>${pid}</code> <b>uploaded ${rd.withdraw.length}</b> of them, so ${rd.withdraw.length === 1 ? 'that one reference travels' : 'those references travel'} back to the scratched point and the ${rd.withdraw.length === 1 ? 'band disappears' : 'bands disappear'}.`
+          + (carriedOnly.length
+            ? ` <code>${carriedOnly.join('</code>, <code>')}</code> ${carriedOnly.length === 1 ? 'is' : 'are'} in its list but ${carriedOnly.length === 1 ? 'was' : 'were'} never uploaded by it — only carried — so ${carriedOnly.length === 1 ? 'it has' : 'they have'} nothing to give back. A chunk drawn <b>hollow</b> has no reference left, which is still not grounds to delete it.`
+            : ` Anything left <b>hollow</b> has no reference at all, which is still not grounds to delete it.`));
+        return { hold: T_REF + rd.withdraw.length * T_REF_GAP + 900, gapScale: 1 };
+      });
+
+      // 3. walk this point's entry list against what is still retained
+      rd.work.forEach((h, k) => {
+        steps.push(() => {
+          const tile = chunkNode(h);
+          if (tile) { tile.classList.remove('watch', 'atrisk'); tile.classList.add('inspect'); }
+          $('coll-io').textContent = (k + 1) + ' / ' + rd.work.length;
+          $('phase-sub').textContent = 'point ' + pid + '  .  ' + (k + 1)
+            + ' of ' + rd.work.length + '  .  ' + h;
+
+          const chips = [...$('chips').children].filter((c) => c.dataset.seq);
+          const byBand = refs[h] && refs[h].length ? refs[h][0].seq : null;
+          const byLayout = (layouts.find((l) => l.set.has(h)) || {}).seq || null;
+          const holder = byBand || byLayout;
+
+          // A surviving reference settles it on its own: the collector stops at the
+          // reference listing and never looks at a layout.
+          if (byBand) {
+            after(420, () => { if (tile) tile.classList.remove('inspect'); });
+            say('gc', `<b>${k + 1} of ${rd.work.length}</b> — <code>${h}</code> still carries point <code>${pad4(byBand)}</code>'s band. <b>A live reference ends the question</b>; no layout is consulted and nothing is asked. It stays.`);
+            return { hold: 620, gapScale: 0.4 };
+          }
+
+          probed++;
+          chips.forEach((chip, i) => {
+            fly(tile || $('chunks'), chip, h, {
+              ms: T_PROBE, delay: i * T_PROBE_GAP, color: 'var(--flag)',
+              onArrive: () => {
+                chip.classList.add('probe');
+                const says = (refs[h] || []).some((r) => String(r.seq) === chip.dataset.seq)
+                  || (layouts.find((l) => String(l.seq) === chip.dataset.seq) || { set: new Set() }).set.has(h);
+                if (says) chip.classList.add('holds');
+                after(900, () => chip.classList.remove('probe', 'holds'));
+              },
+            });
+          });
+
+          const settle = T_PROBE + chips.length * T_PROBE_GAP + 250;
+          after(settle, () => {
+            if (!tile) return;
+            tile.classList.remove('inspect');
+            if (holder) {
+              if (!refs[h] || !refs[h].length) {
+                tile.classList.remove('orphan');
+                tile.classList.add('carried');
+                tile.title = 'carried forward by point ' + holder;
+                savedBy[h] = holder;
+              } else {
+                delete savedBy[h];
+              }
+            } else {
+              tile.classList.add('doomed');
+              after(700, () => {
+                fly(tile, $('bin'), h, {
+                  ms: T_BIN, color: 'var(--flag)',
+                  onArrive: () => {
+                    tile.remove(); store.delete(h); delete refs[h];
+                    binCount++;
+                    $('bin-n').textContent = String(binCount);
+                    $('bin').classList.add('bump');
+                    after(600, () => $('bin').classList.remove('bump'));
+                    $('store-tag').textContent = store.size + ' ' + objWord(store.size);
+                  },
+                });
+                tile.classList.add('swept');
+              });
+            }
+          });
+
+          const verdict = byLayout
+            ? `point <code>${pad4(byLayout)}</code> <b>still lists it</b>, carried forward, so it stays — in the <i>carried</i> colour, because that layout is now the only thing holding it`
+            : `<b>nobody does</b>, so it is <b>deleted</b>`;
+          say('gc', `<b>${k + 1} of ${rd.work.length}</b> — <code>${h}</code> has <b>no reference left</b>, so this is the one case where the layouts have to be read. Asking each point that survives: ${verdict}.`);
+          return { hold: settle + (holder ? 500 : 700 + T_BIN + 400), gapScale: 0.55 };
+        });
+      });
+
+      } else {
+
+      // 2'. nothing is shared, so the point's objects go without being asked about
+      steps.push(() => {
+        layouts.shift();
+        $('coll-io').textContent = 'deleting ' + rd.work.length;
+        $('phase-sub').textContent = 'point ' + pid + '  .  '
+          + rd.work.length + ' objects, none shared';
+        rd.work.forEach((k, i) => {
+          const tile = chunkNode(k);
+          if (!tile) return;
+          tile.classList.remove('watch', 'atrisk');
+          tile.classList.add('doomed');
+          after(300 + i * 280, () => {
+            fly(tile, $('bin'), k, {
+              ms: T_BIN, color: 'var(--flag)',
+              onArrive: () => {
+                tile.remove(); store.delete(k); delete refs[k];
+                binCount++;
+                $('bin-n').textContent = String(binCount);
+                $('bin').classList.add('bump');
+                after(600, () => $('bin').classList.remove('bump'));
+                $('store-tag').textContent = store.size + ' ' + objWord(store.size);
+              },
+            });
+            tile.classList.add('swept');
+          });
+        });
+        say('gc', `With dedup off <b>nothing is shared</b>: every object belongs to exactly one point. So there is nothing to ask anybody — the <b>${rd.work.length} objects</b> point <code>${pid}</code> owned go straight to the bin. No references to withdraw, no layouts to consult.`);
+        return { hold: 300 + rd.work.length * 280 + T_BIN + 600, gapScale: 1 };
+      });
+
+      }
+    });
+
+    // the collector switches off again
+    steps.push(() => {
+      $('coll').classList.remove('busy');
+      $('coll-io').textContent = 'collected ' + goneSeqs.map(pad4).join(', ');
+      [...$('coll-pit').children].forEach((c) => c.classList.remove('active'));
+      $('store').classList.remove('collecting');
+      const examined = rounds.reduce((a, r) => a + r.work.length, 0);
+      $('phase-sub').textContent = examined + ' examined  .  ' + binCount + ' reclaimed';
+      after(1200, () => $('phase').classList.remove('on'));
+      say('gc', !MODE.dedup
+        ? `Both points are collected and <b>${binCount} objects reclaimed</b>, without a question being asked about any of them. This is what the mode buys: collection costs a delete per object and nothing else. What it costs instead is the duplicates you watched being uploaded.`
+        : MODE.full
+          ? `Both points are collected: <b>${examined} entries considered, ${probed} of them actually read against the layouts, ${binCount} reclaimed</b>. The other ${examined - probed} still had a live reference, which ends the question on its own. The work was proportional to the <b>points that expired</b>, not to the store — and the layout reads are the price of <code>full</code>: a chunk with no reference can still be in use.`
+          : `Both points are collected and <b>${binCount} chunks reclaimed</b>, and <b>nothing was examined at all</b> — withdrawing the last reference was itself the decision, because no point here lists a chunk it did not upload. That is the collection this format buys, against the per-chunk walk a synthetic full needs.`);
+      return { hold: 900, gapScale: 1 };
+    });
+    return steps;
+  }
+
+  // ---- the whole run as one addressable list of steps --------------------
+  function buildAll() {
+    const out = [];
+    chapters = [];
+    CYCLES.forEach((spec, n) => {
+      const marks = [];
+      const cycleSteps = buildCycle(n, marks);
+      const base = out.length;
+      marks.forEach((m) => chapters.push({ label: m.label, at: base + m.rel, sub: m.sub }));
+      cycleSteps.forEach((f) => out.push(f));
+    });
+    chapters.push({ label: 'Garbage collection', at: out.length, gc: true });
+    buildGc().forEach((f) => out.push(f));
+    out.push(() => say('done', 'Four cycles and one collection. The store holds <b>one object per distinct chunk</b>, every retained point describes the whole volume, the destination only ever fetched what differed, and the one chunk nothing could still ask for is gone.'));
+    return out;
+  }
+
+  function syncUi() {
+    $('pos').max = String(steps.length);
+    $('pos').value = String(pos);
+    $('pos-lbl').textContent = pos + ' / ' + steps.length;
+    // the chapter the slider points into: at its boundary it is already the one
+    // you are about to play, which is where its button sends you
+    let cur = -1;
+    chapters.forEach((ch, i) => { if (pos >= ch.at) cur = i; });
+    [...$('chapters').children].forEach((b, i) => b.classList.toggle('on', i === cur));
+    $('back').disabled = pos === 0;
+    $('step').disabled = pos >= steps.length;
+    $('run').textContent = running ? 'Pause' : 'Run';
+  }
+
+  // Jump anywhere by replaying from a clean state with the animation suppressed.
+  // Every step is written to be runnable instantly, which is what makes Back and the
+  // scrubber possible without recording an undo log.
+  function jumpTo(k) {
+    const target = Math.max(0, Math.min(k, steps.length));
+    clearTimeout(timer);
+    blank();
+    INSTANT = true;
+    for (let i = 0; i < target; i++) steps[i]();
+    INSTANT = false;
+    pos = target;
+    if (pos === 0) say('—', 'Press <b>Run</b> to start the first cycle.');
+    syncUi();
+  }
+
+  function advance() {
+    if (pos >= steps.length) { running = false; syncUi(); return null; }
+    const r = steps[pos]() || 0;
+    pos++;
+    syncUi();
+    if (typeof r === 'object') return r;
+    if (r) return { hold: r, gapScale: 1 };
+    return lastReading ? { hold: readMs(), gapScale: 0.4 } : { hold: 0, gapScale: 1 };
+  }
+
+  function tick() {
+    if (!running) return;
+    const r = advance();
+    if (!r) return;
+    timer = setTimeout(tick, scale(GAP * (r.gapScale == null ? 1 : r.gapScale) + r.hold));
+  }
+
+  $('run').onclick = () => {
+    if (pos >= steps.length) jumpTo(0);
+    running = !running;
+    syncUi();
+    if (running) tick(); else clearTimeout(timer);
+  };
+  $('step').onclick = () => {
+    running = false; clearTimeout(timer); syncUi();
+    advance();
+  };
+  $('back').onclick = () => {
+    running = false; clearTimeout(timer);
+    jumpTo(pos - 1);
+  };
+  $('replay').onclick = () => { running = false; jumpTo(0); };
+  $('spd').oninput = () => { $('spd-lbl').textContent = rate().toFixed(1) + 'x'; };
+  $('pos').oninput = () => {
+    running = false; clearTimeout(timer);
+    jumpTo(+$('pos').value);
+  };
+
+  const MODE_TEXT = () => MODE.full && !MODE.dedup
+    ? `<b>Synthetic full, no dedup</b> — <span class="kx">the combination the design excludes, shown so the cost is visible rather than asserted.</span> A standalone point names the whole volume, so with nothing shared every entry must exist under that point's own prefix: the entries a cycle did not change are <b>copied inside the store</b>, object to object, every cycle. Watch the object count against the other three. The OEP's figure is ten retained points of a 10&nbsp;TiB volume costing 100&nbsp;TiB. What it buys is the one thing the two incremental modes cannot do — restore to a past point — with collection still as trivial as deleting a prefix.`
+    : MODE.full
+    ? `<b>Synthetic full, deduplicated.</b> Every point describes the whole volume — the entries this cycle changed plus the ones it carried forward — assembled from the point before without re-reading the source. Chunks are named by their contents and shared, so a point costs what changed. Any point can be restored from on its own.`
+    : MODE.dedup
+      ? `<b>Incremental only, deduplicated.</b> A point carries only what its cycle changed, and there is no base anywhere in the store. The cheapest to keep, but the store holds the last <code>ttl</code> of <i>changes</i> rather than a copy: a destination that loses its position has to be given a base again. Collection gets simpler — a chunk no surviving point uploaded is gone, with no layout to fall back on.`
+      : `<b>Incremental only, no dedup.</b> Each cluster is written into the point that wrote it, named by where it sits rather than by what it contains. Identical bytes are stored more than once — watch cycle&nbsp;1 upload <code>a1f0</code> twice — but collection is trivial: deleting a point deletes everything it owns, with nothing to check.`;
+
+  function setMode(full, dedup) {
+    MODE.full = full; MODE.dedup = dedup;
+    $('fmt-full').classList.toggle('on', MODE.full);
+    $('fmt-inc').classList.toggle('on', !MODE.full);
+    $('dd-on').classList.toggle('on', MODE.dedup);
+    $('dd-off').classList.toggle('on', !MODE.dedup);
+    $('kdesc').innerHTML = MODE_TEXT();
+    $('phase-mode').textContent = (MODE.full ? 'synthetic full' : 'incremental only')
+      + '  .  dedup ' + (MODE.dedup ? 'on' : 'off');
+    $('note-dedup').innerHTML = MODE.dedup
+      ? `<h3>The name is the address</h3><p>A chunk is stored under the BLAKE3 digest of its contents, so identical bytes are one object. Watch cycle&nbsp;1: two offsets hold the same content and only one upload happens. Each stored chunk is striped with the colour of <em>every</em> point that uploaded it — that set is what a collector has to be certain of before it can delete anything.</p>`
+      : `<h3>The name is where it sits</h3><p>With dedup off an object is <code>0001/@0</code>: the point that wrote it, and the offset. Nothing is shared, so cycle&nbsp;1 stores <code>a1f0</code> twice and the store carries more bytes. In exchange every object has exactly one owner, and collection never has to ask a question.</p>`;
+    $('note-point').innerHTML = MODE.full && !MODE.dedup
+      ? `<h3>A point is the whole volume, physically</h3><p>The bar still shows a small <code>changed</code> half and a large <code>carried</code> half — but here the carried half is not a reference, it is a copy. Every point stores the whole volume again. The bar is the same; the bill is not.</p>`
+      : MODE.full
+      ? `<h3>A point is the whole volume</h3><p>The bar shows each point's entries: a small <code>changed</code> half and a large <code>carried</code> half. Only the changed half is ever uploaded, but any point can be restored from on its own.</p>`
+      : `<h3>A point is only its own delta</h3><p>The bar is all <code>changed</code>: an incremental point lists nothing it did not write. The store is a window of recent change, not a copy — which is cheaper and simpler to collect, at the cost of not being able to restore from one point alone.</p>`;
+    // ================= second stage: one chunk, segment by segment =============
+  // Faithful to the engine and the mover. The engine reads in fixed SEGMENT_SIZE
+  // units - SPDK_BDEV_LARGE_BUF_MAX_SIZE, 64 KiB - with SEGMENT_TASKS = 16 in flight,
+  // and reports a segment it found nothing allocated in as a hole: a length and no
+  // bytes. The mover keeps a zeroed chunk-sized buffer and copies each segment into
+  // its slice, then hashes the whole thing once `covered` reaches the chunk size.
+  //
+  // Allocation is tracked per *cluster* and the chunk size is the largest divisor of
+  // the cluster that is at most 4 MiB, so a chunk never straddles two clusters: every
+  // segment of a chunk agrees about whether it is a hole. A chunk is all bytes or all
+  // hole, and an all-hole chunk is dropped without being hashed or uploaded.
+  const SEG_KIB = 64, MAX_CHUNK_KIB = 4096, IN_FLIGHT = 16;   // SEGMENT_TASKS
+  const CLUSTERS = {
+    1: { kib: 1024, label: '1 MiB' },
+    4: { kib: 4096, label: '4 MiB' },
+    32: { kib: 32768, label: '32 MiB' },
+  };
+  let cluster = 4;
+  const chunkKib = () => Math.min(CLUSTERS[cluster].kib, MAX_CHUNK_KIB);
+  const segsPerChunk = () => chunkKib() / SEG_KIB;
+  const chunksPerCluster = () => CLUSTERS[cluster].kib / chunkKib();
+  const DIGEST = '7c41a0d95f8e2b6704aa13c8e0d5f29b8c47e1a60fb39d2e5a8c71409e3bd6f2';
+  // the rest of a cluster, when the 4 MiB cap makes it more than one chunk
+  const MORE = ['b3e1', '29af', 'c074', '5d6b', '8a12', 'f49c', '1e7d'];
+  const T_SEG = 520, T_HASH = 900;
+
+  // A modelled chunk, in ms: read 4 MiB from the pool with 16 reads in flight, hash
+  // it (measured), then one HEAD round trip and a PUT of 4 MiB over 10 GbE. Only the
+  // hash is measured here; the rest is a plausible same-datacentre store.
+  const TL_N = 8;
+  const tlRead = () => 2.0 * chunkKib() / 4096;
+  const tlHash = () => 0.87 * chunkKib() / 4096;
+  const TL_RTT = 2.0, TL_XFER = 3.4;            // ms: round trip, and 4 MiB on 10 GbE
+  const tlNet = () => TL_RTT * 2 + TL_XFER * chunkKib() / 4096;   // HEAD + PUT
+  let tlMode = 'seq', tlDone = 0;
+
+  let covered2 = 0, held2 = 0, got2 = 0, slots2 = [];
+  let steps2 = [], pos2 = 0, running2 = false, timer2;
+
+  const kib = (n) => (n >= 1024 && n % 1024 === 0 ? (n / 1024) + ' MiB' : n + ' KiB');
+  function say2(no, html) {
+    $('step-no2').textContent = no;
+    $('step-txt2').innerHTML = html;
+    const box = $('narrate2');
+    box.classList.remove('flash');
+    if (INSTANT) return;
+    void box.offsetWidth;
+    box.classList.add('flash');
+    after(700, () => box.classList.remove('flash'), 'chunk');
+  }
+
+  function meta2() {
+    $('buf-meta').textContent = 'covered ' + covered2 + ' / ' + chunkKib()
+      + ' KiB  .  held ' + held2 + ' KiB';
+    $('f-done').textContent = got2 + ' / ' + segsPerChunk();
+  }
+
+  // Lay out TL_N chunks on two lanes. Sequential is what the code does: the stream
+  // loop awaits each chunk's HEAD and PUT, so the engine lane is a hatched stall for
+  // the whole round trip. Pipelined overlaps them, bounded by the link.
+  function drawTl() {
+    const r = tlRead(), h = tlHash(), net = tlNet();
+    const eng = [], sto = [];
+    let span;
+    if (tlMode === 'seq') {
+      const per = r + h + net;
+      span = TL_N * per;
+      for (let i = 0; i < TL_N; i++) {
+        const t = i * per;
+        eng.push([t, r, 'read', i]);
+        eng.push([t + r, h + net, 'stall', i]);
+        sto.push([t + r, h, 'hash', i]);
+        sto.push([t + r + h, net, 'net', i]);
+      }
+    } else {
+      // reads run back to back; uploads overlap, so the link sets the floor
+      const per = Math.max(r + h, TL_XFER * chunkKib() / 4096);
+      span = TL_N * per + net;
+      for (let i = 0; i < TL_N; i++) {
+        eng.push([i * per, r, 'read', i]);
+        sto.push([i * per + r, h, 'hash', i]);
+        sto.push([i * per + r + h, net, 'net', i]);
+      }
+    }
+    const put = (lane, list) => {
+      lane.innerHTML = '';
+      list.forEach(([t, d, cls, i]) => {
+        const b = document.createElement('b');
+        b.className = cls + (i < tlDone ? '' : ' pending');
+        b.style.left = (t / span * 100) + '%';
+        b.style.width = Math.max(0.4, d / span * 100) + '%';
+        b.title = 'chunk ' + (i + 1) + ': ' + cls + ' ' + d.toFixed(2) + ' ms';
+        lane.appendChild(b);
+      });
+    };
+    put($('tl-eng'), eng);
+    put($('tl-store'), sto);
+    const seqSpan = TL_N * (r + h + net);
+    const pipeSpan = TL_N * Math.max(r + h, TL_XFER * chunkKib() / 4096) + net;
+    $('tl-total').textContent = span.toFixed(1) + ' ms for ' + kib(TL_N * chunkKib())
+      + '  .  ' + (TL_N * chunkKib() / 1024 / (span / 1000)).toFixed(0) + ' MiB/s';
+    $('tl-note').innerHTML = tlMode === 'seq'
+      ? `This is what <code>mover.rs</code> does today: <code>store_chunk().await</code> sits inside the loop reading the stream, so the engine's sixteen reads stop for the whole <b>${(h + net).toFixed(1)} ms</b> of hashing and round trip. The engine lane is idle <b>${((h + net) / (r + h + net) * 100).toFixed(0)}%</b> of the time.`
+      : `The same work with uploads in flight rather than awaited inline: <b>${(seqSpan / pipeSpan).toFixed(1)}x</b> over these eight chunks, rising to <b>${((r + h + net) / Math.max(r + h, TL_XFER * chunkKib() / 4096)).toFixed(1)}x</b> across a real cycle once the trailing drain amortises away. The link rather than the loop becomes the limit. Nothing in the design is in the way — chunk completion order is never relied on, and the point's entries are sorted by offset at the end. Memory is the knob: <i>n</i> in flight costs <i>n</i> x ${kib(chunkKib())}.`;
+  }
+
+  function blank2() {
+    clearTimeout(timer2);
+    EP.chunk++;
+    tlDone = 0;
+    covered2 = 0; held2 = 0; got2 = 0;
+    const n = segsPerChunk();
+    const buf = $('buf');
+    buf.innerHTML = '';
+    buf.classList.remove('hashing');
+    buf.classList.toggle('narrow', n <= 16);
+    slots2 = [];
+    for (let i = 0; i < n; i++) {
+      const c = document.createElement('i');
+      c.title = 'segment ' + (i + 1) + ', ' + SEG_KIB + ' KiB';
+      buf.appendChild(c);
+      slots2.push(c);
+    }
+    $('f-segs').textContent = String(n);
+    $('buf-tag').textContent = kib(chunkKib());
+    $('cl-state').textContent = 'cluster @0, ' + CLUSTERS[cluster].label;
+    $('cl-alloc').textContent = 'allocated';
+    $('clusterbox').classList.remove('busy');
+    $('hash-io').textContent = 'nothing to hash yet';
+    $('hashbox').classList.remove('busy');
+    $('digest').textContent = '';
+    $('digest-cap').textContent = '';
+    $('chunks2').innerHTML = '';
+    $('s2-tag').textContent = '0 chunks';
+    $('aside2').textContent = '';
+    $('aside-eng').textContent = '';
+    meta2();
+    drawTl();
+    [...$('stage2').querySelectorAll('.fly')].forEach((e) => e.remove());
+  }
+
+  function build2() {
+    const out = [];
+    const n = segsPerChunk();
+    const per = Math.min(IN_FLIGHT, n);   // a round of reads in flight
+    const chunkN = chunkKib();
+
+    out.push(() => {
+      $('clusterbox').style.setProperty('--c', 'var(--c1)');
+      $('clusterbox').classList.add('busy');
+      say2('setup', `The pool's cluster is <b>${CLUSTERS[cluster].label}</b>, so the chunk is <b>${kib(chunkN)}</b> — the largest divisor of the cluster that is at most 4 MiB. ${chunksPerCluster() > 1 ? `One cluster is therefore <b>${chunksPerCluster()} chunks</b>. ` : 'One cluster is exactly one chunk. '}The mover allocates a zeroed <b>${kib(chunkN)}</b> buffer and the engine starts reading it <b>${SEG_KIB} KiB at a time</b> — ${n} segments for this chunk.`);
+      return { hold: 1100, gapScale: 1 };
+    });
+
+    for (let bstart = 0; bstart < n; bstart += per) {
+      const from = bstart, to = Math.min(bstart + per, n);
+      out.push(() => {
+        for (let k = from; k < to; k++) slots2[k].classList.add('now');
+        fly($('clusterbox'), slots2[Math.floor((from + to) / 2)] || $('buf'),
+          (to - from) + ' x 64K', {
+            ms: T_SEG, color: 'var(--c1)', stage: $('stage2'), epoch: 'chunk',
+            onArrive: () => {
+              for (let k = from; k < to; k++) {
+                slots2[k].classList.remove('now');
+                slots2[k].classList.add('data');
+              }
+              const bytes = (to - from) * SEG_KIB;
+              covered2 += bytes; held2 += bytes; got2 += to - from;
+              meta2();
+              if (held2 > 0) $('hash-io').textContent = 'waiting for the last segment';
+            },
+          });
+        $('aside-eng').textContent = 'read_src_segment @' + (from * SEG_KIB) + 'K  ->  allocated';
+        say2('segments ' + (from + 1) + '-' + to, from === 0
+          ? `A round of <b>${to - from} segments</b> — <code>SEGMENT_TASKS = ${IN_FLIGHT}</code>, the engine's concurrent reads — arrives and is copied into the buffer. They complete <b>out of order</b>, which is the first reason the mover cannot simply hash as they land: a hash is order-dependent.`
+          : `<b>${to - from} more</b>, another round in flight. Every segment of this chunk reports <b>allocated</b>, and that is not luck: allocation is tracked per cluster and the chunk divides the cluster, so a chunk never straddles the boundary between allocated and not.`);
+        return { hold: T_SEG + 260, gapScale: 0.3 };
+      });
+    }
+
+    out.push(() => {
+      say2('complete', `<b>covered has reached ${chunkN} KiB</b>, so the chunk is whole. The engine never sends a range twice, which is why coverage alone is enough — the mover never has to track <i>which</i> parts arrived. <b>held is ${chunkN} KiB</b> as well: no holes inside a chunk, by construction.`);
+      return { hold: 1100, gapScale: 1 };
+    });
+
+    out.push(() => {
+      $('aside-eng').textContent = 'stream paused: store_chunk().await';
+      say2('why buffer', `Why hold the whole thing rather than hash each ${SEG_KIB} KiB as it lands? Segments <b>complete out of order</b> and a hash is order-dependent; the bytes have to be <b>resident anyway</b>, since the chunk cannot be uploaded until it is named. And it would be the wrong target: the hash is <b>${(chunkN / 4096 * 0.87).toFixed(2)} ms</b> against a <code>HEAD</code> and <code>PUT</code> the stream <i>waits on inline</i>. Watch the engine lane in the timeline below go hatched for the whole round trip.`);
+      return { hold: 1400, gapScale: 1 };
+    });
+
+    out.push(() => {
+      $('buf').classList.add('hashing');
+      $('hashbox').style.setProperty('--c', 'var(--flag)');
+      $('hashbox').classList.add('busy');
+      $('cl-alloc').textContent = 'stalled';
+      $('clusterbox').classList.remove('busy');
+      $('aside-eng').textContent = 'stream blocked: store_chunk().await';
+      $('hash-io').textContent = 'hashing ' + kib(chunkN) + '...';
+      after(T_HASH, () => {
+        $('buf').classList.remove('hashing');
+        $('hashbox').classList.remove('busy');
+        $('hash-io').textContent = (chunkN / 4096 * 0.87).toFixed(2) + ' ms  .  4.48 GiB/s';
+        $('digest').textContent = DIGEST;
+        $('digest-cap').textContent = '32 bytes  .  64 hex characters  .  2^128 against collisions';
+      }, 'chunk');
+      say2('hash', `One <b>BLAKE3</b> pass over the whole buffer, <b>256 bits out</b>. Not streamed segment by segment: they arrive out of order, so there is nothing to hash until the chunk is complete. Measured at <b>4.48 GiB/s</b> single-threaded — <b>${(chunkN / 4096 * 0.87).toFixed(2)} ms</b> for ${kib(chunkN)}, against 2.14 ms for SHA-256 and 7.12 for SHA-512 on the same part.`);
+      return { hold: T_HASH + 600, gapScale: 1 };
+    });
+
+    out.push(() => {
+      $('aside2').textContent = 'HEAD chunks/7c/41/7c41a0...  ->  404';
+      say2('ask', `Those 32 bytes are the whole of it. 256 bits of output is <b>2^128 against collisions</b> — <b>exactly SHA-256's</b>, since a 256-bit digest caps there by the birthday bound whatever computes it. Asking BLAKE3 for 64 bytes would return the same digest with more keystream after it, byte-identical for the first 32, and buy nothing: only a wider chaining value moves that bound. The digest <i>is</i> the address, so the only question left is whether the store already holds that name. One <code>HEAD</code>. If it answered yes this chunk would cost nothing more — that is deduplication, and it is why a cycle costs what changed rather than what exists.`);
+      return { hold: 900, gapScale: 1 };
+    });
+
+    out.push(() => {
+      const tile = document.createElement('div');
+      tile.className = 'chunk pending';
+      tile.textContent = DIGEST.slice(0, 4);
+      tile.title = DIGEST;
+      tile.style.setProperty('--c', 'var(--c1)');
+      $('chunks2').appendChild(tile);
+      fly($('buf'), tile, DIGEST.slice(0, 4), {
+        ms: 700, color: 'var(--c1)', stage: $('stage2'), epoch: 'chunk',
+        onArrive: () => {
+          tile.classList.remove('pending');
+          $('s2-tag').textContent = '1 chunk';
+          $('aside2').textContent = 'PUT chunks/7c/41/7c41a0...  ' + kib(chunkN);
+          tlDone = 1; drawTl();
+        },
+      });
+      say2('upload', `Absent, so the buffer is uploaded under its own name.${chunksPerCluster() > 1 ? ` That was <b>chunk 1 of ${chunksPerCluster()}</b> in this cluster.` : ''}`);
+      return { hold: 1100, gapScale: 1 };
+    });
+
+    // the 4 MiB cap means a large cluster is several chunks, and each is its own
+    // read, its own hash and its own object
+    if (chunksPerCluster() > 1) {
+      const more = chunksPerCluster() - 1;
+      out.push(() => {
+        for (let i = 0; i < more; i++) {
+          const tile = document.createElement('div');
+          tile.className = 'chunk pending';
+          tile.textContent = MORE[i];
+          tile.title = 'chunk ' + (i + 2) + ' of this cluster';
+          tile.style.setProperty('--c', 'var(--c1)');
+          $('chunks2').appendChild(tile);
+          fly($('buf'), tile, MORE[i], {
+            ms: 520, delay: i * 260, color: 'var(--c1)',
+            stage: $('stage2'), epoch: 'chunk',
+            onArrive: () => {
+              tile.classList.remove('pending');
+              $('s2-tag').textContent = (i + 2) + ' chunks';
+              $('aside2').textContent = 'PUT chunks/' + MORE[i].slice(0, 2) + '/'
+                + MORE[i].slice(2) + '/' + MORE[i] + '...  ' + kib(chunkN);
+              tlDone = i + 2; drawTl();
+            },
+          });
+        }
+        say2('the rest of the cluster', `The buffer is refilled and rehashed <b>${more} more times</b> to finish this one cluster: ${more} more rounds of ${segsPerChunk()} segments, ${more} more BLAKE3 passes, <b>${more} more objects</b>, each with its own name. The 4 MiB cap is what makes a ${CLUSTERS[cluster].label} cluster cost ${chunksPerCluster()} objects rather than one — and it is deliberate, so that a large cluster cannot become a large object or a coarse unit of deduplication.`);
+        return { hold: 520 + more * 260 + 500, gapScale: 1 };
+      });
+    }
+
+    // the hole case, at the granularity it actually happens: a whole cluster
+    out.push(() => {
+      $('cl-state').textContent = 'cluster @' + kib(CLUSTERS[cluster].kib) + ', ' + CLUSTERS[cluster].label;
+      $('cl-alloc').textContent = 'hole';
+      $('clusterbox').classList.remove('busy');
+      $('aside-eng').textContent = 'read_src_segment  ->  put_empty(len, allocated: false)';
+      slots2.forEach((c) => { c.classList.remove('data'); c.classList.add('hole'); });
+      covered2 = chunkN; held2 = 0; got2 = segsPerChunk();
+      meta2();
+      $('buf').classList.remove('hashing');
+      $('digest').textContent = '';
+      $('hash-io').textContent = 'nothing to hash';
+      say2('a hole', `The <b>next</b> cluster is unallocated. Every one of its ${segsPerChunk()} segments comes back as a hole — a length and no bytes — so <b>covered fills and held stays at zero</b>. This is the only shape a hole takes: a whole cluster, never part of a chunk.`);
+      return { hold: 1300, gapScale: 1 };
+    });
+
+    out.push(() => {
+      say2('dropped', `<b>held is zero, so nothing is hashed and nothing is uploaded.</b> The buffer is discarded${chunksPerCluster() > 1 ? ` — and with a ${CLUSTERS[cluster].label} cluster that one hole drops <b>all ${chunksPerCluster()} chunks</b> of it at once` : ''}. A point names no entry at this offset, and the destination reads zeroes there because its own volume never allocated it either.`);
+      return { hold: 1100, gapScale: 1 };
+    });
+
+    out.push(() => {
+      say2('done', `That is one chunk and one hole. A cycle does this for every chunk a snapshot's own layer touches, concurrently — and the whole reason a chunk is buffered rather than streamed onward is the one fact at the centre of this design: <b>the name is the hash, so nothing can be addressed until all of it has arrived</b>.`);
+      return { hold: 900, gapScale: 1 };
+    });
+
+    return out;
+  }
+
+  function sync2() {
+    $('pos2-lbl').textContent = pos2 + ' / ' + steps2.length;
+    $('back2').disabled = pos2 === 0;
+    $('step2').disabled = pos2 >= steps2.length;
+    $('run2').textContent = running2 ? 'Pause' : 'Run';
+  }
+
+  function jumpTo2(k) {
+    const target = Math.max(0, Math.min(k, steps2.length));
+    clearTimeout(timer2);
+    blank2();
+    INSTANT = true;
+    for (let i = 0; i < target; i++) steps2[i]();
+    INSTANT = false;
+    pos2 = target;
+    if (pos2 === 0) say2('—', 'Press <b>Run</b> to read one chunk.');
+    sync2();
+  }
+
+  function advance2() {
+    if (pos2 >= steps2.length) { running2 = false; sync2(); return null; }
+    const r = steps2[pos2]() || 0;
+    pos2++;
+    sync2();
+    return typeof r === 'object' ? r : { hold: r, gapScale: 1 };
+  }
+
+  function tick2() {
+    if (!running2) return;
+    const r = advance2();
+    if (!r) return;
+    timer2 = setTimeout(tick2, scale(GAP * (r.gapScale == null ? 1 : r.gapScale) + r.hold));
+  }
+
+  function setCluster(c) {
+    cluster = c;
+    [1, 4, 32].forEach((x) => $('cl-' + x).classList.toggle('on', x === c));
+    $('cl-desc').innerHTML = `A <b>${CLUSTERS[c].label}</b> cluster gives a <b>${kib(chunkKib())}</b> chunk`
+      + (chunksPerCluster() > 1
+        ? `, because the chunk is capped at 4 MiB — so one cluster is <b>${chunksPerCluster()} chunks</b> and a single unallocated cluster drops all ${chunksPerCluster()} of them.`
+        : `, which is the cluster itself — one cluster, one chunk, one object.`)
+      + ` ${segsPerChunk()} engine segments of ${SEG_KIB} KiB fill it.`;
+    steps2 = build2();
+    jumpTo2(0);
+  }
+
+  $('run2').onclick = () => {
+    if (pos2 >= steps2.length) jumpTo2(0);
+    running2 = !running2;
+    sync2();
+    if (running2) tick2(); else clearTimeout(timer2);
+  };
+  $('step2').onclick = () => { running2 = false; clearTimeout(timer2); sync2(); advance2(); };
+  $('back2').onclick = () => { running2 = false; clearTimeout(timer2); jumpTo2(pos2 - 1); };
+  $('replay2').onclick = () => { running2 = false; jumpTo2(0); };
+  $('tl-seq').onclick = () => {
+    tlMode = 'seq';
+    $('tl-seq').classList.add('on'); $('tl-pipe').classList.remove('on');
+    drawTl();
+  };
+  $('tl-pipe').onclick = () => {
+    tlMode = 'pipe';
+    $('tl-pipe').classList.add('on'); $('tl-seq').classList.remove('on');
+    drawTl();
+  };
+
+  $('cl-1').onclick = () => setCluster(1);
+  $('cl-4').onclick = () => setCluster(4);
+  $('cl-32').onclick = () => setCluster(32);
+
+  setCluster(4);
+
+  steps = buildAll();
+    const bar = $('chapters');
+    bar.innerHTML = '';
+    const ticks = $('chapter-ticks');
+    ticks.innerHTML = '';
+    chapters.forEach((ch) => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = ch.gc ? 'gc' : ch.sub ? 'sub' : '';
+      b.textContent = ch.label;
+      // land on the boundary: the chapter's first step is the next one to run
+      b.title = 'starts at step ' + (ch.at + 1);
+      b.onclick = () => { running = false; clearTimeout(timer); jumpTo(ch.at); };
+      bar.appendChild(b);
+      const o = document.createElement('option');
+      o.value = String(ch.at);
+      ticks.appendChild(o);
+    });
+    jumpTo(0);
+  }
+
+  $('fmt-full').onclick = () => setMode(true, MODE.dedup);
+  $('fmt-inc').onclick = () => setMode(false, MODE.dedup);
+  $('dd-on').onclick = () => setMode(MODE.full, true);
+  $('dd-off').onclick = () => setMode(MODE.full, false);
+
+  $('spd').oninput();
+  setMode(false, false);
+})();
+</script>
+</body>
+</html>
