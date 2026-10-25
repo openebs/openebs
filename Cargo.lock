@@ -1733,7 +1733,7 @@ dependencies = [
  "jsonptr",
  "serde",
  "serde_json",
- "thiserror 2.0.11",
+ "thiserror 2.0.21",
 ]
 
 [[package]]
@@ -1746,7 +1746,7 @@ dependencies = [
  "pest_derive",
  "regex",
  "serde_json",
- "thiserror 2.0.11",
+ "thiserror 2.0.21",
 ]
 
 [[package]]
@@ -1815,7 +1815,7 @@ dependencies = [
  "serde",
  "serde_json",
  "serde_yaml",
- "thiserror 2.0.11",
+ "thiserror 2.0.21",
  "tokio",
  "tokio-tungstenite",
  "tokio-util",
@@ -1839,7 +1839,7 @@ dependencies = [
  "serde",
  "serde-value",
  "serde_json",
- "thiserror 2.0.11",
+ "thiserror 2.0.21",
 ]
 
 [[package]]
@@ -1868,7 +1868,7 @@ dependencies = [
  "kube",
  "openapi",
  "shutdown",
- "thiserror 1.0.69",
+ "thiserror 2.0.21",
  "tokio",
  "tokio-stream",
  "tower",
@@ -1886,7 +1886,7 @@ dependencies = [
  "kube",
  "kube-forward",
  "openapi",
- "thiserror 1.0.69",
+ "thiserror 2.0.21",
  "tower",
  "url",
  "utils",
@@ -1914,7 +1914,7 @@ dependencies = [
  "pin-project",
  "serde",
  "serde_json",
- "thiserror 2.0.11",
+ "thiserror 2.0.21",
  "tokio",
  "tokio-util",
  "tracing",
@@ -2282,7 +2282,7 @@ dependencies = [
  "futures-sink",
  "js-sys",
  "pin-project-lite",
- "thiserror 2.0.11",
+ "thiserror 2.0.21",
  "tracing",
 ]
 
@@ -2309,7 +2309,7 @@ dependencies = [
  "opentelemetry-proto",
  "opentelemetry_sdk",
  "prost",
- "thiserror 2.0.11",
+ "thiserror 2.0.21",
  "tokio",
  "tonic",
 ]
@@ -2344,7 +2344,7 @@ dependencies = [
  "opentelemetry",
  "percent-encoding",
  "rand 0.9.5",
- "thiserror 2.0.11",
+ "thiserror 2.0.21",
 ]
 
 [[package]]
@@ -2448,7 +2448,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8b7cafe60d6cf8e62e1b9b2ea516a089c008945bb5a275416789e7db0bc199dc"
 dependencies = [
  "memchr",
- "thiserror 2.0.11",
+ "thiserror 2.0.21",
  "ucd-trie",
 ]
 
@@ -3456,11 +3456,11 @@ dependencies = [
 
 [[package]]
 name = "thiserror"
-version = "2.0.11"
+version = "2.0.21"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d452f284b73e6d76dd36758a0c8684b1d5be31f92b89d07fd5822175732206fc"
+checksum = "09e52cb86a36cede5cb101bf8908837b3e4c6e5e59fe7fd85c23fb56200d189e"
 dependencies = [
- "thiserror-impl 2.0.11",
+ "thiserror-impl 2.0.21",
 ]
 
 [[package]]
@@ -3476,13 +3476,13 @@ dependencies = [
 
 [[package]]
 name = "thiserror-impl"
-version = "2.0.11"
+version = "2.0.21"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "26afc1baea8a989337eeb52b6e72a039780ce45c3edfcc9c5b9d112feeb173c2"
+checksum = "fe5197923287db20a58125f0bc85c062f7f2c892de97b18c356f9efb14b28524"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 2.0.98",
+ "syn 3.0.5",
 ]
 
 [[package]]
@@ -3866,7 +3866,7 @@ dependencies = [
  "log",
  "rand 0.9.5",
  "sha1",
- "thiserror 2.0.11",
+ "thiserror 2.0.21",
  "utf-8",
 ]
 
@@ -3931,6 +3931,7 @@ dependencies = [
  "humantime",
  "k8s-openapi",
  "kube",
+ "kube-forward",
  "kube-proxy",
  "maplit",
  "openapi",
