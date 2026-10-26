@@ -144,8 +144,9 @@ async fn upgrade_job(
     );
 
     let helm_args_set = args.set.join(",");
+    // The REST endpoint and its TLS/JWT settings are discovered by the job itself, as they
+    // may change as part of the upgrade (e.g. when enabling TLS).
     let mut job_args: Vec<String> = vec![
-        format!("--rest-endpoint=http://{release_name}-api-rest:8081"),
         format!(
             "--namespace={namespace}",
             namespace = args.namespace.as_str()

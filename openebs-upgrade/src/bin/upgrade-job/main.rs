@@ -27,6 +27,20 @@ async fn main() -> Result<()> {
         .with_tracing_tags(cli_args.tracing_tags.clone())
         .init("upgrade-job");
 
+    let data_plane_upgrader = if cli_args.skip_data_plane_restart {
+        None
+    } else {
+        Some(DataPlaneUpgrader {
+            namespace: cli_args.namespace.clone(),
+            release_name: cli_args.release_name.clone(),
+            rest_endpoint: cli_args.rest_endpoint,
+            jwt: cli_args.jwt,
+            tls_ca_file: cli_args.tls_ca_file,
+            tls_cert_file: cli_args.tls_cert_file,
+            tls_key_file: cli_args.tls_key_file,
+        })
+    };
+
     let helm_upgrade_config = HelmUpgradeConfig {
         release_name: cli_args.release_name,
         namespace: cli_args.namespace.clone(),
@@ -37,15 +51,6 @@ async fn main() -> Result<()> {
             args_set_file: cli_args.helm_args_set_file,
             storage_driver: cli_args.helm_storage_driver,
         },
-    };
-
-    let data_plane_upgrader = if cli_args.skip_data_plane_restart {
-        None
-    } else {
-        Some(DataPlaneUpgrader {
-            namespace: cli_args.namespace.clone(),
-            rest_endpoint: cli_args.rest_endpoint,
-        })
     };
 
     let mut event_recorder = EventRecorder::builder()

@@ -116,7 +116,8 @@ pub(crate) fn upgrade_job_cluster_role(
             PolicyRule {
                 api_groups: Some(vec!["events.k8s.io"].into_vec()),
                 resources: Some(vec!["events"].into_vec()),
-                verbs: vec!["create"].into_vec(),
+                // The kube Recorder de-duplicates events by patching the existing event's series.
+                verbs: vec!["create", "patch"].into_vec(),
                 ..Default::default()
             },
             PolicyRule {

@@ -20,6 +20,7 @@ INS_RAWFILE=
 INS_ZFS=
 INS_HOSTPATH="true"
 INS_LOKI="true"
+PULL_POLICY=
 HELM="helm"
 KUBECTL="kubectl"
 TEMPLATE=
@@ -43,6 +44,7 @@ Options:
   --lvm                                 Install the local pv lvm.
   --zfs                                 Install the local pv zfs.
   --hostpath                            Install the local pv hostpath (always enabled!).
+  --pull-policy     <policy>            Set the image pull policy, on all enabled engines.
   --no-loki                             Don't deploy Loki.
   --helm            <stringArray>       Pass Helm Args directly to the install/upgrade commands.
 
@@ -123,6 +125,22 @@ hostpath_analytics_disable() {
  make_hostpath_args "analytics.enabled=false"
 }
 
+mayastor_pull_policy() {
+  [ -n "$PULL_POLICY" ] && openebs_set_args "$(make_mayastor_args "image.pullPolicy=$PULL_POLICY")"
+}
+lvm_pull_policy() {
+  [ -n "$PULL_POLICY" ] && openebs_set_args "$(make_lvm_args "lvmPlugin.image.pullPolicy=$PULL_POLICY")"
+}
+rawfile_pull_policy() {
+  [ -n "$PULL_POLICY" ] && openebs_set_args "$(make_rawfile_args "image.pullPolicy=$PULL_POLICY")"
+}
+zfs_pull_policy() {
+  [ -n "$PULL_POLICY" ] && openebs_set_args "$(make_zfs_args "zfsPlugin.image.pullPolicy=$PULL_POLICY")"
+}
+hostpath_pull_policy() {
+  [ -n "$PULL_POLICY" ] && openebs_set_args "$(make_hostpath_args "localpv.image.pullPolicy=$PULL_POLICY")"
+}
+
 mayastor_args() {
   if ! [ "$INS_MAYASTOR" = "true" ]; then
     openebs_set_args "engines.replicated.mayastor.enabled=false"
@@ -131,7 +149,8 @@ mayastor_args() {
   echo -n "$(mayastor_set_args "etcd.livenessProbe.initialDelaySeconds=5,etcd.readinessProbe.initialDelaySeconds=5,etcd.replicaCount=1")" \
           "$(mayastor_set_args "eventing.enabled=true")" \
           "$(openebs_set_args "$(mayastor_analytics_disable)")" \
-          "$(openebs_set_args "engines.replicated.mayastor.enabled=true")"
+          "$(openebs_set_args "engines.replicated.mayastor.enabled=true")" \
+          "$(mayastor_pull_policy)"
 }
 lvm_args() {
   if ! [ "$INS_LVM" = "true" ]; then
@@ -139,7 +158,8 @@ lvm_args() {
     return 0
   fi
   echo -n "$(openebs_set_args "engines.local.lvm.enabled=true")" \
-          "$(openebs_set_args "$(lvm_analytics_disable)")"
+          "$(openebs_set_args "$(lvm_analytics_disable)")" \
+          "$(lvm_pull_policy)"
 }
 rawfile_args() {
   if ! [ "$INS_RAWFILE" = "true" ]; then
@@ -147,7 +167,8 @@ rawfile_args() {
     return 0
   fi
   echo -n "$(openebs_set_args "engines.local.rawfile.enabled=true")" \
-          "$(openebs_set_args "$(rawfile_analytics_disable)")"
+          "$(openebs_set_args "$(rawfile_analytics_disable)")" \
+          "$(rawfile_pull_policy)"
 }
 zfs_args() {
   if ! [ "$INS_ZFS" = "true" ]; then
@@ -155,10 +176,12 @@ zfs_args() {
     return 0
   fi
   echo -n "$(openebs_set_args "engines.local.zfs.enabled=true")" \
-          "$(openebs_set_args "$(zfs_analytics_disable)")"
+          "$(openebs_set_args "$(zfs_analytics_disable)")" \
+          "$(zfs_pull_policy)"
 }
 hostpath_args() {
-  echo -n "$(openebs_set_args "$(hostpath_analytics_disable)")"
+  echo -n "$(openebs_set_args "$(hostpath_analytics_disable)")" \
+          "$(hostpath_pull_policy)"
 }
 loki_args() {
   local replicas=1
@@ -282,6 +305,11 @@ while [ "$#" -gt 0 ]; do
       shift;;
     --hostpath)
       INS_HOSTPATH="true"
+      shift;;
+    --pull-policy)
+      shift
+      test $# -lt 1 && die "Missing pull policy"
+      PULL_POLICY="$1"
       shift;;
     --no-loki)
       INS_LOKI="false"

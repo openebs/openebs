@@ -25,6 +25,20 @@ LABEL=
 IPFAM="ipv4"
 USE_DOCKER_CFG="true"
 SUDO=${SUDO:-"sudo"}
+REGISTRY_MIRROR="true"
+# Nodes reach the mirrors by container name over the "kind" docker network (see
+# connect_registry_mirrors/configure_registry_mirror_hosts). These host ports are just for
+# convenience, e.g. local debugging with curl.
+declare -A REGISTRY_MIRROR_UPSTREAMS=(
+  ["docker.io"]="https://registry-1.docker.io"
+  ["quay.io"]="https://quay.io"
+  ["registry.k8s.io"]="https://registry.k8s.io"
+)
+declare -A REGISTRY_MIRROR_PORTS=(
+  ["docker.io"]="5001"
+  ["quay.io"]="5002"
+  ["registry.k8s.io"]="5003"
+)
 
 help() {
   cat <<EOF
@@ -45,6 +59,9 @@ Options:
   --cleanup                         Prior to starting, stops the running instance of the deployer.
   --ip-family     <str>             KIND has support for IPv4, IPv6 and dual-stack clusters, with the default being ipv4.
   --no-login                        Don't use the docker config json file.
+  --no-registry-mirror              Don't run local pull-through registry mirrors for docker.io/quay.io/registry.k8s.io.
+                                     These mirrors cache images on the host so repeated (re)installs/clusters don't
+                                     re-pull the same images from the internet on every node.
 
 Command:
   start                             Start the k8s cluster.
@@ -63,6 +80,90 @@ die() {
   local _return="${2:-1}"
   echo_stderr "$1"
   exit "${_return}"
+}
+
+registry_mirror_name() {
+  local upstream="$1"
+  echo "kind-registry-mirror-${upstream//./-}"
+}
+
+# Starts (if not already running) one `registry:3` pull-through cache per upstream registry.
+# Each is also published on its own host port purely for convenience (e.g. local debugging
+# with curl) - the cluster nodes reach it by container name on the "kind" docker network
+# instead, via connect_registry_mirrors, since that's resolved fresh by Docker's embedded DNS
+# every time the container (re)starts rather than being baked into a file once. Each cache is
+# backed by a named docker volume so it survives cluster recreations.
+start_registry_mirrors() {
+  local upstream remote port name
+
+  for upstream in "${!REGISTRY_MIRROR_UPSTREAMS[@]}"; do
+    remote="${REGISTRY_MIRROR_UPSTREAMS[$upstream]}"
+    port="${REGISTRY_MIRROR_PORTS[$upstream]}"
+    name="$(registry_mirror_name "$upstream")"
+
+    if [ "$($DOCKER inspect -f '{{.State.Running}}' "$name" 2>/dev/null)" != "true" ]; then
+      echo "Starting registry mirror $name ($upstream -> $remote) on port $port"
+      $DOCKER run -d --restart=always --name "$name" \
+        -p "$port:5000" \
+        -v "$name-cache:/var/lib/registry" \
+        -e REGISTRY_PROXY_REMOTEURL="$remote" \
+        registry:3 > /dev/null
+    fi
+  done
+}
+
+# Attaches the registry mirrors to the "kind" docker network (created by `kind create cluster`,
+# so this can only run afterwards) so nodes can resolve them by container name via Docker's
+# embedded DNS. Idempotent, and since the mirrors run with --restart=always, Docker reattaches
+# them to this network automatically on daemon/host restart too.
+connect_registry_mirrors() {
+  local upstream name
+
+  for upstream in "${!REGISTRY_MIRROR_UPSTREAMS[@]}"; do
+    name="$(registry_mirror_name "$upstream")"
+    if [ "$($DOCKER inspect -f '{{json .NetworkSettings.Networks.kind}}' "$name")" = "null" ]; then
+      $DOCKER network connect kind "$name"
+    fi
+  done
+}
+
+# Emits the containerd `containerdConfigPatches` block enabling the certs.d-based registry
+# config (hosts.toml per upstream, written by configure_registry_mirror_hosts below). This is
+# the mechanism kind's own docs recommend; the older `registry.mirrors` TOML stanza is deprecated.
+registry_mirror_config_patch() {
+  cat <<'EOF'
+containerdConfigPatches:
+- |-
+  [plugins."io.containerd.grpc.v1.cri".registry]
+    config_path = "/etc/containerd/certs.d"
+EOF
+}
+
+# Writes /etc/containerd/certs.d/<upstream>/hosts.toml on the given node, pointing it at the
+# local mirror by container name on the "kind" network (resolved via Docker's embedded DNS).
+configure_registry_mirror_hosts() {
+  local node="$1"
+  local upstream name dir
+
+  for upstream in "${!REGISTRY_MIRROR_UPSTREAMS[@]}"; do
+    name="$(registry_mirror_name "$upstream")"
+    dir="/etc/containerd/certs.d/$upstream"
+
+    $DOCKER exec "$node" mkdir -p "$dir"
+    printf '[host."http://%s:5000"]\n  capabilities = ["pull", "resolve"]\n' "$name" \
+      | $DOCKER exec -i "$node" tee "$dir/hosts.toml" > /dev/null
+  done
+}
+
+# Removes the registry mirror containers. Their cache volumes are left intact (removing a
+# container never removes a named volume), so the next `start` reuses the warm cache.
+stop_registry_mirrors() {
+  local upstream name
+
+  for upstream in "${!REGISTRY_MIRROR_UPSTREAMS[@]}"; do
+    name="$(registry_mirror_name "$upstream")"
+    $DOCKER rm -f "$name" 2>/dev/null || true
+  done
 }
 
 COMMAND=
@@ -144,6 +245,9 @@ while [ "$#" -gt 0 ]; do
         --no-login)
           USE_DOCKER_CFG="false"
           shift;;
+        --no-registry-mirror)
+          REGISTRY_MIRROR="false"
+          shift;;
         --dry-run)
           if [ -z "$DRY_RUN" ]; then
             DRY_RUN="--dry-run"
@@ -170,6 +274,9 @@ if [ "$COMMAND" = "stop" ] || [ "$CLEANUP" = "true" ]; then
     $SUDO nvme disconnect-all
   fi
   $KIND delete cluster
+  if [ "$REGISTRY_MIRROR" = "true" ]; then
+    stop_registry_mirrors
+  fi
   if [ "$COMMAND" = "stop" ]; then
     exit 0
   fi
@@ -188,6 +295,10 @@ if [ "$SETUP_LVM" = "true" ]; then
   "$SCRIPT_DIR"/setup-io-prereq.sh --lvm $DRY_RUN
 fi
 
+if [ "$REGISTRY_MIRROR" = "true" ] && [ -z "$DRY_RUN" ]; then
+  start_registry_mirrors
+fi
+
 # Create and cleanup the tmp folder
 # Note: this is static in case you want to restart the worker node
 mkdir -p "$TMP_KIND"
@@ -199,6 +310,11 @@ kind: Cluster
 apiVersion: kind.x-k8s.io/v1alpha4
 networking:
   ipFamily: $IPFAM
+EOF
+if [ "$REGISTRY_MIRROR" = "true" ]; then
+  registry_mirror_config_patch >> "$TMP_KIND_CONFIG"
+fi
+cat <<EOF >> "$TMP_KIND_CONFIG"
 nodes:
 - role: control-plane
 EOF
@@ -274,6 +390,10 @@ fi
 
 $KIND create cluster --config "$TMP_KIND_CONFIG"
 
+if [ "$REGISTRY_MIRROR" = "true" ] && [ -z "$DRY_RUN" ]; then
+  connect_registry_mirrors
+fi
+
 $KUBECTL cluster-info --context kind-kind
 if [ -z "$DRY_RUN" ]; then
   host_ip=$($DOCKER network inspect kind | jq -r 'first (.[0].IPAM.Config[].Gateway | select(.))')
@@ -281,9 +401,13 @@ fi
 echo "HostIP: $host_ip"
 
 # shellcheck disable=SC2068
-for node in ${nodes[@]}; do
+for node in kind-control-plane ${nodes[@]}; do
   $DOCKER exec "$node" mount -o remount,rw /sys
 
   # Note: this will go away if the node restarts...
   $DOCKER exec "$node" bash -c 'printf "'"$host_ip"' kvmhost\n" >> /etc/hosts'
+
+  if [ "$REGISTRY_MIRROR" = "true" ] && [ -z "$DRY_RUN" ]; then
+    configure_registry_mirror_hosts "$node"
+  fi
 done

@@ -14,8 +14,27 @@ use url::Url;
 #[command(about = format!("Upgrades OpenEBS"), long_about = None)]
 pub(crate) struct CliArgs {
     /// This is the URL for the storage REST API server.
+    /// If not set, it is derived from the release name and the TLS mode discovered from the
+    /// api-rest pods.
     #[arg(short = 'e', long)]
-    pub(crate) rest_endpoint: Url,
+    pub(crate) rest_endpoint: Option<Url>,
+
+    /// Path to the TLS CA certificate bundle used to validate REST server certificates.
+    /// If not set, TLS settings are discovered from the api-rest pods.
+    #[arg(long)]
+    pub(crate) tls_ca_file: Option<PathBuf>,
+
+    /// Path to the client TLS certificate chain file (PEM) for mTLS.
+    #[arg(long, requires = "tls_key_file")]
+    pub(crate) tls_cert_file: Option<PathBuf>,
+
+    /// Path to the client TLS private key file (PEM) for mTLS.
+    #[arg(long, requires = "tls_cert_file")]
+    pub(crate) tls_key_file: Option<PathBuf>,
+
+    /// Path to a file containing the JWT bearer token for REST authentication.
+    #[arg(long)]
+    pub(crate) jwt: Option<PathBuf>,
 
     /// This is the Kubernetes Namespace for the Helm release.
     #[arg(short, long)]
