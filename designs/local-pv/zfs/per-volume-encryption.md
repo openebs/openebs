@@ -7,8 +7,8 @@ owners:
   - "@rdegez"
 editor: "@rdegez"
 creation-date: 2026-10-05
-last-updated: 2026-10-22
-status: provisional
+last-updated: 2026-10-27
+status: implementable
 ---
 
 # Per-PersistentVolume Encryption Keys for LocalPV-ZFS
