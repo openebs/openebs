@@ -7,7 +7,7 @@ owners:
   - "@rdegez"
 editor: "@rdegez"
 creation-date: 2026-10-05
-last-updated: 2026-10-27
+last-updated: 2026-10-29
 status: implementable
 ---
 
@@ -135,10 +135,10 @@ A key can be shared on purpose: several PVCs can reference the same Secret, for 
 
 ### Provisioning (controller)
 
-At CreateVolume the controller, which learns the PVC through the external-provisioner's `--extra-create-metadata`:
+At CreateVolume of a new volume (a retried request for an existing volume returns it as is), the controller, which learns the PVC through the external-provisioner's `--extra-create-metadata`:
 
 1. reads both signals: a non-boolean `autoCreateEncryptionKey` is rejected with `InvalidArgument`, and so is an annotation that is empty or does not lead to a valid Secret (see step 3); a PVC that cannot be read fails the provisioning (it is retried), since it may name its own key;
-2. **fails closed**: a key source without the `encryption` parameter is rejected with `InvalidArgument`, instead of provisioning a plaintext volume; so is `encryption` with no key source at all and no legacy `keylocation`;
+2. **fails closed**: a key source without the `encryption` parameter, or with `encryption: off`, is rejected with `InvalidArgument`, instead of provisioning a plaintext volume. Without a key source, `encryption` behaves as before: a legacy `keylocation`, or a key inherited from an encrypted parent dataset;
 3. resolves the source:
    - **Secret**: validates it (present, 64 hex characters after trimming surrounding whitespace) and fails fast with `InvalidArgument` otherwise;
    - **auto**: records the reference to `zfs-enc-<volume>` only; the key itself is created by the node (see [Key Lifecycle](#key-lifecycle));
@@ -271,7 +271,7 @@ Keeping the key material out of etcd is then a matter of [etcd encryption at res
 | Risk | Mitigation |
 |---|---|
 | Keys live in etcd (base64). | Documented; recommend etcd encryption at rest with a KMS provider when key custody matters. |
-| A plaintext volume created by mistake. | Fail closed on any key source without `encryption`, and on `encryption` without a key source. |
+| A plaintext volume created by mistake. | Fail closed on any key source without `encryption` or with `encryption: off`, and on a clone or a restore whose PVC names another key. |
 | The managed Secret is the only copy of a key. | `immutable: true`, the ValidatingAdmissionPolicy, and an optional ESO `PushSecret` copy in the KMS. |
 | A managed key deleted while its data still exists. | Deletion is tied to `zfs destroy` on the node, not to the ZFSVolume object, and requires `zfs list` to report the dataset as missing. |
 | The driver namespace deleted, or the driver reinstalled elsewhere, while volumes use generated keys. | The admission policy, kept on `helm uninstall`, blocks the deletion; documented: back the keys up first. |
@@ -287,14 +287,14 @@ Keeping the key material out of etcd is then a matter of [etcd encryption at res
 
 Three pull requests, each building and passing the tests on its own, in this order:
 
-1. **Secret mode** — `encryptionKeyRef` on `VolumeInfo` (v1 and v1alpha1) with deepcopy and CRD manifests; node side (create with the key on stdin, load-key at mount, zvol device wait, wrong-key error, node RBAC); controller side (annotation, validation, fail closed, PV marker); docs, including the ESO pull pattern.
+1. **Secret mode** — `encryptionKeyRef` on `VolumeInfo` (v1 and v1alpha1) with deepcopy and CRD manifests; node side (create with the key on stdin, load-key at mount, zvol device wait, wrong-key error, node RBAC); controller side (annotation, validation, fail closed, clones and restores cannot pick another key, PV marker); docs, including the ESO pull pattern.
 2. **Auto mode** — `autoCreateEncryptionKey`; the managed Secret created and deleted by the node; the node Role; the ValidatingAdmissionPolicy; docs, including the ESO push pattern, and a StatefulSet sample.
 3. **Clones** — load the parent key before `zfs clone`; docs, including the Velero limitation.
 
 ## Test Plan
 
 - **Unit**: create-argument builders (`prompt` vs legacy file); key validation and trimming; `UsesManagedKey`; managed Secret creation (labels, immutability, `volume` entry, no owner reference, no finalizer), idempotency and refusal to adopt an unmanaged Secret; empty annotation rejected; "dataset does not exist" classification before a key is deleted; PV marker values; a clone's annotation naming another key rejected; the guards of `EnsureParentKeyLoaded`; which volume owns a managed key (own key, clone, user Secret); managed Secret removal (never an unlabelled Secret, already-gone is fine); zvol device wait (appears, times out, context cancelled).
-- **Integration** (`tests/encryption_test.go`, in the existing minikube + ZFS CI, where the chart installs the admission policy): a volume with a key Secret and one in auto mode are provisioned and mounted, record their key reference and carry the PV marker; an empty annotation, a missing Secret and a StorageClass without `encryption` are rejected; generated keys are distinct, labelled, protected by the admission policy and deleted with their volume; a clone and a restore share their source's key, and are rejected when their PVC names another Secret.
+- **Integration** (`tests/encryption_test.go`, in the existing minikube + ZFS CI, where the chart installs the admission policy): a volume with a key Secret and one in auto mode are provisioned and mounted, record their key reference and carry the PV marker; a key is reloaded at mount after being unloaded, as after a reboot, and a changed key is refused; an empty annotation, a missing Secret and a StorageClass without `encryption` or with `encryption: off` are rejected; generated keys are distinct, labelled, protected by the admission policy and deleted with their volume; a clone and a restore share their source's key, and are rejected when their PVC names another Secret.
 - **Manual e2e** (done on a single-node Talos cluster, Kubernetes 1.33, OpenZFS 2.3.3, with a real ZFS pool): both modes on filesystem and raw block volumes; fail-closed and hardening cases; keys created by the node only; the admission policy (deletion and label removal denied to cluster-admin, unrelated Secrets unaffected, break-glass, node allowed); keys unloaded then reloaded at mount; managed key deleted after `zfs destroy`; ZFSVolume deleted without its dataset, key kept, dataset re-imported and read back; no key left behind by a failing `zfs create`; clones and snapshot restores sharing their parent's key, parent destroyed only after them, and rejected when their PVC names another key; an empty annotation rejected; the PV marker (`volume`, `storageclass`); snapshot lifecycle; **node reboot** (every volume remounted on the first attempt, no zvol ENOENT, data read back); ESO 2.12 pull with OpenBao, and push with OpenBao and OVHcloud OKMS (mTLS), every key in its own entry, kept after the volume's deletion, restored to the exact key; upgrade from the stock chart; and the Velero investigation described below.
 - **Not covered by an automated test**: a PVC that cannot be read (the check sits in `CreateVolume`, which reads the PVC through the API), the deletion of the driver namespace while generated keys exist, and a ZFSVolume deleted without its dataset (covered by the manual e2e above).
 
