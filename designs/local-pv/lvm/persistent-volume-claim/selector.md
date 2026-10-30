@@ -31,7 +31,7 @@ This proposal points out workflow details to support the selector field in Persi
 
 ### Implementation Details
 
-Detailed information about use cases and workflow is available [here](https://github.com/kubernetes/community/blob/master/contributors/design-proposals/storage/volume-selectors.md#abstract).
+Detailed information about use cases and workflow is available [here](https://github.com/kubernetes/design-proposals-archive/blob/main/storage/volume-selectors.md#abstract).
 
 **Note**: If Selector field is specified request will not be sent to CSI driver.
 
