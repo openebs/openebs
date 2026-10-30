@@ -29,7 +29,7 @@ This proposal points out workflow details of PersistentVolumeClaim Volume Mode.
 ### Implementation Details
 
 Kubernetes supports two kinds of volume modes one is filesystem mode and another one is
-raw block mode. For more detailed information about raw block mode click [here](https://github.com/kubernetes/community/blob/master/contributors/design-proposals/storage/raw-block-pv.md#raw-block-consumption-in-kubernetes).
+raw block mode. For more detailed information about raw block mode click [here](https://github.com/kubernetes/design-proposals-archive/blob/main/storage/raw-block-pv.md#raw-block-consumption-in-kubernetes).
 
 - During application mount time Kubelet will send volume capabilities as a payload for
   `NodePublishVolume` gRPC request. Driver will perform following operations based on
