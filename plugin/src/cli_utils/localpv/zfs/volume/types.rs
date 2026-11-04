@@ -54,13 +54,15 @@ pub(crate) struct ZfsVolSpec {
     /// Capacity of volume.
     capacity: String,
     /// Specifies the block-level compression algorithm to be applied.
+    #[serde(default)]
     compression: String,
     /// Dedup on or off on the volume.
+    #[serde(default)]
     dedup: String,
     /// Encryption on or off. This can be algorithm used also.
     encryption: Option<String>,
     /// Specifies filesystem type for the zfs volume/dataset.
-    #[serde(alias = "fsType")]
+    #[serde(default, alias = "fsType")]
     fs_type: String,
     /// Format of encryption key used if enabled.
     keyformat: Option<String>,
@@ -73,6 +75,7 @@ pub(crate) struct ZfsVolSpec {
     #[serde(alias = "poolName")]
     pool_name: String,
     /// Specifies a suggested block size for files in the filesystem.
+    #[serde(default)]
     recordsize: String,
     /// Specifies the name of the snapshot where the volume has been cloned from.
     snapname: Option<String>,
@@ -270,5 +273,40 @@ impl TryFrom<(ZfsVolume, PersistentVolume)> for ZfsVolumeObject {
             vol_block_size: zfs_volume.spec.vol_block_size.unwrap_or_default(),
             vol_type: zfs_volume.spec.vol_type.clone(),
         })
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::ZfsVolume;
+    use serde_json::json;
+
+    #[test]
+    fn deserializes_volume_without_optional_properties() {
+        // zfs-localpv omits the properties that the StorageClass does not set.
+        let volume = json!({
+            "apiVersion": "zfs.openebs.io/v1",
+            "kind": "ZFSVolume",
+            "metadata": {
+                "name": "pvc-test",
+                "namespace": "openebs"
+            },
+            "spec": {
+                "capacity": "1073741824",
+                "ownerNodeID": "worker-1",
+                "poolName": "zfspv-pool",
+                "volumeType": "DATASET"
+            },
+            "status": {
+                "state": "Ready"
+            }
+        });
+
+        let volume: ZfsVolume = serde_json::from_value(volume).unwrap();
+        assert_eq!(volume.spec.pool_name, "zfspv-pool");
+        assert_eq!(volume.spec.compression, "");
+        assert_eq!(volume.spec.dedup, "");
+        assert_eq!(volume.spec.fs_type, "");
+        assert_eq!(volume.spec.recordsize, "");
     }
 }
