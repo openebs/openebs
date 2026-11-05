@@ -66,7 +66,7 @@ OpenEBS source code is spread across multiple repositories, organized either by 
 
 - Design Documents for various components and features are listed here([local-pv](./local-pv/), [replicated-pv](./replicated-pv/))
 - Find the template for creating the design proposal [here](./oep-template.md)
-- Find the process of the OEP [here](./oep-template.md)
+- Find the process of the OEP [here](./oep-process.md)
 
 # Getting involved with Contributions
 

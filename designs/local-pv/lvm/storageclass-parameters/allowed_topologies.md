@@ -35,7 +35,7 @@ This proposal points out workflow details to support allowed topologies.
 
 ### Implementation Details
 
-This feature is natively driven by Kubernetes(for more information about workflow click [here](https://github.com/kubernetes/community/blob/master/contributors/design-proposals/storage/volume-topology-scheduling.md#volume-topology-aware-scheduling)) and LocalPV-LVM CSI-Driver is a consumer of topology
+This feature is natively driven by Kubernetes(for more information about workflow click [here](https://github.com/kubernetes/design-proposals-archive/blob/main/storage/volume-topology-scheduling.md#volume-topology-aware-scheduling)) and LocalPV-LVM CSI-Driver is a consumer of topology
 feature.
 
 - During volume provisioning time external-provisioner will read topology information specified
