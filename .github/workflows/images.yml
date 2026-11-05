@@ -96,7 +96,7 @@ jobs:
           submodules: 'recursive'
           fetch-depth: 0
 
-      - uses: cachix/install-nix-action@v31.11.1
+      - uses: cachix/install-nix-action@v31.11.3
 
       # The upgrade job image carries the chart, so the chart versions must be
       # settled before it is built. Only for a release: a push build ships
