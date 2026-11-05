@@ -15,7 +15,10 @@ let
   helm_chart = sourcer.whitelistSource ../../.. [ "charts" "scripts/helm" "mayastor/scripts/utils" ];
   image_suffix = { "release" = ""; "debug" = "-debug"; "coverage" = "-coverage"; };
   tag = if img_tag != "" then img_tag else openebs.version;
-  build-openebs-image = { pname, buildType, package, extraCommands ? '''', fakeRootCommands ? '''', copyToRoot ? [ ], config ? { } }:
+  # Images run as an unprivileged uid unless an image opts out with
+  # `user = null`, which leaves User unset and so runs as root.
+  nonroot-user = "65534:65534";
+  build-openebs-image = { pname, buildType, package, extraCommands ? '''', fakeRootCommands ? '''', copyToRoot ? [ ], config ? { }, user ? nonroot-user }:
     dockerTools.buildLayeredImage {
       inherit extraCommands fakeRootCommands tag;
       enableFakechroot = fakeRootCommands != "";
@@ -24,6 +27,8 @@ let
       contents = [ package ] ++ copyToRoot;
       config = {
         Entrypoint = [ package.binary ];
+      } // lib.optionalAttrs (user != null) {
+        User = user;
       } // config;
     };
   tagged_helm_chart = runCommand "tagged_helm_chart"
@@ -64,6 +69,14 @@ let
       inherit buildType;
       package = openebs.${buildType}.upgrade.${name};
       copyToRoot = [ kubernetes-helm-wrapped busybox tagged_helm_chart yq-go ];
+      # The job rewrites chart values through `yq -i`, which writes to a temp
+      # file before moving it into place. Go resolves that to /tmp, which the
+      # image would not otherwise have and an unprivileged uid cannot create
+      # at /.
+      extraCommands = ''
+        mkdir -p tmp
+        chmod 1777 tmp
+      '';
       fakeRootCommands = ''
         chmod -R 0777 /chart
       '';
