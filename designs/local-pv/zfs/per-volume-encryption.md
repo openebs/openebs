@@ -7,7 +7,7 @@ owners:
   - "@rdegez"
 editor: "@rdegez"
 creation-date: 2026-10-05
-last-updated: 2026-11-03
+last-updated: 2026-11-05
 status: implementable
 ---
 
@@ -135,7 +135,7 @@ A key can be shared on purpose: several PVCs can reference the same Secret, for 
 
 ### Provisioning (controller)
 
-At CreateVolume of a new volume (a retried request for an existing volume returns it as is), the controller, which learns the PVC through the external-provisioner's `--extra-create-metadata`:
+At CreateVolume of a new volume (a retried request for an existing volume returns it as is), the controller, which learns the PVC through the external-provisioner's `--extra-create-metadata` and reads it from an informer cache (the API server only for a PVC the cache does not have yet):
 
 1. reads both signals: a non-boolean `autoCreateEncryptionKey` is rejected with `InvalidArgument`, and so is an annotation that is empty or does not lead to a valid Secret (see step 3); a PVC that cannot be read fails the provisioning (it is retried), since it may name its own key;
 2. **fails closed**: a key source without the `encryption` parameter, or with `encryption: off`, is rejected with `InvalidArgument`, instead of provisioning a plaintext volume. Without a key source, `encryption` behaves as before: a legacy `keylocation`, or a key inherited from an encrypted parent dataset;
@@ -150,9 +150,9 @@ The controller has read-only access to Secrets.
 ### Create and Mount (node)
 
 - **Create**: the dataset is created with `keyformat=hex` and `keylocation=prompt`, the key piped to `zfs create` on stdin.
-- **Mount**: `EnsureKeyLoaded` runs `zfs load-key` on the encryption root when the key is not loaded, which is what makes an encrypted volume survive a reboot (a `prompt` dataset does not load its key on pool import). "Key already loaded" is treated as success, as concurrent mounts race on a shared encryption root.
+- **Mount**: `EnsureKeyLoaded` runs `zfs load-key` on the encryption root when the key is not loaded, which is what makes an encrypted volume survive a reboot (a `prompt` dataset does not load its key on pool import). A failed `load-key` reads the key status again: concurrent mounts race on a shared encryption root, and a key loaded by another mount counts as success. No `zfs` error message is parsed.
 - **Zvols**: after `load-key`, udev creates `/dev/zvol/<pool>/<name>` asynchronously; mounting too early failed with ENOENT after a reboot until a later kubelet retry. The node now waits for the device node, bounded (10 s by default, `ZFS_ZVOL_DEVICE_WAIT_TIMEOUT`) and cancelled with the request context.
-- **Wrong key**: a key that no longer matches its dataset fails the mount with an explicit "encryption key … is incorrect" error.
+- **Wrong key**: a key that no longer matches its dataset fails the mount with an error naming the key Secret and carrying the output of `zfs` ("Incorrect key provided").
 
 ### Snapshots and Clones
 
@@ -165,8 +165,8 @@ The key source travels with the snapshot: the `ZFSSnapshot` CR carries a copy of
 A driver-managed key lives exactly as long as its data, so its lifecycle is owned by the node agent, the component that runs `zfs create` and `zfs destroy`:
 
 - **Creation**: the node generates the key and stores it in the managed Secret right before `zfs create`. It is idempotent across retries, and a pre-existing Secret of that name without the managed label is never adopted.
-- **Deletion**: the node deletes the Secret only after `zfs destroy` succeeded, before releasing the ZFSVolume finalizer. Since deleting a key cannot be undone, it requires positive proof that the dataset is gone: its parent dataset is available and `zfs list` reports the dataset as missing. Any other outcome, or a failed delete, keeps the finalizer and the key, and the deletion is retried.
-- **Failed creation**: if the dataset cannot be created, the node deletes the key at once. The ZFSVolume of a failed volume carries no finalizer, so its deletion never reaches the destroy path; without this, a PVC deleted while its provisioning keeps failing would leave its key behind.
+- **Deletion**: the node deletes the Secret only after `zfs destroy` succeeded, before releasing the ZFSVolume finalizer. Since deleting a key cannot be undone, it requires positive proof that the dataset is gone: its parent dataset can be listed and the dataset is not under it. Any other outcome, or a failed delete, keeps the finalizer and the key, and the deletion is retried.
+- **Failed creation**: if the dataset cannot be created, the node deletes the key at once, once its pool can be listed and the dataset is not in it. The ZFSVolume of a failed volume carries no finalizer, so its deletion never reaches the destroy path; without this, a PVC deleted while its provisioning keeps failing would leave its key behind.
 - **Keeping the data**: deleting a ZFSVolume whose finalizer was removed first, as [import-existing-volume.md] documents to keep a dataset, does not run `zfs destroy`, so the key is kept too and the dataset can be imported again.
 - **Clones** share their parent's Secret and never create nor delete it. ZFS refuses to destroy a parent that still has clones, so the parent's key outlives them.
 - **User Secrets** are never touched.
