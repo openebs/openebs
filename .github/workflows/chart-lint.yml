@@ -37,7 +37,7 @@ jobs:
 
       - name: Set up chart-testing
         if: steps.changes.outputs.chart == 'true'
-        uses: helm/chart-testing-action@v2.8.0
+        uses: helm/chart-testing-action@v2.9.0
 
       - name: Run chart-testing (list-changed)
         if: steps.changes.outputs.chart == 'true'
@@ -53,7 +53,7 @@ jobs:
         run: ct lint --config ct.yaml
 
       - name: Create kind cluster
-        uses: helm/kind-action@v1.15.0
+        uses: helm/kind-action@v1.15.1
         if: steps.list-changed.outputs.changed == 'true'
 
       - name: Add dependency chart repos
