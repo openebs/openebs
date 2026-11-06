@@ -31,6 +31,11 @@ helm.sh/resource-policy: keep
     Matching on the release is what makes this safe across upgrades: our own CRD comes back
     with our annotations, so it stays in the release rather than dropping out of it.
 
+    Leaving someone else's CRD alone is only safe if it serves the version this chart's
+    driver talks to. If it exists but does not serve v1, rendering fails with a message
+    naming the CRD. Skipping quietly would defer the problem to the first snapshot a user
+    takes, where nothing points back to the cause.
+
     `lookup` returns nothing when the renderer has no cluster to ask, in which case the CRD is
     installed exactly as it is today. `helm template`, `helm install --dry-run` without
     `=server`, and Argo CD all fall into that case; set the value explicitly there. Flux's
@@ -43,8 +48,9 @@ helm.sh/resource-policy: keep
 
 {{- define "crds.installVolumeSnapshot" -}}
 {{- $root := .root -}}
+{{- $crd := .crd -}}
 {{- if $root.Values.csi.volumeSnapshots.enabled -}}
-{{- $existing := lookup "apiextensions.k8s.io/v1" "CustomResourceDefinition" "" .crd -}}
+{{- $existing := lookup "apiextensions.k8s.io/v1" "CustomResourceDefinition" "" $crd -}}
 {{- if not $existing -}}
 true
 {{- else -}}
@@ -53,6 +59,16 @@ true
 {{- $ownerNamespace := default "" (index $annotations "meta.helm.sh/release-namespace") -}}
 {{- if and (eq $owner $root.Release.Name) (eq $ownerNamespace $root.Release.Namespace) -}}
 true
+{{- else -}}
+{{- $servesV1 := false -}}
+{{- range $existing.spec.versions -}}
+{{- if and (eq .name "v1") .served -}}
+{{- $servesV1 = true -}}
+{{- end -}}
+{{- end -}}
+{{- if not $servesV1 -}}
+{{- fail (printf "%s is already installed on this cluster by something else, but it does not serve snapshot.storage.k8s.io/v1, which this chart requires. Upgrade that CRD to one that serves v1, or remove it and let this chart install it." $crd) -}}
+{{- end -}}
 {{- end -}}
 {{- end -}}
 {{- end -}}
