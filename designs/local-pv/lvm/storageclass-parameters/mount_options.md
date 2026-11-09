@@ -68,7 +68,7 @@ specific paths during [NodePublishVolume](https://github.com/container-storage-i
 **Note**:
 - How kubelet gets event on pod scheduling and what it does after receiving a successful
   response from NodePublishVolume request is out of scope in this workflow.
-- For more information about mount options are available [here](https://github.com/kubernetes/community/blob/master/contributors/design-proposals/storage/mount-options.md#mount-options-for-mountable-volume-types).
+- For more information about mount options are available [here](https://github.com/kubernetes/design-proposals-archive/blob/main/storage/mount-options.md#mount-options-for-mountable-volume-types).
 - There won't be any validations on mount options either from K8s side (or) from LocalPV-LVM
   side. If user doesn't specify invalid values mount operation will be errored and the reason
   can be seen in describe of the application pod.
