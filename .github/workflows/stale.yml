@@ -17,5 +17,9 @@ jobs:
         stale-pr-message: 'PRs go stale after 90d of inactivity. Please comment or re-open the PR if you are still working on this PR.'
         stale-issue-label: 'no-issue-activity'
         stale-pr-label: 'no-pr-activity'
-        days-before-stale: 90
+        # Issues and PRs both.
+        days-before-stale: 180
+        days-before-close: 90
+        # PRs override.
+        days-before-pr-close: -1
         exempt-issue-labels: 'ignore-no-issue-activity'
