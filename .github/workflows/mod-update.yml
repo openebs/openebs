@@ -26,6 +26,9 @@ jobs:
           pre-fetch-nix: ./scripts/helm/shell.nix
       - name: Update submodules
         run: ./scripts/git/set-submodule-branches.sh -u
+      # Submodule crates are path dependencies, so their Cargo.toml changes may need Cargo.lock updates
+      - name: Update Cargo.lock
+        run: nix-shell nix/shells/rust.nix --run "cargo metadata --format-version 1 >/dev/null"
       - name: Generate image list
         run: nix-shell ./scripts/helm/shell.nix --run "./scripts/helm/images.sh generate --dependency-update"
       - name: Patch chart/Chart.yaml
