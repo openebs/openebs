@@ -23,13 +23,9 @@ jobs:
           submodules: recursive
           fetch-depth: 0
 
-      - uses: cachix/install-nix-action@v31.11.1
-
-      - name: Pre-populate nix-shell
-        run: |
-          export NIX_PATH=nixpkgs=$(jq '.nixpkgs.url' nix/sources.json -r)
-          echo "NIX_PATH=$NIX_PATH" >> $GITHUB_ENV
-          nix-shell --pure --run "echo" ./shell.nix
+      - uses: ./mayastor/dependencies/control-plane/utils/dependencies/.github/actions/setup-nix
+        with:
+          pre-fetch-nix: ./shell.nix
 
       - name: Helm dependency update
         working-directory: charts
@@ -71,13 +67,9 @@ jobs:
           submodules: 'recursive'
           fetch-depth: 0
 
-      - uses: cachix/install-nix-action@v31.11.1
-
-      - name: Pre-populate nix-shell
-        run: |
-          export NIX_PATH=nixpkgs=$(jq '.nixpkgs.url' nix/sources.json -r)
-          echo "NIX_PATH=$NIX_PATH" >> $GITHUB_ENV
-          nix-shell --pure --run "echo" ./scripts/helm/shell.nix
+      - uses: ./mayastor/dependencies/control-plane/utils/dependencies/.github/actions/setup-nix
+        with:
+          pre-fetch-nix: ./scripts/helm/shell.nix
 
       - name: Generate image list
         run: |

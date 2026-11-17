@@ -96,7 +96,7 @@ jobs:
           submodules: 'recursive'
           fetch-depth: 0
 
-      - uses: cachix/install-nix-action@v31.11.1
+      - uses: ./mayastor/dependencies/control-plane/utils/dependencies/.github/actions/setup-nix
 
       # The upgrade job image carries the chart, so the chart versions must be
       # settled before it is built. Only for a release: a push build ships
@@ -104,7 +104,6 @@ jobs:
       - name: Update the chart versions
         if: inputs.tag != ''
         run: |
-          export NIX_PATH=nixpkgs=$(jq '.nixpkgs.url' nix/sources.json -r)
           nix-shell --pure --run "./scripts/helm/update-version-upon-release.sh" ./scripts/staging/shell.nix
 
       - name: Build the release images

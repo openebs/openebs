@@ -21,12 +21,9 @@ jobs:
           fetch-depth: 0
           submodules: recursive
 
-      - uses: cachix/install-nix-action@v31.11.1
-      - name: Pre-populate nix-shell
-        run: |
-          export NIX_PATH=nixpkgs=$(jq '.nixpkgs.url' nix/sources.json -r)
-          echo "NIX_PATH=$NIX_PATH" >> $GITHUB_ENV
-          nix-shell --pure --run "echo" ./scripts/staging/shell.nix
+      - uses: ./mayastor/dependencies/control-plane/utils/dependencies/.github/actions/setup-nix
+        with:
+          pre-fetch-nix: ./scripts/staging/shell.nix
 
       - name: Login to Docker Hub
         uses: docker/login-action@v4
@@ -70,12 +67,9 @@ jobs:
           fetch-depth: 0
           submodules: recursive
 
-      - uses: cachix/install-nix-action@v31.11.1
-      - name: Pre-populate nix-shell
-        run: |
-          export NIX_PATH=nixpkgs=$(jq '.nixpkgs.url' nix/sources.json -r)
-          echo "NIX_PATH=$NIX_PATH" >> $GITHUB_ENV
-          nix-shell --pure --run "echo" ./scripts/staging/shell.nix
+      - uses: ./mayastor/dependencies/control-plane/utils/dependencies/.github/actions/setup-nix
+        with:
+          pre-fetch-nix: ./scripts/staging/shell.nix
 
       # oras logs itself in below; this is what leaves the credentials where
       # cosign can find them when it signs what oras pushed.
@@ -124,12 +118,9 @@ jobs:
           fetch-depth: 0
           submodules: recursive
 
-      - uses: cachix/install-nix-action@v31.11.1
-      - name: Pre-populate nix-shell
-        run: |
-          export NIX_PATH=nixpkgs=$(jq '.nixpkgs.url' nix/sources.json -r)
-          echo "NIX_PATH=$NIX_PATH" >> $GITHUB_ENV
-          nix-shell --pure --run "echo" ./scripts/helm/shell.nix
+      - uses: ./mayastor/dependencies/control-plane/utils/dependencies/.github/actions/setup-nix
+        with:
+          pre-fetch-nix: ./scripts/helm/shell.nix
 
       - name: Update version for staging
         run: |
@@ -172,12 +163,9 @@ jobs:
           fetch-depth: 0
           submodules: recursive
 
-      - uses: cachix/install-nix-action@v31.11.1
-      - name: Pre-populate nix-shell
-        run: |
-          export NIX_PATH=nixpkgs=$(jq '.nixpkgs.url' nix/sources.json -r)
-          echo "NIX_PATH=$NIX_PATH" >> $GITHUB_ENV
-          nix-shell --pure --run "echo" ./scripts/staging/shell.nix
+      - uses: ./mayastor/dependencies/control-plane/utils/dependencies/.github/actions/setup-nix
+        with:
+          pre-fetch-nix: ./scripts/staging/shell.nix
 
       - name: Login to GHCR
         uses: docker/login-action@v4
