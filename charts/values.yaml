@@ -14,6 +14,29 @@ openebs-crds:
       enabled: true
       keep: true
 
+# A cluster only needs one snapshot-controller, so it is installed here instead of by each engine.
+snapshotController:
+  # -- Enable/Disable the snapshot-controller. Disable if the cluster already runs one.
+  enabled: true
+  # -- Number of snapshot-controller replicas
+  replicas: 1
+  # -- Additional arguments for the snapshot-controller
+  extraArgs: []
+  # -- Resource requests and limits for the snapshot-controller
+  resources: {}
+  # -- Optional registry credentials
+  imagePullSecrets: []
+  # - name: secretName
+  image:
+    # -- The container image registry URL for the snapshot-controller
+    registry: registry.k8s.io
+    # -- The container repository for the snapshot-controller
+    repo: sig-storage/snapshot-controller
+    # -- The container image tag for the snapshot-controller
+    tag: "v8.2.1"
+    # -- The imagePullPolicy for the container
+    pullPolicy: IfNotPresent
+
 # Refer to https://github.com/openebs/dynamic-localpv-provisioner/blob/v4.2.0/deploy/helm/charts/values.yaml for complete set of values.
 localpv-provisioner:
   rbac:
@@ -28,6 +51,9 @@ localpv-provisioner:
 
 # Refer to https://github.com/openebs/zfs-localpv/blob/v2.7.1/deploy/helm/charts/values.yaml for complete set of values.
 zfs-localpv:
+  zfsController:
+    snapshotController:
+      enabled: false
   crds:
     zfsLocalPv:
       enabled: true
@@ -37,6 +63,9 @@ zfs-localpv:
 
 # Refer to https://github.com/openebs/lvm-localpv/blob/lvm-localpv-1.6.2/deploy/helm/charts/values.yaml for complete set of values.
 lvm-localpv:
+  lvmController:
+    snapshotController:
+      enabled: false
   crds:
     lvmLocalPv:
       enabled: true
@@ -46,6 +75,9 @@ lvm-localpv:
 
 # Refer to https://github.com/openebs/rawfile-localpv/blob/v0.11.0/deploy/helm/rawfile-localpv/values.yaml for complete set of values.
 rawfile-localpv:
+  node:
+    snapshotController:
+      enabled: false
   crds:
     csi:
       volumeSnapshots:
@@ -54,6 +86,9 @@ rawfile-localpv:
 # Refer to https://github.com/openebs/mayastor-extensions/blob/v2.8.0/chart/values.yaml for complete set of values.
 mayastor:
   csi:
+    controller:
+      snapshotController:
+        enabled: false
     node:
       initContainers:
         enabled: true
