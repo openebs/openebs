@@ -1,9 +1,6 @@
 { norust ? false, devrustup ? true, rust-profile ? "stable" }:
 let
-  sources = import ./nix/sources.nix;
-  pkgs = import sources.nixpkgs {
-    overlays = [ (_: _: { inherit sources; }) (import ./nix/overlay.nix { }) (import sources.rust-overlay) ];
-  };
+  pkgs = import ./nix/pkgs.nix;
 in
 with pkgs;
 let
@@ -11,9 +8,9 @@ let
     "You have requested an environment without rust, you should provide it!";
   devrustup_moth =
     "You have requested an environment for rustup, you should provide it!";
-  channel = import ./mayastor/nix/lib/rust.nix { inherit pkgs; };
-  rust_chan = channel.default_src;
-  rust = rust_chan.${rust-profile};
+  rust-shell = import ./nix/shells/rust.nix { inherit pkgs rust-profile; };
+  build-shell = import ./nix/shells/build.nix { inherit pkgs; };
+  rust = rust-shell.rust;
   k8sShellAttrs = import ./scripts/k8s/shell.nix { inherit pkgs; };
   helmShellAttrs = import ./charts/shell.nix { inherit pkgs; };
   stagingShellAttrs = import ./scripts/staging/shell.nix { inherit pkgs; };
@@ -25,28 +22,16 @@ let
 in
 mkShellNoCC {
   name = "openebs-shell";
+  inputsFrom = [ build-shell ] ++ pkgs.lib.optional (!norust) rust-shell;
   buildInputs = [
     cargo-expand
     cargo-udeps
-    # aws-lc-rs fips
-    cmake
-    go
-    perl
     commitlint
     cowsay
-    git
     nixpkgs-fmt
-    paperclip
-    pkg-config
-    which
     codespell
-  ] ++ pkgs.lib.optional (!norust) rust
-  ++ pkgs.lib.optional (usePreCommit) pre-commit
-  ++ k8sShellAttrs.buildInputs ++ helmShellAttrs.buildInputs ++ stagingShellAttrs.buildInputs
-  ++ pkgs.lib.optional (system == "aarch64-darwin") darwin.apple_sdk.frameworks.Security;
-
-  PROTOC = "${protobuf}/bin/protoc";
-  PROTOC_INCLUDE = "${protobuf}/include";
+  ] ++ pkgs.lib.optional (usePreCommit) pre-commit
+  ++ k8sShellAttrs.buildInputs ++ helmShellAttrs.buildInputs ++ stagingShellAttrs.buildInputs;
 
   # using the nix rust toolchain
   USE_NIX_RUST = "${toString (!norust)}";
@@ -71,7 +56,5 @@ mkShellNoCC {
 
     rust_version="${rust.version}" rustup_channel="${lib.strings.concatMapStringsSep "-" (x: x) (lib.lists.drop 1 (lib.strings.splitString "-" rust.version))}" \
     dev_rustup="${toString (devrustup)}" devrustup_moth="${devrustup_moth}" . "$CTRL_SRC"/scripts/rust/env-setup.sh
-    unset CC
-    unset AR
   '';
 }

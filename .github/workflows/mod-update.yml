@@ -21,15 +21,14 @@ jobs:
         with:
           fetch-depth: 0
           submodules: recursive
-      - id: nixpath
-        run: echo "nix_path=nixpkgs=$(jq -r '.nixpkgs.url' nix/sources.json)" >> $GITHUB_OUTPUT
-      - uses: cachix/install-nix-action@v31.11.1
+      - uses: ./mayastor/dependencies/control-plane/utils/dependencies/.github/actions/setup-nix
         with:
-          nix_path: "${{ steps.nixpath.outputs.nix_path }}"
-      - name: Prefetch Nix-Shell
-        run: nix-build ./scripts/helm/shell.nix
+          pre-fetch-nix: ./scripts/helm/shell.nix
       - name: Update submodules
         run: ./scripts/git/set-submodule-branches.sh -u
+      # Submodule crates are path dependencies, so their Cargo.toml changes may need Cargo.lock updates
+      - name: Update Cargo.lock
+        run: nix-shell nix/shells/rust.nix --run "cargo metadata --format-version 1 >/dev/null"
       - name: Generate image list
         run: nix-shell ./scripts/helm/shell.nix --run "./scripts/helm/images.sh generate --dependency-update"
       - name: Patch chart/Chart.yaml
@@ -52,7 +51,7 @@ jobs:
           branch: ${{ steps.set-target.outputs.branch }}
           token: ${{ secrets.CI_BOT_1_RAISE_PRS }}
       - name: Approve Pull Request by CI Bot
-        if: ${{ steps.cpr.outputs.pull-request-number }}
+        if: ${{ steps.cpr.outputs.pull-request-operation == 'created' }}
         run: |
           gh pr review ${{ steps.cpr.outputs.pull-request-number }} --approve
         env:
