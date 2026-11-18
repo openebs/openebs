@@ -1,6 +1,7 @@
 csi:
   volumeSnapshots:
-    # -- Install Volume Snapshot CRDs
+    # -- Install Volume Snapshot CRDs. Any the cluster already has are left to whoever owns
+    # them; set this to false to skip them entirely.
     enabled: true
     # -- Keep CRDs on chart uninstall
     keep: true
