@@ -32,7 +32,7 @@ This proposal points out workflow details to support dynamic provisioning of vol
 ### Implementation Details
 
 Kubernetes introduced StorageClass filed to support dynamic provisioning. More detailed
-information on how storageclass is involved in provisioning is described [here](https://github.com/kubernetes/community/blob/master/contributors/design-proposals/storage/container-storage-interface.md#provisioning-and-deleting).
+information on how storageclass is involved in provisioning is described [here](https://github.com/kubernetes/design-proposals-archive/blob/main/storage/container-storage-interface.md#provisioning-and-deleting).
 
 **Note**: Kubernetes will not perform any validation given StorgeClass.
           If StorageClass is not available PVC will remains in pending.
