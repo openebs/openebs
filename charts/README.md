@@ -123,6 +123,7 @@ helm delete `<RELEASE NAME>` -n `<RELEASE NAMESPACE>`
 | loki.&ZeroWidthSpace;singleBinary.&ZeroWidthSpace;persistence.&ZeroWidthSpace;size | Size of loki local storage volume | `"2Gi"` |
 | loki.&ZeroWidthSpace;singleBinary.&ZeroWidthSpace;persistence.&ZeroWidthSpace;storageClass | Storage class for loki storage | `"openebs-loki-localpv"` |
 | mayastor.&ZeroWidthSpace;etcd.&ZeroWidthSpace;clusterDomain | Kubernetes Cluster Domain | `"cluster.local"` |
+| mayastor.&ZeroWidthSpace;eventing.&ZeroWidthSpace;aggregator.&ZeroWidthSpace;lokiMode | Run the eventing-aggregator in Loki mode (events are written to stdout and shipped to Loki by Alloy). Mayastor's own loki is disabled above because openebs deploys a global loki (see top-level `loki`). Must be "true" when the top-level `loki.enabled` is true, and "false" when it is false. | `"true"` |
 | openebs-crds.&ZeroWidthSpace;csi.&ZeroWidthSpace;volumeSnapshots.&ZeroWidthSpace;enabled | Enable/Disable installation of Volume Snapshot CRD's | `true` |
 | preUpgradeHook.&ZeroWidthSpace;enabled | Enable/Disable openebs pre-upgrade hook | `true` |
 | preUpgradeHook.&ZeroWidthSpace;image.&ZeroWidthSpace;pullPolicy | The imagePullPolicy for the container | `"IfNotPresent"` |
