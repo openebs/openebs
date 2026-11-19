@@ -68,6 +68,12 @@ mayastor:
     enabled: false
   alloy:
     enabled: false
+  eventing:
+    aggregator:
+      # -- Run the eventing-aggregator in Loki mode (events are written to stdout and shipped to Loki by Alloy).
+      # Mayastor's own loki is disabled above because openebs deploys a global loki (see top-level `loki`).
+      # Must be "true" when the top-level `loki.enabled` is true, and "false" when it is false.
+      lokiMode: "true"
 
 # This runs only for upgrades from openebs v3 to v4. Uses the localpv-provisioner deployment to decide if it's v3 or v4.
 preUpgradeHook:

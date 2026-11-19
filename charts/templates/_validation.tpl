@@ -45,4 +45,34 @@ CONFIGURATION ERROR: engines.local.hostpath.enabled=false but mayastor.etcd.loca
 ` -}}
   {{- end -}}
 {{- end -}}
+{{- if .Values.engines.replicated.mayastor.enabled -}}
+  {{- $lokiMode := .Values.mayastor.eventing.aggregator.lokiMode | toString -}}
+  {{- if and .Values.loki.enabled (eq $lokiMode "false") -}}
+    {{- fail `
+
+CONFIGURATION ERROR: loki.enabled=true but mayastor.eventing.aggregator.lokiMode=false
+
+  The eventing-aggregator would write events to a local emptyDir instead of
+  logging them for Loki, so events would not reach the openebs loki.
+
+  To fix, choose one of:
+    1. --set mayastor.eventing.aggregator.lokiMode=true
+    2. --set loki.enabled=false
+` -}}
+  {{- end -}}
+  {{- if and (not .Values.loki.enabled) (not .Values.mayastor.loki.enabled) (eq $lokiMode "true") -}}
+    {{- fail `
+
+CONFIGURATION ERROR: no loki is deployed but mayastor.eventing.aggregator.lokiMode=true
+
+  The eventing-aggregator would log events for Loki, but neither the openebs
+  loki (loki.enabled) nor mayastor's loki (mayastor.loki.enabled) is deployed,
+  and the events would not be persisted.
+
+  To fix, choose one of:
+    1. --set mayastor.eventing.aggregator.lokiMode=false
+    2. --set loki.enabled=true
+` -}}
+  {{- end -}}
+{{- end -}}
 {{- end -}}
