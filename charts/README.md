@@ -104,6 +104,7 @@ helm delete `<RELEASE NAME>` -n `<RELEASE NAMESPACE>`
 | engines.&ZeroWidthSpace;local.&ZeroWidthSpace;rawfile.&ZeroWidthSpace;enabled | Enable/Disable LocalPV Rawfile Storage Engine | `false` |
 | engines.&ZeroWidthSpace;local.&ZeroWidthSpace;zfs.&ZeroWidthSpace;enabled | Enable/Disable LocalPV ZFS Storage Engine | `true` |
 | engines.&ZeroWidthSpace;replicated.&ZeroWidthSpace;mayastor.&ZeroWidthSpace;enabled | Enable/Disable Replicated PV Mayastor Storage Engine | `true` |
+| engines.&ZeroWidthSpace;replicated.&ZeroWidthSpace;mayastor.&ZeroWidthSpace;eventingAggregator.&ZeroWidthSpace;enabled | Enable/Disable the Replicated PV Mayastor eventing-aggregator. It is rendered by this chart (instead of the mayastor chart) and runs in Loki mode when `loki.enabled` or `mayastor.loki.enabled` is true, otherwise it stores the events in a local emptyDir. It is configured via `mayastor.eventing.aggregator`, except for `enabled`. | `true` |
 | global.&ZeroWidthSpace;imagePullPolicy | Global override for image pull policy | `""` |
 | global.&ZeroWidthSpace;imagePullSecrets | Global image pull secrets (merged with local imagePullSecrets and not overridden) - secret | `[]` |
 | global.&ZeroWidthSpace;imageRegistry | Global override for container image registry | `""` |
