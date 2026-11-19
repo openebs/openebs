@@ -54,16 +54,14 @@ pub(crate) struct ZfsVolSpec {
     /// Capacity of volume.
     capacity: String,
     /// Specifies the block-level compression algorithm to be applied.
-    #[serde(default)]
-    compression: String,
+    compression: Option<String>,
     /// Dedup on or off on the volume.
-    #[serde(default)]
-    dedup: String,
+    dedup: Option<String>,
     /// Encryption on or off. This can be algorithm used also.
     encryption: Option<String>,
     /// Specifies filesystem type for the zfs volume/dataset.
-    #[serde(default, alias = "fsType")]
-    fs_type: String,
+    #[serde(alias = "fsType")]
+    fs_type: Option<String>,
     /// Format of encryption key used if enabled.
     keyformat: Option<String>,
     /// Location for the encryption key.
@@ -75,8 +73,7 @@ pub(crate) struct ZfsVolSpec {
     #[serde(alias = "poolName")]
     pool_name: String,
     /// Specifies a suggested block size for files in the filesystem.
-    #[serde(default)]
-    recordsize: String,
+    recordsize: Option<String>,
     /// Specifies the name of the snapshot where the volume has been cloned from.
     snapname: Option<String>,
     /// Thin provisioning on or off.
@@ -261,14 +258,14 @@ impl TryFrom<(ZfsVolume, PersistentVolume)> for ZfsVolumeObject {
             volume_mode: spec.volume_mode.clone().ok_or_else(|| Error::Generic {
                 source: anyhow::anyhow!("PV vol mode missing for {}", pv_name),
             })?,
-            compression: zfs_volume.spec.compression,
-            dedup: zfs_volume.spec.dedup,
+            compression: zfs_volume.spec.compression.unwrap_or_default(),
+            dedup: zfs_volume.spec.dedup.unwrap_or_default(),
             encryption: zfs_volume.spec.encryption.unwrap_or_default(),
-            fs_type: zfs_volume.spec.fs_type,
+            fs_type: zfs_volume.spec.fs_type.unwrap_or_default(),
             keyformat: zfs_volume.spec.keyformat.unwrap_or_default(),
             keylocation: zfs_volume.spec.keylocation.unwrap_or_default(),
             pool_name: zfs_volume.spec.pool_name,
-            recordsize: zfs_volume.spec.recordsize,
+            recordsize: zfs_volume.spec.recordsize.unwrap_or_default(),
             snapname: zfs_volume.spec.snapname.unwrap_or_default(),
             vol_block_size: zfs_volume.spec.vol_block_size.unwrap_or_default(),
             vol_type: zfs_volume.spec.vol_type.clone(),
@@ -304,9 +301,9 @@ mod tests {
 
         let volume: ZfsVolume = serde_json::from_value(volume).unwrap();
         assert_eq!(volume.spec.pool_name, "zfspv-pool");
-        assert_eq!(volume.spec.compression, "");
-        assert_eq!(volume.spec.dedup, "");
-        assert_eq!(volume.spec.fs_type, "");
-        assert_eq!(volume.spec.recordsize, "");
+        assert_eq!(volume.spec.compression, None);
+        assert_eq!(volume.spec.dedup, None);
+        assert_eq!(volume.spec.fs_type, None);
+        assert_eq!(volume.spec.recordsize, None);
     }
 }
