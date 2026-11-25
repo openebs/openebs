@@ -123,7 +123,7 @@ helm delete `<RELEASE NAME>` -n `<RELEASE NAMESPACE>`
 | loki.&ZeroWidthSpace;singleBinary.&ZeroWidthSpace;persistence.&ZeroWidthSpace;size | Size of loki local storage volume | `"2Gi"` |
 | loki.&ZeroWidthSpace;singleBinary.&ZeroWidthSpace;persistence.&ZeroWidthSpace;storageClass | Storage class for loki storage | `"openebs-loki-localpv"` |
 | mayastor.&ZeroWidthSpace;etcd.&ZeroWidthSpace;clusterDomain | Kubernetes Cluster Domain | `"cluster.local"` |
-| openebs-crds.&ZeroWidthSpace;csi.&ZeroWidthSpace;volumeSnapshots.&ZeroWidthSpace;enabled | Enable/Disable installation of Volume Snapshot CRD's | `true` |
+| openebs-crds.&ZeroWidthSpace;csi.&ZeroWidthSpace;volumeSnapshots.&ZeroWidthSpace;enabled | Enable/Disable installation of Volume Snapshot CRD's. Any the cluster already has are left to whoever owns them; set this to false to skip them entirely. | `true` |
 | preUpgradeHook.&ZeroWidthSpace;enabled | Enable/Disable openebs pre-upgrade hook | `true` |
 | preUpgradeHook.&ZeroWidthSpace;image.&ZeroWidthSpace;pullPolicy | The imagePullPolicy for the container | `"IfNotPresent"` |
 | preUpgradeHook.&ZeroWidthSpace;image.&ZeroWidthSpace;registry | The container image registry URL for the hook job | `"docker.io"` |

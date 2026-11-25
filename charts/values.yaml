@@ -10,7 +10,8 @@ global:
 openebs-crds:
   csi:
     volumeSnapshots:
-      # -- Enable/Disable installation of Volume Snapshot CRD's
+      # -- Enable/Disable installation of Volume Snapshot CRD's. Any the cluster already has
+      # are left to whoever owns them; set this to false to skip them entirely.
       enabled: true
       keep: true
 
