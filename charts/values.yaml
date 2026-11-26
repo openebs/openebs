@@ -68,6 +68,12 @@ mayastor:
     enabled: false
   alloy:
     enabled: false
+  eventing:
+    aggregator:
+      # The eventing-aggregator is rendered by this chart instead (see `engines.replicated.mayastor.eventingAggregator`),
+      # so that it runs in Loki mode when this chart's loki is deployed. Must stay false, or two eventing-aggregators
+      # are rendered.
+      enabled: false
 
 # This runs only for upgrades from openebs v3 to v4. Uses the localpv-provisioner deployment to decide if it's v3 or v4.
 preUpgradeHook:
@@ -116,6 +122,12 @@ engines:
     mayastor:
       # -- Enable/Disable Replicated PV Mayastor Storage Engine
       enabled: true
+      eventingAggregator:
+        # -- Enable/Disable the Replicated PV Mayastor eventing-aggregator. It is rendered by this chart (instead of
+        # the mayastor chart) and runs in Loki mode when `loki.enabled` or `mayastor.loki.enabled` is true, otherwise
+        # it stores the events in a local emptyDir. It is configured via `mayastor.eventing.aggregator`, except for
+        # `enabled`.
+        enabled: true
 
 loki:
   # -- Enable/Disable loki.

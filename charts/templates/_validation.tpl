@@ -45,4 +45,19 @@ CONFIGURATION ERROR: engines.local.hostpath.enabled=false but mayastor.etcd.loca
 ` -}}
   {{- end -}}
 {{- end -}}
+{{- if and .Values.engines.replicated.mayastor.enabled .Values.mayastor.eventing.aggregator.enabled -}}
+  {{- fail `
+
+CONFIGURATION ERROR: mayastor.eventing.aggregator.enabled=true
+
+  The mayastor eventing-aggregator is rendered by this chart, so that it runs
+  in Loki mode when this chart's loki is deployed. Enabling it in the mayastor
+  chart as well would render two eventing-aggregators.
+
+  To fix:
+    --set mayastor.eventing.aggregator.enabled=false
+  and enable/disable the eventing-aggregator with:
+    --set engines.replicated.mayastor.eventingAggregator.enabled=<true|false>
+` -}}
+{{- end -}}
 {{- end -}}

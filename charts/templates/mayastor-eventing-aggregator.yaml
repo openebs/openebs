@@ -1,0 +1,13 @@
+{{- /*
+The mayastor eventing-aggregator is rendered here instead of in the mayastor chart (mayastor.eventing.aggregator.enabled
+is false), because the mayastor chart's loki is disabled in favour of this chart's loki, and the mayastor chart can't
+tell whether this chart's loki is deployed. The Deployment itself comes from the mayastor chart's
+"eventing_aggregator_deployment" template, rendered with the mayastor chart's context.
+*/}}
+{{- if and .Values.engines.replicated.mayastor.enabled .Values.mayastor.eventing.enabled .Values.engines.replicated.mayastor.eventingAggregator.enabled }}
+{{- $mayastor := (.Subcharts | default dict).mayastor }}
+{{- if not $mayastor }}
+{{- fail "the mayastor sub-chart context (.Subcharts.mayastor) is not available, which is required to render the mayastor eventing-aggregator; Helm 3.10 or later is required" }}
+{{- end }}
+{{- include "eventing_aggregator_deployment" (dict "context" $mayastor "lokiEnabled" (or .Values.loki.enabled .Values.mayastor.loki.enabled)) }}
+{{- end }}
